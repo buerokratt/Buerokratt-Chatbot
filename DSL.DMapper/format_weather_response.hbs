@@ -1,0 +1,9 @@
+{{#if tains}}
+    [
+        { "text": "Hetkel on õhutemperatuur {{tains}} kraadi.{{#ifnoteq ws10ma "null"}} Puhub tuul {{ws10ma}}m/s.{{/ifnoteq}}{{#ifnoteq rhins "null"}} Õhuniiskus on {{rhins}}%.{{/ifnoteq}}" }
+    ]
+{{else}}
+    [
+        { "text": "Teenuse tarbimine ei ole hetkel tehniliste probleemide tõttu võimalik, palun proovige hiljem uuesti." }
+    ]
+{{/if}}

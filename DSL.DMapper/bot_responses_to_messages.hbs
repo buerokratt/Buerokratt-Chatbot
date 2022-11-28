@@ -1,0 +1,16 @@
+[
+    {{#each botMessages}}
+        {
+            "chatId": "{{chatId}}",
+            "content": "{{{escape_special_chars text}}}",
+            "authorTimestamp": "{{authorTimestamp}}",
+            "authorId": "{{authorId}}",
+            "authorFirstName": "{{authorFirstName}}",
+            "authorLastName": "{{authorLastName}}",
+            "created": "{{created}}"
+        }
+        {{#unless @last}}
+            ,
+        {{/unless}}
+    {{/each}}
+]

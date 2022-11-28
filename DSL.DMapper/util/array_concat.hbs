@@ -1,0 +1,13 @@
+[
+{{#each array}}
+    {{#if @last}}
+        {{json this}} {{#each ../values}} {{#if @first}} , {{/if}} {{/each}}
+    {{else}}
+        {{json this}},
+    {{/if}}
+{{/each}}
+
+{{#each values}}
+    {{json this}} {{#unless @last}} , {{/unless}}
+{{/each}}
+]
