@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd
+http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd">
+
+    <changeSet id="20211103171001" author="Fred Oja">
+          <createTable tableName="user_status">
+            <column name="id_code" type="varchar(50)">
+                <constraints unique="true" nullable="false" uniqueConstraintName="ux_status_id_code"/>
+            </column>
+            <column name="active" defaultValue="false"
+                    type="boolean">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseColumnNames="id_code"
+                                 baseTableName="user_status"
+                                 constraintName="fk_id_code"
+                                 referencedColumnNames="id_code"
+                                 referencedTableName="user"/>
+
+    </changeSet>
+</databaseChangeLog>

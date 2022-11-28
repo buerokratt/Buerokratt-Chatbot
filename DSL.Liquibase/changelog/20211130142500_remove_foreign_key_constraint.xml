@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.9.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="20211130142500" author="Fred Oja">
+        <dropForeignKeyConstraint  baseColumnNames="user_id"
+                                   baseTableName="user_authority"
+                                   constraintName="fk_user_id"
+                                   referencedColumnNames="id"
+                                   referencedTableName="user"/>
+
+        <modifyDataType  catalogName="byk"
+                         columnName="user_id"
+                         newDataType="varchar(50)"
+                         schemaName="public"
+                         tableName="user_authority"/>
+
+        <addForeignKeyConstraint baseColumnNames="user_id"
+                                 baseTableName="user_authority"
+                                 constraintName="fk_user_id_code"
+                                 referencedColumnNames="id_code"
+                                 referencedTableName="user"/>
+
+    </changeSet>
+</databaseChangeLog>
