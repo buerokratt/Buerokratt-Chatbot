@@ -1,0 +1,86 @@
+{
+  "action_type": "BLOGIC",
+  "destination": [
+    {
+      "chat_info": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "proceed"
+          }
+        },
+        "proceed": {
+          "cookies": [
+            "chatJwt"
+          ],
+          "method": "post",
+          "endpoint": "{tim_url}/jwt/custom-jwt-userinfo",
+          "post_body_struct": "chatJwt",
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
+      "forwarding_validation": {
+        "verify": {
+          "verification_endpoint": {
+            "method": "post",
+            "endpoint": "{ruuter_url}/param_string_length",
+            "post_body_struct": {
+              "input": "{#.chat_info#.forwardTo}",
+              "min": 1,
+              "max": 300
+            }
+          },
+          "response": {
+            "ok": "external_request",
+            "nok": "local_request"
+          }
+        },
+        "local_request": {
+          "method": "post",
+          "endpoint": "{dmapper_url}/json/v2/return_first_chat_from_array",
+          "post_body_parameters": {
+            "data": {
+              "method": "post",
+              "endpoint": "{resql_url}/get-chat-by-id",
+              "post_body_struct": {
+                "id": "{#.chat_info#.chatId}"
+              },
+              "response": {
+                "ok": "proceed",
+                "nok": "stop"
+              }
+            }
+          },
+          "post_body_struct": {
+            "chatArray": "{$.data}"
+          },
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "external_request": {
+          "method": "post",
+          "cookies": {
+            "redirectJwt": "chatJwt"
+          },
+          "endpoint": "https://{#.chat_info#.forwardTo}/get-chat-by-id",
+          "post_body_struct": {},
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        }
+      }
+    }
+  ]
+}

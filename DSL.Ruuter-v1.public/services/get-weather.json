@@ -1,0 +1,169 @@
+{
+  "action_type": "BLOGIC",
+  "destination": [
+    {
+      "reflect_input": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{dmapper_url}/json/v2/reflect_weather",
+          "post_body_struct": {
+            "chatId": "{#.chatId}",
+            "authorId": "{#.authorId}",
+            "locationName": "{#.locationName}"
+          },
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        }
+      }
+    },
+    {
+      "get_location_coordinates": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{ruuter_url}/get-location-coordinates",
+          "post_body_struct": {
+            "locationName": "{#.reflect_input#.locationName}"
+          },
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
+      "get_station_id": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{ruuter_url}/get-weather-station-id",
+          "post_body_struct": {
+            "latitude": "{#.get_location_coordinates#.data#.format_response#.latitude}",
+            "longitude": "{#.get_location_coordinates#.data#.format_response#.longitude}"
+          },
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
+      "get_weather_data": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{ruuter_url}/get-weather-data",
+          "post_body_struct": {
+            "latitude": "{#.get_location_coordinates#.data#.format_response#.latitude}",
+            "longitude": "{#.get_location_coordinates#.data#.format_response#.longitude}",
+            "stationId": "{#.get_station_id#.data#.format_response#.id}"
+          },
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
+      "format_end_user_response": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{dmapper_url}/json/v2/format_weather_response",
+          "post_body_struct": {
+            "tains": "{#.get_weather_data#.data#.get_weather_data#.entries#.entry[0]#.tains}",
+            "ws10ma": "{#.get_weather_data#.data#.get_weather_data#.entries#.entry[0]#.ws10ma}",
+            "rhins": "{#.get_weather_data#.data#.get_weather_data#.entries#.entry[0]#.rhins}"
+          },
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        }
+      }
+    },
+    {
+      "save_response_message": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{resql_url}/insert-bot-message",
+          "post_body_parameters": {
+            "convert_bot_responses_to_messages": {
+              "method": "post",
+              "endpoint": "{dmapper_url}/json/v2/bot_responses_to_messages",
+              "post_body_struct": {
+                "botMessages": "{#.format_end_user_response}",
+                "chatId": "{#.reflect_input#.chatId}",
+                "authorId": "{#.reflect_input#.authorId}",
+                "authorFirstName": "",
+                "authorLastName": "",
+                "authorTimestamp": "$_getInstant()",
+                "created": "$_getInstant()"
+              },
+              "response": {
+                "ok": "proceed",
+                "nok": "stop"
+              }
+            }
+          },
+          "post_body_struct": {
+            "messages": "{$.convert_bot_responses_to_messages}"
+          },
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        }
+      }
+    }
+  ]
+}

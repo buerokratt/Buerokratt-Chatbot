@@ -1,0 +1,46 @@
+{
+  "action_type": "BLOGIC",
+  "destination": [
+    {
+      "get_greeting_message": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "proceed"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{resql_url}/get-greeting-message",
+          "post_body_struct": {
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
+      "return_first_greeting_from_array": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "proceed"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{dmapper_url}/json/v2/return_first_greeting_from_array",
+          "post_body_struct": {
+            "greetingArray": "{#.get_greeting_message}"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    }
+  ]
+}

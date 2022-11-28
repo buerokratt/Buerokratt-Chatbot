@@ -1,0 +1,44 @@
+{
+  "action_type": "BLOGIC",
+  "destination": [
+    {
+      "get_coordinates": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "get",
+          "endpoint": "{gazetteer_url}/gazetteer?features=EHAK&results=3&address={#.locationName}",
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        }
+      }
+    },
+    {
+      "format_response": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{dmapper_url}/json/v2/format_gazetteer_response",
+          "post_body_struct": {
+            "queryResponse": "{#.get_coordinates#.addresses}"
+          },
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        }
+      }
+    }
+  ]
+}

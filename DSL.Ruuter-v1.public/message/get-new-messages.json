@@ -1,0 +1,110 @@
+{
+  "action_type": "BLOGIC",
+  "destination": [
+    {
+      "reflect_input": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{dmapper_url}/json/v2/reflect_timerange",
+          "post_body_struct": {
+            "timeRangeBegin": "{#.timeRangeBegin}"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
+      "chat_info": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "proceed"
+          }
+        },
+        "proceed": {
+          "cookies": [
+            "chatJwt"
+          ],
+          "method": "post",
+          "endpoint": "{tim_url}/jwt/custom-jwt-userinfo",
+          "post_body_struct": "chatJwt",
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
+      "forwarding_validation": {
+        "verify": {
+          "verification_endpoint": {
+            "method": "post",
+            "endpoint": "{ruuter_url}/param_string_length",
+            "post_body_struct": {
+              "input": "{#.chat_info#.forwardTo}",
+              "min": 1,
+              "max": 300
+            }
+          },
+          "response": {
+            "ok": "external_request",
+            "nok": "local_request"
+          }
+        },
+        "local_request": {
+          "method": "post",
+          "endpoint": "{resql_url}/get-chat-messages-updated-after-time",
+          "post_body_struct": {
+            "chatId": "{#.chat_info#.chatId}",
+            "timeRangeBegin": "{#.reflect_input#.timeRangeBegin}"
+          },
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "external_request": {
+          "method": "post",
+          "endpoint": "{dmapper_url}/json/v2/reflect_data_arr",
+          "post_body_parameters": {
+            "data": {
+              "method": "post",
+              "cookies": {
+                "redirectJwt": "chatJwt"
+              },
+              "endpoint": "https://{#.chat_info#.forwardTo}/get-new-messages",
+              "post_body_struct": {
+                "timeRangeBegin": "{#.reflect_input#.timeRangeBegin}"
+              },
+              "response": {
+                "ok": "proceed",
+                "nok": "stop"
+              }
+            }
+          },
+          "post_body_struct": {
+            "data": "{$.data$.data$.forwarding_validation}"
+          },
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        }
+      }
+    }
+  ]
+}

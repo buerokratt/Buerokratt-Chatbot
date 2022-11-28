@@ -1,0 +1,48 @@
+{
+  "action_type": "BLOGIC",
+  "destination": [
+    {
+    "get_station_id": {
+      "verify": {
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      },
+      "proceed": {
+        "method": "get",
+        "endpoint": "{publicapi_url}/nearestStationByCoordinates?longitude={#.longitude}&latitude={#.latitude}",
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      },
+      "response": {
+        "ok": "proceed",
+        "nok": "stop"
+      }
+    }
+  },
+    {
+      "format_response": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{dmapper_url}/json/v2/format_weather_station_response",
+          "post_body_struct": {
+            "queryResponse": "{#.get_station_id#.entries#.entry}"
+          },
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        }
+      }
+    }
+  ]
+}

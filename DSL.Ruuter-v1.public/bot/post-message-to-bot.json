@@ -1,0 +1,292 @@
+{
+  "action_type": "BLOGIC",
+  "destination": [
+    {
+      "reflect_input": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{dmapper_url}/json/v2/reflect_post_message",
+          "post_body_struct": {
+            "chatId": "{#.chatId}",
+            "authorRole": "",
+            "authorTimestamp": "",
+            "content": "{#.content}"
+          },
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        }
+      }
+    },
+    {
+      "check_bot_is_active": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{ruuter_url}/match_input",
+          "post_body_parameters": {
+            "get_configuration_value": {
+              "method": "post",
+              "endpoint": "{resql_url}/get-configuration",
+              "post_body_parameters": {},
+              "post_body_struct": {
+                "key": "is_bot_active"
+              },
+              "response": {
+                "ok": "proceed",
+                "nok": "stop"
+              }
+            }
+          },
+          "post_body_struct": {
+            "input": {
+              "is_active": "{$.get_configuration_value[0]$.value}"
+            },
+            "validate_against": {
+              "is_active": "true"
+            },
+            "validation_type": "MUST_MATCH_EXACT"
+          },
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        }
+      }
+    },
+    {
+      "get_bot_name": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{resql_url}/get-configuration",
+          "post_body_parameters": {},
+          "post_body_struct": {
+            "key": "bot_institution_id"
+          }
+        }
+      }
+    },
+    {
+      "get_chat": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{dmapper_url}/json/v2/return_first_chat_from_array",
+          "post_body_parameters": {
+            "get_chat_by_id": {
+              "method": "post",
+              "endpoint": "{resql_url}/get-chat-by-id",
+              "post_body_struct": {
+                "id": "{#.reflect_input#.chatId}"
+              },
+              "response": {
+                "ok": "proceed",
+                "nok": "stop"
+              }
+            }
+          },
+          "post_body_struct": {
+            "chatArray": "{$.get_chat_by_id}"
+          },
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        }
+      }
+    },
+    {
+      "check_chat_belongs_to_bot": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{ruuter_url}/match_input",
+          "post_body_struct": {
+            "input": {
+              "id_code": "{#.get_bot_name[0]#.value}"
+            },
+            "validate_against": {
+              "id_code": "{#.get_chat#.customerSupportId}"
+            },
+            "validation_type": "MUST_MATCH_EXACT"
+          },
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        }
+      }
+    },
+    {
+      "post_client_message_to_bot": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{bot_url}/webhooks/rest/webhook",
+          "post_body_struct": {
+            "sender": "{#.reflect_input#.chatId}",
+            "message": "{#.reflect_input#.content}"
+          },
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        }
+      }
+    },
+    {
+      "parse_str": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{ruuter_url}/functions/parseString",
+          "post_body_struct": {
+            "string": "{#.post_client_message_to_bot[0]#.text}"
+          },
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        }
+      }
+    },
+    {
+      "service_check": {
+        "verify": {
+          "verification_endpoint": {
+            "method": "post",
+            "endpoint": "{ruuter_url}/empty_list",
+            "post_body_struct": {
+              "list": "{#.parse_str#.output}"
+            }
+          },
+          "response": {
+            "ok": "service_request",
+            "nok": "regular_message"
+          }
+        },
+        "service_request": {
+          "method": "post",
+          "endpoint": "{ruuter_url}/get-weather",
+          "post_body_struct": {
+            "locationName": "{#.parse_str#.output[1]}",
+            "chatId": "{#.reflect_input#.chatId}",
+            "authorId": "{#.get_bot_name[0]#.value}"
+          },
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "regular_message": {
+          "method": "post",
+          "endpoint": "{resql_url}/insert-bot-message",
+          "post_body_parameters": {
+            "convert_bot_responses_to_messages": {
+              "method": "post",
+              "endpoint": "{dmapper_url}/json/v2/bot_responses_to_messages",
+              "post_body_struct": {
+                "botMessages": "{#.post_client_message_to_bot}",
+                "chatId": "{#.reflect_input#.chatId}",
+                "authorId": "{#.get_bot_name[0]#.value}",
+                "authorFirstName": "",
+                "authorLastName": "",
+                "authorTimestamp": "$_getInstant()",
+                "created": "$_getInstant()"
+              },
+              "response": {
+                "ok": "proceed",
+                "nok": "stop"
+              }
+            }
+          },
+          "post_body_struct": {
+            "messages": "{$.convert_bot_responses_to_messages}"
+          },
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        }
+      }
+    },
+    {
+      "redirect_chat_if_bot_unable_to_respond": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{resql_url}/remove_cs_agent_from_chat",
+          "post_body_parameters": {
+            "check_if_bot_unable_to_respond": {
+              "method": "post",
+              "endpoint": "{ruuter_url}/match_input",
+              "post_body_struct": {
+                "input": {
+                  "id_code": "{#.post_client_message_to_bot[0]#.text}"
+                },
+                "validate_against": {
+                  "id_code": "Suunan teid klienditeenindajale. Varuge natukene kannatust."
+                },
+                "validation_type": "MUST_MATCH_EXACT"
+              },
+              "response": {
+                "ok": "proceed",
+                "nok": "stop"
+              }
+            }
+          },
+          "post_body_struct": {
+            "chatId": "{#.reflect_input#.chatId}"
+          },
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        }
+      }
+    }
+  ]
+}

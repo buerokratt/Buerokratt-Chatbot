@@ -1,0 +1,124 @@
+{
+  "action_type": "BLOGIC",
+  "destination": [
+    {
+      "reflect_input": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{dmapper_url}/json/v2/reflect_post_message",
+          "post_body_struct": {
+            "chatId": "{#.chatId}",
+            "authorTimestamp": "{#.authorTimestamp}",
+            "authorRole": "{#.authorRole}",
+            "content": "{#.content}",
+            "event": "{#.event}"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
+      "chat_info": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "proceed"
+          }
+        },
+        "proceed": {
+          "cookies": [
+            "chatJwt"
+          ],
+          "method": "post",
+          "endpoint": "{tim_url}/jwt/custom-jwt-userinfo",
+          "post_body_struct": "chatJwt",
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
+      "forwarding_validation": {
+        "verify": {
+          "verification_endpoint": {
+            "method": "post",
+            "endpoint": "{ruuter_url}/param_string_length",
+            "post_body_struct": {
+              "input": "{#.chat_info#.forwardTo}",
+              "min": 1,
+              "max": 300
+            }
+          },
+          "response": {
+            "ok": "external_request",
+            "nok": "local_request"
+          }
+        },
+        "local_request": {
+          "method": "post",
+          "cookies": [
+            "chatJwt"
+          ],
+          "endpoint": "{ruuter_url}/post-message-locally",
+          "post_body_struct": {
+            "chatId": "{#.chat_info#.chatId}",
+            "authorTimestamp": "{#.reflect_input#.authorTimestamp}",
+            "authorRole": "{#.reflect_input#.authorRole}",
+            "content": "{#.reflect_input#.content}",
+            "event": "{#.reflect_input#.event}"
+          },
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "external_request": {
+          "method": "post",
+          "endpoint": "{dmapper_url}/json/v2/reflect_data_arr",
+          "post_body_parameters": {
+            "data": {
+              "method": "post",
+              "cookies": {
+                "redirectJwt": "chatJwt"
+              },
+              "endpoint": "https://{#.chat_info#.forwardTo}/post-message",
+              "post_body_struct": {
+                "chatId": "{#.reflect_input#.chatId}",
+                "authorTimestamp": "{#.reflect_input#.authorTimestamp}",
+                "authorRole": "{#.reflect_input#.authorRole}",
+                "content": "{#.reflect_input#.content}",
+                "event": "{#.reflect_input#.event}"
+              },
+              "response": {
+                "ok": "proceed",
+                "nok": "stop"
+              }
+            }
+          },
+          "post_body_struct": {
+            "data": "{$.data$.data$.forwarding_validation}"
+          },
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        }
+      }
+    }
+  ]
+}
