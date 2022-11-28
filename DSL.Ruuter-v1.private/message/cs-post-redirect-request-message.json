@@ -1,0 +1,179 @@
+{
+  "action_type": "BLOGIC",
+  "destination": [
+    {
+      "reflect_input": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{dmapper_url}/json/v2/reflect_forward_message",
+          "post_body_struct": {
+            "chatId": "{#.chatId}",
+            "event": "{#.event}",
+            "authorTimestamp": "{#.authorTimestamp}",
+            "messageIds": "{#.content#.selectedMessageIds}",
+            "establishmentName": "{#.content#.institution}"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
+      "get_userinfo": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{tim_url}/jwt/custom-jwt-userinfo",
+          "cookies": [
+            "customJwtCookie"
+          ],
+          "post_body_struct": "customJwtCookie"
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
+      "verify_user": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{ruuter_url}/match_input",
+          "post_body_struct": {
+            "input": {
+              "authorities": "{#.get_userinfo#.authorities}"
+            },
+            "validate_against": {
+              "authorities": [
+                "ROLE_ADMINISTRATOR",
+                "ROLE_CUSTOMER_SUPPORT_AGENT",
+                "ROLE_SERVICE_MANAGER"
+              ]
+            },
+            "validation_type": "MUST_MATCH_ANY"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
+      "get_active_chat": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{resql_url}/get-active-chat-by-id",
+          "post_body_struct": {
+            "id": "{#.reflect_input#.chatId}"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
+      "get_message_uuid": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{ruuter_url}/functions/generateRandomUuid",
+          "post_body_struct": {}
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
+      "post_message":{
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{resql_url}/insert-message-with-array-content",
+          "post_body_struct": {
+            "chatId": "{#.reflect_input#.chatId}",
+            "messageId": "{#.get_message_uuid#.output}",
+            "content": "{#.reflect_input#.messageIds}",
+            "event": "{#.reflect_input#.event}",
+            "authorTimestamp": "{#.reflect_input#.authorTimestamp}",
+            "authorId": "{#.get_userinfo#.idCode}",
+            "authorFirstName": "",
+            "authorLastName": "",
+            "authorRole": "backoffice-user",
+            "rating": "",
+            "created": "$_getInstant()"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
+      "post_chat":{
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{ruuter_url}/cs-chat-add-forwarding-value",
+          "cookies": [
+            "customJwtCookie"
+          ],
+          "post_body_struct": {
+            "chatId": "{#.reflect_input#.chatId}",
+            "establishmentName": "{#.reflect_input#.establishmentName}"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    }
+  ]
+}

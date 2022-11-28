@@ -1,0 +1,60 @@
+{
+  "action_type": "BLOGIC",
+  "destination": {
+    "delete_user": {
+      "verify": {
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      },
+      "proceed": {
+        "method": "post",
+        "endpoint": "{resql_url}/delete-user",
+        "post_body_struct": {
+          "userIdCode": "{#.userIdCode}",
+          "created": "$_getInstant()"
+        },
+        "post_body_parameters": {
+          "check_roles": {
+            "method": "post",
+            "endpoint": "{ruuter_url}/match_input",
+            "post_body_parameters": {
+              "userinfo": {
+                "cookies": [
+                  "customJwtCookie"
+                ],
+                "method": "post",
+                "endpoint": "{tim_url}/jwt/custom-jwt-userinfo",
+                "post_body_struct": "customJwtCookie",
+                "response": {
+                  "ok": "proceed",
+                  "nok": "stop"
+                }
+              }
+            },
+            "post_body_struct": {
+              "input": {
+                "authorities": "{$.userinfo$.authorities}"
+              },
+              "validate_against": {
+                "authorities": [
+                  "ROLE_ADMINISTRATOR"
+                ]
+              },
+              "validation_type": "MUST_MATCH_ANY"
+            },
+            "response": {
+              "ok": "proceed",
+              "nok": "stop"
+            }
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,154 @@
+{
+  "action_type": "BLOGIC",
+  "destination": [
+    {
+      "get_is_bot_training": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{ruuter_url}/functions/isBotCurrentlyTraining",
+          "post_body_parameters": {
+            "check_roles": {
+              "method": "post",
+              "endpoint": "{ruuter_url}/match_input",
+              "post_body_parameters": {
+                "userinfo": {
+                  "cookies": [
+                    "customJwtCookie"
+                  ],
+                  "method": "post",
+                  "endpoint": "{tim_url}/jwt/custom-jwt-userinfo",
+                  "post_body_struct": "customJwtCookie",
+                  "response": {
+                    "ok": "proceed",
+                    "nok": "stop"
+                  }
+                }
+              },
+              "post_body_struct": {
+                "input": {
+                  "authorities": "{$.userinfo$.authorities}"
+                },
+                "validate_against": {
+                  "authorities": [
+                    "ROLE_ADMINISTRATOR",
+                    "ROLE_CHATBOT_TRAINER"
+                  ]
+                },
+                "validation_type": "MUST_MATCH_ANY"
+              },
+              "response": {
+                "ok": "proceed",
+                "nok": "stop"
+              }
+            }
+          },
+          "post_body_struct": {
+            "username": "{training_user}",
+            "prvKey": "{training_prv_key}",
+            "host": "{training_url}"
+          },
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
+      "get_are_latest_training_results_positive": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{ruuter_url}/functions/areLatestTestResultsPositive",
+          "post_body_parameters": {
+            "check_roles": {
+              "method": "post",
+              "endpoint": "{ruuter_url}/match_input",
+              "post_body_parameters": {
+                "userinfo": {
+                  "cookies": [
+                    "customJwtCookie"
+                  ],
+                  "method": "post",
+                  "endpoint": "{tim_url}/jwt/custom-jwt-userinfo",
+                  "post_body_struct": "customJwtCookie",
+                  "response": {
+                    "ok": "proceed",
+                    "nok": "stop"
+                  }
+                }
+              },
+              "post_body_struct": {
+                "input": {
+                  "authorities": "{$.userinfo$.authorities}"
+                },
+                "validate_against": {
+                  "authorities": [
+                    "ROLE_ADMINISTRATOR",
+                    "ROLE_CHATBOT_TRAINER"
+                  ]
+                },
+                "validation_type": "MUST_MATCH_ANY"
+              },
+              "response": {
+                "ok": "proceed",
+                "nok": "stop"
+              }
+            }
+          },
+          "post_body_struct": {
+            "username": "{training_user}",
+            "prvKey": "{training_prv_key}",
+            "host": "{training_url}",
+            "botDirectory": "{training_bot_directory_name}"
+          },
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
+      "return_both_request_results": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{dmapper_url}/json/v2/return_training_metadata",
+          "post_body_struct": {
+            "areTrainingResultsPositive": "{#.get_are_latest_training_results_positive#.output}",
+            "isBotTraining": "{#.get_is_bot_training#.output}"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    }
+  ]
+}

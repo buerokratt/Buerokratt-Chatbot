@@ -1,0 +1,230 @@
+{
+  "action_type": "BLOGIC",
+  "destination": [
+    {
+      "get_is_bot_active": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{dmapper_url}/json/v2/return_first_configuration_from_array",
+          "post_body_parameters": {
+            "get_configuration_value": {
+              "method": "post",
+              "endpoint": "{resql_url}/get-configuration",
+              "post_body_parameters": {
+                "check_roles": {
+                  "cookies": [
+                    "customJwtCookie"
+                  ],
+                  "method": "post",
+                  "endpoint": "{ruuter_url}/match_input",
+                  "post_body_parameters": {
+                    "userinfo": {
+                      "cookies": [
+                        "customJwtCookie"
+                      ],
+                      "method": "post",
+                      "endpoint": "{tim_url}/jwt/custom-jwt-userinfo",
+                      "post_body_struct": "customJwtCookie",
+                      "response": {
+                        "ok": "proceed",
+                        "nok": "stop"
+                      }
+                    }
+                  },
+                  "post_body_struct": {
+                    "input": {
+                      "authorities": "{$.userinfo$.authorities}"
+                    },
+                    "validate_against": {
+                      "authorities": [
+                        "ROLE_ADMINISTRATOR",
+                        "ROLE_CUSTOMER_SUPPORT_AGENT",
+                        "ROLE_SERVICE_MANAGER"
+                      ]
+                    },
+                    "validation_type": "MUST_MATCH_ANY"
+                  },
+                  "response": {
+                    "ok": "proceed",
+                    "nok": "stop"
+                  }
+                }
+              },
+              "post_body_struct": {
+                "key": "is_bot_active"
+              },
+              "response": {
+                "ok": "proceed",
+                "nok": "stop"
+              }
+            }
+          },
+          "post_body_struct": {
+            "configurationArray": "{$.get_configuration_value}"
+          },
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        }
+      }
+    },
+    {
+      "get_bot_name": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{resql_url}/get-configuration",
+          "post_body_parameters": {},
+          "post_body_struct": {
+            "key": "bot_institution_id"
+          }
+        }
+      }
+    },
+    {
+      "end_old_bot_chats": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{resql_url}/insert-chat-ended-by-last-message-datetime",
+          "post_body_parameters": {
+            "proceed_when_state_false": {
+              "method": "post",
+              "endpoint": "{ruuter_url}/match_input",
+              "post_body_struct": {
+                "input": {
+                  "is_active": "{#.get_is_bot_active#.value}"
+                },
+                "validate_against": {
+                  "is_active": "false"
+                },
+                "validation_type": "MUST_MATCH_ANY"
+              },
+              "response": {
+                "ok": "proceed",
+                "nok": "stop"
+              }
+            }
+          },
+          "post_body_struct": {
+            "authorId": "{#.get_bot_name[0]#.value}",
+            "authorRole": "buerokratt",
+            "content": "Teie vestlus antakse üle nõustajale.",
+            "currentDatetime": "$_getInstant()",
+            "currentStatus": "OPEN",
+            "event": "inactive-chat-ended",
+            "interval": "2 hours",
+            "newStatus": "ENDED",
+            "targetUser": "end-user"
+          },
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        }
+      }
+    },
+    {
+      "insert_message_content": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{resql_url}/insert-message-content-by-customer-support-id",
+          "post_body_parameters": {
+            "proceed_when_state_false": {
+              "method": "post",
+              "endpoint": "{ruuter_url}/match_input",
+              "post_body_struct": {
+                "input": {
+                  "is_active": "{#.get_is_bot_active#.value}"
+                },
+                "validate_against": {
+                  "is_active": "false"
+                },
+                "validation_type": "MUST_MATCH_ANY"
+              },
+              "response": {
+                "ok": "proceed",
+                "nok": "stop"
+              }
+            }
+          },
+          "post_body_struct": {
+            "customerSupportId": "{#.get_bot_name[0]#.value}",
+            "authorId": "{#.get_bot_name[0]#.value}",
+            "authorRole": "buerokratt",
+            "content": "Teie vestlus antakse üle nõustajale.",
+            "event": "",
+            "created": "$_getInstant()"
+          },
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        }
+      }
+    },
+    {
+      "insert_chat_customer_support": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{resql_url}/insert-chat-customer-support-by-customer-support-id",
+          "post_body_parameters": {
+            "proceed_when_state_false": {
+              "method": "post",
+              "endpoint": "{ruuter_url}/match_input",
+              "post_body_struct": {
+                "input": {
+                  "is_active": "{#.get_is_bot_active#.value}"
+                },
+                "validate_against": {
+                  "is_active": "false"
+                },
+                "validation_type": "MUST_MATCH_ANY"
+              },
+              "response": {
+                "ok": "proceed",
+                "nok": "stop"
+              }
+            }
+          },
+          "post_body_struct": {
+            "customerSupportId": "{#.get_bot_name[0]#.value}"
+          },
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        }
+      }
+    }
+  ]
+}

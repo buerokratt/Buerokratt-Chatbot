@@ -1,0 +1,50 @@
+{
+  "action_type": "BLOGIC",
+  "destination": [
+    {
+      "reflect": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{dmapper_url}/json/v2/reflect_json_data",
+          "post_body_struct": {
+            "data": "{$cookies$}"
+          },
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        }
+      }
+    },
+    {
+      "authorize": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "get",
+          "endpoint": "{analytics_url}/api/v1/restapiinfo",
+          "request_header": {
+            "Authorization": "Bearer {#.reflect#.customJwtCookie}"
+          },
+          "passthrough_response_headers": [
+            "set-cookie"
+          ],
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        }
+      }
+    }
+  ]
+}

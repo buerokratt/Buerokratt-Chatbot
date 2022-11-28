@@ -1,0 +1,162 @@
+{
+  "action_type": "BLOGIC",
+  "destination": [
+    {
+      "reflect_input": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{dmapper_url}/json/v2/reflect_training_dates",
+          "post_body_struct": {
+            "trainingDate": "{#.trainingDate}",
+            "helperFunctionInput": "{#.helperFunctionInput}"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
+      "set_training_message": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{resql_url}/set-configuration-value",
+          "post_body_parameters": {
+            "check_roles": {
+              "method": "post",
+              "endpoint": "{ruuter_url}/match_input",
+              "cookies": [
+                "customJwtCookie"
+              ],
+              "post_body_parameters": {
+                "userinfo": {
+                  "cookies": [
+                    "customJwtCookie"
+                  ],
+                  "method": "post",
+                  "endpoint": "{tim_url}/jwt/custom-jwt-userinfo",
+                  "post_body_struct": "customJwtCookie",
+                  "response": {
+                    "ok": "proceed",
+                    "nok": "stop"
+                  }
+                }
+              },
+              "post_body_struct": {
+                "input": {
+                  "authorities": "{$.userinfo$.authorities}"
+                },
+                "validate_against": {
+                  "authorities": [
+                    "ROLE_ADMINISTRATOR",
+                    "ROLE_CHATBOT_TRAINER"
+                  ]
+                },
+                "validation_type": "MUST_MATCH_ANY"
+              },
+              "response": {
+                "ok": "proceed",
+                "nok": "stop"
+              }
+            }
+          },
+          "post_body_struct": {
+            "created": "$_getInstant()",
+            "key": "training_date",
+            "value": "{#.reflect_input#.trainingDate}"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
+      "train_model_at": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{dmapper_url}/json/v2/return_helper_function_output",
+          "post_body_parameters": {
+            "query_helper_function": {
+              "method": "post",
+              "endpoint": "{ruuter_url}/functions/trainModelAt",
+              "post_body_parameters": {
+                "check_roles": {
+                  "method": "post",
+                  "endpoint": "{ruuter_url}/match_input",
+                  "post_body_parameters": {
+                    "userinfo": {
+                      "cookies": [
+                        "customJwtCookie"
+                      ],
+                      "method": "post",
+                      "endpoint": "{tim_url}/jwt/custom-jwt-userinfo",
+                      "post_body_struct": "customJwtCookie",
+                      "response": {
+                        "ok": "proceed",
+                        "nok": "stop"
+                      }
+                    }
+                  },
+                  "post_body_struct": {
+                    "input": {
+                      "authorities": "{$.userinfo$.authorities}"
+                    },
+                    "validate_against": {
+                      "authorities": [
+                        "ROLE_ADMINISTRATOR",
+                        "ROLE_CHATBOT_TRAINER"
+                      ]
+                    },
+                    "validation_type": "MUST_MATCH_ANY"
+                  },
+                  "response": {
+                    "ok": "proceed",
+                    "nok": "stop"
+                  }
+                }
+              },
+              "post_body_struct": {
+                "username": "{training_user}",
+                "prvKey": "{training_prv_key}",
+                "host": "{training_url}",
+                "timestamp": "{#.reflect_input#.helperFunctionInput}"
+              },
+              "response": {
+                "ok": "proceed",
+                "nok": "stop"
+              }
+            }
+          },
+          "post_body_struct": {
+            "data": "{$.query_helper_function}"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    }
+  ]
+}

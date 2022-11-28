@@ -1,0 +1,31 @@
+{
+  "action_type": "BLOGIC",
+  "destination": [
+    {
+      "cs_get_session_length": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{resql_url}/get-configuration",
+          "post_body_parameters": {},
+          "post_body_struct": {
+            "key": "training_date"
+          },
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "action_type": "BLOGIC",
+  "destination": [
+    {
+      "get_estimated_waiting_time": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{resql_url}/get-estimated-waiting-time",
+          "post_body_parameters": {},
+          "post_body_struct": {
+            "key": "estimated_waiting_time"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
+      "return_first_estimated_time_from_array": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "proceed"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{dmapper_url}/json/v2/return_first_estimated_time_from_array",
+          "post_body_struct": {
+            "estimatedTimeArray": "{#.get_estimated_waiting_time}"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    }
+  ]
+}

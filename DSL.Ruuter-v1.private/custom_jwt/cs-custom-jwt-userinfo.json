@@ -1,0 +1,25 @@
+{
+  "action_type": "BLOGIC",
+  "destination": {
+    "custom_jwt_userinfo": {
+      "verify": {
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      },
+      "proceed": {
+        "cookies": [
+          "customJwtCookie"
+        ],
+        "method": "post",
+        "endpoint": "{tim_url}/jwt/custom-jwt-userinfo",
+        "post_body_struct": "customJwtCookie",
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    }
+  }
+}

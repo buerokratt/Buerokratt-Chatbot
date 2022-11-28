@@ -1,0 +1,13 @@
+{
+  "action_type": "FWD",
+  "destination": {
+    "resql_healthz": {
+      "method": "get",
+      "endpoint": "{resql_url}/healthz",
+      "response": {
+        "ok": "proceed",
+        "nok": "stop"
+      }
+    }
+  }
+}
