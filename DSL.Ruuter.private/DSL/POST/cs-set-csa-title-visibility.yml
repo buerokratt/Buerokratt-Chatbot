@@ -1,0 +1,42 @@
+extractRequestData:
+  assign:
+    isVisible: ${incoming.body.isVisible}
+    cookie: ${incoming.headers.cookie}
+
+extractTokenData:
+  call: http.post
+  args:
+    # TODO: replace with env variable and correct path to TIM endpoint
+    url: http://byk-private-ruuter-yml:8080/mock-tim-custom-jwt-userinfo
+    headers:
+      cookie: ${cookie}
+    body:
+      # TODO: pass cookie name correctly to TIM
+      cookieName: "customJwtCookie"
+  result: jwtResult
+
+validateAdministrator:
+  switch:
+    # TODO: use correct structure when request is made against TIM
+    - condition: ${jwtResult.response.body.response.authorities.includes("ROLE_ADMINISTRATOR")}
+      next: setConfigurationValue
+  next: returnFailure
+
+setConfigurationValue:
+  call: http.post
+  args:
+    # TODO: replace with env variable
+    url: https://byk-resql:8443/set-configuration-value
+    body:
+      created: ${new Date().toISOString()}
+      key: "is_csa_title_visible"
+      value: ${isVisible}
+  result: setConfigurationResult
+  next: returnSuccess
+
+returnSuccess:
+  return: ${setConfigurationResult.response.body}
+  next: end
+
+returnFailure:
+  return: "error: unauthorized"
