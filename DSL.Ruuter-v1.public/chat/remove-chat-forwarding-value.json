@@ -63,6 +63,7 @@
             "id": "{#.get_chatId#.chatId}",
             "customerSupportId": "{#.get_not_ended_chat[0]#.customerSupportId}",
             "customerSupportDisplayName": "{#.get_not_ended_chat[0]#.customerSupportDisplayName}",
+            "title": "{#.get_not_ended_chat[0]#.title}",
             "endUserId": "{#.get_not_ended_chat[0]#.endUserId}",
             "endUserFirstName": "{#.get_not_ended_chat[0]#.endUserFirstName}",
             "endUserLastName": "{#.get_not_ended_chat[0]#.endUserLastName}",

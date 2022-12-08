@@ -15,6 +15,8 @@
           "post_body_struct": {
             "userIdCode": "{#.userIdCode}",
             "displayName": "{#.displayName}",
+            "title": "{#.title}",
+            "email": "{#.email}",
             "roles": "{#.roles}"
           },
           "post_body_parameters": {
@@ -46,10 +48,12 @@
                       "endpoint": "{ruuter_url}/match_input",
                       "post_body_struct": {
                         "input": {
-                          "id_code": "$_validateIdCode({#.userIdCode})"
+                          "id_code": "$_validateIdCode({#.userIdCode})",
+                          "email": "$_validateEmail(#.email)"
                         },
                         "validate_against": {
-                          "id_code": "{#.userIdCode}"
+                          "id_code": "{#.userIdCode}",
+                          "email": "{#.email}"
                         },
                         "validation_type": "MUST_MATCH_EXACT"
                       },
@@ -125,7 +129,9 @@
             "created": "$_getInstant()",
             "status": "active",
             "userIdCode": "{#.reflect_input#.userIdCode}",
-            "displayName": "{#.reflect_input#.displayName}"
+            "displayName": "{#.reflect_input#.displayName}",
+            "title":"{#.reflect_input#.title}",
+            "email": "{#.reflect_input#.email}"
           }
         }
       }

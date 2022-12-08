@@ -46,6 +46,8 @@
           "post_body_struct": {
             "userIdCode": "{#.userIdCode}",
             "displayName": "{#.displayName}",
+            "title": "{#.title}",
+            "email": "{#.email}",
             "roles": "{#.roles}"
           }
         },
@@ -110,7 +112,9 @@
             "created": "$_getInstant()",
             "status": "active",
             "userIdCode": "{#.reflect_input#.userIdCode}",
-            "displayName": "{#.reflect_input#.displayName}"
+            "displayName": "{#.reflect_input#.displayName}",
+            "title": "{#.reflect_input#.title}",
+            "email": "{#.reflect_input#.email}"
           }
         }
       }

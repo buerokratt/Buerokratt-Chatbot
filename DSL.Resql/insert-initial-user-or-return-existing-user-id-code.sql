@@ -1,6 +1,6 @@
 WITH initial_user AS (
-    INSERT INTO "user" (login, id_code, first_name, last_name, display_name, status, created)
-        SELECT :userIdCode, :userIdCode, :firstName, :lastName, :firstName, 'active', :created::timestamp with time zone
+    INSERT INTO "user" (login, id_code, first_name, last_name, display_name, status, created, title, email)
+        SELECT :userIdCode, :userIdCode, :firstName, :lastName, :firstName, 'active', :created::timestamp with time zone, :title, :email
         WHERE NOT exists(SELECT 1 FROM "user")
         RETURNING id_code),
      initial_user_authority AS (
@@ -8,7 +8,7 @@ WITH initial_user AS (
              SELECT id_code, ARRAY [ :initialUserRole ], :created::timestamp with time zone FROM initial_user
              RETURNING user_id),
      existing_user AS (
-         SELECT login, password_hash, display_name, status, first_name, last_name, id_code
+         SELECT login, password_hash, display_name, status, first_name, last_name, id_code, title, email
          FROM "user"
          WHERE id_code = :userIdCode
            AND id IN (SELECT max(id) FROM "user" WHERE status <> 'deleted' GROUP BY id_code)
