@@ -5,8 +5,8 @@
 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
     <changeSet id="20221129164600" author="Net Group">
         <addColumn tableName="user">
-            <column name="title" type="varchar"/>
-            <column name="email" type="varchar"/>
+            <column name="csa_title" type="varchar"/>
+            <column name="csa_email" type="varchar"/>
         </addColumn>
     </changeSet>
 </databaseChangeLog>

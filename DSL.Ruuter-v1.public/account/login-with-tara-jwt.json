@@ -83,7 +83,7 @@
                 "id": "{#.get_chat_by_id[0]#.id}",
                 "customerSupportId": "{#.get_chat_by_id[0]#.customerSupportId}",
                 "customerSupportDisplayName": "{#.get_chat_by_id[0]#.customerSupportDisplayName}",
-                "title": "{#.get_chat_by_id[0]#.title}",
+                "csa_title": "{#.get_chat_by_id[0]#.csa_title}",
                 "status": "{#.get_chat_by_id[0]#.status}",
                 "endUserOs": "{#.get_chat_by_id[0]#.endUserOs}",
                 "endUserUrl": "{#.get_chat_by_id[0]#.endUserUrl}",

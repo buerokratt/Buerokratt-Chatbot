@@ -2,7 +2,7 @@ SELECT c.base_id AS id,
        c.customer_support_id,
        c.customer_support_display_name,
        (CASE WHEN (SELECT value FROM configuration WHERE key = 'is_csa_title_visible' AND deleted = false) = 'true'
-           THEN c.title ELSE '' END) AS title,
+           THEN c.csa_title ELSE '' END) AS csa_title,
        c.end_user_id,
        c.end_user_first_name,
        c.end_user_last_name,

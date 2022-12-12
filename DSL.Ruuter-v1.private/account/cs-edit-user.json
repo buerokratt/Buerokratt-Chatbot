@@ -46,8 +46,8 @@
           "post_body_struct": {
             "userIdCode": "{#.userIdCode}",
             "displayName": "{#.displayName}",
-            "title": "{#.title}",
-            "email": "{#.email}",
+            "csa_title": "{#.csa_title}",
+            "csa_email": "{#.csa_email}",
             "roles": "{#.roles}"
           }
         },
@@ -113,8 +113,8 @@
             "status": "active",
             "userIdCode": "{#.reflect_input#.userIdCode}",
             "displayName": "{#.reflect_input#.displayName}",
-            "title": "{#.reflect_input#.title}",
-            "email": "{#.reflect_input#.email}"
+            "csa_title": "{#.reflect_input#.csa_title}",
+            "csa_email": "{#.reflect_input#.csa_email}"
           }
         }
       }

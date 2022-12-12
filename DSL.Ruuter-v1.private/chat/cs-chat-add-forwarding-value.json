@@ -137,7 +137,7 @@
             "id": "{#.reflect_input#.chatId}",
             "customerSupportId": "{#.get_not_ended_chat[0]#.customerSupportId}",
             "customerSupportDisplayName": "{#.get_not_ended_chat[0]#.customerSupportDisplayName}",
-            "title": "{#.get_not_ended_chat[0]#.title}",
+            "csa_title": "{#.get_not_ended_chat[0]#.csa_title}",
             "endUserId": "{#.get_not_ended_chat[0]#.endUserId}",
             "endUserFirstName": "{#.get_not_ended_chat[0]#.endUserFirstName}",
             "endUserLastName": "{#.get_not_ended_chat[0]#.endUserLastName}",

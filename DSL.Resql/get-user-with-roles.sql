@@ -3,8 +3,8 @@ SELECT u.login,
        u.last_name,
        u.id_code,
        u.display_name,
-       u.title,
-       u.email,
+       u.csa_title,
+       u.csa_email,
        ua.authority_name AS authorities
 FROM "user" u
          INNER JOIN (SELECT authority_name, user_id
