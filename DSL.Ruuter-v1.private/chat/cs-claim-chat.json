@@ -15,7 +15,8 @@
           "post_body_struct": {
             "id": "{#.id}",
             "customerSupportId": "{#.customerSupportId}",
-            "customerSupportDisplayName": "{#.customerSupportDisplayName}"
+            "customerSupportDisplayName": "{#.customerSupportDisplayName}",
+            "csa_title": "{#.csa_title}"
           }
         },
         "response": {
@@ -124,6 +125,7 @@
             "id": "{#.reflect_input#.id}",
             "customerSupportId": "{#.reflect_input#.customerSupportId}",
             "customerSupportDisplayName": "{#.reflect_input#.customerSupportDisplayName}",
+            "csa_title": "{#.reflect_input#.csa_title}",
             "endUserId": "{#.get_not_ended_chat[0]#.endUserId}",
             "endUserFirstName": "{#.get_not_ended_chat[0]#.endUserFirstName}",
             "endUserLastName": "{#.get_not_ended_chat[0]#.endUserLastName}",

@@ -1,6 +1,6 @@
 INSERT INTO chat(base_id, customer_support_id, customer_support_display_name, end_user_id, end_user_first_name,
                  end_user_last_name, status, created, ended, end_user_os, end_user_url, feedback_text, feedback_rating,
-                 external_id, forwarded_to, forwarded_to_name, received_from, received_from_name)
+                 external_id, forwarded_to, forwarded_to_name, received_from, received_from_name, csa_title)
 SELECT base_id,
        customer_support_id,
        customer_support_display_name,
@@ -18,7 +18,8 @@ SELECT base_id,
        forwarded_to,
        forwarded_to_name,
        received_from,
-       received_from_name
+       received_from_name,
+       csa_title
 FROM chat
 WHERE base_id = :id
 ORDER BY updated DESC

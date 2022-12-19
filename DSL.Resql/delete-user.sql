@@ -18,7 +18,7 @@ WITH active_administrators AS (SELECT user_id
                                             FROM user_authority
                                             GROUP BY user_id))
 INSERT
-INTO "user" (login, password_hash, first_name, last_name, id_code, display_name, status, created)
+INTO "user" (login, password_hash, first_name, last_name, id_code, display_name, status, created, csa_title, csa_email)
 SELECT login,
        password_hash,
        first_name,
@@ -26,7 +26,9 @@ SELECT login,
        id_code,
        display_name,
        'deleted',
-       :created::timestamp with time zone
+       :created::timestamp with time zone,
+       csa_title,
+       csa_email
 FROM "user"
 WHERE id_code = :userIdCode
   AND status <> 'deleted'
