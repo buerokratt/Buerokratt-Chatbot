@@ -1,0 +1,28 @@
+getEmergencyNotice:
+  call: http.post
+  args:
+    # TODO: replace with env variable
+    url: https://byk-resql:8443/get-organization-working-time
+  result: getOrganizationWorkingTimeResult
+
+validateOrganizationWorkingTimeExists:
+  switch:
+    - condition: '${getOrganizationWorkingTimeResult.response.body.length > 0}'
+      next: mapOrganizationWorkingTimeData
+  next: returnNotFound
+
+mapOrganizationWorkingTimeData:
+  call: http.post
+  args:
+    # TODO: replace with env variable
+    url: https://byk-dmapper:8443/json/v2/return_organization_working_time
+    body:
+      configurationArray: ${getOrganizationWorkingTimeResult.response.body}
+  result: organizationWorkingTimeData
+
+returnSuccess:
+  return: ${organizationWorkingTimeData.response.body}
+  next: end
+
+returnNotFound:
+  return: "error: not found"
