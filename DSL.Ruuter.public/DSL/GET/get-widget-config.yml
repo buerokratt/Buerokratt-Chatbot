@@ -1,0 +1,30 @@
+getWidgetConfig:
+  call: http.post
+  args:
+    # TODO: replace with env variable
+    url: https://byk-resql:8443/get-widget-config
+  result: getWidgetConfigResult
+
+validateWidgetConfigExists:
+  switch:
+    - condition: '${getWidgetConfigResult.response.body.length > 0}'
+      next: mapWidgetConfigData
+  next: returnNotFound
+
+mapWidgetConfigData:
+  call: http.post
+  args:
+    # TODO: replace with env variable
+    url: https://byk-dmapper:8443/json/v2/return_widget_config
+    body:
+      configurationArray: ${getWidgetConfigResult.response.body}
+  result: widgetConfigData
+  next: returnSuccess
+
+returnSuccess:
+  return: ${widgetConfigData.response.body}
+  next: end
+
+returnNotFound:
+  return: "error: not found"
+  next: end
