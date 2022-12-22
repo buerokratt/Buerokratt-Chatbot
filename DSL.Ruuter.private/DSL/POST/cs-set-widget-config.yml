@@ -1,0 +1,63 @@
+extractRequestData:
+  assign:
+    cookie: ${incoming.headers.cookie}
+    widgetProactiveSeconds: ${incoming.body.widgetProactiveSeconds}
+    widgetDisplayBubbleMessageSeconds: ${incoming.body.widgetDisplayBubbleMessageSeconds}
+    widgetBubbleMessageText: ${incoming.body.widgetBubbleMessageText}
+    widgetColor: ${incoming.body.widgetColor}
+    isWidgetActive: ${incoming.body.isWidgetActive}
+
+extractTokenData:
+  call: http.post
+  args:
+    # TODO: replace with env variable and correct path to TIM endpoint
+    url: http://byk-private-ruuter-yml:8080/mock-tim-custom-jwt-userinfo
+    headers:
+      cookie: ${cookie}
+    body:
+      # TODO: pass cookie name correctly to TIM
+      cookieName: "customJwtCookie"
+  result: jwtResult
+
+validateAdministrator:
+  switch:
+    # TODO: use correct structure when request is made against TIM
+    - condition: ${jwtResult.response.body.response.authorities.includes("ROLE_ADMINISTRATOR")}
+      next: setWidgetConfig
+  next: returnUnauthorized
+
+setWidgetConfig:
+  call: http.post
+  args:
+    # TODO: replace with env variable
+    url: https://byk-resql:8443/set-widget-config
+    body:
+      widgetProactiveSeconds: ${widgetProactiveSeconds}
+      widgetDisplayBubbleMessageSeconds: ${widgetDisplayBubbleMessageSeconds}
+      widgetBubbleMessageText: ${widgetBubbleMessageText}
+      widgetColor: ${widgetColor}
+      isWidgetActive: ${isWidgetActive}
+      created: ${new Date().toISOString()}
+  result: setWidgetConfigResult
+
+mapWidgetConfigData:
+  call: http.post
+  args:
+    # TODO: replace with env variable
+    url: https://byk-dmapper:8443/json/v2/return_widget_config
+    body:
+      configurationArray: ${setWidgetConfigResult.response.body}
+  result: widgetConfigData
+  next: returnSuccess
+
+returnSuccess:
+  return: ${widgetConfigData.response.body}
+  next: end
+
+returnInvalidBody:
+  return: "error: invalid body"
+  next: end
+
+returnUnauthorized:
+  return: "error: unauthorized"
+  next: end
