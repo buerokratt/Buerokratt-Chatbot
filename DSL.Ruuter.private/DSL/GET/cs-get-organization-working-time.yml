@@ -34,8 +34,6 @@ validateOrganizationWorkingTimeExists:
       next: mapWorkingTimeData
   next: returnNotFound
 
-
-
 mapWorkingTimeData:
   call: http.post
   args:
@@ -52,6 +50,7 @@ returnSuccess:
 
 returnUnauthorized:
   return: "error: unauthorized"
+  next: end
 
 returnNotFound:
   return: "error: not found"

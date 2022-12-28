@@ -55,6 +55,7 @@
           "post_body_struct": {
             "active": "{#.customerSupportStatus}",
             "userIdCode": "{#.customerSupportId}",
+            "status": "{#.status}",
             "created": "$_getInstant()"
           }
         },
