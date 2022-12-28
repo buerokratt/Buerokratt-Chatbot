@@ -37,6 +37,7 @@ setOrganizationWorkingTime:
     body:
       organizationWorkingTimeStartISO: ${organizationWorkingTimeStartISO}
       organizationWorkingTimeEndISO: ${organizationWorkingTimeEndISO}
+      created: ${new Date().toISOString()}
   result: setOrganizationWorkingTimeResult
 
 mapOrganizationWorkingTimeData:
