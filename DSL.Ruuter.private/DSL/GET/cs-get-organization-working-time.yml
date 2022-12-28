@@ -18,7 +18,7 @@ validateAdministrator:
   switch:
     # TODO: use correct structure when request is made against TIM
     - condition: ${jwtResult.response.body.response.authorities.includes("ROLE_ADMINISTRATOR")}
-      next: getConfigurationValue
+      next: getOrganizationWorkingTime
   next: returnUnauthorized
 
 getOrganizationWorkingTime:
@@ -30,9 +30,10 @@ getOrganizationWorkingTime:
 
 validateOrganizationWorkingTimeExists:
   switch:
-    - condition: '${getConfigurationValueResult.response.body.length > 0}'
+    - condition: '${getOrganizationWorkingTimeValueResult.response.body.length > 0}'
       next: mapWorkingTimeData
   next: returnNotFound
+
 
 
 mapWorkingTimeData:
