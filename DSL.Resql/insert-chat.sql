@@ -5,4 +5,4 @@ VALUES (:id, :customerSupportId, :customerSupportDisplayName, :endUserId, :endUs
         :endUserLastName, :status, :created::timestamp with time zone,
         (CASE WHEN (:ended = '') THEN null WHEN (:ended = 'null') THEN null ELSE :ended END)::timestamp with time zone,
         :endUserOs, :endUserUrl, :feedbackText, :feedbackRating, :externalId, :forwardedTo, :forwardedToName,
-        :receivedFrom, :receivedFromName, (CASE WHEN (:csa_title = 'null') THEN null WHEN (:csa_title = '') THEN null ELSE :csa_title END));
+        :receivedFrom, :receivedFromName, (CASE WHEN (:csaTitle = 'null') THEN null WHEN (:csaTitle = '') THEN null ELSE :csaTitle END));
