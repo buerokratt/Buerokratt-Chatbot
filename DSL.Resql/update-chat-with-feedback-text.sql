@@ -19,7 +19,7 @@ SELECT base_id,
        forwarded_to_name,
        received_from,
        received_from_name,
-       csa_title
+       csaTitle
 FROM chat
 WHERE base_id = :id
 ORDER BY updated DESC
