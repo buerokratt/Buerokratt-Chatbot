@@ -1,0 +1,131 @@
+@import 'src/styles/tools/spacing';
+@import 'src/styles/tools/color';
+@import 'src/styles/settings/variables/other';
+@import 'src/styles/settings/variables/typography';
+
+.btn {
+  $self: &;
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  background: none;
+  border: 0;
+  color: get-color(black-coral-0);
+  cursor: pointer;
+  font: inherit;
+  gap: get-spacing(rapla);
+  overflow: visible;
+  padding: 8px 40px;
+  text-decoration: none;
+  font-size: $veera-font-size-100;
+  line-height: 24px;
+  border-radius: 20px;
+  white-space: nowrap;
+
+  &:focus {
+    outline: none;
+  }
+
+  &--disabled {
+    cursor: not-allowed;
+  }
+
+  &--primary {
+    background-color: get-color(sapphire-blue-10);
+
+    &:hover,
+    &:active {
+      background-color: get-color(sapphire-blue-13);
+    }
+
+    &:focus {
+      box-shadow: inset 0 0 0 2px get-color(sapphire-blue-3)
+    }
+
+    &#{$self}--disabled {
+      background-color: get-color(black-coral-2);
+      color: get-color(white);
+    }
+  }
+
+  &--secondary {
+    background-color: get-color(white);
+    box-shadow: inset 0 0 0 2px get-color(black-coral-10);
+    color: get-color(black-coral-15);
+
+    &:hover,
+    &:active {
+      box-shadow: inset 0 0 0 2px get-color(black-coral-2);
+    }
+
+    &:focus {
+      box-shadow: inset 0 0 0 2px get-color(sapphire-blue-10);
+    }
+
+    &#{$self}--disabled {
+      background-color: get-color(black-coral-2);
+      color: get-color(black-coral-6);
+      box-shadow: inset 0 0 0 2px get-color(black-coral-2);
+    }
+  }
+
+  &--text {
+    padding: 0;
+    background: none;
+    color: get-color(sapphire-blue-10);
+    gap: 4px;
+    border-radius: 0;
+
+    &:hover,
+    &:active {
+      text-decoration: underline;
+    }
+
+    &:focus {
+      box-shadow: inset 0 0 0 2px get-color(sapphire-blue-10);
+    }
+
+    &#{$self}--disabled {
+      color: get-color(black-coral-6);
+    }
+  }
+
+  &--error {
+    background-color: get-color(jasper-10);
+
+    &:hover,
+    &:active {
+      background-color: get-color(jasper-12);
+    }
+
+    &:focus {
+      box-shadow: inset 0 0 0 2px get-color(jasper-13);
+    }
+
+    &#{$self}--disabled {
+      background-color: get-color(black-coral-2);
+    }
+  }
+
+  &--success {
+    background-color: get-color(sea-green-10);
+
+    &:hover,
+    &:active {
+      background-color: get-color(sea-green-12);
+    }
+
+    &:focus {
+      background-color: get-color(sea-green-10);
+      box-shadow: inset 0 0 0 2px get-color(sea-green-12);
+    }
+
+    &#{$self}--disabled {
+      background-color: get-color(black-coral-2);
+    }
+  }
+
+  &--s {
+    padding: 4.5px 24px;
+  }
+}

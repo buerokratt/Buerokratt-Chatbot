@@ -1,0 +1,35 @@
+{
+  "global": {
+    "save": "Salvesta",
+    "add": "Lisa",
+    "edit": "Muuda",
+    "delete": "Kustuta",
+    "cancel": "Tühista",
+    "modifiedAt": "Viimati muudetud",
+    "addNew": "Lisa uus",
+    "dependencies": "Sõltuvused",
+    "language": "Keel",
+    "choose": "Vali",
+    "search": "Otsi",
+    "notification": "Teade",
+    "active": "Aktiivne",
+    "activate": "Aktiveeri",
+    "deactivate": "Deaktiveeri",
+    "on": "Sees",
+    "off": "Väljas",
+    "back": "Tagasi",
+    "from": "Alates",
+    "to": "Kuni",
+    "view": "Vaata",
+    "resultCount": "Kuvan korraga",
+    "paginationNavigation": "Paginatsiooni navigatsioon",
+    "gotoPage": "Mine lehele",
+    "name": "Nimi"
+  },
+  "mainMenu": {
+    "menuLabel": "Põhinavigatsioon",
+    "closeMenu": "Kitsendan menüü",
+    "openMenuIcon": "Ava menüü ikoon",
+    "closeMenuIcon": "Sulge menüü ikoon"
+  }
+}

@@ -1,0 +1,21 @@
+// Settings - Sass variables and mixins
+@import 'settings/variables/colors';
+@import 'settings/variables/typography';
+@import 'settings/variables/breakpoints';
+@import 'settings/variables/grid';
+@import 'settings/variables/spacing';
+@import 'settings/variables/other';
+@import 'settings/mixins';
+@import 'settings/utility-classes';
+
+// Tools - Sass functions
+@import 'tools/color';
+@import 'tools/spacing';
+
+// Generic - global CSS styling and CSS at-rules
+@import 'generic/reset';
+@import 'generic/fonts';
+@import 'generic/base';
+
+// Components
+@import 'components/vertical-tabs';

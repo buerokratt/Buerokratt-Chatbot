@@ -1,0 +1,26 @@
+@import 'src/styles/tools/spacing';
+@import 'src/styles/tools/color';
+@import 'src/styles/settings/variables/other';
+@import 'src/styles/settings/variables/typography';
+
+.card {
+  background-color: get-color(white);
+  border: 1px solid get-color(black-coral-2);
+  border-radius: $veera-radius-s;
+
+  &__header,
+  &__body,
+  &__footer {
+    padding: get-spacing(haapsalu);
+  }
+
+  &__header {
+    border-bottom: 1px solid get-color(black-coral-2);
+    background-color: get-color(extra-light);
+    border-radius: $veera-radius-s $veera-radius-s 0 0;
+  }
+
+  &__footer {
+    border-top: 1px solid get-color(black-coral-2);
+  }
+}

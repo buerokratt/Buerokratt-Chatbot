@@ -1,0 +1,35 @@
+{
+  "global": {
+    "save": "Save",
+    "add": "Add",
+    "edit": "Edit",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "modifiedAt": "Last modified at",
+    "addNew": "Add new",
+    "dependencies": "Dependencies",
+    "language": "Language",
+    "choose": "Choose",
+    "search": "Search",
+    "notification": "Notification",
+    "active": "Active",
+    "activate": "Activate",
+    "deactivate": "Deactivate",
+    "on": "On",
+    "off": "Off",
+    "back": "Back",
+    "from": "From",
+    "to": "To",
+    "view": "View",
+    "resultCount": "Result count",
+    "paginationNavigation": "Pagination navigation",
+    "gotoPage": "Goto page",
+    "name": "Name"
+  },
+  "mainMenu": {
+    "menuLabel": "Main navigation",
+    "closeMenu": "Close menu",
+    "openIcon": "Open menu icon",
+    "closeIcon": "Close menu icon"
+  }
+}

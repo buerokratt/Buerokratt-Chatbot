@@ -1,0 +1,115 @@
+@import 'src/styles/tools/spacing';
+@import 'src/styles/tools/color';
+@import 'src/styles/settings/variables/other';
+@import 'src/styles/settings/variables/typography';
+
+.chat {
+  $self: &;
+  height: 100%;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 16px 16px;
+  color: get-color(black-coral-20);
+  justify-content: flex-end;
+  //transform: rotate(180deg);
+  //direction: rtl;
+
+  &__group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-left: 56px;
+    position: relative;
+    //transform: rotate(180deg);
+    //direction: ltr;
+
+    &--bot {
+      #{$self} {
+        &__group-initials {
+          background-color: get-color(sapphire-blue-10);
+        }
+
+        &__group-name {
+          color: get-color(sapphire-blue-10);
+        }
+
+        &__message-text {
+          background-color: get-color(sapphire-blue-10);
+          color: get-color(white);
+        }
+      }
+    }
+
+    &--client {
+
+    }
+
+    &--client-support {
+      #{$self} {
+        &__group-initials {
+          background-color: get-color(black-coral-10);
+          color: get-color(white);
+        }
+
+        &__message-text {
+          background-color: get-color(black-coral-10);
+          color: get-color(white);
+        }
+      }
+    }
+  }
+
+  &__group-initials {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background-color: get-color(black-coral-1);
+    border-radius: 50%;
+    font-size: $veera-font-size-80;
+    line-height: $veera-line-height-500;
+    font-weight: $veera-font-weight-delta;
+    color: get-color(black-coral-6);
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+
+  &__group-name {
+    font-size: $veera-font-size-80;
+    line-height: $veera-line-height-500;
+    font-weight: $veera-font-weight-delta;
+  }
+
+  &__messages {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
+  }
+
+  &__message {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__message-text {
+    display: flex;
+    align-items: center;
+    padding: 4px 8px;
+    background-color: get-color(black-coral-0);
+    border-radius: 8px 8px 8px 4px;
+    font-size: $veera-font-size-100;
+    line-height: $veera-line-height-500;
+  }
+
+  &__message-date {
+    color: get-color(black-coral-6);
+    font-size: 11px;
+    line-height: 20px;
+  }
+}

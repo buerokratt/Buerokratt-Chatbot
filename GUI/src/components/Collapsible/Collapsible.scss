@@ -1,0 +1,35 @@
+@import 'src/styles/tools/spacing';
+@import 'src/styles/tools/color';
+@import 'src/styles/settings/variables/other';
+@import 'src/styles/settings/variables/typography';
+
+.collapsible {
+  border: 1px solid get-color(black-coral-2);
+  border-radius: 4px;
+
+  &__trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: get-spacing(haapsalu);
+    background-color: get-color(extra-light);
+    border-radius: 4px;
+
+    &[aria-expanded=true] {
+      border-bottom: 1px solid get-color(black-coral-2);
+      border-radius: 4px 4px 0 0;
+    }
+
+    .icon {
+      font-size: 21px;
+    }
+  }
+
+  &__content {
+    padding: get-spacing(haapsalu);
+    background-color: get-color(white);
+    border-radius: 0 0 4px 4px;
+    overflow: hidden;
+  }
+}

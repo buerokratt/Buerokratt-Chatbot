@@ -1,0 +1,73 @@
+@import 'src/styles/tools/spacing';
+@import 'src/styles/tools/color';
+@import 'src/styles/settings/variables/other';
+@import 'src/styles/settings/variables/typography';
+
+.toast {
+  padding: 16px;
+  border-radius: 5px;
+  border: 1px solid;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+  transition: opacity 0.25s ease-out;
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-right: 25px;
+  }
+
+  &__list {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 8px;
+    width: 408px;
+    max-width: 100vw;
+    z-index: 9999;
+    list-style: none;
+  }
+
+  &__content {
+    font-size: $veera-font-size-80;
+
+    a {
+      display: inline;
+      color: get-color(sapphire-blue-10);
+      text-decoration: underline;
+    }
+  }
+
+  &__close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    font-size: 20px;
+  }
+
+  &--success {
+    border-color: get-color(sea-green-10);
+    background-color: get-color(sea-green-0);
+  }
+
+  &--info {
+    border-color: get-color(sapphire-blue-10);
+    background-color: get-color(sapphire-blue-1);
+  }
+
+  &--error {
+    border-color: #fceeee;
+    background-color: get-color(jasper-10);
+  }
+
+  &--warning {
+    border-color: get-color(dark-tangerine-10);
+    background-color: get-color(dark-tangerine-1);
+  }
+}
