@@ -24,7 +24,11 @@
     "resultCount": "Kuvan korraga",
     "paginationNavigation": "Paginatsiooni navigatsioon",
     "gotoPage": "Mine lehele",
-    "name": "Nimi"
+    "name": "Nimi",
+    "idCode": "Isikukood",
+    "status": "Staatus",
+    "yes": "Jah",
+    "no": "Ei"
   },
   "mainMenu": {
     "menuLabel": "Põhinavigatsioon",
@@ -33,8 +37,24 @@
     "closeMenuIcon": "Sulge menüü ikoon"
   },
   "chat": {
+    "status": {
+      "active": "Aktiivne",
+      "ended": "Lõpetatud"
+    },
     "active": {
       "list": "Aktiivsed vestlused"
+    },
+    "history": {
+      "title": "Ajalugu",
+      "searchChats": "Otsi üle vestluste",
+      "startTime": "Algusaeg",
+      "endTime": "Lõppaeg",
+      "csaName": "Nõustaja nimi",
+      "contact": "Kontaktandmed",
+      "comment": "Kommentaar",
+      "label": "Pealkiri",
+      "nps": "NPS",
+      "forwarded": "Suunatud"
     }
   }
 }

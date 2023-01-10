@@ -1,7 +1,7 @@
-import axios, {AxiosError} from 'axios';
+import axios, { AxiosError } from 'axios';
 
 const instance = axios.create({
-  baseURL: import.meta.env.BASE_URL + 'api/',
+  baseURL: import.meta.env.BASE_URL,
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json',

@@ -24,7 +24,11 @@
     "resultCount": "Result count",
     "paginationNavigation": "Pagination navigation",
     "gotoPage": "Goto page",
-    "name": "Name"
+    "name": "Name",
+    "idCode": "ID code",
+    "status": "Status",
+    "yes": "Yes",
+    "no": "No"
   },
   "mainMenu": {
     "menuLabel": "Main navigation",
@@ -33,8 +37,24 @@
     "closeIcon": "Close menu icon"
   },
   "chat": {
+    "status": {
+      "active": "Active",
+      "ended": "Ended"
+    },
     "active": {
       "list": "Active chat list"
+    },
+    "history": {
+      "title": "History",
+      "searchChats": "Search chats",
+      "startTime": "Start time",
+      "endTime": "End time",
+      "csaName": "Customer support name",
+      "contact": "Contact",
+      "comment": "Comment",
+      "label": "Label",
+      "nps": "NPS",
+      "forwarded": "Forwarded"
     }
   }
 }

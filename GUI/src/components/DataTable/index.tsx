@@ -150,7 +150,7 @@ const DataTable: FC<DataTableProps> = (
       </table>
       {pagination && (
         <div className='data-table__pagination-wrapper'>
-          {table.getPageCount() > table.getState().pagination.pageSize && (
+          {(table.getPageCount() * table.getState().pagination.pageSize) > table.getState().pagination.pageSize && (
             <div className='data-table__pagination'>
               <button
                 className='previous'
