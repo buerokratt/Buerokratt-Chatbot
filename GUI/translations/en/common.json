@@ -31,5 +31,10 @@
     "closeMenu": "Close menu",
     "openIcon": "Open menu icon",
     "closeIcon": "Close menu icon"
+  },
+  "chat": {
+    "active": {
+      "list": "Active chat list"
+    }
   }
 }

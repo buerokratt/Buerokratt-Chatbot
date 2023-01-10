@@ -2,7 +2,7 @@ import { FC } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 import { Layout } from 'components';
-import ChatActive from './pages/ Chat/ChatActive';
+import ChatActive from 'pages/Chat/ChatActive';
 
 const App: FC = () => {
   return (

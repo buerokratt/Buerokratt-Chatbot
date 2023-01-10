@@ -31,5 +31,10 @@
     "closeMenu": "Kitsendan menüü",
     "openMenuIcon": "Ava menüü ikoon",
     "closeMenuIcon": "Sulge menüü ikoon"
+  },
+  "chat": {
+    "active": {
+      "list": "Aktiivsed vestlused"
+    }
   }
 }
