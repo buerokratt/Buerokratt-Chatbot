@@ -46,7 +46,7 @@
           "post_body_struct": {
             "userIdCode": "{#.userIdCode}",
             "displayName": "{#.displayName}",
-            "csa_title": "{#.csa_title}",
+            "csaTitle": "{#.csaTitle}",
             "csa_email": "{#.csa_email}",
             "roles": "{#.roles}"
           }
@@ -113,7 +113,7 @@
             "status": "active",
             "userIdCode": "{#.reflect_input#.userIdCode}",
             "displayName": "{#.reflect_input#.displayName}",
-            "csa_title": "{#.reflect_input#.csa_title}",
+            "csaTitle": "{#.reflect_input#.csaTitle}",
             "csa_email": "{#.reflect_input#.csa_email}"
           }
         }
