@@ -16,7 +16,7 @@
             "id": "{#.id}",
             "customerSupportId": "{#.customerSupportId}",
             "customerSupportDisplayName": "{#.customerSupportDisplayName}",
-            "csa_title": "{#.csa_title}"
+            "csaTitle": "{#.csaTitle}"
           }
         },
         "response": {
@@ -125,7 +125,7 @@
             "id": "{#.reflect_input#.id}",
             "customerSupportId": "{#.reflect_input#.customerSupportId}",
             "customerSupportDisplayName": "{#.reflect_input#.customerSupportDisplayName}",
-            "csa_title": "{#.reflect_input#.csa_title}",
+            "csaTitle": "{#.reflect_input#.csaTitle}",
             "endUserId": "{#.get_not_ended_chat[0]#.endUserId}",
             "endUserFirstName": "{#.get_not_ended_chat[0]#.endUserFirstName}",
             "endUserLastName": "{#.get_not_ended_chat[0]#.endUserLastName}",
