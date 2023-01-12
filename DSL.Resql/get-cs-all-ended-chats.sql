@@ -12,6 +12,7 @@ SELECT c.base_id AS id,
        c.ended,
        c.forwarded_to_name,
        c.received_from,
+       c.labels,
        m.content AS last_message,
        (SELECT content
         FROM message
