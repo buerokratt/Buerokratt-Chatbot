@@ -1,0 +1,67 @@
+@import 'src/styles/tools/spacing';
+@import 'src/styles/tools/color';
+@import 'src/styles/settings/variables/other';
+@import 'src/styles/settings/variables/typography';
+
+.switch {
+  $self: &;
+  display: flex;
+  align-items: center;
+
+  &__label {
+    flex: 0 0 170px;
+    font-size: $veera-font-size-100;
+    line-height: 24px;
+  }
+
+  &__button {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 40px;
+    isolation: isolate;
+    padding: 4px;
+    border-radius: 20px;
+    background-color: get-color(black-coral-1);
+    font-size: $veera-font-size-80;
+    line-height: $veera-line-height-500;
+    color: get-color(black-coral-12);
+    position: relative;
+    transition: background-color .25s ease-out;
+
+    &[aria-checked=true] {
+      background-color: get-color(sapphire-blue-10);
+      color: get-color(sapphire-blue-10);
+
+      #{$self} {
+        &__off {
+          color: get-color(white);
+          background: none;
+        }
+
+        &__on {
+          color: get-color(sapphire-blue-10);
+          background-color: get-color(white);
+        }
+      }
+    }
+  }
+
+  &__thumb {
+    display: none;
+  }
+
+  &__on,
+  &__off {
+    display: flex;
+    border-radius: 20px;
+    padding: 5.5px 10px;
+    font-weight: $veera-font-weight-delta;
+    transition: all .25s ease-out;
+  }
+
+  &__off {
+    font-weight: $veera-font-weight-delta;
+    background-color: get-color(white);
+  }
+}

@@ -1,0 +1,76 @@
+@import 'src/styles/tools/spacing';
+@import 'src/styles/tools/color';
+@import 'src/styles/settings/variables/other';
+@import 'src/styles/settings/variables/typography';
+
+.label {
+  $self: &;
+  display: flex;
+  padding: 1.5px 16px;
+  font-size: $veera-font-size-80;
+  font-weight: $veera-font-weight-delta;
+  border: 2px solid;
+  background-color: get-color(white);
+  border-radius: $veera-radius-s;
+  position: relative;
+
+  &--info {
+    color: get-color(sapphire-blue-10);
+    border-color: get-color(sapphire-blue-10);
+
+    #{$self} {
+      &__icon {
+        border-color: get-color(sapphire-blue-10);
+      }
+    }
+  }
+
+  &--warning {
+    color: get-color(dark-tangerine-10);
+    border-color: get-color(dark-tangerine-10);
+
+    #{$self} {
+      &__icon {
+        border-color: get-color(dark-tangerine-10);
+      }
+    }
+  }
+
+  &--error {
+    color: get-color(jasper-10);
+    border-color: get-color(jasper-10);
+
+    #{$self} {
+      &__icon {
+        border-color: get-color(jasper-10);
+      }
+    }
+  }
+
+  &--success {
+    color: get-color(sea-green-10);
+    border-color: get-color(sea-green-10);
+
+    #{$self} {
+      &__icon {
+        border-color: get-color(sea-green-10);
+      }
+    }
+  }
+
+  &__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    font-size: 13px;
+    line-height: 15px;
+    right: -8px;
+    top: 4px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid;
+    background-color: get-color(white);
+  }
+}

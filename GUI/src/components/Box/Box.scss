@@ -1,0 +1,41 @@
+@import 'src/styles/tools/spacing';
+@import 'src/styles/tools/color';
+@import 'src/styles/settings/variables/other';
+@import 'src/styles/settings/variables/typography';
+
+.box {
+  padding: get-spacing(paldiski);
+  border-radius: 4px;
+  border: 1px solid;
+  font-size: $veera-font-size-100;
+  line-height: $veera-line-height-500;
+
+  &:hover {
+    cursor: grab;
+  }
+
+  &--default {
+    background-color: get-color(black-coral-1);
+    border-color: get-color(black-coral-3);
+  }
+
+  &--blue {
+    background-color: get-color(sapphire-blue-0);
+    border-color: get-color(sapphire-blue-2);
+  }
+
+  &--yellow {
+    background-color: get-color(dark-tangerine-0);
+    border-color: get-color(dark-tangerine-4);
+  }
+
+  &--green {
+    background-color: get-color(sea-green-1);
+    border-color: get-color(sea-green-3);
+  }
+
+  &--red {
+    background-color: get-color(jasper-1);
+    border-color: get-color(jasper-3);
+  }
+}

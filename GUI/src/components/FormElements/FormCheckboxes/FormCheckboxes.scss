@@ -1,0 +1,63 @@
+@import 'src/styles/tools/spacing';
+@import 'src/styles/tools/color';
+@import 'src/styles/settings/variables/other';
+@import 'src/styles/settings/variables/typography';
+
+.checkboxes {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: get-spacing(paldiski);
+
+  &__label {
+    display: block;
+    flex: 0 0 170px;
+    font-size: $veera-font-size-100;
+    line-height: 24px;
+  }
+
+  &__wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__item {
+    input[type=checkbox] {
+      display: none;
+
+      + label {
+        display: block;
+        padding-left: 32px;
+        position: relative;
+        font-size: $veera-font-size-100;
+        line-height: $veera-line-height-500;
+
+        &::before {
+          content: '';
+          display: block;
+          width: 16px;
+          height: 16px;
+          box-shadow: inset 0 0 0 1px get-color(black-coral-2);
+          border-radius: 2px;
+          position: absolute;
+          left: 4px;
+          top: 4px;
+        }
+      }
+
+      &:checked {
+        + label {
+          &::before {
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQiIGhlaWdodD0iMTEiIHZpZXdCb3g9IjAgMCAxNCAxMSIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTQuNzQ5NzkgOC4xMjkwNkwxLjYyMjI5IDUuMDAxNTZMMC41NjEwMzUgNi4wNjI4MUw0Ljc0OTc5IDEwLjI1MTZMMTMuNzQ5OCAxLjI1MTU2TDEyLjY4ODUgMC4xOTAzMDhMNC43NDk3OSA4LjEyOTA2WiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+Cg==');
+            background-color: get-color(sapphire-blue-10);
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 13px 10px;
+            box-shadow: inset 0 0 0 1px get-color(sapphire-blue-10);
+          }
+        }
+      }
+    }
+  }
+}

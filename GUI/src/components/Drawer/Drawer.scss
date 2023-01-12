@@ -1,0 +1,35 @@
+@import 'src/styles/tools/spacing';
+@import 'src/styles/tools/color';
+@import 'src/styles/settings/variables/other';
+@import 'src/styles/settings/variables/typography';
+
+.drawer {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  top: 105px;
+  right: 0;
+  bottom: 0;
+  background-color: get-color(white);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.14);
+  width: 50%;
+  transition: transform .25s ease-out;
+  overflow: hidden;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: get-spacing(haapsalu);
+    padding: get-spacing(haapsalu);
+    border-bottom: 1px solid get-color(black-coral-2);
+
+    .icon {
+      font-size: 20px;
+    }
+  }
+
+  &__title,
+  &__body {
+    flex: 1;
+  }
+}

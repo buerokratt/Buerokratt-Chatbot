@@ -137,6 +137,23 @@
       }
     },
     {
+      "post_authentication_success_event": {
+        "method": "post",
+        "endpoint": "{resql_url}/insert-message",
+        "post_body_struct": {
+          "chatId": "{#.reflect_input#.chatId}",
+          "messageId": "",
+          "event": "authentication_successful",
+          "authorRole": "backoffice-user",
+          "created": "$_getInstant()"
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
       "blacklist_tara_jwt": {
         "verify": {
           "response": {
