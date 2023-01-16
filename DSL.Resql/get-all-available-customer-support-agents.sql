@@ -1,0 +1,2 @@
+SELECT *
+FROM customer_support_agent_activity
