@@ -1,0 +1,19 @@
+getAvailableCustomerSupportAgents:
+  call: http.post
+  args:
+    # TODO: replace with env variable
+    url: https://byk-resql:8443/get-all-available-customer-support-agents
+  result: getAvailableCustomerSupportAgentsResult
+
+validateAvailableAgentsExist:
+  switch:
+    - condition: '${getAvailableCustomerSupportAgentsResult.response.body.length > 0}'
+      next: returnSuccess
+  next: returnNotFound
+
+returnSuccess:
+  return: ${getAvailableCustomerSupportAgentsResult.response.body}
+  next: end
+
+returnNotFound:
+  return: "no available customer support agents found"
