@@ -1,4 +1,4 @@
-import { forwardRef, InputHTMLAttributes } from 'react';
+import { forwardRef, InputHTMLAttributes, useId } from 'react';
 import clsx from 'clsx';
 
 import './FormInput.scss';
@@ -10,6 +10,8 @@ type InputProps = InputHTMLAttributes<HTMLInputElement> & {
 };
 
 const FieldInput = forwardRef<HTMLInputElement, InputProps>(({ label, name, disabled, hideLabel, ...rest }, ref) => {
+  const id = useId();
+
   const inputClasses = clsx(
     'input',
     disabled && 'input--disabled',
@@ -17,9 +19,16 @@ const FieldInput = forwardRef<HTMLInputElement, InputProps>(({ label, name, disa
 
   return (
     <div className={inputClasses}>
-      {label && !hideLabel && <label htmlFor={name} className='input__label'>{label}</label>}
+      {label && !hideLabel && <label htmlFor={id} className='input__label'>{label}</label>}
       <div className='input__wrapper'>
-        <input className={inputClasses} name={name} id={name} ref={ref} {...rest} />
+        <input
+          className={inputClasses}
+          name={name}
+          id={id}
+          ref={ref}
+          aria-label={hideLabel ? label : undefined}
+          {...rest}
+        />
       </div>
     </div>
   );

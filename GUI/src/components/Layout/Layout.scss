@@ -9,6 +9,7 @@
     flex: 1;
     display: flex;
     flex-direction: column;
+    position: relative;
   }
 
   &__main {
@@ -17,8 +18,11 @@
     flex-direction: column;
     gap: get-spacing(haapsalu);
     overflow: auto;
-    height: 100%;
     padding: get-spacing(haapsalu);
-    position: relative;
+    position: absolute;
+    top: 105px;
+    left: 0;
+    right: 0;
+    bottom: 0;
   }
 }
