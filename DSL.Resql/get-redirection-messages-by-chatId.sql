@@ -9,6 +9,11 @@ SELECT chat_base_id,
        author_role,
        rating,
        created,
+       forwarded_by_csa,
+       forwarded_from_csa,
+       forwarded_to_csa,
+       forward_received_from_csa,
+       forward_received_by_csa,
        updated
 FROM message
 WHERE base_id = ANY (ARRAY(SELECT content::varchar[] AS message_ids

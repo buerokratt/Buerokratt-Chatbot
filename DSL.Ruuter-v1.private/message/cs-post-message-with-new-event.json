@@ -67,6 +67,12 @@
             "created": "{#.get_message_by_id[0]#.created}",
             "content": "{#.get_message_by_id[0]#.content}",
             "event": "{#.reflect_input#.event}",
+            "forwardedByCsa": "{#.get_message_by_id[0]#.forwardedByCsa}",
+            "forwardedFromCsa": "{#.get_message_by_id[0]#.forwardedFromCsa}",
+            "forwardedToCsa": "{#.get_message_by_id[0]#.forwardedToCsa}",
+            "forwardReceivedFromCsa":  "{#.get_message_by_id[0]#.forwardReceivedFromCsa}",
+            "forwardReceivedByCsa": "{#.get_message_by_id[0]#.forwardReceivedByCsa}",
+
             "rating": ""
           },
           "response": {
