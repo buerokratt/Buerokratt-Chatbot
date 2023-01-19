@@ -11,7 +11,7 @@ i18n
   .init({
     debug: import.meta.env.NODE_ENV === 'development',
     fallbackLng: 'et',
-    supportedLngs: ['et', 'en'],
+    supportedLngs: ['et'],
     resources: {
       en: {
         common: commonEN,

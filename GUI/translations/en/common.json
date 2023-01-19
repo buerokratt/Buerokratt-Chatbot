@@ -28,7 +28,8 @@
     "idCode": "ID code",
     "status": "Status",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "removeValidation": "Are you sure?"
   },
   "mainMenu": {
     "menuLabel": "Main navigation",
@@ -55,6 +56,29 @@
       "label": "Label",
       "nps": "NPS",
       "forwarded": "Forwarded"
+    }
+  },
+  "roles": {
+    "ROLE_ADMINISTRATOR": "Administrator",
+    "ROLE_SERVICE_MANAGER": "Service manager",
+    "ROLE_CUSTOMER_SUPPORT_AGENT": "Customer support",
+    "ROLE_CHATBOT_TRAINER": "Chatbot trainer",
+    "ROLE_ANALYST": "Analyst",
+    "ROLE_UNAUTHENTICATED": "Unauthenticated"
+  },
+  "settings": {
+    "users": {
+      "title": "Users",
+      "name": "Name",
+      "idCode": "ID code",
+      "role": "Role",
+      "displayName": "User title",
+      "email": "E-mail",
+      "addUser": "Add user",
+      "editUser": "Edit user",
+      "deleteUser": "Delete user",
+      "fullName": "First- and lastname",
+      "userRoles": "User role(s)"
     }
   }
 }
