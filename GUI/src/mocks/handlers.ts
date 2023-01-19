@@ -32,4 +32,13 @@ export const handlers = [
       ctx.json(usersData),
     );
   }),
+  rest.get(import.meta.env.BASE_URL + 'cs-get-is-bot-active', (req, res, ctx) => {
+    return res(ctx.json({ is_bot_active: true }));
+  }),
+  rest.get(import.meta.env.BASE_URL + 'cs-get-csa-name-visibility', (req, res, ctx) => {
+    return res(ctx.json({ isVisible: true }));
+  }),
+  rest.get(import.meta.env.BASE_URL + 'cs-get-csa-title-visibility', (req, res, ctx) => {
+    return res(ctx.json({ isVisible: false }));
+  }),
 ];

@@ -67,6 +67,7 @@
     "ROLE_UNAUTHENTICATED": "Unauthenticated"
   },
   "settings": {
+    "title": "Settings",
     "users": {
       "title": "Users",
       "name": "Name",
@@ -79,6 +80,11 @@
       "deleteUser": "Delete user",
       "fullName": "First- and lastname",
       "userRoles": "User role(s)"
+    },
+    "chat": {
+      "chatActive": "Chatbot active",
+      "showSupportName": "Show support name",
+      "showSupportTitle": "Show support title"
     }
   }
 }

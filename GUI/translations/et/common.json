@@ -67,6 +67,7 @@
     "ROLE_UNAUTHENTICATED": "Autentimata"
   },
   "settings": {
+    "title": "Seaded",
     "users": {
       "title": "Kasutajad",
       "name": "Nimi",
@@ -79,6 +80,11 @@
       "deleteUser": "Kustuta kasutaja",
       "fullName": "Ees- ja perekonnanimi",
       "userRoles": "Kasutaja roll(id)"
+    },
+    "chat": {
+      "chatActive": "Vestlusrobot aktiivne",
+      "showSupportName": "Kuva nõustaja nimi",
+      "showSupportTitle": "Kuva nõustaja tiitel"
     }
   }
 }
