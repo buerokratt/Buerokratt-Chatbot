@@ -1,0 +1,1 @@
+export const EMERGENCY_NOTICE_LENGTH = 250;

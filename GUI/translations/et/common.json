@@ -12,6 +12,7 @@
     "choose": "Vali",
     "search": "Otsi",
     "notification": "Teade",
+    "notificationError": "Veateade",
     "active": "Aktiivne",
     "activate": "Aktiveeri",
     "deactivate": "Deaktiveeri",
@@ -29,7 +30,9 @@
     "status": "Staatus",
     "yes": "Jah",
     "no": "Ei",
-    "removeValidation": "Oled sa kindel?"
+    "removeValidation": "Oled sa kindel?",
+    "startDate": "Algus kuupäev",
+    "endDate": "Lõpp kuupäev"
   },
   "mainMenu": {
     "menuLabel": "Põhinavigatsioon",
@@ -85,6 +88,12 @@
       "chatActive": "Vestlusrobot aktiivne",
       "showSupportName": "Kuva nõustaja nimi",
       "showSupportTitle": "Kuva nõustaja tiitel"
+    },
+    "emergencyNotices": {
+      "title": "Erakorralised teated",
+      "noticeActive": "Teade aktiivne",
+      "notice": "Teade",
+      "displayPeriod": "Kuvamisperiood"
     }
   }
 }

@@ -4,7 +4,15 @@ import Header from './Header';
 import MainNavigation from './MainNavigation';
 import Icon from './Icon';
 import Track from './Track';
-import { FormInput, FormTextarea, FormSelect, Switch, FormCheckboxes, FormCheckbox } from './FormElements';
+import {
+  FormInput,
+  FormTextarea,
+  FormSelect,
+  Switch,
+  FormCheckboxes,
+  FormCheckbox,
+  FormDatepicker,
+} from './FormElements';
 import DataTable from './DataTable';
 import Tooltip from './Tooltip';
 import Card from './Card';
@@ -29,6 +37,7 @@ export {
   FormInput,
   FormTextarea,
   FormSelect,
+  FormDatepicker,
   Switch,
   Card,
   Label,

@@ -6,6 +6,7 @@ import ChatActive from 'pages/Chat/ChatActive';
 import ChatHistory from 'pages/Chat/ChatHistory';
 import SettingsUsers from 'pages/Settings/SettingsUsers';
 import SettingsChatSettings from 'pages/Settings/SettingsChatSettings';
+import SettingsEmergencyNotices from 'pages/Settings/SettingsEmergencyNotices';
 
 const App: FC = () => {
   return (
@@ -16,6 +17,7 @@ const App: FC = () => {
         <Route path='/vestlus/ajalugu' element={<ChatHistory />} />
         <Route path='/haldus/kasutajad' element={<SettingsUsers />} />
         <Route path='/haldus/vestlusrobot/seaded' element={<SettingsChatSettings />} />
+        <Route path='/haldus/vestlusrobot/erakorralised-teated' element={<SettingsEmergencyNotices />} />
       </Route>
     </Routes>
   );

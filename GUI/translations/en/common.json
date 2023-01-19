@@ -12,6 +12,7 @@
     "choose": "Choose",
     "search": "Search",
     "notification": "Notification",
+    "notificationError": "Error",
     "active": "Active",
     "activate": "Activate",
     "deactivate": "Deactivate",
@@ -29,7 +30,9 @@
     "status": "Status",
     "yes": "Yes",
     "no": "No",
-    "removeValidation": "Are you sure?"
+    "removeValidation": "Are you sure?",
+    "startDate": "Start date",
+    "endDate": "End date"
   },
   "mainMenu": {
     "menuLabel": "Main navigation",
@@ -85,6 +88,12 @@
       "chatActive": "Chatbot active",
       "showSupportName": "Show support name",
       "showSupportTitle": "Show support title"
+    },
+    "emergencyNotices": {
+      "title": "Emergency notices",
+      "noticeActive": "Notice active",
+      "notice": "Notice",
+      "displayPeriod": "Display period"
     }
   }
 }

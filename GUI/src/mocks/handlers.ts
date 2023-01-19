@@ -41,4 +41,12 @@ export const handlers = [
   rest.get(import.meta.env.BASE_URL + 'cs-get-csa-title-visibility', (req, res, ctx) => {
     return res(ctx.json({ isVisible: false }));
   }),
+  rest.get(import.meta.env.BASE_URL + 'cs-get-emergency-notice', (req, res, ctx) => {
+    return res(ctx.json({
+      emergencyNoticeText: 'Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Aenean lacinia bibendum nulla sed consectetur.',
+      emergencyNoticeStartISO: new Date().toISOString(),
+      emergencyNoticeEndISO: new Date().toISOString(),
+      isEmergencyNoticeVisible: true,
+    }));
+  }),
 ];
