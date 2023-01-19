@@ -1,4 +1,4 @@
-import { forwardRef, useState } from 'react';
+import { ChangeEvent, forwardRef, useId, useState } from 'react';
 import TextareaAutosize, { TextareaAutosizeProps } from 'react-textarea-autosize';
 import clsx from 'clsx';
 
@@ -22,27 +22,41 @@ const FormTextarea = forwardRef<HTMLTextAreaElement, TextareaProps>((
     hideLabel,
     showMaxLength,
     defaultValue,
+    onChange,
     ...rest
   },
   ref,
 ) => {
-  const [currentLength, setCurrentLength] = useState(typeof defaultValue === 'string' && defaultValue.length || 0);
+  const id = useId();
+  const [currentLength, setCurrentLength] = useState((typeof defaultValue === 'string' && defaultValue.length) || 0);
   const textareaClasses = clsx(
     'textarea',
     disabled && 'textarea--disabled',
     showMaxLength && 'textarea--maxlength-shown',
   );
 
+  const handleOnChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    if (showMaxLength) {
+      setCurrentLength(e.target.value.length);
+    }
+  };
+
   return (
     <div className={textareaClasses}>
-      {label && !hideLabel && <label htmlFor={name} className='textarea__label'>{label}</label>}
+      {label && !hideLabel && <label htmlFor={id} className='textarea__label'>{label}</label>}
       <div className='textarea__wrapper'>
         <TextareaAutosize
-          onChange={showMaxLength ? (e) => setCurrentLength(e.target.value.length) : undefined}
-          maxLength={maxLength} minRows={minRows}
+          id={id}
+          maxLength={maxLength}
+          minRows={minRows}
           maxRows={maxRows}
           ref={ref}
           defaultValue={defaultValue}
+          aria-label={hideLabel ? label : undefined}
+          onChange={(e) => {
+            if (onChange) onChange(e);
+            handleOnChange(e);
+          }}
           {...rest}
         />
         {showMaxLength && (

@@ -5,7 +5,7 @@ import { createColumnHelper, PaginationState } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { MdOutlineRemoveRedEye } from 'react-icons/md';
 
-import { Button, Card, DataTable, Drawer, FormInput, Chat, Icon } from 'components';
+import { Button, Card, DataTable, Drawer, FormInput, HistoricalChat, Icon } from 'components';
 import { Chat as ChatType, CHAT_STATUS } from 'types/chat';
 import { Message } from 'types/message';
 
@@ -105,7 +105,7 @@ const ChatHistory: FC = () => {
           title={`${selectedChat.endUserFirstName} ${selectedChat.endUserLastName}`}
           onClose={() => setSelectedChat(null)}
         >
-          <Chat messages={chatMessages} />
+          {/*<HistoricalChat  />*/}
         </Drawer>
       )}
     </>

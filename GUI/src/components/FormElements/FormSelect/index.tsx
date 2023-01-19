@@ -1,4 +1,4 @@
-import { FC, SelectHTMLAttributes, useState } from 'react';
+import { FC, SelectHTMLAttributes, useId, useState } from 'react';
 import { useSelect } from 'downshift';
 import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';
@@ -6,7 +6,6 @@ import { MdArrowDropDown } from 'react-icons/md';
 
 import { Icon } from 'components';
 import './FormSelect.scss';
-
 
 type FormSelectProps = SelectHTMLAttributes<HTMLSelectElement> & {
   label: string;
@@ -26,7 +25,6 @@ const itemToString = (item: ({ label: string, value: string } | null)) => {
 const FormSelect: FC<FormSelectProps> = (
   {
     label,
-    name,
     hideLabel,
     options,
     disabled,
@@ -35,6 +33,7 @@ const FormSelect: FC<FormSelectProps> = (
     onSelectionChange,
   },
 ) => {
+  const id = useId();
   const { t } = useTranslation();
   const defaultSelected = options.find((o) => o.value === defaultValue) || null;
   const [selectedItem, setSelectedItem] = useState<{ label: string, value: string } | null>(defaultSelected);
@@ -46,6 +45,7 @@ const FormSelect: FC<FormSelectProps> = (
     highlightedIndex,
     getItemProps,
   } = useSelect({
+    id,
     items: options,
     itemToString,
     selectedItem,
@@ -64,7 +64,7 @@ const FormSelect: FC<FormSelectProps> = (
 
   return (
     <div className={selectClasses}>
-      {label && !hideLabel && <label htmlFor={name} className='select__label' {...getLabelProps()}>{label}</label>}
+      {label && !hideLabel && <label htmlFor={id} className='select__label' {...getLabelProps()}>{label}</label>}
       <div className='select__wrapper'>
         <div className='select__trigger' {...getToggleButtonProps()}>
           {selectedItem?.label ?? placeholderValue}

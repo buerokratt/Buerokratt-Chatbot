@@ -90,6 +90,25 @@
     }
   }
 
+  &--icon {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    justify-content: center;
+    color: get-color(black-coral-10);
+    font-size: 24px;
+
+    &:hover,
+    &:active {
+      color: get-color(sapphire-blue-10);
+    }
+
+    &:focus {
+      color: get-color(sapphire-blue-10);
+      box-shadow: inset 0 0 0 2px get-color(sapphire-blue-10);
+    }
+  }
+
   &--error {
     background-color: get-color(jasper-10);
 

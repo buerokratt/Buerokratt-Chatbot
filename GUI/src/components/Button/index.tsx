@@ -27,7 +27,7 @@ const Button: FC<PropsWithChildren<ButtonProps>> = (
   );
 
   return (
-    <button className={buttonClasses} ref={ref} {...rest}>
+    <button className={buttonClasses} ref={ref} disabled={disabled} {...rest}>
       {children}
     </button>
   );

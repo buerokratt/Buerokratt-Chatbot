@@ -1,11 +1,19 @@
-import React, { FC, ReactNode, useId, useState } from 'react';
+import React, { CSSProperties, FC, ReactNode, useId, useState } from 'react';
 import {
   ColumnDef,
   useReactTable,
   getCoreRowModel,
   flexRender,
   getSortedRowModel,
-  SortingState, FilterFn, getFilteredRowModel, VisibilityState, getPaginationRowModel, PaginationState,
+  SortingState,
+  FilterFn,
+  getFilteredRowModel,
+  VisibilityState,
+  getPaginationRowModel,
+  PaginationState,
+  TableMeta,
+  Row,
+  RowData,
 } from '@tanstack/react-table';
 import {
   RankingInfo,
@@ -37,6 +45,7 @@ type DataTableProps = {
   columnVisibility?: VisibilityState,
   setColumnVisibility?: React.Dispatch<React.SetStateAction<VisibilityState>>,
   disableHead?: boolean;
+  meta?: TableMeta<any>;
 }
 
 type ColumnMeta = {
@@ -55,6 +64,11 @@ declare module '@tanstack/table-core' {
   }
 }
 
+declare module '@tanstack/react-table' {
+  interface TableMeta<TData extends RowData> {
+    getRowStyles: (row: Row<TData>) => CSSProperties;
+  }
+}
 
 type CustomColumnDef = ColumnDef<any> & ColumnMeta;
 
@@ -79,6 +93,7 @@ const DataTable: FC<DataTableProps> = (
     columnVisibility,
     setColumnVisibility,
     disableHead,
+    meta,
   },
 ) => {
   const id = useId();
@@ -96,6 +111,7 @@ const DataTable: FC<DataTableProps> = (
       columnVisibility,
       ...{ pagination },
     },
+    meta,
     onGlobalFilterChange: setGlobalFilter,
     onColumnVisibilityChange: setColumnVisibility,
     globalFilterFn: fuzzyFilter,
@@ -140,7 +156,7 @@ const DataTable: FC<DataTableProps> = (
         <tbody>
         {tableBodyPrefix}
         {table.getRowModel().rows.map((row) => (
-          <tr key={row.id}>
+          <tr key={row.id} style={table.options.meta?.getRowStyles(row)}>
             {row.getVisibleCells().map((cell) => (
               <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
             ))}

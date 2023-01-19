@@ -28,7 +28,8 @@
     "idCode": "Isikukood",
     "status": "Staatus",
     "yes": "Jah",
-    "no": "Ei"
+    "no": "Ei",
+    "removeValidation": "Oled sa kindel?"
   },
   "mainMenu": {
     "menuLabel": "Põhinavigatsioon",
@@ -55,6 +56,29 @@
       "label": "Pealkiri",
       "nps": "NPS",
       "forwarded": "Suunatud"
+    }
+  },
+  "roles": {
+    "ROLE_ADMINISTRATOR": "Administraator",
+    "ROLE_SERVICE_MANAGER": "Teenuse haldur",
+    "ROLE_CUSTOMER_SUPPORT_AGENT": "Nõustaja",
+    "ROLE_CHATBOT_TRAINER": "Vestlusroboti treener",
+    "ROLE_ANALYST": "Analüütik",
+    "ROLE_UNAUTHENTICATED": "Autentimata"
+  },
+  "settings": {
+    "users": {
+      "title": "Kasutajad",
+      "name": "Nimi",
+      "idCode": "Isikukood",
+      "role": "Roll",
+      "displayName": "Tiitel",
+      "email": "E-post",
+      "addUser": "Lisa kasutaja",
+      "editUser": "Muuda kasutajat",
+      "deleteUser": "Kustuta kasutaja",
+      "fullName": "Ees- ja perekonnanimi",
+      "userRoles": "Kasutaja roll(id)"
     }
   }
 }

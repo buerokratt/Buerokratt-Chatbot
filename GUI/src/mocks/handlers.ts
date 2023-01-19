@@ -3,6 +3,7 @@ import { rest } from 'msw';
 import { mainNavigationET } from './mainNavigation';
 import { endedChatsData } from './endedChats';
 import { chatMessagesData } from './chatMessages';
+import { usersData } from './users';
 
 export const handlers = [
   rest.get(import.meta.env.BASE_URL + 'main-navigation', (req, res, ctx) => {
@@ -23,6 +24,12 @@ export const handlers = [
     return res(
       ctx.status(200),
       ctx.json(chatMessagesData),
+    );
+  }),
+  rest.get(import.meta.env.BASE_URL + 'cs-get-admins', (req, res, ctx) => {
+    return res(
+      ctx.status(200),
+      ctx.json(usersData),
     );
   }),
 ];
