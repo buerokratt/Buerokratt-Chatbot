@@ -158,11 +158,8 @@
             "authorLastName": "",
             "authorRole": "backoffice-user",
             "rating": "",
-            "forwardedByCsa": "",
             "forwardedFromCsa": "",
-            "forwardedToCsa":  "",
-            "forwardReceivedFromCsa":  "",
-            "forwardReceivedByCsa": "",
+            "forwardedToCsa": "",
             "created": "$_getInstant()"
           }
         },

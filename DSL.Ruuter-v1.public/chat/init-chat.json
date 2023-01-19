@@ -19,11 +19,8 @@
             "endUserId": "",
             "endUserOs": "{#.endUserTechnicalData#.endUserOs}",
             "endUserUrl": "{#.endUserTechnicalData#.endUserUrl}",
-            "forwardedByCsa": "",
             "forwardedFromCsa": "",
-            "forwardedToCsa":  "",
-            "forwardReceivedFromCsa":  "",
-            "forwardReceivedByCsa": ""
+            "forwardedToCsa":  ""
           }
         },
         "response": {
@@ -198,11 +195,8 @@
             "authorLastName": "",
             "authorRole": "{#.reflect_input#.authorRole}",
             "rating": "",
-            "forwardedByCsa": "{#.reflect_input#.forwardedByCsa}",
             "forwardedFromCsa": "{#.reflect_input#.forwardedFromCsa}",
-            "forwardedToCsa":  "{#.reflect_input#.forwardedToCsa}",
-            "forwardReceivedFromCsa":  "{#.reflect_input#.forwardReceivedFromCsa}",
-            "forwardReceivedByCsa": "{#.reflect_input#.forwardReceivedByCsa}",
+            "forwardedToCsa": "{#.reflect_input#.forwardedToCsa}",
             "created": "$_getInstant()"
           },
           "response": {

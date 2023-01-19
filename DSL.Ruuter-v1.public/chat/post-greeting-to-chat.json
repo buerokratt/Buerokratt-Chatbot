@@ -99,11 +99,8 @@
             "authorLastName": "",
             "authorRole": "buerokratt",
             "rating": "",
-            "forwardedByCsa": "",
             "forwardedFromCsa": "",
-            "forwardedToCsa":  "",
-            "forwardReceivedFromCsa":  "",
-            "forwardReceivedByCsa": "",
+            "forwardedToCsa": "",
             "created": "$_getInstant()"
           },
           "response": {

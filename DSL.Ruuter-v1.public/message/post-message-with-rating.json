@@ -134,11 +134,8 @@
             "content": "{#.get_message_by_id[0]#.content}",
             "event": "rating",
             "rating": "{#.reflect_input#.rating}",
-            "forwardedByCsa": "{#.get_message_by_id[0]#.forwardedByCsa}",
             "forwardedFromCsa": "{#.get_message_by_id[0]#.forwardedFromCsa}",
-            "forwardedToCsa": "{#.get_message_by_id[0]#.forwardedToCsa}",
-            "forwardReceivedFromCsa":  "{#.get_message_by_id[0]#.forwardReceivedFromCsa}",
-            "forwardReceivedByCsa": "{#.get_message_by_id[0]#.forwardReceivedByCsa}"
+            "forwardedToCsa": "{#.get_message_by_id[0]#.forwardedToCsa}"
           },
           "response": {
             "ok": "proceed",

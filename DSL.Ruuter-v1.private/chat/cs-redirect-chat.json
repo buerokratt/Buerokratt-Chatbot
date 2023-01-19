@@ -17,11 +17,8 @@
             "customerSupportId": "{#.customerSupportId}",
             "customerSupportDisplayName": "{#.customerSupportDisplayName}",
             "csaTitle": "{#.csaTitle}",
-            "forwardedByCsa": "{#.forwardedByCsa}",
             "forwardedFromCsa": "{#.forwardedFromCsa}",
-            "forwardedToCsa":  "{#.forwardedToCsa}",
-            "forwardReceivedFromCsa":  "{#.forwardReceivedFromCsa}",
-            "forwardReceivedByCsa": "{#.forwardReceivedByCsa}"
+            "forwardedToCsa": "{#.forwardedToCsa}"
           }
         },
         "response": {
@@ -197,11 +194,8 @@
             "authorLastName": "",
             "authorRole": "buerokratt",
             "rating": "",
-            "forwardedByCsa": "{#.reflect_input#.forwardedByCsa}",
             "forwardedFromCsa": "{#.reflect_input#.forwardedFromCsa}",
-            "forwardedToCsa":  "{#.reflect_input#.forwardedToCsa}",
-            "forwardReceivedFromCsa":  "{#.reflect_input#.forwardReceivedFromCsa}",
-            "forwardReceivedByCsa": "{#.reflect_input#.forwardReceivedByCsa}",
+            "forwardedToCsa": "{#.reflect_input#.forwardedToCsa}",
             "created": "$_getInstant()"
           }
         },
