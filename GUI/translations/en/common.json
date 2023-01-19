@@ -32,7 +32,8 @@
     "no": "No",
     "removeValidation": "Are you sure?",
     "startDate": "Start date",
-    "endDate": "End date"
+    "endDate": "End date",
+    "preview": "Preview"
   },
   "mainMenu": {
     "menuLabel": "Main navigation",
@@ -94,6 +95,13 @@
       "noticeActive": "Notice active",
       "notice": "Notice",
       "displayPeriod": "Display period"
+    },
+    "appearance": {
+      "title": "Appearance and bahavior",
+      "widgetBubbleMessageText": "Widget bubble message text",
+      "widgetProactiveSeconds": "Widget proactive seconds",
+      "widgetDisplayBubbleMessageSeconds": "Widget bubble message seconds",
+      "widgetColor": "Widget color"
     }
   }
 }

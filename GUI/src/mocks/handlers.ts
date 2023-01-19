@@ -49,4 +49,13 @@ export const handlers = [
       isEmergencyNoticeVisible: true,
     }));
   }),
+  rest.get(import.meta.env.BASE_URL + 'cs-get-widget-config', (req, res, ctx) => {
+    return res(ctx.json({
+      widgetProactiveSeconds: 3,
+      widgetDisplayBubbleMessageSeconds: 5,
+      widgetBubbleMessageText: 'Küsi minult!',
+      widgetColor: '#E99B03',
+      isWidgetActive: true,
+    }));
+  }),
 ];

@@ -32,7 +32,8 @@
     "no": "Ei",
     "removeValidation": "Oled sa kindel?",
     "startDate": "Algus kuupäev",
-    "endDate": "Lõpp kuupäev"
+    "endDate": "Lõpp kuupäev",
+    "preview": "Eelvaade"
   },
   "mainMenu": {
     "menuLabel": "Põhinavigatsioon",
@@ -94,6 +95,13 @@
       "noticeActive": "Teade aktiivne",
       "notice": "Teade",
       "displayPeriod": "Kuvamisperiood"
+    },
+    "appearance": {
+      "title": "Välimus ja käitumine",
+      "widgetBubbleMessageText": "Märguandesõnum",
+      "widgetProactiveSeconds": "Proaktiivsusaeg",
+      "widgetDisplayBubbleMessageSeconds": "Märguandesõnumi aeg",
+      "widgetColor": "Põhivärv"
     }
   }
 }

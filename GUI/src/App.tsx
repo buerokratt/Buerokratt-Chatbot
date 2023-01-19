@@ -7,6 +7,7 @@ import ChatHistory from 'pages/Chat/ChatHistory';
 import SettingsUsers from 'pages/Settings/SettingsUsers';
 import SettingsChatSettings from 'pages/Settings/SettingsChatSettings';
 import SettingsEmergencyNotices from 'pages/Settings/SettingsEmergencyNotices';
+import SettingsAppearance from 'pages/Settings/SettingsAppearance';
 
 const App: FC = () => {
   return (
@@ -18,6 +19,7 @@ const App: FC = () => {
         <Route path='/haldus/kasutajad' element={<SettingsUsers />} />
         <Route path='/haldus/vestlusrobot/seaded' element={<SettingsChatSettings />} />
         <Route path='/haldus/vestlusrobot/erakorralised-teated' element={<SettingsEmergencyNotices />} />
+        <Route path='/haldus/vestlusrobot/välimus-ja-kaitumine' element={<SettingsAppearance />} />
       </Route>
     </Routes>
   );
