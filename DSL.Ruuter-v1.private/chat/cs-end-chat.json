@@ -122,50 +122,47 @@
           }
         },
         "proceed": {
-          "method": "post",
-          "endpoint": "{resql_url}/insert-message",
           "post_body_parameters": {
-            "check_event": {
+            "check_roles": {
+              "post_body_parameters": {
+                "check_statuses": {
+                  "method": "post",
+                  "endpoint": "{ruuter_url}/match_input",
+                  "post_body_struct": {
+                    "input": {
+                      "authorities": "{#.reflect_input#.event}"
+                    },
+                    "validate_against": {
+                      "authorities": [
+                        "CLIENT_LEFT_WITH_ACCEPTED",
+                        "CLIENT_LEFT_WITH_NO_RESOLUTION",
+                        "CLIENT_LEFT_FOR_UNKNOWN_REASONS",
+                        "ACCEPTED",
+                        "ANSWERED",
+                        "HATE_SPEECH",
+                        "OTHER",
+                        "RESPONSE_SENT_TO_CLIENT_EMAIL"
+                      ]
+                    },
+                    "validation_type": "MUST_MATCH_ANY"
+                  },
+                  "response": {
+                    "ok": "proceed",
+                    "nok": "stop"
+                  }
+                }
+              },
               "method": "post",
               "endpoint": "{ruuter_url}/match_input",
               "post_body_struct": {
                 "input": {
-                  "event": "{#.reflect_input#.event}"
-                },
-                "post_body_parameters": {
-                  "check_roles": {
-                    "method": "post",
-                    "endpoint": "{ruuter_url}/match_input",
-                    "post_body_struct": {
-                      "input": {
-                        "authorities": "{#.get_userinfo#.authorities}"
-                      },
-                      "validate_against": {
-                        "authorities": [
-                          "ROLE_ADMINISTRATOR",
-                          "ROLE_CUSTOMER_SUPPORT_AGENT",
-                          "ROLE_SERVICE_MANAGER"
-                        ]
-                      },
-                      "validation_type": "MUST_MATCH_ANY"
-                    },
-                    "response": {
-                      "ok": "proceed",
-                      "nok": "stop"
-                    }
-                  }
+                  "authorities": "{#.get_userinfo#.authorities}"
                 },
                 "validate_against": {
-                  "event": [
-                    "CLIENT_LEFT_WITH_ACCEPTED",
-                    "CLIENT_LEFT_WITH_NO_RESOLUTION",
-                    "CLIENT_LEFT_FOR_UNKNOWN_REASONS",
-                    "ACCEPTED",
-                    "answered",
-                    "ANSWERED",
-                    "HATE_SPEECH",
-                    "OTHER",
-                    "RESPONSE_SENT_TO_CLIENT_EMAIL"
+                  "authorities": [
+                    "ROLE_ADMINISTRATOR",
+                    "ROLE_CUSTOMER_SUPPORT_AGENT",
+                    "ROLE_SERVICE_MANAGER"
                   ]
                 },
                 "validation_type": "MUST_MATCH_ANY"
@@ -174,26 +171,24 @@
                 "ok": "proceed",
                 "nok": "stop"
               }
-            },
-            "response": {
-              "ok": "proceed",
-              "nok": "stop"
             }
           },
+          "method": "post",
+          "endpoint": "{resql_url}/insert-message",
           "post_body_struct": {
-              "chatId": "{#.reflect_input#.chatId}",
-              "messageId": "{#.get_message_uuid#.output}",
-              "content": "",
-              "event": "{#.reflect_input#.event}",
-              "authorTimestamp": "{#.reflect_input#.authorTimestamp}",
-              "authorId": "{#.get_userinfo#.idCode}",
-              "authorFirstName": "",
-              "authorLastName": "",
-              "authorRole": "backoffice-user",
-              "rating": "",
-              "created": "$_getInstant()"
+            "chatId": "{#.reflect_input#.chatId}",
+            "messageId": "{#.get_message_uuid#.output}",
+            "content": "",
+            "event": "{#.reflect_input#.event}",
+            "authorTimestamp": "{#.reflect_input#.authorTimestamp}",
+            "authorId": "{#.get_userinfo#.idCode}",
+            "authorFirstName": "",
+            "authorLastName": "",
+            "authorRole": "backoffice-user",
+            "rating": "",
+            "created": "$_getInstant()"
           }
-  },
+        },
         "response": {
           "ok": "proceed",
           "nok": "stop"
