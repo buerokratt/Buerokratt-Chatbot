@@ -102,6 +102,11 @@
       "widgetProactiveSeconds": "Proaktiivsusaeg",
       "widgetDisplayBubbleMessageSeconds": "Märguandesõnumi aeg",
       "widgetColor": "Põhivärv"
+    },
+    "workingTime": {
+      "title": "Asutuse tööaeg",
+      "openFrom": "Avatud alates",
+      "openUntil": "Avatud kuni"
     }
   }
 }

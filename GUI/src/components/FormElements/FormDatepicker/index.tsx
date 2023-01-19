@@ -2,7 +2,7 @@ import { FC, useId, useState } from 'react';
 import ReactDatePicker, { registerLocale } from 'react-datepicker';
 import clsx from 'clsx';
 import { et } from 'date-fns/locale';
-import { MdChevronRight, MdChevronLeft, MdOutlineToday } from 'react-icons/md';
+import { MdChevronRight, MdChevronLeft, MdOutlineToday, MdOutlineSchedule } from 'react-icons/md';
 
 import { Icon } from 'components';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -35,7 +35,7 @@ const FormDatepicker: FC<FormDatepickerProps> = ({ label, name, hideLabel, disab
         <ReactDatePicker
           selected={date}
           onChange={setDate}
-          dateFormat='dd.MM.yyyy'
+          dateFormat={timePicker ? 'HH:ii' : 'dd.MM.yyyy'}
           locale='et-EE'
           placeholderText={placeholder}
           previousMonthButtonLabel={<MdChevronLeft />}
@@ -43,9 +43,14 @@ const FormDatepicker: FC<FormDatepickerProps> = ({ label, name, hideLabel, disab
           aria-label={hideLabel ? label : undefined}
           showTimeSelect={timePicker}
           showTimeSelectOnly={timePicker}
-          portalId="overlay-root"
+          portalId='overlay-root'
         />
-        <Icon icon={<MdOutlineToday color='#5D6071' fontSize={18} />} size='medium' />
+        <Icon
+          icon={timePicker
+            ? (<MdOutlineSchedule color='#5D6071' fontSize={20} />)
+            : (<MdOutlineToday color='#5D6071' fontSize={20} />)
+          }
+          size='medium' />
       </div>
     </div>
   );

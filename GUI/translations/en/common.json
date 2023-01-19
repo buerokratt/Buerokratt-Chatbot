@@ -102,6 +102,11 @@
       "widgetProactiveSeconds": "Widget proactive seconds",
       "widgetDisplayBubbleMessageSeconds": "Widget bubble message seconds",
       "widgetColor": "Widget color"
+    },
+    "workingTime": {
+      "title": "Organization working time",
+      "openFrom": "Open from",
+      "openUntil": "Open until"
     }
   }
 }

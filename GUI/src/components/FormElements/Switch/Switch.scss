@@ -7,6 +7,7 @@
   $self: &;
   display: flex;
   align-items: center;
+  gap: get-spacing(paldiski);
 
   &__label {
     flex: 0 0 170px;

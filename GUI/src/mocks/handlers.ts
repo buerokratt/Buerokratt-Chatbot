@@ -58,4 +58,10 @@ export const handlers = [
       isWidgetActive: true,
     }));
   }),
+  rest.get(import.meta.env.BASE_URL + 'cs-get-organization-working-time', (req, res, ctx) => {
+    return res(ctx.json({
+      organizationWorkingTimeStartISO: new Date(),
+      organizationWorkingTimeEndISO: new Date(),
+    }));
+  }),
 ];

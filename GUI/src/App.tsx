@@ -8,6 +8,7 @@ import SettingsUsers from 'pages/Settings/SettingsUsers';
 import SettingsChatSettings from 'pages/Settings/SettingsChatSettings';
 import SettingsEmergencyNotices from 'pages/Settings/SettingsEmergencyNotices';
 import SettingsAppearance from 'pages/Settings/SettingsAppearance';
+import SettingsWorkingTime from 'pages/Settings/SettingsWorkingTime';
 
 const App: FC = () => {
   return (
@@ -20,6 +21,7 @@ const App: FC = () => {
         <Route path='/haldus/vestlusrobot/seaded' element={<SettingsChatSettings />} />
         <Route path='/haldus/vestlusrobot/erakorralised-teated' element={<SettingsEmergencyNotices />} />
         <Route path='/haldus/vestlusrobot/välimus-ja-kaitumine' element={<SettingsAppearance />} />
+        <Route path='/haldus/asutuse-tooaeg' element={<SettingsWorkingTime />} />
       </Route>
     </Routes>
   );
