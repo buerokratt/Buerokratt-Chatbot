@@ -18,7 +18,10 @@
             "content": "{#.message#.content}",
             "endUserId": "",
             "endUserOs": "{#.endUserTechnicalData#.endUserOs}",
-            "endUserUrl": "{#.endUserTechnicalData#.endUserUrl}"
+            "endUserUrl": "{#.endUserTechnicalData#.endUserUrl}",
+            "forwardedByUser": "",
+            "forwardedFromCsa": "",
+            "forwardedToCsa":  ""
           }
         },
         "response": {
@@ -193,6 +196,9 @@
             "authorLastName": "",
             "authorRole": "{#.reflect_input#.authorRole}",
             "rating": "",
+            "forwardedByUser": "{#.reflect_input#.forwardedByUser}",
+            "forwardedFromCsa": "{#.reflect_input#.forwardedFromCsa}",
+            "forwardedToCsa": "{#.reflect_input#.forwardedToCsa}",
             "created": "$_getInstant()"
           },
           "response": {
