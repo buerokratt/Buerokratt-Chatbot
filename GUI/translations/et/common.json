@@ -12,6 +12,7 @@
     "choose": "Vali",
     "search": "Otsi",
     "notification": "Teade",
+    "notificationError": "Veateade",
     "active": "Aktiivne",
     "activate": "Aktiveeri",
     "deactivate": "Deaktiveeri",
@@ -29,7 +30,10 @@
     "status": "Staatus",
     "yes": "Jah",
     "no": "Ei",
-    "removeValidation": "Oled sa kindel?"
+    "removeValidation": "Oled sa kindel?",
+    "startDate": "Algus kuupäev",
+    "endDate": "Lõpp kuupäev",
+    "preview": "Eelvaade"
   },
   "mainMenu": {
     "menuLabel": "Põhinavigatsioon",
@@ -67,6 +71,7 @@
     "ROLE_UNAUTHENTICATED": "Autentimata"
   },
   "settings": {
+    "title": "Seaded",
     "users": {
       "title": "Kasutajad",
       "name": "Nimi",
@@ -79,6 +84,33 @@
       "deleteUser": "Kustuta kasutaja",
       "fullName": "Ees- ja perekonnanimi",
       "userRoles": "Kasutaja roll(id)"
+    },
+    "chat": {
+      "chatActive": "Vestlusrobot aktiivne",
+      "showSupportName": "Kuva nõustaja nimi",
+      "showSupportTitle": "Kuva nõustaja tiitel"
+    },
+    "emergencyNotices": {
+      "title": "Erakorralised teated",
+      "noticeActive": "Teade aktiivne",
+      "notice": "Teade",
+      "displayPeriod": "Kuvamisperiood"
+    },
+    "appearance": {
+      "title": "Välimus ja käitumine",
+      "widgetBubbleMessageText": "Märguandesõnum",
+      "widgetProactiveSeconds": "Proaktiivsusaeg",
+      "widgetDisplayBubbleMessageSeconds": "Märguandesõnumi aeg",
+      "widgetColor": "Põhivärv"
+    },
+    "workingTime": {
+      "title": "Asutuse tööaeg",
+      "openFrom": "Avatud alates",
+      "openUntil": "Avatud kuni"
+    },
+    "userSession": {
+      "title": "Kasutaja sessioon",
+      "sessionLength": "Sessiooni pikkus"
     }
   }
 }

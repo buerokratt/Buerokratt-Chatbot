@@ -32,4 +32,45 @@ export const handlers = [
       ctx.json(usersData),
     );
   }),
+  rest.get(import.meta.env.BASE_URL + 'cs-get-is-bot-active', (req, res, ctx) => {
+    return res(ctx.json({ is_bot_active: true }));
+  }),
+  rest.get(import.meta.env.BASE_URL + 'cs-get-csa-name-visibility', (req, res, ctx) => {
+    return res(ctx.json({ isVisible: true }));
+  }),
+  rest.get(import.meta.env.BASE_URL + 'cs-get-csa-title-visibility', (req, res, ctx) => {
+    return res(ctx.json({ isVisible: false }));
+  }),
+  rest.get(import.meta.env.BASE_URL + 'cs-get-emergency-notice', (req, res, ctx) => {
+    return res(ctx.json({
+      emergencyNoticeText: 'Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Aenean lacinia bibendum nulla sed consectetur.',
+      emergencyNoticeStartISO: new Date().toISOString(),
+      emergencyNoticeEndISO: new Date().toISOString(),
+      isEmergencyNoticeVisible: true,
+    }));
+  }),
+  rest.get(import.meta.env.BASE_URL + 'cs-get-widget-config', (req, res, ctx) => {
+    return res(ctx.json({
+      widgetProactiveSeconds: 3,
+      widgetDisplayBubbleMessageSeconds: 5,
+      widgetBubbleMessageText: 'Küsi minult!',
+      widgetColor: '#E99B03',
+      isWidgetActive: true,
+    }));
+  }),
+  rest.get(import.meta.env.BASE_URL + 'cs-get-organization-working-time', (req, res, ctx) => {
+    return res(ctx.json({
+      organizationWorkingTimeStartISO: new Date(),
+      organizationWorkingTimeEndISO: new Date(),
+    }));
+  }),
+  rest.get(import.meta.env.BASE_URL + 'cs-get-session-length', (req, res, ctx) => {
+    return res(ctx.json({
+      id: 28,
+      key: 'session_length',
+      value: '480',
+      deleted: false,
+      created: '2023-01-18T12:15:41.385+00:00',
+    }));
+  }),
 ];

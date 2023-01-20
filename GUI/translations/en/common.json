@@ -12,6 +12,7 @@
     "choose": "Choose",
     "search": "Search",
     "notification": "Notification",
+    "notificationError": "Error",
     "active": "Active",
     "activate": "Activate",
     "deactivate": "Deactivate",
@@ -29,7 +30,10 @@
     "status": "Status",
     "yes": "Yes",
     "no": "No",
-    "removeValidation": "Are you sure?"
+    "removeValidation": "Are you sure?",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "preview": "Preview"
   },
   "mainMenu": {
     "menuLabel": "Main navigation",
@@ -67,6 +71,7 @@
     "ROLE_UNAUTHENTICATED": "Unauthenticated"
   },
   "settings": {
+    "title": "Settings",
     "users": {
       "title": "Users",
       "name": "Name",
@@ -79,6 +84,33 @@
       "deleteUser": "Delete user",
       "fullName": "First- and lastname",
       "userRoles": "User role(s)"
+    },
+    "chat": {
+      "chatActive": "Chatbot active",
+      "showSupportName": "Show support name",
+      "showSupportTitle": "Show support title"
+    },
+    "emergencyNotices": {
+      "title": "Emergency notices",
+      "noticeActive": "Notice active",
+      "notice": "Notice",
+      "displayPeriod": "Display period"
+    },
+    "appearance": {
+      "title": "Appearance and bahavior",
+      "widgetBubbleMessageText": "Widget bubble message text",
+      "widgetProactiveSeconds": "Widget proactive seconds",
+      "widgetDisplayBubbleMessageSeconds": "Widget bubble message seconds",
+      "widgetColor": "Widget color"
+    },
+    "workingTime": {
+      "title": "Organization working time",
+      "openFrom": "Open from",
+      "openUntil": "Open until"
+    },
+    "userSession": {
+      "title": "User session",
+      "sessionLength": "Session length"
     }
   }
 }

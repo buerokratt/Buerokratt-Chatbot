@@ -6,6 +6,8 @@ SELECT content::varchar[] AS message_ids,
        author_first_name,
        author_last_name,
        author_role,
+       forwarded_from_csa,
+       forwarded_to_csa,
        created
 FROM message
 WHERE chat_base_id = :chatId

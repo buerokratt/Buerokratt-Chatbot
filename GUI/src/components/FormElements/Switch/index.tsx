@@ -1,27 +1,30 @@
-import { FC, InputHTMLAttributes, useId } from 'react';
+import { forwardRef, useId } from 'react';
 import * as RadixSwitch from '@radix-ui/react-switch';
 import { useTranslation } from 'react-i18next';
+import { ControllerRenderProps } from 'react-hook-form';
 
 import './Switch.scss';
 
-type SwitchProps = InputHTMLAttributes<HTMLInputElement> & {
+type SwitchProps = ControllerRenderProps & {
   onLabel?: string;
   offLabel?: string;
   name: string;
   label: string;
+  checked?: boolean;
   hideLabel?: boolean;
   onCheckedChange?: (checked: boolean) => void;
 }
 
-const Switch: FC<SwitchProps> = (
+const Switch = forwardRef<HTMLButtonElement, SwitchProps>((
   {
     onLabel,
     offLabel,
     label,
+    checked,
     hideLabel,
-    defaultChecked,
     onCheckedChange,
   },
+  ref,
 ) => {
   const id = useId();
   const { t } = useTranslation();
@@ -32,10 +35,11 @@ const Switch: FC<SwitchProps> = (
     <div className='switch'>
       {label && !hideLabel && <label htmlFor={id} className='switch__label'>{label}</label>}
       <RadixSwitch.Root
+        ref={ref}
         id={id}
         className='switch__button'
-        defaultChecked={defaultChecked}
         onCheckedChange={onCheckedChange}
+        checked={checked}
       >
         <RadixSwitch.Thumb className='switch__thumb' />
         <span className='switch__on'>{onValueLabel}</span>
@@ -43,6 +47,6 @@ const Switch: FC<SwitchProps> = (
       </RadixSwitch.Root>
     </div>
   );
-};
+});
 
 export default Switch;

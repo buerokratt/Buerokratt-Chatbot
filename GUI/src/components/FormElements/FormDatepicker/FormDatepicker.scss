@@ -3,7 +3,7 @@
 @import 'src/styles/settings/variables/other';
 @import 'src/styles/settings/variables/typography';
 
-.input {
+.datepicker {
   $self: &;
   display: flex;
   align-items: center;
@@ -17,16 +17,17 @@
   }
 
   &__wrapper {
-    flex: 1;
     display: flex;
     flex-direction: column;
     gap: 7px;
     position: relative;
+    width: 125px;
 
     .icon {
       position: absolute;
-      top: 10px;
-      right: 10px;
+      right: 8px;
+      top: 8px;
+      pointer-events: none;
     }
   }
 
@@ -85,6 +86,54 @@
   &--disabled & {
     input {
       background-color: get-color(black-coral-0);
+    }
+  }
+}
+
+.react-datepicker {
+  font-family: inherit;
+  font-size: 14px;
+  border: 1px solid get-color(black-coral-6);
+  border-radius: 4px;
+
+  &-popper[data-placement^=bottom] {
+    padding: 0;
+  }
+
+  &-wrapper {
+    display: block;
+  }
+
+  &__input-container {
+    display: block;
+  }
+
+  &__triangle {
+    &::before,
+    &::after {
+      content: none !important;
+    }
+  }
+
+  &__navigation {
+    width: 50px;
+    height: 50px;
+    top: 0;
+
+    &:hover {
+      background-color: var(--color-bg);
+    }
+
+    &--previous {
+      border-top-left-radius: 4px;
+      border-right: 1px solid var(--color-gray);
+      left: 0;
+    }
+
+    &--next {
+      border-top-right-radius: 4px;
+      border-left: 1px solid var(--color-gray);
+      right: 0;
     }
   }
 }
