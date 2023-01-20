@@ -155,6 +155,9 @@
             "authorLastName": "",
             "authorRole": "{#.reflect_input#.authorRole}",
             "rating": "",
+            "forwardedByUser": "",
+            "forwardedFromCsa": "",
+            "forwardedToCsa": "",
             "created": "$_getInstant()"
           }
         },

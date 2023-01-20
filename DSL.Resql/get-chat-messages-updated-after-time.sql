@@ -7,6 +7,8 @@ SELECT m.base_id      AS id,
        m.author_first_name,
        m.author_last_name,
        m.author_role,
+       m.forwarded_from_csa,
+       m.forwarded_to_csa,
        rating,
        created,
        updated

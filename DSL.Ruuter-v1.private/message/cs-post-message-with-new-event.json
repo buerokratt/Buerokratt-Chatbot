@@ -67,6 +67,9 @@
             "created": "{#.get_message_by_id[0]#.created}",
             "content": "{#.get_message_by_id[0]#.content}",
             "event": "{#.reflect_input#.event}",
+            "forwardedByUser": "{#.get_message_by_id[0]#.forwardedByUser}",
+            "forwardedFromCsa": "{#.get_message_by_id[0]#.forwardedFromCsa}",
+            "forwardedToCsa": "{#.get_message_by_id[0]#.forwardedToCsa}",
             "rating": ""
           },
           "response": {
