@@ -99,6 +99,7 @@
             "authorLastName": "",
             "authorRole": "buerokratt",
             "rating": "",
+            "forwardedByUser": "",
             "forwardedFromCsa": "",
             "forwardedToCsa": "",
             "created": "$_getInstant()"

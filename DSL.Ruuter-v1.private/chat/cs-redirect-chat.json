@@ -17,6 +17,7 @@
             "customerSupportId": "{#.customerSupportId}",
             "customerSupportDisplayName": "{#.customerSupportDisplayName}",
             "csaTitle": "{#.csaTitle}",
+            "forwardedByUser": "{#.forwardedByUser}",
             "forwardedFromCsa": "{#.forwardedFromCsa}",
             "forwardedToCsa": "{#.forwardedToCsa}"
           }
@@ -194,6 +195,7 @@
             "authorLastName": "",
             "authorRole": "buerokratt",
             "rating": "",
+            "forwardedByUser": "{#.reflect_input#.forwardedByUser}",
             "forwardedFromCsa": "{#.reflect_input#.forwardedFromCsa}",
             "forwardedToCsa": "{#.reflect_input#.forwardedToCsa}",
             "created": "$_getInstant()"

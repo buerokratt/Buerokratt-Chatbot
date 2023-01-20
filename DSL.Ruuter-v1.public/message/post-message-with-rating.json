@@ -134,6 +134,7 @@
             "content": "{#.get_message_by_id[0]#.content}",
             "event": "rating",
             "rating": "{#.reflect_input#.rating}",
+            "forwardedByUser": "{#.get_message_by_id[0]#.forwardedByUser}",
             "forwardedFromCsa": "{#.get_message_by_id[0]#.forwardedFromCsa}",
             "forwardedToCsa": "{#.get_message_by_id[0]#.forwardedToCsa}"
           },
