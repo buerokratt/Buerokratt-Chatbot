@@ -1,5 +1,5 @@
 import { FC, useMemo } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { AxiosError } from 'axios';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -21,6 +21,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
   const queryClient = useQueryClient();
   const {
     register,
+    control,
     handleSubmit,
   } = useForm<UserDTO>({
     defaultValues: {
@@ -102,10 +103,17 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
       <Track direction='vertical' gap={16}>
         <FormInput {...register('login')} label={t('settings.users.fullName')} />
         <FormInput {...register('idCode')} label={t('settings.users.idCode')} />
-        <FormSelect
-          {...register('authorities')}
-          label={t('settings.users.userRoles')}
-          options={roles}
+        <Controller
+          name='authorities'
+          control={control}
+          render={({ field }) =>
+            <FormSelect
+              label={t('settings.users.userRoles')}
+              onSelectionChange={field.onChange}
+              options={roles}
+              {...field}
+            />
+          }
         />
         <FormInput {...register('displayName')} label={t('settings.users.displayName')} />
         <FormInput {...register('email')} label={t('settings.users.email')} type='email' />

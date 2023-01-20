@@ -4,6 +4,7 @@ import { mainNavigationET } from './mainNavigation';
 import { endedChatsData } from './endedChats';
 import { chatMessagesData } from './chatMessages';
 import { usersData } from './users';
+import { userInfoData } from './userInfo';
 
 export const handlers = [
   rest.get(import.meta.env.BASE_URL + 'main-navigation', (req, res, ctx) => {
@@ -72,5 +73,8 @@ export const handlers = [
       deleted: false,
       created: '2023-01-18T12:15:41.385+00:00',
     }));
+  }),
+  rest.get(import.meta.env.BASE_URL + 'cs-custom-jwt-userinfo', (req, res, ctx) => {
+    return res(ctx.json(userInfoData));
   }),
 ];

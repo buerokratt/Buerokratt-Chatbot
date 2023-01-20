@@ -33,7 +33,8 @@
     "removeValidation": "Oled sa kindel?",
     "startDate": "Algus kuupäev",
     "endDate": "Lõpp kuupäev",
-    "preview": "Eelvaade"
+    "preview": "Eelvaade",
+    "logout": "Logi välja"
   },
   "mainMenu": {
     "menuLabel": "Põhinavigatsioon",
@@ -111,6 +112,9 @@
     "userSession": {
       "title": "Kasutaja sessioon",
       "sessionLength": "Sessiooni pikkus"
+    },
+    "greeting": {
+      "title": "Tervitussõnum"
     }
   }
 }

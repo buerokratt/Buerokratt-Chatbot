@@ -62,7 +62,7 @@ const SettingsChatSettings: FC = () => {
           <Switch
             name='is_bot_active'
             label={t('settings.chat.chatActive')}
-            defaultChecked={botConfig.is_bot_active}
+            checked={botConfig.is_bot_active}
             onCheckedChange={(value) => botConfigMutation.mutate({ is_bot_active: value })}
           />
         )}
@@ -72,7 +72,7 @@ const SettingsChatSettings: FC = () => {
             <Switch
               name='is_csa_name_visible'
               label={t('settings.chat.showSupportName')}
-              defaultChecked={csaNameVisibility.isVisible}
+              checked={csaNameVisibility.isVisible}
               onCheckedChange={(value) => csaNameVisibilityMutation.mutate({ isVisible: value })}
             />
           )}
@@ -80,7 +80,7 @@ const SettingsChatSettings: FC = () => {
             <Switch
               name='is_csa_title_visible'
               label={t('settings.chat.showSupportTitle')}
-              defaultChecked={csaTitleVisibility.isVisible}
+              checked={csaTitleVisibility.isVisible}
               onCheckedChange={(value) => csaTitleVisibilityMutation.mutate({ isVisible: value })}
             />
           )}

@@ -21,73 +21,73 @@ export const mainNavigationET = [
   {
     id: 'training',
     label: 'Treening',
-    path: '/treening',
+    path: '#',
     children: [
       {
         label: 'Treening',
-        path: '/treening/treening',
+        path: '#',
         children: [
           {
             label: 'Teemad',
-            path: '/treening/treening/teemad',
+            path: '#',
           },
           {
             label: 'Vastused',
-            path: '/treening/treening/vastused',
+            path: '#',
           },
           {
             label: 'Kasutuslood',
-            path: '/treening/treening/kasutuslood',
+            path: '#',
           },
           {
             label: 'Konfiguratsioon',
-            path: '/treening/treening/konfiguratsioon',
+            path: '#',
           },
           {
             label: 'Vormid',
-            path: '/treening/treening/vormid',
+            path: '#',
           },
           {
             label: 'Pilud',
-            path: '/treening/treening/pilud',
+            path: '#',
           },
         ],
       },
       {
         label: 'Ajaloolised vestlused',
-        path: '/treening/ajaloolised-vestlused',
+        path: '#',
         children: [
           {
             label: 'Ajalugu',
-            path: '/treening/ajaloolised-vestlused/ajalugu',
+            path: '#',
           },
           {
             label: 'Pöördumised',
-            path: '/treening/ajaloolised-vestlused/poordumised',
+            path: '#',
           },
         ],
       },
       {
         label: 'Mudelipank ja analüütika',
-        path: '/treening/mudelipank-ja-analuutika',
+        path: '#',
         children: [
           {
             label: 'Teemade ülevaade',
-            path: '/treening/mudelipank-ja-analuutika/teemade-ulevaade',
+            path: '#',
           },
           {
             label: 'Mudelite võrdlus',
-            path: '/treening/mudelipank-ja-analuutika/mudelite-vordlus',
+            path: '#',
           },
           {
             label: 'Testlood',
-            path: '/treening/mudelipank-ja-analuutika/testlood',
+            path: '#',
           },
         ],
       },
       {
         label: 'Treeni uus mudel',
-        path: '/treening/treeni-uus-mudel',
+        path: '#',
       },
     ],
   },
@@ -110,7 +110,7 @@ export const mainNavigationET = [
           },
           {
             label: 'Tervitussõnum',
-            path: '/haldus/vestlusrobot/tervitussõnum',
+            path: '#',
           },
           {
             label: 'Välimus ja käitumine',
@@ -128,7 +128,7 @@ export const mainNavigationET = [
       },
       {
         label: 'Sessiooni pikkus',
-        path: '/haldus/sessiooni-pikkus',
+        path: '#',
       },
     ],
   },

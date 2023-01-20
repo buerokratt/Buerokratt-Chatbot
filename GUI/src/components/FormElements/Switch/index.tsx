@@ -5,7 +5,7 @@ import { ControllerRenderProps } from 'react-hook-form';
 
 import './Switch.scss';
 
-type SwitchProps = ControllerRenderProps & {
+type SwitchProps = Partial<ControllerRenderProps> & {
   onLabel?: string;
   offLabel?: string;
   name: string;

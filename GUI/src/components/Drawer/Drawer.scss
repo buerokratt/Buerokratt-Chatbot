@@ -7,7 +7,7 @@
   position: fixed;
   display: flex;
   flex-direction: column;
-  top: 105px;
+  top: 100px;
   right: 0;
   bottom: 0;
   background-color: get-color(white);
@@ -15,6 +15,7 @@
   width: 50%;
   transition: transform .25s ease-out;
   overflow: hidden;
+  z-index: 98;
 
   &__header {
     display: flex;

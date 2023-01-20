@@ -33,7 +33,8 @@
     "removeValidation": "Are you sure?",
     "startDate": "Start date",
     "endDate": "End date",
-    "preview": "Preview"
+    "preview": "Preview",
+    "logout": "Logout"
   },
   "mainMenu": {
     "menuLabel": "Main navigation",
@@ -111,6 +112,9 @@
     "userSession": {
       "title": "User session",
       "sessionLength": "Session length"
+    },
+    "greeting": {
+      "title": "Greeting message"
     }
   }
 }

@@ -42,7 +42,8 @@
     "react-textarea-autosize": "^8.4.0",
     "reactflow": "^11.4.0",
     "regexify-string": "^1.0.19",
-    "usehooks-ts": "^2.9.1"
+    "usehooks-ts": "^2.9.1",
+    "zustand": "^4.3.2"
   },
   "devDependencies": {
     "@types/lodash.debounce": "^4.0.7",
