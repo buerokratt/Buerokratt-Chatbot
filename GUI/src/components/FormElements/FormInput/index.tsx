@@ -40,6 +40,7 @@ const FieldInput = forwardRef<HTMLInputElement, InputProps>((
           id={id}
           ref={ref}
           aria-label={hideLabel ? label : undefined}
+          pattern={colorInput ? '^#([a-fA-F0-9]{3}){1,2}$' : undefined}
           {...rest}
         />
         {colorInput && (

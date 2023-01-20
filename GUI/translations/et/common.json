@@ -107,6 +107,10 @@
       "title": "Asutuse tööaeg",
       "openFrom": "Avatud alates",
       "openUntil": "Avatud kuni"
+    },
+    "userSession": {
+      "title": "Kasutaja sessioon",
+      "sessionLength": "Sessiooni pikkus"
     }
   }
 }

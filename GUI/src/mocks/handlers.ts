@@ -64,4 +64,13 @@ export const handlers = [
       organizationWorkingTimeEndISO: new Date(),
     }));
   }),
+  rest.get(import.meta.env.BASE_URL + 'cs-get-session-length', (req, res, ctx) => {
+    return res(ctx.json({
+      id: 28,
+      key: 'session_length',
+      value: '480',
+      deleted: false,
+      created: '2023-01-18T12:15:41.385+00:00',
+    }));
+  }),
 ];

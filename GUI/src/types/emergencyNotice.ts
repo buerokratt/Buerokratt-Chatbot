@@ -1,6 +1,6 @@
 export interface EmergencyNotice {
   emergencyNoticeText: string;
-  emergencyNoticeStartISO: string;
-  emergencyNoticeEndISO: string;
+  emergencyNoticeStartISO: Date | string;
+  emergencyNoticeEndISO: Date | string;
   isEmergencyNoticeVisible: boolean;
 }

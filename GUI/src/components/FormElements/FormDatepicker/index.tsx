@@ -1,7 +1,8 @@
-import { FC, useId, useState } from 'react';
+import { FC, forwardRef, useId, useState } from 'react';
 import ReactDatePicker, { registerLocale } from 'react-datepicker';
 import clsx from 'clsx';
 import { et } from 'date-fns/locale';
+import { ControllerRenderProps } from 'react-hook-form';
 import { MdChevronRight, MdChevronLeft, MdOutlineToday, MdOutlineSchedule } from 'react-icons/md';
 
 import { Icon } from 'components';
@@ -10,7 +11,7 @@ import './FormDatepicker.scss';
 
 registerLocale('et-EE', et);
 
-type FormDatepickerProps = {
+type FormDatepickerProps = ControllerRenderProps & {
   label: string;
   name: string;
   hideLabel?: boolean;
@@ -19,9 +20,20 @@ type FormDatepickerProps = {
   timePicker?: boolean;
 }
 
-const FormDatepicker: FC<FormDatepickerProps> = ({ label, name, hideLabel, disabled, placeholder, timePicker }) => {
+const FormDatepicker = forwardRef<any, FormDatepickerProps>((
+  {
+    label,
+    name,
+    hideLabel,
+    disabled,
+    placeholder,
+    timePicker,
+    ...rest
+  },
+  ref,
+) => {
   const id = useId();
-  const [date, setDate] = useState<Date | null>(null);
+  const {value, onChange} = rest;
 
   const datepickerClasses = clsx(
     'datepicker',
@@ -33,9 +45,8 @@ const FormDatepicker: FC<FormDatepickerProps> = ({ label, name, hideLabel, disab
       {label && !hideLabel && <label htmlFor={id} className='datepicker__label'>{label}</label>}
       <div className='datepicker__wrapper'>
         <ReactDatePicker
-          selected={date}
-          onChange={setDate}
-          dateFormat={timePicker ? 'HH:ii' : 'dd.MM.yyyy'}
+          selected={new Date(value)}
+          dateFormat={timePicker ? 'hh:mm:ss' : 'dd.MM.yyyy'}
           locale='et-EE'
           placeholderText={placeholder}
           previousMonthButtonLabel={<MdChevronLeft />}
@@ -43,7 +54,12 @@ const FormDatepicker: FC<FormDatepickerProps> = ({ label, name, hideLabel, disab
           aria-label={hideLabel ? label : undefined}
           showTimeSelect={timePicker}
           showTimeSelectOnly={timePicker}
+          timeIntervals={15}
+          timeFormat='hh:mm:ss'
+          timeInputLabel=''
           portalId='overlay-root'
+          {...rest}
+          onChange={onChange}
         />
         <Icon
           icon={timePicker
@@ -54,6 +70,6 @@ const FormDatepicker: FC<FormDatepickerProps> = ({ label, name, hideLabel, disab
       </div>
     </div>
   );
-};
+});
 
 export default FormDatepicker;

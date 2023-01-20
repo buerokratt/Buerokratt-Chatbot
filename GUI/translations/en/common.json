@@ -107,6 +107,10 @@
       "title": "Organization working time",
       "openFrom": "Open from",
       "openUntil": "Open until"
+    },
+    "userSession": {
+      "title": "User session",
+      "sessionLength": "Session length"
     }
   }
 }

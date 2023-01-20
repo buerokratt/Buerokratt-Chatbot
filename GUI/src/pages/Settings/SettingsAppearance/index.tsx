@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { AxiosError } from 'axios';
 
 import { Button, Card, FormInput, Switch, Track } from 'components';
@@ -12,7 +12,7 @@ import api from 'services/api';
 const SettingsAppearance: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
-  const { register, handleSubmit, reset } = useForm<WidgetConfig>();
+  const { register, control, handleSubmit, reset } = useForm<WidgetConfig>();
   const { data: widgetConfig } = useQuery<WidgetConfig>({
     queryKey: ['cs-get-widget-config'],
     onSuccess: (data) => reset(data),
@@ -53,10 +53,17 @@ const SettingsAppearance: FC = () => {
             label={t('settings.appearance.widgetProactiveSeconds')}
             type='number'
           />
-          <Switch
-            {...register('isWidgetActive')}
-            label={t('settings.appearance.widgetBubbleMessageText')}
-            defaultChecked={widgetConfig.isWidgetActive}
+          <Controller
+            name='isWidgetActive'
+            control={control}
+            render={({ field }) =>
+              <Switch
+                onCheckedChange={field.onChange}
+                label={t('settings.appearance.widgetBubbleMessageText')}
+                checked={widgetConfig.isWidgetActive}
+                {...field}
+              />
+            }
           />
           <FormInput
             {...register('widgetDisplayBubbleMessageSeconds')}

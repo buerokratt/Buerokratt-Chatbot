@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { AxiosError } from 'axios';
 import { useTranslation } from 'react-i18next';
 
@@ -13,10 +13,13 @@ import api from 'services/api';
 const SettingsEmergencyNotices: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
-  const { register, handleSubmit, reset } = useForm<EmergencyNotice>();
+  const { register, control, handleSubmit, reset } = useForm<EmergencyNotice>();
   const { data: emergencyNotice } = useQuery<EmergencyNotice>({
     queryKey: ['cs-get-emergency-notice'],
-    onSuccess: (data) => reset(data),
+    onSuccess: (data) => reset({
+      emergencyNoticeStartISO: new Date(data.emergencyNoticeStartISO),
+      emergencyNoticeEndISO: new Date(data.emergencyNoticeEndISO),
+    }),
   });
 
   const emergencyNoticeMutation = useMutation({
@@ -48,10 +51,13 @@ const SettingsEmergencyNotices: FC = () => {
         }
       >
         <Track gap={16} direction='vertical' align='left'>
-          <Switch
-            {...register('isEmergencyNoticeVisible')}
-            defaultChecked={emergencyNotice.isEmergencyNoticeVisible}
-            label={t('settings.emergencyNotices.noticeActive')}
+          <Controller name='isEmergencyNoticeVisible' control={control} render={({ field }) =>
+            <Switch
+              checked={emergencyNotice.isEmergencyNoticeVisible}
+              label={t('settings.emergencyNotices.noticeActive')}
+              {...field}
+            />
+          }
           />
           <FormTextarea
             {...register('emergencyNoticeText')}
@@ -64,9 +70,21 @@ const SettingsEmergencyNotices: FC = () => {
           <Track gap={8}>
             <p style={{ flex: '0 0 170px' }}>{t('settings.emergencyNotices.displayPeriod')}</p>
             <Track gap={16}>
-              <FormDatepicker {...register('emergencyNoticeStartISO')} label={t('global.startDate')} hideLabel />
+              <Controller
+                name='emergencyNoticeStartISO'
+                control={control}
+                render={({ field }) =>
+                  <FormDatepicker label={t('global.startDate')} hideLabel {...field} />
+                }
+              />
               <span>{t('global.to').toLowerCase()}</span>
-              <FormDatepicker {...register('emergencyNoticeEndISO')} label={t('global.endDate')} hideLabel />
+              <Controller
+                name='emergencyNoticeEndISO'
+                control={control}
+                render={({ field }) =>
+                  <FormDatepicker label={t('global.endDate')} hideLabel {...field} />
+                }
+              />
             </Track>
           </Track>
         </Track>

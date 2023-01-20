@@ -1,4 +1,4 @@
 export interface OrganizationWorkingTime {
-  organizationWorkingTimeStartISO: string;
-  organizationWorkingTimeEndISO: string;
+  organizationWorkingTimeStartISO: Date | string;
+  organizationWorkingTimeEndISO: Date | string;
 }
