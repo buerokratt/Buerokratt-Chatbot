@@ -208,6 +208,61 @@
       }
     },
     {
+      "post_customer_support_agent_notification": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "post_body_parameters": {
+            "get_is_customer_support_agent_forwarded_chat_email_notification_enabled": {
+              "post_body_parameters": {
+                "get_user_profile_settings": {
+                  "post_body_parameters": {
+                    "get_user_id_by_id_code": {
+                      "method": "post",
+                      "endpoint": "{resql_url}/get-user-id-by-id-code",
+                      "post_body_struct": {
+                        "userIdCode": "{#.reflect_input#.customerSupportId}"
+                      }
+                    }
+                  },
+                  "method": "post",
+                  "endpoint": "{resql_url}/get-user-profile-settings",
+                  "post_body_struct": {
+                    "userId": "{$.get_user_id_by_id_code$.id}"
+                  }
+                }
+              },
+              "method": "post",
+              "endpoint": "{ruuter_url}/match_input",
+              "post_body_struct": {
+                "input": {
+                  "is_active": "{$.get_user_profile_settings$.forwarded_chat_email_notifications}"
+                },
+                "validate_against": {
+                  "is_active": "true"
+                },
+                "validation_type": "MUST_MATCH_ANY"
+              }
+            }
+          },
+          "method": "post",
+          "endpoint": "{ruuter_v2_url}/notification/csa/email",
+          "post_body_struct": {
+            "to": "{$.get_is_customer_support_agent_forwarded_chat_email_notification_enabled}",
+            "chatId": "{#.reflect_input#.id}"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
       "get_claimed_chat": {
         "verify": {
           "response": {
