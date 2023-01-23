@@ -139,13 +139,13 @@
             "nok": "stop"
           }
         },
-      "proceed": {
-        "method": "post",
-        "endpoint": "{dmapper_url}/json/v2/reflect_allowed_statuses",
-        "post_body_struct": {
-          "statuses": "{#.get_allowed_statuses}"
-        }
-      },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{dmapper_url}/json/v2/reflect_allowed_statuses",
+          "post_body_struct": {
+            "statuses": "{#.get_allowed_statuses}"
+          }
+        },
         "response": {
           "ok": "proceed",
           "nok": "stop"
