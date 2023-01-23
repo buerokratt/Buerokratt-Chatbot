@@ -114,6 +114,45 @@
       }
     },
     {
+      "get_allowed_statuses": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{resql_url}/get-allowed-statuses",
+          "post_body_struct": {}
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {"formatted_allowed_statuses": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+      "proceed": {
+        "method": "post",
+        "endpoint": "{dmapper_url}/json/v2/reflect_allowed_statuses",
+        "post_body_struct": {
+          "statuses": "{#.get_allowed_statuses}"
+        }
+      },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
       "post_message": {
         "verify": {
           "response": {
@@ -130,19 +169,10 @@
                   "endpoint": "{ruuter_url}/match_input",
                   "post_body_struct": {
                     "input": {
-                      "authorities": "{#.reflect_input#.event}"
+                      "authorities": "['{#.reflect_input#.event}']"
                     },
                     "validate_against": {
-                      "authorities": [
-                        "CLIENT_LEFT_WITH_ACCEPTED",
-                        "CLIENT_LEFT_WITH_NO_RESOLUTION",
-                        "CLIENT_LEFT_FOR_UNKNOWN_REASONS",
-                        "ACCEPTED",
-                        "ANSWERED",
-                        "HATE_SPEECH",
-                        "OTHER",
-                        "RESPONSE_SENT_TO_CLIENT_EMAIL"
-                      ]
+                      "authorities": "{#.formatted_allowed_statuses}"
                     },
                     "validation_type": "MUST_MATCH_ANY"
                   },
