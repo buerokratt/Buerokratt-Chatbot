@@ -13,13 +13,13 @@
   transform: translate(-50%, -50%);
   width: 100%;
   max-width: 600px;
-  z-index: 2;
+  z-index: 101;
 
   &__overlay {
     position: fixed;
     inset: 0;
     background-color: rgba(0, 0, 0, 0.54);
-    z-index: 1;
+    z-index: 100;
   }
 
   &__header,

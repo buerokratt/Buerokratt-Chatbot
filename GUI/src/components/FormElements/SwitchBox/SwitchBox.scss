@@ -1,0 +1,45 @@
+@import 'src/styles/tools/spacing';
+@import 'src/styles/tools/color';
+@import 'src/styles/settings/variables/other';
+@import 'src/styles/settings/variables/typography';
+
+.switchbox {
+  $self: &;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  &__button {
+    width: 48px;
+    height: 8px;
+    border-radius: 4px;
+    background-color: get-color(black-coral-6);
+    position: relative;
+
+    &[aria-checked=true] {
+      background-color: get-color(sapphire-blue-4);
+
+      #{$self} {
+        &__thumb {
+          transform: translate(24px, -50%);
+          background-color: get-color(sapphire-blue-10);
+        }
+      }
+    }
+  }
+
+  &__thumb {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: get-color(white);
+    border: 1px solid get-color(black-coral-2);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.14);
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: all .25s ease-out;
+  }
+}

@@ -33,4 +33,8 @@
   &__body {
     flex: 1;
   }
+
+  &__body {
+    overflow: auto;
+  }
 }

@@ -84,7 +84,14 @@
       "editUser": "Muuda kasutajat",
       "deleteUser": "Kustuta kasutaja",
       "fullName": "Ees- ja perekonnanimi",
-      "userRoles": "Kasutaja roll(id)"
+      "userRoles": "Kasutaja roll(id)",
+      "autoCorrector": "Autokorrektor",
+      "emailNotifications": "Märguanded e-postile",
+      "soundNotifications": "Häälmärguanded",
+      "popupNotifications": "Pop-up märguanded",
+      "newUnansweredChat": "Uus vastamata vestlus",
+      "newForwardedChat": "Uus suunatud vestlus",
+      "useAutocorrect": "Teksti autokorrektor"
     },
     "chat": {
       "chatActive": "Vestlusrobot aktiivne",

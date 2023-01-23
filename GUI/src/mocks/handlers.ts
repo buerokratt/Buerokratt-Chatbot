@@ -5,6 +5,7 @@ import { endedChatsData } from './endedChats';
 import { chatMessagesData } from './chatMessages';
 import { usersData } from './users';
 import { userInfoData } from './userInfo';
+import { userProfileSettingsData } from './userProfileSettings';
 
 export const handlers = [
   rest.get(import.meta.env.BASE_URL + 'main-navigation', (req, res, ctx) => {
@@ -76,5 +77,8 @@ export const handlers = [
   }),
   rest.get(import.meta.env.BASE_URL + 'cs-custom-jwt-userinfo', (req, res, ctx) => {
     return res(ctx.json(userInfoData));
+  }),
+  rest.get(import.meta.env.BASE_URL + 'cs-get-user-profile-settings', (req, res, ctx) => {
+    return res(ctx.json(userProfileSettingsData));
   }),
 ];

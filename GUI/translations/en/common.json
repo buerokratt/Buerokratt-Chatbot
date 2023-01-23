@@ -84,7 +84,14 @@
       "editUser": "Edit user",
       "deleteUser": "Delete user",
       "fullName": "First- and lastname",
-      "userRoles": "User role(s)"
+      "userRoles": "User role(s)",
+      "autoCorrector": "Auto corrector",
+      "emailNotifications": "Notifications to e-mail",
+      "soundNotifications": "Sound notifications",
+      "popupNotifications": "Popup notifications",
+      "newUnansweredChat": "New unanswered chat",
+      "newForwardedChat": "New forwarded chat",
+      "useAutocorrect": "Text auto corrector"
     },
     "chat": {
       "chatActive": "Chatbot active",

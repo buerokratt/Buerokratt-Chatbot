@@ -5,5 +5,6 @@ import Switch from './Switch';
 import FormCheckboxes from './FormCheckboxes';
 import FormCheckbox from './FormCheckbox';
 import FormDatepicker from './FormDatepicker';
+import SwitchBox from './SwitchBox';
 
-export { FormInput, FormTextarea, FormSelect, Switch, FormCheckboxes, FormCheckbox, FormDatepicker };
+export { FormInput, FormTextarea, FormSelect, Switch, FormCheckboxes, FormCheckbox, FormDatepicker, SwitchBox };
