@@ -114,7 +114,7 @@
       }
     },
     {
-      "post_message": {
+      "get_allowed_statuses": {
         "verify": {
           "response": {
             "ok": "proceed",
@@ -123,9 +123,65 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/insert-message",
+          "endpoint": "{resql_url}/get-allowed-statuses",
+          "post_body_struct": {}
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {"formatted_allowed_statuses": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{dmapper_url}/json/v2/reflect_allowed_statuses",
+          "post_body_struct": {
+            "statuses": "{#.get_allowed_statuses}"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
+      "post_message": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
           "post_body_parameters": {
             "check_roles": {
+              "post_body_parameters": {
+                "check_statuses": {
+                  "method": "post",
+                  "endpoint": "{ruuter_url}/match_input",
+                  "post_body_struct": {
+                    "input": {
+                      "authorities": "['{#.reflect_input#.event}']"
+                    },
+                    "validate_against": {
+                      "authorities": "{#.formatted_allowed_statuses}"
+                    },
+                    "validation_type": "MUST_MATCH_ANY"
+                  },
+                  "response": {
+                    "ok": "proceed",
+                    "nok": "stop"
+                  }
+                }
+              },
               "method": "post",
               "endpoint": "{ruuter_url}/match_input",
               "post_body_struct": {
@@ -147,6 +203,8 @@
               }
             }
           },
+          "method": "post",
+          "endpoint": "{resql_url}/insert-message",
           "post_body_struct": {
             "chatId": "{#.reflect_input#.chatId}",
             "messageId": "{#.get_message_uuid#.output}",

@@ -9,6 +9,7 @@ SELECT chat_base_id,
        author_role,
        rating,
        created,
+       forwarded_by_user,
        forwarded_from_csa,
        forwarded_to_csa,
        updated

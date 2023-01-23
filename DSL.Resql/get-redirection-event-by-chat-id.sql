@@ -6,6 +6,7 @@ SELECT content::varchar[] AS message_ids,
        author_first_name,
        author_last_name,
        author_role,
+       forwarded_by_user,
        forwarded_from_csa,
        forwarded_to_csa,
        created
