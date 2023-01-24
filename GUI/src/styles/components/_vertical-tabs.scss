@@ -7,7 +7,7 @@
   &__list {
     display: flex;
     flex-direction: column;
-    min-width: 288px;
+    width: 288px;
     flex-shrink: 0;
     background-color: get-color(black-coral-0);
     border-radius: 4px 0 0 4px;
@@ -25,6 +25,18 @@
 
     &[data-state="inactive"] {
       display: none;
+    }
+  }
+
+  &__body-placeholder {
+    flex: 1;
+    position: relative;
+
+    p {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
     }
   }
 
@@ -63,5 +75,15 @@
     &:first-child {
       border-top-left-radius: 4px;
     }
+  }
+
+  &__group-header {
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: $veera-font-size-100;
+    line-height: 24px;
+    padding: 16px 16px 4px;
+    color: get-color(black-coral-20);
+    border-bottom: 1px solid get-color(black-coral-2);
   }
 }

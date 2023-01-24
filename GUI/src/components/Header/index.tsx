@@ -21,6 +21,9 @@ const Header: FC = () => {
   const { data: userProfileSettings } = useQuery<UserProfileSettings>({
     queryKey: ['cs-get-user-profile-settings'],
   });
+  const { data: customerSupportActivity } = useQuery({
+    queryKey: ['cs-get-customer-support-activity'],
+  });
 
   const userProfileSettingsMutation = useMutation({
     mutationFn: (data: UserProfileSettings) => api.post('cs-set-user-profile-settings', data),
@@ -34,11 +37,23 @@ const Header: FC = () => {
     },
   });
 
+  const customerSupportActivityMutation = useMutation({
+    mutationFn: (data) => api.post('cs-set-customer-support-activity', data),
+    onError: async (error: AxiosError) => {
+      await queryClient.invalidateQueries(['cs-get-customer-support-activity']);
+      toast.open({
+        type: 'error',
+        title: t('global.notificationError'),
+        message: error.message,
+      });
+    },
+  });
+
   const handleUserProfileSettingsChange = (key: string, checked: boolean) => {
     if (!userProfileSettings) return;
     const newSettings = {
       ...userProfileSettings,
-      [`${key}`]: checked,
+      [key]: checked,
     };
     userProfileSettingsMutation.mutate(newSettings);
   };
@@ -74,7 +89,7 @@ const Header: FC = () => {
                 { label: t('settings.users.email'), value: userInfo.email },
               ].map((meta, index) => (
                 <Track key={`${meta.label}-${index}`} gap={24} align='left'>
-                  <p style={{ flex: '0 0 120px' }}>{meta.label}</p>
+                  <p style={{ flex: '0 0 120px' }}>{meta.label}:</p>
                   <p>{meta.value}</p>
                 </Track>
               ))}

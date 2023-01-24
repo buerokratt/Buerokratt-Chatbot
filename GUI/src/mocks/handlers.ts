@@ -6,6 +6,10 @@ import { chatMessagesData } from './chatMessages';
 import { usersData } from './users';
 import { userInfoData } from './userInfo';
 import { userProfileSettingsData } from './userProfileSettings';
+import { activeChatsData } from './activeChats';
+import { activeChatMessages } from './activeChatMessages';
+import { Chat } from '../types/chat';
+import { Message } from '../types/message';
 
 export const handlers = [
   rest.get(import.meta.env.BASE_URL + 'main-navigation', (req, res, ctx) => {
@@ -80,5 +84,12 @@ export const handlers = [
   }),
   rest.get(import.meta.env.BASE_URL + 'cs-get-user-profile-settings', (req, res, ctx) => {
     return res(ctx.json(userProfileSettingsData));
+  }),
+  rest.get(import.meta.env.BASE_URL + 'cs-get-all-active-chats', (req, res, ctx) => {
+    return res(ctx.json(activeChatsData));
+  }),
+  rest.get(import.meta.env.BASE_URL + 'cs-get-messages-by-chat-id/:id', (req, res, ctx) => {
+    const requestedChatMessages = (activeChatMessages as Record<string, Message[]>)[String(req.params.id)];
+    return res(ctx.json(requestedChatMessages));
   }),
 ];

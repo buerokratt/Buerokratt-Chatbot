@@ -34,7 +34,8 @@
     "startDate": "Algus kuupäev",
     "endDate": "Lõpp kuupäev",
     "preview": "Eelvaade",
-    "logout": "Logi välja"
+    "logout": "Logi välja",
+    "anonymous": "Anonüümne"
   },
   "mainMenu": {
     "menuLabel": "Põhinavigatsioon",
@@ -48,7 +49,10 @@
       "ended": "Lõpetatud"
     },
     "active": {
-      "list": "Aktiivsed vestlused"
+      "list": "Aktiivsed vestlused",
+      "myChats": "Minu vestlused",
+      "newChats": "Uued vestlused",
+      "chooseChat": "Alustamiseks vali vestlus"
     },
     "history": {
       "title": "Ajalugu",
