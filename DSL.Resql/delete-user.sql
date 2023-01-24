@@ -5,8 +5,8 @@ WITH active_administrators AS (SELECT user_id
                                             FROM user_authority
                                             GROUP BY user_id))
 INSERT
-INTO customer_support_agent_activity (id_code, active, created)
-SELECT :userIdCode, 'false', :created::timestamp with time zone
+INTO customer_support_agent_activity (id_code, active, created, status)
+SELECT :userIdCode, 'false', :created::timestamp with time zone, 'offline'
 WHERE (1 < (SELECT COUNT(*) FROM active_administrators)
     OR (1 = (SELECT COUNT(*) FROM active_administrators)
         AND :userIdCode NOT IN (SELECT * FROM active_administrators)));
