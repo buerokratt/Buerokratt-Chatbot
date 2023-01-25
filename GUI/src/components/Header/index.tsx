@@ -4,13 +4,25 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { MdOutlineExpandMore } from 'react-icons/md';
 
-import { Track, Button, Icon, Drawer, Section, SwitchBox } from 'components';
+import { Track, Button, Icon, Drawer, Section, SwitchBox, Switch } from 'components';
 import useUserInfoStore from 'store/store';
+import { ReactComponent as BykLogo } from 'assets/logo.svg';
 import { UserProfileSettings } from 'types/userProfileSettings';
 import { useToast } from 'hooks/useToast';
 import api from 'services/api';
-import { ReactComponent as BykLogo } from 'assets/logo.svg';
 import './Header.scss';
+
+type CustomerSupportActivity = {
+  idCode: string;
+  active: true;
+  status: string;
+}
+
+const statusColors: Record<string, string> = {
+  idle: '#FFB511',
+  online: '#308653',
+  offline: '#D73E3E',
+};
 
 const Header: FC = () => {
   const { t } = useTranslation();
@@ -18,10 +30,11 @@ const Header: FC = () => {
   const toast = useToast();
   const queryClient = useQueryClient();
   const [userDrawerOpen, setUserDrawerOpen] = useState(false);
+  const [csaStatus, setCsaStatus] = useState<'idle' | 'offline' | 'online'>('online');
   const { data: userProfileSettings } = useQuery<UserProfileSettings>({
     queryKey: ['cs-get-user-profile-settings'],
   });
-  const { data: customerSupportActivity } = useQuery({
+  const { data: customerSupportActivity } = useQuery<CustomerSupportActivity>({
     queryKey: ['cs-get-customer-support-activity'],
   });
 
@@ -58,6 +71,10 @@ const Header: FC = () => {
     userProfileSettingsMutation.mutate(newSettings);
   };
 
+  const handleCsaStatusChange = () => {
+
+  };
+
   return (
     <>
       <header className='header'>
@@ -66,7 +83,28 @@ const Header: FC = () => {
 
           {userInfo && (
             <Track gap={32}>
+              <Track gap={16}>
+                <Switch
+                  onCheckedChange={handleCsaStatusChange}
+                  label={t('global.csaStatus')}
+                  hideLabel
+                  name='csaStatus'
+                  onColor='#308653'
+                  onLabel={t('global.present') || ''}
+                  offLabel={t('global.away') || ''} />
+              </Track>
+              <span style={{ display: 'block', width: 2, height: 30, backgroundColor: '#DBDFE2' }}></span>
               <Button appearance='text' onClick={() => setUserDrawerOpen(!userDrawerOpen)}>
+                {customerSupportActivity && (
+                  <span style={{
+                    display: 'block',
+                    width: 16,
+                    height: 16,
+                    borderRadius: '50%',
+                    backgroundColor: statusColors[csaStatus],
+                    marginRight: 8,
+                  }}></span>
+                )}
                 {userInfo.displayName}
                 <Icon icon={<MdOutlineExpandMore />} />
               </Button>

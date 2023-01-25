@@ -35,7 +35,10 @@
     "endDate": "Lõpp kuupäev",
     "preview": "Eelvaade",
     "logout": "Logi välja",
-    "anonymous": "Anonüümne"
+    "anonymous": "Anonüümne",
+    "csaStatus": "Klienditeenindaja",
+    "present": "Kohal",
+    "away": "Eemal"
   },
   "mainMenu": {
     "menuLabel": "Põhinavigatsioon",

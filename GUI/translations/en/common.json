@@ -35,7 +35,10 @@
     "endDate": "End date",
     "preview": "Preview",
     "logout": "Logout",
-    "anonymous": "Anonymous"
+    "anonymous": "Anonymous",
+    "csaStatus": "Customer support status",
+    "present": "Present",
+    "away": "Away"
   },
   "mainMenu": {
     "menuLabel": "Main navigation",

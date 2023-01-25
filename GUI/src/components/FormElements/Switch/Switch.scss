@@ -31,7 +31,7 @@
     transition: background-color .25s ease-out;
 
     &[aria-checked=true] {
-      background-color: get-color(sapphire-blue-10);
+      background-color: var(--active-color, get-color(sapphire-blue-10));
       color: get-color(sapphire-blue-10);
 
       #{$self} {
@@ -41,7 +41,7 @@
         }
 
         &__on {
-          color: get-color(sapphire-blue-10);
+          color: var(--active-color, get-color(sapphire-blue-10));
           background-color: get-color(white);
         }
       }
