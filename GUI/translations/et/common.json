@@ -44,6 +44,7 @@
     "closeMenuIcon": "Sulge menüü ikoon"
   },
   "chat": {
+    "reply": "Vasta",
     "status": {
       "active": "Aktiivne",
       "ended": "Lõpetatud"
@@ -52,7 +53,14 @@
       "list": "Aktiivsed vestlused",
       "myChats": "Minu vestlused",
       "newChats": "Uued vestlused",
-      "chooseChat": "Alustamiseks vali vestlus"
+      "chooseChat": "Alustamiseks vali vestlus",
+      "endChat": "Lõpeta vestlus",
+      "askAuthentication": "Küsi autentimist",
+      "askForContact": "Küsi kontaktandmeid",
+      "askPermission": "Küsi permission",
+      "forwardToColleague": "Suuna kolleegile",
+      "forwardToOrganization": "Suuna asutusele",
+      "startedAt": "Vestlus alustatud {{date}}"
     },
     "history": {
       "title": "Ajalugu",

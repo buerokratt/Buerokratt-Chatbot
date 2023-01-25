@@ -26,6 +26,7 @@ import Drawer from './Drawer';
 import HistoricalChat from './HistoricalChat';
 import Dialog from './Dialog';
 import Section from './Section';
+import Chat from './Chat';
 
 export {
   Layout,
@@ -54,4 +55,5 @@ export {
   HistoricalChat,
   Dialog,
   Section,
+  Chat,
 };

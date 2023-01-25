@@ -1,30 +1,29 @@
-import { FC, useState } from 'react';
+import { FC, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Tabs from '@radix-ui/react-tabs';
 import { useQuery } from '@tanstack/react-query';
 import { formatDistanceStrict } from 'date-fns';
 import { et } from 'date-fns/locale';
 
-import { Track } from 'components';
-import { Chat } from 'types/chat';
+import { Track, Chat } from 'components';
+import { Chat as ChatType } from 'types/chat';
 import useUserInfoStore from 'store/store';
-
 
 const ChatActive: FC = () => {
   const { t } = useTranslation();
   const { userInfo } = useUserInfoStore();
-  const [selectedChat, setSelectedChat] = useState<string | null>(null);
-  const { data: activeChats } = useQuery<Chat[]>({
+  const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
+  const { data: activeChats } = useQuery<ChatType[]>({
     queryKey: ['cs-get-all-active-chats'],
   });
 
-  console.log(activeChats);
+  const selectedChat = useMemo(() => activeChats && activeChats.find((c) => c.id === selectedChatId), [activeChats, selectedChatId]);
 
   return (
     <Tabs.Root
       className='vertical-tabs'
       orientation='vertical'
-      onValueChange={setSelectedChat}
+      onValueChange={setSelectedChatId}
     >
       <Tabs.List
         className='vertical-tabs__list'
@@ -67,12 +66,12 @@ const ChatActive: FC = () => {
         ))}
       </Tabs.List>
 
-      {selectedChat ? (
+      {selectedChatId ? (
         <Tabs.Content
           className='vertical-tabs__body'
-          value={selectedChat}
+          value={selectedChatId}
         >
-          tab
+          {selectedChat && <Chat chat={selectedChat} />}
         </Tabs.Content>
       ) : (
         <div className='vertical-tabs__body-placeholder'>

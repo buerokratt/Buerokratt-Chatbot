@@ -88,6 +88,13 @@ export const handlers = [
   rest.get(import.meta.env.BASE_URL + 'cs-get-all-active-chats', (req, res, ctx) => {
     return res(ctx.json(activeChatsData));
   }),
+  rest.get(import.meta.env.BASE_URL + 'cs-get-customer-support-activity', (req, res, ctx) => {
+    return res(ctx.json({
+      idCode: 'EE49902216518',
+      active: 'true',
+      status: 'idle',
+    }));
+  }),
   rest.get(import.meta.env.BASE_URL + 'cs-get-messages-by-chat-id/:id', (req, res, ctx) => {
     const requestedChatMessages = (activeChatMessages as Record<string, Message[]>)[String(req.params.id)];
     return res(ctx.json(requestedChatMessages));

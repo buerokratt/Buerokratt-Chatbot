@@ -44,6 +44,7 @@
     "closeIcon": "Close menu icon"
   },
   "chat": {
+    "reply": "Reply",
     "status": {
       "active": "Active",
       "ended": "Ended"
@@ -52,7 +53,14 @@
       "list": "Active chat list",
       "myChats": "My chats",
       "newChats": "New Chats",
-      "chooseChat": "Choose a chat to begin"
+      "chooseChat": "Choose a chat to begin",
+      "endChat": "End chat",
+      "askAuthentication": "Ask for authentication",
+      "askForContact": "Ask for contact",
+      "askPermission": "Ask permission",
+      "forwardToColleague": "Forward to colleague",
+      "forwardToOrganization": "Forward to organization",
+      "startedAt": "Chat started at {{date}}"
     },
     "history": {
       "title": "History",
