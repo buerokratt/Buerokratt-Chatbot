@@ -48,6 +48,13 @@
   },
   "chat": {
     "reply": "Vasta",
+    "unansweredChats": "Vastamata vestlused",
+    "endUser": "Vestleja",
+    "csaName": "Nõustaja nimi",
+    "startedAt": "Vestlus alustatud",
+    "device": "Seade",
+    "location": "Lähtekoht",
+    "redirectedMessage": "{{from}} suunas vestluse kasutajale {{to}} {{date}}",
     "status": {
       "active": "Aktiivne",
       "ended": "Lõpetatud"

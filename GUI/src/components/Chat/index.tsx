@@ -11,6 +11,8 @@ import { ReactComponent as BykLogoWhite } from 'assets/logo-white.svg';
 import { Chat as ChatType } from 'types/chat';
 import { Message } from 'types/message';
 import './Chat.scss';
+import ChatMessage from './ChatMessage';
+import ChatEvent from './ChatEvent';
 
 type ChatProps = {
   chat: ChatType;
@@ -40,10 +42,22 @@ const Chat: FC<ChatProps> = ({ chat }) => {
     messages.forEach((message) => {
       const lastGroup = groupedMessages[groupedMessages.length - 1];
       if (lastGroup?.type === message.authorRole) {
-        lastGroup.messages.push(message);
+        if (!message.event || message.event === 'greeting') {
+          lastGroup.messages.push(message);
+        } else {
+          groupedMessages.push({
+            name: '',
+            type: 'event',
+            messages: [message],
+          });
+        }
       } else {
         groupedMessages.push({
-          name: message.authorRole === 'end-user' ? endUserFullName : message.authorRole,
+          name: message.authorRole === 'end-user'
+            ? endUserFullName
+            : message.authorRole === 'backoffice-user'
+              ? `${message.authorFirstName} ${message.authorLastName}`
+              : message.authorRole,
           type: message.authorRole,
           messages: [message],
         });
@@ -52,9 +66,11 @@ const Chat: FC<ChatProps> = ({ chat }) => {
     setMessageGroups(groupedMessages);
   }, [messages, endUserFullName]);
 
+  console.log(messageGroups);
+
   useEffect(() => {
     if (!chatRef.current || !messageGroups) return;
-    chatRef.current.scrollIntoView({ block: 'end' });
+    chatRef.current.scrollIntoView({ block: 'end', inline: 'end' });
   }, [messageGroups]);
 
   const handleResponseTextSend = () => {
@@ -73,30 +89,31 @@ const Chat: FC<ChatProps> = ({ chat }) => {
           </Track>
         </div>
 
-        <div className='active-chat__group-wrapper' ref={chatRef}>
+        <div className='active-chat__group-wrapper'>
           {messageGroups && messageGroups.map((group, index) => (
             <div className={clsx(['active-chat__group', `active-chat__group--${group.type}`])} key={`group-${index}`}>
-              <div className='active-chat__group-initials'>
-                {group.type === 'buerokratt' ? (
-                  <BykLogoWhite height={24} />
-                ) : (
-                  <>{group.name.split(' ').map((n) => n[0]).join('').toUpperCase()}</>
-                )}
-              </div>
-              <div className='active-chat__group-name'>{group.name}</div>
-              <div className='active-chat__messages'>
-                {group.messages.map((message, i) => (
-                  <div className='active-chat__message' key={`message-${i}`}>
-                    <div className='active-chat__message-text'>{message.content}</div>
-                    <time dateTime={message.authorTimestamp} className='active-chat__message-date'>
-                      {format(new Date(message.authorTimestamp), 'HH:ii:ss')}
-                    </time>
+              {group.type === 'event' ? (
+                <ChatEvent message={group.messages[0]} />
+              ) : (
+                <>
+                  <div className='active-chat__group-initials'>
+                    {group.type === 'buerokratt' || group.type === 'chatbot' ? (
+                      <BykLogoWhite height={24} />
+                    ) : (
+                      <>{group.name.split(' ').map((n) => n[0]).join('').toUpperCase()}</>
+                    )}
                   </div>
-                ))}
-              </div>
+                  <div className='active-chat__group-name'>{group.name}</div>
+                  <div className='active-chat__messages'>
+                    {group.messages.map((message, i) => (
+                      <ChatMessage message={message} key={`message-${i}`} />
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
           ))}
-          <div id='anchor'></div>
+          <div id='anchor' ref={chatRef}></div>
         </div>
 
         <div className='active-chat__toolbar'>
@@ -108,10 +125,10 @@ const Chat: FC<ChatProps> = ({ chat }) => {
           />
           <div className='active-chat__toolbar-actions'>
             <Button appearance='primary' onClick={handleResponseTextSend}>
-              <Icon icon={<MdOutlineSend />} size='medium' />
+              <Icon icon={<MdOutlineSend fontSize={18} />} size='medium' />
             </Button>
             <Button appearance='secondary'>
-              <Icon icon={<MdOutlineAttachFile />} size='medium' />
+              <Icon icon={<MdOutlineAttachFile fontSize={18} />} size='medium' />
             </Button>
           </div>
         </div>
@@ -131,25 +148,25 @@ const Chat: FC<ChatProps> = ({ chat }) => {
             <p>{chat.id}</p>
           </div>
           <div>
-            <p><strong>Vestleja</strong></p>
+            <p><strong>{t('chat.endUser')}</strong></p>
             <p>{endUserFullName}</p>
           </div>
           {chat.customerSupportDisplayName && (
             <div>
-              <p><strong>Nõustaja nimi</strong></p>
+              <p><strong>{t('chat.csaName')}</strong></p>
               <p>{chat.customerSupportDisplayName}</p>
             </div>
           )}
           <div>
-            <p><strong>Vestlus alustatud</strong></p>
+            <p><strong>{t('chat.startedAt')}</strong></p>
             <p>{format(new Date(chat.created), 'dd. MMMM Y HH:ii:ss', { locale: et }).toLowerCase()}</p>
           </div>
           <div>
-            <p><strong>Seade</strong></p>
+            <p><strong>{t('chat.device')}</strong></p>
             <p>{chat.endUserOs}</p>
           </div>
           <div>
-            <p><strong>Lähtekoht</strong></p>
+            <p><strong>{t('chat.location')}</strong></p>
             <p>{chat.endUserUrl}</p>
           </div>
         </div>

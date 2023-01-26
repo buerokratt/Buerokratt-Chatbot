@@ -48,6 +48,13 @@
   },
   "chat": {
     "reply": "Reply",
+    "unansweredChats": "Unanswered chats",
+    "endUser": "End user",
+    "csaName": "Client support name",
+    "startedAt": "Chat started at",
+    "device": "Device",
+    "location": "Location",
+    "redirectedMessage": "{{from}} redirected the conversation to user {{to}} {{date}}",
     "status": {
       "active": "Active",
       "ended": "Ended"

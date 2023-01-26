@@ -12,6 +12,7 @@ import SettingsChatSettings from 'pages/Settings/SettingsChatSettings';
 import SettingsEmergencyNotices from 'pages/Settings/SettingsEmergencyNotices';
 import SettingsAppearance from 'pages/Settings/SettingsAppearance';
 import SettingsWorkingTime from 'pages/Settings/SettingsWorkingTime';
+import ChatUnanswered from 'pages/Chat/ChatUnanswered';
 
 const App: FC = () => {
   const store = useUserInfoStore();
@@ -24,6 +25,7 @@ const App: FC = () => {
     <Routes>
       <Route element={<Layout />}>
         <Route index element={<Navigate to='/vestlus/aktiivsed' />} />
+        <Route path='/vestlus/vastamata' element={<ChatUnanswered />} />
         <Route path='/vestlus/aktiivsed' element={<ChatActive />} />
         <Route path='/vestlus/ajalugu' element={<ChatHistory />} />
         <Route path='/haldus/kasutajad' element={<SettingsUsers />} />

@@ -8,6 +8,7 @@
   display: flex;
   justify-content: flex-end;
   position: relative;
+  height: 100%;
 
   &__body {
     flex: 1;
@@ -29,13 +30,14 @@
 
   &__group-wrapper {
     flex: 1;
-    padding: get-spacing(haapsalu) get-spacing(haapsalu) get-spacing(paldiski);
+    padding: get-spacing(haapsalu) get-spacing(haapsalu) 0;
     overflow: auto;
     overflow-anchor: none;
 
     #anchor {
       overflow-anchor: auto;
       height: 1px;
+      margin-top: 16px;
     }
   }
 
@@ -63,6 +65,9 @@
     height: 100%;
     overflow: auto;
     border-left: 1px solid get-color(black-coral-2);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 
     .btn {
       justify-content: center;
@@ -94,7 +99,40 @@
       margin-bottom: 8px;
     }
 
-    &--buerokratt {
+    &--event {
+      #{$self} {
+        &__event-message {
+          display: flex;
+          position: relative;
+          isolation: isolate;
+          padding: 6px 0;
+
+          p {
+            color: get-color(black-coral-12);
+            font-size: $veera-font-size-80;
+            line-height: $veera-line-height-500;
+            padding: 4px 8px 4px 0;
+            background-color: get-color(white);
+          }
+
+          &::after {
+            content: '';
+            display: block;
+            height: 1px;
+            background-color: get-color(black-coral-2);
+            position: absolute;
+            top: 50%;
+            left: 56px;
+            right: 0;
+            transform: translateY(-50%);
+            z-index: -1;
+          }
+        }
+      }
+    }
+
+    &--buerokratt,
+    &--chatbot {
       #{$self} {
         &__group-initials {
           background-color: get-color(sapphire-blue-10);
@@ -115,7 +153,7 @@
       }
     }
 
-    &--chatbot {
+    &--backoffice-user {
       #{$self} {
         &__group-initials {
           background-color: get-color(black-coral-10);
@@ -155,6 +193,7 @@
     font-size: $veera-font-size-80;
     line-height: $veera-line-height-500;
     font-weight: $veera-font-weight-delta;
+    text-transform: capitalize;
   }
 
   &__messages {

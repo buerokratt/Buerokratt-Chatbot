@@ -9,16 +9,16 @@ import { Track, Chat } from 'components';
 import { Chat as ChatType } from 'types/chat';
 import useUserInfoStore from 'store/store';
 
-const ChatActive: FC = () => {
+const ChatUnanswered: FC = () => {
   const { t } = useTranslation();
   const { userInfo } = useUserInfoStore();
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
-  const { data: chatData } = useQuery<ChatType[]>({
+  const { data: activeChats } = useQuery<ChatType[]>({
     queryKey: ['cs-get-all-active-chats'],
   });
 
-  const selectedChat = useMemo(() => chatData && chatData.find((c) => c.id === selectedChatId), [chatData, selectedChatId]);
-  const activeChats = useMemo(() => chatData ? chatData.filter((c) => c.customerSupportId !== '') : [], [chatData]);
+  const selectedChat = useMemo(() => activeChats && activeChats.find((c) => c.id === selectedChatId), [activeChats, selectedChatId]);
+  const unansweredChats = useMemo(() => activeChats ? activeChats.filter((c) => c.customerSupportId === '') : [], [activeChats]);
 
   return (
     <Tabs.Root
@@ -33,20 +33,9 @@ const ChatActive: FC = () => {
         style={{ overflow: 'auto' }}
       >
         <div className='vertical-tabs__group-header'>
-          <p>{t('chat.active.myChats')}</p>
+          <p>{t('chat.unansweredChats')}</p>
         </div>
-        {activeChats.filter((chat) => chat.customerSupportId === userInfo?.idCode).map((chat) => (
-          <Tabs.Trigger
-            key={chat.id}
-            className='vertical-tabs__trigger'
-            value={chat.id}>
-            {}
-          </Tabs.Trigger>
-        ))}
-        <div className='vertical-tabs__group-header'>
-          <p>{t('chat.active.newChats')}</p>
-        </div>
-        {activeChats.filter((chat) => chat.customerSupportId !== userInfo?.idCode).map((chat) => (
+        {unansweredChats.map((chat) => (
           <Tabs.Trigger
             key={chat.id}
             className='vertical-tabs__trigger'
@@ -60,7 +49,9 @@ const ChatActive: FC = () => {
                 ) : <p><strong>{t('global.anonymous')}</strong></p>}
                 {chat.lastMessageTimestamp && (
                   <p
-                    style={{ color: '#4D4F5D' }}>{formatDistanceStrict(new Date(chat.lastMessageTimestamp), new Date(), { locale: et })}</p>
+                    style={{ color: '#4D4F5D' }}>
+                    {formatDistanceStrict(new Date(chat.lastMessageTimestamp), new Date(), { locale: et })}
+                  </p>
                 )}
               </Track>
               <p style={{ color: '#4D4F5D' }}>{chat.lastMessage}</p>
@@ -85,4 +76,4 @@ const ChatActive: FC = () => {
   );
 };
 
-export default ChatActive;
+export default ChatUnanswered;

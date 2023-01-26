@@ -102,7 +102,7 @@ export const activeChatsData = [
     ended: null,
     endUserOs: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
     endUserUrl: 'https://test.buerokratt.ee/',
-    forwardedToName: 'null',
+    forwardedToName: null,
     lastMessage: '',
     contactsMessage: null,
     lastMessageTimestamp: '2023-01-23T15:13:51.469+00:00',
