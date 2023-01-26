@@ -38,7 +38,8 @@
     "anonymous": "Anonüümne",
     "csaStatus": "Klienditeenindaja",
     "present": "Kohal",
-    "away": "Eemal"
+    "away": "Eemal",
+    "today": "Täna"
   },
   "mainMenu": {
     "menuLabel": "Põhinavigatsioon",
@@ -144,6 +145,13 @@
     },
     "greeting": {
       "title": "Tervitussõnum"
+    }
+  },
+  "monitoring": {
+    "uptime": {
+      "title": "Tööaeg",
+      "daysAgo": "{{days}} päeva tagasi",
+      "uptimePercent": "{{percent}}% tööaeg"
     }
   }
 }

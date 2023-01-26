@@ -10,6 +10,7 @@ import { activeChatsData } from './activeChats';
 import { activeChatMessages } from './activeChatMessages';
 import { Chat } from '../types/chat';
 import { Message } from '../types/message';
+import { healthzStatusData } from './healthzStatus';
 
 export const handlers = [
   rest.get(import.meta.env.BASE_URL + 'main-navigation', (req, res, ctx) => {
@@ -98,5 +99,8 @@ export const handlers = [
   rest.get(import.meta.env.BASE_URL + 'cs-get-messages-by-chat-id/:id', (req, res, ctx) => {
     const requestedChatMessages = (activeChatMessages as Record<string, Message[]>)[String(req.params.id)];
     return res(ctx.json(requestedChatMessages));
+  }),
+  rest.get(import.meta.env.BASE_URL + 'cs-get-components-healthz-status', (req, res, ctx) => {
+    return res(ctx.json(healthzStatusData));
   }),
 ];

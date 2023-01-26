@@ -38,7 +38,8 @@
     "anonymous": "Anonymous",
     "csaStatus": "Customer support status",
     "present": "Present",
-    "away": "Away"
+    "away": "Away",
+    "today": "Today"
   },
   "mainMenu": {
     "menuLabel": "Main navigation",
@@ -144,6 +145,13 @@
     },
     "greeting": {
       "title": "Greeting message"
+    }
+  },
+  "monitoring": {
+    "uptime": {
+      "title": "Uptime",
+      "daysAgo": "{{days}} ago",
+      "uptimePercent": "{{percent}}% uptime"
     }
   }
 }
