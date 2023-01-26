@@ -8,6 +8,9 @@ export interface Message {
   authorFirstName: string;
   authorLastName?: string;
   authorRole: string;
+  forwardedByUser: string;
+  forwardedFromCsa: string;
+  forwardedToCsa: string;
   rating?: string;
   created?: string;
   updated?: string;

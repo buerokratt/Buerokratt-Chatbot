@@ -68,7 +68,7 @@
       "endChat": "Lõpeta vestlus",
       "askAuthentication": "Küsi autentimist",
       "askForContact": "Küsi kontaktandmeid",
-      "askPermission": "Küsi permission",
+      "askPermission": "Küsi nõusolekut",
       "forwardToColleague": "Suuna kolleegile",
       "forwardToOrganization": "Suuna asutusele",
       "startedAt": "Vestlus alustatud {{date}}"

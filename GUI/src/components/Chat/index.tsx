@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef, useState } from 'react';
+import { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
@@ -8,11 +8,12 @@ import { MdOutlineAttachFile, MdOutlineSend } from 'react-icons/all';
 
 import { Button, FormInput, Icon, Track } from 'components';
 import { ReactComponent as BykLogoWhite } from 'assets/logo-white.svg';
+import useUserInfoStore from 'store/store';
 import { Chat as ChatType } from 'types/chat';
 import { Message } from 'types/message';
-import './Chat.scss';
 import ChatMessage from './ChatMessage';
 import ChatEvent from './ChatEvent';
+import './Chat.scss';
 
 type ChatProps = {
   chat: ChatType;
@@ -26,12 +27,19 @@ type GroupedMessage = {
 
 const Chat: FC<ChatProps> = ({ chat }) => {
   const { t } = useTranslation();
+  const { userInfo } = useUserInfoStore();
   const chatRef = useRef<HTMLDivElement>(null);
   const [messageGroups, setMessageGroups] = useState<GroupedMessage[]>([]);
   const [responseText, setResponseText] = useState('');
   const { data: messages } = useQuery<Message[]>({
     queryKey: [`cs-get-messages-by-chat-id/${chat.id}`],
   });
+
+  const hasAccessToActions = useMemo(() => {
+    console.log(chat);
+    if (chat.customerSupportId === userInfo?.idCode) return true;
+    return false;
+  }, [chat, userInfo]);
 
   const endUserFullName = chat.endUserFirstName !== '' && chat.endUserLastName !== ''
     ? `${chat.endUserFirstName} ${chat.endUserLastName}` : t('global.anonymous');
@@ -65,8 +73,6 @@ const Chat: FC<ChatProps> = ({ chat }) => {
     });
     setMessageGroups(groupedMessages);
   }, [messages, endUserFullName]);
-
-  console.log(messageGroups);
 
   useEffect(() => {
     if (!chatRef.current || !messageGroups) return;

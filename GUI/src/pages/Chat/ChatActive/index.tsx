@@ -40,7 +40,7 @@ const ChatActive: FC = () => {
             key={chat.id}
             className='vertical-tabs__trigger'
             value={chat.id}>
-            {}
+            <ChatTrigger chat={chat} />
           </Tabs.Trigger>
         ))}
         <div className='vertical-tabs__group-header'>
@@ -53,18 +53,7 @@ const ChatActive: FC = () => {
             value={chat.id}
             style={{ borderBottom: '1px solid #D2D3D8' }}
           >
-            <div style={{ fontSize: 14, lineHeight: '1.5', color: '#09090B' }}>
-              <Track justify='between'>
-                {chat.endUserFirstName !== '' && chat.endUserLastName !== '' ? (
-                  <p><strong>{chat.endUserFirstName} {chat.endUserLastName}</strong></p>
-                ) : <p><strong>{t('global.anonymous')}</strong></p>}
-                {chat.lastMessageTimestamp && (
-                  <p
-                    style={{ color: '#4D4F5D' }}>{formatDistanceStrict(new Date(chat.lastMessageTimestamp), new Date(), { locale: et })}</p>
-                )}
-              </Track>
-              <p style={{ color: '#4D4F5D' }}>{chat.lastMessage}</p>
-            </div>
+            <ChatTrigger chat={chat} />
           </Tabs.Trigger>
         ))}
       </Tabs.List>
@@ -82,6 +71,25 @@ const ChatActive: FC = () => {
         </div>
       )}
     </Tabs.Root>
+  );
+};
+
+const ChatTrigger: FC<{ chat: ChatType }> = ({ chat }) => {
+  const { t } = useTranslation();
+
+  return (
+    <div style={{ fontSize: 14, lineHeight: '1.5', color: '#09090B' }}>
+      <Track justify='between'>
+        {chat.endUserFirstName !== '' && chat.endUserLastName !== '' ? (
+          <p><strong>{chat.endUserFirstName} {chat.endUserLastName}</strong></p>
+        ) : <p><strong>{t('global.anonymous')}</strong></p>}
+        {chat.lastMessageTimestamp && (
+          <p
+            style={{ color: '#4D4F5D' }}>{formatDistanceStrict(new Date(chat.lastMessageTimestamp), new Date(), { locale: et })}</p>
+        )}
+      </Track>
+      <p style={{ color: '#4D4F5D' }}>{chat.lastMessage}</p>
+    </div>
   );
 };
 
