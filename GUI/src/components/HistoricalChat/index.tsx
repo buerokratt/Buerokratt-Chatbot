@@ -1,122 +1,124 @@
-import { FC, useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
-import { useTranslation } from 'react-i18next';
+import { et } from 'date-fns/locale';
 import clsx from 'clsx';
+import { MdOutlineAttachFile, MdOutlineSend } from 'react-icons/all';
 
-import { Button, Dialog, FormInput, FormSelect, Track } from 'components';
-import type { Conversation, Message } from 'types/conversation';
-import type { Intent } from 'types/intent';
+import { Button, FormInput, FormSelect, Icon, Track } from 'components';
 import { ReactComponent as BykLogoWhite } from 'assets/logo-white.svg';
+import useUserInfoStore from 'store/store';
+import { Chat as ChatType } from 'types/chat';
+import { Message } from 'types/message';
+import ChatMessage from './ChatMessage';
+import ChatEvent from './ChatEvent';
 import './HistoricalChat.scss';
 
-type HistoricalChatProps = {
-  conversationId: number;
+type ChatProps = {
+  chat: ChatType;
 }
 
 type GroupedMessage = {
   name: string;
-  type: 'bot' | 'client' | 'client-support';
+  type: string;
   messages: Message[];
 }
 
-const HistoricalChat: FC<HistoricalChatProps> = ({ conversationId }) => {
+const HistoricalChat: FC<ChatProps> = ({ chat }) => {
   const { t } = useTranslation();
-  const [markedMessage, setMarkedMessage] = useState<string | null>(null);
-  const { data: conversation } = useQuery<Conversation>({
-    queryKey: [`conversations/${conversationId}`],
-  });
-  const { data: intents } = useQuery<Intent[]>({
-    queryKey: ['intents'],
+  const { userInfo } = useUserInfoStore();
+  const chatRef = useRef<HTMLDivElement>(null);
+  const [messageGroups, setMessageGroups] = useState<GroupedMessage[]>([]);
+  const { data: messages } = useQuery<Message[]>({
+    queryKey: [`cs-get-messages-by-chat-id/${chat.id}`],
   });
 
-  const messageGroups = useMemo(() => {
-    if (!conversation) return null;
-    const groupedMessages: GroupedMessage[] = [];
-    let lastName: string | null = null;
-    let group: GroupedMessage | null = null;
-    for (let message of conversation.messages) {
-      if (lastName === null || lastName !== message.name) {
-        group = {
-          name: message.name,
-          type: message.type,
-          messages: [],
-        };
-        groupedMessages.push(group);
-      }
-      if (group) {
-        group.messages.push(message);
-      }
-      lastName = message.name;
-    }
-    return groupedMessages;
-  }, [conversation]);
+  console.log(chat);
 
-  if (!conversation) return <>Loading...</>;
+  const hasAccessToActions = useMemo(() => {
+    if (chat.customerSupportId === userInfo?.idCode) return true;
+    return false;
+  }, [chat, userInfo]);
+
+  const endUserFullName = chat.endUserFirstName !== '' && chat.endUserLastName !== ''
+    ? `${chat.endUserFirstName} ${chat.endUserLastName}` : t('global.anonymous');
+
+  useEffect(() => {
+    if (!messages) return;
+    let groupedMessages: GroupedMessage[] = [];
+    messages.forEach((message) => {
+      const lastGroup = groupedMessages[groupedMessages.length - 1];
+      if (lastGroup?.type === message.authorRole) {
+        if (!message.event || message.event === 'greeting') {
+          lastGroup.messages.push(message);
+        } else {
+          groupedMessages.push({
+            name: '',
+            type: 'event',
+            messages: [message],
+          });
+        }
+      } else {
+        groupedMessages.push({
+          name: message.authorRole === 'end-user'
+            ? endUserFullName
+            : message.authorRole === 'backoffice-user'
+              ? `${message.authorFirstName} ${message.authorLastName}`
+              : message.authorRole,
+          type: message.authorRole,
+          messages: [message],
+        });
+      }
+    });
+    setMessageGroups(groupedMessages);
+  }, [messages, endUserFullName]);
+
+  useEffect(() => {
+    if (!chatRef.current || !messageGroups) return;
+    chatRef.current.scrollIntoView({ block: 'end', inline: 'end' });
+  }, [messageGroups]);
 
   return (
-    <>
-      <div className='chat'>
-        {messageGroups && messageGroups.map((group, index) => (
-          <div className={clsx(['chat__group', `chat__group--${group.type}`])} key={`group-${index}`}>
-            <div className='chat__group-initials'>
-              {group.type === 'bot' ? (
-                <BykLogoWhite height={24} />
+    <div className='historical-chat'>
+      <div className='historical-chat__body'>
+        <div className='historical-chat__group-wrapper'>
+          {messageGroups && messageGroups.map((group, index) => (
+            <div className={clsx(['historical-chat__group', `historical-chat__group--${group.type}`])}
+                 key={`group-${index}`}>
+              {group.type === 'event' ? (
+                <ChatEvent message={group.messages[0]} />
               ) : (
-                <>{group.name.split(' ').map((n) => n[0]).join('').toUpperCase()}</>
+                <>
+                  <div className='historical-chat__group-initials'>
+                    {group.type === 'buerokratt' || group.type === 'chatbot' ? (
+                      <BykLogoWhite height={24} />
+                    ) : (
+                      <>{group.name.split(' ').map((n) => n[0]).join('').toUpperCase()}</>
+                    )}
+                  </div>
+                  <div className='historical-chat__group-name'>{group.name}</div>
+                  <div className='historical-chat__messages'>
+                    {group.messages.map((message, i) => (
+                      <ChatMessage message={message} key={`message-${i}`} />
+                    ))}
+                  </div>
+                </>
               )}
             </div>
-            <div className='chat__group-name'>{group.name}</div>
-            <div className='chat__messages'>
-              {group.messages.map((message, i) => (
-                <div className='chat__message' key={`message-${i}`}>
-                  {message.type === 'client' ? (
-                    <button
-                      className='chat__message-text'
-                      onClick={() => setMarkedMessage(message.message)}
-                    >
-                      {message.message}
-                    </button>
-                  ) : (
-                    <div className='chat__message-text'>{message.message}</div>
-                  )}
-                  <time dateTime={message.sentAt} className='chat__message-date'>
-                    {format(new Date(message.sentAt), 'HH:ii:ss')}
-                  </time>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+          <div id='anchor' ref={chatRef}></div>
+        </div>
 
-      {markedMessage && (
-        // TODO: Modify modal with correct data
-        <Dialog
-          title='Euismod Egestas Elit'
-          onClose={() => setMarkedMessage(null)}
-          footer={
-            <>
-              <Button appearance='secondary' onClick={() => setMarkedMessage(null)}>
-                {t('global.cancel')}
-              </Button>
-              <Button>{t('global.save')}</Button>
-            </>
-          }
-        >
-          <Track direction='vertical' gap={16}>
-            <FormInput label='Nullam Ullamcorper' name='test1' defaultValue={markedMessage} />
-            {intents && (
-              <FormSelect
-                label='Etiam Vestibulum'
-                name='test2'
-                options={intents.map((intent) => ({ label: intent.intent, value: String(intent.id) }))}
-              />
-            )}
-          </Track>
-        </Dialog>
-      )}
-    </>
+        <div className='historical-chat__toolbar'>
+          <FormSelect
+            name='chatStatus'
+            label={t('chat.chatStatus')}
+            options={[]}
+          />
+        </div>
+      </div>
+    </div>
   );
 };
 

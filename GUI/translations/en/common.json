@@ -60,6 +60,7 @@
       "active": "Active",
       "ended": "Ended"
     },
+    "chatStatus": "Chat status",
     "active": {
       "list": "Active chat list",
       "myChats": "My chats",

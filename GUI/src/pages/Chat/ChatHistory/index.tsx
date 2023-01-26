@@ -5,7 +5,7 @@ import { createColumnHelper, PaginationState } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { MdOutlineRemoveRedEye } from 'react-icons/md';
 
-import { Button, Card, DataTable, Drawer, FormInput, HistoricalChat, Icon } from 'components';
+import { Button, Card, Chat, DataTable, Drawer, FormInput, HistoricalChat, Icon } from 'components';
 import { Chat as ChatType, CHAT_STATUS } from 'types/chat';
 import { Message } from 'types/message';
 
@@ -86,6 +86,7 @@ const ChatHistory: FC = () => {
           hideLabel
           name='searchChats'
           placeholder={t('chat.history.searchChats') + '...'}
+          onChange={(e) => setFilter(e.target.value)}
         />
       </Card>
 
@@ -102,10 +103,12 @@ const ChatHistory: FC = () => {
 
       {selectedChat && chatMessages && (
         <Drawer
-          title={`${selectedChat.endUserFirstName} ${selectedChat.endUserLastName}`}
+          title={selectedChat.endUserFirstName !== '' && selectedChat.endUserLastName !== ''
+            ? `${selectedChat.endUserFirstName} ${selectedChat.endUserLastName}`
+            : t('global.anonymous')}
           onClose={() => setSelectedChat(null)}
         >
-          {/*<HistoricalChat  />*/}
+          <HistoricalChat chat={selectedChat} />
         </Drawer>
       )}
     </>
