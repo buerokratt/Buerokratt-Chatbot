@@ -1,0 +1,37 @@
+assignIncoming:
+  assign:
+    chatId: ${incoming.params.chatId}
+    interval: ${incoming.body.interval}
+
+getAverageWaitingTimeInSeconds:
+  call: http.post
+  args:
+    url: https://byk-resql:8443/get-average-waiting-time-in-seconds-by-interval
+    body:
+      interval: ${interval}
+  result: averageWaitingTimeInSeconds
+
+getOpenAgentChatAmount:
+  call: http.post
+  args:
+    url: https://byk-resql:8443/get-open-agent-chat-amount
+  result: openAgentChatAmount
+
+assignResponseVariables:
+  assign:
+    chatSeconds: ${averageWaitingTimeInSeconds.response.body[0].chatSeconds}
+    openChats: ${openAgentChatAmount.response.body[0].openChats}
+
+checkChatIdParameter:
+  switch:
+    - condition: ${!!chatId && chatId !== "" && chatId !== null}
+      next: returnWithChatIdParameter
+  next: returnWithoutChatIdParameter
+
+returnWithChatIdParameter:
+  return: ${chatId}
+  next: end
+
+returnWithoutChatIdParameter:
+  return: ${chatSeconds / openChats}
+  next: end

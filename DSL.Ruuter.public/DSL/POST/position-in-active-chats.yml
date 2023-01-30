@@ -1,0 +1,11 @@
+getPositionInActiveChats:
+  call: http.post
+  args:
+    url: https://byk-resql:8443/get-position-in-active-chats-by-chat-id
+    body:
+      chatId: ${incoming.body.chatId}
+  result: positionInActiveChats
+
+returnPosition:
+  return: ${positionInActiveChats.response.body[0].position}
+  next: end
