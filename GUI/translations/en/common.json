@@ -79,7 +79,8 @@
       "onlyActiveAgents": "Show only active client support agents",
       "establishment": "Establishment",
       "searchByEstablishmentName": "Search by establishment name",
-      "sendToEmail": "Send to email"
+      "sendToEmail": "Send to email",
+      "chooseChatStatus": "Choose chat status"
     },
     "history": {
       "title": "History",

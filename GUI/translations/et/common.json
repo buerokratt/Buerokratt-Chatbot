@@ -79,7 +79,8 @@
       "onlyActiveAgents": "Näita ainult kohalolevaid nõustajaid",
       "establishment": "Asutus",
       "searchByEstablishmentName": "Otsi asutuse nime järgi",
-      "sendToEmail": "Saada e-mailile"
+      "sendToEmail": "Saada e-mailile",
+      "chooseChatStatus": "Vali vestluse staatus"
     },
     "history": {
       "title": "Ajalugu",

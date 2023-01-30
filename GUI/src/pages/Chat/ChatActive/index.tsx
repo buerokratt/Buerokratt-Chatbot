@@ -6,7 +6,7 @@ import { formatDistanceStrict } from 'date-fns';
 import { AxiosError } from 'axios';
 import { et } from 'date-fns/locale';
 
-import { Track, Chat, Dialog, Button } from 'components';
+import { Track, Chat, Dialog, Button, FormRadios } from 'components';
 import { Chat as ChatType } from 'types/chat';
 import useUserInfoStore from 'store/store';
 import { User } from 'types/user';
@@ -15,11 +15,19 @@ import api from 'services/api';
 import ForwardToColleaugeModal from '../ForwardToColleaugeModal';
 import ForwardToEstablishmentModal from '../ForwardToEstablishmentModal';
 
+const CSAchatStatuses = [
+  'accepted',
+  'hate-speech',
+  'other',
+  'response-sent-to-client-email',
+];
+
 const ChatActive: FC = () => {
   const { t } = useTranslation();
   const { userInfo } = useUserInfoStore();
   const toast = useToast();
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
+  const [endChatModal, setEndChatModal] = useState<ChatType | null>(null);
   const [forwardToColleaugeModal, setForwardToColleaugeModal] = useState<ChatType | null>(null);
   const [forwardToEstablishmentModal, setForwardToEstablishmentModal] = useState<ChatType | null>(null);
   const [sendToEmailModal, setSendToEmailModal] = useState<ChatType | null>(null);
@@ -66,6 +74,16 @@ const ChatActive: FC = () => {
       type: 'success',
       title: t('global.notification'),
       message: `Chat forwarded to ${establishment}`,
+    });
+  };
+
+  const handleChatEnd = () => {
+    // TODO: Add endpoint for chat ending
+    setEndChatModal(null);
+    toast.open({
+      type: 'success',
+      title: t('global.notification'),
+      message: `Chat ended`,
     });
   };
 
@@ -116,6 +134,7 @@ const ChatActive: FC = () => {
             {selectedChat && (
               <Chat
                 chat={selectedChat}
+                onChatEnd={setEndChatModal}
                 onForwardToColleauge={setForwardToColleaugeModal}
                 onForwardToEstablishment={setForwardToEstablishmentModal}
                 onSendToEmail={setSendToEmailModal}
@@ -162,6 +181,24 @@ const ChatActive: FC = () => {
           }
         >
           <p>{t('global.removeValidation')}</p>
+        </Dialog>
+      )}
+
+      {endChatModal && (
+        <Dialog
+          title={t('chat.active.chooseChatStatus')}
+          onClose={() => setEndChatModal(null)}
+          footer={
+            <>
+              <Button appearance='secondary'>{t('global.cancel')}</Button>
+              <Button appearance='success' onClick={handleChatEnd}>{t('chat.active.endChat')}</Button>
+            </>
+          }
+        >
+          <FormRadios name='endedChatStatuses' label={t('')} items={CSAchatStatuses.map((status) => ({
+            label: t(`chat.events.${status}`),
+            value: status,
+          }))} />
         </Dialog>
       )}
     </>

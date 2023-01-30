@@ -17,6 +17,7 @@ import './Chat.scss';
 
 type ChatProps = {
   chat: ChatType;
+  onChatEnd: (chat: ChatType) => void;
   onForwardToColleauge?: (chat: ChatType) => void;
   onForwardToEstablishment?: (chat: ChatType) => void;
   onSendToEmail?: (chat: ChatType) => void;
@@ -28,7 +29,7 @@ type GroupedMessage = {
   messages: Message[];
 }
 
-const Chat: FC<ChatProps> = ({ chat, onForwardToColleauge, onForwardToEstablishment, onSendToEmail }) => {
+const Chat: FC<ChatProps> = ({ chat, onChatEnd, onForwardToColleauge, onForwardToEstablishment, onSendToEmail }) => {
   const { t } = useTranslation();
   const { userInfo } = useUserInfoStore();
   const chatRef = useRef<HTMLDivElement>(null);
@@ -148,7 +149,12 @@ const Chat: FC<ChatProps> = ({ chat, onForwardToColleauge, onForwardToEstablishm
       </div>
       <div className='active-chat__side'>
         <div className='active-chat__side-actions'>
-          <Button appearance='success'>{t('chat.active.endChat')}</Button>
+          <Button
+            appearance='success'
+            onClick={onChatEnd ? () => onChatEnd(chat) : undefined}
+          >
+            {t('chat.active.endChat')}
+          </Button>
           <Button appearance='secondary'>{t('chat.active.askAuthentication')}</Button>
           <Button appearance='secondary'>{t('chat.active.askForContact')}</Button>
           <Button appearance='secondary'>{t('chat.active.askPermission')}</Button>
