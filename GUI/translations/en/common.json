@@ -39,7 +39,8 @@
     "csaStatus": "Customer support status",
     "present": "Present",
     "away": "Away",
-    "today": "Today"
+    "today": "Today",
+    "forward": "Forward"
   },
   "mainMenu": {
     "menuLabel": "Main navigation",
@@ -72,7 +73,10 @@
       "askPermission": "Ask permission",
       "forwardToColleague": "Forward to colleague",
       "forwardToOrganization": "Forward to organization",
-      "startedAt": "Chat started at {{date}}"
+      "startedAt": "Chat started at {{date}}",
+      "forwardChat": "Who to forward the chat?",
+      "searchByName": "Search by name",
+      "onlyActiveAgents": "Show only active client support agents"
     },
     "history": {
       "title": "History",

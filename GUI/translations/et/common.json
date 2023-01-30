@@ -39,7 +39,8 @@
     "csaStatus": "Klienditeenindaja",
     "present": "Kohal",
     "away": "Eemal",
-    "today": "Täna"
+    "today": "Täna",
+    "forward": "Suuna"
   },
   "mainMenu": {
     "menuLabel": "Põhinavigatsioon",
@@ -72,7 +73,10 @@
       "askPermission": "Küsi nõusolekut",
       "forwardToColleague": "Suuna kolleegile",
       "forwardToOrganization": "Suuna asutusele",
-      "startedAt": "Vestlus alustatud {{date}}"
+      "startedAt": "Vestlus alustatud {{date}}",
+      "forwardChat": "Kellele vestlus suunata?",
+      "searchByName": "Otsi nime või tiitli järgi",
+      "onlyActiveAgents": "Näita ainult kohalolevaid nõustajaid"
     },
     "history": {
       "title": "Ajalugu",

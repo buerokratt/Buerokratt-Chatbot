@@ -56,7 +56,7 @@ const SettingsUsers: FC = () => {
     columnHelper.accessor('displayName', {
       header: t('settings.users.displayName') || '',
     }),
-    columnHelper.accessor('email', {
+    columnHelper.accessor('csaEmail', {
       header: t('settings.users.email') || '',
     }),
     columnHelper.display({

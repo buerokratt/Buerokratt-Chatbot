@@ -1,5 +1,6 @@
 import { rest } from 'msw';
 
+import { Message } from 'types/message';
 import { mainNavigationET } from './mainNavigation';
 import { endedChatsData } from './endedChats';
 import { chatMessagesData } from './chatMessages';
@@ -8,9 +9,8 @@ import { userInfoData } from './userInfo';
 import { userProfileSettingsData } from './userProfileSettings';
 import { activeChatsData } from './activeChats';
 import { activeChatMessages } from './activeChatMessages';
-import { Chat } from '../types/chat';
-import { Message } from '../types/message';
 import { healthzStatusData } from './healthzStatus';
+import { customerSupportAgentsData } from './customerSupportAgents';
 
 export const handlers = [
   rest.get(import.meta.env.BASE_URL + 'main-navigation', (req, res, ctx) => {
@@ -102,5 +102,8 @@ export const handlers = [
   }),
   rest.get(import.meta.env.BASE_URL + 'cs-get-components-healthz-status', (req, res, ctx) => {
     return res(ctx.json(healthzStatusData));
+  }),
+  rest.get(import.meta.env.BASE_URL + 'cs-get-customer-support-agents', (req, res, ctx) => {
+    return res(ctx.json(customerSupportAgentsData));
   }),
 ];

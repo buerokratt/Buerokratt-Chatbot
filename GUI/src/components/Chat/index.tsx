@@ -17,6 +17,7 @@ import './Chat.scss';
 
 type ChatProps = {
   chat: ChatType;
+  onForwardToColleauge?: (chat: ChatType) => void;
 }
 
 type GroupedMessage = {
@@ -25,18 +26,18 @@ type GroupedMessage = {
   messages: Message[];
 }
 
-const Chat: FC<ChatProps> = ({ chat }) => {
+const Chat: FC<ChatProps> = ({ chat, onForwardToColleauge }) => {
   const { t } = useTranslation();
   const { userInfo } = useUserInfoStore();
   const chatRef = useRef<HTMLDivElement>(null);
   const [messageGroups, setMessageGroups] = useState<GroupedMessage[]>([]);
   const [responseText, setResponseText] = useState('');
+  const [forwardToColleaugeModalOpen, setForwardToColleaugeModalOpen] = useState(false);
   const { data: messages } = useQuery<Message[]>({
     queryKey: [`cs-get-messages-by-chat-id/${chat.id}`],
   });
 
   const hasAccessToActions = useMemo(() => {
-    console.log(chat);
     if (chat.customerSupportId === userInfo?.idCode) return true;
     return false;
   }, [chat, userInfo]);
@@ -145,7 +146,9 @@ const Chat: FC<ChatProps> = ({ chat }) => {
           <Button appearance='secondary'>{t('chat.active.askAuthentication')}</Button>
           <Button appearance='secondary'>{t('chat.active.askForContact')}</Button>
           <Button appearance='secondary'>{t('chat.active.askPermission')}</Button>
-          <Button appearance='secondary'>{t('chat.active.forwardToColleague')}</Button>
+          <Button appearance='secondary' onClick={onForwardToColleauge ? () => onForwardToColleauge(chat) : undefined}>
+            {t('chat.active.forwardToColleague')}
+          </Button>
           <Button appearance='secondary'>{t('chat.active.forwardToOrganization')}</Button>
         </div>
         <div className='active-chat__side-meta'>
