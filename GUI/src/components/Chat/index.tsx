@@ -33,7 +33,7 @@ const Chat: FC<ChatProps> = ({ chat, onForwardToColleauge, onForwardToEstablishm
   const chatRef = useRef<HTMLDivElement>(null);
   const [messageGroups, setMessageGroups] = useState<GroupedMessage[]>([]);
   const [responseText, setResponseText] = useState('');
-  const [forwardToColleaugeModalOpen, setForwardToColleaugeModalOpen] = useState(false);
+  const [selectedMessages, setSelectedMessages] = useState<Message[]>([]);
   const { data: messages } = useQuery<Message[]>({
     queryKey: [`cs-get-messages-by-chat-id/${chat.id}`],
   });
@@ -114,7 +114,11 @@ const Chat: FC<ChatProps> = ({ chat, onForwardToColleauge, onForwardToEstablishm
                   <div className='active-chat__group-name'>{group.name}</div>
                   <div className='active-chat__messages'>
                     {group.messages.map((message, i) => (
-                      <ChatMessage message={message} key={`message-${i}`} />
+                      <ChatMessage
+                        message={message}
+                        key={`message-${i}`}
+                        onSelect={(message) => setSelectedMessages(prevState => [...prevState, message])}
+                      />
                     ))}
                   </div>
                 </>
@@ -147,7 +151,10 @@ const Chat: FC<ChatProps> = ({ chat, onForwardToColleauge, onForwardToEstablishm
           <Button appearance='secondary'>{t('chat.active.askAuthentication')}</Button>
           <Button appearance='secondary'>{t('chat.active.askForContact')}</Button>
           <Button appearance='secondary'>{t('chat.active.askPermission')}</Button>
-          <Button appearance='secondary' onClick={onForwardToColleauge ? () => onForwardToColleauge(chat) : undefined}>
+          <Button appearance='secondary' onClick={onForwardToColleauge ? () => {
+            onForwardToColleauge(chat);
+            setSelectedMessages([]);
+          } : undefined}>
             {t('chat.active.forwardToColleague')}
           </Button>
           <Button appearance='secondary'
