@@ -95,7 +95,7 @@ const SettingsUsers: FC = () => {
       </Track>
 
       <Card>
-        <DataTable data={users} columns={usersColumns} sortable />
+        <DataTable data={users} columns={usersColumns} sortable filterable />
       </Card>
 
       {newUserModal && (

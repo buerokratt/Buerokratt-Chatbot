@@ -13,7 +13,7 @@ import {
   PaginationState,
   TableMeta,
   Row,
-  RowData,
+  RowData, ColumnFiltersState,
 } from '@tanstack/react-table';
 import {
   RankingInfo,
@@ -24,20 +24,22 @@ import {
   MdExpandMore,
   MdExpandLess,
   MdOutlineEast,
-  MdOutlineWest,
+  MdOutlineWest, MdOutlineSearch,
 } from 'react-icons/md';
+import clsx from 'clsx';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import { Icon, Track } from 'components';
+import Filter from './Filter';
 import './DataTable.scss';
-import clsx from 'clsx';
-import { Link } from 'react-router-dom';
 
 type DataTableProps = {
   data: any;
   columns: ColumnDef<any, any>[];
   tableBodyPrefix?: ReactNode;
   sortable?: boolean;
+  filterable?: boolean;
   pagination?: PaginationState;
   setPagination?: React.Dispatch<React.SetStateAction<PaginationState>>;
   globalFilter?: string;
@@ -86,6 +88,7 @@ const DataTable: FC<DataTableProps> = (
     columns,
     tableBodyPrefix,
     sortable,
+    filterable,
     pagination,
     setPagination,
     globalFilter,
@@ -99,6 +102,7 @@ const DataTable: FC<DataTableProps> = (
   const id = useId();
   const { t } = useTranslation();
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const table = useReactTable({
     data,
     columns,
@@ -107,11 +111,13 @@ const DataTable: FC<DataTableProps> = (
     },
     state: {
       sorting,
+      columnFilters,
       globalFilter,
       columnVisibility,
       ...{ pagination },
     },
     meta,
+    onColumnFiltersChange: setColumnFilters,
     onGlobalFilterChange: setGlobalFilter,
     onColumnVisibilityChange: setColumnVisibility,
     globalFilterFn: fuzzyFilter,
@@ -133,19 +139,24 @@ const DataTable: FC<DataTableProps> = (
               {headerGroup.headers.map((header) => (
                 <th key={header.id} style={{ width: (header.column.columnDef as CustomColumnDef).meta?.size }}>
                   {header.isPlaceholder ? null : (
-                    <Track gap={8} onClick={header.column.getToggleSortingHandler()}>
-                      {sortable && header.column.getCanSort() && (
-                        <>
-                          {{
-                            asc: <Icon icon={<MdExpandMore fontSize={20} />} size='medium' />,
-                            desc: <Icon icon={<MdExpandLess fontSize={20} />} size='medium' />,
-                          }[header.column.getIsSorted() as string] ?? (
-                            <Icon icon={<MdUnfoldMore fontSize={22} />} size='medium' />
-                          )}
-                        </>
-                      )}
-                      {flexRender(header.column.columnDef.header, header.getContext())}
-                    </Track>
+                    <>
+                      <Track gap={8}>
+                        {sortable && header.column.getCanSort() && (
+                          <button onClick={header.column.getToggleSortingHandler()}>
+                            {{
+                              asc: <Icon icon={<MdExpandMore fontSize={20} />} size='medium' />,
+                              desc: <Icon icon={<MdExpandLess fontSize={20} />} size='medium' />,
+                            }[header.column.getIsSorted() as string] ?? (
+                              <Icon icon={<MdUnfoldMore fontSize={22} />} size='medium' />
+                            )}
+                          </button>
+                        )}
+                        {flexRender(header.column.columnDef.header, header.getContext())}
+                        {filterable && header.column.getCanFilter() && (
+                          <Filter column={header.column} table={table} />
+                        )}
+                      </Track>
+                    </>
                   )}
                 </th>
               ))}
