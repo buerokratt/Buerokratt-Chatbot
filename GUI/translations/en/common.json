@@ -78,7 +78,8 @@
       "searchByName": "Search by name",
       "onlyActiveAgents": "Show only active client support agents",
       "establishment": "Establishment",
-      "searchByEstablishmentName": "Search by establishment name"
+      "searchByEstablishmentName": "Search by establishment name",
+      "sendToEmail": "Send to email"
     },
     "history": {
       "title": "History",

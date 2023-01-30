@@ -78,7 +78,8 @@
       "searchByName": "Otsi nime või tiitli järgi",
       "onlyActiveAgents": "Näita ainult kohalolevaid nõustajaid",
       "establishment": "Asutus",
-      "searchByEstablishmentName": "Otsi asutuse nime järgi"
+      "searchByEstablishmentName": "Otsi asutuse nime järgi",
+      "sendToEmail": "Saada e-mailile"
     },
     "history": {
       "title": "Ajalugu",

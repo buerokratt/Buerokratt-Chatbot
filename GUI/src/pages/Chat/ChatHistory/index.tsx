@@ -1,18 +1,23 @@
 import { FC, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { createColumnHelper, PaginationState } from '@tanstack/react-table';
 import { format } from 'date-fns';
-import { MdOutlineRemoveRedEye } from 'react-icons/md';
+import { AxiosError } from 'axios';
+import { MdMailOutline, MdOutlineRemoveRedEye } from 'react-icons/md';
 
-import { Button, Card, Chat, DataTable, Drawer, FormInput, HistoricalChat, Icon } from 'components';
+import { Button, Card, Chat, DataTable, Dialog, Drawer, FormInput, HistoricalChat, Icon } from 'components';
 import { Chat as ChatType, CHAT_STATUS } from 'types/chat';
 import { Message } from 'types/message';
+import { useToast } from 'hooks/useToast';
+import api from 'services/api';
 
 const ChatHistory: FC = () => {
   const { t } = useTranslation();
+  const toast = useToast();
   const [filter, setFilter] = useState('');
   const [selectedChat, setSelectedChat] = useState<ChatType | null>(null);
+  const [sendToEmailModal, setSendToEmailModal] = useState<ChatType | null>(null);
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
@@ -24,6 +29,26 @@ const ChatHistory: FC = () => {
     queryKey: ['cs-get-messages-by-chat-id', selectedChat?.id],
     enabled: !!selectedChat,
   });
+
+  const sendToEmailMutation = useMutation({
+    mutationFn: (data: ChatType) => api.post('cs-send-chat-to-email', data),
+    onSuccess: () => {
+      toast.open({
+        type: 'success',
+        title: t('global.notification'),
+        message: 'Message sent to user email',
+      });
+    },
+    onError: (error: AxiosError) => {
+      toast.open({
+        type: 'error',
+        title: t('global.notificationError'),
+        message: error.message,
+      });
+    },
+    onSettled: () => setSendToEmailModal(null),
+  });
+
   const columnHelper = createColumnHelper<ChatType>();
 
   const endedChatsColumns = useMemo(() => [
@@ -50,9 +75,6 @@ const ChatHistory: FC = () => {
         ? t('global.yes')
         : t('global.no'),
     }),
-    // columnHelper.accessor('comment', {}),
-    // columnHelper.accessor('label', {}),
-    // columnHelper.accessor('NPS', {}),
     columnHelper.accessor('status', {
       header: t('global.status') || '',
       cell: (props) => props.getValue() === CHAT_STATUS.ENDED ? t('chat.status.ended') : '',
@@ -66,6 +88,18 @@ const ChatHistory: FC = () => {
         <Button appearance='text' onClick={() => setSelectedChat(props.row.original)}>
           <Icon icon={<MdOutlineRemoveRedEye color={'rgba(0,0,0,0.54)'} />} />
           {t('global.view')}
+        </Button>
+      ),
+      meta: {
+        size: '1%',
+      },
+    }),
+    columnHelper.display({
+      id: 'detail',
+      cell: (props) => (
+        <Button appearance='text' onClick={() => setSendToEmailModal(props.row.original)}>
+          <Icon icon={<MdMailOutline color={'rgba(0,0,0,0.54)'} />} />
+          {t('chat.active.sendToEmail')}
         </Button>
       ),
       meta: {
@@ -110,6 +144,26 @@ const ChatHistory: FC = () => {
         >
           <HistoricalChat chat={selectedChat} />
         </Drawer>
+      )}
+
+      {sendToEmailModal !== null && (
+        <Dialog
+          title={t('chat.active.sendToEmail')}
+          onClose={() => setSendToEmailModal(null)}
+          footer={
+            <>
+              <Button appearance='secondary' onClick={() => setSendToEmailModal(null)}>{t('global.no')}</Button>
+              <Button
+                appearance='error'
+                onClick={() => sendToEmailMutation.mutate(sendToEmailModal)}
+              >
+                {t('global.yes')}
+              </Button>
+            </>
+          }
+        >
+          <p>{t('global.removeValidation')}</p>
+        </Dialog>
       )}
     </>
   );

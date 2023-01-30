@@ -1,15 +1,17 @@
 import { FC, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Tabs from '@radix-ui/react-tabs';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { formatDistanceStrict } from 'date-fns';
+import { AxiosError } from 'axios';
 import { et } from 'date-fns/locale';
 
-import { Track, Chat } from 'components';
+import { Track, Chat, Dialog, Button } from 'components';
 import { Chat as ChatType } from 'types/chat';
 import useUserInfoStore from 'store/store';
 import { User } from 'types/user';
 import { useToast } from 'hooks/useToast';
+import api from 'services/api';
 import ForwardToColleaugeModal from '../ForwardToColleaugeModal';
 import ForwardToEstablishmentModal from '../ForwardToEstablishmentModal';
 
@@ -20,8 +22,28 @@ const ChatActive: FC = () => {
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
   const [forwardToColleaugeModal, setForwardToColleaugeModal] = useState<ChatType | null>(null);
   const [forwardToEstablishmentModal, setForwardToEstablishmentModal] = useState<ChatType | null>(null);
+  const [sendToEmailModal, setSendToEmailModal] = useState<ChatType | null>(null);
   const { data: chatData } = useQuery<ChatType[]>({
     queryKey: ['cs-get-all-active-chats'],
+  });
+
+  const sendToEmailMutation = useMutation({
+    mutationFn: (data: ChatType) => api.post('cs-send-chat-to-email', data),
+    onSuccess: () => {
+      toast.open({
+        type: 'success',
+        title: t('global.notification'),
+        message: 'Message sent to user email',
+      });
+    },
+    onError: (error: AxiosError) => {
+      toast.open({
+        type: 'error',
+        title: t('global.notificationError'),
+        message: error.message,
+      });
+    },
+    onSettled: () => setSendToEmailModal(null),
   });
 
   const selectedChat = useMemo(() => chatData && chatData.find((c) => c.id === selectedChatId), [chatData, selectedChatId]);
@@ -96,6 +118,7 @@ const ChatActive: FC = () => {
                 chat={selectedChat}
                 onForwardToColleauge={setForwardToColleaugeModal}
                 onForwardToEstablishment={setForwardToEstablishmentModal}
+                onSendToEmail={setSendToEmailModal}
               />
             )}
           </Tabs.Content>
@@ -120,6 +143,26 @@ const ChatActive: FC = () => {
           onModalClose={() => setForwardToEstablishmentModal(null)}
           onForward={handleEstablishmentForward}
         />
+      )}
+
+      {sendToEmailModal !== null && (
+        <Dialog
+          title={t('chat.active.sendToEmail')}
+          onClose={() => setSendToEmailModal(null)}
+          footer={
+            <>
+              <Button appearance='secondary' onClick={() => setSendToEmailModal(null)}>{t('global.no')}</Button>
+              <Button
+                appearance='error'
+                onClick={() => sendToEmailMutation.mutate(sendToEmailModal)}
+              >
+                {t('global.yes')}
+              </Button>
+            </>
+          }
+        >
+          <p>{t('global.removeValidation')}</p>
+        </Dialog>
       )}
     </>
   );

@@ -19,6 +19,7 @@ type ChatProps = {
   chat: ChatType;
   onForwardToColleauge?: (chat: ChatType) => void;
   onForwardToEstablishment?: (chat: ChatType) => void;
+  onSendToEmail?: (chat: ChatType) => void;
 }
 
 type GroupedMessage = {
@@ -27,7 +28,7 @@ type GroupedMessage = {
   messages: Message[];
 }
 
-const Chat: FC<ChatProps> = ({ chat, onForwardToColleauge, onForwardToEstablishment }) => {
+const Chat: FC<ChatProps> = ({ chat, onForwardToColleauge, onForwardToEstablishment, onSendToEmail }) => {
   const { t } = useTranslation();
   const { userInfo } = useUserInfoStore();
   const chatRef = useRef<HTMLDivElement>(null);
@@ -159,6 +160,11 @@ const Chat: FC<ChatProps> = ({ chat, onForwardToColleauge, onForwardToEstablishm
           </Button>
           <Button appearance='secondary'
                   onClick={onForwardToEstablishment ? () => onForwardToEstablishment(chat) : undefined}>{t('chat.active.forwardToOrganization')}</Button>
+          <Button
+            appearance='secondary'
+            onClick={onSendToEmail ? () => onSendToEmail(chat) : undefined}>
+            {t('chat.active.sendToEmail')}
+          </Button>
         </div>
         <div className='active-chat__side-meta'>
           <div>
