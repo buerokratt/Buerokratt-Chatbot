@@ -6,7 +6,7 @@ import { format } from 'date-fns';
 import { AxiosError } from 'axios';
 import { MdMailOutline, MdOutlineRemoveRedEye } from 'react-icons/md';
 
-import { Button, Card, Chat, DataTable, Dialog, Drawer, FormInput, HistoricalChat, Icon } from 'components';
+import { Button, Card, DataTable, Dialog, Drawer, FormInput, HistoricalChat, Icon } from 'components';
 import { Chat as ChatType, CHAT_STATUS } from 'types/chat';
 import { Message } from 'types/message';
 import { useToast } from 'hooks/useToast';
@@ -47,6 +47,24 @@ const ChatHistory: FC = () => {
       });
     },
     onSettled: () => setSendToEmailModal(null),
+  });
+
+  const chatStatusChangeMutation = useMutation({
+    mutationFn: (data: { chatId: string | number, event: string }) => api.post('cs-end-chat', data),
+    onSuccess: () => {
+      toast.open({
+        type: 'success',
+        title: t('global.notification'),
+        message: 'Chat status changed',
+      });
+    },
+    onError: (error: AxiosError) => {
+      toast.open({
+        type: 'error',
+        title: t('global.notificationError'),
+        message: error.message,
+      });
+    },
   });
 
   const columnHelper = createColumnHelper<ChatType>();
@@ -95,7 +113,7 @@ const ChatHistory: FC = () => {
       },
     }),
     columnHelper.display({
-      id: 'detail',
+      id: 'forward',
       cell: (props) => (
         <Button appearance='text' onClick={() => setSendToEmailModal(props.row.original)}>
           <Icon icon={<MdMailOutline color={'rgba(0,0,0,0.54)'} />} />
@@ -107,6 +125,11 @@ const ChatHistory: FC = () => {
       },
     }),
   ], []);
+
+  const handleChatStatusChange = (event: string) => {
+    if (!selectedChat) return;
+    chatStatusChangeMutation.mutate({ chatId: selectedChat.id, event });
+  };
 
   if (!endedChats) return <>Loading...</>;
 
@@ -142,7 +165,7 @@ const ChatHistory: FC = () => {
             : t('global.anonymous')}
           onClose={() => setSelectedChat(null)}
         >
-          <HistoricalChat chat={selectedChat} />
+          <HistoricalChat chat={selectedChat} onChatStatusChange={handleChatStatusChange} />
         </Drawer>
       )}
 

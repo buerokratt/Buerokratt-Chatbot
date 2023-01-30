@@ -17,6 +17,7 @@ import './HistoricalChat.scss';
 
 type ChatProps = {
   chat: ChatType;
+  onChatStatusChange: (event: string) => void;
 }
 
 type GroupedMessage = {
@@ -25,7 +26,17 @@ type GroupedMessage = {
   messages: Message[];
 }
 
-const HistoricalChat: FC<ChatProps> = ({ chat }) => {
+const chatStatuses = [
+  'client-left-with-accepted',
+  'client-left-with-no-resolution',
+  'client-left-for-unknown-reason',
+  'accepted',
+  'hate-speech',
+  'other',
+  'response-sent-to-client-email',
+];
+
+const HistoricalChat: FC<ChatProps> = ({ chat, onChatStatusChange }) => {
   const { t } = useTranslation();
   const { userInfo } = useUserInfoStore();
   const chatRef = useRef<HTMLDivElement>(null);
@@ -33,8 +44,6 @@ const HistoricalChat: FC<ChatProps> = ({ chat }) => {
   const { data: messages } = useQuery<Message[]>({
     queryKey: [`cs-get-messages-by-chat-id/${chat.id}`],
   });
-
-  console.log(chat);
 
   const hasAccessToActions = useMemo(() => {
     if (chat.customerSupportId === userInfo?.idCode) return true;
@@ -114,7 +123,8 @@ const HistoricalChat: FC<ChatProps> = ({ chat }) => {
           <FormSelect
             name='chatStatus'
             label={t('chat.chatStatus')}
-            options={[]}
+            onSelectionChange={(selection) => selection ? onChatStatusChange(selection.value) : null}
+            options={chatStatuses.map((status) => ({ label: t(`chat.events.${status}`), value: status }))}
           />
         </div>
       </div>

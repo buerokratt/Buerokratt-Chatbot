@@ -92,6 +92,15 @@
       "label": "Pealkiri",
       "nps": "NPS",
       "forwarded": "Suunatud"
+    },
+    "events": {
+      "client-left-with-accepted": "Klient lahkus aktsepteeritud vastusega",
+      "client-left-with-no-resolution": "Klient lahkus vastuseta",
+      "client-left-for-unknown-reason": "Klient lahkus määramata põhjustel",
+      "accepted": "Aktsepteeritud vastusega",
+      "hate-speech": "Vihakõne",
+      "other": "Muudel põhjustel",
+      "response-sent-to-client-email": "Kliendile vastati tema jäetud kontaktile"
     }
   },
   "roles": {

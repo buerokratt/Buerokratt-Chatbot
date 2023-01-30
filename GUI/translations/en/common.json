@@ -92,6 +92,15 @@
       "label": "Label",
       "nps": "NPS",
       "forwarded": "Forwarded"
+    },
+    "events": {
+      "client-left-with-accepted": "Client left with accepted response",
+      "client-left-with-no-resolution": "Client left with no resolution",
+      "client-left-for-unknown-reason": "Client left for unknown reason",
+      "accepted": "Accepted response",
+      "hate-speech": "Hatespeech",
+      "other": "Other reasons",
+      "response-sent-to-client-email": "Response was sent to client email"
     }
   },
   "roles": {
