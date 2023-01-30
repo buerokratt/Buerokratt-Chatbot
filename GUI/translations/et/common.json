@@ -76,7 +76,9 @@
       "startedAt": "Vestlus alustatud {{date}}",
       "forwardChat": "Kellele vestlus suunata?",
       "searchByName": "Otsi nime või tiitli järgi",
-      "onlyActiveAgents": "Näita ainult kohalolevaid nõustajaid"
+      "onlyActiveAgents": "Näita ainult kohalolevaid nõustajaid",
+      "establishment": "Asutus",
+      "searchByEstablishmentName": "Otsi asutuse nime järgi"
     },
     "history": {
       "title": "Ajalugu",

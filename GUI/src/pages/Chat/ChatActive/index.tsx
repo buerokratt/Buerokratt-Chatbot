@@ -11,6 +11,7 @@ import useUserInfoStore from 'store/store';
 import { User } from 'types/user';
 import { useToast } from 'hooks/useToast';
 import ForwardToColleaugeModal from '../ForwardToColleaugeModal';
+import ForwardToEstablishmentModal from '../ForwardToEstablishmentModal';
 
 const ChatActive: FC = () => {
   const { t } = useTranslation();
@@ -18,6 +19,7 @@ const ChatActive: FC = () => {
   const toast = useToast();
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
   const [forwardToColleaugeModal, setForwardToColleaugeModal] = useState<ChatType | null>(null);
+  const [forwardToEstablishmentModal, setForwardToEstablishmentModal] = useState<ChatType | null>(null);
   const { data: chatData } = useQuery<ChatType[]>({
     queryKey: ['cs-get-all-active-chats'],
   });
@@ -32,6 +34,16 @@ const ChatActive: FC = () => {
       type: 'success',
       title: t('global.notification'),
       message: `Chat forwarded to ${user.displayName}`,
+    });
+  };
+
+  const handleEstablishmentForward = (chat: ChatType, establishment: string) => {
+    // TODO: Add endpoint for chat forwarding
+    setForwardToEstablishmentModal(null);
+    toast.open({
+      type: 'success',
+      title: t('global.notification'),
+      message: `Chat forwarded to ${establishment}`,
     });
   };
 
@@ -79,7 +91,13 @@ const ChatActive: FC = () => {
             className='vertical-tabs__body'
             value={selectedChatId}
           >
-            {selectedChat && <Chat chat={selectedChat} onForwardToColleauge={setForwardToColleaugeModal} />}
+            {selectedChat && (
+              <Chat
+                chat={selectedChat}
+                onForwardToColleauge={setForwardToColleaugeModal}
+                onForwardToEstablishment={setForwardToEstablishmentModal}
+              />
+            )}
           </Tabs.Content>
         ) : (
           <div className='vertical-tabs__body-placeholder'>
@@ -93,6 +111,14 @@ const ChatActive: FC = () => {
           chat={forwardToColleaugeModal}
           onModalClose={() => setForwardToColleaugeModal(null)}
           onForward={handleCsaForward}
+        />
+      )}
+
+      {forwardToEstablishmentModal && (
+        <ForwardToEstablishmentModal
+          chat={forwardToEstablishmentModal}
+          onModalClose={() => setForwardToEstablishmentModal(null)}
+          onForward={handleEstablishmentForward}
         />
       )}
     </>

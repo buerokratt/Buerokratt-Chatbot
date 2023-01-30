@@ -76,7 +76,9 @@
       "startedAt": "Chat started at {{date}}",
       "forwardChat": "Who to forward the chat?",
       "searchByName": "Search by name",
-      "onlyActiveAgents": "Show only active client support agents"
+      "onlyActiveAgents": "Show only active client support agents",
+      "establishment": "Establishment",
+      "searchByEstablishmentName": "Search by establishment name"
     },
     "history": {
       "title": "History",

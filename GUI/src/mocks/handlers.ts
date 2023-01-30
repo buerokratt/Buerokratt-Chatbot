@@ -11,6 +11,7 @@ import { activeChatsData } from './activeChats';
 import { activeChatMessages } from './activeChatMessages';
 import { healthzStatusData } from './healthzStatus';
 import { customerSupportAgentsData } from './customerSupportAgents';
+import { establishmentsData } from './establishments';
 
 export const handlers = [
   rest.get(import.meta.env.BASE_URL + 'main-navigation', (req, res, ctx) => {
@@ -105,5 +106,8 @@ export const handlers = [
   }),
   rest.get(import.meta.env.BASE_URL + 'cs-get-customer-support-agents', (req, res, ctx) => {
     return res(ctx.json(customerSupportAgentsData));
+  }),
+  rest.get(import.meta.env.BASE_URL + 'cs-get-all-establishments', (req, res, ctx) => {
+    return res(ctx.json(establishmentsData));
   }),
 ];
