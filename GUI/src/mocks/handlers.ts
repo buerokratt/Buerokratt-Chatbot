@@ -1,10 +1,17 @@
 import { rest } from 'msw';
 
+import { Message } from 'types/message';
 import { mainNavigationET } from './mainNavigation';
 import { endedChatsData } from './endedChats';
 import { chatMessagesData } from './chatMessages';
 import { usersData } from './users';
 import { userInfoData } from './userInfo';
+import { userProfileSettingsData } from './userProfileSettings';
+import { activeChatsData } from './activeChats';
+import { activeChatMessages } from './activeChatMessages';
+import { healthzStatusData } from './healthzStatus';
+import { customerSupportAgentsData } from './customerSupportAgents';
+import { establishmentsData } from './establishments';
 
 export const handlers = [
   rest.get(import.meta.env.BASE_URL + 'main-navigation', (req, res, ctx) => {
@@ -76,5 +83,31 @@ export const handlers = [
   }),
   rest.get(import.meta.env.BASE_URL + 'cs-custom-jwt-userinfo', (req, res, ctx) => {
     return res(ctx.json(userInfoData));
+  }),
+  rest.get(import.meta.env.BASE_URL + 'cs-get-user-profile-settings', (req, res, ctx) => {
+    return res(ctx.json(userProfileSettingsData));
+  }),
+  rest.get(import.meta.env.BASE_URL + 'cs-get-all-active-chats', (req, res, ctx) => {
+    return res(ctx.json(activeChatsData));
+  }),
+  rest.get(import.meta.env.BASE_URL + 'cs-get-customer-support-activity', (req, res, ctx) => {
+    return res(ctx.json({
+      idCode: 'EE49902216518',
+      active: 'true',
+      status: 'idle',
+    }));
+  }),
+  rest.get(import.meta.env.BASE_URL + 'cs-get-messages-by-chat-id/:id', (req, res, ctx) => {
+    const requestedChatMessages = (activeChatMessages as Record<string, Message[]>)[String(req.params.id)];
+    return res(ctx.json(requestedChatMessages));
+  }),
+  rest.get(import.meta.env.BASE_URL + 'cs-get-components-healthz-status', (req, res, ctx) => {
+    return res(ctx.json(healthzStatusData));
+  }),
+  rest.get(import.meta.env.BASE_URL + 'cs-get-customer-support-agents', (req, res, ctx) => {
+    return res(ctx.json(customerSupportAgentsData));
+  }),
+  rest.get(import.meta.env.BASE_URL + 'cs-get-all-establishments', (req, res, ctx) => {
+    return res(ctx.json(establishmentsData));
   }),
 ];

@@ -18,7 +18,10 @@
             "authorFirstName": "{#.authorFirstName}",
             "authorRole": "{#.authorRole}",
             "authorTimestamp": "{#.authorTimestamp}",
-            "content": "{#.content}"
+            "content": "{#.content}",
+            "forwardedByUser": "",
+            "forwardedFromCsa": "",
+            "forwardedToCsa": ""
           }
         },
         "response": {
@@ -113,7 +116,10 @@
             "authorLastName": "",
             "authorRole": "{#.reflect_input#.authorRole}",
             "rating": "",
-            "created": "$_getInstant()"
+            "created": "$_getInstant()",
+            "forwardedByUser": "",
+            "forwardedFromCsa": "",
+            "forwardedToCsa": ""
           }
         },
         "response": {

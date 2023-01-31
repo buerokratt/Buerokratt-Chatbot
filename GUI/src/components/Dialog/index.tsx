@@ -4,19 +4,21 @@ import { MdOutlineClose } from 'react-icons/md';
 
 import { Icon, Track } from 'components';
 import './Dialog.scss';
+import clsx from 'clsx';
 
 type DialogProps = {
   title: string;
   footer?: ReactNode;
   onClose: () => void;
+  size?: 'default' | 'large';
 }
 
-const Dialog: FC<PropsWithChildren<DialogProps>> = ({ title, footer, onClose, children }) => {
+const Dialog: FC<PropsWithChildren<DialogProps>> = ({ title, footer, onClose, size = 'default', children }) => {
   return (
     <RadixDialog.Root defaultOpen={true} onOpenChange={onClose}>
       <RadixDialog.Portal>
         <RadixDialog.Overlay className='dialog__overlay' />
-        <RadixDialog.Content className='dialog'>
+        <RadixDialog.Content className={clsx('dialog', `dialog--${size}`)}>
           <div className='dialog__header'>
             <RadixDialog.Title className='h3 dialog__title'>{title}</RadixDialog.Title>
             <RadixDialog.Close asChild>
@@ -29,7 +31,7 @@ const Dialog: FC<PropsWithChildren<DialogProps>> = ({ title, footer, onClose, ch
             {children}
           </div>
           {footer && (
-            <Track className='dialog__footer' gap={16} justify="end">{footer}</Track>
+            <Track className='dialog__footer' gap={16} justify='end'>{footer}</Track>
           )}
         </RadixDialog.Content>
       </RadixDialog.Portal>

@@ -3,18 +3,90 @@
 @import 'src/styles/settings/variables/other';
 @import 'src/styles/settings/variables/typography';
 
-.chat {
+.active-chat {
   $self: &;
-  height: 100%;
-  overflow: auto;
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 0 16px 16px;
-  color: get-color(black-coral-20);
   justify-content: flex-end;
-  //transform: rotate(180deg);
-  //direction: rtl;
+  position: relative;
+  height: 100%;
+
+  &__body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 288px;
+  }
+
+  &__header {
+    padding: get-spacing(haapsalu);
+    background-color: get-color(extra-light);
+    border-bottom: 1px solid get-color(black-coral-2);
+  }
+
+  &__group-wrapper {
+    flex: 1;
+    padding: get-spacing(haapsalu) get-spacing(haapsalu) 0;
+    overflow: auto;
+    overflow-anchor: none;
+
+    #anchor {
+      overflow-anchor: auto;
+      height: 1px;
+      margin-top: 16px;
+    }
+  }
+
+  &__toolbar {
+    background-color: get-color(extra-light);
+    border-top: 1px solid get-color(black-coral-2);
+    padding: get-spacing(paldiski);
+    position: relative;
+  }
+
+  &__toolbar-actions {
+    display: flex;
+    gap: 8px;
+    position: absolute;
+    right: 12px;
+    top: 8px;
+
+    .btn {
+      padding: 8px 20px;
+    }
+  }
+
+  &__side {
+    flex: 0 0 288px;
+    height: 100%;
+    overflow: auto;
+    border-left: 1px solid get-color(black-coral-2);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    .btn {
+      justify-content: center;
+    }
+  }
+
+  &__side-actions,
+  &__side-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: get-spacing(haapsalu);
+  }
+
+  &__side-meta {
+    font-size: $veera-font-size-80;
+    line-height: $veera-line-height-500;
+    color: get-color(black-coral-12);
+  }
 
   &__group {
     display: flex;
@@ -22,10 +94,45 @@
     gap: 4px;
     padding-left: 56px;
     position: relative;
-    //transform: rotate(180deg);
-    //direction: ltr;
 
-    &--bot {
+    &:not(:last-child) {
+      margin-bottom: 8px;
+    }
+
+    &--event {
+      #{$self} {
+        &__event-message {
+          display: flex;
+          position: relative;
+          isolation: isolate;
+          padding: 6px 0;
+
+          p {
+            color: get-color(black-coral-12);
+            font-size: $veera-font-size-80;
+            line-height: $veera-line-height-500;
+            padding: 4px 8px 4px 0;
+            background-color: get-color(white);
+          }
+
+          &::after {
+            content: '';
+            display: block;
+            height: 1px;
+            background-color: get-color(black-coral-2);
+            position: absolute;
+            top: 50%;
+            left: 56px;
+            right: 0;
+            transform: translateY(-50%);
+            z-index: -1;
+          }
+        }
+      }
+    }
+
+    &--buerokratt,
+    &--chatbot {
       #{$self} {
         &__group-initials {
           background-color: get-color(sapphire-blue-10);
@@ -38,15 +145,15 @@
         &__message-text {
           background-color: get-color(sapphire-blue-10);
           color: get-color(white);
+
+          &:hover {
+            background-color: get-color(sapphire-blue-13);
+          }
         }
       }
     }
 
-    &--client {
-
-    }
-
-    &--client-support {
+    &--backoffice-user {
       #{$self} {
         &__group-initials {
           background-color: get-color(black-coral-10);
@@ -56,6 +163,14 @@
         &__message-text {
           background-color: get-color(black-coral-10);
           color: get-color(white);
+
+          &:hover {
+            background-color: #535665;
+          }
+        }
+
+        &__selection-icon {
+          background-color: get-color(black-coral-20);
         }
       }
     }
@@ -82,6 +197,7 @@
     font-size: $veera-font-size-80;
     line-height: $veera-line-height-500;
     font-weight: $veera-font-weight-delta;
+    text-transform: capitalize;
   }
 
   &__messages {
@@ -95,6 +211,30 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    position: relative;
+
+    &--selected {
+      #{$self}__message-text {
+        box-shadow: inset 0 0 0 1px get-color(black-coral-20);
+      }
+    }
+  }
+
+  &__selection-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 12px;
+    height: 12px;
+    background-color: get-color(black-coral-10);
+    border-radius: 50%;
+    color: get-color(white);
+    font-size: 8px;
+    line-height: 1;
+    position: absolute;
+    top: 50%;
+    left: -6px;
+    transform: translateY(-50%);
   }
 
   &__message-text {
@@ -105,6 +245,12 @@
     border-radius: 8px 8px 8px 4px;
     font-size: $veera-font-size-100;
     line-height: $veera-line-height-500;
+    transition: all .25s ease-out;
+    cursor: pointer;
+
+    &:hover {
+      background-color: get-color(black-coral-1);
+    }
   }
 
   &__message-date {

@@ -8,6 +8,7 @@ import './Switch.scss';
 type SwitchProps = Partial<ControllerRenderProps> & {
   onLabel?: string;
   offLabel?: string;
+  onColor?: string;
   name: string;
   label: string;
   checked?: boolean;
@@ -19,6 +20,7 @@ const Switch = forwardRef<HTMLButtonElement, SwitchProps>((
   {
     onLabel,
     offLabel,
+    onColor,
     label,
     checked,
     hideLabel,
@@ -32,7 +34,7 @@ const Switch = forwardRef<HTMLButtonElement, SwitchProps>((
   const offValueLabel = offLabel || t('global.off');
 
   return (
-    <div className='switch'>
+    <div className='switch' style={{[`${'--active-color'}`]: onColor}}>
       {label && !hideLabel && <label htmlFor={id} className='switch__label'>{label}</label>}
       <RadixSwitch.Root
         ref={ref}

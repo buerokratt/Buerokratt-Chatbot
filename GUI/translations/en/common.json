@@ -34,7 +34,13 @@
     "startDate": "Start date",
     "endDate": "End date",
     "preview": "Preview",
-    "logout": "Logout"
+    "logout": "Logout",
+    "anonymous": "Anonymous",
+    "csaStatus": "Customer support status",
+    "present": "Present",
+    "away": "Away",
+    "today": "Today",
+    "forward": "Forward"
   },
   "mainMenu": {
     "menuLabel": "Main navigation",
@@ -43,12 +49,41 @@
     "closeIcon": "Close menu icon"
   },
   "chat": {
+    "reply": "Reply",
+    "unansweredChats": "Unanswered chats",
+    "unanswered": "Unanswered",
+    "forwarded": "Forwarded",
+    "endUser": "End user",
+    "csaName": "Client support name",
+    "startedAt": "Chat started at",
+    "device": "Device",
+    "location": "Location",
+    "redirectedMessage": "{{from}} redirected the conversation to user {{to}} {{date}}",
     "status": {
       "active": "Active",
       "ended": "Ended"
     },
+    "chatStatus": "Chat status",
     "active": {
-      "list": "Active chat list"
+      "list": "Active chat list",
+      "myChats": "My chats",
+      "newChats": "New Chats",
+      "chooseChat": "Choose a chat to begin",
+      "endChat": "End chat",
+      "askAuthentication": "Ask for authentication",
+      "askForContact": "Ask for contact",
+      "askPermission": "Ask permission",
+      "forwardToColleague": "Forward to colleague",
+      "forwardToOrganization": "Forward to organization",
+      "startedAt": "Chat started at {{date}}",
+      "forwardChat": "Who to forward the chat?",
+      "searchByName": "Search by name",
+      "onlyActiveAgents": "Show only active client support agents",
+      "establishment": "Establishment",
+      "searchByEstablishmentName": "Search by establishment name",
+      "sendToEmail": "Send to email",
+      "chooseChatStatus": "Choose chat status",
+      "statusChange": "Chat status change"
     },
     "history": {
       "title": "History",
@@ -61,6 +96,15 @@
       "label": "Label",
       "nps": "NPS",
       "forwarded": "Forwarded"
+    },
+    "events": {
+      "client-left-with-accepted": "Client left with accepted response",
+      "client-left-with-no-resolution": "Client left with no resolution",
+      "client-left-for-unknown-reason": "Client left for unknown reason",
+      "accepted": "Accepted response",
+      "hate-speech": "Hatespeech",
+      "other": "Other reasons",
+      "response-sent-to-client-email": "Response was sent to client email"
     }
   },
   "roles": {
@@ -84,7 +128,14 @@
       "editUser": "Edit user",
       "deleteUser": "Delete user",
       "fullName": "First- and lastname",
-      "userRoles": "User role(s)"
+      "userRoles": "User role(s)",
+      "autoCorrector": "Auto corrector",
+      "emailNotifications": "Notifications to e-mail",
+      "soundNotifications": "Sound notifications",
+      "popupNotifications": "Popup notifications",
+      "newUnansweredChat": "New unanswered chat",
+      "newForwardedChat": "New forwarded chat",
+      "useAutocorrect": "Text auto corrector"
     },
     "chat": {
       "chatActive": "Chatbot active",
@@ -115,6 +166,13 @@
     },
     "greeting": {
       "title": "Greeting message"
+    }
+  },
+  "monitoring": {
+    "uptime": {
+      "title": "Uptime",
+      "daysAgo": "{{days}} ago",
+      "uptimePercent": "{{percent}}% uptime"
     }
   }
 }

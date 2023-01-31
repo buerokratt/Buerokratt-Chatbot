@@ -10,4 +10,5 @@ export interface UserInfo {
   authorities: string[];
   displayName: string;
   idCode: string;
+  email: string;
 }

@@ -24,7 +24,13 @@ SELECT c.base_id AS id,
             (SELECT MAX(id)
              FROM message
              WHERE event = 'contact-information-fulfilled' AND chat_base_id = c.base_id))) AS contacts_message,
-       m.updated                                                                           AS last_message_timestamp
+       m.updated                                                                           AS last_message_timestamp,
+       (SELECT event
+        FROM message
+        WHERE id IN (
+            (SELECT MAX(id)
+             FROM message
+             WHERE event <> '' AND chat_base_id = c.base_id)))                             AS last_message_event
 FROM (SELECT *
       FROM chat
       WHERE id IN (SELECT MAX(id) FROM chat GROUP BY base_id)

@@ -1,0 +1,72 @@
+@import 'src/styles/tools/spacing';
+@import 'src/styles/tools/color';
+@import 'src/styles/settings/variables/other';
+@import 'src/styles/settings/variables/typography';
+
+.radios {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: get-spacing(paldiski);
+
+  &__label {
+    display: block;
+    flex: 0 0 170px;
+    font-size: $veera-font-size-100;
+    line-height: 24px;
+  }
+
+  &__wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__item {
+    input[type=radio] {
+      display: none;
+
+      + label {
+        display: block;
+        padding-left: 32px;
+        position: relative;
+        font-size: $veera-font-size-100;
+        line-height: $veera-line-height-500;
+
+        &::before {
+          content: '';
+          display: block;
+          width: 16px;
+          height: 16px;
+          box-shadow: inset 0 0 0 1px get-color(black-coral-2);
+          border-radius: 50%;
+          position: absolute;
+          left: 4px;
+          top: 4px;
+        }
+      }
+
+      &:checked {
+        + label {
+          &::before {
+            width: 20px;
+            height: 20px;
+            box-shadow: inset 0 0 0 1px #8F91A8;
+          }
+
+          &::after {
+            content: '';
+            display: block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: get-color(sapphire-blue-10);
+            position: absolute;
+            top: 9px;
+            left: 9px;
+          }
+        }
+      }
+    }
+  }
+}

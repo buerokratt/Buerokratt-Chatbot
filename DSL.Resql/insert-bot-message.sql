@@ -8,7 +8,7 @@ SELECT (SELECT value) ->> 'chatId'          AS chat_base_id,
        (SELECT value) ->> 'authorId'        AS author_id,
        (SELECT value) ->> 'authorFirstName' AS author_first_name,
        (SELECT value) ->> 'authorLastName'  AS author_last_name,
-       'chatbot',
+       'buerokratt',
        '',
        now() + ordinality * interval '1 microsecond'
 FROM json_array_elements(array_to_json(ARRAY [ :messages ])) WITH ORDINALITY msg;
