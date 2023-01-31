@@ -166,7 +166,18 @@
     },
     "greeting": {
       "title": "Greeting message"
-    }
+    },
+    "weekdays": {
+      "label": "Weekdays",
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday",
+      "sunday": "Sunday"
+    },
+    "nationalHolidays": "National holidays"
   },
   "monitoring": {
     "uptime": {

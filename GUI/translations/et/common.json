@@ -166,7 +166,18 @@
     },
     "greeting": {
       "title": "Tervitussõnum"
-    }
+    },
+    "weekdays": {
+      "label": "Nädalapäevad",
+      "monday": "Esmaspäev",
+      "tuesday": "Teisipäev",
+      "wednesday": "Kolmapäev",
+      "thursday": "Neljapäev",
+      "friday": "Reede",
+      "saturday": "Laupäev",
+      "sunday": "Pühapäev"
+    },
+    "nationalHolidays": "Riiklikud pühad"
   },
   "monitoring": {
     "uptime": {
