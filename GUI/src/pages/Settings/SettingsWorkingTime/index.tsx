@@ -4,10 +4,20 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { useTranslation } from 'react-i18next';
 
-import { Button, Card, FormDatepicker, Track } from 'components';
+import { Button, Card, FormCheckbox, FormCheckboxes, FormDatepicker, Switch, Track } from 'components';
 import { OrganizationWorkingTime } from 'types/organizationWorkingTime';
 import { useToast } from 'hooks/useToast';
 import api from 'services/api';
+
+const weekdaysOptions = [
+  'monday',
+  'tuesday',
+  'wednesday',
+  'thursday',
+  'friday',
+  'saturday',
+  'sunday',
+];
 
 const SettingsWorkingTime: FC = () => {
   const { t } = useTranslation();
@@ -49,7 +59,7 @@ const SettingsWorkingTime: FC = () => {
           </Track>
         }
       >
-        <Track gap={8} direction='vertical'>
+        <Track gap={8} direction='vertical' align='left'>
           <Controller
             name='organizationWorkingTimeStartISO'
             control={control}
@@ -71,6 +81,15 @@ const SettingsWorkingTime: FC = () => {
                 {...field}
               />
             }
+          />
+          <FormCheckboxes
+            name='organizationWorkingTimeWeekdays'
+            label={t('settings.weekdays.label')}
+            items={weekdaysOptions.map((d) => ({ label: t(`settings.weekdays.${d}`), value: d }))}
+          />
+          <Switch
+            name='organizationWorkingTimeNationalHolidays'
+            label={t('settings.nationalHolidays')}
           />
         </Track>
       </Card>

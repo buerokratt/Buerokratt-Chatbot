@@ -136,7 +136,12 @@ export const mainNavigationET = [
     id: 'monitoring',
     label: 'Seire',
     path: '/seire',
-    children: [],
+    children: [
+      {
+        label: 'Tööaeg',
+        path: '/seire/tooaeg',
+      },
+    ],
   },
 ];
 
@@ -278,6 +283,11 @@ export const mainNavigationEN = [
     id: 'monitoring',
     label: 'Monitoring',
     path: '/monitoring',
-    children: [],
+    children: [
+      {
+        label: 'Uptime',
+        path: '/monitoring/uptime',
+      },
+    ],
   },
 ];

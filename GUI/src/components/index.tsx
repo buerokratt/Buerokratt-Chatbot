@@ -10,6 +10,7 @@ import {
   FormSelect,
   Switch,
   FormCheckboxes,
+  FormRadios,
   FormCheckbox,
   FormDatepicker,
   SwitchBox,
@@ -26,6 +27,7 @@ import Drawer from './Drawer';
 import HistoricalChat from './HistoricalChat';
 import Dialog from './Dialog';
 import Section from './Section';
+import Chat from './Chat';
 
 export {
   Layout,
@@ -46,6 +48,7 @@ export {
   Label,
   Toast,
   FormCheckboxes,
+  FormRadios,
   FormCheckbox,
   Popover,
   Collapsible,
@@ -54,4 +57,5 @@ export {
   HistoricalChat,
   Dialog,
   Section,
+  Chat,
 };

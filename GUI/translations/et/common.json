@@ -35,7 +35,12 @@
     "endDate": "Lõpp kuupäev",
     "preview": "Eelvaade",
     "logout": "Logi välja",
-    "anonymous": "Anonüümne"
+    "anonymous": "Anonüümne",
+    "csaStatus": "Klienditeenindaja",
+    "present": "Kohal",
+    "away": "Eemal",
+    "today": "Täna",
+    "forward": "Suuna"
   },
   "mainMenu": {
     "menuLabel": "Põhinavigatsioon",
@@ -44,15 +49,41 @@
     "closeMenuIcon": "Sulge menüü ikoon"
   },
   "chat": {
+    "reply": "Vasta",
+    "unansweredChats": "Vastamata vestlused",
+    "unanswered": "Vastamata",
+    "forwarded": "Suunatud",
+    "endUser": "Vestleja",
+    "csaName": "Nõustaja nimi",
+    "startedAt": "Vestlus alustatud",
+    "device": "Seade",
+    "location": "Lähtekoht",
+    "redirectedMessage": "{{from}} suunas vestluse kasutajale {{to}} {{date}}",
     "status": {
       "active": "Aktiivne",
       "ended": "Lõpetatud"
     },
+    "chatStatus": "Vestluse staatus",
     "active": {
       "list": "Aktiivsed vestlused",
       "myChats": "Minu vestlused",
       "newChats": "Uued vestlused",
-      "chooseChat": "Alustamiseks vali vestlus"
+      "chooseChat": "Alustamiseks vali vestlus",
+      "endChat": "Lõpeta vestlus",
+      "askAuthentication": "Küsi autentimist",
+      "askForContact": "Küsi kontaktandmeid",
+      "askPermission": "Küsi nõusolekut",
+      "forwardToColleague": "Suuna kolleegile",
+      "forwardToOrganization": "Suuna asutusele",
+      "startedAt": "Vestlus alustatud {{date}}",
+      "forwardChat": "Kellele vestlus suunata?",
+      "searchByName": "Otsi nime või tiitli järgi",
+      "onlyActiveAgents": "Näita ainult kohalolevaid nõustajaid",
+      "establishment": "Asutus",
+      "searchByEstablishmentName": "Otsi asutuse nime järgi",
+      "sendToEmail": "Saada e-mailile",
+      "chooseChatStatus": "Vali vestluse staatus",
+      "statusChange": "Vestluse staatus"
     },
     "history": {
       "title": "Ajalugu",
@@ -65,6 +96,15 @@
       "label": "Pealkiri",
       "nps": "NPS",
       "forwarded": "Suunatud"
+    },
+    "events": {
+      "client-left-with-accepted": "Klient lahkus aktsepteeritud vastusega",
+      "client-left-with-no-resolution": "Klient lahkus vastuseta",
+      "client-left-for-unknown-reason": "Klient lahkus määramata põhjustel",
+      "accepted": "Aktsepteeritud vastusega",
+      "hate-speech": "Vihakõne",
+      "other": "Muudel põhjustel",
+      "response-sent-to-client-email": "Kliendile vastati tema jäetud kontaktile"
     }
   },
   "roles": {
@@ -126,6 +166,24 @@
     },
     "greeting": {
       "title": "Tervitussõnum"
+    },
+    "weekdays": {
+      "label": "Nädalapäevad",
+      "monday": "Esmaspäev",
+      "tuesday": "Teisipäev",
+      "wednesday": "Kolmapäev",
+      "thursday": "Neljapäev",
+      "friday": "Reede",
+      "saturday": "Laupäev",
+      "sunday": "Pühapäev"
+    },
+    "nationalHolidays": "Riiklikud pühad"
+  },
+  "monitoring": {
+    "uptime": {
+      "title": "Tööaeg",
+      "daysAgo": "{{days}} päeva tagasi",
+      "uptimePercent": "{{percent}}% tööaeg"
     }
   }
 }

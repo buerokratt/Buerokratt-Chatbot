@@ -13,6 +13,7 @@
     border-bottom: 1px solid get-color(black-coral-10);
     font-weight: $veera-font-weight-beta;
     vertical-align: middle;
+    position: relative;
   }
 
   td {
@@ -44,6 +45,41 @@
         td {
           border-bottom: 0;
         }
+      }
+    }
+  }
+
+  &__filter {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    padding: get-spacing(paldiski);
+    background-color: get-color(white);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.14);
+    border-radius: 0 0 4px 4px;
+    border: 1px solid get-color(black-coral-2);
+
+    input {
+      width: 100%;
+      display: block;
+      appearance: none;
+      background-color: get-color(white);
+      border: 1px solid get-color(black-coral-6);
+      border-radius: 5px;
+      color: var(--color-black);
+      font-size: $veera-font-size-100;
+      height: 32px;
+      line-height: 24px;
+      padding: get-spacing(paldiski);
+
+      &::placeholder {
+        color: get-color(black-coral-6);
+      }
+
+      &:focus {
+        outline: none;
+        border-color: get-color(sapphire-blue-10);
       }
     }
   }

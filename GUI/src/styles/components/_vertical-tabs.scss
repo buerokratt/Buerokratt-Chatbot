@@ -67,9 +67,19 @@
     line-height: 24px;
     color: get-color(sapphire-blue-20);
 
+    &.active {
+      background-color: #FCEEEE;
+      box-shadow: inset 0 0 0 1px get-color(jasper-10);
+    }
+
     &[aria-selected=true] {
       color: get-color(sapphire-blue-10);
       background-color: get-color(white);
+
+      &.active {
+        background-color: get-color(white);
+        box-shadow: none;
+      }
     }
 
     &:first-child {

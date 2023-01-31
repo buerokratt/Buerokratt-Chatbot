@@ -29,7 +29,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
       idCode: user?.idCode,
       authorities: user?.authorities,
       displayName: user?.displayName,
-      email: user?.email,
+      csaEmail: user?.csaEmail,
     },
   });
 
@@ -116,7 +116,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
           }
         />
         <FormInput {...register('displayName')} label={t('settings.users.displayName')} />
-        <FormInput {...register('email')} label={t('settings.users.email')} type='email' />
+        <FormInput {...register('csaEmail')} label={t('settings.users.email')} type='email' />
       </Track>
     </Dialog>
   );

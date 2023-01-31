@@ -1,0 +1,13 @@
+checkChatIdParameter:
+  switch:
+    - condition: ${!!incoming.params.chatId && incoming.params.chatId !== "" && incoming.params.chatId !== null}
+      next: returnWithParameter
+  next: returnNoParameter
+
+returnWithParameter:
+  return: 100
+  next: end
+
+returnNoParameter:
+  return: "300"
+  next: end
