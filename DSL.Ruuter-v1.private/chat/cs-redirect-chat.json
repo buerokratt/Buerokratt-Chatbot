@@ -217,43 +217,55 @@
         },
         "proceed": {
           "post_body_parameters": {
-            "get_is_customer_support_agent_forwarded_chat_email_notification_enabled": {
+            "fill_notification_redirected_chat": {
               "post_body_parameters": {
-                "get_user_profile_settings": {
+                "get_user_email": {
                   "post_body_parameters": {
-                    "get_user_id_by_id_code": {
+                    "get_is_customer_support_agent_forwarded_chat_email_notification_enabled": {
+                      "post_body_parameters": {
+                        "get_user_profile_settings": {
+                          "method": "post",
+                          "endpoint": "{resql_url}/get-user-profile-settings",
+                          "post_body_struct": {
+                            "userId": "{#.reflect_input#.customerSupportId}"
+                          }
+                        }
+                      },
                       "method": "post",
-                      "endpoint": "{resql_url}/get-user-id-by-id-code",
+                      "endpoint": "{ruuter_url}/match_input",
                       "post_body_struct": {
-                        "userIdCode": "{#.reflect_input#.customerSupportId}"
+                        "input": {
+                          "is_active": "{$.get_user_profile_settings[0]$.forwardedChatEmailNotifications}"
+                        },
+                        "validate_against": {
+                          "is_active": "true"
+                        },
+                        "validation_type": "MUST_MATCH_ANY"
                       }
                     }
                   },
                   "method": "post",
-                  "endpoint": "{resql_url}/get-user-profile-settings",
+                  "endpoint": "{resql_url}/get-user-email-by-id-code",
                   "post_body_struct": {
-                    "userId": "{$.get_user_id_by_id_code$.id}"
+                    "userIdCode": "{#.reflect_input#.customerSupportId}"
                   }
                 }
               },
               "method": "post",
-              "endpoint": "{ruuter_url}/match_input",
+              "endpoint": "{dmapper_url}/json/v2/notification_redirected_chat",
               "post_body_struct": {
-                "input": {
-                  "is_active": "{$.get_user_profile_settings$.forwarded_chat_email_notifications}"
-                },
-                "validate_against": {
-                  "is_active": "true"
-                },
-                "validation_type": "MUST_MATCH_ANY"
+                "reflect_input123123": "{#.reflect_input}",
+                "from": "{#.reflect_input#.forwardedFromCsa}",
+                "chatId": "{#.reflect_input#.id}"
               }
             }
           },
           "method": "post",
-          "endpoint": "{ruuter_v2_url}/notification/csa/email",
+          "endpoint": "{datamapper_url}/js/email/sendMockEmail",
           "post_body_struct": {
-            "to": "{$.get_is_customer_support_agent_forwarded_chat_email_notification_enabled}",
-            "chatId": "{#.reflect_input#.id}"
+            "to": "{$.get_user_email[0]$.csaEmail}",
+            "subject": "Teile on suunatud vestlus!",
+            "text": "{$.fill_notification_redirected_chat}"
           }
         },
         "response": {

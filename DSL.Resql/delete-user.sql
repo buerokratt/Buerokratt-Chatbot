@@ -50,3 +50,17 @@ FROM user_authority
 WHERE 1 < (SELECT COUNT(*) FROM active_administrators)
    OR (1 = (SELECT COUNT(*) FROM active_administrators)
     AND :userIdCode NOT IN (SELECT * FROM active_administrators));
+
+WITH active_administrators AS (SELECT user_id
+                               FROM user_authority
+                               WHERE 'ROLE_ADMINISTRATOR' = ANY (authority_name)
+                                 AND id IN (SELECT max(id)
+                                            FROM user_authority
+                                            GROUP BY user_id))
+INSERT
+INTO user_profile_settings (user_id, forwarded_chat_popup_notifications, forwarded_chat_sound_notifications, forwarded_chat_email_notifications, new_chat_popup_notifications, new_chat_sound_notifications, new_chat_email_notifications, use_autocorrect)
+SELECT :userIdCode, false, false, false, false, false, false, false
+FROM user_authority
+WHERE 1 < (SELECT COUNT(*) FROM active_administrators)
+   OR (1 = (SELECT COUNT(*) FROM active_administrators)
+    AND :userIdCode NOT IN (SELECT * FROM active_administrators));
