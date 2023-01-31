@@ -82,7 +82,8 @@
       "establishment": "Asutus",
       "searchByEstablishmentName": "Otsi asutuse nime järgi",
       "sendToEmail": "Saada e-mailile",
-      "chooseChatStatus": "Vali vestluse staatus"
+      "chooseChatStatus": "Vali vestluse staatus",
+      "statusChange": "Vestluse staatus"
     },
     "history": {
       "title": "Ajalugu",

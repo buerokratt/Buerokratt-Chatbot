@@ -82,7 +82,8 @@
       "establishment": "Establishment",
       "searchByEstablishmentName": "Search by establishment name",
       "sendToEmail": "Send to email",
-      "chooseChatStatus": "Choose chat status"
+      "chooseChatStatus": "Choose chat status",
+      "statusChange": "Chat status change"
     },
     "history": {
       "title": "History",

@@ -18,6 +18,7 @@ const ChatHistory: FC = () => {
   const [filter, setFilter] = useState('');
   const [selectedChat, setSelectedChat] = useState<ChatType | null>(null);
   const [sendToEmailModal, setSendToEmailModal] = useState<ChatType | null>(null);
+  const [statusChangeModal, setStatusChangeModal] = useState<string | null>(null);
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
@@ -65,6 +66,7 @@ const ChatHistory: FC = () => {
         message: error.message,
       });
     },
+    onSettled: () => setStatusChangeModal(null),
   });
 
   const columnHelper = createColumnHelper<ChatType>();
@@ -165,7 +167,7 @@ const ChatHistory: FC = () => {
             : t('global.anonymous')}
           onClose={() => setSelectedChat(null)}
         >
-          <HistoricalChat chat={selectedChat} onChatStatusChange={handleChatStatusChange} />
+          <HistoricalChat chat={selectedChat} onChatStatusChange={setStatusChangeModal} />
         </Drawer>
       )}
 
@@ -179,6 +181,26 @@ const ChatHistory: FC = () => {
               <Button
                 appearance='error'
                 onClick={() => sendToEmailMutation.mutate(sendToEmailModal)}
+              >
+                {t('global.yes')}
+              </Button>
+            </>
+          }
+        >
+          <p>{t('global.removeValidation')}</p>
+        </Dialog>
+      )}
+
+      {statusChangeModal && (
+        <Dialog
+          title={t('chat.active.sendToEmail')}
+          onClose={() => setSendToEmailModal(null)}
+          footer={
+            <>
+              <Button appearance='secondary' onClick={() => setSendToEmailModal(null)}>{t('global.no')}</Button>
+              <Button
+                appearance='error'
+                onClick={() => handleChatStatusChange(statusChangeModal)}
               >
                 {t('global.yes')}
               </Button>
