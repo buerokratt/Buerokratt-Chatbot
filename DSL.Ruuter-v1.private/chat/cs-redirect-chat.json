@@ -274,7 +274,7 @@
           "method": "post",
           "endpoint": "{datamapper_url}/js/email/sendMockEmail",
           "post_body_struct": {
-            "getUserEmail": "{#.get_user_email[0]#.csaEmail}",
+            "to": "{#.get_user_email[0]#.csaEmail}",
             "subject": "Teile on suunatud vestlus!",
             "text": "{$.fill_notification_redirected_chat}"
           }

@@ -269,6 +269,29 @@
       }
     },
     {
+      "get_online_customer_support_agents": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{resql_url}/cs-get-all-available-customer-support-agents-with-email-notifications-enabled",
+          "post_body_struct": {},
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
       "post_customer_support_agent_notification": {
         "verify": {
           "response": {
@@ -278,21 +301,25 @@
         },
         "proceed": {
           "post_body_parameters": {
-            "get_online_customer_support_agents": {
+            "fill_notification_new_chat": {
+              "post_body_parameters": {
+              },
               "method": "post",
-              "endpoint": "{resql_url}/cs-get-all-available-customer-support-agents-with-email-notifications-enabled",
-              "post_body_struct": {},
-              "response": {
-                "ok": "proceed",
-                "nok": "stop"
+              "endpoint": "{dmapper_url}/json/v2/notification_new_chat",
+              "post_body_struct": {
+                "authorTimestamp": "{#.reflect_input#.authorTimestamp}",
+                "content": "#.reflect_input#.content",
+                "endUserOs": "#.reflect_input#.endUserOs",
+                "endUserUrl": "#.reflect_input#.endUserUrl"
               }
             }
           },
           "method": "post",
-          "endpoint": "{ruuter_v2_url}/notification/csa/email",
+          "endpoint": "{datamapper_url}/js/email/sendMockEmail",
           "post_body_struct": {
-            "to": "{$.get_online_customer_support_agents}",
-            "chatId": "{#.get_chat_uuid#.output}"
+            "to": "{#.get_online_customer_support_agents}",
+            "subject": "Avati uus vestlus",
+            "text": "{#.fill_notification_new_chat}"
           }
         },
         "response": {
