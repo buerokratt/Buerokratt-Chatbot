@@ -3,5 +3,6 @@ export interface WidgetConfig {
   widgetDisplayBubbleMessageSeconds: number;
   widgetBubbleMessageText: string;
   widgetColor: string;
+  widgetAnimation: string;
   isWidgetActive: boolean;
 }

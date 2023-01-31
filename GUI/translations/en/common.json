@@ -153,7 +153,8 @@
       "widgetBubbleMessageText": "Widget bubble message text",
       "widgetProactiveSeconds": "Widget proactive seconds",
       "widgetDisplayBubbleMessageSeconds": "Widget bubble message seconds",
-      "widgetColor": "Widget color"
+      "widgetColor": "Widget color",
+      "widgetAnimation": "Widget animation"
     },
     "workingTime": {
       "title": "Organization working time",
