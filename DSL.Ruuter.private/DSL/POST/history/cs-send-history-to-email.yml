@@ -1,0 +1,76 @@
+extractRequestData:
+  assign:
+    chatId: ${incoming.body.chatId}
+
+getUserEmailByChatId:
+  call: http.post
+  args:
+    # TODO: replace with env variable
+    url: https://byk-resql:8443/get-user-email-by-chat-id
+    body:
+      chatId: ${chatId}
+  result: getUserEmailByChatIdResult
+  next: getMessagesByChatId
+
+getMessagesByChatId:
+  call: http.post
+  args:
+    # TODO: replace with env variable
+    url: https://byk-resql:8443/get-chat-messages
+    body:
+      chatId: ${chatId}
+  result: getMessagesByChatIdResult
+  next: mapChatMessages
+
+mapChatMessages:
+  call: http.post
+  args:
+    # TODO: replace with env variable
+    url: https://byk-dmapper:8443/json/v2/format_chat_log
+    body:
+      data: ${getMessagesByChatIdResult.response.body}
+  result: chatMessagesData
+  next: sendDataToEmail
+
+sendDataToEmail:
+  call: http.post
+  args:
+    # TODO: replace with env variable
+    url: http://localhost:3100/js/email/sendMockEmail
+    body:
+      to: ${getUserEmailByChatIdResult.response.body[0].csaEmail}
+      subject: "Buerokratt chat: " + ${chatId}
+      text: ${chatMessagesData.response.body}
+  result: emailResponseData
+  next: registerEmailSentEvent
+
+registerEmailSentEvent:
+  call: http.post
+  args:
+    # TODO: replace with env variable
+    url: https://byk-resql:8443/insert-message
+    body:
+      chatId: ${chatId}
+      messageId: ""
+      content: ""
+      event: "chat_sent_to_csa_email"
+      authorTimestamp: ${new Date().toISOString()}
+      authorId: ""
+      authorFirstName: ""
+      authorLastName: ""
+      authorRole: "backoffice-user"
+      rating: ""
+      forwardedByUser: ""
+      forwardedFromCsa: ""
+      forwardedToCsa: ""
+      created: ${new Date().toISOString()}
+  result: eventRegistered
+  next: returnSuccess
+
+returnSuccess:
+  return: ${getUserEmailResult.response.body[0].csaEmail}
+  next: end
+
+
+returnFailure:
+  return: "error: unauthorized"
