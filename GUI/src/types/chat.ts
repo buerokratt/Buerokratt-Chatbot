@@ -48,5 +48,8 @@ export interface Chat {
   endUserOs?: string;
   lastMessageTimestamp?: string;
   forwardedToName?: string;
+  forwardedByUser?: string;
+  forwardedFromCsa?: string,
+  forwardedToCsa?: string,
   receivedFrom?: string;
 }

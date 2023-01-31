@@ -7,13 +7,14 @@ import { AxiosError } from 'axios';
 import { et } from 'date-fns/locale';
 
 import { Track, Chat, Dialog, Button, FormRadios } from 'components';
-import { Chat as ChatType } from 'types/chat';
+import { Chat as ChatType, CHAT_STATUS } from 'types/chat';
 import useUserInfoStore from 'store/store';
 import { User } from 'types/user';
 import { useToast } from 'hooks/useToast';
 import api from 'services/api';
 import ForwardToColleaugeModal from '../ForwardToColleaugeModal';
 import ForwardToEstablishmentModal from '../ForwardToEstablishmentModal';
+import clsx from 'clsx';
 
 const CSAchatStatuses = [
   'accepted',
@@ -117,7 +118,11 @@ const ChatActive: FC = () => {
           {activeChats.filter((chat) => chat.customerSupportId !== userInfo?.idCode).map((chat) => (
             <Tabs.Trigger
               key={chat.id}
-              className='vertical-tabs__trigger'
+              className={
+                clsx('vertical-tabs__trigger', {
+                  'active': chat.status === CHAT_STATUS.REDIRECTED && chat.customerSupportId !== userInfo?.idCode,
+                })
+              }
               value={chat.id}
               style={{ borderBottom: '1px solid #D2D3D8' }}
             >
