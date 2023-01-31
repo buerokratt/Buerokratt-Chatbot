@@ -17,10 +17,19 @@ getOpenAgentChatAmount:
     url: https://byk-resql:8443/get-open-agent-chat-amount
   result: openAgentChatAmount
 
+getPositionInActiveChats:
+  call: http.post
+  args:
+    url: https://byk-resql:8443/get-position-in-active-chats-by-chat-id
+    body:
+      chatId: ${incoming.body.chatId}
+  result: positionInActiveChats
+
 assignResponseVariables:
   assign:
     chatSeconds: ${averageWaitingTimeInSeconds.response.body[0].chatSeconds}
     openChats: ${openAgentChatAmount.response.body[0].openChats}
+    position: ${positionInActiveChats.response.body[0].position}
 
 checkChatIdParameter:
   switch:
@@ -29,7 +38,7 @@ checkChatIdParameter:
   next: returnWithoutChatIdParameter
 
 returnWithChatIdParameter:
-  return: ${chatId}
+  return: ${position}
   next: end
 
 returnWithoutChatIdParameter:
