@@ -8,17 +8,54 @@ import { et } from 'date-fns/locale';
 import { Track, Chat } from 'components';
 import { Chat as ChatType } from 'types/chat';
 import useUserInfoStore from 'store/store';
+import { User } from 'types/user';
+import { useToast } from 'hooks/useToast';
 
 const ChatUnanswered: FC = () => {
   const { t } = useTranslation();
   const { userInfo } = useUserInfoStore();
+  const toast = useToast();
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
+  const [endChatModal, setEndChatModal] = useState<ChatType | null>(null);
+  const [forwardToColleaugeModal, setForwardToColleaugeModal] = useState<ChatType | null>(null);
+  const [forwardToEstablishmentModal, setForwardToEstablishmentModal] = useState<ChatType | null>(null);
+  const [sendToEmailModal, setSendToEmailModal] = useState<ChatType | null>(null);
   const { data: activeChats } = useQuery<ChatType[]>({
     queryKey: ['cs-get-all-active-chats'],
   });
 
   const selectedChat = useMemo(() => activeChats && activeChats.find((c) => c.id === selectedChatId), [activeChats, selectedChatId]);
   const unansweredChats = useMemo(() => activeChats ? activeChats.filter((c) => c.customerSupportId === '') : [], [activeChats]);
+
+  const handleCsaForward = (chat: ChatType, user: User) => {
+    // TODO: Add endpoint for chat forwarding
+    setForwardToColleaugeModal(null);
+    toast.open({
+      type: 'success',
+      title: t('global.notification'),
+      message: `Chat forwarded to ${user.displayName}`,
+    });
+  };
+
+  const handleEstablishmentForward = (chat: ChatType, establishment: string) => {
+    // TODO: Add endpoint for chat forwarding
+    setForwardToEstablishmentModal(null);
+    toast.open({
+      type: 'success',
+      title: t('global.notification'),
+      message: `Chat forwarded to ${establishment}`,
+    });
+  };
+
+  const handleChatEnd = () => {
+    // TODO: Add endpoint for chat ending
+    setEndChatModal(null);
+    toast.open({
+      type: 'success',
+      title: t('global.notification'),
+      message: `Chat ended`,
+    });
+  };
 
   return (
     <Tabs.Root
@@ -65,7 +102,15 @@ const ChatUnanswered: FC = () => {
           className='vertical-tabs__body'
           value={selectedChatId}
         >
-          {selectedChat && <Chat chat={selectedChat} />}
+          {selectedChat && (
+            <Chat
+              chat={selectedChat}
+              onChatEnd={setEndChatModal}
+              onForwardToColleauge={setForwardToColleaugeModal}
+              onForwardToEstablishment={setForwardToEstablishmentModal}
+              onSendToEmail={setSendToEmailModal}
+            />
+          )}
         </Tabs.Content>
       ) : (
         <div className='vertical-tabs__body-placeholder'>

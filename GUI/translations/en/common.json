@@ -51,6 +51,8 @@
   "chat": {
     "reply": "Reply",
     "unansweredChats": "Unanswered chats",
+    "unanswered": "Unanswered",
+    "forwarded": "Forwarded",
     "endUser": "End user",
     "csaName": "Client support name",
     "startedAt": "Chat started at",

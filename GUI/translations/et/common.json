@@ -51,6 +51,8 @@
   "chat": {
     "reply": "Vasta",
     "unansweredChats": "Vastamata vestlused",
+    "unanswered": "Vastamata",
+    "forwarded": "Suunatud",
     "endUser": "Vestleja",
     "csaName": "Nõustaja nimi",
     "startedAt": "Vestlus alustatud",
