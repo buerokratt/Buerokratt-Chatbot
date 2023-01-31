@@ -68,7 +68,7 @@ registerEmailSentEvent:
   next: returnSuccess
 
 returnSuccess:
-  return: ${getUserEmailResult.response.body[0].csaEmail}
+  return: ${emailResponseData.response.body}
   next: end
 
 
