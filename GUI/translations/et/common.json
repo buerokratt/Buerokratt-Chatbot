@@ -93,7 +93,7 @@
       "csaName": "Nõustaja nimi",
       "contact": "Kontaktandmed",
       "comment": "Kommentaar",
-      "label": "Pealkiri",
+      "label": "Märksõna",
       "nps": "NPS",
       "forwarded": "Suunatud"
     },
@@ -153,7 +153,8 @@
       "widgetBubbleMessageText": "Märguandesõnum",
       "widgetProactiveSeconds": "Proaktiivsusaeg",
       "widgetDisplayBubbleMessageSeconds": "Märguandesõnumi aeg",
-      "widgetColor": "Põhivärv"
+      "widgetColor": "Põhivärv",
+      "widgetAnimation": "Animatsioon"
     },
     "workingTime": {
       "title": "Asutuse tööaeg",
