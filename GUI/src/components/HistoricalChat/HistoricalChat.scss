@@ -42,10 +42,12 @@
   }
 
   &__toolbar {
-    background-color: get-color(extra-light);
+
+  }
+
+  &__toolbar-row {
     border-top: 1px solid get-color(black-coral-2);
     padding: get-spacing(paldiski) get-spacing(haapsalu);
-    position: relative;
   }
 
   &__group {

@@ -6,7 +6,7 @@ import { format } from 'date-fns';
 import { AxiosError } from 'axios';
 import { MdMailOutline, MdOutlineRemoveRedEye } from 'react-icons/md';
 
-import { Button, Card, DataTable, Dialog, Drawer, FormInput, HistoricalChat, Icon } from 'components';
+import { Button, Card, DataTable, Dialog, Drawer, FormInput, HistoricalChat, Icon, Tooltip } from 'components';
 import { Chat as ChatType, CHAT_STATUS } from 'types/chat';
 import { Message } from 'types/message';
 import { useToast } from 'hooks/useToast';
@@ -69,6 +69,24 @@ const ChatHistory: FC = () => {
     onSettled: () => setStatusChangeModal(null),
   });
 
+  const chatCommentChangeMutation = useMutation({
+    mutationFn: (data: { chatId: string | number, comment: string }) => api.post('cs-comment-history', data),
+    onSuccess: () => {
+      toast.open({
+        type: 'success',
+        title: t('global.notification'),
+        message: 'Chat comment changed',
+      });
+    },
+    onError: (error: AxiosError) => {
+      toast.open({
+        type: 'error',
+        title: t('global.notificationError'),
+        message: error.message,
+      });
+    },
+  });
+
   const columnHelper = createColumnHelper<ChatType>();
 
   const endedChatsColumns = useMemo(() => [
@@ -86,7 +104,7 @@ const ChatHistory: FC = () => {
     columnHelper.accessor((row) => `${row.endUserFirstName} ${row.endUserLastName}`, {
       header: t('global.name') || '',
     }),
-    columnHelper.accessor('customerSupportId', {
+    columnHelper.accessor('endUserId', {
       header: t('global.idCode') || '',
     }),
     columnHelper.accessor('contactsMessage', {
@@ -95,6 +113,21 @@ const ChatHistory: FC = () => {
         ? t('global.yes')
         : t('global.no'),
     }),
+    columnHelper.accessor('comment', {
+      header: t('chat.history.comment') || '',
+      cell: (props) => (
+        <Tooltip content={props.getValue()}>
+          <span>{props.getValue()?.slice(0, 30) + '...'}</span>
+        </Tooltip>
+      ),
+    }),
+    columnHelper.accessor('labels', {
+      header: t('chat.history.label') || '',
+      cell: (props) => <span></span>,
+    }),
+    // columnHelper.accessor('nps', {
+    //   header: 'NPS',
+    // }),
     columnHelper.accessor('status', {
       header: t('global.status') || '',
       cell: (props) => props.getValue() === CHAT_STATUS.ENDED ? t('chat.status.ended') : '',
@@ -133,6 +166,11 @@ const ChatHistory: FC = () => {
     chatStatusChangeMutation.mutate({ chatId: selectedChat.id, event });
   };
 
+  const handleCommentChange = (comment: string) => {
+    if (!selectedChat) return;
+    chatCommentChangeMutation.mutate({ chatId: selectedChat.id, comment });
+  };
+
   if (!endedChats) return <>Loading...</>;
 
   return (
@@ -152,6 +190,7 @@ const ChatHistory: FC = () => {
       <Card>
         <DataTable
           data={endedChats}
+          sortable
           columns={endedChatsColumns}
           globalFilter={filter}
           setGlobalFilter={setFilter}
@@ -167,7 +206,11 @@ const ChatHistory: FC = () => {
             : t('global.anonymous')}
           onClose={() => setSelectedChat(null)}
         >
-          <HistoricalChat chat={selectedChat} onChatStatusChange={setStatusChangeModal} />
+          <HistoricalChat
+            chat={selectedChat}
+            onChatStatusChange={setStatusChangeModal}
+            onCommentChange={handleCommentChange}
+          />
         </Drawer>
       )}
 

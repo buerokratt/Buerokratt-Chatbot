@@ -1,12 +1,10 @@
 import { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from '@tanstack/react-query';
-import { format } from 'date-fns';
-import { et } from 'date-fns/locale';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
-import { MdOutlineAttachFile, MdOutlineSend } from 'react-icons/all';
+import { MdOutlineModeEditOutline, MdOutlineSave } from 'react-icons/all';
 
-import { Button, FormInput, FormSelect, Icon, Track } from 'components';
+import { Button, FormSelect, FormTextarea, Icon, Track } from 'components';
 import { ReactComponent as BykLogoWhite } from 'assets/logo-white.svg';
 import useUserInfoStore from 'store/store';
 import { Chat as ChatType } from 'types/chat';
@@ -18,6 +16,7 @@ import './HistoricalChat.scss';
 type ChatProps = {
   chat: ChatType;
   onChatStatusChange: (event: string) => void;
+  onCommentChange: (comment: string) => void;
 }
 
 type GroupedMessage = {
@@ -36,11 +35,12 @@ const chatStatuses = [
   'response-sent-to-client-email',
 ];
 
-const HistoricalChat: FC<ChatProps> = ({ chat, onChatStatusChange }) => {
+const HistoricalChat: FC<ChatProps> = ({ chat, onChatStatusChange, onCommentChange }) => {
   const { t } = useTranslation();
   const { userInfo } = useUserInfoStore();
   const chatRef = useRef<HTMLDivElement>(null);
   const [messageGroups, setMessageGroups] = useState<GroupedMessage[]>([]);
+  const [editingComment, setEditingComment] = useState<string | null>(null);
   const { data: messages } = useQuery<Message[]>({
     queryKey: [`cs-get-messages-by-chat-id/${chat.id}`],
   });
@@ -120,12 +120,53 @@ const HistoricalChat: FC<ChatProps> = ({ chat, onChatStatusChange }) => {
         </div>
 
         <div className='historical-chat__toolbar'>
-          <FormSelect
-            name='chatStatus'
-            label={t('chat.chatStatus')}
-            onSelectionChange={(selection) => selection ? onChatStatusChange(selection.value) : null}
-            options={chatStatuses.map((status) => ({ label: t(`chat.events.${status}`), value: status }))}
-          />
+          <div className='historical-chat__toolbar-row'>
+            <Track gap={16} justify='between'>
+              {editingComment ? (
+                <FormTextarea
+                  name='comment'
+                  label={t('global.comment')}
+                  value={editingComment}
+                  hideLabel
+                  onChange={(e) =>
+                    setEditingComment(e.target.value)
+                  }
+                />
+              ) : (
+                <p>{chat.comment}</p>
+              )}
+              {editingComment ? (
+                <Button
+                  appearance='text'
+                  onClick={() => {
+                    onCommentChange(editingComment);
+                    setEditingComment(null);
+                  }}
+                >
+                  <Icon icon={<MdOutlineSave />} />
+                  {t('global.save')}
+                </Button>
+              ) : (
+                <Button
+                  appearance='text'
+                  onClick={() =>
+                    setEditingComment(chat.comment)
+                  }
+                >
+                  <Icon icon={<MdOutlineModeEditOutline />} />
+                  {t('global.edit')}
+                </Button>
+              )}
+            </Track>
+          </div>
+          <div className='historical-chat__toolbar-row'>
+            <FormSelect
+              name='chatStatus'
+              label={t('chat.chatStatus')}
+              onSelectionChange={(selection) => selection ? onChatStatusChange(selection.value) : null}
+              options={chatStatuses.map((status) => ({ label: t(`chat.events.${status}`), value: status }))}
+            />
+          </div>
         </div>
       </div>
     </div>

@@ -84,8 +84,19 @@ const Header: FC = () => {
     });
   };
 
+  const onActive = () => {
+    if (!customerSupportActivity) return;
+    setCsaStatus('online');
+    customerSupportActivityMutation.mutate({
+      customerSupportActive: customerSupportActivity.active,
+      customerSupportId: customerSupportActivity.idCode,
+      customerSupportStatus: 'online',
+    });
+  };
+
   const { getRemainingTime } = useIdleTimer({
     onIdle,
+    onActive,
     timeout: USER_IDLE_STATUS_TIMEOUT,
     throttle: 500,
   });
