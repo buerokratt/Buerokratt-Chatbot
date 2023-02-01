@@ -53,9 +53,9 @@
             }
           },
           "post_body_struct": {
-            "active": "{#.customerSupportStatus}",
+            "active": "{#.customerSupportActive}",
             "userIdCode": "{#.customerSupportId}",
-            "status": "{#.status}",
+            "status": "{#.customerSupportStatus}",
             "created": "$_getInstant()"
           }
         },
