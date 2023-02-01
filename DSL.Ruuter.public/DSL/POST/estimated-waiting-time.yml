@@ -1,46 +1,69 @@
 assignIncoming:
   assign:
-    chatId: ${incoming.params.chatId}
-    interval: ${incoming.body.interval}
+    chatId: '${incoming.params.chatId}'
 
-getAverageWaitingTimeInSeconds:
+getDurationTotalInSeconds:
   call: http.post
   args:
-    url: https://byk-resql:8443/get-average-waiting-time-in-seconds-by-interval
+    # TODO: replace with env variable
+    url: https://byk-resql:8443/get-ended-chats-total-duration-in-seconds
+  result: durationTotalInSeconds
+
+#checkChatIdParameter:
+#  switch:
+#    - condition: ${chatId != null && chatId !== "" && !!chatId}
+#      next: getUnassignedChatsWithChatId
+#  next: getUnassignedChats
+
+getUnassignedChats:
+  call: http.post
+  args:
+    # TODO: replace with env variable
+    url: https://byk-resql:8443/get-unassigned-chat-total-with-position-by-chat-id
     body:
-      interval: ${interval}
-  result: averageWaitingTimeInSeconds
-
-getOpenAgentChatAmount:
-  call: http.post
-  args:
-    url: https://byk-resql:8443/get-open-agent-chat-amount
-  result: openAgentChatAmount
-
-getPositionInActiveChats:
-  call: http.post
-  args:
-    url: https://byk-resql:8443/get-position-in-active-chats-by-chat-id
-    body:
-      chatId: ${incoming.body.chatId}
-  result: positionInActiveChats
+      chatId: "${chatId ? chatId : ''}"
+  result: unassignedChats
 
 assignResponseVariables:
   assign:
-    chatSeconds: ${averageWaitingTimeInSeconds.response.body[0].chatSeconds}
-    openChats: ${openAgentChatAmount.response.body[0].openChats}
-    position: ${positionInActiveChats.response.body[0].position}
+    durationInSeconds: ${durationTotalInSeconds.response.body[0].durationInSeconds}
+    positionInUnassignedChats: ${unassignedChats.response.body[0].positionInUnassignedChats}
+    unassignedChatTotal: ${unassignedChats.response.body[0].unassignedChatTotal}
+#    calculatedWaitingTime: ${durationInSeconds / unassignedChatTotal}
 
-checkChatIdParameter:
-  switch:
-    - condition: ${!!chatId && chatId !== "" && chatId !== null}
-      next: returnWithChatIdParameter
-  next: returnWithoutChatIdParameter
+#ifPositionAbove0:
+#  switch:
+#    - condition: ${positionInUnassignedChats > 0 || positionInUnassignedChats != '0'}
+#      next: return1
+#  next: return2
+#
+#return1:
+#  assign:
+#    calculatedDuration: esimene
+#
+#return2:
+#  assign:
+#    calculatedDuration: teine
 
-returnWithChatIdParameter:
-  return: ${position}
+getEstimatedWaitingTime:
+  call: http.post
+  args:
+    # TODO: replace with env variable
+    url: https://byk-dmapper:8443/json/v2/reflect_waiting_time
+    body:
+      durationInSeconds: '${durationInSeconds}'
+      positionInUnassignedChats: '${positionInUnassignedChats}'
+  result: estimatedWaitingTime
+  next: return
+
+return:
+  return: ${estimatedWaitingTime.response.body}
   next: end
 
-returnWithoutChatIdParameter:
-  return: ${chatSeconds / openChats}
-  next: end
+#returnWithChatIdParameter:
+#  return: ${position}
+#  next: end
+#
+#returnWithoutChatIdParameter:
+#  return: ${chatSeconds / openChats}
+#  next: end

@@ -21,6 +21,6 @@ SELECT SUM(ABS(EXTRACT(EPOCH FROM
                               WHERE id IN (SELECT max(id)
                                            FROM message
                                            WHERE chat_base_id = c.base_id))
-    ))) as summed_chat_seconds
+    ))) as duration_in_seconds
 FROM chat c
          RIGHT JOIN ended_chats ec ON c.id = ec.id;
