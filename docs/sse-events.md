@@ -14,7 +14,7 @@ This content is to be used by front-end developers to create and test applying a
 | [Show information about chat forwarding and takeover](https://github.com/buerokratt/Buerokratt-Chatbot/issues/39)          | /cs-get-messages-by-chat-id      | `forwardedByUser`, `forwardedFromCsa`, `forwardedToCsa` |   [Chat forwarding and takeover](#Chat-forwarding-and-takeover)                                                                          |
 | [CSA sees if the End User has seen message](https://github.com/buerokratt/Buerokratt-Chatbot/issues/11)                    | /cs-get-new-messages             |     ` "event": "message-read"`                                                    |  [End user has seen message event](#End-user-has-seen-message-event)                                                                        |
 | [Notifications about unanswered and new active forwarded chat](https://github.com/buerokratt/Buerokratt-Chatbot/issues/24) |                                  |                                                         |                                                                             |
-| [Show information about chat activities](https://github.com/buerokratt/Buerokratt-Chatbot/issues/42)                       |                                  |                                                         |                                                                             |
+| [Show information about chat activities](https://github.com/buerokratt/Buerokratt-Chatbot/issues/42)                       |                                  |      all `event` field values                                                   |       [Chat activities](#Chat-activities)                                                                      |
 | [End User is notified when Bürokratt is not working](https://github.com/buerokratt/Buerokratt-Chatbot/issues/43)           | /healthz                         |                                                         | [System health-check](#System-health-check)                                 |
 |                                                                                                                            |                                  |                                                         |                                                                             |
 
@@ -117,6 +117,30 @@ Response body for SSE: `cs-get-new-messages`
   rating: "",
   created: "2023-01-24T08:42:01.538+00:00",
   updated: "2023-01-24T08:42:01.545+00:00",
-};
+}
+```
+
+### Chat activities
+
+Response body for SSE: `cs-get-new-messages`
+
+```json
+{
+  id: "0e6c2a27-fbc1-4f07-9c84-e941af4fce51",
+  chatid: "7045872f-bb09-4b8e-8dd0-76783983792b",
+  content: "",
+  event: "message-read",
+  authorId: "",
+  authorTimestamp: "2023-01-24T08:42:01.352+00:00",
+  authorFirstName: "",
+  authorLastName: "",
+  authorRole: "end-user",
+  forwardedByUser: null,
+  forwardedFromCsa: null,
+  forwardedToCsa: null,
+  rating: "",
+  created: "2023-01-24T08:42:01.538+00:00",
+  updated: "2023-01-24T08:42:01.545+00:00",
+}
 ```
 
