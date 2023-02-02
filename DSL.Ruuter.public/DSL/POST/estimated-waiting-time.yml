@@ -41,8 +41,8 @@ getEstimatedWaitingTime:
       durationInSeconds: '${calculatedDuration}'
       positionInUnassignedChats: '${position}'
   result: estimatedWaitingTime
-  next: return
+  next: returnSuccess
 
-return:
+returnSuccess:
   return: ${estimatedWaitingTime.response.body}
   next: end
