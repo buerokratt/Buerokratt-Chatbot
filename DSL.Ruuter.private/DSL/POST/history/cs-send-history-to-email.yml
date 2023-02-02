@@ -36,7 +36,7 @@ sendDataToEmail:
   call: http.post
   args:
     # TODO: replace with env variable
-    url: http://localhost:3100/js/email/sendMockEmail
+    url: http://byk-datamapper:3100/js/email/sendMockEmail
     body:
       to: ${getUserEmailByChatIdResult.response.body[0].csaEmail}
       subject: "Chat history"
