@@ -1,0 +1,38 @@
+assignIncoming:
+  assign:
+    chatId: "${incoming.body.chatId}"
+    email: "${incoming.body.endUserEmail}"
+    phone: "${incoming.body.endUserPhone}"
+
+# switch to enter email if exists
+checkChatId:
+  switch:
+    - condition: ${!!chatId && chatId !== "" && chatId !== null}
+      next: insertEmail
+  next: returnNoChatId
+
+insertEmail:
+  call: http.post
+  args:
+    url: https://byk-resql:8443/update-chat-with-end-user-email
+    body:
+      chatId: ${chatId}
+      endUserEmail: "${email ? email : ''}"
+  result: insertEmailResult
+
+insertPhone:
+  call: http.post
+  args:
+    url: https://byk-resql:8443/update-chat-with-end-user-phone
+    body:
+      chatId: ${chatId}
+      endUserPhone: "${phone ? phone : ''}"
+  result: insertPhoneResult
+
+returnSuccess:
+  return: Updated ${chatId} with ${email} and ${phone}
+  next: end
+
+returnNoChatId:
+  return: Missing chatId in request body.
+  next: end
