@@ -6,8 +6,8 @@ This content is to be used by front-end developers to create and test applying a
 
 | Event description                                                                                                          | REST endpoint                    | Content of interest                                     | Sample response                                                             |
 | :------------------------------------------------------------------------------------------------------------------------- | :------------------------------- | :------------------------------------------------------ | :-------------------------------------------------------------------------- |
-| End chat session by the End User                                                                                           | /end-chat                        |                                                         |                                                                             |
-| [End chat session by the CSA](https://github.com/buerokratt/Buerokratt-Chatbot/issues/6)                                   | /cs-end-chat                     |                                                         |                                                                             |
+| End chat session by the End User                                                                                           | /end-chat                        |                                                         |    [End chat session by end user](#End-chat-session-by-end-user)                                                                         |
+| [End chat session by the CSA](https://github.com/buerokratt/Buerokratt-Chatbot/issues/6)                                   | /cs-end-chat                     |                                                         |        [End chat session by CSA](#End-chat-session-by-CSA)                                                                     |
 | [Provide End User estimated waiting for response](https://github.com/buerokratt/Buerokratt-Chatbot/issues/48)              | /estimated-waiting-time          |                                                         | [Estimated waiting time for response](#Estimated-waiting-time-for-response) |
 | [Provide End User estimated waiting for response](https://github.com/buerokratt/Buerokratt-Chatbot/issues/48)              | /estimated-waiting-time/{CHATID} |                                                         | [Estimated waiting time for response](#Estimated-waiting-time-for-response) |
 | [Notification of the authentication result](https://github.com/buerokratt/Buerokratt-Chatbot/issues/46)                    |     /login-with-tara-jwt                             |                                                         |                                                                             |
@@ -141,6 +141,33 @@ Response body for SSE: `cs-get-new-messages`
   "rating": "",
   "created": "2023-01-24T08:42:01.538+00:00",
   "updated": "2023-01-24T08:42:01.545+00:00",
+}
+```
+
+### End chat session by CSA
+
+Request payload for POST: `cs-end-chat`
+
+```json
+{
+    "chatId": "7045872f-bb09-4b8e-8dd0-76783983792b",
+    "event": "ACCEPTED",
+    "authorTimestamp": "2023-02-02T07:44:42.612Z",
+    "authorFirstName": "Mary-Änn",
+    "authorId": "EE49003106521",
+    "authorRole": "backoffice-user"
+}
+```
+
+### End chat session by end user
+
+Request payload for POST: `end-chat`
+```json
+{
+    "chatId": "7c237f49-7850-4b53-b008-4909c43fc298",
+    "event": "client-left",
+    "authorTimestamp": "2023-02-02T07:49:41.133Z",
+    "authorRole": "end-user"
 }
 ```
 
