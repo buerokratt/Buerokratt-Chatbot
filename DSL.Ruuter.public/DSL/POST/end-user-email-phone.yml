@@ -4,7 +4,6 @@ assignIncoming:
     email: "${incoming.body.endUserEmail}"
     phone: "${incoming.body.endUserPhone}"
 
-# switch to enter email if exists
 checkChatId:
   switch:
     - condition: ${!!chatId && chatId !== "" && chatId !== null}
