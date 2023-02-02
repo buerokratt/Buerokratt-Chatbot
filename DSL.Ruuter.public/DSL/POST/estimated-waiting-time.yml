@@ -9,12 +9,6 @@ getDurationTotalInSeconds:
     url: https://byk-resql:8443/get-ended-chats-total-duration-in-seconds
   result: durationTotalInSeconds
 
-#checkChatIdParameter:
-#  switch:
-#    - condition: ${chatId != null && chatId !== "" && !!chatId}
-#      next: getUnassignedChatsWithChatId
-#  next: getUnassignedChats
-
 getUnassignedChats:
   call: http.post
   args:
@@ -26,24 +20,17 @@ getUnassignedChats:
 
 assignResponseVariables:
   assign:
-    durationInSeconds: ${durationTotalInSeconds.response.body[0].durationInSeconds}
-    positionInUnassignedChats: ${unassignedChats.response.body[0].positionInUnassignedChats}
-    unassignedChatTotal: ${unassignedChats.response.body[0].unassignedChatTotal}
-#    calculatedWaitingTime: ${durationInSeconds / unassignedChatTotal}
+    duration: ${durationTotalInSeconds.response.body[0].durationInSeconds}
+    position: ${unassignedChats.response.body[0].positionInUnassignedChats}
+    unassignedChats: ${unassignedChats.response.body[0].unassignedChatTotal}
 
-#ifPositionAbove0:
-#  switch:
-#    - condition: ${positionInUnassignedChats > 0 || positionInUnassignedChats != '0'}
-#      next: return1
-#  next: return2
-#
-#return1:
-#  assign:
-#    calculatedDuration: esimene
-#
-#return2:
-#  assign:
-#    calculatedDuration: teine
+calculateAverage:
+  assign:
+    average: ${duration / unassignedChats}
+
+calculateDuration:
+  assign:
+    calculatedDuration: "${position > 0 ? average * position : duration}"
 
 getEstimatedWaitingTime:
   call: http.post
@@ -51,19 +38,11 @@ getEstimatedWaitingTime:
     # TODO: replace with env variable
     url: https://byk-dmapper:8443/json/v2/reflect_waiting_time
     body:
-      durationInSeconds: '${durationInSeconds}'
-      positionInUnassignedChats: '${positionInUnassignedChats}'
+      durationInSeconds: '${calculatedDuration}'
+      positionInUnassignedChats: '${position}'
   result: estimatedWaitingTime
   next: return
 
 return:
   return: ${estimatedWaitingTime.response.body}
   next: end
-
-#returnWithChatIdParameter:
-#  return: ${position}
-#  next: end
-#
-#returnWithoutChatIdParameter:
-#  return: ${chatSeconds / openChats}
-#  next: end
