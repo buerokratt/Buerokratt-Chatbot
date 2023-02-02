@@ -33,7 +33,7 @@ Return for `/estimated-waiting-time`
 }
 ```
 
-Return for `/estimated-waiting-time/{CHATID}`
+Return for `/estimated-waiting-time?chatId=123`
 
 ```json
 {
