@@ -12,7 +12,7 @@ This content is to be used by front-end developers to create and test applying a
 | [Provide End User estimated waiting for response](https://github.com/buerokratt/Buerokratt-Chatbot/issues/48)              | /estimated-waiting-time/{CHATID} |                                                         | [Estimated waiting time for response](#Estimated-waiting-time-for-response) |
 | [Notification of the authentication result](https://github.com/buerokratt/Buerokratt-Chatbot/issues/46)                    |     /login-with-tara-jwt                             |                                                         |                                                                             |
 | [Show information about chat forwarding and takeover](https://github.com/buerokratt/Buerokratt-Chatbot/issues/39)          | /cs-get-messages-by-chat-id      | `forwardedByUser`, `forwardedFromCsa`, `forwardedToCsa` |   [Chat forwarding and takeover](#Chat-forwarding-and-takeover)                                                                          |
-| [CSA sees if the End User has seen message](https://github.com/buerokratt/Buerokratt-Chatbot/issues/11)                    | /cs-get-new-messages             |                                                         |                                                                             |
+| [CSA sees if the End User has seen message](https://github.com/buerokratt/Buerokratt-Chatbot/issues/11)                    | /cs-get-new-messages             |     ` "event": "message-read"`                                                    |     [End user has seen message event](#End-user-has-seen message-event)                                                                        |
 | [Notifications about unanswered and new active forwarded chat](https://github.com/buerokratt/Buerokratt-Chatbot/issues/24) |                                  |                                                         |                                                                             |
 | [Show information about chat activities](https://github.com/buerokratt/Buerokratt-Chatbot/issues/42)                       |                                  |                                                         |                                                                             |
 | [End User is notified when Bürokratt is not working](https://github.com/buerokratt/Buerokratt-Chatbot/issues/43)           | /healthz                         |                                                         | [System health-check](#System-health-check)                                 |
@@ -83,5 +83,40 @@ Response for GET: `cs-get-messages-by-chat-id`
     },
     "error": null
 }
+```
+
+### End user has seen message event
+
+Request body for POST: `post-message`
+
+```json
+{
+    "chatId": "23f2ebbc-90d4-4716-9894-9e14f553a852",
+    "authorRole": "end-user",
+    "authorTimestamp": "2023-01-13T14:23:52.953Z",
+    "content": "",
+    "event": "message-read"
+}
+```
+Response body for SSE: `cs-get-new-messages`
+
+```json
+{
+  id: "0e6c2a27-fbc1-4f07-9c84-e941af4fce51",
+  chatid: "7045872f-bb09-4b8e-8dd0-76783983792b",
+  content: "",
+  event: "message-read",
+  authorId: "",
+  authorTimestamp: "2023-01-24T08:42:01.352+00:00",
+  authorFirstName: "",
+  authorLastName: "",
+  authorRole: "end-user",
+  forwardedByUser: null,
+  forwardedFromCsa: null,
+  forwardedToCsa: null,
+  rating: "",
+  created: "2023-01-24T08:42:01.538+00:00",
+  updated: "2023-01-24T08:42:01.545+00:00",
+};
 ```
 
