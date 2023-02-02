@@ -1,0 +1,9 @@
+version: "3.9"
+services:
+  buerokratt_chatbot:
+    container_name: buerokratt_chatbot
+    build:
+      context: .
+      target: web
+    ports:
+      - '80:80'
