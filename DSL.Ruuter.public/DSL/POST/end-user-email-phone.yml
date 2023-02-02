@@ -30,7 +30,7 @@ insertPhone:
   result: insertPhoneResult
 
 returnSuccess:
-  return: Updated ${chatId} with ${email} and ${phone}
+  return: Updated ${chatId} with ${email} and ${phone}.
   next: end
 
 returnNoChatId:
