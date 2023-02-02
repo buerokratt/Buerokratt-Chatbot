@@ -208,6 +208,84 @@
       }
     },
     {
+      "get_user_email": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{resql_url}/get-user-email-by-id-code",
+          "post_body_struct": {
+            "userIdCode": "{#.reflect_input#.customerSupportId}"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
+      "post_customer_support_agent_notification": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "post_body_parameters": {
+            "fill_notification_redirected_chat": {
+              "post_body_parameters": {
+                "get_is_customer_support_agent_forwarded_chat_email_notification_enabled": {
+                  "post_body_parameters": {
+                    "get_user_profile_settings": {
+                      "method": "post",
+                      "endpoint": "{resql_url}/get-user-profile-settings",
+                      "post_body_struct": {
+                        "userId": "{#.reflect_input#.customerSupportId}"
+                      }
+                    }
+                  },
+                  "method": "post",
+                  "endpoint": "{ruuter_url}/match_input",
+                  "post_body_struct": {
+                    "input": {
+                      "is_active": "{$.get_user_profile_settings[0]$.forwardedChatEmailNotifications}"
+                    },
+                    "validate_against": {
+                      "is_active": "true"
+                    },
+                    "validation_type": "MUST_MATCH_ANY"
+                  }
+                }
+              },
+              "method": "post",
+              "endpoint": "{dmapper_url}/json/v2/notification_redirected_chat",
+              "post_body_struct": {
+                "from": "{#.reflect_input#.forwardedFromCsa}",
+                "chatId": "{#.reflect_input#.id}"
+              }
+            }
+          },
+          "method": "post",
+          "endpoint": "{datamapper_url}/js/email/sendMockEmail",
+          "post_body_struct": {
+            "to": "{#.get_user_email[0]#.csaEmail}",
+            "subject": "Teile on suunatud vestlus!",
+            "text": "{$.fill_notification_redirected_chat}"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
       "get_claimed_chat": {
         "verify": {
           "response": {
