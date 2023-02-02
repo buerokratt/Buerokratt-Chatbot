@@ -11,7 +11,7 @@ This content is to be used by front-end developers to create and test applying a
 | [Provide End User estimated waiting for response](https://github.com/buerokratt/Buerokratt-Chatbot/issues/48)              | /estimated-waiting-time          |                                                         | [Estimated waiting time for response](#Estimated-waiting-time-for-response) |
 | [Provide End User estimated waiting for response](https://github.com/buerokratt/Buerokratt-Chatbot/issues/48)              | /estimated-waiting-time/{CHATID} |                                                         | [Estimated waiting time for response](#Estimated-waiting-time-for-response) |
 | [Notification of the authentication result](https://github.com/buerokratt/Buerokratt-Chatbot/issues/46)                    |     /login-with-tara-jwt                             |                                                         |                                                                             |
-| [Show information about chat forwarding and takeover](https://github.com/buerokratt/Buerokratt-Chatbot/issues/39)          | /cs-get-messages-by-chat-id      | `forwardedByUser`, `forwardedFromCsa`, `forwardedToCsa` |                                                                             |
+| [Show information about chat forwarding and takeover](https://github.com/buerokratt/Buerokratt-Chatbot/issues/39)          | /cs-get-messages-by-chat-id      | `forwardedByUser`, `forwardedFromCsa`, `forwardedToCsa` |   [Chat forwarding and takeover](#Chat-forwarding-and-takeover)                                                                          |
 | [CSA sees if the End User has seen message](https://github.com/buerokratt/Buerokratt-Chatbot/issues/11)                    | /cs-get-new-messages             |                                                         |                                                                             |
 | [Notifications about unanswered and new active forwarded chat](https://github.com/buerokratt/Buerokratt-Chatbot/issues/24) |                                  |                                                         |                                                                             |
 | [Show information about chat activities](https://github.com/buerokratt/Buerokratt-Chatbot/issues/42)                       |                                  |                                                         |                                                                             |
@@ -39,3 +39,49 @@ Return for `/estimated-waiting-time/{CHATID}`
 ```json
 {"data":{"set_healthz_response":{"data":[{"name":"TIM","version":"1.0"},{"name":"RUUTER","version":"1.0"},{"name":"DMAPPER","version":"1.0"},{"name":"RESQL","version":"1.0"}]}},"error":null}
 ```
+
+### Chat forwarding and takeover
+
+Request body for POST: `cs-redirect-chat`
+
+```json
+{
+    "id": "8cecdc84-57fb-4f18-845e-5ca0be3d6223",
+    "customerSupportDisplayName": "someCsaAgent",
+    "customerSupportId": "EE49902206520",
+    "forwardedByUser": "someAdminUser",
+    "forwardedFromCsa": "csa1",
+    "forwardedToCsa":  "csa2"
+}
+```
+
+
+Response for GET: `cs-get-messages-by-chat-id`
+
+```json
+{
+    "data": {
+        "cs_get_messages_by_chat_id": [
+            {
+                "id": "f25ea8f0-ed23-4abf-9f76-d99b21094d69",
+                "chatId": "8cecdc84-57fb-4f18-845e-5ca0be3d6223",
+                "content": "hello",
+                "event": "",
+                "authorId": "",
+                "authorTimestamp": "2023-01-18T12:56:52.159+00:00",
+                "authorFirstName": "",
+                "authorLastName": "",
+                "authorRole": "end-user",
+                "forwardedByUser": "someAdminUser",
+                "forwardedFromCsa": "csa1",
+                "forwardedToCsa": "csa2",
+                "rating": "",
+                "created": "2023-01-18T12:56:52.895+00:00",
+                "updated": "2023-01-18T12:56:52.909+00:00"
+            }
+        ]
+    },
+    "error": null
+}
+```
+
