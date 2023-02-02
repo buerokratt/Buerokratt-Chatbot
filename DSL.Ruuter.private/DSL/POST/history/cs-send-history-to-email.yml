@@ -64,13 +64,9 @@ registerEmailSentEvent:
       forwardedFromCsa: ""
       forwardedToCsa: ""
       created: ${new Date().toISOString()}
-  result: eventRegistered
   next: returnSuccess
 
 returnSuccess:
   return: ${emailResponseData.response.body}
   next: end
 
-
-returnFailure:
-  return: "error: unauthorized"
