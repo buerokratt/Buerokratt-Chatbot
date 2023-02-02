@@ -85,6 +85,8 @@
                 "customerSupportDisplayName": "{#.get_chat_by_id[0]#.customerSupportDisplayName}",
                 "csaTitle": "{#.get_chat_by_id[0]#.csaTitle}",
                 "status": "{#.get_chat_by_id[0]#.status}",
+                "endUserEmail": "{#.get_chat_by_id[0]#.endUserEmail}",
+                "endUserPhone": "{#.get_chat_by_id[0]#.endUserPhone}",
                 "endUserOs": "{#.get_chat_by_id[0]#.endUserOs}",
                 "endUserUrl": "{#.get_chat_by_id[0]#.endUserUrl}",
                 "feedbackText": "",

@@ -103,6 +103,8 @@
           "endpoint": "https://{#.reflect_forward_to_value#.forwardTo}/destination-forward",
           "post_body_struct": {
             "messages": "{#.get_messages_to_redirect}",
+            "endUserEmail": "{#.get_not_ended_chat[0]#.endUserEmail}",
+            "endUserPhone": "{#.get_not_ended_chat[0]#.endUserPhone}",
             "endUserOs": "{#.get_not_ended_chat[0]#.endUserOs}",
             "endUserUrl": "{#.get_not_ended_chat[0]#.endUserUrl}",
             "originChatId": "{#.get_chatId#.chatId}",
@@ -188,6 +190,8 @@
             "endUserFirstName": "{#.get_not_ended_chat[0]#.endUserFirstName}",
             "endUserLastName": "{#.get_not_ended_chat[0]#.endUserLastName}",
             "status": "REDIRECTED",
+            "endUserEmail": "{#.get_not_ended_chat[0]#.endUserEmail}",
+            "endUserPhone": "{#.get_not_ended_chat[0]#.endUserPhone}",
             "endUserOs": "{#.get_not_ended_chat[0]#.endUserOs}",
             "endUserUrl": "{#.get_not_ended_chat[0]#.endUserUrl}",
             "feedbackText": "",

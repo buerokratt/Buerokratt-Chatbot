@@ -133,6 +133,8 @@
             "endUserFirstName": "{#.get_not_ended_chat[0]#.endUserFirstName}",
             "endUserLastName": "{#.get_not_ended_chat[0]#.endUserLastName}",
             "status": "{#.get_not_ended_chat[0]#.status}",
+            "endUserEmail": "{#.get_not_ended_chat[0]#.endUserEmail}",
+            "endUserPhone": "{#.get_not_ended_chat[0]#.endUserPhone}",
             "endUserOs": "{#.get_not_ended_chat[0]#.endUserOs}",
             "endUserUrl": "{#.get_not_ended_chat[0]#.endUserUrl}",
             "feedbackText": "",

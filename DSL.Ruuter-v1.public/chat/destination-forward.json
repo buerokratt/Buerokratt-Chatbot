@@ -14,6 +14,8 @@
           "endpoint": "{dmapper_url}/json/v2/reflect_destination_forward",
           "post_body_struct": {
             "messages": "{#.messages}",
+            "endUserEmail": "{#.endUserEmail}",
+            "endUserPhone": "{#.endUserPhone}",
             "endUserOs": "{#.endUserOs}",
             "endUserUrl": "{#.endUserUrl}",
             "destinationChatId": "{#.destinationChatId}",
@@ -94,6 +96,8 @@
             "ended": "",
             "feedbackRating": "",
             "feedbackText": "",
+            "endUserEmail": "{#.reflect_input#.endUserEmail}",
+            "endUserPhone": "{#.reflect_input#.endUserPhone}",
             "endUserOs": "{#.reflect_input#.endUserOs}",
             "endUserUrl": "{#.reflect_input#.endUserUrl}",
             "forwardedTo": "",
