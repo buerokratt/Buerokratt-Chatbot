@@ -39,7 +39,7 @@ sendDataToEmail:
     url: http://localhost:3100/js/email/sendMockEmail
     body:
       to: ${getUserEmailByChatIdResult.response.body[0].csaEmail}
-      subject: "Buerokratt chat: " + ${chatId}
+      subject: "Chat history"
       text: ${chatMessagesData.response.body}
   result: emailResponseData
   next: registerEmailSentEvent
