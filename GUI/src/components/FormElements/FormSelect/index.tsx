@@ -1,4 +1,4 @@
-import { FC, SelectHTMLAttributes, useId, useState } from 'react';
+import { FC, ReactNode, SelectHTMLAttributes, useId, useState } from 'react';
 import { useSelect } from 'downshift';
 import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';
@@ -8,7 +8,7 @@ import { Icon } from 'components';
 import './FormSelect.scss';
 
 type FormSelectProps = SelectHTMLAttributes<HTMLSelectElement> & {
-  label: string;
+  label: ReactNode;
   name: string;
   hideLabel?: boolean;
   options: {
@@ -31,6 +31,7 @@ const FormSelect: FC<FormSelectProps> = (
     placeholder,
     defaultValue,
     onSelectionChange,
+    ...rest
   },
 ) => {
   const id = useId();
@@ -63,7 +64,7 @@ const FormSelect: FC<FormSelectProps> = (
   const placeholderValue = placeholder || t('global.choose');
 
   return (
-    <div className={selectClasses}>
+    <div className={selectClasses} style={rest.style}>
       {label && !hideLabel && <label htmlFor={id} className='select__label' {...getLabelProps()}>{label}</label>}
       <div className='select__wrapper'>
         <div className='select__trigger' {...getToggleButtonProps()}>

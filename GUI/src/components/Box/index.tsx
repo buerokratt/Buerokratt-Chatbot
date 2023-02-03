@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import './Box.scss';
 
 type BoxProps = {
-  color?: 'default' | 'blue' | 'yellow' | 'green' | 'red';
+  color?: 'default' | 'blue' | 'yellow' | 'green' | 'red' | 'gray' | 'dark-blue' | 'orange';
 }
 
 const Box = forwardRef<HTMLDivElement, PropsWithChildren<BoxProps>>(({ color = 'default', children }, ref) => {

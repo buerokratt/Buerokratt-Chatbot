@@ -1,9 +1,9 @@
 import { FC } from 'react';
+import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 
 import { Message } from 'types/message';
 import { CHAT_EVENTS } from 'types/chat';
-import { format } from 'date-fns';
 
 type ChatEventProps = {
   message: Message;
@@ -14,13 +14,15 @@ const ChatEvent: FC<ChatEventProps> = ({ message }) => {
   const { event, authorTimestamp, forwardedFromCsa, forwardedToCsa } = message;
 
   return (
-    <div className='active-chat__event-message'>
-      {event === CHAT_EVENTS.REDIRECTED && (
-        <p>{t('chat.redirectedMessage', {
+    <div className='historical-chat__event-message'>
+      {event === CHAT_EVENTS.REDIRECTED ? (
+        <p>{t('chat.event.redirected', {
           from: forwardedFromCsa,
           to: forwardedToCsa,
           date: format(new Date(authorTimestamp), 'dd.MM.yyyy HH:ii:ss'),
         })}</p>
+      ) : (
+        <p>{t(`chat.event.${event}`)}</p>
       )}
     </div>
   );

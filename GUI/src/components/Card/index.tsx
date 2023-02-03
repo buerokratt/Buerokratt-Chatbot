@@ -1,15 +1,17 @@
 import { FC, PropsWithChildren, ReactNode } from 'react';
+import clsx from 'clsx';
 
 import './Card.scss';
 
 type CardProps = {
   header?: ReactNode;
   footer?: ReactNode;
+  borderless?: boolean;
 }
 
-const Card: FC<PropsWithChildren<CardProps>> = ({ header, footer, children }) => {
+const Card: FC<PropsWithChildren<CardProps>> = ({ header, footer, borderless, children }) => {
   return (
-    <div className='card'>
+    <div className={clsx('card', { 'card--borderless': borderless })}>
       {header && <div className='card__header'>{header}</div>}
       <div className='card__body'>
         {children}

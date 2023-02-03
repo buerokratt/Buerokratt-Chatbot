@@ -38,4 +38,19 @@
     background-color: get-color(jasper-1);
     border-color: get-color(jasper-3);
   }
+
+  &--gray {
+    background-color: get-color(black-coral-1);
+    border-color: get-color(black-coral-3);
+  }
+
+  &--dark-blue {
+    background-color: get-color(sapphire-blue-3);
+    border-color: get-color(sapphire-blue-5);
+  }
+
+  &--orange {
+    background-color: get-color(orange-3);
+    border-color: get-color(orange-5);
+  }
 }
