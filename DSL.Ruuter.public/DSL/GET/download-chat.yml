@@ -27,7 +27,7 @@ convertDataToPDF:
   call: http.get
   args:
     # TODO: replace with env variable
-    url: http://byk-datamapper:3100/hbs/pdf
+    url: http://byk-datamapper:3100/js/convert/pdf
     body:
       data: ${formattedChatMessages}
   result: pdfFile
