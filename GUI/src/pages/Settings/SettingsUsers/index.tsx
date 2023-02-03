@@ -48,16 +48,17 @@ const SettingsUsers: FC = () => {
     }),
     columnHelper.accessor('idCode', {
       header: t('settings.users.idCode') || '',
+      enableColumnFilter: false,
     }),
-    columnHelper.accessor('authorities', {
+    columnHelper.accessor(row => row.authorities.map((r) => t(`roles.${r}`)).join(', '), {
       header: t('settings.users.role') || '',
-      cell: (props) => props.getValue().map((r) => t(`roles.${r}`)).join(', '),
     }),
     columnHelper.accessor('displayName', {
       header: t('settings.users.displayName') || '',
     }),
     columnHelper.accessor('csaEmail', {
       header: t('settings.users.email') || '',
+      enableColumnFilter: false,
     }),
     columnHelper.display({
       id: 'edit',

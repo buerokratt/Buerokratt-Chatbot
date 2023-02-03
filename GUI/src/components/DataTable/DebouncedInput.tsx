@@ -1,4 +1,4 @@
-import { FC, InputHTMLAttributes, useEffect, useState } from 'react';
+import { FC, InputHTMLAttributes, useEffect, useRef, useState } from 'react';
 
 type DebouncedInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange'> & {
   value: string | number
@@ -14,10 +14,12 @@ const DebouncedInput: FC<DebouncedInputProps> = (
     ...props
   },
 ) => {
+  const ref = useRef<HTMLInputElement>(null);
   const [value, setValue] = useState(initialValue);
 
   useEffect(() => {
     setValue(initialValue);
+    ref.current?.focus();
   }, [initialValue]);
 
   useEffect(() => {
@@ -29,7 +31,7 @@ const DebouncedInput: FC<DebouncedInputProps> = (
   }, [value]);
 
   return (
-    <input {...props} value={value} onChange={e => setValue(e.target.value)} />
+    <input {...props} ref={ref} value={value} onChange={e => setValue(e.target.value)} />
   );
 };
 
