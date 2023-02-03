@@ -40,7 +40,8 @@
     "present": "Present",
     "away": "Away",
     "today": "Today",
-    "forward": "Forward"
+    "forward": "Forward",
+    "chosen": "Chosen"
   },
   "mainMenu": {
     "menuLabel": "Main navigation",

@@ -1,6 +1,7 @@
 import FormInput from './FormInput';
 import FormTextarea from './FormTextarea';
 import FormSelect from './FormSelect';
+import FormMultiselect from './FormSelect/FormMultiselect';
 import Switch from './Switch';
 import FormCheckboxes from './FormCheckboxes';
 import FormRadios from './FormRadios';
@@ -12,6 +13,7 @@ export {
   FormInput,
   FormTextarea,
   FormSelect,
+  FormMultiselect,
   Switch,
   FormCheckboxes,
   FormRadios,

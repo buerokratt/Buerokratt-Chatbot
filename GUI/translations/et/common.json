@@ -40,7 +40,8 @@
     "present": "Kohal",
     "away": "Eemal",
     "today": "Täna",
-    "forward": "Suuna"
+    "forward": "Suuna",
+    "chosen": "Valitud"
   },
   "mainMenu": {
     "menuLabel": "Põhinavigatsioon",

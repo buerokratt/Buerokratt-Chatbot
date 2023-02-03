@@ -6,7 +6,19 @@ import { format } from 'date-fns';
 import { AxiosError } from 'axios';
 import { MdMailOutline, MdOutlineRemoveRedEye } from 'react-icons/md';
 
-import { Button, Card, DataTable, Dialog, Drawer, FormInput, HistoricalChat, Icon, Tooltip } from 'components';
+import {
+  Button,
+  Card,
+  DataTable,
+  Dialog,
+  Drawer,
+  FormInput,
+  FormMultiselect,
+  HistoricalChat,
+  Icon,
+  Tooltip,
+  Track,
+} from 'components';
 import { Chat as ChatType, CHAT_STATUS } from 'types/chat';
 import { Message } from 'types/message';
 import { useToast } from 'hooks/useToast';
@@ -30,6 +42,19 @@ const ChatHistory: FC = () => {
     queryKey: ['cs-get-messages-by-chat-id', selectedChat?.id],
     enabled: !!selectedChat,
   });
+
+  const visibleColumnOptions = useMemo(() => [
+    { label: t('chat.history.startTime'), value: 'created' },
+    { label: t('chat.history.endTime'), value: 'ended' },
+    { label: t('chat.history.csaName'), value: 'customerSupportDisplayName' },
+    { label: t('global.name'), value: '' },
+    { label: t('chat.history.contact'), value: 'contactsMessage' },
+    { label: t('chat.history.comment'), value: 'comment' },
+    { label: t('chat.history.label'), value: 'labels' },
+    // { label: t('chat.history.nps'), value: 'nps' },
+    { label: t('global.status'), value: 'status' },
+    { label: 'ID', value: 'id' },
+  ], [t]);
 
   const sendToEmailMutation = useMutation({
     mutationFn: (data: ChatType) => api.post('cs-send-chat-to-email', data),
@@ -178,13 +203,20 @@ const ChatHistory: FC = () => {
       <h1>{t('chat.history.title')}</h1>
 
       <Card>
-        <FormInput
-          label={t('chat.history.searchChats')}
-          hideLabel
-          name='searchChats'
-          placeholder={t('chat.history.searchChats') + '...'}
-          onChange={(e) => setFilter(e.target.value)}
-        />
+        <Track gap={16}>
+          <FormInput
+            label={t('chat.history.searchChats')}
+            hideLabel
+            name='searchChats'
+            placeholder={t('chat.history.searchChats') + '...'}
+            onChange={(e) => setFilter(e.target.value)}
+          />
+          <FormMultiselect
+            name='visibleColumns'
+            label={t('')}
+            options={visibleColumnOptions}
+          />
+        </Track>
       </Card>
 
       <Card>
