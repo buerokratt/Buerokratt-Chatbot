@@ -1,4 +1,4 @@
-import React, { CSSProperties, FC, ReactNode, useId, useState } from 'react';
+import React, { CSSProperties, FC, ReactNode, useEffect, useId, useState } from 'react';
 import {
   ColumnDef,
   useReactTable,

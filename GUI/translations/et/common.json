@@ -41,7 +41,8 @@
     "away": "Eemal",
     "today": "Täna",
     "forward": "Suuna",
-    "chosen": "Valitud"
+    "chosen": "Valitud",
+    "chosenColumns": "Valitud tulbad"
   },
   "mainMenu": {
     "menuLabel": "Põhinavigatsioon",

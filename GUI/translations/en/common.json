@@ -41,7 +41,8 @@
     "away": "Away",
     "today": "Today",
     "forward": "Forward",
-    "chosen": "Chosen"
+    "chosen": "Chosen",
+    "chosenColumns": "Chosen columns"
   },
   "mainMenu": {
     "menuLabel": "Main navigation",

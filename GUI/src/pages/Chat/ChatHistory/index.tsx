@@ -1,7 +1,7 @@
 import { FC, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { createColumnHelper, PaginationState } from '@tanstack/react-table';
+import { createColumnHelper, PaginationState, VisibilityState } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { AxiosError } from 'axios';
 import { MdMailOutline, MdOutlineRemoveRedEye } from 'react-icons/md';
@@ -31,6 +31,7 @@ const ChatHistory: FC = () => {
   const [selectedChat, setSelectedChat] = useState<ChatType | null>(null);
   const [sendToEmailModal, setSendToEmailModal] = useState<ChatType | null>(null);
   const [statusChangeModal, setStatusChangeModal] = useState<string | null>(null);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
@@ -47,11 +48,10 @@ const ChatHistory: FC = () => {
     { label: t('chat.history.startTime'), value: 'created' },
     { label: t('chat.history.endTime'), value: 'ended' },
     { label: t('chat.history.csaName'), value: 'customerSupportDisplayName' },
-    { label: t('global.name'), value: '' },
+    { label: t('global.name'), value: 'fullName' },
     { label: t('chat.history.contact'), value: 'contactsMessage' },
     { label: t('chat.history.comment'), value: 'comment' },
     { label: t('chat.history.label'), value: 'labels' },
-    // { label: t('chat.history.nps'), value: 'nps' },
     { label: t('global.status'), value: 'status' },
     { label: 'ID', value: 'id' },
   ], [t]);
@@ -128,6 +128,7 @@ const ChatHistory: FC = () => {
     }),
     columnHelper.accessor((row) => `${row.endUserFirstName} ${row.endUserLastName}`, {
       header: t('global.name') || '',
+      id: 'fullName'
     }),
     columnHelper.accessor('endUserId', {
       header: t('global.idCode') || '',
@@ -150,9 +151,6 @@ const ChatHistory: FC = () => {
       header: t('chat.history.label') || '',
       cell: (props) => <span></span>,
     }),
-    // columnHelper.accessor('nps', {
-    //   header: 'NPS',
-    // }),
     columnHelper.accessor('status', {
       header: t('global.status') || '',
       cell: (props) => props.getValue() === CHAT_STATUS.ENDED ? t('chat.status.ended') : '',
@@ -184,7 +182,7 @@ const ChatHistory: FC = () => {
         size: '1%',
       },
     }),
-  ], []);
+  ], [columnHelper]);
 
   const handleChatStatusChange = (event: string) => {
     if (!selectedChat) return;
@@ -194,6 +192,12 @@ const ChatHistory: FC = () => {
   const handleCommentChange = (comment: string) => {
     if (!selectedChat) return;
     chatCommentChangeMutation.mutate({ chatId: selectedChat.id, comment });
+  };
+
+  const handleColumnSelection = (selection: { label: string; value: string }[] | null) => {
+    let newSelection: Record<string, boolean> = {};
+    selection?.forEach((item) => newSelection[item.value] = true);
+    setColumnVisibility(newSelection);
   };
 
   if (!endedChats) return <>Loading...</>;
@@ -213,8 +217,11 @@ const ChatHistory: FC = () => {
           />
           <FormMultiselect
             name='visibleColumns'
-            label={t('')}
+            label={t('global.chosenColumns')}
+            hideLabel
             options={visibleColumnOptions}
+            defaultOptions={visibleColumnOptions}
+            onSelectionChange={handleColumnSelection}
           />
         </Track>
       </Card>
@@ -228,6 +235,8 @@ const ChatHistory: FC = () => {
           setGlobalFilter={setFilter}
           pagination={pagination}
           setPagination={setPagination}
+          columnVisibility={columnVisibility}
+          setColumnVisibility={setColumnVisibility}
         />
       </Card>
 
