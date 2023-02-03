@@ -128,7 +128,7 @@ const ChatHistory: FC = () => {
     }),
     columnHelper.accessor((row) => `${row.endUserFirstName} ${row.endUserLastName}`, {
       header: t('global.name') || '',
-      id: 'fullName'
+      id: 'fullName',
     }),
     columnHelper.accessor('endUserId', {
       header: t('global.idCode') || '',
@@ -149,7 +149,19 @@ const ChatHistory: FC = () => {
     }),
     columnHelper.accessor('labels', {
       header: t('chat.history.label') || '',
-      cell: (props) => <span></span>,
+      cell: (props) => (
+        <Track gap={4} isMultiline>
+          {props.getValue().map((label) => (
+            <span style={{
+              border: '2px solid #005AA3',
+              borderRadius: 4,
+              backgroundColor: '#fff',
+              color: '#005AA3',
+              padding: '0 8px',
+            }}>{label}</span>
+          ))}
+        </Track>
+      ),
     }),
     columnHelper.accessor('status', {
       header: t('global.status') || '',

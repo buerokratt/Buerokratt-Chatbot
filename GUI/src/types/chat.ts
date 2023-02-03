@@ -53,5 +53,5 @@ export interface Chat {
   forwardedToCsa?: string,
   receivedFrom?: string;
   comment: string;
-  labels: string;
+  labels: string[];
 }
