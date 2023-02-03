@@ -20,7 +20,7 @@ mapChatMessages:
     url: https://byk-dmapper:8443/json/v2/format_chat_log
     body:
       data: ${getMessagesByChatIdResult.response.body}
-  result: chatMessagesData
+  result: formatedChatMessages
   next: convertDataToPDF
 
 convertDataToPDF:
@@ -28,17 +28,21 @@ convertDataToPDF:
   args:
     # TODO: replace with env variable
     url: http://byk-datamapper:3100/hbs/pdf
-    headers:
-      Content-Disposition: 'attachment; filename="chathistory.pdf"'
-      Content-Type: 'application/pdf'
-      Cache-Control: 'private'
-  result: pdfData
+    body:
+      data: ${formattedChatMessages}
+  result: pdfFile
   next: returnSuccess
 
+checkPDFExists:
+  switch:
+    - condition: ${!!pdfFile.response.body  && pdfFile.response.body !== null}
+      next: returnSuccess
+  next: returnFailure
+
 returnSuccess:
-  return: ${pdfData}
+  return: ${pdfFile.response.body}
   next: end
 
 
 returnFailure:
-  return: "error: unauthorized"
+  return: "error: unable to download PDF"
