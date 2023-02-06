@@ -4,19 +4,20 @@ The following is a list of events sent **by back-end to front-end** by using Ser
 
 This content is to be used by front-end developers to create and test applying appropriate styles and actions on widget-side.
 
-| Event description                                                                                                          | REST endpoint                      | Content of interest                                                | Sample response                                                             |
-|:---------------------------------------------------------------------------------------------------------------------------|:-----------------------------------|:-------------------------------------------------------------------|:----------------------------------------------------------------------------|
+| Event description                                                                                                          | REST endpoint                      | Content of interest                                     | Sample response                                                             |
+|:-------------------------------------------------------------------------------------------------------------------------- |:---------------------------------- |:------------------------------------------------------- |:--------------------------------------------------------------------------- |
 | Start new chat (ruuter_v1 public /init-chat)                                                                               | /init-chat                         | `datamapper_url` / `post_customer_support_agent_notification`      | [Start new chat](#Start-new-chat)                                           |
-| End chat session by the End User                                                                                           | /end-chat                          |                                                                    | [End chat session by end user](#End-chat-session-by-end-user)               |
-| [End chat session by the CSA](https://github.com/buerokratt/Buerokratt-Chatbot/issues/6)                                   | /cs-end-chat                       |                                                                    | [End chat session by CSA](#End-chat-session-by-CSA)                         |
-| [Provide End User estimated waiting for response](https://github.com/buerokratt/Buerokratt-Chatbot/issues/48)              | /estimated-waiting-time            |                                                                    | [Estimated waiting time for response](#Estimated-waiting-time-for-response) |
-| [Provide End User estimated waiting for response](https://github.com/buerokratt/Buerokratt-Chatbot/issues/48)              | /estimated-waiting-time?chatId=123 |                                                                    | [Estimated waiting time for response](#Estimated-waiting-time-for-response) |
-| [Notification of the authentication result](https://github.com/buerokratt/Buerokratt-Chatbot/issues/46)                    | /login-with-tara-jwt               |                                                                    |                                                                             |
-| [Show information about chat forwarding and takeover](https://github.com/buerokratt/Buerokratt-Chatbot/issues/39)          | /cs-get-messages-by-chat-id        | `forwardedByUser`, `forwardedFromCsa`, `forwardedToCsa`            | [Chat forwarding and takeover](#Chat-forwarding-and-takeover)               |
-| [CSA sees if the End User has seen message](https://github.com/buerokratt/Buerokratt-Chatbot/issues/11)                    | /cs-get-new-messages               | ` "event": "message-read"`                                         | [End user has seen message event](#End-user-has-seen-message-event)         |
+| End chat session by the End User                                                                                           | /end-chat                          |                                                         | [End chat session by end user](#End-chat-session-by-end-user)               |
+| [End chat session by the CSA](https://github.com/buerokratt/Buerokratt-Chatbot/issues/6)                                   | /cs-end-chat                       |                                                         | [End chat session by CSA](#End-chat-session-by-CSA)                         |
+| [Provide End User estimated waiting for response](https://github.com/buerokratt/Buerokratt-Chatbot/issues/48)              | /estimated-waiting-time            |                                                         | [Estimated waiting time for response](#Estimated-waiting-time-for-response) |
+| [Provide End User estimated waiting for response](https://github.com/buerokratt/Buerokratt-Chatbot/issues/48)              | /estimated-waiting-time?chatId=123 |                                                         | [Estimated waiting time for response](#Estimated-waiting-time-for-response) |
+| [Notification of the authentication result](https://github.com/buerokratt/Buerokratt-Chatbot/issues/46)                    | /login-with-tara-jwt |     `cs-get-messages-by-chat-id` "event": "authentication_successful"                                                     |     [Notification of authentication result](#Notification-of-authentication-result)                                                                        | 
+| [Show information about chat forwarding and takeover](https://github.com/buerokratt/Buerokratt-Chatbot/issues/39)          | /cs-get-messages-by-chat-id        | `forwardedByUser`, `forwardedFromCsa`, `forwardedToCsa` | [Chat forwarding and takeover](#Chat-forwarding-and-takeover)               |
+| [CSA sees if the End User has seen message](https://github.com/buerokratt/Buerokratt-Chatbot/issues/11)                    | /cs-get-new-messages               | ` "event": "message-read"`                              | [End user has seen message event](#End-user-has-seen-message-event)         |
 | [Notifications about unanswered and new active forwarded chat](https://github.com/buerokratt/Buerokratt-Chatbot/issues/24) | /cs-get-all-active-chats           | `customerSupportId` when not empty/null, `event` when `redirected` |                                                                             |
 | [Show information about chat activities](https://github.com/buerokratt/Buerokratt-Chatbot/issues/42)                       | All confs which get messages       | all `event` field values                                           | [Chat activities](#Chat-activities)                                         |
-| [End User is notified when Bürokratt is not working](https://github.com/buerokratt/Buerokratt-Chatbot/issues/43)           | /cs-get-components-healthz-status  |                                                                    | [System health-check](#System-health-check)                                 |
+| [End User is notified when Bürokratt is not working](https://github.com/buerokratt/Buerokratt-Chatbot/issues/43)           | /cs-get-components-healthz-status  |                                                         | [System health-check](#System-health-check)                                 |
+|                                                                                                                            |                                    |                                                         |                                                                             |
 
 # Sample requests
 
@@ -203,6 +204,33 @@ Request payload for POST: `end-chat`
   "event": "client-left",
   "authorTimestamp": "2023-02-02T07:49:41.133Z",
   "authorRole": "end-user"
+}
+```
+
+## Notification of authentication result
+
+Response of `cs-get-messages-by-chat-id`
+```json
+{
+  "cs_get_messages_by_chat_id": [
+    {
+      "id": "7d9cc156-6934-473c-92d8-81462e212765",
+      "chatId": "3b71c597-cbb7-4f6e-ba99-a77acaefbe11",
+      "content": "",
+      "event": "authentication_successful",
+      "authorId": "",
+      "authorTimestamp": "2023-02-06T08:17:33.790+00:00",
+      "authorFirstName": "",
+      "authorLastName": "",
+      "authorRole": "backoffice-user"
+      "forwardedByUser": "",
+      "forwardedFromCsa": "",
+      "forwardedToCsa": "",
+      "rating": "",
+      "created": "2023-02-06T08:17:33.791+00:00",
+      "updated": "2023-02-06T08:17:33.802+00:00"
+    }
+  ]
 }
 ```
 
