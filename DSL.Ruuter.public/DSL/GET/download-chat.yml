@@ -35,7 +35,7 @@ convertDataToPDF:
 
 checkPDFExists:
   switch:
-    - condition: ${!!pdfFile.response.body  && pdfFile.response.body !== null}
+    - condition: ${!!pdfFile.response.body && pdfFile.response.body !== null}
       next: returnSuccess
   next: returnFailure
 
