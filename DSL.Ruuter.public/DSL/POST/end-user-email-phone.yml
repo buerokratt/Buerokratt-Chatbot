@@ -10,23 +10,15 @@ checkChatId:
       next: insertEmail
   next: returnNoChatId
 
-insertEmail:
+insertEmailAndPhone:
   call: http.post
   args:
-    url: https://byk-resql:8443/update-chat-with-end-user-email
+    url: https://byk-resql:8443/update-chat-with-end-user-email-and-phone
     body:
       chatId: ${chatId}
       endUserEmail: "${email ? email : ''}"
-  result: insertEmailResult
-
-insertPhone:
-  call: http.post
-  args:
-    url: https://byk-resql:8443/update-chat-with-end-user-phone
-    body:
-      chatId: ${chatId}
       endUserPhone: "${phone ? phone : ''}"
-  result: insertPhoneResult
+  result: insertEmailAndPhoneResult
 
 returnSuccess:
   return: Updated ${chatId} with ${email} and ${phone}.
