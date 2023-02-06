@@ -278,7 +278,7 @@
           "post_body_struct": {
             "to": "{#.get_user_email[0]#.csaEmail}",
             "subject": "Teile on suunatud vestlus!",
-            "text": "{$.fill_notification_redirected_chat}"
+            "text": "{$.fill_notification_redirected_chat$.notification}"
           }
         },
         "response": {
