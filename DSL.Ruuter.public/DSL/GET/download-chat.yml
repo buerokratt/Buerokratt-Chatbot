@@ -1,0 +1,48 @@
+extractRequestData:
+  assign:
+    chatId: ${incoming.body.chatId}
+    email: ${incoming.body.email}
+
+getMessagesByChatId:
+  call: http.post
+  args:
+    # TODO: replace with env variable
+    url: https://byk-resql:8443/get-chat-messages
+    body:
+      chatId: ${chatId}
+  result: getMessagesByChatIdResult
+  next: mapChatMessages
+
+mapChatMessages:
+  call: http.post
+  args:
+    # TODO: replace with env variable
+    url: https://byk-dmapper:8443/json/v2/format_chat_log
+    body:
+      data: ${getMessagesByChatIdResult.response.body}
+  result: formatedChatMessages
+  next: convertDataToPDF
+
+convertDataToPDF:
+  call: http.get
+  args:
+    # TODO: replace with env variable
+    url: http://byk-datamapper:3100/js/convert/pdf
+    body:
+      data: ${formattedChatMessages}
+  result: pdfFile
+  next: returnSuccess
+
+checkPDFExists:
+  switch:
+    - condition: ${!!pdfFile.response.body && pdfFile.response.body !== null}
+      next: returnSuccess
+  next: returnFailure
+
+returnSuccess:
+  return: ${pdfFile.response.body}
+  next: end
+
+
+returnFailure:
+  return: "error: unable to download PDF"
