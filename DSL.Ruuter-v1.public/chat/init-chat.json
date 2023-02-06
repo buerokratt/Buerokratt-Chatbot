@@ -17,6 +17,8 @@
             "authorTimestamp": "{#.message#.authorTimestamp}",
             "content": "{#.message#.content}",
             "endUserId": "",
+            "endUserEmail": "",
+            "endUserPhone": "",
             "endUserOs": "{#.endUserTechnicalData#.endUserOs}",
             "endUserUrl": "{#.endUserTechnicalData#.endUserUrl}",
             "forwardedByUser": "",
@@ -230,6 +232,8 @@
             "ended": "",
             "feedbackRating": "",
             "feedbackText": "",
+            "endUserEmail": "{#.reflect_input#.endUserEmail}",
+            "endUserPhone": "{#.reflect_input#.endUserPhone}",
             "endUserOs": "{#.reflect_input#.endUserOs}",
             "endUserUrl": "{#.reflect_input#.endUserUrl}",
             "externalId": "",
@@ -319,7 +323,7 @@
           "post_body_struct": {
             "to": "{#.get_online_customer_support_agents}",
             "subject": "Avati uus vestlus",
-            "text": "{#.fill_notification_new_chat}"
+            "text": "{$.fill_notification_new_chat$.notification}"
           }
         },
         "response": {

@@ -8,13 +8,13 @@ SELECT base_id,
        end_user_first_name,
        end_user_last_name,
        status,
-       :created::timestamp with time zone,
+       created::timestamp with time zone,
        ended::timestamp with time zone,
        end_user_email,
-       end_user_phone,
+       :endUserPhone,
        end_user_os,
        end_user_url,
-       :feedbackText,
+       feedback_text,
        feedback_rating,
        external_id,
        forwarded_to,
@@ -23,6 +23,6 @@ SELECT base_id,
        received_from_name,
        csa_title
 FROM chat
-WHERE base_id = :id
+WHERE base_id = :chatId
 ORDER BY updated DESC
 LIMIT 1;
