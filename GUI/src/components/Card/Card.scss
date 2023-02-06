@@ -4,9 +4,19 @@
 @import 'src/styles/settings/variables/typography';
 
 .card {
+  $self: &;
   background-color: get-color(white);
   border: 1px solid get-color(black-coral-2);
   border-radius: $veera-radius-s;
+
+  &--borderless {
+    border: 0;
+    border-radius: 0;
+
+    #{$self}__header {
+      border-radius: 0;
+    }
+  }
 
   &__header,
   &__body,

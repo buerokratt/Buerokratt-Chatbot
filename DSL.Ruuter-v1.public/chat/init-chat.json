@@ -282,7 +282,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/cs-get-all-available-customer-support-agents-with-email-notifications-enabled",
+          "endpoint": "{resql_url}/get-all-available-customer-support-agents-with-email-notifications-enabled",
           "post_body_struct": {},
           "response": {
             "ok": "proceed",

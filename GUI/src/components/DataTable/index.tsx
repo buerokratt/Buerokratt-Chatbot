@@ -24,7 +24,7 @@ import {
   MdExpandMore,
   MdExpandLess,
   MdOutlineEast,
-  MdOutlineWest, MdOutlineSearch,
+  MdOutlineWest,
 } from 'react-icons/md';
 import clsx from 'clsx';
 import { Link } from 'react-router-dom';

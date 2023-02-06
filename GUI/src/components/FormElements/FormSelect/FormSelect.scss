@@ -70,7 +70,14 @@
   }
 
   &__option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     padding: 8px 15px;
+
+    span {
+      display: block;
+    }
 
     &[aria-selected=true] {
       background-color: get-color(sapphire-blue-10);
