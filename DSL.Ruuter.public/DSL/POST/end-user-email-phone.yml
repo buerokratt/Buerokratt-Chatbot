@@ -7,7 +7,7 @@ assignIncoming:
 checkChatId:
   switch:
     - condition: ${!!chatId && chatId !== "" && chatId !== null}
-      next: insertEmail
+      next: insertEmailAndPhone
   next: returnNoChatId
 
 insertEmailAndPhone:
