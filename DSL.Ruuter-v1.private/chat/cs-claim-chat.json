@@ -16,7 +16,10 @@
             "id": "{#.id}",
             "customerSupportId": "{#.customerSupportId}",
             "customerSupportDisplayName": "{#.customerSupportDisplayName}",
-            "csaTitle": "{#.csaTitle}"
+            "csaTitle": "{#.csaTitle}",
+            "forwardedByUser": "{#.forwardedByUser}",
+            "forwardedFromCsa": "{#.forwardedFromCsa}",
+            "forwardedToCsa": "{#.forwardedToCsa}"
           }
         },
         "response": {
