@@ -88,33 +88,61 @@
           "method": "post",
           "endpoint": "{resql_url}/insert-chat",
           "post_body_parameters": {
-            "check_roles": {
-              "method": "post",
-              "endpoint": "{ruuter_url}/match_input",
+            "check_csa_status": {
               "post_body_parameters": {
-                "userinfo": {
-                  "cookies": [
-                    "customJwtCookie"
-                  ],
+                "get_csa_status": {
+                  "post_body_parameters": {
+                    "check_roles": {
+                      "method": "post",
+                      "endpoint": "{ruuter_url}/match_input",
+                      "post_body_parameters": {
+                        "userinfo": {
+                          "cookies": [
+                            "customJwtCookie"
+                          ],
+                          "method": "post",
+                          "endpoint": "{tim_url}/jwt/custom-jwt-userinfo",
+                          "post_body_struct": "customJwtCookie",
+                          "response": {
+                            "ok": "proceed",
+                            "nok": "stop"
+                          }
+                        }
+                      },
+                      "post_body_struct": {
+                        "input": {
+                          "authorities": "{$.userinfo$.authorities}"
+                        },
+                        "validate_against": {
+                          "authorities": [
+                            "ROLE_ADMINISTRATOR",
+                            "ROLE_CUSTOMER_SUPPORT_AGENT",
+                            "ROLE_SERVICE_MANAGER"
+                          ]
+                        },
+                        "validation_type": "MUST_MATCH_ANY"
+                      },
+                      "response": {
+                        "ok": "proceed",
+                        "nok": "stop"
+                      }
+                    }
+                  },
                   "method": "post",
-                  "endpoint": "{tim_url}/jwt/custom-jwt-userinfo",
-                  "post_body_struct": "customJwtCookie",
-                  "response": {
-                    "ok": "proceed",
-                    "nok": "stop"
+                  "endpoint": "{resql_url}/get-user-is-online-or-idle",
+                  "post_body_struct": {
+                    "userIdCode": "{#.reflect_input#.customerSupportId}"
                   }
                 }
               },
+              "method": "post",
+              "endpoint": "{ruuter_url}/match_input",
               "post_body_struct": {
                 "input": {
-                  "authorities": "{$.userinfo$.authorities}"
+                  "id_code": "{$.get_csa_status[0]$.idCode}"
                 },
                 "validate_against": {
-                  "authorities": [
-                    "ROLE_ADMINISTRATOR",
-                    "ROLE_CUSTOMER_SUPPORT_AGENT",
-                    "ROLE_SERVICE_MANAGER"
-                  ]
+                  "id_code": [ "{#.reflect_input#.customerSupportId}" ]
                 },
                 "validation_type": "MUST_MATCH_ANY"
               },
