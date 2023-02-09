@@ -126,6 +126,29 @@
       }
     },
     {
+      "get_session_length": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{ruuter_url}/cs-get-session-length",
+          "post_body_struct": {},
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
       "update_chat_jwt": {
         "verify": {
           "response": {
@@ -138,7 +161,7 @@
           "endpoint": "{tim_url}/jwt/custom-jwt-generate",
           "post_body_struct": {
             "JWTName": "chatJwt",
-            "expirationInMinutes": 120,
+            "expirationInMinutes": "{#.get_session_length#.data#.cs_get_session_length[0]#.value}",
             "content": {
               "chatId": "{#.get_chatId#.chatId}",
               "JWTCreated": "{#.get_chatId#.JWTCreated}",

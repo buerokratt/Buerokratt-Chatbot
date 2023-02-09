@@ -53,32 +53,6 @@
       }
     },
     {
-      "extend_chat_session":  {
-        "verify": {
-          "response": {
-            "ok": "proceed",
-            "nok": "proceed"
-          }
-        },
-        "proceed": {
-          "cookies": [
-            "chatJwt"
-          ],
-          "method": "post",
-          "endpoint": "{ruuter_url}/custom-jwt-extend",
-          "post_body_struct": "chatJwt",
-          "response": {
-            "ok": "proceed",
-            "nok": "stop"
-          }
-        },
-        "response": {
-          "ok": "proceed",
-          "nok": "stop"
-        }
-      }
-    },
-    {
       "get_message_uuid": {
         "verify": {
           "response": {

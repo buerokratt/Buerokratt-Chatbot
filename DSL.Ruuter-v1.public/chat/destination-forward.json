@@ -72,6 +72,29 @@
       }
     },
     {
+      "get_session_length": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{ruuter_url}/cs-get-session-length",
+          "post_body_struct": {},
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
       "insert_chat": {
         "verify": {
           "response": {
@@ -121,7 +144,7 @@
           "endpoint": "{tim_url}/jwt/custom-jwt-generate",
           "post_body_struct": {
             "JWTName": "redirectJwt",
-            "expirationInMinutes": 120,
+            "expirationInMinutes": "{#.get_session_length#.data#.cs_get_session_length[0]#.value}",
             "content": {
               "chatId": "{#.get_chat_uuid#.output}",
               "originChatId": "{#.reflect_input#.originChatId}",

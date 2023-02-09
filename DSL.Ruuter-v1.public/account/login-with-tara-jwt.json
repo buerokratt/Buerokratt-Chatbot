@@ -65,6 +65,29 @@
       }
     },
     {
+      "get_session_length": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{ruuter_url}/cs-get-session-length",
+          "post_body_struct": {},
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
       "client_custom_jwt_cookie": {
         "verify": {
           "response": {
@@ -109,7 +132,7 @@
           },
           "post_body_struct": {
             "JWTName": "clientCustomJwtCookie",
-            "expirationInMinutes": 480,
+            "expirationInMinutes": "{#.get_session_length#.data#.cs_get_session_length[0]#.value}",
             "content": "{#.tara_user_info}"
           },
           "response_header": {

@@ -18,7 +18,7 @@ extractTokenData:
 validateAdministrator:
   switch:
     # TODO: use correct structure when request is made against TIM
-    - condition: ${jwtResult.response.body.response.authorities.includes("ROLE_ADMINISTRATOR")}
+    - condition: ${jwtResult.response.body.response.authorities.some(role => ["ROLE_ADMINISTRATOR", "ROLE_CUSTOMER_SUPPORT_AGENT","ROLE_SERVICE_MANAGER"].includes(role))}
       next: setConfigurationValue
   next: returnFailure
 
