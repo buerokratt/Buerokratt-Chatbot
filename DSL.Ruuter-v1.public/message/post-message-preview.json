@@ -20,25 +20,6 @@
       }
     },
     {
-      "get_message_uuid": {
-        "verify": {
-          "response": {
-            "ok": "proceed",
-            "nok": "stop"
-          }
-        },
-        "proceed": {
-          "method": "post",
-          "endpoint": "{ruuter_url}/functions/generateRandomUuid",
-          "post_body_struct": {}
-        },
-        "response": {
-          "ok": "proceed",
-          "nok": "stop"
-        }
-      }
-    },
-    {
       "post_message_preview": {
         "verify": {
           "response": {
