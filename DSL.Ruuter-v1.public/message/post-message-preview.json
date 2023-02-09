@@ -51,10 +51,7 @@
           "endpoint": "{resql_url}/insert-message-preview",
           "post_body_struct": {
             "chatId": "{#.reflect_input#.chatId}",
-            "messageId": "{#.get_message_uuid#.output}",
-            "content": "{#.reflect_input#.content}",
-            "event": "typing",
-            "created": "$_getInstant()"
+            "content": "{#.reflect_input#.content}"
           },
           "response": {
             "ok": "proceed",

@@ -8,23 +8,10 @@ http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibas
 
     <changeSet id="20230208124800" author="Net Group">
         <createTable tableName="message_preview">
-            <column name="id" type="bigint" autoIncrement="true">
+            <column name="chat_base_id" type="varchar(36)">
                 <constraints unique="true" nullable="false"/>
             </column>
-            <column name="chat_base_id" type="varchar(36)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="base_id" type="varchar(36)">
-                <constraints nullable="false"/>
-            </column>
             <column name="content" type="varchar(3000)">
-            </column>
-            <column name="event" type="varchar(128)">
-            </column>
-            <column name="created" type="timestamp with time zone">
-                <constraints nullable="false"/>
-            </column>
-            <column name="updated" defaultValueComputed="current_timestamp" type="timestamp with time zone">
             </column>
         </createTable>
     </changeSet>
