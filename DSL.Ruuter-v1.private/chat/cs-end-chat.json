@@ -114,6 +114,27 @@
       }
     },
     {
+      "delete_message_previews": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{resql_url}/delete-message-preview",
+          "post_body_struct": {
+            "chatId": "{#.reflect_input#.chatId}"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
       "get_allowed_statuses": {
         "verify": {
           "response": {
@@ -132,7 +153,8 @@
         }
       }
     },
-    {"formatted_allowed_statuses": {
+    {
+      "formatted_allowed_statuses": {
         "verify": {
           "response": {
             "ok": "proceed",
