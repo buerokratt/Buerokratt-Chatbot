@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd
+http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd">
+
+    <changeSet id="20230208124800" author="Net Group">
+        <createTable tableName="message_preview">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="chat_base_id" type="varchar(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="base_id" type="varchar(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="content" type="varchar(3000)">
+            </column>
+            <column name="event" type="varchar(128)">
+            </column>
+            <column name="created" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated" defaultValueComputed="current_timestamp" type="timestamp with time zone">
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>
