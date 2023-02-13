@@ -1,7 +1,5 @@
-import {FC, useEffect, useLayoutEffect, useState} from 'react';
+import {FC, useState} from 'react';
 import {format} from 'date-fns';
-
-import {Message} from 'types/message';
 import clsx from 'clsx';
 import {MdOutlineCheck} from 'react-icons/md';
 import {Message} from "../../types/message";
@@ -17,20 +15,6 @@ type ChatMessageProps = {
 
 const ChatMessage: FC<ChatMessageProps> = ({message, onSelect, readStatus}) => {
     const [selected, setSelected] = useState(false);
-    const [messageStatus, setMessageStatus] = useState<any>({
-        read: false,
-        readTime: null,
-    })
-
-    useLayoutEffect(() => {
-        console.log('message.read', message)
-        if (message.read === true) {
-            setMessageStatus({
-                read: true,
-                readTime: message.readTime,
-            })
-        }
-    }, [message]);
 
     return (
         <div className={clsx('active-chat__messageContainer')}>
@@ -47,14 +31,12 @@ const ChatMessage: FC<ChatMessageProps> = ({message, onSelect, readStatus}) => {
                         <MdOutlineCheck/>
                     </div>
                 )}
-
             </div>
-            {messageStatus.read === true && (
-                // <span style={{color: 'red'}}>Message Read</span>
-                <span className='active-chat__message-status'>{null ? MessageStatus.READ : MessageStatus.DELIVERED}
-                    <time
-                        dateTime={message.authorTimestamp}> {format(new Date(messageStatus.readTime), 'HH:ii:ss')}</time></span>
-            )}
+            {readStatus.current.messageId === message.id ? (
+                <span className='active-chat__message-status'>Loetud
+                  <time
+                      dateTime={readStatus.current.readTime}> {format(new Date(readStatus.current.readTime), 'HH:ii:ss')}</time></span>
+            ) : null}
         </div>
     );
 };
