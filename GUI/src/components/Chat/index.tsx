@@ -14,6 +14,7 @@ import { Message } from 'types/message';
 import ChatMessage from './ChatMessage';
 import ChatEvent from './ChatEvent';
 import './Chat.scss';
+import handleSse from "../../mocks/handleSse";
 
 type ChatProps = {
   chat: ChatType;
@@ -87,6 +88,21 @@ const Chat: FC<ChatProps> = ({ chat, onChatEnd, onForwardToColleauge, onForwardT
 
   };
 
+
+
+
+  useEffect(() => {
+    const sseResponse = handleSse(messageGroups);
+    setMessageGroups(sseResponse.messageGroups as any);
+    console.log(sseResponse.eventSource)
+    return () => {
+      sseResponse.eventSource.close();
+    };
+  }, [messageGroups]);
+
+
+  console.log('selectedMessages',selectedMessages)
+  // console.log('messageGroups', messageGroups)
   return (
     <div className='active-chat'>
       <div className='active-chat__body'>
