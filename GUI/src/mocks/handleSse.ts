@@ -1,32 +1,26 @@
-// @ts-ignore
+// @ts-ignore npm i --save-dev @types/mocksse does not exist
 import {MockEvent, EventSource} from 'mocksse';
 import {chatMessagesSeen} from "./chatMessagesSeen";
-
-enum Message {
-    READ = 'message-read',
-    DELIVERED = 'message-delivered',
-}
+import {MessageSseEvent} from "../components/Chat/types";
 
 /*
 TODO: find out how to set
 { withCredentials: true }
 */
 
-const handleSse = (messageGroups: any) => {
-// Instantiate a MockEvent.
-//     console.log('messageGroups', messageGroups)
+const handleSse = () => {
     new MockEvent({
         // TODO: set correct url
         url: 'http://localhost:3000/cs-get-new-messages',
-        setInterval: [5_000, 8_000],
+        setInterval: 3_000,
         responses: [
-            {type: Message.READ, data: chatMessagesSeen},
-            {type: Message.DELIVERED, data: chatMessagesSeen},
+            {type: MessageSseEvent.READ, data: chatMessagesSeen},
+            // {type: MessageSseEvent.DELIVERED, data: chatMessagesSeen},
         ]
     });
 
     // TODO: set correct url
-    const eventSource = new EventSource('http://localhost:3000/cs-get-new-messages');
+    return new EventSource('http://localhost:3000/cs-get-new-messages');
 
     // TODO find out what is the event name for message-delivered
     // eventSource.addEventListener(Message.DELIVERED, (event: any) => {
@@ -34,40 +28,11 @@ const handleSse = (messageGroups: any) => {
     //
     // });
 
-
-    eventSource.addEventListener(Message.READ, (event: any) => {
-        const readMessageId = event.data.id;
-        let messageReadStatus = false;
-        let messageReadTime = event.data.authorTimestamp;
-        messageGroups.forEach((messageGroup) => {
-                if (messageGroup.messages[0].id === readMessageId) messageReadStatus = true;
-            }
-        );
-        if(messageReadStatus) {
-            messageGroups.forEach((messageGroup) => {
-                if (messageGroup.messages[0].id === readMessageId) {
-                    messageGroup.messages[0].read = messageReadStatus;
-                    messageGroup.messages[0].readTime = messageReadTime;
-                }
-            });
-        }
-
-        return messageGroups;
-            // return a response with the updated messageGroups
-
-    });
-
     //TODO: handle error
     // eventSource.onerror = (error:any) => {
     //     // Expect to see the following message
     //     // error.message === '`EventSource` instance closed while sending.'
     // };
-    let response = {
-        eventSource: eventSource,
-        messageGroups: messageGroups,
-
-    }
-    return response;
 }
 
 export default handleSse;
