@@ -17,17 +17,17 @@ import './Chat.scss';
 import handleSse from "../../mocks/handleSse";
 
 type ChatProps = {
-  chat: ChatType;
-  onChatEnd: (chat: ChatType) => void;
-  onForwardToColleauge?: (chat: ChatType) => void;
-  onForwardToEstablishment?: (chat: ChatType) => void;
-  onSendToEmail?: (chat: ChatType) => void;
+    chat: ChatType;
+    onChatEnd: (chat: ChatType) => void;
+    onForwardToColleauge?: (chat: ChatType) => void;
+    onForwardToEstablishment?: (chat: ChatType) => void;
+    onSendToEmail?: (chat: ChatType) => void;
 }
 
 type GroupedMessage = {
-  name: string;
-  type: string;
-  messages: Message[];
+    name: string;
+    type: string;
+    messages: Message[];
 }
 
 const Chat: FC<ChatProps> = ({ chat, onChatEnd, onForwardToColleauge, onForwardToEstablishment, onSendToEmail }) => {

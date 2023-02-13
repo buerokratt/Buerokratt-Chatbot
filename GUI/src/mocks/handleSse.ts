@@ -1,7 +1,7 @@
 // @ts-ignore npm i --save-dev @types/mocksse does not exist
 import {MockEvent, EventSource} from 'mocksse';
 import {chatMessagesSeen} from "./chatMessagesSeen";
-import {MessageSseEvent} from "../components/Chat/types";
+import {MessageSseEvent} from "../types/chat";
 
 /*
 TODO: find out how to set

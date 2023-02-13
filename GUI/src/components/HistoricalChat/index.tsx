@@ -7,22 +7,22 @@ import { MdOutlineModeEditOutline, MdOutlineSave } from 'react-icons/all';
 import { Button, FormSelect, FormTextarea, Icon, Track } from 'components';
 import { ReactComponent as BykLogoWhite } from 'assets/logo-white.svg';
 import useUserInfoStore from 'store/store';
-import { Chat as ChatType } from 'types/chat';
-import { Message } from 'types/message';
+import {Chat as ChatType} from 'types/chat';
+import {Message} from 'types/message';
 import ChatMessage from './ChatMessage';
 import ChatEvent from './ChatEvent';
 import './HistoricalChat.scss';
 
 type ChatProps = {
-  chat: ChatType;
-  onChatStatusChange: (event: string) => void;
-  onCommentChange: (comment: string) => void;
+    chat: ChatType;
+    onChatStatusChange: (event: string) => void;
+    onCommentChange: (comment: string) => void;
 }
 
 type GroupedMessage = {
-  name: string;
-  type: string;
-  messages: Message[];
+    name: string;
+    type: string;
+    messages: Message[];
 }
 
 const chatStatuses = [

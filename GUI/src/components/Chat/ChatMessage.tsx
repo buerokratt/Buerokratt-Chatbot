@@ -4,18 +4,18 @@ import {format} from 'date-fns';
 import {Message} from 'types/message';
 import clsx from 'clsx';
 import {MdOutlineCheck} from 'react-icons/md';
+import {Message} from "../../types/message";
+import {MessageStatus} from "../../types/chat";
 
 type ChatMessageProps = {
     message: Message;
     onSelect: (message: Message) => void;
+    readStatus: {
+        current: MessageStatus;
+    };
 }
 
-enum MessageStatus {
-    READ = 'Loetud',
-    DELIVERED = 'Saadetud',
-}
-
-const ChatMessage: FC<ChatMessageProps> = ({message, onSelect}) => {
+const ChatMessage: FC<ChatMessageProps> = ({message, onSelect, readStatus}) => {
     const [selected, setSelected] = useState(false);
     const [messageStatus, setMessageStatus] = useState<any>({
         read: false,
