@@ -16,8 +16,8 @@ export type GroupedMessage = {
 }
 
 export enum MessageSseEvent {
-    READ = 'Loetud',
-    DELIVERED = 'Saadetud',
+    READ = 'message-read',
+    DELIVERED = 'message-delivered'
 }
 
 export type ChatMessageProps = {
