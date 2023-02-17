@@ -58,7 +58,8 @@ export interface Chat {
 
 export enum MessageSseEvent {
   READ = 'message-read',
-  DELIVERED = 'message-delivered'
+  DELIVERED = 'message-delivered',
+  PREVIEW = 'message-preview',
 }
 
 export type MessageStatus = {
