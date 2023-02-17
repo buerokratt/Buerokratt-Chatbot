@@ -16,13 +16,13 @@ type ChatMessageProps = {
 const ChatMessage: FC<ChatMessageProps> = ({message, onSelect, readStatus}) => {
     const [selected, setSelected] = useState(false);
 
-    return (
+   return (
         <div className={clsx('active-chat__messageContainer')}>
             <div className={clsx('active-chat__message', {'active-chat__message--selected': selected})}>
-                <div className='active-chat__message-text' onClick={() => {
+                <div className={clsx('active-chat__message-text', !!message.preview && 'active-chat__message-preview')} onClick={() => {
                     setSelected(!selected);
                     onSelect(message);
-                }}>{message.content}</div>
+                }}>{message.content}{!!message.preview && message.preview}</div>
                 <time dateTime={message.authorTimestamp} className='active-chat__message-date'>
                     {format(new Date(message.authorTimestamp), 'HH:ii:ss')}
                 </time>
@@ -38,7 +38,7 @@ const ChatMessage: FC<ChatMessageProps> = ({message, onSelect, readStatus}) => {
                       dateTime={readStatus.current.readTime}> {format(new Date(readStatus.current.readTime), 'HH:ii:ss')}</time></span>
             ) : null}
         </div>
-    );
+    )
 };
 
 export default ChatMessage;
