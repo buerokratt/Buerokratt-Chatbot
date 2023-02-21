@@ -15,6 +15,7 @@ import ChatEvent from './ChatEvent';
 import './Chat.scss';
 import handleSse from "../../mocks/handleSse";
 import {findIndex} from 'lodash';
+import axios from 'axios';
 
 
 type ChatProps = {
@@ -89,6 +90,56 @@ const Chat: FC<ChatProps> = ({chat, onChatEnd, onForwardToColleauge, onForwardTo
 
         const endUserFullName = chat.endUserFirstName !== '' && chat.endUserLastName !== ''
             ? `${chat.endUserFirstName} ${chat.endUserLastName}` : t('global.anonymous');
+
+        const allSideButtons = [
+            {id: 'endChat', button: <Button
+                key='endChat'
+                appearance='success'
+                onClick={onChatEnd ? () => onChatEnd(chat) : undefined}>
+                {t('chat.active.endChat')}
+            </Button>},
+            {id: 'askAuthentication', button: <Button key='askAuthentication' appearance='secondary'>{t('chat.active.askAuthentication')}</Button>},
+            {id: 'askForContact', button: <Button key='askForContact' appearance='secondary'>{t('chat.active.askForContact')}</Button>},
+            {id: 'askPermission', button: <Button key='askPermission' appearance='secondary'>{t('chat.active.askPermission')}</Button>},
+            {id: 'forwardToColleague', button: <Button key='forwardToColleague' appearance='secondary' onClick={onForwardToColleauge ? () => {
+                onForwardToColleauge(chat);
+                setSelectedMessages([]);
+                } : undefined}>
+                {t('chat.active.forwardToColleague')}
+            </Button>},
+            {id: 'forwardToOrganization', button: <Button key='forwardToOrganization' appearance='secondary'
+                onClick={onForwardToEstablishment ? () => onForwardToEstablishment(chat) : undefined}>{t('chat.active.forwardToOrganization')}</Button>},
+            {id: 'sendToEmail', button: <Button
+                key='sendToEmail'
+                appearance='secondary'
+                onClick={onSendToEmail ? () => onSendToEmail(chat) : undefined}>
+                {t('chat.active.sendToEmail')}
+            </Button>}
+        ];
+        const [sideButtons, setSideButtons] = useState([]);
+        const [buttonsToAllow] = useState([]);
+
+        useEffect(() => {
+            if (sideButtons.length > 0) return;
+            let buttons = [];
+            userInfo?.authorities.forEach((authority) => {
+                // make role more uri friendly
+                let role = authority.substring(5).replaceAll('_', '-').toLowerCase();
+                // TODO: Replace '/active/admin.json' with '/<type>/<role>.json'.
+                axios({url: `http://localhost:8085/cdn/buttons/chats/active/${role}.json`})
+                .then(res => {
+                    res.data.buttons.forEach((btnId) => {
+                        if (!buttonsToAllow.includes(btnId))
+                            buttonsToAllow.push(btnId);
+                    });
+                });
+            });
+            allSideButtons.forEach((button) => {
+                if (buttonsToAllow.includes(button.id))
+                    buttons.push(button.button);
+            });
+            setSideButtons(buttons);
+        }, [buttonsToAllow, sideButtons]);
 
         useEffect(() => {
             if (!messages) return;
