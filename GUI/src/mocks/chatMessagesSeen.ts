@@ -1,4 +1,4 @@
-export const chatMessagesSeenSse = {
+export const chatMessagesSeen = {
     // "id": "0e6c2a27-fbc1-4f07-9c84-e941af4fce51",
     "id": "a4a47f36-57e5-f25a-7a48-dd019096d08b",
     "chatid": "7045872f-bb09-4b8e-8dd0-76783983792b",
