@@ -1,4 +1,4 @@
-import {FC, useEffect, useMemo, useRef, useState} from 'react';
+import {FC, useEffect, useMemo, useRef, useState, useTransition} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useQuery} from '@tanstack/react-query';
 import {format} from 'date-fns';
@@ -9,12 +9,13 @@ import {Button, FormInput, Icon, Track} from 'components';
 import {ReactComponent as BykLogoWhite} from 'assets/logo-white.svg';
 import useUserInfoStore from 'store/store';
 import {Chat as ChatType, MessageSseEvent, MessageStatus} from 'types/chat';
-import {Message} from 'types/message';
+import {Message, MessagePreviewSseResponse} from 'types/message';
 import ChatMessage from './ChatMessage';
 import ChatEvent from './ChatEvent';
 import './Chat.scss';
 import handleSse from "../../mocks/handleSse";
-
+import {findIndex} from 'lodash';
+import axios from 'axios';
 
 
 type ChatProps = {
@@ -35,7 +36,13 @@ const Chat: FC<ChatProps> = ({chat, onChatEnd, onForwardToColleauge, onForwardTo
         const {t} = useTranslation();
         const {userInfo} = useUserInfoStore();
         const chatRef = useRef<HTMLDivElement>(null);
-        const [messageGroups, setMessageGroups] = useState<GroupedMessage[]>([]);
+        const [messageGroups, _setMessageGroups] = useState<GroupedMessage[]>([]);
+        const messageGroupsRef = useRef(messageGroups);
+        const setMessageGroups = (data: GroupedMessage[]) => {
+            messageGroupsRef.current = data;
+            _setMessageGroups(data);
+        };
+        const [isPending, startTransition] = useTransition();
         const [responseText, setResponseText] = useState('');
         const [selectedMessages, setSelectedMessages] = useState<Message[]>([]);
         const {data: messages} = useQuery<Message[]>({
@@ -52,6 +59,30 @@ const Chat: FC<ChatProps> = ({chat, onChatEnd, onForwardToColleauge, onForwardTo
             _setMessageReadStatus(data);
         };
 
+
+        const setPreviewMessage = (event: MessagePreviewSseResponse) => {
+            const PREVIEW_MESSAGE:GroupedMessage = {
+                name: endUserFullName,
+                type: event.data.authorRole,
+                messages: event.data as any, // TODO fix types
+            };
+            const CURRENT_MESSAGE_GROUPS = messageGroupsRef.current;
+            const index = findIndex(CURRENT_MESSAGE_GROUPS, (o) => o.messages[0].id === PREVIEW_MESSAGE.messages[0].id);
+
+            if (index === -1) {
+                CURRENT_MESSAGE_GROUPS.push(PREVIEW_MESSAGE);
+                startTransition(() => {
+                    setMessageGroups(CURRENT_MESSAGE_GROUPS)
+                })
+            } else {
+                CURRENT_MESSAGE_GROUPS.splice(index, 1, PREVIEW_MESSAGE);
+                startTransition(() => {
+                    setMessageGroups(CURRENT_MESSAGE_GROUPS)
+                })
+            }
+        };
+
+
         const hasAccessToActions = useMemo(() => {
             if (chat.customerSupportId === userInfo?.idCode) return true;
             return false;
@@ -59,6 +90,56 @@ const Chat: FC<ChatProps> = ({chat, onChatEnd, onForwardToColleauge, onForwardTo
 
         const endUserFullName = chat.endUserFirstName !== '' && chat.endUserLastName !== ''
             ? `${chat.endUserFirstName} ${chat.endUserLastName}` : t('global.anonymous');
+
+        const allSideButtons = [
+            {id: 'endChat', button: <Button
+                key='endChat'
+                appearance='success'
+                onClick={onChatEnd ? () => onChatEnd(chat) : undefined}>
+                {t('chat.active.endChat')}
+            </Button>},
+            {id: 'askAuthentication', button: <Button key='askAuthentication' appearance='secondary'>{t('chat.active.askAuthentication')}</Button>},
+            {id: 'askForContact', button: <Button key='askForContact' appearance='secondary'>{t('chat.active.askForContact')}</Button>},
+            {id: 'askPermission', button: <Button key='askPermission' appearance='secondary'>{t('chat.active.askPermission')}</Button>},
+            {id: 'forwardToColleague', button: <Button key='forwardToColleague' appearance='secondary' onClick={onForwardToColleauge ? () => {
+                onForwardToColleauge(chat);
+                setSelectedMessages([]);
+                } : undefined}>
+                {t('chat.active.forwardToColleague')}
+            </Button>},
+            {id: 'forwardToOrganization', button: <Button key='forwardToOrganization' appearance='secondary'
+                onClick={onForwardToEstablishment ? () => onForwardToEstablishment(chat) : undefined}>{t('chat.active.forwardToOrganization')}</Button>},
+            {id: 'sendToEmail', button: <Button
+                key='sendToEmail'
+                appearance='secondary'
+                onClick={onSendToEmail ? () => onSendToEmail(chat) : undefined}>
+                {t('chat.active.sendToEmail')}
+            </Button>}
+        ];
+        const [sideButtons, setSideButtons] = useState([]);
+        const [buttonsToAllow] = useState([]);
+
+        useEffect(() => {
+            if (sideButtons.length > 0) return;
+            let buttons = [];
+            userInfo?.authorities.forEach((authority) => {
+                // make role more uri friendly
+                let role = authority.substring(5).replaceAll('_', '-').toLowerCase();
+                // TODO: Replace '/active/admin.json' with '/<type>/<role>.json'.
+                axios({url: `http://localhost:8085/cdn/buttons/chats/active/${role}.json`})
+                .then(res => {
+                    res.data.buttons.forEach((btnId) => {
+                        if (!buttonsToAllow.includes(btnId))
+                            buttonsToAllow.push(btnId);
+                    });
+                });
+            });
+            allSideButtons.forEach((button) => {
+                if (buttonsToAllow.includes(button.id))
+                    buttons.push(button.button);
+            });
+            setSideButtons(buttons);
+        }, [buttonsToAllow, sideButtons]);
 
         useEffect(() => {
             if (!messages) return;
@@ -102,17 +183,22 @@ const Chat: FC<ChatProps> = ({chat, onChatEnd, onForwardToColleauge, onForwardTo
         useEffect(() => {
                 const sseResponse = handleSse();
                 sseResponse.addEventListener(MessageSseEvent.READ, (event: any) => {
-
                     setMessageReadStatus({
                         messageId: event.data.id,
                         readTime: event.data.created,
                     })
                 });
+
+                sseResponse.addEventListener(MessageSseEvent.PREVIEW, (event: MessagePreviewSseResponse) => {
+                    setPreviewMessage(event);
+                });
+
                 return () => {
                     sseResponse.close();
                 };
             }, []
         );
+
         return (
             <div className='active-chat'>
                 <div className='active-chat__body'>

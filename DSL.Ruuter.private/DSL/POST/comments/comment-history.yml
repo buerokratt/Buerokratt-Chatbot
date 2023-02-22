@@ -8,7 +8,7 @@ extractTokenData:
   call: http.post
   args:
     # TODO: replace with env variable and correct path to TIM endpoint
-    url: http://byk-private-ruuter-yml:8080/mock-tim-custom-jwt-userinfo
+    url: http://byk-private-ruuter-yml:8080/mocks/mock-tim-custom-jwt-userinfo
     headers:
       cookie: ${cookie}
     body:
