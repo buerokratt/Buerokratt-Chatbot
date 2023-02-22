@@ -14,12 +14,4 @@ export interface Message {
   rating?: string;
   created?: string;
   updated?: string;
-
-  preview?: string;
-}
-
-export interface MessagePreviewSseResponse {
-  data: Message;
-  origin: string;
-  type: string;
 }
