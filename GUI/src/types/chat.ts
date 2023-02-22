@@ -55,13 +55,3 @@ export interface Chat {
   comment: string;
   labels: string;
 }
-
-export enum MessageSseEvent {
-  READ = 'message-read',
-  DELIVERED = 'message-delivered'
-}
-
-export type MessageStatus = {
-  messageId: string | null;
-  readTime: any;
-}
