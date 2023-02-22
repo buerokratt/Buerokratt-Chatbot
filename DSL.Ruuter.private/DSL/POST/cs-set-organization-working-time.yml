@@ -3,8 +3,6 @@ extractRequestData:
     cookie: ${incoming.headers.cookie}
     organizationWorkingTimeStartISO: ${incoming.body.organizationWorkingTimeStartISO}
     organizationWorkingTimeEndISO: ${incoming.body.organizationWorkingTimeEndISO}
-    organizationWorkingTimeWeekdays: ${incoming.body.organizationWorkingTimeWeekdays}
-    organizationWorkingTimeHolidays: ${incoming.body.organizationWorkingTimeHolidays}
 
 extractTokenData:
   call: http.post
@@ -22,8 +20,14 @@ validateAdministrator:
   switch:
     # TODO: use correct structure when request is made against TIM
     - condition: ${jwtResult.response.body.response.authorities.includes("ROLE_ADMINISTRATOR")}
-      next: setOrganizationWorkingTime
+      next: validateBody
   next: returnUnauthorized
+
+validateBody:
+  switch:
+    - condition: '${!!(new Date(organizationWorkingTimeStartISO).getDay() && new Date(organizationWorkingTimeEndISO).getDay())}'
+      next: setOrganizationWorkingTime
+  next: returnInvalidBody
 
 setOrganizationWorkingTime:
   call: http.post
@@ -33,8 +37,6 @@ setOrganizationWorkingTime:
     body:
       organizationWorkingTimeStartISO: ${organizationWorkingTimeStartISO}
       organizationWorkingTimeEndISO: ${organizationWorkingTimeEndISO}
-      organizationWorkingTimeWeekdays: ${incoming.body.organizationWorkingTimeWeekdays}
-      organizationWorkingTimeHolidays: ${incoming.body.organizationWorkingTimeHolidays}
       created: ${new Date().toISOString()}
   result: setOrganizationWorkingTimeResult
 
