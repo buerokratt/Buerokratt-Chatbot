@@ -1,4 +1,4 @@
-import {FC, useEffect, useMemo, useRef, useState, useTransition} from 'react';
+import {FC, useEffect, useMemo, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useQuery} from '@tanstack/react-query';
 import {format} from 'date-fns';
@@ -9,12 +9,12 @@ import {Button, FormInput, Icon, Track} from 'components';
 import {ReactComponent as BykLogoWhite} from 'assets/logo-white.svg';
 import useUserInfoStore from 'store/store';
 import {Chat as ChatType, MessageSseEvent, MessageStatus} from 'types/chat';
-import {Message, MessagePreviewSseResponse} from 'types/message';
+import {Message} from 'types/message';
 import ChatMessage from './ChatMessage';
 import ChatEvent from './ChatEvent';
 import './Chat.scss';
 import handleSse from "../../mocks/handleSse";
-import {findIndex} from 'lodash';
+
 
 
 type ChatProps = {
@@ -35,13 +35,7 @@ const Chat: FC<ChatProps> = ({chat, onChatEnd, onForwardToColleauge, onForwardTo
         const {t} = useTranslation();
         const {userInfo} = useUserInfoStore();
         const chatRef = useRef<HTMLDivElement>(null);
-        const [messageGroups, _setMessageGroups] = useState<GroupedMessage[]>([]);
-        const messageGroupsRef = useRef(messageGroups);
-        const setMessageGroups = (data: GroupedMessage[]) => {
-            messageGroupsRef.current = data;
-            _setMessageGroups(data);
-        };
-        const [isPending, startTransition] = useTransition();
+        const [messageGroups, setMessageGroups] = useState<GroupedMessage[]>([]);
         const [responseText, setResponseText] = useState('');
         const [selectedMessages, setSelectedMessages] = useState<Message[]>([]);
         const {data: messages} = useQuery<Message[]>({
@@ -57,30 +51,6 @@ const Chat: FC<ChatProps> = ({chat, onChatEnd, onForwardToColleauge, onForwardTo
             messageReadStatusRef.current = data;
             _setMessageReadStatus(data);
         };
-
-
-        const setPreviewMessage = (event: MessagePreviewSseResponse) => {
-            const PREVIEW_MESSAGE:GroupedMessage = {
-                name: endUserFullName,
-                type: event.data.authorRole,
-                messages: event.data as any, // TODO fix types
-            };
-            const CURRENT_MESSAGE_GROUPS = messageGroupsRef.current;
-            const index = findIndex(CURRENT_MESSAGE_GROUPS, (o) => o.messages[0].id === PREVIEW_MESSAGE.messages[0].id);
-
-            if (index === -1) {
-                CURRENT_MESSAGE_GROUPS.push(PREVIEW_MESSAGE);
-                startTransition(() => {
-                    setMessageGroups(CURRENT_MESSAGE_GROUPS)
-                })
-            } else {
-                CURRENT_MESSAGE_GROUPS.splice(index, 1, PREVIEW_MESSAGE);
-                startTransition(() => {
-                    setMessageGroups(CURRENT_MESSAGE_GROUPS)
-                })
-            }
-        };
-
 
         const hasAccessToActions = useMemo(() => {
             if (chat.customerSupportId === userInfo?.idCode) return true;
@@ -132,22 +102,17 @@ const Chat: FC<ChatProps> = ({chat, onChatEnd, onForwardToColleauge, onForwardTo
         useEffect(() => {
                 const sseResponse = handleSse();
                 sseResponse.addEventListener(MessageSseEvent.READ, (event: any) => {
+
                     setMessageReadStatus({
                         messageId: event.data.id,
                         readTime: event.data.created,
                     })
                 });
-
-                sseResponse.addEventListener(MessageSseEvent.PREVIEW, (event: MessagePreviewSseResponse) => {
-                    setPreviewMessage(event);
-                });
-
                 return () => {
                     sseResponse.close();
                 };
             }, []
         );
-
         return (
             <div className='active-chat'>
                 <div className='active-chat__body'>
