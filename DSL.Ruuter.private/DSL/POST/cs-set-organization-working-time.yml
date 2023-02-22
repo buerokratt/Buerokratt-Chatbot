@@ -3,37 +3,31 @@ extractRequestData:
     cookie: ${incoming.headers.cookie}
     organizationWorkingTimeStartISO: ${incoming.body.organizationWorkingTimeStartISO}
     organizationWorkingTimeEndISO: ${incoming.body.organizationWorkingTimeEndISO}
-    organizationWorkingTimeWeekdaysArray: ${incoming.body.organizationWorkingTimeWeekdays}
-    organizationWorkingTimeHolidays: ${incoming.body.organizationWorkingTimeHolidays}
 
 extractTokenData:
   call: http.post
   args:
     # TODO: replace with env variable and correct path to TIM endpoint
-    url: http://byk-private-ruuter-yml:8080/mocks/mock-tim-custom-jwt-userinfo
+    url: http://byk-private-ruuter-yml:8080/mock-tim-custom-jwt-userinfo
     headers:
       cookie: ${cookie}
     body:
       # TODO: pass cookie name correctly to TIM
       cookieName: "customJwtCookie"
   result: jwtResult
-  next: validateAdministrator
 
 validateAdministrator:
   switch:
     # TODO: use correct structure when request is made against TIM
     - condition: ${jwtResult.response.body.response.authorities.includes("ROLE_ADMINISTRATOR")}
-      next: mapArrayToString
+      next: validateBody
   next: returnUnauthorized
 
-mapArrayToString:
-  call: http.post
-  args:
-    url: https://byk-dmapper:8443/json/v2/map_array_to_string
-    body:
-      inputArray: ${organizationWorkingTimeWeekdaysArray}
-  result: mapArrayResult
-  next: setOrganizationWorkingTime
+validateBody:
+  switch:
+    - condition: '${!!(new Date(organizationWorkingTimeStartISO).getDay() && new Date(organizationWorkingTimeEndISO).getDay())}'
+      next: setOrganizationWorkingTime
+  next: returnInvalidBody
 
 setOrganizationWorkingTime:
   call: http.post
@@ -43,8 +37,6 @@ setOrganizationWorkingTime:
     body:
       organizationWorkingTimeStartISO: ${organizationWorkingTimeStartISO}
       organizationWorkingTimeEndISO: ${organizationWorkingTimeEndISO}
-      organizationWorkingTimeWeekdays: ${mapArrayResult.response.body.concatenatedArray}
-      organizationWorkingTimeHolidays: ${incoming.body.organizationWorkingTimeHolidays}
       created: ${new Date().toISOString()}
   result: setOrganizationWorkingTimeResult
 
