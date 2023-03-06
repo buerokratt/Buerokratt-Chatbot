@@ -99,13 +99,29 @@
       "forwarded": "Suunatud"
     },
     "events": {
-      "client-left-with-accepted": "Klient lahkus aktsepteeritud vastusega",
-      "client-left-with-no-resolution": "Klient lahkus vastuseta",
-      "client-left-for-unknown-reason": "Klient lahkus määramata põhjustel",
-      "accepted": "Aktsepteeritud vastusega",
-      "hate-speech": "Vihakõne",
-      "other": "Muudel põhjustel",
-      "response-sent-to-client-email": "Kliendile vastati tema jäetud kontaktile"
+      "answered": "Vastatud {{date}}",
+      "terminated": "Lõpetatud {{date}}",
+      "client-left": "Klient lahkus {{date}}",
+      "client-left-with-accepted": "Klient lahkus aktsepteeritud vastusega {{date}}",
+      "client-left-with-no-resolution": "Klient lahkus vastuseta {{date}}",
+      "client-left-for-unknown-reason": "Klient lahkus määramata põhjustel {{date}}",
+      "accepted": "Aktsepteeritud {{date}}",
+      "hate-speech": "Vihakõne {{date}}",
+      "other": "Muud põhjused {{date}}",
+      "response-sent-to-client-email": "Kliendile vastati tema jäetud kontaktile {{date}}",
+      "greeting": "Tervitus",
+      "requested-authentication": "Küsiti autentimist",
+      "ask-permission": "Küsiti nõusolekut",
+      "ask-permission-accepted": "Nõusolek aktsepteeritud {{date}}",
+      "ask-permission-rejected": "Nõusolek tagasi lükatud {{date}}",
+      "ask-permission-ignored": "Nõusolek ignoreeritud {{date}}",
+      "rating": "Hinnang {{date}}",
+      "contact-information": "Küsiti kontakti infot {{date}}",
+      "contact-information-rejected": "Kontakti info tagasi lükatud {{date}}",
+      "contact-information-fulfilled": "Kontakti info täidetud {{date}}",
+      "requested-chat-forward": "Küsiti vestluse suunamist",
+      "requested-chat-forward-accepted": "Vestluse suunamine aktsepteeritud {{date}}",
+      "requested-chat-forward-rejected": "Vestluse suunamine tagasi lükatud {{date}}"
     }
   },
   "roles": {
