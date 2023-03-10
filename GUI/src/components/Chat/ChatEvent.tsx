@@ -83,6 +83,16 @@ const ChatEvent: FC<ChatEventProps> = ({message}) => {
                 date: format(new Date(authorTimestamp), 'dd.MM.yyyy HH:ii:ss'),
             })
             break;
+        case CHAT_EVENTS.AUTHENTICATION_SUCCESSFUL:
+            EVENT_PARAMS = t('chat.events.authentication-successful', {
+                date: format(new Date(authorTimestamp), 'dd.MM.yyyy HH:ii:ss'),
+            })
+            break;
+        case CHAT_EVENTS.AUTHENTICATION_FAILED:
+            EVENT_PARAMS = t('chat.events.authentication-failed', {
+                date: format(new Date(authorTimestamp), 'dd.MM.yyyy HH:ii:ss'),
+            })
+            break;
         case CHAT_EVENTS.ASK_PERMISSION:
             EVENT_PARAMS = t('chat.events.ask-permission', {
                 date: format(new Date(authorTimestamp), 'dd.MM.yyyy HH:ii:ss'),
