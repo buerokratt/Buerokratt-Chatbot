@@ -111,6 +111,8 @@
       "response-sent-to-client-email": "Response was sent to client email {{date}}",
       "greeting": "Greetings {{date}}",
       "requested-authentication": "Requested authentication {{date}}",
+      "authentication_successful": "Authentication successful {{date}}",
+      "authentication_failed": "Authentication failed {{date}}",
       "ask-permission": "Asked permission {{date}}",
       "ask-permission-accepted": "Permission accepted {{date}}",
       "ask-permission-rejected": "Permission rejected {{date}}",

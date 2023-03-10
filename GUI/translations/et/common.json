@@ -111,6 +111,8 @@
       "response-sent-to-client-email": "Kliendile vastati tema jäetud kontaktile {{date}}",
       "greeting": "Tervitus",
       "requested-authentication": "Küsiti autentimist",
+      "authentication_successful": "Autoriseerimine oli edukas {{date}}",
+      "authentication_failed": "Autoriseerimine ei olnud edukas {{date}}",
       "ask-permission": "Küsiti nõusolekut",
       "ask-permission-accepted": "Nõusolek aktsepteeritud {{date}}",
       "ask-permission-rejected": "Nõusolek tagasi lükatud {{date}}",
