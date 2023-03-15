@@ -320,15 +320,13 @@ const Chat: FC<ChatProps> = ({
   function handleSendAttachment() {
     const mutationArgs = {
       data: userInputFile!,
-      successCb: () => {
-        console.log('Attachment sent successfully');
-      },
-      errorCb: () => {
-        console.log('Attachment sent failed');
-      },
+      // successCb: () => {},
+      // errorCb: () => {},
     };
     sendAttachmentMutation.mutate(mutationArgs as any);
     sendAttachmentMutation.isLoading && console.log('Attachment sending...');
+    sendAttachmentMutation.isSuccess && console.log('Attachment sent');
+    sendAttachmentMutation.isError && console.log('Attachment sending error');
   }
 
   async function handleFileRead(file: File): Promise<string | null> {

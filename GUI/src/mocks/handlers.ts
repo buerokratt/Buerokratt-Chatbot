@@ -114,7 +114,8 @@ export const handlers = [
 
   // rest.post(BASE_URL + '', (req, res, ctx) => {}), // TODO add send chat message here
   rest.post(BASE_URL + 'attachments/add', (req, res, ctx) => {
-    return res(ctx.status(400));
+    return res(ctx.status(200));
+    // return res(ctx.status(400));
   })
 
 ];
