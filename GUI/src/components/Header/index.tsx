@@ -1,19 +1,21 @@
-import { FC, useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { useIdleTimer } from 'react-idle-timer';
 import { MdOutlineExpandMore } from 'react-icons/md';
 
-import { Track, Button, Icon, Drawer, Section, SwitchBox, Switch } from 'components';
+import { Track, Button, Icon, Drawer, Section, SwitchBox, Switch, Toast } from 'components';
 import useUserInfoStore from 'store/store';
 import { ReactComponent as BykLogo } from 'assets/logo.svg';
 import { UserProfileSettings } from 'types/userProfileSettings';
-import { Chat as ChatType } from 'types/chat';
+import { CHAT_STATUS, Chat as ChatType } from 'types/chat';
 import { useToast } from 'hooks/useToast';
 import { USER_IDLE_STATUS_TIMEOUT } from 'constants/config';
 import api from 'services/api';
 import './Header.scss';
+import chatSound from '../../assets/chatSound.mp3';
+import { Subscription, interval } from 'rxjs';
 
 type CustomerSupportActivity = {
   idCode: string;
@@ -40,6 +42,7 @@ const Header: FC = () => {
   const queryClient = useQueryClient();
   const [userDrawerOpen, setUserDrawerOpen] = useState(false);
   const [csaStatus, setCsaStatus] = useState<'idle' | 'offline' | 'online'>('online');
+  const audio = useMemo(() => new Audio(chatSound), []);
   const { data: userProfileSettings } = useQuery<UserProfileSettings>({
     queryKey: ['cs-get-user-profile-settings'],
   });
@@ -49,6 +52,55 @@ const Header: FC = () => {
   const { data: chatData } = useQuery<ChatType[]>({
     queryKey: ['cs-get-all-active-chats'],
   });
+
+  const unansweredChats = useMemo(() => chatData ? chatData.filter((c) => c.customerSupportId === '').length : 0, [chatData]);
+  const forwardedChats = useMemo(() => chatData ? chatData.filter((c) => c.status === CHAT_STATUS.REDIRECTED).length : 0, [chatData]);
+
+  useEffect(() => {
+    let subscription: Subscription;
+    if(unansweredChats > 0) {
+      audio.play();
+      toast.open({
+        type: 'info',
+        title: t('settings.users.newUnansweredChat'),
+        message: '',
+      });
+      subscription = interval(2 * 60 * 1000).subscribe(() => {
+        audio.play();
+        toast.open({
+          type: 'info',
+          title: t('settings.users.newUnansweredChat'),
+          message: '',
+        });
+      });
+    }
+    return () => {
+      if (subscription) subscription.unsubscribe();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [unansweredChats])
+
+  useEffect(() => {
+    let subscription: Subscription;
+    if(forwardedChats > 0) audio.play();
+    toast.open({
+      type: 'info',
+      title: t('settings.users.newForwardedChat'),
+      message: '',
+    });
+    subscription = interval(2 * 60 * 1000).subscribe(() => {
+      audio.play();
+      toast.open({
+        type: 'info',
+        title: t('settings.users.newForwardedChat'),
+        message: '',
+      });
+    });
+    return () => {
+      if (subscription) subscription.unsubscribe();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[forwardedChats])
 
   const userProfileSettingsMutation = useMutation({
     mutationFn: (data: UserProfileSettings) => api.post('cs-set-user-profile-settings', data),
@@ -101,9 +153,6 @@ const Header: FC = () => {
     throttle: 500,
   });
 
-  const unansweredChats = useMemo(() => chatData ? chatData.filter((c) => c.customerSupportId === '').length : 0, [chatData]);
-  const activeChats = useMemo(() => chatData ? chatData.filter((c) => c.customerSupportId !== '').length : 0, [chatData]);
-
   const handleUserProfileSettingsChange = (key: string, checked: boolean) => {
     if (!userProfileSettings) return;
     const newSettings = {
@@ -122,7 +171,6 @@ const Header: FC = () => {
       <header className='header'>
         <Track justify='between'>
           <BykLogo height={50} />
-
           {userInfo && (
             <Track gap={32}>
               <Track gap={16}>
@@ -130,8 +178,8 @@ const Header: FC = () => {
                   {unansweredChats && (
                     <><strong>{unansweredChats}</strong> {t('chat.unanswered')}</>
                   )}
-                  {activeChats && (
-                    <>{' '}<strong>{activeChats}</strong> {t('chat.forwarded')}</>
+                  {forwardedChats && (
+                    <>{' '}<strong>{forwardedChats}</strong> {t('chat.forwarded')}</>
                   )}
                 </p>
                 <Switch
