@@ -272,4 +272,20 @@
     font-size: 11px;
     line-height: 20px;
   }
+  &__message-status {
+    color: get-color(black-coral-6);
+    font-size: 11px;
+    line-height: 15px;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    &::before {
+      // css base64 ::before checkmark
+      content: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iMTAiIHZpZXdCb3g9IjAgMCAxMiAxMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTMuODYzMzkgNy41ODMzNkwxLjA4MzM5IDQuODAzMzZMMC4xMzY3MTkgNS43NDMzNkwzLjg2MzM5IDkuNDcwMDNMMTEuODYzNCAxLjQ3MDAzTDEwLjkyMzQgMC41MzAwMjlMMy44NjMzOSA3LjU4MzM2WiIgZmlsbD0iIzk3OTlBNCIvPgo8L3N2Zz4K');
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+    }
+  }
 }
