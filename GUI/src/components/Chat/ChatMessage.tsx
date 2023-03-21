@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import { Message } from 'types/message';
 import clsx from 'clsx';
 import { MdOutlineCheck } from 'react-icons/md';
+import { CHAT_EVENTS } from 'types/chat';
 
 type ChatMessageProps = {
   message: Message;
@@ -45,7 +46,7 @@ const ChatMessage: FC<ChatMessageProps> = ({ message, onSelect }) => {
           </div>
         )}
       </div>
-      {message.event === 'message-read' ? (
+      {message.event === CHAT_EVENTS.READ ? (
         <span className="active-chat__message-status">
           Loetud
           <time dateTime={message.authorTimestamp}>

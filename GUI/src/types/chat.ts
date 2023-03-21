@@ -29,6 +29,7 @@ export enum CHAT_EVENTS {
   REQUESTED_CHAT_FORWARD = 'requested-chat-forward',
   REQUESTED_CHAT_FORWARD_ACCEPTED = 'requested-chat-forward-accepted',
   REQUESTED_CHAT_FORWARD_REJECTED = 'requested-chat-forward-rejected',
+  READ = 'message-read',
 }
 
 export interface Chat {
@@ -49,8 +50,8 @@ export interface Chat {
   lastMessageTimestamp?: string;
   forwardedToName?: string;
   forwardedByUser?: string;
-  forwardedFromCsa?: string,
-  forwardedToCsa?: string,
+  forwardedFromCsa?: string;
+  forwardedToCsa?: string;
   receivedFrom?: string;
   comment: string;
   labels: string;
