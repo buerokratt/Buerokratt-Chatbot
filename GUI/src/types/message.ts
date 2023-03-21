@@ -11,6 +11,7 @@ export interface Message {
   forwardedByUser: string;
   forwardedFromCsa: string;
   forwardedToCsa: string;
+  preview?: string;
   rating?: string;
   created?: string;
   updated?: string;

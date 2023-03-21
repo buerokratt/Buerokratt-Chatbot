@@ -245,12 +245,26 @@
     border-radius: 8px 8px 8px 4px;
     font-size: $veera-font-size-100;
     line-height: $veera-line-height-500;
-    transition: all .25s ease-out;
+    transition: all 0.25s ease-out;
     cursor: pointer;
 
     &:hover {
       background-color: get-color(black-coral-1);
     }
+  }
+
+  &__message-preview {
+    display: flex;
+    align-items: center;
+    padding: 4px 8px;
+    border-radius: 8px 8px 8px 4px;
+    font-size: $veera-font-size-100;
+    line-height: $veera-line-height-500;
+    transition: all 0.25s ease-out;
+    cursor: pointer;
+
+    background-color: #e7f3ff;
+    color: #4472c4;
   }
 
   &__message-date {

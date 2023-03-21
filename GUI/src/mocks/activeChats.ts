@@ -10,7 +10,8 @@ export const activeChatsData = [
     created: '2023-01-10T12:08:38.992+00:00',
     updated: '2023-01-10T12:08:48.116+00:00',
     ended: null,
-    endUserOs: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
+    endUserOs:
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
     endUserUrl: 'https://test.buerokratt.ee/',
     forwardedToName: null,
     forwardedByUser: '',
@@ -31,7 +32,8 @@ export const activeChatsData = [
     created: '2023-01-17T13:18:38.808+00:00',
     updated: '2023-01-17T13:19:26.348+00:00',
     ended: null,
-    endUserOs: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36',
+    endUserOs:
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36',
     endUserUrl: 'https://test.buerokratt.ee/',
     forwardedToName: null,
     forwardedByUser: '',
@@ -52,7 +54,8 @@ export const activeChatsData = [
     created: '2023-01-19T13:38:32.421+00:00',
     updated: '2023-01-19T13:38:32.430+00:00',
     ended: null,
-    endUserOs: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36',
+    endUserOs:
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36',
     endUserUrl: 'https://test.buerokratt.ee/',
     forwardedToName: null,
     forwardedByUser: '',
@@ -73,7 +76,8 @@ export const activeChatsData = [
     created: '2023-01-19T13:38:32.421+00:00',
     updated: '2023-01-19T13:38:32.430+00:00',
     ended: null,
-    endUserOs: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36',
+    endUserOs:
+      'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36',
     endUserUrl: 'https://test.buerokratt.ee/',
     forwardedToName: null,
     forwardedByUser: '',
@@ -94,7 +98,8 @@ export const activeChatsData = [
     created: '2023-01-20T13:10:25.360+00:00',
     updated: '2023-01-20T13:10:25.369+00:00',
     ended: null,
-    endUserOs: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
+    endUserOs:
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
     endUserUrl: 'https://test.buerokratt.ee/',
     forwardedToName: null,
     forwardedByUser: '',
@@ -115,7 +120,8 @@ export const activeChatsData = [
     created: '2023-01-23T15:13:44.833+00:00',
     updated: '2023-01-23T15:13:51.410+00:00',
     ended: null,
-    endUserOs: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
+    endUserOs:
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
     endUserUrl: 'https://test.buerokratt.ee/',
     forwardedToName: '',
     forwardedByUser: '',
@@ -136,7 +142,8 @@ export const activeChatsData = [
     created: '2023-01-23T15:13:44.833+00:00',
     updated: '2023-01-23T15:13:51.410+00:00',
     ended: null,
-    endUserOs: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
+    endUserOs:
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
     endUserUrl: 'https://test.buerokratt.ee/',
     forwardedToName: null,
     forwardedByUser: '',
