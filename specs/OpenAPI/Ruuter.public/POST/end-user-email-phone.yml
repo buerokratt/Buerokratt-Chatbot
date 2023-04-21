@@ -1,0 +1,51 @@
+openapi: 3.1.0
+info:
+  title: User data
+  description: API for checking user info and updating email and phone
+  version: 1.0.0
+servers:
+#  - url: https://171.22.247.156
+  - url: https://play.buerokratt.ee
+    description: server for the main database requests
+paths:
+  /end-user-email-phone:
+    post:
+      summary: Get estimated waiting time for the response
+      requestBody:
+        description: send users chatId, user email and phone
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  example: 8cfbc32a-7244-4933-8a25-14422b557ad2
+                email:
+                  type: string
+                  example: example@example.com
+                phone:
+                  type: string
+                  example: +37255555555
+      responses:
+        '200':
+          description: Return successful request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  returnSuccess:
+                    type: string
+                    example: 'Updated 8cfbc32a-7244-4933-8a25-14422b557ad2 with example@example.com and +37255555555'
+        '400':
+          description: Missing chatId in request body
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  returnNoChatId:
+                    type: string
+                    example: 'Missing chatID in request body'
+#sequritySchemes:
