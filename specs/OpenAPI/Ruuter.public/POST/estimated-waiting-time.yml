@@ -4,96 +4,23 @@ info:
   description: API for calculating chat duration and estimated waiting time.
   version: 1.0.0
 servers:
-  - url: https://byk-resql:8443
-    description: server for the main database requests
-  - url: https://byk-dmapper:8443
-    description: server for the duration mapper
-#servers:
-#  - url: https://{domain}:{port}
-#    description: Base server for the Chat Waiting Time API
-#    variables:
-#      domain:
-#        default: 'byk-resql'
-#        description: The domain for the API server
-#        alternative: 'byk-dmapper'
-#        description: Domain for the duration mapper
-#      port:
-#        default: '8443'
-#        description: The port for the API server
+  - url: https://171.22.247.156
+#  - url: https://play.buerokratt.ee
+    description: main server for the database requests
 paths:
-  /get-ended-chats-total-duration-in-seconds:
+  /estimated-waiting-time:
     post:
-      summary: Get total duration of ended chats
-      operationId: getDurationTotalInSeconds
-      #      parameters:
-      #        - name: chatId
-      #          in: query
-      #          description: id of the chat
-      #          schema:
-      #            type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ChatId'
+      summary: Get estimated waiting time for the response
+      parameters:
+        - name: id
+          in: query
+          description: id of the chat
+          schema:
+            type: string
+            example: 8cfbc32a-7244-4933-8a25-14422b557ad2
       responses:
         '200':
-          description: Total chat duration in seconds. Assign 'durationInSeconds' to 'duration' variable.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  durationTotalInSeconds:
-                    #                  durationInSeconds:
-                    type: number
-  /get-unassigned-chat-total-with-position-by-chat-id:
-    post:
-      summary: Get unassigned chats and their positions base on chatId
-      operationId: getUnassignedChats
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ChatId'
-      responses:
-        '200':
-          description: Unassigned chat details. Assign 'positionInUnassignedChats' to 'position' and 'unassignedChatTotal' to 'unassignedChats' variable
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  unassignedChats:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        positionInUnassignedChats:
-                          type: number
-                        unassignedChatTotal:
-                          type: number
-  /json/v2/reflect_waiting_time:
-    post:
-      summary: Get estimated waiting time.
-      description: initially need to calculate a new variable 'average = ${duration / unassignedChats}'
-      operationId: getEstimatedWaitingTime
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                durationInSeconds:
-                  type: number
-                  description: 'calculatedDuration = ${position > 0 ? average * position : duration}'
-                  example: '${calculatedDuration}'
-                positionInUnassignedChats:
-                  type: number
-                  example: '${position}'
-      responses:
-        '200':
-          description: Estimated waiting time based on the duration
+          description: Estimated waiting time of the chat
           content:
             application/json:
               schema:
@@ -101,12 +28,5 @@ paths:
                 properties:
                   estimatedWaitingTime:
                     type: number
-components:
-  schemas:
-    ChatId:
-      type: object
-      properties:
-        chatId:
-          type: string
-          example: 8cfbc32a-7244-4933-8a25-14422b557ad2
-#          example: "${chatId ? chatId : ''}"
+                    example: 0
+#sequritySchemes:

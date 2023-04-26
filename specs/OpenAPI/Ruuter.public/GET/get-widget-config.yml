@@ -1,0 +1,35 @@
+openapi: 3.1.0
+
+info:
+  title: Openapi 3.1.0 specification for get-widget-config
+  description: API for getting widget config
+  version: 1.0.0
+
+servers:
+  - url: https://play.buerokratt.ee
+    description: main server for the database requests
+
+paths:
+  /get-widget-config:
+    get:
+      summary: gets widget config
+      responses:
+        '200':
+          description: return widget config
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  widgetConfigData:
+                    type: object
+        '400':
+          description: not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  returnNotFound:
+                    type: string
+                    example: 'error: not found'
