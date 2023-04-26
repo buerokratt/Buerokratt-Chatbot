@@ -117,18 +117,18 @@ const Chat: FC<ChatProps> = ({chat, onChatEnd, onForwardToColleauge, onForwardTo
             </Button>}
         ];
         const [sideButtons, setSideButtons] = useState([]);
-        const [buttonsToAllow] = useState([]);
+        const [buttonsToAllow] = useState<any[]>([]);
 
         useEffect(() => {
             if (sideButtons.length > 0) return;
-            let buttons = [];
+            let buttons: any = [];
             userInfo?.authorities.forEach((authority) => {
                 // make role more uri friendly
                 let role = authority.substring(5).replaceAll('_', '-').toLowerCase();
                 // TODO: Replace '/active/admin.json' with '/<type>/<role>.json'.
                 axios({url: `http://localhost:8085/cdn/buttons/chats/active/${role}.json`})
                 .then(res => {
-                    res.data.buttons.forEach((btnId) => {
+                    res.data.buttons.forEach((btnId: any) => {
                         if (!buttonsToAllow.includes(btnId))
                             buttonsToAllow.push(btnId);
                     });
