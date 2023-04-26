@@ -13,5 +13,5 @@ RUN ./node_modules/.bin/vite build --mode=development
 FROM $nginx_version AS web
 COPY ./nginx/http-nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build ./usr/buerokratt-chatbot/build /usr/share/nginx/html/buerokratt-chatbot
-EXPOSE 3001
+EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
