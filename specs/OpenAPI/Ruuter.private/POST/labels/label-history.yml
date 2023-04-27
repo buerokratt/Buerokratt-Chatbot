@@ -4,6 +4,9 @@ info:
   title: Openapi specification for label-history API
   version: 1.0.0
 
+servers:
+  - url: https://play.buerokratt.ee
+
 paths:
   /label-history:
     post:
