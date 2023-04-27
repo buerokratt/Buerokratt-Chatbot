@@ -11,7 +11,7 @@ servers:
 paths:
   /cs-get-csa-name-visibility:
     get:
-      summary: checks whether user has administrator access and retrieves the name visibility setting for csa
+      summary: Checks whether user has administrator access and retrieves the name visibility setting for csa
 #      parameters:
 #        - in: header
 #          name: cookie
@@ -21,11 +21,11 @@ paths:
 #          description: Cookie containing user information
       responses:
         '200':
-          description: csa name visibility retrieved successfully
+          description: Csa name visibility retrieved successfully
           content:
             application/json:
               schema:
-                object
+                type: object
         '401':
           description: Unauthorized request
 

@@ -1,15 +1,15 @@
 openapi: 3.1.0
 info:
-  title: Get all available customer support agents
+  title: Openapi specification for GET get-all-available-customer-support-agents API
   description: API for getting available customer support agents
   version: 1.0.0
 servers:
   - url: https://play.buerokratt.ee
-    description: main server for the database requests
+    description: Main server for the database requests
 paths:
   /get-all-available-customer-support-agents:
     get:
-      summary: gets all available customer support agents
+      summary: Send a request for all available customer support agents
       responses:
         '200':
           description: Successful request for customer support agents

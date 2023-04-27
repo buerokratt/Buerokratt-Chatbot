@@ -1,18 +1,18 @@
 openapi: 3.1.0
 info:
-  title: Get organization working time
+  title: Openapi specification for GET get-organization-working-time API
   description: API that returns the working time of an organization
   version: 1.0.0
 servers:
   - url: https://play.buerokratt.ee
-    description: main server for the database requests
+    description: Main server for the database requests
 paths:
   /get-organization-working-time:
     get:
-      summary: get organization working time
+      summary: Send a request for organization working time
       responses:
         '200':
-          description: return emergency responseData
+          description: Return emergency response data
           content:
             application/json:
               schema:
@@ -21,7 +21,7 @@ paths:
                   organizationWorkingTimeData:
                     type: string
         '400':
-          description: not found
+          description: Not found
           content:
             application/json:
               schema:

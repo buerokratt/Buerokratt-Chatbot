@@ -1,0 +1,44 @@
+openapi: 3.1.0
+
+info:
+  title: Openapi specification for cs-get-user-profile-settings API
+  description: YAML file defining an endpoint for retrieving the user profile settings
+  version: 1.0.0
+
+servers:
+  - url: https://play.buerokratt.ee
+
+paths:
+  /cs-get-user-profile-settings:
+    get:
+      summary: Checks whether user is authorized and retrieves profile settings of the user
+      # TODO: Openapi 3.. does not allow requestBody for a GET operation, find an alternative (for example POST operation) way or use openapi 2.0
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                  description: The ID of the user
+      responses:
+        '200':
+          description: User profile settings retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+        '401':
+          description: Unauthorized request
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: customJwtCookie
+
+security:
+  - cookieAuth: []

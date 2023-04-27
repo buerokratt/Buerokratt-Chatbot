@@ -1,21 +1,21 @@
 openapi: 3.1.0
 
 info:
-  title: Openapi 3.1.0 specification for get-widget-config
+  title: Openapi 3.1.0 specification for GET get-widget-config API
   description: API for getting widget config
   version: 1.0.0
 
 servers:
   - url: https://play.buerokratt.ee
-    description: main server for the database requests
+    description: Main server for the database requests
 
 paths:
   /get-widget-config:
     get:
-      summary: gets widget config
+      summary: Send a request for widget config
       responses:
         '200':
-          description: return widget config
+          description: Return widget config
           content:
             application/json:
               schema:
@@ -24,7 +24,7 @@ paths:
                   widgetConfigData:
                     type: object
         '400':
-          description: not found
+          description: Not found
           content:
             application/json:
               schema:

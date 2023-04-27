@@ -1,18 +1,18 @@
 openapi: 3.1.0
 info:
-  title: User data
+  title: Openapi specification for POST end-user-email-phone API
   description: API for checking user info and updating email and phone
   version: 1.0.0
 servers:
   # - url: https://171.22.247.156
   - url: https://play.buerokratt.ee
-    description: server for the main database requests
+    description: Server for the main database requests
 paths:
   /end-user-email-phone:
     post:
       summary: Get estimated waiting time for the response
       requestBody:
-        description: send users chatId, user email and phone
+        description: Send users chatId, user email and phone
         content:
           application/json:
             schema:

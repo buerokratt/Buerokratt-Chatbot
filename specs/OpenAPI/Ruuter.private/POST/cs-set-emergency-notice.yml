@@ -1,0 +1,69 @@
+openapi: 3.1.0
+info:
+  title: Openapi specification for cs-set-emergency-notice API
+  version: 1.0.0
+paths:
+  /cs-set-emergency-notice:
+    post:
+      summary: Set the emergency notice details
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                emergencyNoticeText:
+                  type: string
+                  description: The text content of the emergency notice
+                emergencyNoticeStartISO:
+                  type: string
+                  format: date-time
+                  description: The start time of the emergency notice in ISO format
+                emergencyNoticeEndISO:
+                  type: string
+                  format: date-time
+                  description: The end time of the emergency notice in ISO format
+                isEmergencyNoticeVisible:
+                  type: boolean
+                  description: The visibility status of the emergency notice
+      responses:
+        '200':
+          description: The emergency notice details were successfully set
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  emergencyNoticeData:
+                    type: array
+                    items:
+                      type: object
+        '400':
+          description: Invalid body
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: customJwtCookie
+
+security:
+  - cookieAuth: []

@@ -1,11 +1,11 @@
 openapi: 3.1.0
 info:
-  title: Estimated user waiting time
+  title: Openapi specification for GET estimated-waiting-time API
   description: API for calculating chat duration and estimated waiting time.
   version: 1.0.0
 servers:
   - url: https://play.buerokratt.ee
-    description: main server for the database requests
+    description: Main server for the database requests
 paths:
   /estimated-waiting-time:
     get:
@@ -13,13 +13,13 @@ paths:
       parameters:
         - name: id
           in: query
-          description: id of the chat
+          description: Id of the chat
           schema:
             type: string
             example: 8cfbc32a-7244-4933-8a25-14422b557ad2
       responses:
         '200':
-          description: Estimated waiting time of the chat
+          description: Send a request for estimated waiting time of the chat
           content:
             application/json:
               schema:

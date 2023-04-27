@@ -1,20 +1,20 @@
 openapi: 3.1.0
 
 info:
-  title: Openapi specification for cs-get-emergency-notice API
-  description: YAML file defining an endpoint for retrieving emergency notice data
+  title: Openapi specification for cs-get-end-user-session-length API
+  description: YAML file defining an endpoint for retrieving end user session length if the request is authorized
   version: 1.0.0
 
 servers:
   - url: https://play.buerokratt.ee
 
 paths:
-  /cs-get-emergency-notice:
+  /cs-get-end-user-session-length:
     get:
-      summary: Checks whether user has administrator access and retrieves the emergency notice
+      summary: Checks whether user is authorized and retrieves the end user session length
       responses:
         '200':
-          description: Emergency notice retrieved successfully
+          description: End user session length retrieved successfully
           content:
             application/json:
               schema:

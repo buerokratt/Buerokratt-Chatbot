@@ -1,18 +1,18 @@
 openapi: 3.1.0
 info:
-  title: Get a emergency response
+  title: Openapi specification for GET get-emergency-notice API
   description: API that returns a emergency response when a valid one exists
   version: 1.0.0
 servers:
   - url: https://play.buerokratt.ee
-    description: main server for the database requests
+    description: Main server for the database requests
 paths:
   /get-emergency-notice:
     get:
-      summary: get a emergency response when a valid one exists
+      summary: Send a request for emergency response when a valid one exists
       responses:
         '200':
-          description: return emergency responseData
+          description: Return emergency responseData
           content:
             application/json:
               schema:
