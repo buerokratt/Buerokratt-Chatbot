@@ -2,8 +2,8 @@ version: '3.9'
 
 services:
 
-  byk-public-ruuter:
-    container_name: byk-public-ruuter
+  ruuter-v1-public:
+    container_name: ruuter-v1-public
     image: riaee/byk-chatbot-public-ruuter:05
     environment:
       - csrf.enabled=false 
@@ -25,14 +25,15 @@ services:
       - ./setup/ruuter/public.urls.docker.json:/usr/local/tomcat/urls.env.json:ro
       - ./setup/ruuter/cert.crt:/usr/local/tomcat/conf/cert.crt:ro
       - ./setup/ruuter/key.key:/usr/local/tomcat/conf/key.key:ro
+      - ./DSL.Ruuter-v1.public:/usr/local/tomcat/configurations
     ports:
-      - 8080:8443
+      - 8080:8080
     restart: always
     networks:
       - bykstack
         
-  byk-private-ruuter:
-    container_name: byk-private-ruuter
+  ruuter-v1-private:
+    container_name: ruuter-v1-private
     image: riaee/byk-chatbot-private-ruuter:05
     environment:
       - legacy-portal-integration.sessionCookieDomain=buerokratt.ee
@@ -62,54 +63,21 @@ services:
       - ./setup/ruuter/private.urls.docker.json:/usr/local/tomcat/urls.env.json:ro
       - ./setup/ruuter/cert.crt:/usr/local/tomcat/conf/cert.crt:ro
       - ./setup/ruuter/key.key:/usr/local/tomcat/conf/key.key:ro
+      - ./DSL.Ruuter-v1.private:/usr/local/tomcat/configurations
     ports:
-      - 8443:8443
+      - 8090:8080
     restart: always
     networks:
       - bykstack
-        
-  byk-dmapper:
-    container_name: byk-dmapper
-    image: riaee/byk-dmapper:10
-    environment:
-      - logging.level.root=INFO
-      - headers.contentSecurityPolicy=
-      - cors.allowedOrigins=ruuter.test.buerokratt.ee,https://ruuter.aadress.ee
-    ports:
-      - 8081:8443
-    volumes:
-      - ./setup/dmapper/server.xml:/usr/local/tomcat/conf/server.xml:ro
-      - ./setup/dmapper/cert.crt:/usr/local/tomcat/conf/tls.crt:ro
-      - ./setup/dmapper/key.key:/usr/local/tomcat/conf/tls.key:ro
-    restart: always
-    networks:
-      - bykstack
-        
-  byk-tim:
-    container_name: byk-tim
+
+  tim:
+    container_name: tim
     image: riaee/byk-tim:07
     environment:
-      - security.allowlist.jwt=byk-public-ruuter,byk-private-ruuter,byk-dmapper,byk-widget,byk-customer-service,byk-resql
+      - security.allowlist.jwt=byk-ruuter-v1-public,ruuter-v1-private,dmapper,resql
       - spring.datasource.url=jdbc:postgresql://tim-postgresql:5432/tim
       - spring.datasource.username=tim
       - spring.datasource.password=123
-      - security.oauth2.client.client-id=tara_client_id
-      - security.oauth2.client.client-secret=tara_client_secret
-      - security.oauth2.client.registered-redirect-uri=https://tim.byk.buerokratt.ee/authenticate
-      - security.oauth2.client.user-authorization-uri=https://tara.ria.ee/oidc/authorize
-      - security.oauth2.client.access-token-uri=https://tara.ria.ee/oidc/token
-      - security.oauth2.resource.jwk.key-set-uri=https://tara.ria.ee/oidc/jwks
-      - auth.success.redirect.whitelist=https://admin.byk.buerokratt.ee/auth/callback,https://byk.buerokratt.ee,https://byk.buerokratt.ee/auth/callback,https://admin.byk.buerokratt.ee
-      - frontpage.redirect.url=https://admin.byk.buerokratt.ee
-      - headers.contentSecurityPolicy=upgrade-insecure-requests; default-src 'self' 'unsafe-inline' 'unsafe-eval' https://tim.byk.buerokratt.ee https://admin.byk.buerokratt.ee https://ruuter.byk.buerokratt.ee https://priv-ruuter.byk.buerokratt.ee byk-tim byk-public-ruuter byk-private-ruuter byk-customer-service; object-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://byk.buerokratt.ee https://admin.byk.buerokratt.ee https://tim.byk.buerokratt.ee; connect-src 'self' https://byk.buerokratt.ee https://tim.byk.buerokratt.ee https://admin.byk.buerokratt.ee https://ruuter.byk.buerokratt.ee https://priv-ruuter.byk.buerokratt.ee; frame-src 'self'; media-src 'none'
-      - legacy-portal-integration.legacyUrl=arendus.eesti.ee
-      - legacy-portal-integration.legacyPortalRefererMarker=https://arendus.eesti.ee/portaal
-      - cors.allowedOrigins=https://byk.buerokratt.ee,https://admin.byk.buerokratt.ee,https://ruuter.byk.buerokratt.ee,https://priv-ruuter.buerokratt.ee
-      - jwt-integration.signature.issuer=byk.buerokratt.ee
-      - jwt-integration.signature.key-store-password=safe_keystore_password
-      - jwt-integration.signature.key-store=file:/usr/local/tomcat/jwtkeystore.jks
-      - spring.profiles.active=dev
-      - legacy-portal-integration.sessionCookieDomain=buerokratt.ee
       - logging.level.root=INFO
     ports:
       - 8085:8443
@@ -118,13 +86,71 @@ services:
       - ./setup/tim/jwtkeystore.jks:/usr/local/tomcat/jwtkeystore.jks:ro
       - ./setup/tim/cert.crt:/usr/local/tomcat/conf/cert.crt:ro
       - ./setup/tim/key.key:/usr/local/tomcat/conf/key.key:ro
-    restart: always
     networks:
       - bykstack
+
+  tim-postgresql:
+    container_name: tim-postgresql
+    image: postgres:14.1
+    environment:
+      - POSTGRES_USER=tim
+      - POSTGRES_PASSWORD=123
+      - POSTGRES_DB=tim
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    volumes:
+      - ./tim-db:/var/lib/postgresql/data  
+    ports:
+      - 9876:5432
+    networks:
+      - bykstack     
+
+  ruuter-v2-private:
+    container_name: ruuter-v2-private
+    image: ruuter
+    environment:
+      - application.cors.allowedOrigins=http://localhost:80
+      - application.httpCodesAllowList=200,201,202,400,401,403,500
+    volumes:
+      - ./DSL.Ruuter.private/DSL:/DSL
+      - ./DSL.Ruuter.public/DSL:/DSL
+    ports:
+      - 8088:8088
+    networks:
+      - bykstack    
+
+  ruuter-v2-public:
+    container_name: ruuter-v2-public
+    image: ruuter
+    environment:
+      - application.cors.allowedOrigins=http://localhost:80
+      - application.httpCodesAllowList=200,201,202,400,401,403,500
+    volumes:
+      - ./DSL.Ruuter.public/DSL:/DSL
+    ports:
+      - 8086:8086
+    networks:
+      - bykstack       
+  dmapper:
+    container_name: dmapper
+    image: riaee/byk-dmapper:11
+    environment:
+      - logging.level.root=INFO
+      - headers.contentSecurityPolicy=
+      - cors.allowedOrigins=ruuter.test.buerokratt.ee,https://ruuter.aadress.ee
+    ports:
+      - 3000:3000
+    volumes:
+      - ./setup/dmapper/server.xml:/usr/local/tomcat/conf/server.xml:ro
+      - ./setup/dmapper/cert.crt:/usr/local/tomcat/conf/tls.crt:ro
+      - ./setup/dmapper/key.key:/usr/local/tomcat/conf/tls.key:ro
+      - ./DSL.DMapper:/workspace/app/views/byk/
+    restart: always
+    networks:
+      - bykstack      
         
-  byk-resql:
-    container_name: byk-resql
-    image: riaee/byk-resql:11
+  resql:
+    container_name: resql
+    image: resql
     depends_on:
       - users_db
     environment:
@@ -134,14 +160,11 @@ services:
       - sqlms.datasources.[0].password=01234
       - logging.level.org.springframework.boot=INFO
     ports:
-      - 8082:8443
+      - 8082:8082
     volumes:
-      - ./setup/resql/server.xml:/usr/local/tomcat/conf/server.xml:ro
-      - ./setup/resql/cert.crt:/usr/local/tomcat/conf/cert.crt:ro
-      - ./setup/resql/key.key:/usr/local/tomcat/conf/key.key:ro
-    restart: always
+      - ./DSL.Resql:/workspace/app/templates/byk
     networks:
-      - bykstack
+      - bykstack    
 
   users_db:
     container_name: users_db
@@ -162,7 +185,6 @@ services:
     environment:
       - NODE_ENV=development
       - CHOKIDAR_USEPOLLING=true
-      - REACT_APP_API_URL=http://localhost:8080
       - PORT=80
     build:
       context: ./GUI
