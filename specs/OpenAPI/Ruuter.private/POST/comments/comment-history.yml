@@ -1,0 +1,58 @@
+openapi: 3.1.0
+
+info:
+  title: Openapi specification for comment-history API
+  version: 1.0.0
+
+servers:
+  - url: https://play.buerokratt.ee
+
+paths:
+  /comment-history:
+    post:
+      summary: Add a new comment to the chat history
+      operationId: postCommentHistory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                comment:
+                  type: string
+                  description: The comment text
+                chatId:
+                  type: integer
+                  description: The chat ID
+              required:
+                - comment
+                - chatId
+      responses:
+        '200':
+          description: Successfully added the comment
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+                    description: Response from inserting chat history comment
+        '401':
+          description: Unauthorized - user does not have the required ROLE_ADMINISTRATOR
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "error: unauthorized"
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: customJwtCookie
+
+security:
+  - cookieAuth: []

@@ -1,0 +1,36 @@
+openapi: 3.1.0
+
+info:
+  title: Openapi specification for cs-send-history-to-email API
+  version: 1.0.0
+
+servers:
+  - url: https://play.buerokratt.ee
+
+paths:
+  /cs-send-history-to-email:
+    post:
+      summary: Send chat history to the email associated with the given chat ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                chatId:
+                  type: string
+                  description: The chat ID
+              required:
+                - chatId
+      responses:
+        '200':
+          description: Successfully sent chat history to the email
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+                    description: Response from sending email with chat history
