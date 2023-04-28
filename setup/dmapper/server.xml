@@ -31,7 +31,7 @@
     </GlobalNamingResources>
 
     <Service name="Catalina">
-        <Connector port="8443"
+        <Connector port="3000"
                    protocol="org.apache.coyote.http11.Http11NioProtocol"
                    clientAuth="false"
                    sslProtocol="TLSv1.2, TLSv1.3"

@@ -11,4 +11,4 @@
     "gazetteer_url":"https://inaadress.maaamet.ee/inaadress",
     "publicapi_url": "https://publicapi.envir.ee/v1/combinedWeatherData",
     "ilmmicroservice_url": "https://ilmmicroservice.envir.ee/api/forecasts"
-  }
+}
