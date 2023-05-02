@@ -6,7 +6,7 @@ services:
     container_name: ruuter-v1-public
     image: riaee/byk-chatbot-public-ruuter:05
     environment:
-      - csrf.enabled=false 
+      - csrf.enabled=false
       - csrf.tim_userinfo_url=
       - csrf.ruuter_services_whitelist=
       - legacy-portal-integration.sessionCookieDomain=buerokratt.ee
@@ -31,7 +31,7 @@ services:
     restart: always
     networks:
       - bykstack
-        
+
   ruuter-v1-private:
     container_name: ruuter-v1-private
     image: riaee/byk-chatbot-private-ruuter:05
@@ -41,22 +41,22 @@ services:
       - ruuter.cors.allowedOrigins=https://buerokratt.ee,https://admin.buerokratt.ee,https://seire.buerokratt.ee
       - headers.contentSecurityPolicy=
       - maxRequestSizeBytes=10000000000
-      - incoming.request.external.validation.enabled=false 
+      - incoming.request.external.validation.enabled=false
       - incoming.request.external.validation.endpoint=
       - verify.requested.method.type=false
       - allowed.requested.method.types=POST
-      - default.requested.method.type=POST 
+      - default.requested.method.type=POST
       - requested.method.type.error.http.response.code=200
       - csrf.enabled=false
       - csrf.tim_userinfo_url=
       - csrf.ruuter_services_whitelist=
       - ip-whitelist.routes[0].ips[0]=127.0.0.1
-      - ip-whitelist.routes[0].patterns[0]=/functions/* 
+      - ip-whitelist.routes[0].patterns[0]=/functions/*
       - ip-whitelist.routes[1].ips[0]=127.0.0.1
-      - ip-whitelist.routes[1].patterns[0]=/get-location-coordinates 
-      - ip-whitelist.routes[1].patterns[1]=/get-weather-data 
-      - ip-whitelist.routes[1].patterns[2]=/get-weather-station-id 
-      - ip-whitelist.routes[1].patterns[3]=/get-weather 
+      - ip-whitelist.routes[1].patterns[0]=/get-location-coordinates
+      - ip-whitelist.routes[1].patterns[1]=/get-weather-data
+      - ip-whitelist.routes[1].patterns[2]=/get-weather-station-id
+      - ip-whitelist.routes[1].patterns[3]=/get-weather
       - ip-whitelist.routes[1].patterns[4]=/param_string_length
     volumes:
       - ./setup/ruuter/server.xml:/usr/local/tomcat/conf/server.xml:ro
@@ -79,16 +79,29 @@ services:
       - spring.datasource.username=tim
       - spring.datasource.password=123
       - logging.level.root=INFO
-      - jwt-integration.signature.issuer=CN
-      - jwt-integration.signature.key-store-password=123456
+      - jwt-integration.signature.issuer=Test.buerokratt.ee
+      - jwt-integration.signature.key-store-password=87h5b88Mn5gO0pk
       - jwt-integration.signature.key-store=file:/usr/local/tomcat/jwtkeystore.jks
       - spring.profiles.active=dev
       - legacy-portal-integration.sessionCookieDomain=buerokratt.ee
+      - security.oauth2.client.client-id=byk_public_test
+      - security.oauth2.client.client-secret=tI6eiKVjASEnKpGBKWSHI1y63Zv69fvh
+      - security.oauth2.client.registered-redirect-uri=https://tim.test.buerokratt.ee/authenticate
+      - security.oauth2.client.user-authorization-uri=https://tara-test.ria.ee/oidc/authorize
+      - security.oauth2.client.access-token-uri=https://tara-test.ria.ee/oidc/token
+      - security.oauth2.resource.jwk.key-set-uri=https://tara-test.ria.ee/oidc/jwks
+      - auth.success.redirect.whitelist=https://admin.test.buerokratt.ee/auth/callback,https://test.buerokratt.ee,https://test.buerokratt.ee/auth/callback,https://admin.test.buerokratt.ee
+      - headers.contentSecurityPolicy=upgrade-insecure-requests; default-src 'self' 'unsafe-inline' 'unsafe-eval' https://tim.byk.buerokratt.ee https://admin.byk.buerokratt.ee https://ruuter.byk.buerokratt.ee https://priv-ruuter.byk.buerokratt.ee byk-tim byk-public-ruuter byk-private-ruuter byk-customer-service; object-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://byk.buerokratt.ee https://admin.byk.buerokratt.ee https://tim.byk.buerokratt.ee; connect-src 'self' https://byk.buerokratt.ee https://tim.byk.buerokratt.ee https://admin.byk.buerokratt.ee https://ruuter.byk.buerokratt.ee https://priv-ruuter.byk.buerokratt.ee; frame-src 'self'; media-src 'none'
+      - legacy-portal-integration.legacyUrl=arendus.eesti.ee
+      - frontpage.redirect.url=https://admin.test.buerokratt.ee
+      - legacy-portal-integration.legacyPortalRefererMarker=https://arendus.eesti.ee/portaal
+      - cors.allowedOrigins=ttps://test.buerokratt.ee,https://admin.test.buerokratt.ee,https://ruuter.test.buerokratt.ee,https://priv-ruuter.test.buerokratt.ee
     ports:
       - 8085:8443
     volumes:
       - ./setup/tim/server.xml:/usr/local/tomcat/conf/server.xml:ro
       - ./setup/tim/jwtkeystore.jks:/usr/local/tomcat/jwtkeystore.jks:ro
+      - ./setup/tim/keystore.jks:/usr/local/tomcat/keystore.jks:ro
       - ./setup/tim/cert.crt:/usr/local/tomcat/conf/cert.crt:ro
       - ./setup/tim/key.key:/usr/local/tomcat/conf/key.key:ro
     networks:
@@ -103,11 +116,11 @@ services:
       - POSTGRES_DB=tim
       - POSTGRES_HOST_AUTH_METHOD=trust
     volumes:
-      - ./tim-db:/var/lib/postgresql/data  
+      - ./tim-db:/var/lib/postgresql/data
     ports:
       - 9876:5432
     networks:
-      - bykstack     
+      - bykstack
 
   ruuter-v2-private:
     container_name: ruuter-v2-private
@@ -121,7 +134,7 @@ services:
     ports:
       - 8088:8088
     networks:
-      - bykstack    
+      - bykstack
 
   ruuter-v2-public:
     container_name: ruuter-v2-public
@@ -134,7 +147,7 @@ services:
     ports:
       - 8086:8086
     networks:
-      - bykstack       
+      - bykstack
   dmapper:
     container_name: dmapper
     image: riaee/byk-dmapper:11
@@ -151,8 +164,8 @@ services:
       - ./DSL.DMapper:/workspace/app/views/byk/
     restart: always
     networks:
-      - bykstack      
-        
+      - bykstack
+
   resql:
     container_name: resql
     image: resql
@@ -167,7 +180,7 @@ services:
     volumes:
       - ./DSL.Resql:/workspace/app/templates/byk
     networks:
-      - bykstack    
+      - bykstack
 
   users_db:
     container_name: users_db
@@ -181,7 +194,7 @@ services:
     volumes:
       - ./data:/var/lib/postgresql/data
     networks:
-      - bykstack    
+      - bykstack
 
   gui:
     container_name: gui
@@ -200,11 +213,11 @@ services:
       - /app/node_modules
       - ./GUI:/app
     networks:
-      - bykstack    
+      - bykstack
 
 networks:
   bykstack:
     name: bykstack
     driver: bridge
-    driver_opts:                         
-       com.docker.network.driver.mtu: 1400
+    driver_opts:
+      com.docker.network.driver.mtu: 1400
