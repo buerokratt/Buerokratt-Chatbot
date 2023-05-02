@@ -4,7 +4,7 @@ info:
   description: API for calculating chat duration and estimated waiting time.
   version: 1.0.0
 servers:
-#  - url: https://171.22.247.156
+#  - url: https://171.22.247.156:8080
   - url: https://play.buerokratt.ee
     description: Main server for the database requests
 paths:

@@ -7,7 +7,7 @@ servers:
   - url: https://play.buerokratt.ee
     description: Main server for the database requests
 paths:
-  /estimated-waiting-time:
+  /get-estimated-waiting-time:
     get:
       summary: Get estimated waiting time for the response
       parameters:
