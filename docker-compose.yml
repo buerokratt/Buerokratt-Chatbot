@@ -95,7 +95,7 @@ services:
       - legacy-portal-integration.legacyUrl=arendus.eesti.ee
       - frontpage.redirect.url=https://admin.test.buerokratt.ee
       - legacy-portal-integration.legacyPortalRefererMarker=https://arendus.eesti.ee/portaal
-      - cors.allowedOrigins=ttps://test.buerokratt.ee,https://admin.test.buerokratt.ee,https://ruuter.test.buerokratt.ee,https://priv-ruuter.test.buerokratt.ee
+      - cors.allowedOrigins=https://test.buerokratt.ee,https://admin.test.buerokratt.ee,https://ruuter.test.buerokratt.ee,https://priv-ruuter.test.buerokratt.ee
     ports:
       - 8085:8443
     volumes:
