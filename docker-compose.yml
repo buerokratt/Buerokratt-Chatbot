@@ -144,11 +144,13 @@ services:
   resql:
     container_name: resql
     image: resql
+    depends_on:
+      - users_db
     environment:
       - sqlms.datasources.[0].name=byk
-      - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://171.22.247.13:5433/byk?sslmode=require
+      - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://users_db:5432/byk?sslmode=require
       - sqlms.datasources.[0].username=byk
-      - sqlms.datasources.[0].password=2nH09n6Gly
+      - sqlms.datasources.[0].password=01234
       - logging.level.org.springframework.boot=INFO
     ports:
       - 8082:8082
