@@ -72,40 +72,15 @@ services:
 
   tim:
     container_name: tim
-    image: riaee/byk-tim:07
-    environment:
-      - security.allowlist.jwt=ruuter-v1-public,ruuter-v1-private,dmapper,resql
-      - spring.datasource.url=jdbc:postgresql://tim-postgresql:5432/tim
-      - spring.datasource.username=tim
-      - spring.datasource.password=123
-      - logging.level.root=INFO
-      - jwt-integration.signature.issuer=Test.buerokratt.ee
-      - jwt-integration.signature.key-store-password=87h5b88Mn5gO0pk
-      - jwt-integration.signature.key-store=file:/usr/local/tomcat/jwtkeystore.jks
-      - spring.profiles.active=dev
-      - legacy-portal-integration.sessionCookieDomain=buerokratt.ee
-      - security.oauth2.client.client-id=byk_public_test
-      - security.oauth2.client.client-secret=tI6eiKVjASEnKpGBKWSHI1y63Zv69fvh
-      - security.oauth2.client.registered-redirect-uri=https://tim.test.buerokratt.ee/authenticate
-      - security.oauth2.client.user-authorization-uri=https://tara-test.ria.ee/oidc/authorize
-      - security.oauth2.client.access-token-uri=https://tara-test.ria.ee/oidc/token
-      - security.oauth2.resource.jwk.key-set-uri=https://tara-test.ria.ee/oidc/jwks
-      - auth.success.redirect.whitelist=https://admin.test.buerokratt.ee/auth/callback,https://test.buerokratt.ee,https://test.buerokratt.ee/auth/callback,https://admin.test.buerokratt.ee
-      - headers.contentSecurityPolicy=upgrade-insecure-requests; default-src 'self' 'unsafe-inline' 'unsafe-eval' https://tim.byk.buerokratt.ee https://admin.byk.buerokratt.ee https://ruuter.byk.buerokratt.ee https://priv-ruuter.byk.buerokratt.ee byk-tim byk-public-ruuter byk-private-ruuter byk-customer-service; object-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://byk.buerokratt.ee https://admin.byk.buerokratt.ee https://tim.byk.buerokratt.ee; connect-src 'self' https://byk.buerokratt.ee https://tim.byk.buerokratt.ee https://admin.byk.buerokratt.ee https://ruuter.byk.buerokratt.ee https://priv-ruuter.byk.buerokratt.ee; frame-src 'self'; media-src 'none'
-      - legacy-portal-integration.legacyUrl=arendus.eesti.ee
-      - frontpage.redirect.url=https://admin.test.buerokratt.ee
-      - legacy-portal-integration.legacyPortalRefererMarker=https://arendus.eesti.ee/portaal
-      - cors.allowedOrigins=https://test.buerokratt.ee,https://admin.test.buerokratt.ee,https://ruuter.test.buerokratt.ee,https://priv-ruuter.test.buerokratt.ee
+    image: tim
+    depends_on:
+     - tim-postgresql
     ports:
-      - 8085:8443
-    volumes:
-      - ./setup/tim/server.xml:/usr/local/tomcat/conf/server.xml:ro
-      - ./setup/tim/jwtkeystore.jks:/usr/local/tomcat/jwtkeystore.jks:ro
-      - ./setup/tim/keystore.jks:/usr/local/tomcat/keystore.jks:ro
-      - ./setup/tim/cert.crt:/usr/local/tomcat/conf/cert.crt:ro
-      - ./setup/tim/key.key:/usr/local/tomcat/conf/key.key:ro
+     - 8085:8085  
     networks:
-      - bykstack
+     - bykstack
+    extra_hosts:
+     - "host.docker.internal:host-gateway" 
 
   tim-postgresql:
     container_name: tim-postgresql
