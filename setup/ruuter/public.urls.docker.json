@@ -1,7 +1,7 @@
 {
     "dmapper_url": "https://dmapper:3000",
     "ruuter_url": "http://localhost:8080",
-    "tim_url": "https://tim:8443",
+    "tim_url": "http://tim:8085",
     "resql_url": "http://resql:8082",
     "bot_url": "http://BOT_IP:5005",
     "training_url": "TRAINIG_BOT",
