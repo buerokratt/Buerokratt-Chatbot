@@ -74,13 +74,13 @@ services:
     container_name: tim
     image: tim
     depends_on:
-     - tim-postgresql
+      - tim-postgresql
     ports:
-     - 8085:8085  
+      - 8085:8085
     networks:
-     - bykstack
+      - bykstack
     extra_hosts:
-     - "host.docker.internal:host-gateway" 
+      - "host.docker.internal:host-gateway"
 
   tim-postgresql:
     container_name: tim-postgresql
@@ -148,9 +148,9 @@ services:
       - users_db
     environment:
       - sqlms.datasources.[0].name=byk
-      - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://users_db:5432/byk?sslmode=require
+      - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://171.22.247.13:5433/byk?sslmode=require
       - sqlms.datasources.[0].username=byk
-      - sqlms.datasources.[0].password=01234
+      - sqlms.datasources.[0].password=2nH09n6Gly
       - logging.level.org.springframework.boot=INFO
     ports:
       - 8082:8082
@@ -178,14 +178,15 @@ services:
     environment:
       - NODE_ENV=development
       - BASE_URL=http://localhost:8080
+      - REACT_APP_RUUTER_API_URL=http://localhost:8080
       - CHOKIDAR_USEPOLLING=true
-      - PORT=80
+      - PORT=3001
     build:
       context: ./GUI
       target: web
       dockerfile: Dockerfile
     ports:
-      - 80:80
+      - 3001:3001
     volumes:
       - /app/node_modules
       - ./GUI:/app
