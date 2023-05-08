@@ -183,7 +183,7 @@ services:
       - PORT=3001
     build:
       context: ./GUI
-      # target: web // To be used in production
+      # target: web // To be used in production (Dockerfile)
       dockerfile: Dockerfile.dev
     ports:
       - 3001:3001
