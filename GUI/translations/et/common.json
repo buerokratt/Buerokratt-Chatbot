@@ -85,7 +85,11 @@
       "sendToEmail": "Saada e-mailile",
       "chooseChatStatus": "Vali vestluse staatus",
       "statusChange": "Vestluse staatus",
-      "startService": "Alusta teenust"
+      "startService": "Alusta teenust",
+      "selectService": "Vali teenus",
+      "searchServicePlaceholder": "Otsi nime või tiitli järgi",
+      "start": "Alusta",
+      "service": "Teenus"
     },
     "history": {
       "title": "Ajalugu",
