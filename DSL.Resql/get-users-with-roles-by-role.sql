@@ -3,7 +3,10 @@ SELECT u.login,
        u.last_name,
        u.id_code,
        u.display_name,
-       ua.authority_name AS authorities
+       u.csa_title,
+       u.csa_email,
+       ua.authority_name AS authorities,
+       csa.status AS customerSupportStatus
 FROM "user" u
          LEFT JOIN (SELECT authority_name, user_id
                     FROM user_authority AS ua
