@@ -15,6 +15,7 @@ import api from 'services/api';
 import ForwardToColleaugeModal from '../ForwardToColleaugeModal';
 import ForwardToEstablishmentModal from '../ForwardToEstablishmentModal';
 import clsx from 'clsx';
+import StartAServiceModal from '../StartAServiceModal';
 
 const CSAchatStatuses = [
   'accepted',
@@ -56,25 +57,6 @@ const ChatActive: FC = () => {
     },
     onSettled: () => setSendToEmailModal(null),
   });
-
-  const startAServiceMutation = useMutation({
-    mutationFn: (data: ChatType) => api.post('trigger-a-service', data),
-    onSuccess: () => {
-      toast.open({
-        type: 'success',
-        title: t('global.notification'),
-        message: 'Message sent to user email',
-      });
-    },
-    onError: (error: AxiosError) => {
-      toast.open({
-        type: 'error',
-        title: t('global.notificationError'),
-        message: error.message,
-      });
-    },
-    onSettled: () => setStartAServiceModal(null),
-  })
 
   const selectedChat = useMemo(() => chatData && chatData.find((c) => c.id === selectedChatId), [chatData, selectedChatId]);
   const activeChats = useMemo(() => chatData ? chatData.filter((c) => c.customerSupportId !== '') : [], [chatData]);
@@ -163,8 +145,8 @@ const ChatActive: FC = () => {
                 onChatEnd={setEndChatModal}
                 onForwardToColleauge={setForwardToColleaugeModal}
                 onForwardToEstablishment={setForwardToEstablishmentModal}
-                onSendToEmail={setStartAServiceModal}
-                onStartAService={setSendToEmailModal}
+                onSendToEmail={setSendToEmailModal}
+                onStartAService={setStartAServiceModal}
               />
             )}
           </Tabs.Content>
@@ -212,12 +194,27 @@ const ChatActive: FC = () => {
       )}
 
       {startAServiceModal !== null && (
-        <Dialog
-          title={t('chat.active.startAService')}
-          onClose={() => setSendToEmailModal(null)}
-        >
-          <p>{t('global.removeValidation')}</p>
-        </Dialog>
+        <StartAServiceModal
+          chat={startAServiceModal}
+          onModalClose={() => setStartAServiceModal(null)}
+          onStartService={(chat, service) => {
+            api.post(service.url, chat)
+              .then(() => {
+                setStartAServiceModal(null)
+                toast.open({
+                  type: 'success',
+                  title: t('global.notification'),
+                  message: `Service '${service.name}' has started`,
+                });
+              }).catch((error) => {
+                toast.open({
+                  type: 'error',
+                  title: t('global.notificationError'),
+                  message: error.message,
+                });
+              })
+          }}
+        />
       )}
 
       {endChatModal && (

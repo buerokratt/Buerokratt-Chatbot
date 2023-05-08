@@ -295,6 +295,11 @@ const Chat: FC<ChatProps> = ({chat, onChatEnd, onForwardToColleauge, onForwardTo
                             onClick={onSendToEmail ? () => onSendToEmail(chat) : undefined}>
                             {t('chat.active.sendToEmail')}
                         </Button>
+                        <Button
+                          appearance='secondary'
+                          onClick={onStartAService ? () => onStartAService(chat): undefined}>
+                          {t('chat.active.startService')}
+                        </Button>
                     </div>
                     <div className='active-chat__side-meta'>
                         <div>

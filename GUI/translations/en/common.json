@@ -87,7 +87,6 @@
       "statusChange": "Chat status change",
       "startService": "Start a service",
       "selectService": "Select a service",
-      "searchServicePlaceholder": "Search by service name or title",
       "start": "Start",
       "service": "Service"
     },

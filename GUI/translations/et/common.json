@@ -87,7 +87,6 @@
       "statusChange": "Vestluse staatus",
       "startService": "Alusta teenust",
       "selectService": "Vali teenus",
-      "searchServicePlaceholder": "Otsi nime või tiitli järgi",
       "start": "Alusta",
       "service": "Teenus"
     },
