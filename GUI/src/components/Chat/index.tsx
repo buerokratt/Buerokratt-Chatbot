@@ -24,6 +24,7 @@ type ChatProps = {
     onForwardToColleauge?: (chat: ChatType) => void;
     onForwardToEstablishment?: (chat: ChatType) => void;
     onSendToEmail?: (chat: ChatType) => void;
+    onStartAService?: (chat: ChatType) => void;
 }
 
 type GroupedMessage = {
@@ -32,7 +33,7 @@ type GroupedMessage = {
     messages: Message[];
 }
 
-const Chat: FC<ChatProps> = ({chat, onChatEnd, onForwardToColleauge, onForwardToEstablishment, onSendToEmail}) => {
+const Chat: FC<ChatProps> = ({chat, onChatEnd, onForwardToColleauge, onForwardToEstablishment, onSendToEmail, onStartAService}) => {
         const {t} = useTranslation();
         const {userInfo} = useUserInfoStore();
         const chatRef = useRef<HTMLDivElement>(null);
@@ -114,7 +115,16 @@ const Chat: FC<ChatProps> = ({chat, onChatEnd, onForwardToColleauge, onForwardTo
                 appearance='secondary'
                 onClick={onSendToEmail ? () => onSendToEmail(chat) : undefined}>
                 {t('chat.active.sendToEmail')}
-            </Button>}
+            </Button>},
+            {
+              id: 'startService',
+              button: <Button
+                key='startService'
+                appearance='secondary'
+                onClick={onStartAService ? () => onStartAService(chat): undefined}>
+                {t('chat.active.startService')}
+              </Button>
+            }
         ];
         const [sideButtons, setSideButtons] = useState([]);
         const [buttonsToAllow] = useState([]);

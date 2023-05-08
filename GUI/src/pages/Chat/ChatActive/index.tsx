@@ -32,6 +32,8 @@ const ChatActive: FC = () => {
   const [forwardToColleaugeModal, setForwardToColleaugeModal] = useState<ChatType | null>(null);
   const [forwardToEstablishmentModal, setForwardToEstablishmentModal] = useState<ChatType | null>(null);
   const [sendToEmailModal, setSendToEmailModal] = useState<ChatType | null>(null);
+  const [startAServiceModal, setStartAServiceModal] = useState<ChatType | null>(null);
+
   const { data: chatData } = useQuery<ChatType[]>({
     queryKey: ['cs-get-all-active-chats'],
   });
@@ -54,6 +56,25 @@ const ChatActive: FC = () => {
     },
     onSettled: () => setSendToEmailModal(null),
   });
+
+  const startAServiceMutation = useMutation({
+    mutationFn: (data: ChatType) => api.post('trigger-a-service', data),
+    onSuccess: () => {
+      toast.open({
+        type: 'success',
+        title: t('global.notification'),
+        message: 'Message sent to user email',
+      });
+    },
+    onError: (error: AxiosError) => {
+      toast.open({
+        type: 'error',
+        title: t('global.notificationError'),
+        message: error.message,
+      });
+    },
+    onSettled: () => setStartAServiceModal(null),
+  })
 
   const selectedChat = useMemo(() => chatData && chatData.find((c) => c.id === selectedChatId), [chatData, selectedChatId]);
   const activeChats = useMemo(() => chatData ? chatData.filter((c) => c.customerSupportId !== '') : [], [chatData]);
@@ -142,7 +163,8 @@ const ChatActive: FC = () => {
                 onChatEnd={setEndChatModal}
                 onForwardToColleauge={setForwardToColleaugeModal}
                 onForwardToEstablishment={setForwardToEstablishmentModal}
-                onSendToEmail={setSendToEmailModal}
+                onSendToEmail={setStartAServiceModal}
+                onStartAService={setSendToEmailModal}
               />
             )}
           </Tabs.Content>
@@ -184,6 +206,15 @@ const ChatActive: FC = () => {
               </Button>
             </>
           }
+        >
+          <p>{t('global.removeValidation')}</p>
+        </Dialog>
+      )}
+
+      {startAServiceModal !== null && (
+        <Dialog
+          title={t('chat.active.startAService')}
+          onClose={() => setSendToEmailModal(null)}
         >
           <p>{t('global.removeValidation')}</p>
         </Dialog>
