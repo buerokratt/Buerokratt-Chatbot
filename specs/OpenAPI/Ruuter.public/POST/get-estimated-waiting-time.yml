@@ -1,12 +1,14 @@
-openapi: 3.1.0
+openapi: 3.0.3
+
 info:
-  title: Openapi specification for POST estimated-waiting-time API
+  title: estimated-waiting-time API
   description: API for calculating chat duration and estimated waiting time.
   version: 1.0.0
+
 servers:
-#  - url: https://171.22.247.156:8080
-  - url: https://play.buerokratt.ee
+  - url: https://ruuter.test.buerokratt.ee
     description: Main server for the database requests
+
 paths:
   /estimated-waiting-time:
     post:
@@ -29,4 +31,3 @@ paths:
                   estimatedWaitingTime:
                     type: number
                     example: 0
-#sequritySchemes:

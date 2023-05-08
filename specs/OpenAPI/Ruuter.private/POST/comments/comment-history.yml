@@ -1,17 +1,16 @@
-openapi: 3.1.0
+openapi: 3.0.3
 
 info:
-  title: Openapi specification for comment-history API
+  title: comment-history API
   version: 1.0.0
 
 servers:
-  - url: https://play.buerokratt.ee
+  - url: https://ruuter.test.buerokratt.ee
 
 paths:
   /comment-history:
     post:
       summary: Add a new comment to the chat history
-      operationId: postCommentHistory
       requestBody:
         required: true
         content:

@@ -1,12 +1,12 @@
-openapi: 3.1.0
+openapi: 3.0.3
 
 info:
-  title: Openapi specification for cs-get-organization-working-time API
+  title: cs-get-organization-working-time API
   description: YAML file defining an endpoint for retrieving the working time of the organization
   version: 1.0.0
 
 servers:
-  - url: https://play.buerokratt.ee
+  - url: https://ruuter.test.buerokratt.ee
 
 paths:
   /cs-get-organization-working-time:

@@ -1,7 +1,12 @@
-openapi: 3.1.0
+openapi: 3.0.3
+
 info:
-  title: Openapi specification for cs-set-emergency-notice API
+  title: cs-set-emergency-notice API
   version: 1.0.0
+
+servers:
+  - url: https://ruuter.test.buerokratt.ee
+
 paths:
   /cs-set-emergency-notice:
     post:

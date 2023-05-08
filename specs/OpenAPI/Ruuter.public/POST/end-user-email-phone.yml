@@ -1,12 +1,14 @@
-openapi: 3.1.0
+openapi: 3.0.3
+
 info:
-  title: Openapi specification for POST end-user-email-phone API
+  title: end-user-email-phone API
   description: API for checking user info and updating email and phone
   version: 1.0.0
+
 servers:
-  # - url: https://171.22.247.156
-  - url: https://play.buerokratt.ee
+  - url: https://ruuter.test.buerokratt.ee
     description: Server for the main database requests
+
 paths:
   /end-user-email-phone:
     post:
@@ -48,4 +50,3 @@ paths:
                   returnNoChatId:
                     type: string
                     example: 'Missing chatID in request body'
-#sequritySchemes:

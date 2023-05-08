@@ -1,12 +1,12 @@
-openapi: 3.1.0
+openapi: 3.0.3
 
 info:
-  title: Openapi 3.1.0 specification for GET get-widget-config API
+  title: get-widget-config API
   description: API for getting widget config
   version: 1.0.0
 
 servers:
-  - url: https://play.buerokratt.ee
+  - url: https://ruuter.test.buerokratt.ee
     description: Main server for the database requests
 
 paths:
