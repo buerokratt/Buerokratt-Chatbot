@@ -7,14 +7,14 @@ import { Chat } from 'types/chat';
 import { MdOutlineArrowForward } from 'react-icons/md';
 import { Service } from 'types/service';
 import api from 'services/api';
+import { useToast } from 'hooks/useToast';
 
 type StartAServiceModalProps = {
   chat: Chat;
   onModalClose: () => void;
-  onStartService: (chat: Chat, service: Service) => void;
 }
 
-const StartAServiceModal: FC<StartAServiceModalProps> = ({ chat, onModalClose, onStartService }) => {
+const StartAServiceModal: FC<StartAServiceModalProps> = ({ chat, onModalClose }) => {
   const { t } = useTranslation();
   const [searchName, setSearchName] = useState('');
   const [pagination, setPagination] = useState<PaginationState>({
@@ -22,11 +22,31 @@ const StartAServiceModal: FC<StartAServiceModalProps> = ({ chat, onModalClose, o
     pageSize: 10,
   });
   const [services, setServices] = useState<Service[]>([]);
+  const toast = useToast();
 
   useEffect(() => {
-    api.get('services')
+    api.get('active-services')
       .then((res) => setServices(res.data))
   }, []);
+
+  const onStartService = ({ state, name }: Service) => {
+    const url = `/services/${state}/${name}`;
+    api.post(url, chat)
+      .then(() => {
+        onModalClose()
+        toast.open({
+          type: 'success',
+          title: t('global.notification'),
+          message: `Service '${name}' has started`,
+        });
+      }).catch((error: any) => {
+        toast.open({
+          type: 'error',
+          title: t('global.notificationError'),
+          message: error.message,
+        });
+      })
+  }
 
   const columnHelper = createColumnHelper<Service>();
 
@@ -37,7 +57,7 @@ const StartAServiceModal: FC<StartAServiceModalProps> = ({ chat, onModalClose, o
     columnHelper.display({
       id: 'start',
       cell: (props) => (
-        <Button appearance='text' onClick={() => { onStartService(chat, props.row.original) }}>
+        <Button appearance='text' onClick={() => onStartService(props.row.original)}>
           <Icon icon={<MdOutlineArrowForward color='rgba(0, 0, 0, 0.54)' />} />
           {t('chat.active.start')}
         </Button>
@@ -47,7 +67,6 @@ const StartAServiceModal: FC<StartAServiceModalProps> = ({ chat, onModalClose, o
       },
     }),
   ], []);
-
 
   return (
     <Dialog

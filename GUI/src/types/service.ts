@@ -1,6 +1,6 @@
 export interface Service {
-  url: string;
+  id: string;
   name: string;
   type: 'POST' | 'GET';
-  status?: 'active' | 'inactive';
+  state?: 'active' | 'inactive' | 'draft';
 }

@@ -197,23 +197,6 @@ const ChatActive: FC = () => {
         <StartAServiceModal
           chat={startAServiceModal}
           onModalClose={() => setStartAServiceModal(null)}
-          onStartService={(chat, service) => {
-            api.post(service.url, chat)
-              .then(() => {
-                setStartAServiceModal(null)
-                toast.open({
-                  type: 'success',
-                  title: t('global.notification'),
-                  message: `Service '${service.name}' has started`,
-                });
-              }).catch((error) => {
-                toast.open({
-                  type: 'error',
-                  title: t('global.notificationError'),
-                  message: error.message,
-                });
-              })
-          }}
         />
       )}
 
