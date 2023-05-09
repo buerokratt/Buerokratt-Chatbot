@@ -11,7 +11,7 @@ import apiDev from 'services/api-dev';
 const SettingsChatSettings: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
-  let [botActive, setBotActive] = useState<boolean>(true);
+  const [botActive, setBotActive] = useState<boolean>(true);
   const { data: botConfig } = useQuery<{ is_bot_active: boolean }>({
     queryKey: ['cs-get-is-bot-active', 'prod'],
     onSuccess(res: any) {

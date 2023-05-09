@@ -18,7 +18,7 @@ const SettingsUsers: FC = () => {
   const [newUserModal, setNewUserModal] = useState(false);
   const [editableRow, setEditableRow] = useState<User | null>(null);
   const [deletableRow, setDeletableRow] = useState<string | number | null>(null);
-  let [usersList, setUsersList] = useState<User[]>([]);
+  const [usersList, setUsersList] = useState<User[]>([]);
   const { data: users } = useQuery<User[]>({
     queryKey: ['/cs-get-customer-support-agents', 'prod'],
     onSuccess(res: any) {
