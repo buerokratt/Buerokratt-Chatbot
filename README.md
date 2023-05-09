@@ -21,7 +21,7 @@ This repo will primarily contain:
 * Install Python
 * Navigate to setup and run `python3 generate-certs.py`
 * Navigate to current repo and run `docker-compose up -d`
-* Go to https://localhost:3001
+* Go to http://localhost:3001
 
 ### Database setup
  * For setting up the database initially, run 
