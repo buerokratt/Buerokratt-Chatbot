@@ -19,7 +19,7 @@ const SettingsUsers: FC = () => {
   const [editableRow, setEditableRow] = useState<User | null>(null);
   const [deletableRow, setDeletableRow] = useState<string | number | null>(null);
   const { data: users } = useQuery<User[]>({
-    queryKey: ['/cs-get-customer-support-agents'],
+    queryKey: ['/cs-get-customer-support-agents', 'prod'],
   });
   const columnHelper = createColumnHelper<User>();
 

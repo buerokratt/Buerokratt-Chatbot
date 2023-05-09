@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { AxiosError } from 'axios';
@@ -6,12 +6,17 @@ import { AxiosError } from 'axios';
 import { Card, Switch, Track } from 'components';
 import { useToast } from 'hooks/useToast';
 import api from 'services/api';
+import apiDev from 'services/api-dev';
 
 const SettingsChatSettings: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
+  let [botActive, setBotActive] = useState<boolean>(true);
   const { data: botConfig } = useQuery<{ is_bot_active: boolean }>({
-    queryKey: ['cs-get-is-bot-active'],
+    queryKey: ['cs-get-is-bot-active', 'prod'],
+    onSuccess(res: any) {
+      setBotActive(res.data.get_is_bot_active.value === 'true' ? true : false);
+    },
   });
   const { data: csaNameVisibility } = useQuery<{ isVisible: boolean }>({
     queryKey: ['cs-get-csa-name-visibility'],
@@ -21,7 +26,10 @@ const SettingsChatSettings: FC = () => {
   });
 
   const botConfigMutation = useMutation({
-    mutationFn: (data: { is_bot_active: boolean }) => api.post(`cs-set-is-bot-active`, data),
+    mutationFn: (data: { is_bot_active: boolean }) => {
+      setBotActive(data.is_bot_active);
+      return apiDev.post(`cs-set-is-bot-active`, { 'isActive': data.is_bot_active })
+    },
     onError: (error: AxiosError) => {
       toast.open({
         type: 'error',
@@ -62,8 +70,9 @@ const SettingsChatSettings: FC = () => {
           <Switch
             name='is_bot_active'
             label={t('settings.chat.chatActive')}
-            checked={botConfig.is_bot_active}
-            onCheckedChange={(value) => botConfigMutation.mutate({ is_bot_active: value })}
+            checked={botActive}
+            onCheckedChange={(value) => botConfigMutation.mutate({ is_bot_active: value })
+            }
           />
         )}
       >
