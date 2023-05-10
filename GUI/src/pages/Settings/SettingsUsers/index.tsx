@@ -25,7 +25,6 @@ const SettingsUsers: FC = () => {
       setUsersList(res.data.get_customer_support_agents);
     },
   });
-
   const columnHelper = createColumnHelper<User>();
 
   const deleteUserMutation = useMutation({
