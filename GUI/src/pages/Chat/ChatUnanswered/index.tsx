@@ -24,7 +24,6 @@ const ChatUnanswered: FC = () => {
   const { data: activeChats } = useQuery<ChatType[]>({
     queryKey: ['cs-get-all-active-chats', 'prod'],
     onSuccess(res: any) {
-      setActiveChatsList([]);
       setActiveChatsList(res.data.get_all_active_chats);
     },
   });

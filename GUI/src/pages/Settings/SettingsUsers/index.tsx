@@ -22,7 +22,6 @@ const SettingsUsers: FC = () => {
   const { data: users } = useQuery<User[]>({
     queryKey: ['/cs-get-customer-support-agents', 'prod'],
     onSuccess(res: any) {
-      setUsersList([]);
       setUsersList(res.data.get_customer_support_agents);
     },
   });
