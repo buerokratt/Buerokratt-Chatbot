@@ -104,9 +104,11 @@ export const handlers = [
   rest.get(import.meta.env.BASE_URL + 'cs-get-components-healthz-status', (req, res, ctx) => {
     return res(ctx.json(healthzStatusData));
   }),
+
   rest.get(import.meta.env.BASE_URL + 'cs-get-customer-support-agents', (req, res, ctx) => {
     return res(ctx.json(customerSupportAgentsData));
   }),
+
   rest.get(import.meta.env.BASE_URL + 'cs-get-all-establishments', (req, res, ctx) => {
     return res(ctx.json(establishmentsData));
   }),

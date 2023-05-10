@@ -6,12 +6,17 @@ import { QueryClient, QueryClientProvider, QueryFunction } from '@tanstack/react
 
 import App from './App';
 import api from 'services/api';
+import apiDev from 'services/api-dev';
 import { ToastProvider } from 'context/ToastContext';
 import { handlers } from 'mocks/handlers';
 import 'styles/main.scss';
 import '../i18n';
 
 const defaultQueryFn: QueryFunction | undefined = async ({ queryKey }) => {
+  if (queryKey[1] === 'prod') {
+    const { data } = await apiDev.get(queryKey[0] as string);
+    return data;
+  }
   const { data } = await api.get(queryKey[0] as string);
   return data;
 };
