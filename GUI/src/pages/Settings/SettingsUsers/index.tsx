@@ -20,7 +20,7 @@ const SettingsUsers: FC = () => {
   const [deletableRow, setDeletableRow] = useState<string | number | null>(null);
   const [usersList, setUsersList] = useState<User[]>([]);
   const { data: users } = useQuery<User[]>({
-    queryKey: ['/cs-get-customer-support-agents', 'prod'],
+    queryKey: ['cs-get-customer-support-agents', 'prod'],
     onSuccess(res: any) {
       setUsersList(res.data.get_customer_support_agents);
     },
@@ -30,7 +30,7 @@ const SettingsUsers: FC = () => {
   const deleteUserMutation = useMutation({
     mutationFn: ({ id }: { id: string | number }) => deleteUser(id),
     onSuccess: async () => {
-      await queryClient.invalidateQueries(['/cs-get-customer-support-agents', 'prod']);
+      await queryClient.invalidateQueries(['cs-get-customer-support-agents', 'prod']);
       toast.open({
         type: 'success',
         title: t('global.notification'),
