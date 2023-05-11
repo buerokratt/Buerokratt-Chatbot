@@ -18,8 +18,12 @@ const SettingsUsers: FC = () => {
   const [newUserModal, setNewUserModal] = useState(false);
   const [editableRow, setEditableRow] = useState<User | null>(null);
   const [deletableRow, setDeletableRow] = useState<string | number | null>(null);
+  const [usersList, setUsersList] = useState<User[]>([]);
   const { data: users } = useQuery<User[]>({
-    queryKey: ['cs-get-admins'],
+    queryKey: ['/cs-get-customer-support-agents', 'prod'],
+    onSuccess(res: any) {
+      setUsersList(res.data.get_customer_support_agents);
+    },
   });
   const columnHelper = createColumnHelper<User>();
 
@@ -95,7 +99,7 @@ const SettingsUsers: FC = () => {
       </Track>
 
       <Card>
-        <DataTable data={users} columns={usersColumns} sortable filterable />
+        <DataTable data={usersList} columns={usersColumns} sortable filterable />
       </Card>
 
       {newUserModal && (
@@ -130,4 +134,3 @@ const SettingsUsers: FC = () => {
 };
 
 export default SettingsUsers;
-

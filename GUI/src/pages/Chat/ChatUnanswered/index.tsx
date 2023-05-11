@@ -20,12 +20,16 @@ const ChatUnanswered: FC = () => {
   const [forwardToColleaugeModal, setForwardToColleaugeModal] = useState<ChatType | null>(null);
   const [forwardToEstablishmentModal, setForwardToEstablishmentModal] = useState<ChatType | null>(null);
   const [sendToEmailModal, setSendToEmailModal] = useState<ChatType | null>(null);
+  const [activeChatsList, setActiveChatsList] = useState<ChatType[]>([]);
   const { data: activeChats } = useQuery<ChatType[]>({
-    queryKey: ['cs-get-all-active-chats'],
+    queryKey: ['cs-get-all-active-chats', 'prod'],
+    onSuccess(res: any) {
+      setActiveChatsList(res.data.get_all_active_chats);
+    },
   });
 
-  const selectedChat = useMemo(() => activeChats && activeChats.find((c) => c.id === selectedChatId), [activeChats, selectedChatId]);
-  const unansweredChats = useMemo(() => activeChats ? activeChats.filter((c) => c.customerSupportId === '') : [], [activeChats]);
+  const selectedChat = useMemo(() => activeChatsList && activeChatsList.find((c) => c.id === selectedChatId), [activeChatsList, selectedChatId]);
+  const unansweredChats = useMemo(() => activeChatsList ? activeChatsList.filter((c) => c.customerSupportId === '') : [], [activeChatsList]);
 
   const handleCsaForward = (chat: ChatType, user: User) => {
     // TODO: Add endpoint for chat forwarding

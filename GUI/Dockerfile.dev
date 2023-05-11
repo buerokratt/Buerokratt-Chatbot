@@ -1,0 +1,12 @@
+FROM node:lts AS image
+WORKDIR /app
+COPY ./package.json .
+
+FROM image AS build
+RUN npm install --legacy-peer-deps --mode=development
+COPY . .
+RUN ./node_modules/.bin/vite build --mode=development
+
+EXPOSE 3001
+
+CMD ["npm", "run", "dev"]

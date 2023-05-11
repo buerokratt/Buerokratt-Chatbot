@@ -1,8 +1,9 @@
 import api from './api';
+import apiDev from './api-dev';
 import { User, UserDTO } from 'types/user';
 
 export async function createUser(userData: UserDTO) {
-  const { data } = await api.post<User>('users', userData);
+  const { data } = await apiDev.post<User>('users', userData);
   return data;
 }
 
