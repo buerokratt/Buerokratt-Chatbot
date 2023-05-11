@@ -48,7 +48,7 @@
                       "endpoint": "{ruuter_url}/match_input",
                       "post_body_struct": {
                         "input": {
-                          "id_code": "$_validateIdCode({#.userIdCode})"
+                          "id_code": "{#.userIdCode}"
                         },
                         "validate_against": {
                           "id_code": "{#.userIdCode}"
@@ -128,7 +128,7 @@
             "status": "active",
             "userIdCode": "{#.reflect_input#.userIdCode}",
             "displayName": "{#.reflect_input#.displayName}",
-            "csaTitle":"{#.reflect_input#.csaTitle}",
+            "csaTitle": "{#.reflect_input#.csaTitle}",
             "csa_email": "{#.reflect_input#.csa_email}"
           }
         }

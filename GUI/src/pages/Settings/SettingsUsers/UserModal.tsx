@@ -29,6 +29,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
       idCode: user?.idCode,
       authorities: user?.authorities,
       displayName: user?.displayName,
+      csaTitle: user?.csaTitle,
       csaEmail: user?.csaEmail,
     },
   });
@@ -44,7 +45,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
   const userCreateMutation = useMutation({
     mutationFn: (data: UserDTO) => createUser(data),
     onSuccess: async () => {
-      await queryClient.invalidateQueries(['cs-get-admins']);
+      await queryClient.invalidateQueries(['/cs-get-customer-support-agents', 'prod']);
       toast.open({
         type: 'success',
         title: t('global.notification'),
@@ -63,7 +64,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
   const userEditMutation = useMutation({
     mutationFn: ({ id, userData }: { id: string | number, userData: UserDTO }) => editUser(id, userData),
     onSuccess: async () => {
-      await queryClient.invalidateQueries(['cs-get-admins']);
+      await queryClient.invalidateQueries(['/cs-get-customer-support-agents', 'prod']);
       toast.open({
         type: 'success',
         title: t('global.notification'),
