@@ -152,6 +152,26 @@
           }
         }
       }
+    },
+    {
+      "set_default_activity": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{resql_url}/set-customer-support-status",
+          "post_body_struct": {
+            "userIdCode": "{#.reflect_input#.userIdCode}",
+            "active": "false",
+            "status": "offline",
+            "created": "$_getInstant()"
+          }
+        }
+      }
     }
   ]
 }

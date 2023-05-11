@@ -36,6 +36,7 @@ const SettingsUsers: FC = () => {
         title: t('global.notification'),
         message: 'User deleted',
       });
+      setDeletableRow(null);
     },
     onError: (error: AxiosError) => {
       toast.open({
