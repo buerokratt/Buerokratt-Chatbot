@@ -30,7 +30,7 @@ const SettingsUsers: FC = () => {
   const deleteUserMutation = useMutation({
     mutationFn: ({ id }: { id: string | number }) => deleteUser(id),
     onSuccess: async () => {
-      await queryClient.invalidateQueries(['cs-get-admins']);
+      await queryClient.invalidateQueries(['/cs-get-customer-support-agents', 'prod']);
       toast.open({
         type: 'success',
         title: t('global.notification'),
@@ -59,6 +59,9 @@ const SettingsUsers: FC = () => {
     }),
     columnHelper.accessor('displayName', {
       header: t('settings.users.displayName') || '',
+    }),
+    columnHelper.accessor('csaTitle', {
+      header: t('settings.users.userTitle') || '',
     }),
     columnHelper.accessor('csaEmail', {
       header: t('settings.users.email') || '',
