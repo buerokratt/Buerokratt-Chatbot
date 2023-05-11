@@ -84,7 +84,11 @@
       "searchByEstablishmentName": "Otsi asutuse nime järgi",
       "sendToEmail": "Saada e-mailile",
       "chooseChatStatus": "Vali vestluse staatus",
-      "statusChange": "Vestluse staatus"
+      "statusChange": "Vestluse staatus",
+      "startService": "Alusta teenust",
+      "selectService": "Vali teenus",
+      "start": "Alusta",
+      "service": "Teenus"
     },
     "history": {
       "title": "Ajalugu",

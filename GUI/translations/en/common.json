@@ -84,7 +84,11 @@
       "searchByEstablishmentName": "Search by establishment name",
       "sendToEmail": "Send to email",
       "chooseChatStatus": "Choose chat status",
-      "statusChange": "Chat status change"
+      "statusChange": "Chat status change",
+      "startService": "Start a service",
+      "selectService": "Select a service",
+      "start": "Start",
+      "service": "Service"
     },
     "history": {
       "title": "History",

@@ -15,6 +15,7 @@ import api from 'services/api';
 import ForwardToColleaugeModal from '../ForwardToColleaugeModal';
 import ForwardToEstablishmentModal from '../ForwardToEstablishmentModal';
 import clsx from 'clsx';
+import StartAServiceModal from '../StartAServiceModal';
 
 const CSAchatStatuses = [
   'accepted',
@@ -32,6 +33,8 @@ const ChatActive: FC = () => {
   const [forwardToColleaugeModal, setForwardToColleaugeModal] = useState<ChatType | null>(null);
   const [forwardToEstablishmentModal, setForwardToEstablishmentModal] = useState<ChatType | null>(null);
   const [sendToEmailModal, setSendToEmailModal] = useState<ChatType | null>(null);
+  const [startAServiceModal, setStartAServiceModal] = useState<ChatType | null>(null);
+
   const { data: chatData } = useQuery<ChatType[]>({
     queryKey: ['cs-get-all-active-chats'],
   });
@@ -143,6 +146,7 @@ const ChatActive: FC = () => {
                 onForwardToColleauge={setForwardToColleaugeModal}
                 onForwardToEstablishment={setForwardToEstablishmentModal}
                 onSendToEmail={setSendToEmailModal}
+                onStartAService={setStartAServiceModal}
               />
             )}
           </Tabs.Content>
@@ -187,6 +191,13 @@ const ChatActive: FC = () => {
         >
           <p>{t('global.removeValidation')}</p>
         </Dialog>
+      )}
+
+      {startAServiceModal !== null && (
+        <StartAServiceModal
+          chat={startAServiceModal}
+          onModalClose={() => setStartAServiceModal(null)}
+        />
       )}
 
       {endChatModal && (
