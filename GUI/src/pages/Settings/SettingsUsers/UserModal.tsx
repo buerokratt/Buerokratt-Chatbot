@@ -51,6 +51,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
         title: t('global.notification'),
         message: 'New user added',
       });
+      onClose();
     },
     onError: (error: AxiosError) => {
       toast.open({
@@ -70,6 +71,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
         title: t('global.notification'),
         message: 'User updated',
       });
+      onClose();
     },
     onError: (error: AxiosError) => {
       toast.open({
