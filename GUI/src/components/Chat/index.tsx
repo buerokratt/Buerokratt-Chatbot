@@ -24,6 +24,7 @@ type ChatProps = {
     onForwardToColleauge?: (chat: ChatType) => void;
     onForwardToEstablishment?: (chat: ChatType) => void;
     onSendToEmail?: (chat: ChatType) => void;
+    onStartAService?: (chat: ChatType) => void;
 }
 
 type GroupedMessage = {
@@ -32,7 +33,7 @@ type GroupedMessage = {
     messages: Message[];
 }
 
-const Chat: FC<ChatProps> = ({ chat, onChatEnd, onForwardToColleauge, onForwardToEstablishment, onSendToEmail }) => {
+const Chat: FC<ChatProps> = ({ chat, onChatEnd, onForwardToColleauge, onForwardToEstablishment, onSendToEmail, onStartAService }) => {
     const { t } = useTranslation();
     const { userInfo } = useUserInfoStore();
     const chatRef = useRef<HTMLDivElement>(null);
@@ -124,8 +125,7 @@ const Chat: FC<ChatProps> = ({ chat, onChatEnd, onForwardToColleauge, onForwardT
             </Button>
         }
     ];
-    const [sideButtons, setSideButtons] = useState([]);
-    const [buttonsToAllow] = useState<string[]>([]);
+
 
     useEffect(() => {
         if (sideButtons.length > 0) return;
@@ -266,6 +266,46 @@ const Chat: FC<ChatProps> = ({ chat, onChatEnd, onForwardToColleauge, onForwardT
                         <Button appearance='secondary'>
                             <Icon icon={<MdOutlineAttachFile fontSize={18} />} size='medium' />
                         </Button>
+                        <Button appearance='secondary'
+                                onClick={onForwardToEstablishment ? () => onForwardToEstablishment(chat) : undefined}>{t('chat.active.forwardToOrganization')}</Button>
+                        <Button
+                            appearance='secondary'
+                            onClick={onSendToEmail ? () => onSendToEmail(chat) : undefined}>
+                            {t('chat.active.sendToEmail')}
+                        </Button>
+                        <Button
+                          appearance='secondary'
+                          onClick={onStartAService ? () => onStartAService(chat): undefined}>
+                          {t('chat.active.startService')}
+                        </Button>
+                    </div>
+                    <div className='active-chat__side-meta'>
+                        <div>
+                            <p><strong>ID</strong></p>
+                            <p>{chat.id}</p>
+                        </div>
+                        <div>
+                            <p><strong>{t('chat.endUser')}</strong></p>
+                            <p>{endUserFullName}</p>
+                        </div>
+                        {chat.customerSupportDisplayName && (
+                            <div>
+                                <p><strong>{t('chat.csaName')}</strong></p>
+                                <p>{chat.customerSupportDisplayName}</p>
+                            </div>
+                        )}
+                        <div>
+                            <p><strong>{t('chat.startedAt')}</strong></p>
+                            <p>{format(new Date(chat.created), 'dd. MMMM Y HH:ii:ss', {locale: et}).toLowerCase()}</p>
+                        </div>
+                        <div>
+                            <p><strong>{t('chat.device')}</strong></p>
+                            <p>{chat.endUserOs}</p>
+                        </div>
+                        <div>
+                            <p><strong>{t('chat.location')}</strong></p>
+                            <p>{chat.endUserUrl}</p>
+                        </div>
                     </div>
                 </div>
             </div>
