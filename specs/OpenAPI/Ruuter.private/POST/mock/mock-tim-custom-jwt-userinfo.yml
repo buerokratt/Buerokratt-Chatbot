@@ -26,32 +26,32 @@ paths:
                     type: string
                   firstName:
                     type: string
-                    example: "MARY ÄNN"
+                    example: 'MARY ÄNN'
                   idCode:
                     type: string
-                    example: "EE60001019906"
+                    example: 'EE60001019906'
                   displayName:
                     type: string
-                    example: "MARY ÄNN"
+                    example: 'MARY ÄNN'
                   iss:
                     type: string
-                    example: "test.buerokratt.ee"
+                    example: 'test.buerokratt.ee'
                   exp:
                     type: integer
                     format: int64
                     example: 1670250948
                   login:
                     type: string
-                    example: "EE60001019906"
+                    example: 'EE60001019906'
                   iat:
                     type: integer
                     format: int64
                     example: 1670243748
                   jti:
                     type: string
-                    example: "e14a5084-3b30-4a55-8720-c2ee22f43c2c"
+                    example: 'e14a5084-3b30-4a55-8720-c2ee22f43c2c'
                   authorities:
                     type: array
                     items:
                       type: string
-                      example: "ROLE_ADMINISTRATOR"
+                      example: 'ROLE_ADMINISTRATOR'
