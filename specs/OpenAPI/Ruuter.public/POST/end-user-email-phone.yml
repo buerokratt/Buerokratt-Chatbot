@@ -25,13 +25,13 @@ paths:
               properties:
                 id:
                   type: string
-                  example: 8cfbc32a-7244-4933-8a25-14422b557ad2
+                  example: '8cfbc32a-7244-4933-8a25-14422b557ad2'
                 email:
                   type: string
                   example: example@example.com
                 phone:
                   type: string
-                  example: +37255555555
+                  example: '+37255555555'
       responses:
         '200':
           description: Return successful request
