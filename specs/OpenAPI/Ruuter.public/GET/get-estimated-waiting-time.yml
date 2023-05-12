@@ -22,7 +22,7 @@ paths:
           description: Id of the chat
           schema:
             type: string
-            example: 8cfbc32a-7244-4933-8a25-14422b557ad2
+            example: '8cfbc32a-7244-4933-8a25-14422b557ad2'
       responses:
         '200':
           description: Send a request for estimated waiting time of the chat
