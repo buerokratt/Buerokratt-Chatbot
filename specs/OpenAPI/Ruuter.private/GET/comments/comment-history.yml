@@ -8,7 +8,7 @@ info:
     url: https://opensource.org/license/mit/
 
 servers:
-  - url: http://play.buerokratt.ee
+  - url: http://ruuter.test.buerokratt.ee
 
 paths:
   /comment-history:
