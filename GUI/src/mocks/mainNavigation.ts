@@ -110,7 +110,7 @@ export const mainNavigationET = [
           },
           {
             label: 'Tervitussõnum',
-            path: '#',
+            path: '/haldus/vestlusrobot/tervitussõnum',
           },
           {
             label: 'Välimus ja käitumine',
@@ -128,7 +128,7 @@ export const mainNavigationET = [
       },
       {
         label: 'Sessiooni pikkus',
-        path: '#',
+        path: '/haldus/sessiooni-pikkus',
       },
     ],
   },
