@@ -4,6 +4,9 @@ info:
   title: get-widget-config API
   description: API for getting widget config
   version: 1.0.0
+  license:
+    name: MIT
+    url: https://opensource.org/license/mit/
 
 servers:
   - url: https://ruuter.test.buerokratt.ee

@@ -4,6 +4,9 @@ info:
   title: cs-get-csa-title-visibility API
   description: YAML file defining an endpoint for retrieving visibility settings for csa title if the end user is an administrator
   version: 1.0.0
+  license:
+    name: MIT
+    url: https://opensource.org/license/mit/
 
 servers:
   - url: https://ruuter.test.buerokratt.ee

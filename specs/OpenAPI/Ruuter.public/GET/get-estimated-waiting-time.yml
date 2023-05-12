@@ -4,6 +4,9 @@ info:
   title: estimated-waiting-time API
   description: API for calculating chat duration and estimated waiting time.
   version: 1.0.0
+  license:
+    name: MIT
+    url: https://opensource.org/license/mit/
 
 servers:
   - url: https://ruuter.test.buerokratt.ee

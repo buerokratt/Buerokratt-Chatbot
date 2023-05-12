@@ -3,6 +3,9 @@ openapi: 3.0.3
 info:
   title: mock-tim-custom-jwt-userinfo API
   version: 1.0.0
+  license:
+    name: MIT
+    url: https://opensource.org/license/mit/
 
 servers:
   - url: https://ruuter.test.buerokratt.ee

@@ -4,6 +4,9 @@ info:
   title: end-user-email-phone API
   description: API for checking user info and updating email and phone
   version: 1.0.0
+  license:
+    name: MIT
+    url: https://opensource.org/license/mit/
 
 servers:
   - url: https://ruuter.test.buerokratt.ee

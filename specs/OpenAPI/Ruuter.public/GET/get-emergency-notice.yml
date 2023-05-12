@@ -4,6 +4,9 @@ info:
   title: get-emergency-notice API
   description: API that returns a emergency response when a valid one exists
   version: 1.0.0
+  license:
+    name: MIT
+    url: https://opensource.org/license/mit/
 
 servers:
   - url: https://ruuter.test.buerokratt.ee
