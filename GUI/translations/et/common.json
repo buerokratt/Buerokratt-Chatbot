@@ -184,7 +184,14 @@
       "saturday": "Laupäev",
       "sunday": "Pühapäev"
     },
-    "nationalHolidays": "Riiklikud pühad"
+    "nationalHolidays": "Riiklikud pühad",
+    "welcomeMessage": {
+      "welcomeMessage": "Tervitussõnum",
+      "description": "Bürokrati automaatne tervitussõnum, mida kuvatakse esimese sõnumina vestlusakna avamisel.",
+      "greetingActive": "Tervitus aktiivne",
+      "messageChanged": "Tervitusteadet muudeti edukalt",
+      "emptyMessage": "Tervitusteate väli ei tohi olla tühi"
+    }
   },
   "monitoring": {
     "uptime": {

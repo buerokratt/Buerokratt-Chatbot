@@ -184,7 +184,14 @@
       "saturday": "Saturday",
       "sunday": "Sunday"
     },
-    "nationalHolidays": "National holidays"
+    "nationalHolidays": "National holidays",
+    "welcomeMessage": {
+      "welcomeMessage": "Welcome Message",
+      "description": "Bürokrati automaatne tervitussõnum, mida kuvatakse esimese sõnumina vestlusakna avamisel.",
+      "greetingActive": "Greeting Active",
+      "messageChanged": "Welcome Message Changed Successfully",
+      "emptyMessage": "Welcome message can't be empty"
+    }
   },
   "monitoring": {
     "uptime": {

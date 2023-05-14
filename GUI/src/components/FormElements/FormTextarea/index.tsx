@@ -9,6 +9,7 @@ type TextareaProps = TextareaAutosizeProps & {
   name: string;
   hideLabel?: boolean;
   showMaxLength?: boolean;
+  maxLengthBottom?: boolean;
 };
 
 const FormTextarea = forwardRef<HTMLTextAreaElement, TextareaProps>((
@@ -21,6 +22,7 @@ const FormTextarea = forwardRef<HTMLTextAreaElement, TextareaProps>((
     disabled,
     hideLabel,
     showMaxLength,
+    maxLengthBottom,
     defaultValue,
     onChange,
     ...rest
@@ -60,7 +62,7 @@ const FormTextarea = forwardRef<HTMLTextAreaElement, TextareaProps>((
           {...rest}
         />
         {showMaxLength && (
-          <div className='textarea__max-length'>{currentLength}/{maxLength}</div>
+          <div className={maxLengthBottom ? 'textarea__max-length-bottom' : 'textarea__max-length-top'}>{currentLength}/{maxLength}</div>
         )}
       </div>
     </div>
