@@ -169,7 +169,12 @@
     },
     "userSession": {
       "title": "Kasutaja sessioon",
-      "sessionLength": "Sessiooni pikkus"
+      "sessionLength": "Sessiooni pikkus",
+      "description": "Kasutaja sessiooni pikkus, mille möödumisel logitakse inaktiivsed kasutajad välja.",
+      "rule": "Sessiooni pikkus on lubatud vahemikus 30 min - 480 min (8h)",
+      "minutes": "minutit",
+      "sessionChanged": "Seansi pikkuse muutmine õnnestus",
+      "emptySession": "Seansi pikkuse väli ei tohi olla tühi"
     },
     "greeting": {
       "title": "Tervitussõnum"

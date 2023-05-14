@@ -1,29 +1,32 @@
-import { FC } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { FC, useState } from 'react';
 import { AxiosError } from 'axios';
 import { useTranslation } from 'react-i18next';
-
-import { Button, Card, FormDatepicker, FormTextarea, Switch, Track } from 'components';
-import { EMERGENCY_NOTICE_LENGTH } from 'constants/config';
-import { EmergencyNotice } from 'types/emergencyNotice';
+import { Button, Card, FormInput, Track } from 'components';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useToast } from 'hooks/useToast';
-import api from 'services/api';
+import apiDev from 'services/api-dev';
+import './SettingsSessionLength.scss';
 
 const SettingsSessionLength: FC = () => {
     const { t } = useTranslation();
     const toast = useToast();
-    const { register, control, handleSubmit, reset } = useForm<EmergencyNotice>();
-    const { data: emergencyNotice } = useQuery<EmergencyNotice>({
-        queryKey: ['cs-get-emergency-notice'],
-        onSuccess: (data) => reset({
-            emergencyNoticeStartISO: new Date(data.emergencyNoticeStartISO),
-            emergencyNoticeEndISO: new Date(data.emergencyNoticeEndISO),
-        }),
+    const [sessionLength, setSessionLength] = useState<string>('');
+    const { data } = useQuery({
+        queryKey: ['cs-get-session-length', 'prod'],
+        onSuccess: (res: any) => setSessionLength(res.data.cs_get_session_length[0].value ?? ''),
     });
 
-    const emergencyNoticeMutation = useMutation({
-        mutationFn: (data: EmergencyNotice) => api.post<EmergencyNotice>('cs-set-emergency-notice', data),
+    const sessionLengthMutation = useMutation({
+        mutationFn: () => apiDev.post('cs-set-session-length', {
+            "sessionLength": sessionLength
+        }),
+        onSuccess: () => {
+            toast.open({
+                type: 'success',
+                title: t('global.notification'),
+                message: t('settings.userSession.sessionChanged'),
+            });
+        },
         onError: (error: AxiosError) => {
             toast.open({
                 type: 'error',
@@ -33,15 +36,22 @@ const SettingsSessionLength: FC = () => {
         },
     });
 
-    const handleFormSubmit = handleSubmit((data) => {
-        emergencyNoticeMutation.mutate(data);
-    });
-
-    if (!emergencyNotice) return <>Loading...</>;
+    const handleFormSubmit = () => {
+        if (sessionLength.length === 0) {
+            toast.open({
+                type: 'error',
+                title: t('global.notificationError'),
+                message: t('settings.userSession.emptySession'),
+            });
+        } else {
+            sessionLengthMutation.mutate();
+        }
+    };
 
     return (
         <>
-            <h1>{t('settings.emergencyNotices.title')}</h1>
+            <h1>{t('settings.userSession.sessionLength')}</h1>
+            <p>{t('settings.userSession.description')}</p>
             <Card
                 footer={
                     <Track justify='end'>
@@ -50,22 +60,17 @@ const SettingsSessionLength: FC = () => {
                 }
             >
                 <Track gap={16} direction='vertical' align='left'>
-                    <Controller name='isEmergencyNoticeVisible' control={control} render={({ field }) =>
-                        <Switch
-                            checked={emergencyNotice.isEmergencyNoticeVisible}
-                            label={t('settings.emergencyNotices.noticeActive')}
-                            {...field}
+                    <Track>
+                        <FormInput
+                            name='session-length'
+                            label={t('settings.userSession.sessionLength')}
+                            type='number'
+                            onChange={(e) => setSessionLength(e.target.value)}
+                            value={sessionLength}
                         />
-                    }
-                    />
-                    <FormTextarea
-                        {...register('emergencyNoticeText')}
-                        label={t('settings.emergencyNotices.notice')}
-                        minRows={1}
-                        maxLength={EMERGENCY_NOTICE_LENGTH}
-                        defaultValue={emergencyNotice.emergencyNoticeText}
-                        showMaxLength
-                    />
+                        <label className='minute'>{t('settings.userSession.minutes')}</label>
+                    </Track>
+                    <label className='rule'>{t('settings.userSession.rule')}</label>
                 </Track>
             </Card >
         </>

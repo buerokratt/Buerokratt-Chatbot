@@ -169,7 +169,12 @@
     },
     "userSession": {
       "title": "User session",
-      "sessionLength": "Session length"
+      "sessionLength": "Session length",
+      "description": "User session length, after which inactive users are logged out.",
+      "rule": "Session length is allowed between 30 min - 480 min (8h)",
+      "minutes": "Minutes",
+      "sessionChanged": "Session length changed successfully",
+      "emptySession": "Session length can't be empty"
     },
     "greeting": {
       "title": "Greeting message"
@@ -189,7 +194,7 @@
       "welcomeMessage": "Welcome Message",
       "description": "Bürokrati automaatne tervitussõnum, mida kuvatakse esimese sõnumina vestlusakna avamisel.",
       "greetingActive": "Greeting Active",
-      "messageChanged": "Welcome Message Changed Successfully",
+      "messageChanged": "Welcome message changed successfully",
       "emptyMessage": "Welcome message can't be empty"
     }
   },
