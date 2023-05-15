@@ -13,6 +13,7 @@ import { Chat as ChatType } from 'types/chat';
 import { useToast } from 'hooks/useToast';
 import { USER_IDLE_STATUS_TIMEOUT } from 'constants/config';
 import api from 'services/api';
+import apiDev from 'services/api-dev';
 import './Header.scss';
 
 type CustomerSupportActivity = {
@@ -40,11 +41,15 @@ const Header: FC = () => {
   const queryClient = useQueryClient();
   const [userDrawerOpen, setUserDrawerOpen] = useState(false);
   const [csaStatus, setCsaStatus] = useState<'idle' | 'offline' | 'online'>('online');
+  const [csaActive, setCsaActive] = useState<boolean>(false);
   const { data: userProfileSettings } = useQuery<UserProfileSettings>({
     queryKey: ['cs-get-user-profile-settings'],
   });
   const { data: customerSupportActivity } = useQuery<CustomerSupportActivity>({
-    queryKey: ['cs-get-customer-support-activity'],
+    queryKey: ['cs-get-customer-support-activity', 'prod'],
+    onSuccess(res: any) {
+      setCsaActive(res.data.get_customer_support_activity[0].active === 'true' ? true : false);
+    },
   });
   const { data: chatData } = useQuery<ChatType[]>({
     queryKey: ['cs-get-all-active-chats'],
@@ -63,9 +68,13 @@ const Header: FC = () => {
   });
 
   const customerSupportActivityMutation = useMutation({
-    mutationFn: (data: CustomerSupportActivityDTO) => api.post('cs-set-customer-support-activity', data),
+    mutationFn: (data: CustomerSupportActivityDTO) => apiDev.post('cs-set-customer-support-activity', {
+      "customerSupportId": data.customerSupportId,
+      "customerSupportActive": data.customerSupportActive,
+      "customerSupportStatus": data.customerSupportStatus
+    }),
     onError: async (error: AxiosError) => {
-      await queryClient.invalidateQueries(['cs-get-customer-support-activity']);
+      await queryClient.invalidateQueries(['cs-get-customer-support-activity', 'prod']);
       toast.open({
         type: 'error',
         title: t('global.notificationError'),
@@ -113,8 +122,9 @@ const Header: FC = () => {
     userProfileSettingsMutation.mutate(newSettings);
   };
 
-  const handleCsaStatusChange = () => {
-
+  const handleCsaStatusChange = (checked: boolean) => {
+    setCsaActive(checked)
+    customerSupportActivityMutation.mutate({ customerSupportActive: checked, customerSupportStatus: checked === true ? 'online' : 'offline', customerSupportId: '' })
   };
 
   return (
@@ -136,6 +146,7 @@ const Header: FC = () => {
                 </p>
                 <Switch
                   onCheckedChange={handleCsaStatusChange}
+                  checked={csaActive}
                   label={t('global.csaStatus')}
                   hideLabel
                   name='csaStatus'
@@ -145,7 +156,7 @@ const Header: FC = () => {
               </Track>
               <span style={{ display: 'block', width: 2, height: 30, backgroundColor: '#DBDFE2' }}></span>
               <Button appearance='text' onClick={() => setUserDrawerOpen(!userDrawerOpen)}>
-                {customerSupportActivity && (
+                {csaActive && (
                   <span style={{
                     display: 'block',
                     width: 16,

@@ -136,7 +136,7 @@ services:
       - ./setup/dmapper/server.xml:/usr/local/tomcat/conf/server.xml:ro
       - ./setup/dmapper/cert.crt:/usr/local/tomcat/conf/tls.crt:ro
       - ./setup/dmapper/key.key:/usr/local/tomcat/conf/tls.key:ro
-      - ./DSL.DMapper:/workspace/app/views/byk/
+      - ./DSL.DMapper:/usr/local/tomcat/templates/v2/
     restart: always
     networks:
       - bykstack
