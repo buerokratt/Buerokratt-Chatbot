@@ -6,7 +6,7 @@ SELECT u.login,
        u.csa_title,
        u.csa_email,
        ua.authority_name AS authorities,
-       csa.status AS customerSupportStatus
+       csa.status AS customer_support_status
 FROM "user" u
          LEFT JOIN (SELECT authority_name, user_id
                     FROM user_authority AS ua
