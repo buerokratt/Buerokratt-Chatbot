@@ -21,8 +21,14 @@ const ForwardToEstablishmentModal: FC<ForwardToEstablishmentModalProps> = ({ cha
     pageIndex: 0,
     pageSize: 10,
   });
+  const [establishmentsList, setEstablishmentsList] = useState<Establishment[]>([]);
   const { data: establishments } = useQuery<Establishment[]>({
-    queryKey: ['cs-get-all-establishments'],
+    queryKey: ['cs-get-all-establishments', 'prod'],
+    onSuccess(res: any) {
+      setEstablishmentsList((res.data.format_data.establishments as string[]).map((name: string, id): Establishment => {
+        return { id, name };
+      }));
+    }
   });
 
   const columnHelper = createColumnHelper<Establishment>();
@@ -66,7 +72,7 @@ const ForwardToEstablishmentModal: FC<ForwardToEstablishmentModalProps> = ({ cha
       </Track>
       {establishments && (
         <DataTable
-          data={establishments}
+          data={establishmentsList}
           columns={establishmentsColumns}
           globalFilter={filter}
           setGlobalFilter={setFilter}
