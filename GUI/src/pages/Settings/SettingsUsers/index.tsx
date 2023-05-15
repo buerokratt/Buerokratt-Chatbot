@@ -20,7 +20,7 @@ const SettingsUsers: FC = () => {
   const [deletableRow, setDeletableRow] = useState<string | number | null>(null);
   const [usersList, setUsersList] = useState<User[]>([]);
   const { data: users } = useQuery<User[]>({
-    queryKey: ['/cs-get-customer-support-agents', 'prod'],
+    queryKey: ['cs-get-customer-support-agents', 'prod'],
     onSuccess(res: any) {
       setUsersList(res.data.get_customer_support_agents);
     },
@@ -30,12 +30,13 @@ const SettingsUsers: FC = () => {
   const deleteUserMutation = useMutation({
     mutationFn: ({ id }: { id: string | number }) => deleteUser(id),
     onSuccess: async () => {
-      await queryClient.invalidateQueries(['cs-get-admins']);
+      await queryClient.invalidateQueries(['cs-get-customer-support-agents', 'prod']);
       toast.open({
         type: 'success',
         title: t('global.notification'),
         message: 'User deleted',
       });
+      setDeletableRow(null);
     },
     onError: (error: AxiosError) => {
       toast.open({
@@ -59,6 +60,9 @@ const SettingsUsers: FC = () => {
     }),
     columnHelper.accessor('displayName', {
       header: t('settings.users.displayName') || '',
+    }),
+    columnHelper.accessor('csaTitle', {
+      header: t('settings.users.userTitle') || '',
     }),
     columnHelper.accessor('csaEmail', {
       header: t('settings.users.email') || '',

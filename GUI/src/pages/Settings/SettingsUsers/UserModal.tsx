@@ -29,6 +29,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
       idCode: user?.idCode,
       authorities: user?.authorities,
       displayName: user?.displayName,
+      csaTitle: user?.csaTitle,
       csaEmail: user?.csaEmail,
     },
   });
@@ -44,12 +45,13 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
   const userCreateMutation = useMutation({
     mutationFn: (data: UserDTO) => createUser(data),
     onSuccess: async () => {
-      await queryClient.invalidateQueries(['cs-get-admins']);
+      await queryClient.invalidateQueries(['cs-get-customer-support-agents', 'prod']);
       toast.open({
         type: 'success',
         title: t('global.notification'),
         message: 'New user added',
       });
+      onClose();
     },
     onError: (error: AxiosError) => {
       toast.open({
@@ -63,12 +65,13 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
   const userEditMutation = useMutation({
     mutationFn: ({ id, userData }: { id: string | number, userData: UserDTO }) => editUser(id, userData),
     onSuccess: async () => {
-      await queryClient.invalidateQueries(['cs-get-admins']);
+      await queryClient.invalidateQueries(['cs-get-customer-support-agents', 'prod']);
       toast.open({
         type: 'success',
         title: t('global.notification'),
         message: 'User updated',
       });
+      onClose();
     },
     onError: (error: AxiosError) => {
       toast.open({
@@ -102,7 +105,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
     >
       <Track direction='vertical' gap={16}>
         <FormInput {...register('login')} label={t('settings.users.fullName')} />
-        <FormInput {...register('idCode')} label={t('settings.users.idCode')} />
+        {!user && <FormInput {...register('idCode')} label={t('settings.users.idCode')} />}
         <Controller
           name='authorities'
           control={control}
@@ -116,6 +119,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
           }
         />
         <FormInput {...register('displayName')} label={t('settings.users.displayName')} />
+        <FormInput {...register('csaTitle')} label={t('settings.users.userTitle')} />
         <FormInput {...register('csaEmail')} label={t('settings.users.email')} type='email' />
       </Track>
     </Dialog>
