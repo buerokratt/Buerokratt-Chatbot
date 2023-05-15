@@ -24,7 +24,7 @@
             }
         },
         {
-            "get-user": {
+            "get_user": {
                 "verify": {
                     "response": {
                         "ok": "proceed",

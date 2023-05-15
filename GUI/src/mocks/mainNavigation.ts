@@ -92,6 +92,37 @@ export const mainNavigationET = [
     ],
   },
   {
+    id: 'analytics',
+    label: 'Analüütika',
+    path: '/analytics',
+    children: [
+      {
+        label: 'Ülevaade',
+        path: '#',
+      },
+      {
+        label: 'Vestlused',
+        path: '#',
+      },
+      {
+        label: 'Bürokratt',
+        path: '#',
+      },
+      {
+        label: 'Tagasiside',
+        path: '#',
+      },
+      {
+        label: 'Nõustajad',
+        path: '#',
+      },
+      {
+        label: 'Avaandmed',
+        path: '#',
+      },
+    ],
+  },
+  {
     id: 'settings',
     label: 'Haldus',
     path: '/haldus',
@@ -235,6 +266,37 @@ export const mainNavigationEN = [
       {
         label: 'Train new model',
         path: '/training/train-new-model',
+      },
+    ],
+  },
+  {
+    id: 'analytics',
+    label: 'Analytics',
+    path: '/analytics',
+    children: [
+      {
+        label: 'Overview',
+        path: '#',
+      },
+      {
+        label: 'Chats',
+        path: '#',
+      },
+      {
+        label: 'Burokratt',
+        path: '#',
+      },
+      {
+        label: 'Feedback',
+        path: '#',
+      },
+      {
+        label: 'Advisors',
+        path: '#',
+      },
+      {
+        label: 'Reports',
+        path: '#',
       },
     ],
   },
