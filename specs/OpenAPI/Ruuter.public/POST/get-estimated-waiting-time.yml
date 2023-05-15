@@ -22,7 +22,7 @@ paths:
           description: Id of the chat
           schema:
             type: string
-            example: 8cfbc32a-7244-4933-8a25-14422b557ad2
+            example: '8cfbc32a-7244-4933-8a25-14422b557ad2'
       responses:
         '200':
           description: Estimated waiting time of the chat
@@ -31,6 +31,17 @@ paths:
               schema:
                 type: object
                 properties:
-                  estimatedWaitingTime:
-                    type: number
-                    example: 0
+                  data:
+                    type: object
+                    properties:
+                      return_first_estimated_time_from_array:
+                        type: object
+                        properties:
+                          isActive:
+                            type: boolean
+                            example: true
+                          time:
+                            type: string
+                            example: '1'
+                  error:
+                    example: null

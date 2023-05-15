@@ -25,22 +25,23 @@ paths:
             example: '8cfbc32a-7244-4933-8a25-14422b557ad2'
       responses:
         '200':
-          description: Send a request for estimated waiting time of the chat
+          description: Estimated waiting time of the chat
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  estimatedWaitingTime:
-                    type: number
-                    example: 100
-        '400':
-          description: No chatId in the request parameter
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  returnNoParameter:
-                    type: string
-                    example: '300'
+                  data:
+                    type: object
+                    properties:
+                      return_first_estimated_time_from_array:
+                        type: object
+                        properties:
+                          isActive:
+                            type: boolean
+                            example: true
+                          time:
+                            type: string
+                            example: '1'
+                  error:
+                    example: null
