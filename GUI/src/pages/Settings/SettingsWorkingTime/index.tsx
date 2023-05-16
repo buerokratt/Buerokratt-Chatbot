@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, Card, FormCheckbox, FormCheckboxes, FormDatepicker, Switch, Track } from 'components';
 import { OrganizationWorkingTime } from 'types/organizationWorkingTime';
 import { useToast } from 'hooks/useToast';
-import api from 'services/api';
+import apiDevV2 from 'services/api-dev-v2';
 
 const weekdaysOptions = [
   'monday',
@@ -23,16 +23,17 @@ const SettingsWorkingTime: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
   const { control, handleSubmit, reset } = useForm<OrganizationWorkingTime>();
-  const { data: workingTime } = useQuery<OrganizationWorkingTime>({
-    queryKey: ['cs-get-organization-working-time'],
-    onSuccess: (data) => reset({
-      organizationWorkingTimeStartISO: new Date(data.organizationWorkingTimeStartISO),
-      organizationWorkingTimeEndISO: new Date(data.organizationWorkingTimeEndISO),
-    }),
+  const { data: workingTime } = useQuery<{response: OrganizationWorkingTime}>({
+    queryKey: ['cs-get-organization-working-time', 'prod-2'],
+    onSuccess: (data) => {
+      reset({
+      organizationWorkingTimeStartISO: new Date(data.response.organizationWorkingTimeStartISO),
+      organizationWorkingTimeEndISO: new Date(data.response.organizationWorkingTimeEndISO),
+    })},
   });
 
   const workingTimeMutation = useMutation({
-    mutationFn: (data: OrganizationWorkingTime) => api.post<OrganizationWorkingTime>('cs-set-organization-working-time', data),
+    mutationFn: (data: OrganizationWorkingTime) => apiDevV2.post<OrganizationWorkingTime>('cs-set-organization-working-time', data),
     onError: (error: AxiosError) => {
       toast.open({
         type: 'error',
