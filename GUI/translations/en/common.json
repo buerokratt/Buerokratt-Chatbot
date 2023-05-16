@@ -230,7 +230,7 @@
     "nationalHolidays": "National holidays",
     "welcomeMessage": {
       "welcomeMessage": "Welcome Message",
-      "description": "Bürokrati automaatne tervitussõnum, mida kuvatakse esimese sõnumina vestlusakna avamisel.",
+      "description": "The bureaucrat's automatic welcome message that is displayed as the first message when opening a chat window.",
       "greetingActive": "Greeting Active",
       "messageChanged": "Welcome message changed successfully",
       "emptyMessage": "Welcome message can't be empty"
