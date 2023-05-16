@@ -5,7 +5,7 @@ import { format } from 'date-fns';
 import { et } from 'date-fns/locale';
 import clsx from 'clsx';
 import { MdOutlineAttachFile, MdOutlineSend } from 'react-icons/all';
-import { Button, FormInput, Icon, Track } from 'components';
+import { Button, FormInput, FormTextarea, Icon, Track } from 'components';
 import { ReactComponent as BykLogoWhite } from 'assets/logo-white.svg';
 import useUserInfoStore from 'store/store';
 import { Chat as ChatType, MessageSseEvent, MessageStatus } from 'types/chat';
@@ -16,6 +16,7 @@ import './Chat.scss';
 import handleSse from "../../mocks/handleSse";
 import { findIndex } from 'lodash';
 import axios from 'axios';
+import { CHAT_INPUT_LENGTH } from 'constants/config';
 
 
 type ChatProps = {
@@ -254,11 +255,19 @@ const Chat: FC<ChatProps> = ({ chat, onChatEnd, onForwardToColleauge, onForwardT
                 </div>
 
                 <div className='active-chat__toolbar'>
-                    <FormInput
+                    {/* <FormInput
                         name='message'
                         label={t('')}
                         placeholder={t('chat.reply') + '...'}
                         maxLength={5}
+                        onChange={(e) => setResponseText(e.target.value)}
+                    /> */}
+                    <FormTextarea
+                        name='message'
+                        label={t('')}
+                        placeholder={t('chat.reply') + '...'}
+                        minRows={1}
+                        maxLength={CHAT_INPUT_LENGTH}
                         onChange={(e) => setResponseText(e.target.value)}
                     />
                     <div className='active-chat__toolbar-actions'>
@@ -268,46 +277,6 @@ const Chat: FC<ChatProps> = ({ chat, onChatEnd, onForwardToColleauge, onForwardT
                         <Button appearance='secondary'>
                             <Icon icon={<MdOutlineAttachFile fontSize={18} />} size='medium' />
                         </Button>
-                        {/* <Button appearance='secondary'
-                            onClick={onForwardToEstablishment ? () => onForwardToEstablishment(chat) : undefined}>{t('chat.active.forwardToOrganization')}</Button>
-                        <Button
-                            appearance='secondary'
-                            onClick={onSendToEmail ? () => onSendToEmail(chat) : undefined}>
-                            {t('chat.active.sendToEmail')}
-                        </Button> */}
-                        {/* <Button
-                            appearance='secondary'
-                            onClick={onStartAService ? () => onStartAService(chat) : undefined}>
-                            {t('chat.active.startService')}
-                        </Button> */}
-                    </div>
-                    <div className='active-chat__side-meta'>
-                        <div>
-                            <p><strong>ID</strong></p>
-                            <p>{chat.id}</p>
-                        </div>
-                        <div>
-                            <p><strong>{t('chat.endUser')}</strong></p>
-                            <p>{endUserFullName}</p>
-                        </div>
-                        {chat.customerSupportDisplayName && (
-                            <div>
-                                <p><strong>{t('chat.csaName')}</strong></p>
-                                <p>{chat.customerSupportDisplayName}</p>
-                            </div>
-                        )}
-                        <div>
-                            <p><strong>{t('chat.startedAt')}</strong></p>
-                            <p>{format(new Date(chat.created), 'dd. MMMM Y HH:ii:ss', { locale: et }).toLowerCase()}</p>
-                        </div>
-                        <div>
-                            <p><strong>{t('chat.device')}</strong></p>
-                            <p>{chat.endUserOs}</p>
-                        </div>
-                        <div>
-                            <p><strong>{t('chat.location')}</strong></p>
-                            <p>{chat.endUserUrl}</p>
-                        </div>
                     </div>
                 </div>
             </div>
