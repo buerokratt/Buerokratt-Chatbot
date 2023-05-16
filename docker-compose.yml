@@ -11,7 +11,7 @@ services:
       - csrf.ruuter_services_whitelist=
       - legacy-portal-integration.sessionCookieDomain=buerokratt.ee
       - allowed.requested.method.types=POST
-      - ruuter.cors.allowedOrigins=https://buerokratt.ee,https://admin.buerokratt.ee,https://tim.buerokratt.ee,http://localhost:3001
+      - ruuter.cors.allowedOrigins=https://buerokratt.ee,https://admin.buerokratt.ee,https://tim.buerokratt.ee,http://localhost:3001,http://localhost:3002
       - maxRequestSizeBytes=10000000000
       - default.requested.method.type=POST
       - incoming.request.external.validation.enabled=false
@@ -38,7 +38,7 @@ services:
     environment:
       - legacy-portal-integration.sessionCookieDomain=buerokratt.ee
       - logging.level.root=INFO
-      - ruuter.cors.allowedOrigins=https://buerokratt.ee,https://admin.buerokratt.ee,https://seire.buerokratt.ee,http://localhost:3001
+      - ruuter.cors.allowedOrigins=https://buerokratt.ee,https://admin.buerokratt.ee,https://seire.buerokratt.ee,http://localhost:3001,http://localhost:3002
       - headers.contentSecurityPolicy=
       - maxRequestSizeBytes=10000000000
       - incoming.request.external.validation.enabled=false
@@ -101,8 +101,9 @@ services:
     container_name: ruuter-v2-private
     image: ruuter
     environment:
-      - application.cors.allowedOrigins=http://localhost:80
+      - application.cors.allowedOrigins=http://localhost:8082,http://localhost:3001
       - application.httpCodesAllowList=200,201,202,400,401,403,500
+      - server.port=8088
     volumes:
       - ./DSL.Ruuter.private/DSL:/DSL
       - ./DSL.Ruuter.public/DSL:/DSL
@@ -115,8 +116,9 @@ services:
     container_name: ruuter-v2-public
     image: ruuter
     environment:
-      - application.cors.allowedOrigins=http://localhost:80
+      - application.cors.allowedOrigins=http://localhost:8086,http://localhost:3001
       - application.httpCodesAllowList=200,201,202,400,401,403,500
+      - server.port=8086
     volumes:
       - ./DSL.Ruuter.public/DSL:/DSL
     ports:
