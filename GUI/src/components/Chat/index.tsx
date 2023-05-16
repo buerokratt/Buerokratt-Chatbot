@@ -131,23 +131,23 @@ const Chat: FC<ChatProps> = ({ chat, onChatEnd, onForwardToColleauge, onForwardT
     useEffect(() => {
         if (sideButtons.length > 0) return;
         let buttons: any = [];
-        userInfo?.authorities.forEach((authority) => {
-            // make role more uri friendly
-            let role = authority.substring(5).replaceAll('_', '-').toLowerCase();
-            // TODO: Replace '/active/admin.json' with '/<type>/<role>.json'.
-            axios({ url: `http://localhost:8085/cdn/buttons/chats/active/${role}.json` })
-                .then(res => {
-                    res.data.buttons.forEach((btnId: any) => {
-                        if (!buttonsToAllow.includes(btnId))
-                            buttonsToAllow.push(btnId);
-                    });
-                });
-        });
-        allSideButtons.forEach((button) => {
-            if (buttonsToAllow.includes(button.id))
-                buttons.push(button.button);
-        });
-        setSideButtons(buttons);
+        // userInfo?.authorities.forEach((authority) => {
+        //     // make role more uri friendly
+        //     let role = authority.substring(5).replaceAll('_', '-').toLowerCase();
+        //     // TODO: Replace '/active/admin.json' with '/<type>/<role>.json'.
+        //     axios({ url: `http://localhost:8085/cdn/buttons/chats/active/${role}.json` })
+        //         .then(res => {
+        //             res.data.buttons.forEach((btnId: any) => {
+        //                 if (!buttonsToAllow.includes(btnId))
+        //                     buttonsToAllow.push(btnId);
+        //             });
+        //         });
+        // });
+        // allSideButtons.forEach((button) => {
+        //     if (buttonsToAllow.includes(button.id))
+        //         buttons.push(button.button);
+        // });
+        // setSideButtons(buttons);
     }, [buttonsToAllow, sideButtons]);
 
     useEffect(() => {
@@ -258,6 +258,7 @@ const Chat: FC<ChatProps> = ({ chat, onChatEnd, onForwardToColleauge, onForwardT
                         name='message'
                         label={t('')}
                         placeholder={t('chat.reply') + '...'}
+                        maxLength={5}
                         onChange={(e) => setResponseText(e.target.value)}
                     />
                     <div className='active-chat__toolbar-actions'>
@@ -267,18 +268,18 @@ const Chat: FC<ChatProps> = ({ chat, onChatEnd, onForwardToColleauge, onForwardT
                         <Button appearance='secondary'>
                             <Icon icon={<MdOutlineAttachFile fontSize={18} />} size='medium' />
                         </Button>
-                        <Button appearance='secondary'
-                                onClick={onForwardToEstablishment ? () => onForwardToEstablishment(chat) : undefined}>{t('chat.active.forwardToOrganization')}</Button>
+                        {/* <Button appearance='secondary'
+                            onClick={onForwardToEstablishment ? () => onForwardToEstablishment(chat) : undefined}>{t('chat.active.forwardToOrganization')}</Button>
                         <Button
                             appearance='secondary'
                             onClick={onSendToEmail ? () => onSendToEmail(chat) : undefined}>
                             {t('chat.active.sendToEmail')}
-                        </Button>
-                        <Button
-                          appearance='secondary'
-                          onClick={onStartAService ? () => onStartAService(chat): undefined}>
-                          {t('chat.active.startService')}
-                        </Button>
+                        </Button> */}
+                        {/* <Button
+                            appearance='secondary'
+                            onClick={onStartAService ? () => onStartAService(chat) : undefined}>
+                            {t('chat.active.startService')}
+                        </Button> */}
                     </div>
                     <div className='active-chat__side-meta'>
                         <div>
@@ -297,7 +298,7 @@ const Chat: FC<ChatProps> = ({ chat, onChatEnd, onForwardToColleauge, onForwardT
                         )}
                         <div>
                             <p><strong>{t('chat.startedAt')}</strong></p>
-                            <p>{format(new Date(chat.created), 'dd. MMMM Y HH:ii:ss', {locale: et}).toLowerCase()}</p>
+                            <p>{format(new Date(chat.created), 'dd. MMMM Y HH:ii:ss', { locale: et }).toLowerCase()}</p>
                         </div>
                         <div>
                             <p><strong>{t('chat.device')}</strong></p>

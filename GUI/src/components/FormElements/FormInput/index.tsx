@@ -4,12 +4,14 @@ import { MdOutlinePalette } from 'react-icons/md';
 
 import { Icon } from 'components';
 import './FormInput.scss';
+import { CHAT_INPUT_LENGTH } from 'constants/config';
 
 type InputProps = InputHTMLAttributes<HTMLInputElement> & {
   label: string;
   name: string;
   hideLabel?: boolean;
   colorInput?: boolean;
+  maxLength?: number;
 };
 
 const FieldInput = forwardRef<HTMLInputElement, InputProps>((
@@ -19,6 +21,7 @@ const FieldInput = forwardRef<HTMLInputElement, InputProps>((
     disabled,
     hideLabel,
     colorInput,
+    maxLength,
     ...rest
   }
   , ref,
@@ -37,6 +40,7 @@ const FieldInput = forwardRef<HTMLInputElement, InputProps>((
         <input
           className={inputClasses}
           name={name}
+          maxLength={CHAT_INPUT_LENGTH}
           id={id}
           ref={ref}
           aria-label={hideLabel ? label : undefined}
