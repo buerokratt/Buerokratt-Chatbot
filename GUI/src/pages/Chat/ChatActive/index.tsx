@@ -16,6 +16,7 @@ import ForwardToColleaugeModal from '../ForwardToColleaugeModal';
 import ForwardToEstablishmentModal from '../ForwardToEstablishmentModal';
 import clsx from 'clsx';
 import StartAServiceModal from '../StartAServiceModal';
+import './ChatActive.scss';
 
 const CSAchatStatuses = [
   'accepted',
@@ -239,7 +240,9 @@ const ChatTrigger: FC<{ chat: ChatType }> = ({ chat }) => {
             style={{ color: '#4D4F5D' }}>{formatDistanceStrict(new Date(chat.lastMessageTimestamp), new Date(), { locale: et })}</p>
         )}
       </Track>
-      <p style={{ color: '#4D4F5D' }}>{chat.lastMessage}</p>
+      <div className="wrapper">
+        <p className="last_message">{chat.lastMessage}.</p>
+      </div>
     </div>
   );
 };
