@@ -143,6 +143,22 @@ services:
     networks:
       - bykstack
 
+  dmapper-v2:
+    container_name: dmapper-v2
+    image: datamapper-node
+    environment:
+      - PORT=3005
+      - CONTENT_FOLDER=/data
+    volumes:
+      - ./DSL:/data
+      - ./DSL.DMapper-v2/hbs:/workspace/app/views/chat-bot
+      - ./DSL.DMapper-v2/js:/workspace/app/js/chat-bot
+      - ./DSL.DMapper-v2/lib:/workspace/app/lib
+    ports:
+      - 3005:3005
+    networks:
+      - bykstack
+
   resql:
     container_name: resql
     image: resql
