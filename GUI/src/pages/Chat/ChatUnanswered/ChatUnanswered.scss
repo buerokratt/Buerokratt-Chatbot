@@ -1,0 +1,12 @@
+.wrapper {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.last_message {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-line-clamp: 3;
+    text-overflow: ellipsis;
+    -webkit-box-orient: vertical;
+}
