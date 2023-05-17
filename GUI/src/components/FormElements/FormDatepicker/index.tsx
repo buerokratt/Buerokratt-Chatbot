@@ -55,7 +55,7 @@ const FormDatepicker = forwardRef<any, FormDatepickerProps>((
           showTimeSelect={timePicker}
           showTimeSelectOnly={timePicker}
           timeIntervals={15}
-          timeFormat='hh:mm:ss'
+          timeFormat='HH:mm:ss'
           timeInputLabel=''
           portalId='overlay-root'
           {...rest}
