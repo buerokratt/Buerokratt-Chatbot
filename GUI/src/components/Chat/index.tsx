@@ -17,6 +17,7 @@ import handleSse from "../../mocks/handleSse";
 import { findIndex } from 'lodash';
 import axios from 'axios';
 import { CHAT_INPUT_LENGTH } from 'constants/config';
+import apiDev from 'services/api-dev';
 
 
 type ChatProps = {
@@ -47,9 +48,17 @@ const Chat: FC<ChatProps> = ({ chat, onChatEnd, onForwardToColleauge, onForwardT
     const [isPending, startTransition] = useTransition();
     const [responseText, setResponseText] = useState('');
     const [selectedMessages, setSelectedMessages] = useState<Message[]>([]);
-    const { data: messages } = useQuery<Message[]>({
-        queryKey: [`cs-get-messages-by-chat-id/${chat.id}`],
-    });
+    const [messagesList, setMessagesList] = useState<Message[]>([]);
+    useEffect(() => {
+        getMessages();
+    }, [])
+
+    const getMessages = async () => {
+        const { data: res } = await apiDev.post('cs-get-messages-by-chat-id', {
+            'chatId': chat.id
+        });
+        setMessagesList(res.data.cs_get_messages_by_chat_id);
+    };
 
     const [messageReadStatus, _setMessageReadStatus] = useState<MessageStatus>({
         messageId: null,
@@ -152,9 +161,9 @@ const Chat: FC<ChatProps> = ({ chat, onChatEnd, onForwardToColleauge, onForwardT
     }, [buttonsToAllow, sideButtons]);
 
     useEffect(() => {
-        if (!messages) return;
+        if (!messagesList) return;
         let groupedMessages: GroupedMessage[] = [];
-        messages.forEach((message) => {
+        messagesList.forEach((message) => {
             const lastGroup = groupedMessages[groupedMessages.length - 1];
             if (lastGroup?.type === message.authorRole) {
                 if (!message.event || message.event === 'greeting') {
@@ -179,7 +188,7 @@ const Chat: FC<ChatProps> = ({ chat, onChatEnd, onForwardToColleauge, onForwardT
             }
         });
         setMessageGroups(groupedMessages);
-    }, [messages, endUserFullName]);
+    }, [messagesList, endUserFullName]);
 
     useEffect(() => {
         if (!chatRef.current || !messageGroups) return;
@@ -303,6 +312,11 @@ const Chat: FC<ChatProps> = ({ chat, onChatEnd, onForwardToColleauge, onForwardT
                         appearance='secondary'
                         onClick={onSendToEmail ? () => onSendToEmail(chat) : undefined}>
                         {t('chat.active.sendToEmail')}
+                    </Button>
+                    <Button
+                        appearance='secondary'
+                        onClick={onStartAService ? () => onStartAService(chat) : undefined}>
+                        {t('chat.active.startService')}
                     </Button>
                 </div>
                 <div className='active-chat__side-meta'>

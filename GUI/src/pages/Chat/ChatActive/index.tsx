@@ -34,9 +34,13 @@ const ChatActive: FC = () => {
   const [forwardToEstablishmentModal, setForwardToEstablishmentModal] = useState<ChatType | null>(null);
   const [sendToEmailModal, setSendToEmailModal] = useState<ChatType | null>(null);
   const [startAServiceModal, setStartAServiceModal] = useState<ChatType | null>(null);
+  const [activeChatsList, setActiveChatsList] = useState<ChatType[]>([]);
 
   const { data: chatData } = useQuery<ChatType[]>({
-    queryKey: ['cs-get-all-active-chats'],
+    queryKey: ['cs-get-all-active-chats', 'prod'],
+    onSuccess(res: any) {
+      setActiveChatsList(res.data.get_all_active_chats);
+    },
   });
 
   const sendToEmailMutation = useMutation({
@@ -58,8 +62,8 @@ const ChatActive: FC = () => {
     onSettled: () => setSendToEmailModal(null),
   });
 
-  const selectedChat = useMemo(() => chatData && chatData.find((c) => c.id === selectedChatId), [chatData, selectedChatId]);
-  const activeChats = useMemo(() => chatData ? chatData.filter((c) => c.customerSupportId !== '') : [], [chatData]);
+  const selectedChat = useMemo(() => activeChatsList && activeChatsList.find((c) => c.id === selectedChatId), [activeChatsList, selectedChatId]);
+  const activeChats = useMemo(() => activeChatsList ? activeChatsList.filter((c) => c.customerSupportId !== '') : [], [activeChatsList]);
 
   const handleCsaForward = (chat: ChatType, user: User) => {
     // TODO: Add endpoint for chat forwarding
