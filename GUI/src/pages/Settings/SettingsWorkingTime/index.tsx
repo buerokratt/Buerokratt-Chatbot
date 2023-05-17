@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
@@ -31,6 +31,7 @@ const SettingsWorkingTime: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
   const { control, handleSubmit, reset } = useForm<OrganizationWorkingTime>();
+  const [key, setKey] = useState(0);
   const { data: workingTime } = useQuery<OrganizationWorkingTime>({
     queryKey: ['cs-get-organization-working-time', 'prod-2'],
     onSuccess: (data) => {
@@ -46,6 +47,7 @@ const SettingsWorkingTime: FC = () => {
         organizationWorkingTimeWeekdays:
           data.organizationWorkingTimeWeekdays ?? [],
       });
+      setKey(key + 1);
     },
   });
 
@@ -68,13 +70,15 @@ const SettingsWorkingTime: FC = () => {
     workingTimeMutation.mutate(data);
   });
 
-  if (!workingTime) return <>Loading...</>;
-
+  if (!workingTime || Object.keys(control._formValues).length === 0) {
+    return <>Loading...</>;
+  }
   return (
     <>
       <h1>{t('settings.workingTime.title')}</h1>
 
       <Card
+        key={key}
         footer={
           <Track justify="end">
             <Button onClick={handleFormSubmit}>{t('global.save')}</Button>
@@ -155,7 +159,12 @@ const SettingsWorkingTime: FC = () => {
             name="organizationWorkingTimeNationalHolidays"
             control={control}
             render={({ field }) => (
-              <Switch label={t('settings.nationalHolidays')} {...field} />
+              <Switch
+                label={t('settings.nationalHolidays')}
+                onCheckedChange={field.onChange}
+                checked={field.value}
+                {...field}
+              />
             )}
           />
         </Track>
