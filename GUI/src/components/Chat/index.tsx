@@ -328,6 +328,12 @@ const Chat: FC<ChatProps> = ({ chat, onChatEnd, onForwardToColleauge, onForwardT
                         <p><strong>{t('chat.endUser')}</strong></p>
                         <p>{endUserFullName}</p>
                     </div>
+                    {chat.endUserId && (
+                        <div>
+                            <p><strong>{t('chat.endUserId')}</strong></p>
+                            <p>{chat.endUserId ?? ''}</p>
+                        </div>
+                    )}
                     {chat.customerSupportDisplayName && (
                         <div>
                             <p><strong>{t('chat.csaName')}</strong></p>
