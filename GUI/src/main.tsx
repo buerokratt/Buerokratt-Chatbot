@@ -13,7 +13,7 @@ import 'styles/main.scss';
 import '../i18n';
 
 const defaultQueryFn: QueryFunction | undefined = async ({ queryKey }) => {
-  if (queryKey[1] === 'prod') {
+  if (queryKey.includes('prod')) {
     const { data } = await apiDev.get(queryKey[0] as string);
     return data;
   }

@@ -52,7 +52,7 @@ export interface Chat {
   forwardedFromCsa?: string,
   forwardedToCsa?: string,
   receivedFrom?: string;
-  comment: string;
+  comment?: string;
   labels: string;
 }
 
