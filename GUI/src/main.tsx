@@ -20,7 +20,7 @@ const defaultQueryFn: QueryFunction | undefined = async ({ queryKey }) => {
   }
   if (queryKey[1] === 'prod-2') {
     const { data } = await apiDevV2.get(queryKey[0] as string);
-    return data;
+    return data?.response;
   }
   const { data } = await api.get(queryKey[0] as string);
   return data;
