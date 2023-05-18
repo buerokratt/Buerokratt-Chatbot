@@ -1,5 +1,5 @@
 {
-    "dmapper_url": "https://dmapper:3000",
+    "dmapper_url": "http://dmapper:3000",
     "ruuter_url": "http://localhost:8080",
     "tim_url": "http://tim:8085",
     "resql_url": "http://resql:8082",
@@ -8,7 +8,7 @@
     "training_user": "TRAINING_BOT_USERNAME",
     "training_prv_key": "TRAINIG_BOT_PRIVATE_SSH_KEY_PATH",
     "training_bot_directory_name": "TRAINING_DATA_DIRECTORY",
-    "gazetteer_url":"https://inaadress.maaamet.ee/inaadress",
+    "gazetteer_url": "https://inaadress.maaamet.ee/inaadress",
     "publicapi_url": "https://publicapi.envir.ee/v1/combinedWeatherData",
     "ilmmicroservice_url": "https://ilmmicroservice.envir.ee/api/forecasts"
 }

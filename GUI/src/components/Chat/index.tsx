@@ -5,7 +5,7 @@ import { format } from 'date-fns';
 import { et } from 'date-fns/locale';
 import clsx from 'clsx';
 import { MdOutlineAttachFile, MdOutlineSend } from 'react-icons/all';
-import { Button, FormInput, Icon, Track } from 'components';
+import { Button, FormInput, FormTextarea, Icon, Track } from 'components';
 import { ReactComponent as BykLogoWhite } from 'assets/logo-white.svg';
 import useUserInfoStore from 'store/store';
 import { Chat as ChatType, MessageSseEvent, MessageStatus } from 'types/chat';
@@ -15,7 +15,10 @@ import ChatEvent from './ChatEvent';
 import './Chat.scss';
 import handleSse from "../../mocks/handleSse";
 import { findIndex } from 'lodash';
-import axios from 'axios';
+import { CHAT_INPUT_LENGTH } from 'constants/config';
+import apiDev from 'services/api-dev';
+import ChatTextArea from './ChatTextArea';
+import TextareaAutosize, { TextareaAutosizeProps } from 'react-textarea-autosize';
 
 
 type ChatProps = {
@@ -46,9 +49,17 @@ const Chat: FC<ChatProps> = ({ chat, onChatEnd, onForwardToColleauge, onForwardT
     const [isPending, startTransition] = useTransition();
     const [responseText, setResponseText] = useState('');
     const [selectedMessages, setSelectedMessages] = useState<Message[]>([]);
-    const { data: messages } = useQuery<Message[]>({
-        queryKey: [`cs-get-messages-by-chat-id/${chat.id}`],
-    });
+    const [messagesList, setMessagesList] = useState<Message[]>([]);
+    useEffect(() => {
+        getMessages();
+    }, [])
+
+    const getMessages = async () => {
+        const { data: res } = await apiDev.post('cs-get-messages-by-chat-id', {
+            'chatId': chat.id
+        });
+        setMessagesList(res.data.cs_get_messages_by_chat_id);
+    };
 
     const [messageReadStatus, _setMessageReadStatus] = useState<MessageStatus>({
         messageId: null,
@@ -131,29 +142,29 @@ const Chat: FC<ChatProps> = ({ chat, onChatEnd, onForwardToColleauge, onForwardT
     useEffect(() => {
         if (sideButtons.length > 0) return;
         let buttons: any = [];
-        userInfo?.authorities.forEach((authority) => {
-            // make role more uri friendly
-            let role = authority.substring(5).replaceAll('_', '-').toLowerCase();
-            // TODO: Replace '/active/admin.json' with '/<type>/<role>.json'.
-            axios({ url: `http://localhost:8085/cdn/buttons/chats/active/${role}.json` })
-                .then(res => {
-                    res.data.buttons.forEach((btnId: any) => {
-                        if (!buttonsToAllow.includes(btnId))
-                            buttonsToAllow.push(btnId);
-                    });
-                });
-        });
-        allSideButtons.forEach((button) => {
-            if (buttonsToAllow.includes(button.id))
-                buttons.push(button.button);
-        });
-        setSideButtons(buttons);
+        // userInfo?.authorities.forEach((authority) => {
+        //     // make role more uri friendly
+        //     let role = authority.substring(5).replaceAll('_', '-').toLowerCase();
+        //     // TODO: Replace '/active/admin.json' with '/<type>/<role>.json'.
+        //     axios({ url: `http://localhost:8085/cdn/buttons/chats/active/${role}.json` })
+        //         .then(res => {
+        //             res.data.buttons.forEach((btnId: any) => {
+        //                 if (!buttonsToAllow.includes(btnId))
+        //                     buttonsToAllow.push(btnId);
+        //             });
+        //         });
+        // });
+        // allSideButtons.forEach((button) => {
+        //     if (buttonsToAllow.includes(button.id))
+        //         buttons.push(button.button);
+        // });
+        // setSideButtons(buttons);
     }, [buttonsToAllow, sideButtons]);
 
     useEffect(() => {
-        if (!messages) return;
+        if (!messagesList) return;
         let groupedMessages: GroupedMessage[] = [];
-        messages.forEach((message) => {
+        messagesList.forEach((message) => {
             const lastGroup = groupedMessages[groupedMessages.length - 1];
             if (lastGroup?.type === message.authorRole) {
                 if (!message.event || message.event === 'greeting') {
@@ -178,7 +189,7 @@ const Chat: FC<ChatProps> = ({ chat, onChatEnd, onForwardToColleauge, onForwardT
             }
         });
         setMessageGroups(groupedMessages);
-    }, [messages, endUserFullName]);
+    }, [messagesList, endUserFullName]);
 
     useEffect(() => {
         if (!chatRef.current || !messageGroups) return;
@@ -254,60 +265,26 @@ const Chat: FC<ChatProps> = ({ chat, onChatEnd, onForwardToColleauge, onForwardT
                 </div>
 
                 <div className='active-chat__toolbar'>
-                    <FormInput
-                        name='message'
-                        label={t('')}
-                        placeholder={t('chat.reply') + '...'}
-                        onChange={(e) => setResponseText(e.target.value)}
-                    />
-                    <div className='active-chat__toolbar-actions'>
-                        <Button appearance='primary' onClick={handleResponseTextSend}>
-                            <Icon icon={<MdOutlineSend fontSize={18} />} size='medium' />
-                        </Button>
-                        <Button appearance='secondary'>
-                            <Icon icon={<MdOutlineAttachFile fontSize={18} />} size='medium' />
-                        </Button>
-                        <Button appearance='secondary'
-                                onClick={onForwardToEstablishment ? () => onForwardToEstablishment(chat) : undefined}>{t('chat.active.forwardToOrganization')}</Button>
-                        <Button
-                            appearance='secondary'
-                            onClick={onSendToEmail ? () => onSendToEmail(chat) : undefined}>
-                            {t('chat.active.sendToEmail')}
-                        </Button>
-                        <Button
-                          appearance='secondary'
-                          onClick={onStartAService ? () => onStartAService(chat): undefined}>
-                          {t('chat.active.startService')}
-                        </Button>
-                    </div>
-                    <div className='active-chat__side-meta'>
-                        <div>
-                            <p><strong>ID</strong></p>
-                            <p>{chat.id}</p>
+                    <Track>
+                        <ChatTextArea
+                            name='message'
+                            label={t('')}
+                            id='chatArea'
+                            placeholder={t('chat.reply') + '...'}
+                            minRows={1}
+                            maxRows={8}
+                            maxLength={CHAT_INPUT_LENGTH}
+                            onChange={(e) => setResponseText(e.target.value)}
+                        />
+                        <div className='active-chat__toolbar-actions'>
+                            <Button id="myButton" appearance='primary' onClick={handleResponseTextSend}>
+                                <Icon icon={<MdOutlineSend fontSize={18} />} size='medium' />
+                            </Button>
+                            <Button appearance='secondary'>
+                                <Icon icon={<MdOutlineAttachFile fontSize={18} />} size='medium' />
+                            </Button>
                         </div>
-                        <div>
-                            <p><strong>{t('chat.endUser')}</strong></p>
-                            <p>{endUserFullName}</p>
-                        </div>
-                        {chat.customerSupportDisplayName && (
-                            <div>
-                                <p><strong>{t('chat.csaName')}</strong></p>
-                                <p>{chat.customerSupportDisplayName}</p>
-                            </div>
-                        )}
-                        <div>
-                            <p><strong>{t('chat.startedAt')}</strong></p>
-                            <p>{format(new Date(chat.created), 'dd. MMMM Y HH:ii:ss', {locale: et}).toLowerCase()}</p>
-                        </div>
-                        <div>
-                            <p><strong>{t('chat.device')}</strong></p>
-                            <p>{chat.endUserOs}</p>
-                        </div>
-                        <div>
-                            <p><strong>{t('chat.location')}</strong></p>
-                            <p>{chat.endUserUrl}</p>
-                        </div>
-                    </div>
+                    </Track>
                 </div>
             </div>
             <div className='active-chat__side'>
@@ -334,6 +311,11 @@ const Chat: FC<ChatProps> = ({ chat, onChatEnd, onForwardToColleauge, onForwardT
                         onClick={onSendToEmail ? () => onSendToEmail(chat) : undefined}>
                         {t('chat.active.sendToEmail')}
                     </Button>
+                    <Button
+                        appearance='secondary'
+                        onClick={onStartAService ? () => onStartAService(chat) : undefined}>
+                        {t('chat.active.startService')}
+                    </Button>
                 </div>
                 <div className='active-chat__side-meta'>
                     <div>
@@ -344,6 +326,12 @@ const Chat: FC<ChatProps> = ({ chat, onChatEnd, onForwardToColleauge, onForwardT
                         <p><strong>{t('chat.endUser')}</strong></p>
                         <p>{endUserFullName}</p>
                     </div>
+                    {chat.endUserId && (
+                        <div>
+                            <p><strong>{t('chat.endUserId')}</strong></p>
+                            <p>{chat.endUserId ?? ''}</p>
+                        </div>
+                    )}
                     {chat.customerSupportDisplayName && (
                         <div>
                             <p><strong>{t('chat.csaName')}</strong></p>

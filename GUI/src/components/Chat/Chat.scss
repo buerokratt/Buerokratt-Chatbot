@@ -51,12 +51,18 @@
   &__toolbar-actions {
     display: flex;
     gap: 8px;
-    position: absolute;
+    position: relative;
     right: 12px;
-    top: 8px;
+    left: 5px;
+    top: 0px;
+    bottom: 8px;
 
     .btn {
-      padding: 8px 20px;
+      padding-left: 20px;
+      padding-right: 20px;
+      padding-top: 9.5px;
+      padding-bottom: 9.5px;
+      border-radius: 15px;
     }
   }
 

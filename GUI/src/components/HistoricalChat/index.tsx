@@ -1,17 +1,18 @@
-import {FC, useEffect, useMemo, useRef, useState} from 'react';
-import {useTranslation} from 'react-i18next';
-import { useQuery} from '@tanstack/react-query';
+import { FC, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
-import {MdOutlineModeEditOutline, MdOutlineSave} from 'react-icons/all';
+import { MdOutlineModeEditOutline, MdOutlineSave } from 'react-icons/all';
 
-import {Button, FormSelect, FormTextarea, Icon, Track} from 'components';
-import {ReactComponent as BykLogoWhite} from 'assets/logo-white.svg';
+import { Button, FormSelect, FormTextarea, Icon, Track } from 'components';
+import { ReactComponent as BykLogoWhite } from 'assets/logo-white.svg';
 import useUserInfoStore from 'store/store';
-import {Chat as ChatType} from 'types/chat';
-import {Message} from 'types/message';
+import { Chat as ChatType } from 'types/chat';
+import { Message } from 'types/message';
 import ChatMessage from './ChatMessage';
 import ChatEvent from './ChatEvent';
 import './HistoricalChat.scss';
+import apiDev from 'services/api-dev';
 
 type ChatProps = {
     chat: ChatType;
@@ -35,15 +36,24 @@ const chatStatuses = [
     'response-sent-to-client-email',
 ];
 
-const HistoricalChat: FC<ChatProps> = ({chat, onChatStatusChange, onCommentChange}) => {
-    const {t} = useTranslation();
-    const {userInfo} = useUserInfoStore();
+const HistoricalChat: FC<ChatProps> = ({ chat, onChatStatusChange, onCommentChange }) => {
+    const { t } = useTranslation();
+    const { userInfo } = useUserInfoStore();
     const chatRef = useRef<HTMLDivElement>(null);
     const [messageGroups, setMessageGroups] = useState<GroupedMessage[]>([]);
     const [editingComment, setEditingComment] = useState<string | null>(null);
-    const {data: messages} = useQuery<Message[]>({
-        queryKey: [`cs-get-messages-by-chat-id/${chat.id}`],
-    });
+    const [messagesList, setMessagesList] = useState<Message[]>([]);
+    useEffect(() => {
+        getMessages();
+    }, [])
+
+    const getMessages = async () => {
+        const { data: res } = await apiDev.post('cs-get-messages-by-chat-id', {
+            'chatId': chat.id
+        });
+        setMessagesList(res.data.cs_get_messages_by_chat_id);
+    };
+
 
     const hasAccessToActions = useMemo(() => {
         if (chat.customerSupportId === userInfo?.idCode) return true;
@@ -54,9 +64,9 @@ const HistoricalChat: FC<ChatProps> = ({chat, onChatStatusChange, onCommentChang
         ? `${chat.endUserFirstName} ${chat.endUserLastName}` : t('global.anonymous');
 
     useEffect(() => {
-        if (!messages) return;
+        if (!messagesList) return;
         let groupedMessages: GroupedMessage[] = [];
-        messages.forEach((message) => {
+        messagesList.forEach((message) => {
             const lastGroup = groupedMessages[groupedMessages.length - 1];
             if (lastGroup?.type === message.authorRole) {
                 if (!message.event || message.event === 'greeting') {
@@ -81,11 +91,11 @@ const HistoricalChat: FC<ChatProps> = ({chat, onChatStatusChange, onCommentChang
             }
         });
         setMessageGroups(groupedMessages);
-    }, [messages, endUserFullName]);
+    }, [messagesList, endUserFullName]);
 
     useEffect(() => {
         if (!chatRef.current || !messageGroups) return;
-        chatRef.current.scrollIntoView({block: 'end', inline: 'end'});
+        chatRef.current.scrollIntoView({ block: 'end', inline: 'end' });
     }, [messageGroups]);
 
     return (
@@ -94,14 +104,14 @@ const HistoricalChat: FC<ChatProps> = ({chat, onChatStatusChange, onCommentChang
                 <div className='historical-chat__group-wrapper'>
                     {messageGroups && messageGroups.map((group, index) => (
                         <div className={clsx(['historical-chat__group', `historical-chat__group--${group.type}`])}
-                             key={`group-${index}`}>
+                            key={`group-${index}`}>
                             {group.type === 'event' ? (
-                                <ChatEvent message={group.messages[0]}/>
+                                <ChatEvent message={group.messages[0]} />
                             ) : (
                                 <>
                                     <div className='historical-chat__group-initials'>
                                         {group.type === 'buerokratt' || group.type === 'chatbot' ? (
-                                            <BykLogoWhite height={24}/>
+                                            <BykLogoWhite height={24} />
                                         ) : (
                                             <>{group.name.split(' ').map((n) => n[0]).join('').toUpperCase()}</>
                                         )}
@@ -109,7 +119,7 @@ const HistoricalChat: FC<ChatProps> = ({chat, onChatStatusChange, onCommentChang
                                     <div className='historical-chat__group-name'>{group.name}</div>
                                     <div className='historical-chat__messages'>
                                         {group.messages.map((message, i) => (
-                                            <ChatMessage message={message} key={`message-${i}`}/>
+                                            <ChatMessage message={message} key={`message-${i}`} />
                                         ))}
                                     </div>
                                 </>
@@ -143,17 +153,17 @@ const HistoricalChat: FC<ChatProps> = ({chat, onChatStatusChange, onCommentChang
                                         setEditingComment(null);
                                     }}
                                 >
-                                    <Icon icon={<MdOutlineSave/>}/>
+                                    <Icon icon={<MdOutlineSave />} />
                                     {t('global.save')}
                                 </Button>
                             ) : (
                                 <Button
                                     appearance='text'
                                     onClick={() =>
-                                        setEditingComment(chat.comment)
+                                        setEditingComment(chat.comment ?? '')
                                     }
                                 >
-                                    <Icon icon={<MdOutlineModeEditOutline/>}/>
+                                    <Icon icon={<MdOutlineModeEditOutline />} />
                                     {t('global.edit')}
                                 </Button>
                             )}
