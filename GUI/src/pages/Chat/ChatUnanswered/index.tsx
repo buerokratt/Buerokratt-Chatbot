@@ -10,6 +10,7 @@ import { Chat as ChatType } from 'types/chat';
 import useUserInfoStore from 'store/store';
 import { User } from 'types/user';
 import { useToast } from 'hooks/useToast';
+import './ChatUnanswered.scss';
 
 const ChatUnanswered: FC = () => {
   const { t } = useTranslation();
@@ -95,7 +96,9 @@ const ChatUnanswered: FC = () => {
                   </p>
                 )}
               </Track>
-              <p style={{ color: '#4D4F5D' }}>{chat.lastMessage}</p>
+              <div className="wrapper">
+                <p className="last_message">{chat.lastMessage}.</p>
+              </div>
             </div>
           </Tabs.Trigger>
         ))}

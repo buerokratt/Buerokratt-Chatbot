@@ -23,11 +23,11 @@ import { Chat as ChatType, CHAT_STATUS } from 'types/chat';
 import { Message } from 'types/message';
 import { useToast } from 'hooks/useToast';
 import api from 'services/api';
+import apiDev from 'services/api-dev';
 
 const ChatHistory: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
-  const [filter, setFilter] = useState('');
   const [selectedChat, setSelectedChat] = useState<ChatType | null>(null);
   const [sendToEmailModal, setSendToEmailModal] = useState<ChatType | null>(null);
   const [statusChangeModal, setStatusChangeModal] = useState<string | null>(null);
@@ -35,12 +35,25 @@ const ChatHistory: FC = () => {
     pageIndex: 0,
     pageSize: 10,
   });
+
+  const [endedChatsList, setEndedChatsList] = useState<ChatType[]>([]);
+  const [filteredEndedChatsList, setFilteredEndedChatsList] = useState<ChatType[]>([]);
+  const [chatMessagesList, setchatMessagesList] = useState<Message[]>([]);
+
   const { data: endedChats } = useQuery<ChatType[]>({
-    queryKey: ['cs-get-all-ended-chats'],
+    queryKey: ['cs-get-all-ended-chats', 'prod'],
+    onSuccess(res: any) {
+      setEndedChatsList(res.data.cs_get_all_ended_chats);
+      setFilteredEndedChatsList(res.data.cs_get_all_ended_chats)
+    },
   });
   const { data: chatMessages } = useQuery<Message[]>({
-    queryKey: ['cs-get-messages-by-chat-id', selectedChat?.id],
+    queryKey: ['cs-get-messages-by-chat-id', selectedChat?.id, 'prod'],
     enabled: !!selectedChat,
+    onSuccess(res: any) {
+      setchatMessagesList(res.data.cs_get_messages_by_chat_id);
+
+    },
   });
 
   const visibleColumnOptions = useMemo(() => [
@@ -73,6 +86,17 @@ const ChatHistory: FC = () => {
       });
     },
     onSettled: () => setSendToEmailModal(null),
+  });
+
+  const searchChatsMutation = useMutation({
+    mutationFn: (searchKey: string) => apiDev.post('cs-get-chat-ids-matching-message-search', {
+      'searchKey': searchKey
+    }),
+    onSuccess: (res) => {
+      const responseList = (res.data.data.get_chat_ids_matching_message_search ?? []).map((item: any) => item.chatId);
+      const filteredChats = endedChatsList.filter(item => responseList.includes(item.id));
+      setFilteredEndedChatsList(filteredChats);
+    }
   });
 
   const chatStatusChangeMutation = useMutation({
@@ -142,7 +166,7 @@ const ChatHistory: FC = () => {
       header: t('chat.history.comment') || '',
       cell: (props) => (
         <Tooltip content={props.getValue()}>
-          <span>{props.getValue()?.slice(0, 30) + '...'}</span>
+          <span>{props.getValue() === undefined ? '' : props.getValue()?.slice(0, 30) + '...'}</span>
         </Tooltip>
       ),
     }),
@@ -196,7 +220,7 @@ const ChatHistory: FC = () => {
     chatCommentChangeMutation.mutate({ chatId: selectedChat.id, comment });
   };
 
-  if (!endedChats) return <>Loading...</>;
+  if (!filteredEndedChatsList) return <>Loading...</>;
 
   return (
     <>
@@ -209,7 +233,7 @@ const ChatHistory: FC = () => {
             hideLabel
             name='searchChats'
             placeholder={t('chat.history.searchChats') + '...'}
-            onChange={(e) => setFilter(e.target.value)}
+            onChange={(e) => e.target.value.length === 0 ? setFilteredEndedChatsList(endedChatsList) : searchChatsMutation.mutate(e.target.value)}
           />
           <FormMultiselect
             name='visibleColumns'
@@ -221,17 +245,15 @@ const ChatHistory: FC = () => {
 
       <Card>
         <DataTable
-          data={endedChats}
+          data={filteredEndedChatsList}
           sortable
           columns={endedChatsColumns}
-          globalFilter={filter}
-          setGlobalFilter={setFilter}
           pagination={pagination}
           setPagination={setPagination}
         />
       </Card>
 
-      {selectedChat && chatMessages && (
+      {selectedChat && chatMessagesList && (
         <Drawer
           title={selectedChat.endUserFirstName !== '' && selectedChat.endUserLastName !== ''
             ? `${selectedChat.endUserFirstName} ${selectedChat.endUserLastName}`
