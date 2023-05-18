@@ -15,9 +15,10 @@ import ChatEvent from './ChatEvent';
 import './Chat.scss';
 import handleSse from "../../mocks/handleSse";
 import { findIndex } from 'lodash';
-import axios from 'axios';
 import { CHAT_INPUT_LENGTH } from 'constants/config';
 import apiDev from 'services/api-dev';
+import ChatTextArea from './ChatTextArea';
+import TextareaAutosize, { TextareaAutosizeProps } from 'react-textarea-autosize';
 
 
 type ChatProps = {
@@ -264,29 +265,26 @@ const Chat: FC<ChatProps> = ({ chat, onChatEnd, onForwardToColleauge, onForwardT
                 </div>
 
                 <div className='active-chat__toolbar'>
-                    {/* <FormInput
-                        name='message'
-                        label={t('')}
-                        placeholder={t('chat.reply') + '...'}
-                        maxLength={5}
-                        onChange={(e) => setResponseText(e.target.value)}
-                    /> */}
-                    <FormTextarea
-                        name='message'
-                        label={t('')}
-                        placeholder={t('chat.reply') + '...'}
-                        minRows={1}
-                        maxLength={CHAT_INPUT_LENGTH}
-                        onChange={(e) => setResponseText(e.target.value)}
-                    />
-                    <div className='active-chat__toolbar-actions'>
-                        <Button appearance='primary' onClick={handleResponseTextSend}>
-                            <Icon icon={<MdOutlineSend fontSize={18} />} size='medium' />
-                        </Button>
-                        <Button appearance='secondary'>
-                            <Icon icon={<MdOutlineAttachFile fontSize={18} />} size='medium' />
-                        </Button>
-                    </div>
+                    <Track>
+                        <ChatTextArea
+                            name='message'
+                            label={t('')}
+                            id='chatArea'
+                            placeholder={t('chat.reply') + '...'}
+                            minRows={1}
+                            maxRows={8}
+                            maxLength={CHAT_INPUT_LENGTH}
+                            onChange={(e) => setResponseText(e.target.value)}
+                        />
+                        <div className='active-chat__toolbar-actions'>
+                            <Button id="myButton" appearance='primary' onClick={handleResponseTextSend}>
+                                <Icon icon={<MdOutlineSend fontSize={18} />} size='medium' />
+                            </Button>
+                            <Button appearance='secondary'>
+                                <Icon icon={<MdOutlineAttachFile fontSize={18} />} size='medium' />
+                            </Button>
+                        </div>
+                    </Track>
                 </div>
             </div>
             <div className='active-chat__side'>
