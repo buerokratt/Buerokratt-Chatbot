@@ -9,7 +9,7 @@ SELECT DISTINCT u.login,
        last_value(csa.status)
        OVER(
         PARTITION BY csa.id_code
-       ) AS customerSupportStatus
+       ) AS customer_support_status
 FROM "user" u
          LEFT JOIN (SELECT authority_name, user_id
                     FROM user_authority AS ua
