@@ -35,6 +35,7 @@ const SettingsWorkingTime: FC = () => {
   const { data: workingTime } = useQuery<OrganizationWorkingTime>({
     queryKey: ['cs-get-organization-working-time', 'prod-2'],
     onSuccess: (data) => {
+      if (Object.keys(control._formValues).length > 0) return;
       reset({
         organizationWorkingTimeStartISO: data.organizationWorkingTimeStartISO
           ? new Date(data.organizationWorkingTimeStartISO)

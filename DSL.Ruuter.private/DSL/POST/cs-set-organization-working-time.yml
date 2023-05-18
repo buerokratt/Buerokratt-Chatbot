@@ -27,7 +27,7 @@ validateAdministrator:
 
 validateBody:
   switch:
-    - condition: "${!!(new Date(organizationWorkingTimeStartISO).getDay() && new Date(organizationWorkingTimeEndISO).getDay()) && typeof organizationWorkingTimeNationalHolidays === 'boolean' && typeof organizationWorkingTimeWeekdays === 'object'}"
+    - condition: "${!!(new Date(organizationWorkingTimeStartISO) && new Date(organizationWorkingTimeEndISO)) && typeof organizationWorkingTimeNationalHolidays === 'boolean' && typeof organizationWorkingTimeWeekdays === 'object'}"
       next: setOrganizationWorkingTime
   next: returnInvalidBody
 
