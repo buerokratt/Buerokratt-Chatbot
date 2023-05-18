@@ -43,8 +43,8 @@ const ChatHistory: FC = () => {
   const { data: endedChats } = useQuery<ChatType[]>({
     queryKey: ['cs-get-all-ended-chats', 'prod'],
     onSuccess(res: any) {
-      setEndedChatsList(res.data.cs_get_all_ended_chats);
-      setFilteredEndedChatsList(res.data.cs_get_all_ended_chats)
+      setEndedChatsList(res.data.cs_get_all_ended_chats ?? []);
+      setFilteredEndedChatsList(res.data.cs_get_all_ended_chats ?? [])
     },
   });
   const { data: chatMessages } = useQuery<Message[]>({
