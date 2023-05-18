@@ -73,10 +73,11 @@
     border: 1px solid get-color(black-coral-6);
     border-radius: $veera-radius-s;
     color: var(--color-black);
-    font-size: $veera-font-size-80;
+    font-size: $veera-font-size-100;
     line-height: $veera-line-height-500;
     height: 40px;
     min-height: 40px;
+    resize: none;
     padding: get-spacing(paldiski);
 
     &::placeholder {

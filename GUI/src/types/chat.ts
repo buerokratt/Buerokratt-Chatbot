@@ -33,6 +33,7 @@ export enum CHAT_EVENTS {
 
 export interface Chat {
   id: string;
+  csaTitle?: string | null;
   customerSupportId?: string;
   customerSupportDisplayName?: string;
   endUserId?: string;
@@ -52,7 +53,7 @@ export interface Chat {
   forwardedFromCsa?: string,
   forwardedToCsa?: string,
   receivedFrom?: string;
-  comment: string;
+  comment?: string;
   labels: string;
 }
 

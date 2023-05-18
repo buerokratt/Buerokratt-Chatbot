@@ -2,7 +2,7 @@ import { ChangeEvent, forwardRef, useId, useState } from 'react';
 import TextareaAutosize, { TextareaAutosizeProps } from 'react-textarea-autosize';
 import clsx from 'clsx';
 
-import './FormTextarea.scss';
+import './ChatTextArea.scss';
 
 type TextareaProps = TextareaAutosizeProps & {
   label: string;
@@ -12,7 +12,7 @@ type TextareaProps = TextareaAutosizeProps & {
   maxLengthBottom?: boolean;
 };
 
-const FormTextarea = forwardRef<HTMLTextAreaElement, TextareaProps>((
+const ChatTextArea = forwardRef<HTMLTextAreaElement, TextareaProps>((
   {
     label,
     name,
@@ -69,4 +69,4 @@ const FormTextarea = forwardRef<HTMLTextAreaElement, TextareaProps>((
   );
 });
 
-export default FormTextarea;
+export default ChatTextArea;

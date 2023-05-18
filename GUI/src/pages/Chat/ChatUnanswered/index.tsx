@@ -10,6 +10,7 @@ import { Chat as ChatType } from 'types/chat';
 import useUserInfoStore from 'store/store';
 import { User } from 'types/user';
 import { useToast } from 'hooks/useToast';
+import './ChatUnanswered.scss';
 
 const ChatUnanswered: FC = () => {
   const { t } = useTranslation();
@@ -26,6 +27,14 @@ const ChatUnanswered: FC = () => {
     onSuccess(res: any) {
       setActiveChatsList(res.data.get_all_active_chats);
     },
+  });
+
+  const { data: csaNameVisiblity } = useQuery<{isVisible: boolean}>({
+    queryKey: ['cs-get-csa-name-visibility', 'prod-2'],
+  });
+
+  const { data: csaTitleVisibility } = useQuery<{isVisible: boolean}>({
+    queryKey: ['cs-get-csa-title-visibility', 'prod-2'],
   });
 
   const selectedChat = useMemo(() => activeChatsList && activeChatsList.find((c) => c.id === selectedChatId), [activeChatsList, selectedChatId]);
@@ -95,7 +104,9 @@ const ChatUnanswered: FC = () => {
                   </p>
                 )}
               </Track>
-              <p style={{ color: '#4D4F5D' }}>{chat.lastMessage}</p>
+              <div className="wrapper">
+                <p className="last_message">{chat.lastMessage}.</p>
+              </div>
             </div>
           </Tabs.Trigger>
         ))}
@@ -109,6 +120,8 @@ const ChatUnanswered: FC = () => {
           {selectedChat && (
             <Chat
               chat={selectedChat}
+              isCsaNameVisible={csaNameVisiblity?.isVisible ?? false}
+              isCsaTitleVisible={csaTitleVisibility?.isVisible ?? false}
               onChatEnd={setEndChatModal}
               onForwardToColleauge={setForwardToColleaugeModal}
               onForwardToEstablishment={setForwardToEstablishmentModal}

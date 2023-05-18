@@ -7,7 +7,7 @@ extractTokenData:
   call: http.post
   args:
     # TODO: replace with env variable and correct path to TIM endpoint
-    url: http://byk-private-ruuter-yml:8080/mocks/mock-tim-custom-jwt-userinfo
+    url: http://ruuter-v2-private:8088/mocks/mock-tim-custom-jwt-userinfo
     headers:
       cookie: ${cookie}
     body:
@@ -26,7 +26,7 @@ setConfigurationValue:
   call: http.post
   args:
     # TODO: replace with env variable
-    url: https://byk-resql:8443/set-configuration-value
+    url: http://resql:8082/set-configuration-value
     body:
       created: ${new Date().toISOString()}
       key: "is_csa_name_visible"
