@@ -49,6 +49,44 @@
     "openIcon": "Open menu icon",
     "closeIcon": "Close menu icon"
   },
+  "menu": {
+    "conversations": "Conversations",
+    "unanswered": "Unanswered",
+    "active": "Active",
+    "history": "History",
+    "training": "Training",
+    "themes": "Themes",
+    "answers": "Answers",
+    "userStories": "User Stories",
+    "configuration": "Configuration",
+    "forms": "Forms",
+    "slots": "Slots",
+    "historicalConversations": "Historical Conversations",
+    "modelBankAndAnalytics": "Model Bank And Analytics",
+    "overviewOfTopics": "Overview Of Topics",
+    "comparisonOfModels": "Comparison Of Models",
+    "appeals": "Appeals",
+    "testTracks": "Test Tracks",
+    "trainNewModel": "Train New Model",
+    "analytics": "Analytics",
+    "settings": "Settings",
+    "overview": "Overview",
+    "chats": "Chats",
+    "burokratt": "Bürokratt",
+    "feedback": "Feedback",
+    "advisors": "Advisors",
+    "reports": "Open Data",
+    "users": "Users",
+    "administration": "Administration",
+    "chatbot": "Chatbot",
+    "welcomeMessage": "Welcome Message",
+    "appearanceAndBehavior": "Appearance And Behavior",
+    "emergencyNotices": "Emergency Notices",
+    "officeOpeningHours": "Office Opening Hours",
+    "sessionLength": "Session Length",
+    "monitoring": "Monitoring",
+    "workingHours": "Working hours"
+  },
   "chat": {
     "reply": "Reply",
     "unansweredChats": "Unanswered chats",
@@ -169,7 +207,12 @@
     },
     "userSession": {
       "title": "User session",
-      "sessionLength": "Session length"
+      "sessionLength": "Session length",
+      "description": "User session length, after which inactive users are logged out.",
+      "rule": "Session length is allowed between 30 min - 480 min (8h)",
+      "minutes": "Minutes",
+      "sessionChanged": "Session length changed successfully",
+      "emptySession": "Session length can't be empty"
     },
     "greeting": {
       "title": "Greeting message"
@@ -184,7 +227,14 @@
       "saturday": "Saturday",
       "sunday": "Sunday"
     },
-    "nationalHolidays": "National holidays"
+    "nationalHolidays": "National holidays",
+    "welcomeMessage": {
+      "welcomeMessage": "Welcome Message",
+      "description": "The bureaucrat's automatic welcome message that is displayed as the first message when opening a chat window.",
+      "greetingActive": "Greeting Active",
+      "messageChanged": "Welcome message changed successfully",
+      "emptyMessage": "Welcome message can't be empty"
+    }
   },
   "monitoring": {
     "uptime": {

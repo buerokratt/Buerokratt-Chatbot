@@ -47,9 +47,18 @@
     }
   }
 
-  &__max-length {
+  &__max-length-top {
     position: absolute;
     top: 10px;
+    right: 8px;
+    font-size: $veera-font-size-80;
+    color: get-color(black-coral-12);
+    pointer-events: none;
+  }
+
+  &__max-length-bottom {
+    position: absolute;
+    bottom: 10px;
     right: 8px;
     font-size: $veera-font-size-80;
     color: get-color(black-coral-12);

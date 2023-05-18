@@ -17,6 +17,8 @@ import SettingsWorkingTime from 'pages/Settings/SettingsWorkingTime';
 
 import ChatUnanswered from 'pages/Chat/ChatUnanswered';
 import MonitoringUptime from 'pages/Monitoring/MonitoringUptime';
+import SettingsWelcomeMessage from 'pages/Settings/SettingsWelcomeMessage';
+import SettingsSessionLength from 'pages/Settings/SettingsSessionLength';
 
 const App: FC = () => {
   const store = useUserInfoStore();
@@ -34,9 +36,11 @@ const App: FC = () => {
         <Route path='/vestlus/ajalugu' element={<ChatHistory />} />
         <Route path='/haldus/kasutajad' element={<SettingsUsers />} />
         <Route path='/haldus/vestlusrobot/seaded' element={<SettingsChatSettings />} />
+        <Route path='/haldus/vestlusrobot/tervitussõnum' element={<SettingsWelcomeMessage />} />
         <Route path='/haldus/vestlusrobot/erakorralised-teated' element={<SettingsEmergencyNotices />} />
         <Route path='/haldus/vestlusrobot/välimus-ja-kaitumine' element={<SettingsAppearance />} />
         <Route path='/haldus/asutuse-tooaeg' element={<SettingsWorkingTime />} />
+        <Route path='/haldus/sessiooni-pikkus' element={<SettingsSessionLength />} />
         <Route path='/seire/tooaeg' element={<MonitoringUptime />} />
       </Route>
     </Routes>
