@@ -18,7 +18,7 @@ This repo will primarily contain:
 * Navigate to Resql and build the image `docker build -t resql .`
 * Clone [TIM](https://github.com/buerokratt/TIM)
 * Go to src -> main -> resources -> application.properties & modify `security.allowlist.jwt` value to be equal `security.allowlist.jwt=ruuter-v1-public,ruuter-v1-private,ruuter-v2-private,ruuter-v2-public,dmapper,resql,tim,tim-postgresql,127.0.0.1,::1` 
-* Navigate to Resql and build the image `docker build -t tim .`
+* Navigate to TIM and build the image `docker build -t tim .`
 * Install Python
 * Navigate to setup and run `python3 generate-certs.py`
 * Navigate to current repo and run `docker-compose up -d`
