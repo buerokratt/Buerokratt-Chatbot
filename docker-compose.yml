@@ -11,7 +11,7 @@ services:
       - csrf.ruuter_services_whitelist=
       - legacy-portal-integration.sessionCookieDomain=buerokratt.ee
       - allowed.requested.method.types=POST
-      - ruuter.cors.allowedOrigins=https://buerokratt.ee,https://admin.buerokratt.ee,https://tim.buerokratt.ee,http://localhost:3001,http://localhost:3002
+      - ruuter.cors.allowedOrigins=https://buerokratt.ee,https://admin.buerokratt.ee,https://tim.buerokratt.ee,http://localhost:3001,http://localhost:3002,http://localhost:3003
       - maxRequestSizeBytes=10000000000
       - default.requested.method.type=POST
       - incoming.request.external.validation.enabled=false
@@ -38,7 +38,7 @@ services:
     environment:
       - legacy-portal-integration.sessionCookieDomain=buerokratt.ee
       - logging.level.root=INFO
-      - ruuter.cors.allowedOrigins=https://buerokratt.ee,https://admin.buerokratt.ee,https://seire.buerokratt.ee,http://localhost:3001,http://localhost:3002
+      - ruuter.cors.allowedOrigins=https://buerokratt.ee,https://admin.buerokratt.ee,https://seire.buerokratt.ee,http://localhost:3001,http://localhost:3002,http://localhost:3003
       - headers.contentSecurityPolicy=
       - maxRequestSizeBytes=10000000000
       - incoming.request.external.validation.enabled=false
@@ -101,7 +101,7 @@ services:
     container_name: ruuter-v2-private
     image: ruuter
     environment:
-      - application.cors.allowedOrigins=http://localhost:8082,http://localhost:3001
+      - application.cors.allowedOrigins=http://localhost:8082,http://localhost:3001,http://localhost:3003
       - application.httpCodesAllowList=200,201,202,400,401,403,500
       - server.port=8088
     volumes:
@@ -116,7 +116,7 @@ services:
     container_name: ruuter-v2-public
     image: ruuter
     environment:
-      - application.cors.allowedOrigins=http://localhost:8086,http://localhost:3001
+      - application.cors.allowedOrigins=http://localhost:8086,http://localhost:3001,http://localhost:3003
       - application.httpCodesAllowList=200,201,202,400,401,403,500
       - server.port=8086
     volumes:
@@ -210,6 +210,75 @@ services:
       - ./GUI:/app
     networks:
       - bykstack
+
+  chat-widget:
+    container_name: chat-widget
+    image: chat-widget
+    ports:
+      - 3003:3003
+    networks:
+      - bykstack
+
+  train-bot:
+    container_name: train-bot
+    image: riaee/byk:bot-20220728
+    ports:
+      - 5005:5005
+    volumes:
+      - ./loba/:/app
+    command:
+      - train
+      - --fixed-model-name
+      - loba-model
+    networks:
+      - bykstack
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+  run-action-server:
+    container_name: bot-action-server
+    image: riaee/byk:bot-action-server-20220728
+    ports:
+      - 5055:5055
+    volumes:
+      - ./loba/actions:/app/actions
+      - ./loba/data:/app/data
+    command:
+      - start
+      - --actions
+      - actions
+    restart: always
+    networks:
+      - bykstack
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+  bot:
+    container_name: bot
+    image: riaee/byk:bot-20220728
+    ports:
+      - 5005:5005
+    volumes:
+      - ./loba/:/app
+    command:
+      - run
+    depends_on:
+      train-bot:
+        condition: service_completed_successfully
+    restart: always
+    networks:
+      - bykstack
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
 
 networks:
   bykstack:
