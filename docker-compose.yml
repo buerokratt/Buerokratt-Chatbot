@@ -264,6 +264,14 @@ services:
         max-size: "50m"
         max-file: "3"
 
+  customer-support:
+    container_name: customer-support
+    image: customer-support
+    ports:
+      - 3004:3004
+    networks:
+      - bykstack
+
 networks:
   bykstack:
     name: bykstack
