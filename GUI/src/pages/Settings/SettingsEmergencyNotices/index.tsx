@@ -21,14 +21,14 @@ const SettingsEmergencyNotices: FC = () => {
     onSuccess: (data) => {
       if (Object.keys(control._formValues).length > 0) return;
       setIsEmergencyNoticeVisible(data.isEmergencyNoticeVisible ?? false);
-      setEmergencyNoticeText(data.emergencyNoticeText ?? "");
+      setEmergencyNoticeText(data.emergencyNoticeText ?? '');
       reset({
         emergencyNoticeStartISO: new Date(data.emergencyNoticeStartISO ?? '0'),
         emergencyNoticeEndISO: new Date(data.emergencyNoticeEndISO ?? '0'),
-        emergencyNoticeText: data.emergencyNoticeText ?? "",
+        emergencyNoticeText: data.emergencyNoticeText ?? '',
         isEmergencyNoticeVisible: data.isEmergencyNoticeVisible ?? false,
       });
-  }
+    },
   });
 
   const emergencyNoticeMutation = useMutation({
@@ -43,9 +43,12 @@ const SettingsEmergencyNotices: FC = () => {
   });
 
   const handleFormSubmit = handleSubmit((data) => {
-    emergencyNoticeMutation.mutate({...data, isEmergencyNoticeVisible, emergencyNoticeText});
+    emergencyNoticeMutation.mutate({
+      ...data,
+      isEmergencyNoticeVisible,
+      emergencyNoticeText,
+    });
   });
-
   if (!emergencyNotice || Object.keys(control._formValues).length === 0) return <>Loading...</>;
 
   return (
