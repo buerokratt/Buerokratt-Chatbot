@@ -12,6 +12,7 @@ import {
   DataTable,
   Dialog,
   Drawer,
+  FormDatepicker,
   FormInput,
   FormMultiselect,
   HistoricalChat,
@@ -24,6 +25,7 @@ import { Message } from 'types/message';
 import { useToast } from 'hooks/useToast';
 import api from 'services/api';
 import apiDev from 'services/api-dev';
+import { Controller, useForm } from 'react-hook-form';
 
 const ChatHistory: FC = () => {
   const { t } = useTranslation();
@@ -39,6 +41,11 @@ const ChatHistory: FC = () => {
   const [endedChatsList, setEndedChatsList] = useState<ChatType[]>([]);
   const [filteredEndedChatsList, setFilteredEndedChatsList] = useState<ChatType[]>([]);
   const [chatMessagesList, setchatMessagesList] = useState<Message[]>([]);
+  const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
+  const { control, handleSubmit, reset } = useForm<{
+    startTime: Date | string;
+    endTime: Date | string;
+  }>();
 
   const { data: endedChats } = useQuery<ChatType[]>({
     queryKey: ['cs-get-all-ended-chats', 'prod'],
@@ -60,7 +67,8 @@ const ChatHistory: FC = () => {
     { label: t('chat.history.startTime'), value: 'created' },
     { label: t('chat.history.endTime'), value: 'ended' },
     { label: t('chat.history.csaName'), value: 'customerSupportDisplayName' },
-    { label: t('global.name'), value: '' },
+    { label: t('global.name'), value: 'endUserName' },
+    { label: t('global.idCode'), value: 'endUserId' },
     { label: t('chat.history.contact'), value: 'contactsMessage' },
     { label: t('chat.history.comment'), value: 'comment' },
     { label: t('chat.history.label'), value: 'labels' },
@@ -140,29 +148,36 @@ const ChatHistory: FC = () => {
 
   const endedChatsColumns = useMemo(() => [
     columnHelper.accessor('created', {
+      id: 'created',
       header: t('chat.history.startTime') || '',
       cell: (props) => format(new Date(props.getValue()), 'd. MMM yyyy HH:ii:ss'),
     }),
     columnHelper.accessor('ended', {
+      id: 'ended',
       header: t('chat.history.endTime') || '',
       cell: (props) => format(new Date(props.getValue()), 'd. MMM yyyy HH:ii:ss'),
     }),
     columnHelper.accessor('customerSupportDisplayName', {
+      id: 'customerSupportDisplayName',
       header: t('chat.history.csaName') || '',
     }),
     columnHelper.accessor((row) => `${row.endUserFirstName} ${row.endUserLastName}`, {
+      id: `endUserName`,
       header: t('global.name') || '',
     }),
     columnHelper.accessor('endUserId', {
+      id: 'endUserId',
       header: t('global.idCode') || '',
     }),
     columnHelper.accessor('contactsMessage', {
+      id: 'contactsMessage',
       header: t('chat.history.contact') || '',
       cell: (props) => props.getValue()
         ? t('global.yes')
         : t('global.no'),
     }),
     columnHelper.accessor('comment', {
+      id: "comment",
       header: t('chat.history.comment') || '',
       cell: (props) => (
         <Tooltip content={props.getValue()}>
@@ -171,6 +186,7 @@ const ChatHistory: FC = () => {
       ),
     }),
     columnHelper.accessor('labels', {
+      id: 'labels',
       header: t('chat.history.label') || '',
       cell: (props) => <span></span>,
     }),
@@ -178,10 +194,12 @@ const ChatHistory: FC = () => {
     //   header: 'NPS',
     // }),
     columnHelper.accessor('status', {
+      id: 'status',
       header: t('global.status') || '',
       cell: (props) => props.getValue() === CHAT_STATUS.ENDED ? t('chat.status.ended') : '',
     }),
     columnHelper.accessor('id', {
+      id: 'id',
       header: 'ID',
     }),
     columnHelper.display({
@@ -220,6 +238,11 @@ const ChatHistory: FC = () => {
     chatCommentChangeMutation.mutate({ chatId: selectedChat.id, comment });
   };
 
+  const getFilteredColumns = () => {
+    if (selectedColumns.length === 0) return endedChatsColumns;
+    return endedChatsColumns.filter((c) => ['detail', 'forward', ...selectedColumns].includes(c.id ?? ""))
+  }
+
   if (!filteredEndedChatsList) return <>Loading...</>;
 
   return (
@@ -235,11 +258,48 @@ const ChatHistory: FC = () => {
             placeholder={t('chat.history.searchChats') + '...'}
             onChange={(e) => e.target.value.length === 0 ? setFilteredEndedChatsList(endedChatsList) : searchChatsMutation.mutate(e.target.value)}
           />
-          <FormMultiselect
-            name='visibleColumns'
-            label={t('')}
-            options={visibleColumnOptions}
-          />
+          <Track style={{width: '100%'}} gap={16}>
+            <Track gap={10}>
+              <p>{t("global.from")}</p>
+              <Controller
+                name="startTime"
+                control={control}
+                render={({ field }) => {
+                  return (
+                    <FormDatepicker
+                    {...field}
+                    label={""}
+                    value={field.value ?? new Date()}
+                    />
+                    );
+                  }}
+              />
+            </Track>
+            <Track gap={10}>
+              <p>{t("global.to")}</p>
+              <Controller
+                name="endTime"
+                control={control}
+                render={({ field }) => {
+                  return (
+                    <FormDatepicker
+                      {...field}
+                      label={""}
+                      value={field.value ?? new Date()}
+                    />
+                  );
+                }}
+              />
+            </Track>
+            <FormMultiselect
+              name='visibleColumns'
+              label={t('')}
+              options={visibleColumnOptions}
+              onSelectionChange={(selection) => {
+                setSelectedColumns(selection?.map((s) => s.value) ?? []);
+              }}
+            />
+          </Track>
         </Track>
       </Card>
 
@@ -247,7 +307,7 @@ const ChatHistory: FC = () => {
         <DataTable
           data={filteredEndedChatsList}
           sortable
-          columns={endedChatsColumns}
+          columns={getFilteredColumns()}
           pagination={pagination}
           setPagination={setPagination}
         />

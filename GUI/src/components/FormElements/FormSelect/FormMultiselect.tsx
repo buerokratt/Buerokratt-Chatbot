@@ -60,16 +60,19 @@ const FormMultiselect: FC<FormMultiselectProps> = (
         return;
       }
       const index = selectedItems.findIndex((item) => item.value === selectedItem.value);
+      const items = [];
       if (index > 0) {
-        setSelectedItems([
+        items.push(
           ...selectedItems.slice(0, index),
-          ...selectedItems.slice(index + 1),
-        ]);
+          ...selectedItems.slice(index + 1)
+        );
       } else if (index === 0) {
-        setSelectedItems([...selectedItems.slice(1)]);
+        items.push(...selectedItems.slice(1));
       } else {
-        setSelectedItems([...selectedItems, selectedItem]);
+        items.push(...selectedItems, selectedItem);
       }
+      setSelectedItems(items);
+      if (onSelectionChange) onSelectionChange(items);
     },
   });
 
