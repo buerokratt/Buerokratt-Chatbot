@@ -46,7 +46,7 @@ const FormDatepicker = forwardRef<any, FormDatepickerProps>((
       <div className='datepicker__wrapper'>
         <ReactDatePicker
           selected={new Date(value)}
-          dateFormat={timePicker ? 'hh:mm:ss' : 'dd.MM.yyyy'}
+          dateFormat={timePicker ? 'HH:mm:ss' : 'dd.MM.yyyy'}
           locale='et-EE'
           placeholderText={placeholder}
           previousMonthButtonLabel={<MdChevronLeft />}
@@ -55,7 +55,7 @@ const FormDatepicker = forwardRef<any, FormDatepickerProps>((
           showTimeSelect={timePicker}
           showTimeSelectOnly={timePicker}
           timeIntervals={15}
-          timeFormat='hh:mm:ss'
+          timeFormat='HH:mm:ss'
           timeInputLabel=''
           portalId='overlay-root'
           {...rest}
