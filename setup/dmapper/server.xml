@@ -35,10 +35,10 @@
                    protocol="org.apache.coyote.http11.Http11NioProtocol"
                    clientAuth="false"
                    sslProtocol="TLSv1.2, TLSv1.3"
-                   SSLEnabled="true"
+                   SSLEnabled="false"
                    maxThreads="150"
-                   scheme="https"
-                   secure="true"
+                   scheme="http"
+                   secure="false"
                    SSLCertificateFile="${catalina.base}/conf/tls.crt"
                    SSLCertificateKeyFile="${catalina.base}/conf/tls.key"
         />

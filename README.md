@@ -17,8 +17,11 @@ This repo will primarily contain:
 * Clone [Resql](https://github.com/buerokratt/Resql)
 * Navigate to Resql and build the image `docker build -t resql .`
 * Clone [TIM](https://github.com/buerokratt/TIM)
-* Go to src -> main -> resources -> application.properties & modify `security.allowlist.jwt` value to be equal `security.allowlist.jwt=ruuter-v1-public,ruuter-v1-private,dmapper,resql,tim,tim-postgresql,127.0.0.1,::1` 
-* Navigate to Resql and build the image `docker build -t tim .`
+* Go to src -> main -> resources -> application.properties & modify `security.allowlist.jwt` value to be equal `security.allowlist.jwt=ruuter-v1-public,ruuter-v1-private,ruuter-v2-private,ruuter-v2-public,dmapper,resql,tim,tim-postgresql,chat-widget,127.0.0.1,::1` 
+* Navigate to TIM and build the image `docker build -t tim .`
+* Clone [Chat Widget](https://github.com/buerokratt/Chat-Widget)
+* Create Dockerfile.dev as referenced in [PR](https://github.com/buerokratt/Chat-Widget/pull/22)
+* build chat widget image `docker build -f Dockerfile.dev -t chat-widget .`
 * Install Python
 * Navigate to setup and run `python3 generate-certs.py`
 * Navigate to current repo and run `docker-compose up -d`
