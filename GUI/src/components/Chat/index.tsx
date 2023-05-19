@@ -125,7 +125,8 @@ const Chat: FC<ChatProps> = ({ chat, onChatEnd, onForwardToColleauge, onForwardT
             </Button>
         }
     ];
-
+    const [sideButtons, setSideButtons] = useState([]);
+    const [buttonsToAllow] = useState<any[]>([]);
 
     useEffect(() => {
         if (sideButtons.length > 0) return;

@@ -49,6 +49,44 @@
     "openMenuIcon": "Ava menüü ikoon",
     "closeMenuIcon": "Sulge menüü ikoon"
   },
+  "menu": {
+    "conversations": "Vestlused",
+    "unanswered": "Vastamata",
+    "active": "Aktiivsed",
+    "history": "Ajalugu",
+    "training": "Treening",
+    "themes": "Teemad",
+    "answers": "Vastused",
+    "userStories": "Kasutaja lood",
+    "configuration": "Konfiguratsioon",
+    "forms": "Vormid",
+    "slots": "Pilud",
+    "historicalConversations": "Ajaloolised vestlused",
+    "modelBankAndAnalytics": "Mudelipank ja analüütika",
+    "overviewOfTopics": "Teemade ülevaade",
+    "comparisonOfModels": "Mudelite võrdlus",
+    "appeals": "Pöördumised",
+    "testTracks": "Testlood",
+    "trainNewModel": "Treeni uus mudel",
+    "analytics": "Analüütika",
+    "settings": "Seaded",
+    "overview": "Ülevaade",
+    "chats": "Vestlused",
+    "burokratt": "Bürokratt",
+    "feedback": "Tagasiside",
+    "advisors": "Nõustajad",
+    "reports": "Avaandmed",
+    "users": "Kasutajad",
+    "administration": "Haldus",
+    "chatbot": "Vestlusbot",
+    "welcomeMessage": "Tervitussõnum",
+    "appearanceAndBehavior": "Välimus ja käitumine",
+    "emergencyNotices": "Erakorralised teated",
+    "officeOpeningHours": "Asutuse tööaeg",
+    "sessionLength": "Sessiooni pikkus",
+    "monitoring": "Seire",
+    "workingHours": "Tööaeg"
+  },
   "chat": {
     "reply": "Vasta",
     "unansweredChats": "Vastamata vestlused",
@@ -169,7 +207,12 @@
     },
     "userSession": {
       "title": "Kasutaja sessioon",
-      "sessionLength": "Sessiooni pikkus"
+      "sessionLength": "Sessiooni pikkus",
+      "description": "Kasutaja sessiooni pikkus, mille möödumisel logitakse inaktiivsed kasutajad välja.",
+      "rule": "Sessiooni pikkus on lubatud vahemikus 30 min - 480 min (8h)",
+      "minutes": "minutit",
+      "sessionChanged": "Seansi pikkuse muutmine õnnestus",
+      "emptySession": "Seansi pikkuse väli ei tohi olla tühi"
     },
     "greeting": {
       "title": "Tervitussõnum"
@@ -184,7 +227,14 @@
       "saturday": "Laupäev",
       "sunday": "Pühapäev"
     },
-    "nationalHolidays": "Riiklikud pühad"
+    "nationalHolidays": "Riiklikud pühad",
+    "welcomeMessage": {
+      "welcomeMessage": "Tervitussõnum",
+      "description": "Bürokrati automaatne tervitussõnum, mida kuvatakse esimese sõnumina vestlusakna avamisel.",
+      "greetingActive": "Tervitus aktiivne",
+      "messageChanged": "Tervitusteadet muudeti edukalt",
+      "emptyMessage": "Tervitusteate väli ei tohi olla tühi"
+    }
   },
   "monitoring": {
     "uptime": {

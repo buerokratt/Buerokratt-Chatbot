@@ -1,0 +1,44 @@
+{
+    "action_type": "BLOGIC",
+    "destination": [
+        {
+            "reflect_input": {
+                "verify": {
+                    "response": {
+                        "ok": "proceed",
+                        "nok": "stop"
+                    }
+                },
+                "proceed": {
+                    "method": "post",
+                    "endpoint": "{tim_url}/jwt/custom-jwt-userinfo",
+                    "cookies": [
+                        "customJwtCookie"
+                    ],
+                    "post_body_struct": "customJwtCookie"
+                },
+                "response": {
+                    "nok": "stop",
+                    "ok": "proceed"
+                }
+            }
+        },
+        {
+            "get_user": {
+                "verify": {
+                    "response": {
+                        "ok": "proceed",
+                        "nok": "stop"
+                    }
+                },
+                "proceed": {
+                    "method": "post",
+                    "endpoint": "{resql_url}/get-user-role",
+                    "post_body_struct": {
+                        "userIdCode": "{#.reflect_input#.idCode}"
+                    }
+                }
+            }
+        }
+    ]
+}
