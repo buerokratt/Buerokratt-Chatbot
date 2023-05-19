@@ -1,0 +1,24 @@
+@import 'src/styles/tools/spacing';
+@import 'src/styles/tools/color';
+@import 'src/styles/settings/variables/other';
+@import 'src/styles/settings/variables/typography';
+
+.weekdays {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: get-spacing(paldiski);
+
+  &__label {
+    display: block;
+    flex: 0 0 170px;
+    font-size: $veera-font-size-100;
+    line-height: 24px;
+  }
+
+  &__wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+}
