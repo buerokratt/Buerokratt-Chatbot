@@ -3,5 +3,6 @@ VALUES ('widgetProactiveSeconds', :widgetProactiveSeconds, :created::timestamp w
        ('widgetDisplayBubbleMessageSeconds', :widgetDisplayBubbleMessageSeconds, :created::timestamp with time zone),
        ('widgetBubbleMessageText', :widgetBubbleMessageText, :created::timestamp with time zone),
        ('widgetColor', :widgetColor, :created::timestamp with time zone),
-       ('isWidgetActive', :isWidgetActive, :created::timestamp with time zone)
+       ('isWidgetActive', :isWidgetActive, :created::timestamp with time zone),
+       ('widgetAnimation', :widgetAnimation, :created::timestamp with time zone)
 RETURNING key, value;

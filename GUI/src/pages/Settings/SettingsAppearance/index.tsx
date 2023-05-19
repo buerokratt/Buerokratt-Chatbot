@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef, useState } from 'react';
+import { FC, useRef, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useForm, Controller, useWatch } from 'react-hook-form';
@@ -9,7 +9,7 @@ import { Button, Card, FormInput, FormSelect, Switch, Track } from 'components';
 import { WidgetConfig } from 'types/widgetConfig';
 import { useToast } from 'hooks/useToast';
 import bykLogo from 'assets/logo-white.svg';
-import api from 'services/api';
+import apiDevV2 from 'services/api-dev-v2';
 import './SettingsAppearance.scss';
 import clsx from 'clsx';
 
@@ -30,10 +30,16 @@ const SettingsAppearance: FC = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [delayFinished, setDelayFinished] = useState(false);
   const { data: widgetConfig } = useQuery<WidgetConfig>({
-    queryKey: ['cs-get-widget-config'],
+    queryKey: ['cs-get-widget-config', 'prod-2'],
     onSuccess: (data) => {
       if (!hasRendered.current) {
-        reset(data);
+        reset({
+          ...data,
+          widgetAnimation:
+            data.widgetAnimation.length === 0
+              ? 'shockwave'
+              : data.widgetAnimation,
+        });
         hasRendered.current = true;
       }
     },
@@ -46,7 +52,7 @@ const SettingsAppearance: FC = () => {
   const widgetAnimation = useWatch({ control, name: 'widgetAnimation' });
 
   const widgetConfigMutation = useMutation({
-    mutationFn: (data: WidgetConfig) => api.post<WidgetConfig>('cs-set-widget-config', data),
+    mutationFn: (data: WidgetConfig) => apiDevV2.post<WidgetConfig>('cs-set-widget-config', data),
     onError: (error: AxiosError) => {
       toast.open({
         type: 'error',
@@ -102,7 +108,7 @@ const SettingsAppearance: FC = () => {
               <Switch
                 onCheckedChange={field.onChange}
                 label={t('settings.appearance.widgetBubbleMessageText')}
-                checked={widgetConfig.isWidgetActive}
+                checked={field.value}
                 {...field}
               />
             }
