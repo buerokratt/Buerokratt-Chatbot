@@ -14,6 +14,7 @@ type FormMultiselectProps = SelectHTMLAttributes<HTMLSelectElement> & {
   name: string;
   hideLabel?: boolean;
   options: SelectOption[];
+  selectedOptions?: SelectOption[];
   onSelectionChange?: (selection: SelectOption[] | null) => void;
 }
 
@@ -25,13 +26,14 @@ const FormMultiselect: FC<FormMultiselectProps> = (
     disabled,
     placeholder,
     defaultValue,
+    selectedOptions,
     onSelectionChange,
     ...rest
   },
 ) => {
   const id = useId();
   const { t } = useTranslation();
-  const [selectedItems, setSelectedItems] = useState<SelectOption[]>([]);
+  const [selectedItems, setSelectedItems] = useState<SelectOption[]>(selectedOptions ?? []);
   const {
     isOpen,
     getToggleButtonProps,
@@ -105,7 +107,7 @@ const FormMultiselect: FC<FormMultiselectProps> = (
               >
                 <input
                   type='checkbox'
-                  checked={selectedItems.includes(item)}
+                  checked={selectedItems.map((s) => s.value).includes(item.value)}
                   value={item.value}
                   onChange={() => null}
                 />

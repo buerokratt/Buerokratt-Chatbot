@@ -26,10 +26,13 @@ import { useToast } from 'hooks/useToast';
 import api from 'services/api';
 import apiDev from 'services/api-dev';
 import { Controller, useForm } from 'react-hook-form';
+import { getFromLocalStorage, setToLocalStorage } from 'utils/local-storage-utils';
+import { CHAT_HISTORY_PREFERENCES_KEY } from '../../../constants/config'
 
 const ChatHistory: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
+  const preferences = getFromLocalStorage(CHAT_HISTORY_PREFERENCES_KEY) as string[];
   const [selectedChat, setSelectedChat] = useState<ChatType | null>(null);
   const [sendToEmailModal, setSendToEmailModal] = useState<ChatType | null>(null);
   const [statusChangeModal, setStatusChangeModal] = useState<string | null>(null);
@@ -37,11 +40,10 @@ const ChatHistory: FC = () => {
     pageIndex: 0,
     pageSize: 10,
   });
-
   const [endedChatsList, setEndedChatsList] = useState<ChatType[]>([]);
   const [filteredEndedChatsList, setFilteredEndedChatsList] = useState<ChatType[]>([]);
   const [chatMessagesList, setchatMessagesList] = useState<Message[]>([]);
-  const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
+  const [selectedColumns, setSelectedColumns] = useState<string[]>(preferences ?? []);
   const { control } = useForm<{
     startDate: Date | string;
     endDate: Date | string;
@@ -314,8 +316,11 @@ const ChatHistory: FC = () => {
               name='visibleColumns'
               label={t('')}
               options={visibleColumnOptions}
+              selectedOptions={visibleColumnOptions.filter((o) => selectedColumns.includes(o.value))}
               onSelectionChange={(selection) => {
-                setSelectedColumns(selection?.map((s) => s.value) ?? []);
+                const columns = selection?.map((s) => s.value) ?? [];
+                setSelectedColumns(columns);
+                setToLocalStorage(CHAT_HISTORY_PREFERENCES_KEY, columns)
               }}
             />
           </Track>
