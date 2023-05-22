@@ -42,16 +42,21 @@ const ChatHistory: FC = () => {
   const [filteredEndedChatsList, setFilteredEndedChatsList] = useState<ChatType[]>([]);
   const [chatMessagesList, setchatMessagesList] = useState<Message[]>([]);
   const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
-  const { control, handleSubmit, reset } = useForm<{
-    startTime: Date | string;
-    endTime: Date | string;
-  }>();
+  const { control } = useForm<{
+    startDate: Date | string;
+    endDate: Date | string;
+  }>({
+    defaultValues: {
+      startDate: new Date(new Date().getUTCFullYear(), new Date().getUTCMonth(), new Date().getUTCDate()),
+      endDate: new Date(new Date().getUTCFullYear(), new Date().getUTCMonth(), new Date().getUTCDate() + 1),
+    }
+  });
 
   const { data: endedChats } = useQuery<ChatType[]>({
     queryKey: ['cs-get-all-ended-chats', 'prod'],
     onSuccess(res: any) {
       setEndedChatsList(res.data.cs_get_all_ended_chats ?? []);
-      setFilteredEndedChatsList(res.data.cs_get_all_ended_chats ?? [])
+      filterChatsList(res.data.cs_get_all_ended_chats ?? [])
     },
   });
   const { data: chatMessages } = useQuery<Message[]>({
@@ -103,7 +108,7 @@ const ChatHistory: FC = () => {
     onSuccess: (res) => {
       const responseList = (res.data.data.get_chat_ids_matching_message_search ?? []).map((item: any) => item.chatId);
       const filteredChats = endedChatsList.filter(item => responseList.includes(item.id));
-      setFilteredEndedChatsList(filteredChats);
+      filterChatsList(filteredChats);
     }
   });
 
@@ -243,6 +248,12 @@ const ChatHistory: FC = () => {
     return endedChatsColumns.filter((c) => ['detail', 'forward', ...selectedColumns].includes(c.id ?? ""))
   }
 
+  const filterChatsList = (chatsList: ChatType[]) => {
+    const startDate = control._formValues.startDate;
+    const endDate = control._formValues.endDate;
+    setFilteredEndedChatsList(chatsList.filter((c) => new Date(c.created) >= startDate && new Date(c.created) <= endDate ));
+  }
+
   if (!filteredEndedChatsList) return <>Loading...</>;
 
   return (
@@ -256,13 +267,13 @@ const ChatHistory: FC = () => {
             hideLabel
             name='searchChats'
             placeholder={t('chat.history.searchChats') + '...'}
-            onChange={(e) => e.target.value.length === 0 ? setFilteredEndedChatsList(endedChatsList) : searchChatsMutation.mutate(e.target.value)}
+            onChange={(e) => e.target.value.length === 0 ? filterChatsList(endedChatsList) : searchChatsMutation.mutate(e.target.value)}
           />
           <Track style={{width: '100%'}} gap={16}>
             <Track gap={10}>
               <p>{t("global.from")}</p>
               <Controller
-                name="startTime"
+                name="startDate"
                 control={control}
                 render={({ field }) => {
                   return (
@@ -270,6 +281,10 @@ const ChatHistory: FC = () => {
                     {...field}
                     label={""}
                     value={field.value ?? new Date()}
+                    onChange={(v) => {
+                      field.onChange(v);
+                      filterChatsList(endedChatsList);
+                    }}
                     />
                     );
                   }}
@@ -278,7 +293,7 @@ const ChatHistory: FC = () => {
             <Track gap={10}>
               <p>{t("global.to")}</p>
               <Controller
-                name="endTime"
+                name="endDate"
                 control={control}
                 render={({ field }) => {
                   return (
@@ -286,6 +301,10 @@ const ChatHistory: FC = () => {
                       {...field}
                       label={""}
                       value={field.value ?? new Date()}
+                      onChange={(v) => {
+                        field.onChange(v);
+                        filterChatsList(endedChatsList);
+                      }}
                     />
                   );
                 }}
