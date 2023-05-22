@@ -288,8 +288,8 @@ const ChatHistory: FC = () => {
                       filterChatsList(endedChatsList);
                     }}
                     />
-                    );
-                  }}
+                  );
+                }}
               />
             </Track>
             <Track gap={10}>
