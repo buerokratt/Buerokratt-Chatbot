@@ -164,9 +164,11 @@ const SettingsAppearance: FC = () => {
           >
             <img src={bykLogo} alt='Buerokratt logo' width={45} />
           </motion.div>
-          <div className={clsx('profile__greeting-message', { 'profile__greeting-message--active': delayFinished })}>
-            {widgetBubbleMessageText}
-          </div>
+          {control._formValues.isWidgetActive && 
+            <div className={clsx('profile__greeting-message', { 'profile__greeting-message--active': delayFinished })}>
+              {widgetBubbleMessageText}
+            </div>
+          }
         </div>
       )}
     </>
