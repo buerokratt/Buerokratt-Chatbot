@@ -1,4 +1,4 @@
-import { FC, useMemo, useState } from 'react';
+import { FC, useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Tabs from '@radix-ui/react-tabs';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -40,9 +40,137 @@ const ChatActive: FC = () => {
   const { data: chatData } = useQuery<ChatType[]>({
     queryKey: ['cs-get-all-active-chats', 'prod'],
     onSuccess(res: any) {
-      setActiveChatsList(res.data.get_all_active_chats);
+      // setActiveChatsList(res.data.get_all_active_chats);
     },
   });
+
+  useEffect(() => {
+    const activeChatsListX: ChatType[] = [
+      {
+        id: "1",
+        customerSupportId: userInfo?.idCode,
+        customerSupportDisplayName: "John Doe",
+        endUserId: "user456",
+        endUserFirstName: "Alice",
+        endUserLastName: "Smith",
+        contactsMessage: "This is a test message",
+        status: CHAT_STATUS.ENDED,
+        created: "2023-05-23T10:00:00",
+        updated: "2023-05-23T10:01:00",
+        ended: "2023-05-23T10:05:00",
+        lastMessage: "Hello",
+        endUserUrl: "https://example.com",
+        endUserOs: "Windows",
+        lastMessageTimestamp: "2023-05-23T10:02:00",
+        forwardedToName: "Jane Doe",
+        forwardedByUser: "support789",
+        forwardedFromCsa: "support123",
+        forwardedToCsa: "support234",
+        receivedFrom: "email@example.com",
+        comment: "This is a comment",
+        labels: "label1",
+      },
+      {
+        id: "2",
+        customerSupportId: "support123",
+        customerSupportDisplayName: "Xohn Doe",
+        endUserId: "user453",
+        endUserFirstName: "Jlice",
+        endUserLastName: "Xmith",
+        contactsMessage: "This is a test message",
+        status: CHAT_STATUS.OPEN,
+        created: "2023-05-23T10:00:00",
+        updated: "2023-05-23T10:01:00",
+        ended: "2023-05-23T10:05:00",
+        lastMessage: "Hello",
+        endUserUrl: "https://example.com",
+        endUserOs: "Windows",
+        lastMessageTimestamp: "2023-05-23T10:02:00",
+        forwardedToName: "Jane Doe",
+        forwardedByUser: "support789",
+        forwardedFromCsa: "support123",
+        forwardedToCsa: "support234",
+        receivedFrom: "email@example.com",
+        comment: "This is a comment",
+        labels: "label1",
+      },
+      {
+        id: "4",
+        customerSupportId: userInfo?.idCode,
+        customerSupportDisplayName: "John Doe",
+        endUserId: "user456",
+        endUserFirstName: "Zlice",
+        endUserLastName: "Zmith",
+        contactsMessage: "This is a test message",
+        status: CHAT_STATUS.REDIRECTED,
+        created: "2023-05-23T10:00:00",
+        updated: "2023-05-23T10:01:00",
+        ended: "2023-05-23T10:05:00",
+        lastMessage: "Hello",
+        endUserUrl: "https://example.com",
+        endUserOs: "Windows",
+        lastMessageTimestamp: "2023-05-23T10:02:00",
+        forwardedToName: "Jane Doe",
+        forwardedByUser: "support789",
+        forwardedFromCsa: "support123",
+        forwardedToCsa: "support234",
+        receivedFrom: "email@example.com",
+        comment: "This is a comment",
+        labels: "label1",
+      },
+      {
+        id: "22",
+        customerSupportId: "support123d",
+        customerSupportDisplayName: "Zohn Doe",
+        endUserId: "user453",
+        endUserFirstName: "Jlice",
+        endUserLastName: "Xmith",
+        contactsMessage: "This is a test message",
+        status: CHAT_STATUS.OPEN,
+        created: "2023-05-23T10:00:00",
+        updated: "2023-05-23T10:01:00",
+        ended: "2023-05-23T10:05:00",
+        lastMessage: "Hello",
+        endUserUrl: "https://example.com",
+        endUserOs: "Windows",
+        lastMessageTimestamp: "2023-05-23T10:02:00",
+        forwardedToName: "Jane Doe",
+        forwardedByUser: "support789",
+        forwardedFromCsa: "support123",
+        forwardedToCsa: "support234",
+        receivedFrom: "email@example.com",
+        comment: "This is a comment",
+        labels: "label1",
+      },
+      {
+        id: "222",
+        customerSupportId: "",
+        customerSupportDisplayName: "",
+        endUserId: "user453",
+        endUserFirstName: "Jlice",
+        endUserLastName: "Xmith",
+        contactsMessage: "This is a test message",
+        status: CHAT_STATUS.OPEN,
+        created: "2023-05-23T10:00:00",
+        updated: "2023-05-23T10:01:00",
+        ended: "2023-05-23T10:05:00",
+        lastMessage: "Hello",
+        endUserUrl: "https://example.com",
+        endUserOs: "Windows",
+        lastMessageTimestamp: "2023-05-23T10:02:00",
+        forwardedToName: "Jane Doe",
+        forwardedByUser: "support789",
+        forwardedFromCsa: "support123",
+        forwardedToCsa: "support234",
+        receivedFrom: "email@example.com",
+        comment: "This is a comment",
+        labels: "label1",
+      },
+    ]
+
+    setActiveChatsList(activeChatsListX);
+  }, [])
+
 
   const sendToEmailMutation = useMutation({
     mutationFn: (data: ChatType) => api.post('cs-send-chat-to-email', data),
@@ -64,7 +192,50 @@ const ChatActive: FC = () => {
   });
 
   const selectedChat = useMemo(() => activeChatsList && activeChatsList.find((c) => c.id === selectedChatId), [activeChatsList, selectedChatId]);
-  const activeChats = useMemo(() => activeChatsList ? activeChatsList.filter((c) => c.customerSupportId !== '') : [], [activeChatsList]);
+
+  interface GroupdChat {
+    myChats: ChatType[];
+    others: {
+      groupId: string;
+      name: string;
+      chats: ChatType[];
+    }[];
+  }
+
+  const activeChats: GroupdChat = useMemo(() => {
+    if (!activeChatsList)
+      return [];
+
+    const grouped: GroupdChat = {
+      myChats: [],
+      others: [],
+    };
+
+    activeChatsList
+      // .filter((c) => c.customerSupportId !== '')
+      .forEach((c) => {
+        if (c.customerSupportId === userInfo?.idCode) {
+          grouped.myChats.push(c);
+          return;
+        }
+
+        const groupIndex = grouped.others.findIndex(x => x.groupId === c.customerSupportId);
+        if (groupIndex === -1) {
+          grouped.others.push({
+            groupId: c.customerSupportId,
+            name: c.customerSupportDisplayName,
+            chats: [c],
+          });
+        }
+        else {
+          grouped.others[groupIndex].chats.push(c)
+        }
+      });
+
+    grouped.others.sort((a, b) => a.name.localeCompare(b.name));
+
+    return grouped;
+  }, [activeChatsList]);
 
   const handleCsaForward = (chat: ChatType, user: User) => {
     // TODO: Add endpoint for chat forwarding
@@ -112,30 +283,42 @@ const ChatActive: FC = () => {
           <div className='vertical-tabs__group-header'>
             <p>{t('chat.active.myChats')}</p>
           </div>
-          {activeChats.filter((chat) => chat.customerSupportId === userInfo?.idCode).map((chat) => (
+          {activeChats?.myChats?.map((chat) => (
             <Tabs.Trigger
               key={chat.id}
               className='vertical-tabs__trigger'
-              value={chat.id}>
+              value={chat.id}
+              style={{ borderBottom: '1px solid #D2D3D8' }}
+            >
               <ChatTrigger chat={chat} />
             </Tabs.Trigger>
           ))}
           <div className='vertical-tabs__group-header'>
             <p>{t('chat.active.newChats')}</p>
           </div>
-          {activeChats.filter((chat) => chat.customerSupportId !== userInfo?.idCode).map((chat) => (
-            <Tabs.Trigger
-              key={chat.id}
-              className={
-                clsx('vertical-tabs__trigger', {
-                  'active': chat.status === CHAT_STATUS.REDIRECTED && chat.customerSupportId !== userInfo?.idCode,
-                })
+          {activeChats?.others?.map(({ name, chats }) => (
+            <>
+              {
+                name &&
+                <div className='vertical-tabs__sub-group-header'>
+                  <p>{name}</p>
+                </div>
               }
-              value={chat.id}
-              style={{ borderBottom: '1px solid #D2D3D8' }}
-            >
-              <ChatTrigger chat={chat} />
-            </Tabs.Trigger>
+              {chats.map((chat) => (
+                <Tabs.Trigger
+                  key={chat.id}
+                  className={
+                    clsx('vertical-tabs__trigger', {
+                      'active': chat.status === CHAT_STATUS.REDIRECTED && chat.customerSupportId !== userInfo?.idCode,
+                    })
+                  }
+                  value={chat.id}
+                  style={{ borderBottom: '1px solid #D2D3D8' }}
+                >
+                  <ChatTrigger chat={chat} />
+                </Tabs.Trigger>
+              ))}
+            </>
           ))}
         </Tabs.List>
 
@@ -229,15 +412,19 @@ const ChatActive: FC = () => {
 const ChatTrigger: FC<{ chat: ChatType }> = ({ chat }) => {
   const { t } = useTranslation();
 
+  const name = chat.endUserFirstName !== '' && chat.endUserLastName !== ''
+    ? `${chat.endUserFirstName} ${chat.endUserLastName}`
+    : t('global.anonymous');
   return (
-    <div style={{ fontSize: 14, lineHeight: '1.5', color: '#09090B' }}>
+    <div style={{ fontSize: 14, lineHeight: '1.5', color: '#4D4F5D' }}>
       <Track justify='between'>
-        {chat.endUserFirstName !== '' && chat.endUserLastName !== '' ? (
-          <p><strong>{chat.endUserFirstName} {chat.endUserLastName}</strong></p>
-        ) : <p><strong>{t('global.anonymous')}</strong></p>}
+        <p>
+          <strong>{name}</strong>
+        </p>
         {chat.lastMessageTimestamp && (
-          <p
-            style={{ color: '#4D4F5D' }}>{formatDistanceStrict(new Date(chat.lastMessageTimestamp), new Date(), { locale: et })}</p>
+          <p>
+            {formatDistanceStrict(new Date(chat.lastMessageTimestamp), new Date(), { locale: et })}
+          </p>
         )}
       </Track>
       <div className="wrapper">

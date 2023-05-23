@@ -96,4 +96,12 @@
     color: get-color(black-coral-20);
     border-bottom: 1px solid get-color(black-coral-2);
   }
+
+  &__sub-group-header {
+    font-weight: 700;
+    line-height: 24px;
+    padding: 16px 16px 4px;
+    color: get-color(black-coral-20);
+    border-bottom: 1px solid get-color(black-coral-2);
+  }
 }
