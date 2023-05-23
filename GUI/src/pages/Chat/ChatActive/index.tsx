@@ -1,4 +1,4 @@
-import { FC, useMemo, useState, useEffect } from 'react';
+import { FC, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Tabs from '@radix-ui/react-tabs';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -40,137 +40,9 @@ const ChatActive: FC = () => {
   const { data: chatData } = useQuery<ChatType[]>({
     queryKey: ['cs-get-all-active-chats', 'prod'],
     onSuccess(res: any) {
-      // setActiveChatsList(res.data.get_all_active_chats);
+      setActiveChatsList(res.data.get_all_active_chats);
     },
   });
-
-  useEffect(() => {
-    const activeChatsListX: ChatType[] = [
-      {
-        id: "1",
-        customerSupportId: userInfo?.idCode,
-        customerSupportDisplayName: "John Doe",
-        endUserId: "user456",
-        endUserFirstName: "Alice",
-        endUserLastName: "Smith",
-        contactsMessage: "This is a test message",
-        status: CHAT_STATUS.ENDED,
-        created: "2023-05-23T10:00:00",
-        updated: "2023-05-23T10:01:00",
-        ended: "2023-05-23T10:05:00",
-        lastMessage: "Hello",
-        endUserUrl: "https://example.com",
-        endUserOs: "Windows",
-        lastMessageTimestamp: "2023-05-23T10:02:00",
-        forwardedToName: "Jane Doe",
-        forwardedByUser: "support789",
-        forwardedFromCsa: "support123",
-        forwardedToCsa: "support234",
-        receivedFrom: "email@example.com",
-        comment: "This is a comment",
-        labels: "label1",
-      },
-      {
-        id: "2",
-        customerSupportId: "support123",
-        customerSupportDisplayName: "Xohn Doe",
-        endUserId: "user453",
-        endUserFirstName: "Jlice",
-        endUserLastName: "Xmith",
-        contactsMessage: "This is a test message",
-        status: CHAT_STATUS.OPEN,
-        created: "2023-05-23T10:00:00",
-        updated: "2023-05-23T10:01:00",
-        ended: "2023-05-23T10:05:00",
-        lastMessage: "Hello",
-        endUserUrl: "https://example.com",
-        endUserOs: "Windows",
-        lastMessageTimestamp: "2023-05-23T10:02:00",
-        forwardedToName: "Jane Doe",
-        forwardedByUser: "support789",
-        forwardedFromCsa: "support123",
-        forwardedToCsa: "support234",
-        receivedFrom: "email@example.com",
-        comment: "This is a comment",
-        labels: "label1",
-      },
-      {
-        id: "4",
-        customerSupportId: userInfo?.idCode,
-        customerSupportDisplayName: "John Doe",
-        endUserId: "user456",
-        endUserFirstName: "Zlice",
-        endUserLastName: "Zmith",
-        contactsMessage: "This is a test message",
-        status: CHAT_STATUS.REDIRECTED,
-        created: "2023-05-23T10:00:00",
-        updated: "2023-05-23T10:01:00",
-        ended: "2023-05-23T10:05:00",
-        lastMessage: "Hello",
-        endUserUrl: "https://example.com",
-        endUserOs: "Windows",
-        lastMessageTimestamp: "2023-05-23T10:02:00",
-        forwardedToName: "Jane Doe",
-        forwardedByUser: "support789",
-        forwardedFromCsa: "support123",
-        forwardedToCsa: "support234",
-        receivedFrom: "email@example.com",
-        comment: "This is a comment",
-        labels: "label1",
-      },
-      {
-        id: "22",
-        customerSupportId: "support123d",
-        customerSupportDisplayName: "Zohn Doe",
-        endUserId: "user453",
-        endUserFirstName: "Jlice",
-        endUserLastName: "Xmith",
-        contactsMessage: "This is a test message",
-        status: CHAT_STATUS.OPEN,
-        created: "2023-05-23T10:00:00",
-        updated: "2023-05-23T10:01:00",
-        ended: "2023-05-23T10:05:00",
-        lastMessage: "Hello",
-        endUserUrl: "https://example.com",
-        endUserOs: "Windows",
-        lastMessageTimestamp: "2023-05-23T10:02:00",
-        forwardedToName: "Jane Doe",
-        forwardedByUser: "support789",
-        forwardedFromCsa: "support123",
-        forwardedToCsa: "support234",
-        receivedFrom: "email@example.com",
-        comment: "This is a comment",
-        labels: "label1",
-      },
-      {
-        id: "222",
-        customerSupportId: "",
-        customerSupportDisplayName: "",
-        endUserId: "user453",
-        endUserFirstName: "Jlice",
-        endUserLastName: "Xmith",
-        contactsMessage: "This is a test message",
-        status: CHAT_STATUS.OPEN,
-        created: "2023-05-23T10:00:00",
-        updated: "2023-05-23T10:01:00",
-        ended: "2023-05-23T10:05:00",
-        lastMessage: "Hello",
-        endUserUrl: "https://example.com",
-        endUserOs: "Windows",
-        lastMessageTimestamp: "2023-05-23T10:02:00",
-        forwardedToName: "Jane Doe",
-        forwardedByUser: "support789",
-        forwardedFromCsa: "support123",
-        forwardedToCsa: "support234",
-        receivedFrom: "email@example.com",
-        comment: "This is a comment",
-        labels: "label1",
-      },
-    ]
-
-    setActiveChatsList(activeChatsListX);
-  }, [])
-
 
   const sendToEmailMutation = useMutation({
     mutationFn: (data: ChatType) => api.post('cs-send-chat-to-email', data),
@@ -212,7 +84,6 @@ const ChatActive: FC = () => {
     };
 
     activeChatsList
-      // .filter((c) => c.customerSupportId !== '')
       .forEach((c) => {
         if (c.customerSupportId === userInfo?.idCode) {
           grouped.myChats.push(c);
