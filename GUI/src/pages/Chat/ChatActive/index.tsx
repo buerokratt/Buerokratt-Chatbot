@@ -7,7 +7,7 @@ import { AxiosError } from 'axios';
 import { et } from 'date-fns/locale';
 
 import { Track, Chat, Dialog, Button, FormRadios } from 'components';
-import { Chat as ChatType, CHAT_STATUS } from 'types/chat';
+import { Chat as ChatType, CHAT_STATUS, GroupdChat } from 'types/chat';
 import useUserInfoStore from 'store/store';
 import { User } from 'types/user';
 import { useToast } from 'hooks/useToast';
@@ -65,22 +65,13 @@ const ChatActive: FC = () => {
 
   const selectedChat = useMemo(() => activeChatsList && activeChatsList.find((c) => c.id === selectedChatId), [activeChatsList, selectedChatId]);
 
-  interface GroupdChat {
-    myChats: ChatType[];
-    others: {
-      groupId: string;
-      name: string;
-      chats: ChatType[];
-    }[];
-  }
-
   const activeChats: GroupdChat = useMemo(() => {
     if (!activeChatsList)
       return [];
 
     const grouped: GroupdChat = {
       myChats: [],
-      others: [],
+      otherChats: [],
     };
 
     activeChatsList
@@ -90,20 +81,20 @@ const ChatActive: FC = () => {
           return;
         }
 
-        const groupIndex = grouped.others.findIndex(x => x.groupId === c.customerSupportId);
+        const groupIndex = grouped.otherChats.findIndex(x => x.groupId === c.customerSupportId);
         if (groupIndex === -1) {
-          grouped.others.push({
+          grouped.otherChats.push({
             groupId: c.customerSupportId,
             name: c.customerSupportDisplayName,
             chats: [c],
           });
         }
         else {
-          grouped.others[groupIndex].chats.push(c)
+          grouped.otherChats[groupIndex].chats.push(c)
         }
       });
 
-    grouped.others.sort((a, b) => a.name.localeCompare(b.name));
+    grouped.otherChats.sort((a, b) => a.name.localeCompare(b.name));
 
     return grouped;
   }, [activeChatsList]);
@@ -167,7 +158,7 @@ const ChatActive: FC = () => {
           <div className='vertical-tabs__group-header'>
             <p>{t('chat.active.newChats')}</p>
           </div>
-          {activeChats?.others?.map(({ name, chats }) => (
+          {activeChats?.otherChats?.map(({ name, chats }) => (
             <>
               {
                 name &&
