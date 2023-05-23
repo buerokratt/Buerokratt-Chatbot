@@ -43,8 +43,11 @@ const SettingsEmergencyNotices: FC = () => {
   });
 
   const handleFormSubmit = handleSubmit((data) => {
+    const endDate = control._formValues.emergencyNoticeEndISO as Date;
+    endDate.setDate(endDate.getDate() + 1);
     emergencyNoticeMutation.mutate({
       ...data,
+      emergencyNoticeEndISO: endDate,
       isEmergencyNoticeVisible,
       emergencyNoticeText,
     });
