@@ -142,13 +142,31 @@
       "forwarded": "Forwarded"
     },
     "events": {
-      "client-left-with-accepted": "Client left with accepted response",
-      "client-left-with-no-resolution": "Client left with no resolution",
-      "client-left-for-unknown-reason": "Client left for unknown reason",
-      "accepted": "Accepted response",
-      "hate-speech": "Hatespeech",
-      "other": "Other reasons",
-      "response-sent-to-client-email": "Response was sent to client email"
+      "answered": "Answered {{date}}",
+      "terminated": "Terminated {{date}}",
+      "client-left": "Client left {{date}}",
+      "client-left-with-accepted": "Client left with accepted response {{date}}",
+      "client-left-with-no-resolution": "Client left with no resolution {{date}}",
+      "client-left-for-unknown-reason": "Client left for unknown reason {{date}}",
+      "accepted": "Accepted response {{date}}",
+      "hate-speech": "Hatespeech {{date}}",
+      "other": "Other reasons {{date}}",
+      "response-sent-to-client-email": "Response was sent to client email {{date}}",
+      "greeting": "Greetings {{date}}",
+      "requested-authentication": "Requested authentication {{date}}",
+      "authentication_successful": "Authentication successful {{date}}",
+      "authentication_failed": "Authentication failed {{date}}",
+      "ask-permission": "Asked permission {{date}}",
+      "ask-permission-accepted": "Permission accepted {{date}}",
+      "ask-permission-rejected": "Permission rejected {{date}}",
+      "ask-permission-ignored": "Permission ignored {{date}}",
+      "rating": "Rating {{date}}",
+      "contact-information": "Requested contact information {{date}}",
+      "contact-information-rejected": "Contact information rejected {{date}}",
+      "contact-information-fulfilled": "Contact information fulfilled {{date}}",
+      "requested-chat-forward": "Requested chat forward {{date}}",
+      "requested-chat-forward-accepted": "Requested chat forward accepted {{date}}",
+      "requested-chat-forward-rejected": "Requested chat forward rejected {{date}}"
     }
   },
   "roles": {
