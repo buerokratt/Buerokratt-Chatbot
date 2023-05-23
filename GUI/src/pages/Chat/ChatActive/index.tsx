@@ -2,11 +2,8 @@ import { FC, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Tabs from '@radix-ui/react-tabs';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { formatDistanceStrict } from 'date-fns';
 import { AxiosError } from 'axios';
-import { et } from 'date-fns/locale';
-
-import { Track, Chat, Dialog, Button, FormRadios } from 'components';
+import { Chat, Dialog, Button, FormRadios } from 'components';
 import { Chat as ChatType, CHAT_STATUS, GroupdChat } from 'types/chat';
 import useUserInfoStore from 'store/store';
 import { User } from 'types/user';
@@ -16,6 +13,7 @@ import ForwardToColleaugeModal from '../ForwardToColleaugeModal';
 import ForwardToEstablishmentModal from '../ForwardToEstablishmentModal';
 import clsx from 'clsx';
 import StartAServiceModal from '../StartAServiceModal';
+import ChatTrigger from './ChatTrigger';
 import './ChatActive.scss';
 
 const CSAchatStatuses = [
@@ -37,7 +35,7 @@ const ChatActive: FC = () => {
   const [startAServiceModal, setStartAServiceModal] = useState<ChatType | null>(null);
   const [activeChatsList, setActiveChatsList] = useState<ChatType[]>([]);
 
-  const { data: chatData } = useQuery<ChatType[]>({
+  useQuery<ChatType[]>({
     queryKey: ['cs-get-all-active-chats', 'prod'],
     onSuccess(res: any) {
       setActiveChatsList(res.data.get_all_active_chats);
@@ -268,31 +266,6 @@ const ChatActive: FC = () => {
         </Dialog>
       )}
     </>
-  );
-};
-
-const ChatTrigger: FC<{ chat: ChatType }> = ({ chat }) => {
-  const { t } = useTranslation();
-
-  const name = chat.endUserFirstName !== '' && chat.endUserLastName !== ''
-    ? `${chat.endUserFirstName} ${chat.endUserLastName}`
-    : t('global.anonymous');
-  return (
-    <div style={{ fontSize: 14, lineHeight: '1.5', color: '#4D4F5D' }}>
-      <Track justify='between'>
-        <p>
-          <strong>{name}</strong>
-        </p>
-        {chat.lastMessageTimestamp && (
-          <p>
-            {formatDistanceStrict(new Date(chat.lastMessageTimestamp), new Date(), { locale: et })}
-          </p>
-        )}
-      </Track>
-      <div className="wrapper">
-        <p className="last_message">{chat.lastMessage}.</p>
-      </div>
-    </div>
   );
 };
 
