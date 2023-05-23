@@ -15,6 +15,7 @@ import { USER_IDLE_STATUS_TIMEOUT } from 'constants/config';
 import api from 'services/api';
 import apiDev from 'services/api-dev';
 import './Header.scss';
+import { useCookies } from 'react-cookie';
 
 type CustomerSupportActivity = {
   idCode: string;
@@ -54,6 +55,8 @@ const Header: FC = () => {
   const { data: chatData } = useQuery<ChatType[]>({
     queryKey: ['cs-get-all-active-chats'],
   });
+  const customJwtCookieKey = 'customJwtCookie'
+  const [_, setCookie] = useCookies([customJwtCookieKey]);
 
   const userProfileSettingsMutation = useMutation({
     mutationFn: (data: UserProfileSettings) => api.post('cs-set-user-profile-settings', data),
@@ -83,6 +86,24 @@ const Header: FC = () => {
     },
   });
 
+  const setNewCookie = (cookieValue: string) => {
+    const cookieOptions = { path: '/' };
+    setCookie(customJwtCookieKey, cookieValue, cookieOptions);
+  }
+
+  const extendUserSessionMutation = useMutation(
+    {
+      mutationFn: async () => {
+        const { data: { data } } = await apiDev.post('cs-custom-jwt-extend', {});
+        if (data.custom_jwt_extend === null) return;
+        setNewCookie(data.custom_jwt_extend);
+      },
+      onError: (error: AxiosError) => {
+        console.log("E: ", error);
+      }
+    }
+  );
+
   const onIdle = () => {
     if (!customerSupportActivity) return;
     setCsaStatus('idle');
@@ -101,6 +122,7 @@ const Header: FC = () => {
       customerSupportId: customerSupportActivity.idCode,
       customerSupportStatus: 'online',
     });
+    extendUserSessionMutation.mutate();
   };
 
   const { getRemainingTime } = useIdleTimer({
