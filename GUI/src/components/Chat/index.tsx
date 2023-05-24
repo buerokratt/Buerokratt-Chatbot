@@ -5,7 +5,7 @@ import { format } from 'date-fns';
 import { et } from 'date-fns/locale';
 import clsx from 'clsx';
 import { MdOutlineAttachFile, MdOutlineSend } from 'react-icons/all';
-import { Button, FormInput, FormTextarea, Icon, Track } from 'components';
+import { Button, FormInput, FormTextarea, Icon, Label, Track } from 'components';
 import { ReactComponent as BykLogoWhite } from 'assets/logo-white.svg';
 import useUserInfoStore from 'store/store';
 import { Chat as ChatType, MessageSseEvent, MessageStatus } from 'types/chat';
@@ -19,6 +19,7 @@ import { CHAT_INPUT_LENGTH } from 'constants/config';
 import apiDev from 'services/api-dev';
 import ChatTextArea from './ChatTextArea';
 import TextareaAutosize, { TextareaAutosizeProps } from 'react-textarea-autosize';
+import { ROLES } from 'utils/constants';
 
 
 type ChatProps = {
@@ -49,9 +50,11 @@ const Chat: FC<ChatProps> = ({ chat, onChatEnd, onForwardToColleauge, onForwardT
     const [isPending, startTransition] = useTransition();
     const [responseText, setResponseText] = useState('');
     const [selectedMessages, setSelectedMessages] = useState<Message[]>([]);
+    const [chatCsaActive, setChatCsaActive] = useState<boolean>(true);
     const [messagesList, setMessagesList] = useState<Message[]>([]);
     useEffect(() => {
         getMessages();
+        getCsaStatus();
     }, [])
 
     const getMessages = async () => {
@@ -59,6 +62,13 @@ const Chat: FC<ChatProps> = ({ chat, onChatEnd, onForwardToColleauge, onForwardT
             'chatId': chat.id
         });
         setMessagesList(res.data.cs_get_messages_by_chat_id);
+    };
+
+    const getCsaStatus = async () => {
+        const { data: res } = await apiDev.post('cs-get-customer-support-activity-by-id', {
+            'customerSupportId': chat.customerSupportId
+        });
+        setChatCsaActive(res.data.get_customer_support_activity[0].status === 'online' ? true : false);
     };
 
     const [messageReadStatus, _setMessageReadStatus] = useState<MessageStatus>({
@@ -288,35 +298,72 @@ const Chat: FC<ChatProps> = ({ chat, onChatEnd, onForwardToColleauge, onForwardT
                 </div>
             </div>
             <div className='active-chat__side'>
-                <div className='active-chat__side-actions'>
-                    <Button
-                        appearance='success'
-                        onClick={onChatEnd ? () => onChatEnd(chat) : undefined}
-                    >
-                        {t('chat.active.endChat')}
-                    </Button>
-                    <Button appearance='secondary'>{t('chat.active.askAuthentication')}</Button>
-                    <Button appearance='secondary'>{t('chat.active.askForContact')}</Button>
-                    <Button appearance='secondary'>{t('chat.active.askPermission')}</Button>
-                    <Button appearance='secondary' onClick={onForwardToColleauge ? () => {
-                        onForwardToColleauge(chat);
-                        setSelectedMessages([]);
-                    } : undefined}>
-                        {t('chat.active.forwardToColleague')}
-                    </Button>
-                    <Button appearance='secondary'
-                        onClick={onForwardToEstablishment ? () => onForwardToEstablishment(chat) : undefined}>{t('chat.active.forwardToOrganization')}</Button>
-                    <Button
-                        appearance='secondary'
-                        onClick={onSendToEmail ? () => onSendToEmail(chat) : undefined}>
-                        {t('chat.active.sendToEmail')}
-                    </Button>
-                    <Button
-                        appearance='secondary'
-                        onClick={onStartAService ? () => onStartAService(chat) : undefined}>
-                        {t('chat.active.startService')}
-                    </Button>
-                </div>
+                {chat.customerSupportId === userInfo?.idCode && 
+                    <div className='active-chat__side-actions'>
+                        <Button
+                            appearance='success'
+                            onClick={onChatEnd ? () => onChatEnd(chat) : undefined}
+                        >
+                            {t('chat.active.endChat')}
+                        </Button>
+                        <Button appearance='secondary'>{t('chat.active.askAuthentication')}</Button>
+                        <Button appearance='secondary'>{t('chat.active.askForContact')}</Button>
+                        <Button appearance='secondary'>{t('chat.active.askPermission')}</Button>
+                        <Button
+                            appearance="secondary"
+                            onClick={
+                            onForwardToColleauge
+                                ? () => {
+                                    onForwardToColleauge(chat);
+                                    setSelectedMessages([]);
+                                }
+                                : undefined
+                            }
+                        >
+                            {t('chat.active.forwardToColleague')}
+                        </Button>
+                        <Button appearance='secondary'
+                            onClick={onForwardToEstablishment ? () => onForwardToEstablishment(chat) : undefined}>{t('chat.active.forwardToOrganization')}</Button>
+                        <Button
+                            appearance='secondary'
+                            onClick={onSendToEmail ? () => onSendToEmail(chat) : undefined}>
+                            {t('chat.active.sendToEmail')}
+                        </Button>
+                        <Button
+                            appearance='secondary'
+                            onClick={onStartAService ? () => onStartAService(chat) : undefined}>
+                            {t('chat.active.startService')}
+                        </Button>
+                    </div>
+                }
+                {(chat.customerSupportId !== userInfo?.idCode && !chatCsaActive) &&
+                    <div className='active-chat__side-actions'>
+                        <Track gap={8} style={{ marginBottom: 36 }}>
+                            <Label type='warning'>!</Label>
+                            <p className='csa-away'>Nõustaja on eemal.</p>
+                        </Track>
+                    {userInfo?.authorities.some((authority) =>
+                        [
+                            ROLES.ROLE_ADMINISTRATOR,
+                            ROLES.ROLE_CUSTOMER_SUPPORT_AGENT,
+                        ].includes(authority as ROLES)
+                    ) && (
+                        <Button
+                            appearance="secondary"
+                            onClick={
+                            onForwardToColleauge
+                                ? () => {
+                                    onForwardToColleauge(chat);
+                                    setSelectedMessages([]);
+                                }
+                                : undefined
+                            }
+                        >
+                            {t('chat.active.forwardToColleague')}
+                        </Button>
+                    )}
+                    </div> 
+                }
                 <div className='active-chat__side-meta'>
                     <div>
                         <p><strong>ID</strong></p>
