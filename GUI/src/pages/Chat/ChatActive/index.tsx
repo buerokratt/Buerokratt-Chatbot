@@ -4,7 +4,7 @@ import * as Tabs from '@radix-ui/react-tabs';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { Chat, Dialog, Button, FormRadios } from 'components';
-import { Chat as ChatType, CHAT_STATUS, GroupdChat } from 'types/chat';
+import { Chat as ChatType, CHAT_STATUS, GroupedChat } from 'types/chat';
 import useUserInfoStore from 'store/store';
 import { User } from 'types/user';
 import { useToast } from 'hooks/useToast';
@@ -63,11 +63,11 @@ const ChatActive: FC = () => {
 
   const selectedChat = useMemo(() => activeChatsList && activeChatsList.find((c) => c.id === selectedChatId), [activeChatsList, selectedChatId]);
 
-  const activeChats: GroupdChat = useMemo(() => {
+  const activeChats: GroupedChat = useMemo(() => {
     if (!activeChatsList)
       return [];
 
-    const grouped: GroupdChat = {
+    const grouped: GroupedChat = {
       myChats: [],
       otherChats: [],
     };

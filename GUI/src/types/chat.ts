@@ -57,12 +57,12 @@ export interface Chat {
   comment?: string;
   labels: string;
 }
-export interface GroupdChat {
-  myChats: ChatType[];
+export interface GroupedChat {
+  myChats: Chat[];
   otherChats: {
     groupId: string;
     name: string;
-    chats: ChatType[];
+    chats: Chat[];
   }[];
 }
 
