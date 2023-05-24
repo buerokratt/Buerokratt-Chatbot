@@ -76,6 +76,9 @@ const Header: FC = () => {
       "customerSupportActive": data.customerSupportActive,
       "customerSupportStatus": data.customerSupportStatus
     }),
+    onSuccess: () => {
+      if (csaStatus === 'online') extendUserSessionMutation.mutate()
+    },
     onError: async (error: AxiosError) => {
       await queryClient.invalidateQueries(['cs-get-customer-support-activity', 'prod']);
       toast.open({
@@ -108,7 +111,7 @@ const Header: FC = () => {
     if (!customerSupportActivity) return;
     setCsaStatus('idle');
     customerSupportActivityMutation.mutate({
-      customerSupportActive: customerSupportActivity.active,
+      customerSupportActive: csaActive,
       customerSupportId: customerSupportActivity.idCode,
       customerSupportStatus: 'idle',
     });
@@ -118,11 +121,10 @@ const Header: FC = () => {
     if (!customerSupportActivity) return;
     setCsaStatus('online');
     customerSupportActivityMutation.mutate({
-      customerSupportActive: customerSupportActivity.active,
+      customerSupportActive: csaActive,
       customerSupportId: customerSupportActivity.idCode,
       customerSupportStatus: 'online',
-    });
-    extendUserSessionMutation.mutate();
+    });    
   };
 
   const { getRemainingTime } = useIdleTimer({
