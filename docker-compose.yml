@@ -125,6 +125,7 @@ services:
       - 8086:8086
     networks:
       - bykstack
+
   dmapper:
     container_name: dmapper
     image: riaee/byk-dmapper:11
