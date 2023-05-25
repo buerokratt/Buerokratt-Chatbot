@@ -3,7 +3,7 @@
   "ruuter_url": "http://localhost:8080",
   "tim_url": "http://tim:8085",
   "resql_url": "http://resql:8082",
-  "bot_url": "http://BOT_IP:5005",
+  "bot_url": "http://bot:5005",
   "training_url": "TRAINIG_BOT",
   "training_user": "TRAINING_BOT_USERNAME",
   "training_prv_key": "TRAINIG_BOT_PRIVATE_SSH_KEY_PATH",
