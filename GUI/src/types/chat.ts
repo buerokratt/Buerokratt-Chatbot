@@ -18,7 +18,7 @@ export enum CHAT_EVENTS {
   GREETING = 'greeting',
   REQUESTED_AUTHENTICATION = 'requested-authentication',
   AUTHENTICATION_SUCCESSFUL = 'authentication_successful',
-  AUTHENTICATION_FAILED = 'authentication-failed',
+  AUTHENTICATION_FAILED = 'authentication_failed',
   ASK_PERMISSION = 'ask-permission',
   ASK_PERMISSION_ACCEPTED = 'ask-permission-accepted',
   ASK_PERMISSION_REJECTED = 'ask-permission-rejected',

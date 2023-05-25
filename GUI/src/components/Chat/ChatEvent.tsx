@@ -106,7 +106,7 @@ const ChatEvent: FC<ChatEventProps> = ({message}) => {
             })
             break;
         case CHAT_EVENTS.AUTHENTICATION_FAILED:
-            EVENT_PARAMS = t('chat.events.authentication-failed', {
+            EVENT_PARAMS = t('chat.events.authentication_failed', {
                 date: format(new Date(authorTimestamp), 'dd.MM.yyyy HH:ii:ss'),
             })
             break;
