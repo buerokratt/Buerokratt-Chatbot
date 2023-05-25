@@ -35,6 +35,7 @@ export enum CHAT_EVENTS {
 
 export interface Chat {
   id: string;
+  csaTitle?: string | null;
   customerSupportId?: string;
   customerSupportDisplayName?: string;
   endUserId?: string;

@@ -44,6 +44,14 @@ const ChatActive: FC = () => {
     },
   });
 
+  const { data: csaNameVisiblity } = useQuery<{isVisible: boolean}>({
+    queryKey: ['cs-get-csa-name-visibility', 'prod-2'],
+  });
+
+  const { data: csaTitleVisibility } = useQuery<{isVisible: boolean}>({
+    queryKey: ['cs-get-csa-title-visibility', 'prod-2'],
+  });
+
   const sendToEmailMutation = useMutation({
     mutationFn: (data: ChatType) => api.post('cs-send-chat-to-email', data),
     onSuccess: () => {
@@ -147,6 +155,8 @@ const ChatActive: FC = () => {
             {selectedChat && (
               <Chat
                 chat={selectedChat}
+                isCsaNameVisible={csaNameVisiblity?.isVisible ?? false}
+                isCsaTitleVisible={csaTitleVisibility?.isVisible ?? false}
                 onChatEnd={setEndChatModal}
                 onForwardToColleauge={setForwardToColleaugeModal}
                 onForwardToEstablishment={setForwardToEstablishmentModal}
