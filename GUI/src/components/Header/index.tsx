@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo, useState } from 'react';
+import { FC, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
@@ -12,10 +12,9 @@ import { UserProfileSettings } from 'types/userProfileSettings';
 import { Chat as ChatType } from 'types/chat';
 import { useToast } from 'hooks/useToast';
 import { USER_IDLE_STATUS_TIMEOUT } from 'constants/config';
+import api from 'services/api';
 import apiDev from 'services/api-dev';
-import apiDevV2 from 'services/api-dev-v2';
 import './Header.scss';
-import { AUTHORITY } from 'types/authorities';
 import { useCookies } from 'react-cookie';
 
 type CustomerSupportActivity = {
@@ -44,29 +43,9 @@ const Header: FC = () => {
   const [userDrawerOpen, setUserDrawerOpen] = useState(false);
   const [csaStatus, setCsaStatus] = useState<'idle' | 'offline' | 'online'>('online');
   const [csaActive, setCsaActive] = useState<boolean>(false);
-  const [userProfileSettings, setUserProfileSettings] = useState<UserProfileSettings>({
-    userId: 1,
-    forwardedChatPopupNotifications: false,
-    forwardedChatSoundNotifications: false,
-    forwardedChatEmailNotifications: false,
-    newChatPopupNotifications: false,
-    newChatSoundNotifications: false,
-    newChatEmailNotifications: false,
-    useAutocorrect: false
+  const { data: userProfileSettings } = useQuery<UserProfileSettings>({
+    queryKey: ['cs-get-user-profile-settings'],
   });
-  useEffect(() => {
-    getMessages();
-}, [])
-
-const getMessages = async () => {
-    const { data: res } = await apiDevV2.get('cs-get-user-profile-settings', {
-      params: {
-        // TODO: Use actual id from userInfo once it starts using real data
-        userId: 1
-      }
-    });
-    if (res.response)  setUserProfileSettings(res.response);
-};
   const { data: customerSupportActivity } = useQuery<CustomerSupportActivity>({
     queryKey: ['cs-get-customer-support-activity', 'prod'],
     onSuccess(res: any) {
@@ -80,10 +59,7 @@ const getMessages = async () => {
   const [_, setCookie] = useCookies([customJwtCookieKey]);
 
   const userProfileSettingsMutation = useMutation({
-    mutationFn: async (data: UserProfileSettings) => {
-        await apiDevV2.post('cs-set-user-profile-settings', data);
-        setUserProfileSettings(data);
-      },
+    mutationFn: (data: UserProfileSettings) => api.post('cs-set-user-profile-settings', data),
     onError: async (error: AxiosError) => {
       await queryClient.invalidateQueries(['cs-get-user-profile-settings']);
       toast.open({
@@ -240,76 +216,68 @@ const getMessages = async () => {
               ))}
             </Track>
           </Section>
-          {[
-            AUTHORITY.ADMINISTRATOR,
-            AUTHORITY.CUSTOMER_SUPPORT_AGENT,
-            AUTHORITY.SERVICE_MANAGER,
-          ].some((auth) => userInfo.authorities.includes(auth)) &&
-            <>
-              <Section>
-                <Track gap={8} direction='vertical' align='left'>
-                  <p className='h6'>{t('settings.users.autoCorrector')}</p>
-                  <SwitchBox
-                    name='useAutocorrect'
-                    label={t('settings.users.useAutocorrect')}
-                    checked={userProfileSettings.useAutocorrect}
-                    onCheckedChange={(checked) => handleUserProfileSettingsChange('useAutocorrect', checked)}
-                  />
-                </Track>
-              </Section>
-              <Section>
-                <Track gap={8} direction='vertical' align='left'>
-                  <p className='h6'>{t('settings.users.emailNotifications')}</p>
-                  <SwitchBox
-                    name='forwardedChatEmailNotifications'
-                    label={t('settings.users.newForwardedChat')}
-                    checked={userProfileSettings.forwardedChatEmailNotifications}
-                    onCheckedChange={(checked) => handleUserProfileSettingsChange('forwardedChatEmailNotifications', checked)}
-                  />
-                  <SwitchBox
-                    name='newChatEmailNotifications'
-                    label={t('settings.users.newUnansweredChat')}
-                    checked={userProfileSettings.newChatEmailNotifications}
-                    onCheckedChange={(checked) => handleUserProfileSettingsChange('newChatEmailNotifications', checked)}
-                  />
-                </Track>
-              </Section>
-              <Section>
-                <Track gap={8} direction='vertical' align='left'>
-                  <p className='h6'>{t('settings.users.soundNotifications')}</p>
-                  <SwitchBox
-                    name='forwardedChatSoundNotifications'
-                    label={t('settings.users.newForwardedChat')}
-                    checked={userProfileSettings.forwardedChatSoundNotifications}
-                    onCheckedChange={(checked) => handleUserProfileSettingsChange('forwardedChatSoundNotifications', checked)}
-                  />
-                  <SwitchBox
-                    name='newChatSoundNotifications'
-                    label={t('settings.users.newUnansweredChat')}
-                    checked={userProfileSettings.newChatSoundNotifications}
-                    onCheckedChange={(checked) => handleUserProfileSettingsChange('newChatSoundNotifications', checked)}
-                  />
-                </Track>
-              </Section>
-              <Section>
-                <Track gap={8} direction='vertical' align='left'>
-                  <p className='h6'>{t('settings.users.popupNotifications')}</p>
-                  <SwitchBox
-                    name='forwardedChatPopupNotifications'
-                    label={t('settings.users.newForwardedChat')}
-                    checked={userProfileSettings.forwardedChatPopupNotifications}
-                    onCheckedChange={(checked) => handleUserProfileSettingsChange('forwardedChatPopupNotifications', checked)}
-                  />
-                  <SwitchBox
-                    name='newChatPopupNotifications'
-                    label={t('settings.users.newUnansweredChat')}
-                    checked={userProfileSettings.newChatPopupNotifications}
-                    onCheckedChange={(checked) => handleUserProfileSettingsChange('newChatPopupNotifications', checked)}
-                  />
-                </Track>
-              </Section>
-            </>
-          }
+          <Section>
+            <Track gap={8} direction='vertical' align='left'>
+              <p className='h6'>{t('settings.users.autoCorrector')}</p>
+              <SwitchBox
+                name='useAutocorrect'
+                label={t('settings.users.useAutocorrect')}
+                checked={userProfileSettings.useAutocorrect}
+                onCheckedChange={(checked) => handleUserProfileSettingsChange('useAutocorrect', checked)}
+              />
+            </Track>
+          </Section>
+          <Section>
+            <Track gap={8} direction='vertical' align='left'>
+              <p className='h6'>{t('settings.users.emailNotifications')}</p>
+              <SwitchBox
+                name='forwardedChatEmailNotifications'
+                label={t('settings.users.newForwardedChat')}
+                checked={userProfileSettings.forwardedChatEmailNotifications}
+                onCheckedChange={(checked) => handleUserProfileSettingsChange('forwardedChatEmailNotifications', checked)}
+              />
+              <SwitchBox
+                name='newChatEmailNotifications'
+                label={t('settings.users.newUnansweredChat')}
+                checked={userProfileSettings.newChatEmailNotifications}
+                onCheckedChange={(checked) => handleUserProfileSettingsChange('newChatEmailNotifications', checked)}
+              />
+            </Track>
+          </Section>
+          <Section>
+            <Track gap={8} direction='vertical' align='left'>
+              <p className='h6'>{t('settings.users.soundNotifications')}</p>
+              <SwitchBox
+                name='forwardedChatSoundNotifications'
+                label={t('settings.users.newForwardedChat')}
+                checked={userProfileSettings.forwardedChatSoundNotifications}
+                onCheckedChange={(checked) => handleUserProfileSettingsChange('forwardedChatSoundNotifications', checked)}
+              />
+              <SwitchBox
+                name='newChatSoundNotifications'
+                label={t('settings.users.newUnansweredChat')}
+                checked={userProfileSettings.newChatSoundNotifications}
+                onCheckedChange={(checked) => handleUserProfileSettingsChange('newChatSoundNotifications', checked)}
+              />
+            </Track>
+          </Section>
+          <Section>
+            <Track gap={8} direction='vertical' align='left'>
+              <p className='h6'>{t('settings.users.popupNotifications')}</p>
+              <SwitchBox
+                name='forwardedChatPopupNotifications'
+                label={t('settings.users.newForwardedChat')}
+                checked={userProfileSettings.forwardedChatPopupNotifications}
+                onCheckedChange={(checked) => handleUserProfileSettingsChange('forwardedChatPopupNotifications', checked)}
+              />
+              <SwitchBox
+                name='newChatPopupNotifications'
+                label={t('settings.users.newUnansweredChat')}
+                checked={userProfileSettings.newChatPopupNotifications}
+                onCheckedChange={(checked) => handleUserProfileSettingsChange('newChatPopupNotifications', checked)}
+              />
+            </Track>
+          </Section>
         </Drawer>
       )}
     </>

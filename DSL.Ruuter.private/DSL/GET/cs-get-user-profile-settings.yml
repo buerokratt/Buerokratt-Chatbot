@@ -1,13 +1,13 @@
 extractRequestData:
   assign:
     cookie: ${incoming.headers.cookie}
-    userId: ${incoming.params.userId}
+    userId: ${incoming.body.userId}
 
 extractTokenData:
   call: http.post
   args:
     # TODO: replace with env variable and correct path to TIM endpoint
-    url: http://ruuter-v2-private:8088/mocks/mock-tim-custom-jwt-userinfo
+    url: http://byk-private-ruuter-yml:8080/mocks/mock-tim-custom-jwt-userinfo
     headers:
       cookie: ${cookie}
     body:
@@ -26,14 +26,14 @@ getUserSettings:
   call: http.post
   args:
     # TODO: replace with env variable
-    url: http://resql:8082/get-user-profile-settings
+    url: https://byk-resql:8443/get-user-profile-settings
     body:
       userId: ${userId}
   result: getUserSettingsResult
 
 validateUserSettingsResultExists:
   switch:
-    - condition: "${getUserSettingsResult.response.body.length > 0}"
+    - condition: '${getUserSettingsResult.response.body.length > 0}'
       next: mapUserSettingsData
   next: returnNotFound
 
@@ -41,7 +41,7 @@ mapUserSettingsData:
   call: http.post
   args:
     # TODO: replace with env variable
-    url: http://dmapper:3000/json/v2/return_user_profile_settings
+    url: https://byk-dmapper:8443/json/v2/return_user_profile_settings
     body:
       settingsArray: ${getUserSettingsResult.response.body}
   result: userSettingsData
