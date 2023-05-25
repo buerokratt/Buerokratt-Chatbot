@@ -84,7 +84,7 @@ const ChatEvent: FC<ChatEventProps> = ({message}) => {
             })
             break;
         case CHAT_EVENTS.AUTHENTICATION_SUCCESSFUL:
-            EVENT_PARAMS = t('chat.events.authentication-successful', {
+            EVENT_PARAMS = t('chat.events.authentication_successful', {
                 date: format(new Date(authorTimestamp), 'dd.MM.yyyy HH:ii:ss'),
             })
             break;

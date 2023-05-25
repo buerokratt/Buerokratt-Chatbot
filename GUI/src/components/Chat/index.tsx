@@ -167,7 +167,7 @@ const Chat: FC<ChatProps> = ({ chat, onChatEnd, onForwardToColleauge, onForwardT
         messagesList.forEach((message) => {
             const lastGroup = groupedMessages[groupedMessages.length - 1];
             if (lastGroup?.type === message.authorRole) {
-                if (!message.event || message.event === 'greeting') {
+                if (!message.event || message.event === '' || message.event === 'greeting') {
                     lastGroup.messages.push(message);
                 } else {
                     groupedMessages.push({
@@ -177,15 +177,23 @@ const Chat: FC<ChatProps> = ({ chat, onChatEnd, onForwardToColleauge, onForwardT
                     });
                 }
             } else {
-                groupedMessages.push({
-                    name: message.authorRole === 'end-user'
+                if (!message.event || message.event === '' || message.event === 'greeting') {
+                    groupedMessages.push({
+                        name: message.authorRole === 'end-user'
                         ? endUserFullName
                         : message.authorRole === 'backoffice-user'
-                            ? `${message.authorFirstName} ${message.authorLastName}`
-                            : message.authorRole,
-                    type: message.authorRole,
-                    messages: [message],
-                });
+                        ? `${message.authorFirstName} ${message.authorLastName}`
+                        : message.authorRole,
+                        type: message.authorRole,
+                        messages: [message],
+                    });
+                } else {
+                    groupedMessages.push({
+                        name: '',
+                        type: 'event',
+                        messages: [message],
+                    });
+                }
             }
         });
         setMessageGroups(groupedMessages);
