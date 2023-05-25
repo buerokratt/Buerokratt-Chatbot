@@ -16,8 +16,8 @@ SELECT c.base_id AS id,
        c.received_from,
        c.forwarded_to_name,
        c.forwarded_to,
-       (CASE WHEN (SELECT value FROM configuration WHERE key = 'is_csa_title_visible' AND deleted = false) = 'true'
-                 THEN c.csa_title ELSE '' END) AS csa_title,
+       (CASE WHEN (SELECT value FROM configuration WHERE key = 'is_csa_title_visible' AND configuration.id IN (SELECT max(id) from configuration GROUP BY key) AND deleted = false) = 'true'
+                 THEN c.csa_title ELSE '' END) AS csa_title,          
        m.content AS last_message,
        m.updated AS last_message_timestamp
 FROM (SELECT *

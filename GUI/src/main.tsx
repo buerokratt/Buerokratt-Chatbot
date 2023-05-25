@@ -12,6 +12,7 @@ import { ToastProvider } from 'context/ToastContext';
 import { handlers } from 'mocks/handlers';
 import 'styles/main.scss';
 import '../i18n';
+import { CookiesProvider } from 'react-cookie';
 
 const defaultQueryFn: QueryFunction | undefined = async ({ queryKey }) => {
   if (queryKey.includes('prod')) {
@@ -49,7 +50,9 @@ prepare().then(() => {
       <QueryClientProvider client={queryClient}>
         <BrowserRouter basename={import.meta.env.BASE_URL}>
           <ToastProvider>
-            <App />
+            <CookiesProvider>
+              <App />
+            </CookiesProvider>
           </ToastProvider>
         </BrowserRouter>
       </QueryClientProvider>

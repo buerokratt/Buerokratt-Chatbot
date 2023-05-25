@@ -1,0 +1,10 @@
+{
+  "rule_only_slots": [
+    "affirm_deny",
+    "common_teenus_ilm_asukoht"
+  ],
+  "rule_only_loops": [
+    "custom_fallback_form",
+    "direct_to_customer_support_form"
+  ]
+}
