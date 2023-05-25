@@ -2,12 +2,9 @@ import { FC, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Tabs from '@radix-ui/react-tabs';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { formatDistanceStrict } from 'date-fns';
 import { AxiosError } from 'axios';
-import { et } from 'date-fns/locale';
-
-import { Track, Chat, Dialog, Button, FormRadios } from 'components';
-import { Chat as ChatType, CHAT_STATUS } from 'types/chat';
+import { Chat, Dialog, Button, FormRadios } from 'components';
+import { Chat as ChatType, CHAT_STATUS, GroupedChat } from 'types/chat';
 import useUserInfoStore from 'store/store';
 import { User } from 'types/user';
 import { useToast } from 'hooks/useToast';
@@ -16,6 +13,7 @@ import ForwardToColleaugeModal from '../ForwardToColleaugeModal';
 import ForwardToEstablishmentModal from '../ForwardToEstablishmentModal';
 import clsx from 'clsx';
 import StartAServiceModal from '../StartAServiceModal';
+import ChatTrigger from './ChatTrigger';
 import './ChatActive.scss';
 
 const CSAchatStatuses = [
@@ -37,11 +35,19 @@ const ChatActive: FC = () => {
   const [startAServiceModal, setStartAServiceModal] = useState<ChatType | null>(null);
   const [activeChatsList, setActiveChatsList] = useState<ChatType[]>([]);
 
-  const { data: chatData } = useQuery<ChatType[]>({
+  useQuery<ChatType[]>({
     queryKey: ['cs-get-all-active-chats', 'prod'],
     onSuccess(res: any) {
       setActiveChatsList(res.data.get_all_active_chats);
     },
+  });
+
+  const { data: csaNameVisiblity } = useQuery<{isVisible: boolean}>({
+    queryKey: ['cs-get-csa-name-visibility', 'prod-2'],
+  });
+
+  const { data: csaTitleVisibility } = useQuery<{isVisible: boolean}>({
+    queryKey: ['cs-get-csa-title-visibility', 'prod-2'],
   });
 
   const sendToEmailMutation = useMutation({
@@ -64,7 +70,40 @@ const ChatActive: FC = () => {
   });
 
   const selectedChat = useMemo(() => activeChatsList && activeChatsList.find((c) => c.id === selectedChatId), [activeChatsList, selectedChatId]);
-  const activeChats = useMemo(() => activeChatsList ? activeChatsList.filter((c) => c.customerSupportId !== '') : [], [activeChatsList]);
+
+  const activeChats: GroupedChat = useMemo(() => {
+    if (!activeChatsList)
+      return [];
+
+    const grouped: GroupedChat = {
+      myChats: [],
+      otherChats: [],
+    };
+
+    activeChatsList
+      .forEach((c) => {
+        if (c.customerSupportId === userInfo?.idCode) {
+          grouped.myChats.push(c);
+          return;
+        }
+
+        const groupIndex = grouped.otherChats.findIndex(x => x.groupId === c.customerSupportId);
+        if (groupIndex === -1) {
+          grouped.otherChats.push({
+            groupId: c.customerSupportId,
+            name: c.customerSupportDisplayName,
+            chats: [c],
+          });
+        }
+        else {
+          grouped.otherChats[groupIndex].chats.push(c)
+        }
+      });
+
+    grouped.otherChats.sort((a, b) => a.name.localeCompare(b.name));
+
+    return grouped;
+  }, [activeChatsList]);
 
   const handleCsaForward = (chat: ChatType, user: User) => {
     // TODO: Add endpoint for chat forwarding
@@ -112,30 +151,42 @@ const ChatActive: FC = () => {
           <div className='vertical-tabs__group-header'>
             <p>{t('chat.active.myChats')}</p>
           </div>
-          {activeChats.filter((chat) => chat.customerSupportId === userInfo?.idCode).map((chat) => (
+          {activeChats?.myChats?.map((chat) => (
             <Tabs.Trigger
               key={chat.id}
               className='vertical-tabs__trigger'
-              value={chat.id}>
+              value={chat.id}
+              style={{ borderBottom: '1px solid #D2D3D8' }}
+            >
               <ChatTrigger chat={chat} />
             </Tabs.Trigger>
           ))}
           <div className='vertical-tabs__group-header'>
             <p>{t('chat.active.newChats')}</p>
           </div>
-          {activeChats.filter((chat) => chat.customerSupportId !== userInfo?.idCode).map((chat) => (
-            <Tabs.Trigger
-              key={chat.id}
-              className={
-                clsx('vertical-tabs__trigger', {
-                  'active': chat.status === CHAT_STATUS.REDIRECTED && chat.customerSupportId !== userInfo?.idCode,
-                })
+          {activeChats?.otherChats?.map(({ name, chats }) => (
+            <>
+              {
+                name &&
+                <div className='vertical-tabs__sub-group-header'>
+                  <p>{name}</p>
+                </div>
               }
-              value={chat.id}
-              style={{ borderBottom: '1px solid #D2D3D8' }}
-            >
-              <ChatTrigger chat={chat} />
-            </Tabs.Trigger>
+              {chats.map((chat) => (
+                <Tabs.Trigger
+                  key={chat.id}
+                  className={
+                    clsx('vertical-tabs__trigger', {
+                      'active': chat.status === CHAT_STATUS.REDIRECTED && chat.customerSupportId !== userInfo?.idCode,
+                    })
+                  }
+                  value={chat.id}
+                  style={{ borderBottom: '1px solid #D2D3D8' }}
+                >
+                  <ChatTrigger chat={chat} />
+                </Tabs.Trigger>
+              ))}
+            </>
           ))}
         </Tabs.List>
 
@@ -147,6 +198,8 @@ const ChatActive: FC = () => {
             {selectedChat && (
               <Chat
                 chat={selectedChat}
+                isCsaNameVisible={csaNameVisiblity?.isVisible ?? false}
+                isCsaTitleVisible={csaTitleVisibility?.isVisible ?? false}
                 onChatEnd={setEndChatModal}
                 onForwardToColleauge={setForwardToColleaugeModal}
                 onForwardToEstablishment={setForwardToEstablishmentModal}
@@ -223,27 +276,6 @@ const ChatActive: FC = () => {
         </Dialog>
       )}
     </>
-  );
-};
-
-const ChatTrigger: FC<{ chat: ChatType }> = ({ chat }) => {
-  const { t } = useTranslation();
-
-  return (
-    <div style={{ fontSize: 14, lineHeight: '1.5', color: '#09090B' }}>
-      <Track justify='between'>
-        {chat.endUserFirstName !== '' && chat.endUserLastName !== '' ? (
-          <p><strong>{chat.endUserFirstName} {chat.endUserLastName}</strong></p>
-        ) : <p><strong>{t('global.anonymous')}</strong></p>}
-        {chat.lastMessageTimestamp && (
-          <p
-            style={{ color: '#4D4F5D' }}>{formatDistanceStrict(new Date(chat.lastMessageTimestamp), new Date(), { locale: et })}</p>
-        )}
-      </Track>
-      <div className="wrapper">
-        <p className="last_message">{chat.lastMessage}.</p>
-      </div>
-    </div>
   );
 };
 
