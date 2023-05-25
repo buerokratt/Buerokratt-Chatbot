@@ -58,6 +58,14 @@ export interface Chat {
   comment?: string;
   labels: string;
 }
+export interface GroupedChat {
+  myChats: Chat[];
+  otherChats: {
+    groupId: string;
+    name: string;
+    chats: Chat[];
+  }[];
+}
 
 export enum MessageSseEvent {
   READ = 'message-read',
