@@ -98,7 +98,9 @@
     "startedAt": "Chat started at",
     "device": "Device",
     "location": "Location",
-    "redirectedMessage": "{{from}} redirected the conversation to user {{to}} {{date}}",
+    "redirectedMessageByOwner": "{{from}} forwarded chat to {{to}} {{date}}",
+    "redirectedMessageClaimed": "{{to}} took over chat from {{from}} {{date}}",
+    "redirectedMessage": "{{user}} forwarded chat from {{from}} to {{to}} {{date}}",
     "status": {
       "active": "Active",
       "ended": "Ended"

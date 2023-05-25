@@ -72,13 +72,12 @@ const ChatActive: FC = () => {
   const selectedChat = useMemo(() => activeChatsList && activeChatsList.find((c) => c.id === selectedChatId), [activeChatsList, selectedChatId]);
 
   const activeChats: GroupedChat = useMemo(() => {
-    if (!activeChatsList)
-      return [];
-
     const grouped: GroupedChat = {
       myChats: [],
       otherChats: [],
     };
+
+    if (!activeChatsList) return grouped;
 
     activeChatsList
       .forEach((c) => {
@@ -90,8 +89,8 @@ const ChatActive: FC = () => {
         const groupIndex = grouped.otherChats.findIndex(x => x.groupId === c.customerSupportId);
         if (groupIndex === -1) {
           grouped.otherChats.push({
-            groupId: c.customerSupportId,
-            name: c.customerSupportDisplayName,
+            groupId: c.customerSupportId ?? "",
+            name: c.customerSupportDisplayName ?? "",
             chats: [c],
           });
         }
