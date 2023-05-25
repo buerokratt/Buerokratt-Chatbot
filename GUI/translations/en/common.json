@@ -198,7 +198,9 @@
       "popupNotifications": "Popup notifications",
       "newUnansweredChat": "New unanswered chat",
       "newForwardedChat": "New forwarded chat",
-      "useAutocorrect": "Text auto corrector"
+      "useAutocorrect": "Text auto corrector",
+      "required": "Required",
+      "invalidemail": "Invalid email"
     },
     "chat": {
       "chatActive": "Chatbot active",
