@@ -13,16 +13,19 @@ import {
   Section,
   SwitchBox,
   Switch,
+  Toast,
 } from 'components';
 import useUserInfoStore from 'store/store';
 import { ReactComponent as BykLogo } from 'assets/logo.svg';
 import { UserProfileSettings } from 'types/userProfileSettings';
-import { Chat as ChatType } from 'types/chat';
+import { CHAT_STATUS, Chat as ChatType, GroupedChat, CHAT_EVENTS } from 'types/chat';
 import { useToast } from 'hooks/useToast';
 import { USER_IDLE_STATUS_TIMEOUT } from 'constants/config';
 import apiDev from 'services/api-dev';
 import apiDevV2 from 'services/api-dev-v2';
 import './Header.scss';
+import chatSound from '../../assets/chatSound.mp3';
+import { Subscription, interval } from 'rxjs';
 import { AUTHORITY } from 'types/authorities';
 import { useCookies } from 'react-cookie';
 
@@ -53,16 +56,17 @@ const Header: FC = () => {
   const [csaStatus, setCsaStatus] = useState<'idle' | 'offline' | 'online'>(
     'online'
   );
+  const audio = useMemo(() => new Audio(chatSound), []);
   const [csaActive, setCsaActive] = useState<boolean>(false);
   const [userProfileSettings, setUserProfileSettings] = useState<UserProfileSettings>({
     userId: 1,
     forwardedChatPopupNotifications: false,
-    forwardedChatSoundNotifications: false,
+    forwardedChatSoundNotifications: true,
     forwardedChatEmailNotifications: false,
     newChatPopupNotifications: false,
-    newChatSoundNotifications: false,
+    newChatSoundNotifications: true,
     newChatEmailNotifications: false,
-    useAutocorrect: false
+    useAutocorrect: true
   });
   useEffect(() => {
     getMessages();
@@ -87,11 +91,90 @@ const getMessages = async () => {
       );
     },
   });
-  const { data: chatData } = useQuery<ChatType[]>({
-    queryKey: ['cs-get-all-active-chats'],
+  const [activeChatsList, setActiveChatsList] = useState<ChatType[]>([]);
+  const [selectedEndChatStatus, setSelectedEndChatStatus] = useState<string | null>(null);
+
+  useQuery<ChatType[]>({
+    queryKey: ['cs-get-all-active-chats', 'prod'],
+    onSuccess(res: any) {
+      setActiveChatsList(res.data.get_all_active_chats);
+    },
   });
   const customJwtCookieKey = 'customJwtCookie';
   const [_, setCookie] = useCookies([customJwtCookieKey]);
+
+  const unansweredChats = useMemo(
+    () =>
+      activeChatsList
+        ? activeChatsList.filter((c) => c.customerSupportId === '').length
+        : 0,
+    [activeChatsList]
+  );
+  const forwardedChats = useMemo(
+    () =>
+      activeChatsList
+        ? activeChatsList.filter(
+            (c) =>
+              c.lastMessageEvent === CHAT_EVENTS.REDIRECTED &&
+              c.customerSupportId === userInfo?.idCode
+          ).length
+        : 0,
+    [activeChatsList]
+  );
+
+  useEffect(() => {
+    let subscription: Subscription;
+    if (unansweredChats > 0) {
+      if (userProfileSettings.newChatSoundNotifications) audio.play();
+      if (userProfileSettings.newChatPopupNotifications)
+        toast.open({
+          type: 'info',
+          title: t('settings.users.newUnansweredChat'),
+          message: '',
+        });
+      subscription = interval(2 * 60 * 1000).subscribe(() => {
+        if (userProfileSettings.newChatSoundNotifications) audio.play();
+        if (userProfileSettings.newChatPopupNotifications)
+          toast.open({
+            type: 'info',
+            title: t('settings.users.newUnansweredChat'),
+            message: '',
+          });
+      });
+    }
+    return () => {
+      if (subscription) subscription.unsubscribe();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [unansweredChats]);
+
+  useEffect(() => {
+    let subscription: Subscription;
+    if (forwardedChats > 0) {
+      if (userProfileSettings.forwardedChatSoundNotifications) audio.play();
+      if (userProfileSettings.forwardedChatPopupNotifications) {
+        toast.open({
+          type: 'info',
+          title: t('settings.users.newForwardedChat'),
+          message: '',
+        });
+      }
+      subscription = interval(2 * 60 * 1000).subscribe(() => {
+        if (userProfileSettings.forwardedChatSoundNotifications) audio.play();
+        if (userProfileSettings.forwardedChatPopupNotifications) {
+          toast.open({
+            type: 'info',
+            title: t('settings.users.newForwardedChat'),
+            message: '',
+          });
+        }
+      });
+    }
+    return () => {
+      if (subscription) subscription.unsubscribe();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [forwardedChats]);
 
   const userProfileSettingsMutation = useMutation({
     mutationFn: async (data: UserProfileSettings) => {
@@ -188,17 +271,6 @@ const getMessages = async () => {
     throttle: 500,
   });
 
-  const unansweredChats = useMemo(
-    () =>
-      chatData ? chatData.filter((c) => c.customerSupportId === '').length : 0,
-    [chatData]
-  );
-  const activeChats = useMemo(
-    () =>
-      chatData ? chatData.filter((c) => c.customerSupportId !== '').length : 0,
-    [chatData]
-  );
-
   const handleUserProfileSettingsChange = (key: string, checked: boolean) => {
     if (!userProfileSettings) return;
     const newSettings = {
@@ -238,10 +310,10 @@ const getMessages = async () => {
                       <strong>{unansweredChats}</strong> {t('chat.unanswered')}
                     </>
                   )}
-                  {activeChats && (
+                  {forwardedChats && (
                     <>
                       {' '}
-                      <strong>{activeChats}</strong> {t('chat.forwarded')}
+                      <strong>{forwardedChats}</strong> {t('chat.forwarded')}
                     </>
                   )}
                 </p>
