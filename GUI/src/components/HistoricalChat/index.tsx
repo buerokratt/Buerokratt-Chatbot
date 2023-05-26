@@ -1,13 +1,12 @@
 import { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { MdOutlineModeEditOutline, MdOutlineSave } from 'react-icons/all';
 
 import { Button, FormSelect, FormTextarea, Icon, Track } from 'components';
 import { ReactComponent as BykLogoWhite } from 'assets/logo-white.svg';
 import useUserInfoStore from 'store/store';
-import { Chat as ChatType } from 'types/chat';
+import { CHAT_EVENTS, Chat as ChatType } from 'types/chat';
 import { Message } from 'types/message';
 import ChatMessage from './ChatMessage';
 import ChatEvent from './ChatEvent';
@@ -27,13 +26,13 @@ type GroupedMessage = {
 }
 
 const chatStatuses = [
-    'client-left-with-accepted',
-    'client-left-with-no-resolution',
-    'client-left-for-unknown-reason',
-    'accepted',
-    'hate-speech',
-    'other',
-    'response-sent-to-client-email',
+    CHAT_EVENTS.ACCEPTED,
+    CHAT_EVENTS.CLIENT_LEFT_FOR_UNKNOWN_REASONS,
+    CHAT_EVENTS.CLIENT_LEFT_WITH_ACCEPTED,
+    CHAT_EVENTS.CLIENT_LEFT_WITH_NO_RESOLUTION,
+    CHAT_EVENTS.HATE_SPEECH,
+    CHAT_EVENTS.OTHER,
+    CHAT_EVENTS.RESPONSE_SENT_TO_CLIENT_EMAIL,
 ];
 
 const HistoricalChat: FC<ChatProps> = ({ chat, onChatStatusChange, onCommentChange }) => {
@@ -69,7 +68,7 @@ const HistoricalChat: FC<ChatProps> = ({ chat, onChatStatusChange, onCommentChan
         messagesList.forEach((message) => {
             const lastGroup = groupedMessages[groupedMessages.length - 1];
             if (lastGroup?.type === message.authorRole) {
-                if (!message.event || message.event === 'greeting') {
+                if (!message.event || message.event.toLowerCase() === 'greeting') {
                     lastGroup.messages.push(message);
                 } else {
                     groupedMessages.push({
@@ -175,7 +174,7 @@ const HistoricalChat: FC<ChatProps> = ({ chat, onChatStatusChange, onCommentChan
                             label={t('chat.chatStatus')}
                             onSelectionChange={(selection) => selection ? onChatStatusChange(selection.value) : null}
                             options={chatStatuses.map((status) => ({
-                                label: t(`chat.events.${status}`),
+                                label: t(`chat.events.${status}`, { date: '' }),
                                 value: status
                             }))}
                         />
