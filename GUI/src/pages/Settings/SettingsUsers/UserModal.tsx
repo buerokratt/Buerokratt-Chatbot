@@ -91,6 +91,8 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
     }
   });
 
+  const requiredText = t('settings.users.required') ?? '*';
+
   return (
     <Dialog
       title={user ? t('settings.users.editUser') : t('settings.users.addUser')}
@@ -106,12 +108,12 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
     >
       <Track direction='vertical' gap={16} align='right'>
         <FormInput
-          {...register('login', { required: t('settings.users.required'), })}
+          {...register('login', { required: requiredText, })}
           label={t('settings.users.fullName')}
         />
         {errors.login && <span style={{ color: '#f00', marginTop: '-1.2rem' }}>{errors.login.message}</span>}
         {!user && <FormInput
-          {...register('idCode', { required: t('settings.users.required'), })}
+          {...register('idCode', { required: requiredText, })}
           label={t('settings.users.idCode')}
         />}
         {!user && errors.idCode && <span style={{ color: '#f00', marginTop: '-1.2rem' }}>{errors.idCode.message}</span>}
@@ -134,7 +136,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
 
         <FormInput
           {...register('csaEmail', {
-            required: t('settings.users.required'),
+            required: requiredText,
             pattern: {
               value: /\S+@\S+\.\S+/,
               message: t('settings.users.invalidemail')
