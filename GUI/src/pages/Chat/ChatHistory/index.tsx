@@ -20,11 +20,12 @@ import {
   Tooltip,
   Track,
 } from 'components';
-import { Chat as ChatType, CHAT_STATUS } from 'types/chat';
+import { CHAT_EVENTS, CHAT_STATUS, Chat as ChatType } from 'types/chat';
 import { Message } from 'types/message';
 import { useToast } from 'hooks/useToast';
 import api from 'services/api';
 import apiDev from 'services/api-dev';
+import useUserInfoStore from '../../../store/store';
 import { Controller, useForm } from 'react-hook-form';
 import { getFromLocalStorage, setToLocalStorage } from 'utils/local-storage-utils';
 import { CHAT_HISTORY_PREFERENCES_KEY } from '../../../constants/config'
@@ -32,6 +33,7 @@ import { CHAT_HISTORY_PREFERENCES_KEY } from '../../../constants/config'
 const ChatHistory: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
+  const { userInfo } = useUserInfoStore();
   const preferences = getFromLocalStorage(CHAT_HISTORY_PREFERENCES_KEY) as string[];
   const [selectedChat, setSelectedChat] = useState<ChatType | null>(null);
   const [sendToEmailModal, setSendToEmailModal] = useState<ChatType | null>(null);
@@ -115,13 +117,33 @@ const ChatHistory: FC = () => {
   });
 
   const chatStatusChangeMutation = useMutation({
-    mutationFn: (data: { chatId: string | number, event: string }) => api.post('cs-end-chat', data),
+    mutationFn: async (data: { chatId: string | number, event: string }) => {
+      const changeableTo = [
+        CHAT_EVENTS.CLIENT_LEFT_WITH_ACCEPTED.toUpperCase(),
+        CHAT_EVENTS.CLIENT_LEFT_WITH_NO_RESOLUTION.toUpperCase(),
+      ];
+      const isChangeable = changeableTo.includes(data.event);
+
+      if (selectedChat?.lastMessageEvent === data.event.toLowerCase()) return;
+      if (selectedChat?.lastMessageEvent !== CHAT_EVENTS.CLIENT_LEFT_FOR_UNKNOWN_REASONS) return;
+      if (!isChangeable) return;
+
+      await apiDev.post('cs-end-chat', {
+        chatId: selectedChat!.id,
+        event: data.event.toUpperCase(),
+        authorTimestamp: new Date().toISOString(),
+        authorFirstName: userInfo!.firstName,
+        authorId: userInfo!.idCode,
+        authorRole: userInfo!.authorities
+      });
+    },
     onSuccess: () => {
       toast.open({
         type: 'success',
         title: t('global.notification'),
         message: 'Chat status changed',
       });
+      setStatusChangeModal(null);
     },
     onError: (error: AxiosError) => {
       toast.open({
@@ -237,7 +259,7 @@ const ChatHistory: FC = () => {
 
   const handleChatStatusChange = (event: string) => {
     if (!selectedChat) return;
-    chatStatusChangeMutation.mutate({ chatId: selectedChat.id, event });
+    chatStatusChangeMutation.mutate({ chatId: selectedChat.id, event: event.toUpperCase() });
   };
 
   const handleCommentChange = (comment: string) => {
@@ -374,11 +396,11 @@ const ChatHistory: FC = () => {
 
       {statusChangeModal && (
         <Dialog
-          title={t('chat.active.sendToEmail')}
+          title={t('chat.changeStatus')}
           onClose={() => setSendToEmailModal(null)}
           footer={
             <>
-              <Button appearance='secondary' onClick={() => setSendToEmailModal(null)}>{t('global.no')}</Button>
+              <Button appearance='secondary' onClick={() => setStatusChangeModal(null)}>{t('global.cancel')}</Button>
               <Button
                 appearance='error'
                 onClick={() => handleChatStatusChange(statusChangeModal)}

@@ -1,4 +1,3 @@
-import api from './api';
 import apiDev from './api-dev';
 import { User, UserDTO } from 'types/user';
 
