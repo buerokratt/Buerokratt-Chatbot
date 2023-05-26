@@ -23,6 +23,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
     register,
     control,
     handleSubmit,
+    formState: { errors },
   } = useForm<UserDTO>({
     defaultValues: {
       login: user?.login,
@@ -90,6 +91,8 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
     }
   });
 
+  const requiredText = t('settings.users.required') ?? '*';
+
   return (
     <Dialog
       title={user ? t('settings.users.editUser') : t('settings.users.addUser')}
@@ -103,12 +106,21 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
         </>
       }
     >
-      <Track direction='vertical' gap={16}>
-        <FormInput {...register('login')} label={t('settings.users.fullName')} />
-        {!user && <FormInput {...register('idCode')} label={t('settings.users.idCode')} />}
+      <Track direction='vertical' gap={16} align='right'>
+        <FormInput
+          {...register('login', { required: requiredText, })}
+          label={t('settings.users.fullName')}
+        />
+        {errors.login && <span style={{ color: '#f00', marginTop: '-1.2rem' }}>{errors.login.message}</span>}
+        {!user && <FormInput
+          {...register('idCode', { required: requiredText, })}
+          label={t('settings.users.idCode')}
+        />}
+        {!user && errors.idCode && <span style={{ color: '#f00', marginTop: '-1.2rem' }}>{errors.idCode.message}</span>}
         <Controller
           name='authorities'
           control={control}
+          required
           render={({ field }) =>
             <FormSelect
               label={t('settings.users.userRoles')}
@@ -118,9 +130,22 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
             />
           }
         />
+        {errors.authorities && <span style={{ color: '#f00', marginTop: '-1.2rem' }}>{errors.authorities.message}</span>}
         <FormInput {...register('displayName')} label={t('settings.users.displayName')} />
         <FormInput {...register('csaTitle')} label={t('settings.users.userTitle')} />
-        <FormInput {...register('csaEmail')} label={t('settings.users.email')} type='email' />
+
+        <FormInput
+          {...register('csaEmail', {
+            required: requiredText,
+            pattern: {
+              value: /\S+@\S+\.\S+/,
+              message: t('settings.users.invalidemail')
+            }
+          })}
+          label={t('settings.users.email')}
+          type='email'
+        />
+        {errors.csaEmail && <span style={{ color: '#f00', marginTop: '-1.2rem' }}>{errors.csaEmail.message}</span>}
       </Track>
     </Dialog>
   );
