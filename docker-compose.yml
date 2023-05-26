@@ -125,6 +125,7 @@ services:
       - 8086:8086
     networks:
       - bykstack
+
   dmapper:
     container_name: dmapper
     image: riaee/byk-dmapper:11
@@ -279,6 +280,14 @@ services:
       options:
         max-size: "50m"
         max-file: "3"
+
+  customer-service:
+    container_name: customer-service
+    image: customer-service
+    ports:
+      - 3004:3004
+    networks:
+      - bykstack
 
 networks:
   bykstack:
