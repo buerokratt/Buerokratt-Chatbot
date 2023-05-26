@@ -147,6 +147,7 @@
     "events": {
       "answered": "Answered {{date}}",
       "terminated": "Terminated {{date}}",
+      "sent_to_csa_email": "Chat sent to CSA email {{date}}",
       "client-left": "Client left {{date}}",
       "client_left_with_accepted": "Client left with accepted response {{date}}",
       "client_left_with_no_resolution": "Client left with no resolution {{date}}",
