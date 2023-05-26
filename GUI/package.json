@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --port 3000",
+    "dev": "vite --port 3001 --host",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "tsc --noEmit && eslint \"./src/**/*.{js,ts,tsx}\"",
@@ -32,7 +32,9 @@
     "framer-motion": "^8.5.5",
     "i18next": "^22.4.5",
     "i18next-browser-languagedetector": "^7.0.1",
+    "lodash": "^4.17.21",
     "react": "^18.2.0",
+    "react-cookie": "^4.1.1",
     "react-datepicker": "^4.8.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.41.5",
@@ -48,6 +50,7 @@
     "zustand": "^4.3.2"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.191",
     "@types/lodash.debounce": "^4.0.7",
     "@types/node": "^18.11.17",
     "@types/react": "^18.0.26",

@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { AxiosError } from 'axios';
 import { useTranslation } from 'react-i18next';
@@ -8,22 +8,31 @@ import { EMERGENCY_NOTICE_LENGTH } from 'constants/config';
 import { EmergencyNotice } from 'types/emergencyNotice';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useToast } from 'hooks/useToast';
-import api from 'services/api';
+import apiDevV2 from 'services/api-dev-v2';
 
 const SettingsEmergencyNotices: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
   const { register, control, handleSubmit, reset } = useForm<EmergencyNotice>();
+  const [isEmergencyNoticeVisible, setIsEmergencyNoticeVisible] = useState(false);
+  const [emergencyNoticeText, setEmergencyNoticeText] = useState("");
   const { data: emergencyNotice } = useQuery<EmergencyNotice>({
-    queryKey: ['cs-get-emergency-notice'],
-    onSuccess: (data) => reset({
-      emergencyNoticeStartISO: new Date(data.emergencyNoticeStartISO),
-      emergencyNoticeEndISO: new Date(data.emergencyNoticeEndISO),
-    }),
+    queryKey: ['cs-get-emergency-notice', 'prod-2'],
+    onSuccess: (data) => {
+      if (Object.keys(control._formValues).length > 0) return;
+      setIsEmergencyNoticeVisible(data.isEmergencyNoticeVisible ?? false);
+      setEmergencyNoticeText(data.emergencyNoticeText ?? '');
+      reset({
+        emergencyNoticeStartISO: new Date(data.emergencyNoticeStartISO ?? '0'),
+        emergencyNoticeEndISO: new Date(data.emergencyNoticeEndISO ?? '0'),
+        emergencyNoticeText: data.emergencyNoticeText ?? '',
+        isEmergencyNoticeVisible: data.isEmergencyNoticeVisible ?? false,
+      });
+    },
   });
 
   const emergencyNoticeMutation = useMutation({
-    mutationFn: (data: EmergencyNotice) => api.post<EmergencyNotice>('cs-set-emergency-notice', data),
+    mutationFn: (data: EmergencyNotice) => apiDevV2.post<EmergencyNotice>('cs-set-emergency-notice', data),
     onError: (error: AxiosError) => {
       toast.open({
         type: 'error',
@@ -34,10 +43,16 @@ const SettingsEmergencyNotices: FC = () => {
   });
 
   const handleFormSubmit = handleSubmit((data) => {
-    emergencyNoticeMutation.mutate(data);
+    const endDate = control._formValues.emergencyNoticeEndISO as Date;
+    endDate.setDate(endDate.getDate() + 1);
+    emergencyNoticeMutation.mutate({
+      ...data,
+      emergencyNoticeEndISO: endDate,
+      isEmergencyNoticeVisible,
+      emergencyNoticeText,
+    });
   });
-
-  if (!emergencyNotice) return <>Loading...</>;
+  if (!emergencyNotice || Object.keys(control._formValues).length === 0) return <>Loading...</>;
 
   return (
     <>
@@ -53,7 +68,8 @@ const SettingsEmergencyNotices: FC = () => {
         <Track gap={16} direction='vertical' align='left'>
           <Controller name='isEmergencyNoticeVisible' control={control} render={({ field }) =>
             <Switch
-              checked={emergencyNotice.isEmergencyNoticeVisible}
+              checked={isEmergencyNoticeVisible}
+              onCheckedChange={(c) => setIsEmergencyNoticeVisible(c)}
               label={t('settings.emergencyNotices.noticeActive')}
               {...field}
             />
@@ -64,8 +80,9 @@ const SettingsEmergencyNotices: FC = () => {
             label={t('settings.emergencyNotices.notice')}
             minRows={1}
             maxLength={EMERGENCY_NOTICE_LENGTH}
-            defaultValue={emergencyNotice.emergencyNoticeText}
+            defaultValue={emergencyNoticeText}
             showMaxLength
+            onChange={(e) => setEmergencyNoticeText(e.target.value)}
           />
           <Track gap={8}>
             <p style={{ flex: '0 0 170px' }}>{t('settings.emergencyNotices.displayPeriod')}</p>
@@ -74,7 +91,12 @@ const SettingsEmergencyNotices: FC = () => {
                 name='emergencyNoticeStartISO'
                 control={control}
                 render={({ field }) =>
-                  <FormDatepicker label={t('global.startDate')} hideLabel {...field} />
+                  <FormDatepicker
+                  label={t('global.startDate')}
+                  hideLabel
+                  {...field}
+                  value={field.value ?? new Date('0')}
+                />
                 }
               />
               <span>{t('global.to').toLowerCase()}</span>
@@ -82,7 +104,12 @@ const SettingsEmergencyNotices: FC = () => {
                 name='emergencyNoticeEndISO'
                 control={control}
                 render={({ field }) =>
-                  <FormDatepicker label={t('global.endDate')} hideLabel {...field} />
+                  <FormDatepicker
+                  label={t('global.endDate')}
+                  hideLabel
+                  {...field}
+                  value={field.value ?? new Date('0')}
+                />
                 }
               />
             </Track>

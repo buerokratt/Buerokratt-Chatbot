@@ -12,5 +12,5 @@ export interface User {
   customerSupportStatus: 'online' | 'idle' | 'offline';
 }
 
-export interface UserDTO extends Pick<User, 'login' | 'idCode' | 'authorities' | 'displayName' | 'csaEmail'> {
+export interface UserDTO extends Pick<User, 'login' | 'idCode' | 'authorities' | 'displayName' | 'csaTitle' | 'csaEmail'> {
 }

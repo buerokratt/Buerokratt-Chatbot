@@ -1,7 +1,7 @@
 SELECT c.base_id AS id,
        c.customer_support_id,
        c.customer_support_display_name,
-       (CASE WHEN (SELECT value FROM configuration WHERE key = 'is_csa_title_visible' AND deleted = false) = 'true'
+       (CASE WHEN (SELECT value FROM configuration WHERE key = 'is_csa_title_visible' AND configuration.id IN (SELECT max(id) from configuration GROUP BY key) AND deleted = false) = 'true'
                  THEN c.csa_title ELSE '' END) AS csa_title,
        c.end_user_id,
        c.end_user_first_name,
@@ -18,6 +18,7 @@ SELECT c.base_id AS id,
        c.received_from,
        c.labels,
        m.content AS last_message,
+       (CASE WHEN m.event = '' THEN NULL ELSE LOWER(m.event) END) as last_message_event,
        (SELECT content
         FROM message
         WHERE id IN (

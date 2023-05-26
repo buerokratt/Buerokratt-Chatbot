@@ -13,6 +13,18 @@
           "method": "post",
           "endpoint": "{resql_url}/set-customer-support-status",
           "post_body_parameters": {
+            "userinfo": {
+              "cookies": [
+                "customJwtCookie"
+              ],
+              "method": "post",
+              "endpoint": "{tim_url}/jwt/custom-jwt-userinfo",
+              "post_body_struct": "customJwtCookie",
+              "response": {
+                "ok": "proceed",
+                "nok": "stop"
+              }
+            },
             "check_roles": {
               "method": "post",
               "endpoint": "{ruuter_url}/match_input",
@@ -54,7 +66,7 @@
           },
           "post_body_struct": {
             "active": "{#.customerSupportActive}",
-            "userIdCode": "{#.customerSupportId}",
+            "userIdCode": "{$.userinfo$.idCode}",
             "status": "{#.customerSupportStatus}",
             "created": "$_getInstant()"
           }

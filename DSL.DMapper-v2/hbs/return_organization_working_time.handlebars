@@ -1,0 +1,10 @@
+{ 
+    "organizationWorkingTimeStartISO": "{{configurationArray.0.value}}",
+    "organizationWorkingTimeEndISO": "{{configurationArray.1.value}}",
+    "organizationWorkingTimeWeekdays": [
+            {{#stringToList configurationArray.2.value}}
+                {{{value}}}
+            {{/stringToList}}
+        ],
+    "organizationWorkingTimeNationalHolidays": {{configurationArray.3.value}}
+}

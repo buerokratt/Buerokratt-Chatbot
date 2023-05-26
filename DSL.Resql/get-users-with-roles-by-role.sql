@@ -1,4 +1,4 @@
-SELECT u.login,
+SELECT DISTINCT u.login,
        u.first_name,
        u.last_name,
        u.id_code,
@@ -6,7 +6,10 @@ SELECT u.login,
        u.csa_title,
        u.csa_email,
        ua.authority_name AS authorities,
-       csa.status AS customerSupportStatus
+       last_value(csa.status)
+       OVER(
+        PARTITION BY csa.id_code
+       ) AS customer_support_status
 FROM "user" u
          LEFT JOIN (SELECT authority_name, user_id
                     FROM user_authority AS ua
@@ -17,4 +20,4 @@ FROM "user" u
          JOIN customer_support_agent_activity as csa on u.id_code = csa.id_code
 WHERE u.status <> 'deleted'
   AND array_length(authority_name, 1) > 0
-  AND u.id IN (SELECT max(id) FROM "user" GROUP BY id_code);
+  AND u.id IN (SELECT max(id) FROM "user" GROUP BY id_code)

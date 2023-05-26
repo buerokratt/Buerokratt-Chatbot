@@ -14,6 +14,7 @@ type FormMultiselectProps = SelectHTMLAttributes<HTMLSelectElement> & {
   name: string;
   hideLabel?: boolean;
   options: SelectOption[];
+  selectedOptions?: SelectOption[];
   onSelectionChange?: (selection: SelectOption[] | null) => void;
 }
 
@@ -25,13 +26,14 @@ const FormMultiselect: FC<FormMultiselectProps> = (
     disabled,
     placeholder,
     defaultValue,
+    selectedOptions,
     onSelectionChange,
     ...rest
   },
 ) => {
   const id = useId();
   const { t } = useTranslation();
-  const [selectedItems, setSelectedItems] = useState<SelectOption[]>([]);
+  const [selectedItems, setSelectedItems] = useState<SelectOption[]>(selectedOptions ?? []);
   const {
     isOpen,
     getToggleButtonProps,
@@ -60,16 +62,19 @@ const FormMultiselect: FC<FormMultiselectProps> = (
         return;
       }
       const index = selectedItems.findIndex((item) => item.value === selectedItem.value);
+      const items = [];
       if (index > 0) {
-        setSelectedItems([
+        items.push(
           ...selectedItems.slice(0, index),
-          ...selectedItems.slice(index + 1),
-        ]);
+          ...selectedItems.slice(index + 1)
+        );
       } else if (index === 0) {
-        setSelectedItems([...selectedItems.slice(1)]);
+        items.push(...selectedItems.slice(1));
       } else {
-        setSelectedItems([...selectedItems, selectedItem]);
+        items.push(...selectedItems, selectedItem);
       }
+      setSelectedItems(items);
+      if (onSelectionChange) onSelectionChange(items);
     },
   });
 
@@ -102,7 +107,7 @@ const FormMultiselect: FC<FormMultiselectProps> = (
               >
                 <input
                   type='checkbox'
-                  checked={selectedItems.includes(item)}
+                  checked={selectedItems.map((s) => s.value).includes(item.value)}
                   value={item.value}
                   onChange={() => null}
                 />

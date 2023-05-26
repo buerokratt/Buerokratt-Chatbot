@@ -143,6 +143,7 @@
                 "#.from_property": "{#.client_custom_jwt_cookie}",
                 "maxAge": 28800,
                 "setSecure": true,
+                "domain": "localhost",
                 "name": "clientCustomJwtCookie"
               },
               {
