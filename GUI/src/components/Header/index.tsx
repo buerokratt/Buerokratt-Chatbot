@@ -18,7 +18,7 @@ import {
 import useUserInfoStore from 'store/store';
 import { ReactComponent as BykLogo } from 'assets/logo.svg';
 import { UserProfileSettings } from 'types/userProfileSettings';
-import { CHAT_STATUS, Chat as ChatType, GroupedChat, CHAT_EVENTS } from 'types/chat';
+import { CHAT_STATUS, Chat as ChatType } from 'types/chat';
 import { useToast } from 'hooks/useToast';
 import { USER_IDLE_STATUS_TIMEOUT } from 'constants/config';
 import apiDev from 'services/api-dev';
@@ -115,7 +115,7 @@ const getMessages = async () => {
       activeChatsList
         ? activeChatsList.filter(
             (c) =>
-              c.lastMessageEvent === CHAT_EVENTS.REDIRECTED &&
+              c.status === CHAT_STATUS.REDIRECTED &&
               c.customerSupportId === userInfo?.idCode
           ).length
         : 0,
