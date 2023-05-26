@@ -92,7 +92,6 @@ const getMessages = async () => {
     },
   });
   const [activeChatsList, setActiveChatsList] = useState<ChatType[]>([]);
-  const [selectedEndChatStatus, setSelectedEndChatStatus] = useState<string | null>(null);
 
   useQuery<ChatType[]>({
     queryKey: ['cs-get-all-active-chats', 'prod'],
@@ -126,20 +125,23 @@ const getMessages = async () => {
     let subscription: Subscription;
     if (unansweredChats > 0) {
       if (userProfileSettings.newChatSoundNotifications) audio.play();
-      if (userProfileSettings.newChatPopupNotifications)
+      if (userProfileSettings.newChatEmailNotifications) // TODO send email notification
+      if (userProfileSettings.newChatPopupNotifications) {
         toast.open({
           type: 'info',
           title: t('settings.users.newUnansweredChat'),
           message: '',
         });
+      }
       subscription = interval(2 * 60 * 1000).subscribe(() => {
         if (userProfileSettings.newChatSoundNotifications) audio.play();
-        if (userProfileSettings.newChatPopupNotifications)
+        if (userProfileSettings.newChatPopupNotifications) {
           toast.open({
             type: 'info',
             title: t('settings.users.newUnansweredChat'),
             message: '',
           });
+        }
       });
     }
     return () => {
@@ -152,6 +154,7 @@ const getMessages = async () => {
     let subscription: Subscription;
     if (forwardedChats > 0) {
       if (userProfileSettings.forwardedChatSoundNotifications) audio.play();
+      if (userProfileSettings.forwardedChatEmailNotifications) // TODO send email notification
       if (userProfileSettings.forwardedChatPopupNotifications) {
         toast.open({
           type: 'info',
