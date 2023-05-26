@@ -74,6 +74,7 @@
               "name": "customJwtCookie",
               "httpOnly": true,
               "maxAge": 0,
+              "domain": "localhost",
               "setSecure": true,
               "value": null
             }
@@ -105,6 +106,7 @@
               "name": "customJwtCookie",
               "httpOnly": true,
               "maxAge": 0,
+              "domain": "localhost",
               "setSecure": true,
               "value": null
             }
