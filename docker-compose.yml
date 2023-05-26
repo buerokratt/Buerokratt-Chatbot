@@ -11,7 +11,7 @@ services:
       - csrf.ruuter_services_whitelist=
       - legacy-portal-integration.sessionCookieDomain=buerokratt.ee
       - allowed.requested.method.types=POST
-      - ruuter.cors.allowedOrigins=https://buerokratt.ee,https://admin.buerokratt.ee,https://tim.buerokratt.ee,http://localhost:3001,http://localhost:3002,http://localhost:3003
+      - ruuter.cors.allowedOrigins=https://buerokratt.ee,https://admin.buerokratt.ee,https://tim.buerokratt.ee,http://localhost:3001,http://localhost:3002,http://localhost:3003,http://localhost:3004
       - maxRequestSizeBytes=10000000000
       - default.requested.method.type=POST
       - incoming.request.external.validation.enabled=false
@@ -38,7 +38,7 @@ services:
     environment:
       - legacy-portal-integration.sessionCookieDomain=buerokratt.ee
       - logging.level.root=INFO
-      - ruuter.cors.allowedOrigins=https://buerokratt.ee,https://admin.buerokratt.ee,https://seire.buerokratt.ee,http://localhost:3001,http://localhost:3002,http://localhost:3003
+      - ruuter.cors.allowedOrigins=https://buerokratt.ee,https://admin.buerokratt.ee,https://tim.buerokratt.ee,http://localhost:3001,http://localhost:3002,http://localhost:3003,http://localhost:3004
       - headers.contentSecurityPolicy=
       - maxRequestSizeBytes=10000000000
       - incoming.request.external.validation.enabled=false
