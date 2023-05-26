@@ -91,8 +91,8 @@ const ChatActive: FC = () => {
         const groupIndex = grouped.otherChats.findIndex(x => x.groupId === c.customerSupportId);
         if (groupIndex === -1) {
           grouped.otherChats.push({
-            groupId: c.customerSupportId!,
-            name: c.customerSupportDisplayName!,
+            groupId: c.customerSupportId ?? "",
+            name: c.customerSupportDisplayName ?? "",
             chats: [c],
           });
         }

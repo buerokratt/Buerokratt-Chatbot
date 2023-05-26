@@ -98,7 +98,9 @@
     "startedAt": "Vestlus alustatud",
     "device": "Seade",
     "location": "Lähtekoht",
-    "redirectedMessage": "{{from}} suunas vestluse kasutajale {{to}} {{date}}",
+    "redirectedMessageByOwner": "{{from}} suunas vestluse kasutajale {{to}} {{date}}",
+    "redirectedMessageClaimed": "{{to}} võttis vestluse üle kasutajalt {{from}} {{date}}",
+    "redirectedMessage": "{{user}} suunas vestluse kasutajalt {{from}} kasutajale {{to}} {{date}}",
     "status": {
       "active": "Aktiivne",
       "ended": "Lõpetatud"
