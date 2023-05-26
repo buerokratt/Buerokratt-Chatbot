@@ -14,7 +14,7 @@ extractTokenData:
   call: http.post
   args:
     # TODO: replace with env variable and correct path to TIM endpoint
-    url: http://byk-private-ruuter-yml:8080/mocks/mock-tim-custom-jwt-userinfo
+    url: http://ruuter-v2-private:8088/mocks/mock-tim-custom-jwt-userinfo
     headers:
       cookie: ${cookie}
     body:
@@ -33,7 +33,7 @@ setUserSettingValue:
   call: http.post
   args:
     # TODO: replace with env variable
-    url: https://byk-resql:8443/set-user-profile-settings
+    url: http://resql:8082/set-user-profile-settings
     body:
       userId: ${userId}
       forwardedChatPopupNotifications: ${forwardedChatPopupNotifications}
