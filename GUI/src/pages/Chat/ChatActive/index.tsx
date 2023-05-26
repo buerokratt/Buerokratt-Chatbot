@@ -73,14 +73,13 @@ const ChatActive: FC = () => {
 
   const selectedChat = useMemo(() => activeChatsList && activeChatsList.find((c) => c.id === selectedChatId), [activeChatsList, selectedChatId]);
 
-  const activeChats: GroupedChat | undefined = useMemo(() => {
-    if (!activeChatsList)
-      return;
-
+  const activeChats: GroupedChat = useMemo(() => {
     const grouped: GroupedChat = {
       myChats: [],
       otherChats: [],
     };
+
+    if (!activeChatsList) return grouped;
 
     activeChatsList
       .forEach((c) => {
