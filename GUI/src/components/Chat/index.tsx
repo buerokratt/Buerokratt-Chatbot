@@ -23,6 +23,8 @@ import TextareaAutosize, { TextareaAutosizeProps } from 'react-textarea-autosize
 
 type ChatProps = {
     chat: ChatType;
+    isCsaNameVisible: boolean;
+    isCsaTitleVisible: boolean;
     onChatEnd: (chat: ChatType) => void;
     onForwardToColleauge?: (chat: ChatType) => void;
     onForwardToEstablishment?: (chat: ChatType) => void;
@@ -36,7 +38,16 @@ type GroupedMessage = {
     messages: Message[];
 }
 
-const Chat: FC<ChatProps> = ({ chat, onChatEnd, onForwardToColleauge, onForwardToEstablishment, onSendToEmail, onStartAService }) => {
+const Chat: FC<ChatProps> = ({
+    chat,
+    isCsaNameVisible,
+    isCsaTitleVisible,
+    onChatEnd,
+    onForwardToColleauge,
+    onForwardToEstablishment,
+    onSendToEmail,
+    onStartAService,
+  }) => {
     const { t } = useTranslation();
     const { userInfo } = useUserInfoStore();
     const chatRef = useRef<HTMLDivElement>(null);
@@ -181,7 +192,7 @@ const Chat: FC<ChatProps> = ({ chat, onChatEnd, onForwardToColleauge, onForwardT
                     name: message.authorRole === 'end-user'
                         ? endUserFullName
                         : message.authorRole === 'backoffice-user'
-                            ? `${message.authorFirstName} ${message.authorLastName}`
+                            ? getCsaName(message)
                             : message.authorRole,
                     type: message.authorRole,
                     messages: [message],
@@ -218,6 +229,16 @@ const Chat: FC<ChatProps> = ({ chat, onChatEnd, onForwardToColleauge, onForwardT
         };
     }, []
     );
+
+    const getCsaName = (message: Message) => {
+        return `${
+            isCsaNameVisible
+                ? `${message.authorFirstName} ${message.authorLastName}`
+                : ''
+            } ${
+            isCsaTitleVisible && chat.csaTitle !== null ? chat.csaTitle : ''
+            }`.trim();
+    }
 
     return (
         <div className='active-chat'>
