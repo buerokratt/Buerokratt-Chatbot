@@ -16,6 +16,8 @@ This repo will primarily contain:
 - Navigate to Ruuter and build the image `docker build -t ruuter .`
 - Clone [Resql](https://github.com/buerokratt/Resql)
 - Navigate to Resql and build the image `docker build -t resql .`
+- Clone [Data Mapper](https://github.com/buerokratt/DataMapper)
+- Navigate to Data Mapper and build the image docker build -t datamapper-node .
 - Clone [TIM](https://github.com/buerokratt/TIM)
 - Go to src -> main -> resources -> application.properties & modify `security.allowlist.jwt` value to `security.allowlist.jwt=ruuter-v1-public,ruuter-v1-private,ruuter-v2-private,ruuter-v2-public,dmapper,resql,tim,tim-postgresql,chat-widget,customer-service,127.0.0.1,::1`
 - Go to src -> main -> resources -> application.properties & add `auth.success.redirect.whitelist=http://localhost:8085,http://localhost:8085/auth/callback`
