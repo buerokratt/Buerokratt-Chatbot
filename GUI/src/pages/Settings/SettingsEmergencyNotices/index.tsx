@@ -80,7 +80,6 @@ const SettingsEmergencyNotices: FC = () => {
             label={t('settings.emergencyNotices.notice')}
             minRows={1}
             maxLength={EMERGENCY_NOTICE_LENGTH}
-            value={emergencyNoticeText}
             defaultValue={emergencyNoticeText}
             showMaxLength
             onChange={(e) => setEmergencyNoticeText(e.target.value)}
