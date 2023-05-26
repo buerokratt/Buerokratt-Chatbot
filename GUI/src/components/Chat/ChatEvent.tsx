@@ -11,17 +11,34 @@ type ChatEventProps = {
 
 const ChatEvent: FC<ChatEventProps> = ({message}) => {
     const {t} = useTranslation();
-    const {event, authorTimestamp, forwardedFromCsa, forwardedToCsa} = message;
+    const {event, authorTimestamp, forwardedByUser, forwardedFromCsa, forwardedToCsa} = message;
 
     let EVENT_PARAMS;
 
     switch (event) {
-        case CHAT_EVENTS.REDIRECTED:
-            EVENT_PARAMS = t('chat.redirectedMessage', {
-                from: forwardedFromCsa,
-                to: forwardedToCsa,
-                date: format(new Date(authorTimestamp), 'dd.MM.yyyy HH:ii:ss'),
-            })
+        case CHAT_EVENTS.REDIRECTED: 
+            {
+                if (forwardedByUser === forwardedFromCsa) {
+                EVENT_PARAMS = t('chat.redirectedMessageByOwner', {
+                    from: forwardedFromCsa,
+                    to: forwardedToCsa,
+                    date: format(new Date(authorTimestamp), 'dd.MM.yyyy HH:ii:ss'),
+                });
+                } else if (forwardedByUser === forwardedToCsa) {
+                EVENT_PARAMS = t('chat.redirectedMessageClaimed', {
+                    from: forwardedFromCsa,
+                    to: forwardedToCsa,
+                    date: format(new Date(authorTimestamp), 'dd.MM.yyyy HH:ii:ss'),
+                });
+                } else {
+                EVENT_PARAMS = t('chat.redirectedMessage', {
+                    user: forwardedByUser,
+                    from: forwardedFromCsa,
+                    to: forwardedToCsa,
+                    date: format(new Date(authorTimestamp), 'dd.MM.yyyy HH:ii:ss'),
+                });
+                }
+            }
             break;
         case CHAT_EVENTS.ANSWERED:
             EVENT_PARAMS = t('chat.events.answered', {
@@ -84,12 +101,12 @@ const ChatEvent: FC<ChatEventProps> = ({message}) => {
             })
             break;
         case CHAT_EVENTS.AUTHENTICATION_SUCCESSFUL:
-            EVENT_PARAMS = t('chat.events.authentication-successful', {
+            EVENT_PARAMS = t('chat.events.authentication_successful', {
                 date: format(new Date(authorTimestamp), 'dd.MM.yyyy HH:ii:ss'),
             })
             break;
         case CHAT_EVENTS.AUTHENTICATION_FAILED:
-            EVENT_PARAMS = t('chat.events.authentication-failed', {
+            EVENT_PARAMS = t('chat.events.authentication_failed', {
                 date: format(new Date(authorTimestamp), 'dd.MM.yyyy HH:ii:ss'),
             })
             break;

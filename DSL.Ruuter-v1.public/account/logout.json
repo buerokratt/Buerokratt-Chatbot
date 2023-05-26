@@ -20,6 +20,7 @@
             "name": "clientCustomJwtCookie",
             "httpOnly": true,
             "maxAge": 0,
+            "domain": "localhost",
             "setSecure": true,
             "value": null
           }
