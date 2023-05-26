@@ -23,6 +23,8 @@ import TextareaAutosize, { TextareaAutosizeProps } from 'react-textarea-autosize
 
 type ChatProps = {
     chat: ChatType;
+    isCsaNameVisible: boolean;
+    isCsaTitleVisible: boolean;
     onChatEnd: (chat: ChatType) => void;
     onForwardToColleauge?: (chat: ChatType) => void;
     onForwardToEstablishment?: (chat: ChatType) => void;
@@ -36,7 +38,16 @@ type GroupedMessage = {
     messages: Message[];
 }
 
-const Chat: FC<ChatProps> = ({ chat, onChatEnd, onForwardToColleauge, onForwardToEstablishment, onSendToEmail, onStartAService }) => {
+const Chat: FC<ChatProps> = ({
+    chat,
+    isCsaNameVisible,
+    isCsaTitleVisible,
+    onChatEnd,
+    onForwardToColleauge,
+    onForwardToEstablishment,
+    onSendToEmail,
+    onStartAService,
+  }) => {
     const { t } = useTranslation();
     const { userInfo } = useUserInfoStore();
     const chatRef = useRef<HTMLDivElement>(null);
@@ -167,7 +178,7 @@ const Chat: FC<ChatProps> = ({ chat, onChatEnd, onForwardToColleauge, onForwardT
         messagesList.forEach((message) => {
             const lastGroup = groupedMessages[groupedMessages.length - 1];
             if (lastGroup?.type === message.authorRole) {
-                if (!message.event || message.event === 'greeting') {
+                if (!message.event || message.event === '' || message.event === 'greeting') {
                     lastGroup.messages.push(message);
                 } else {
                     groupedMessages.push({
@@ -177,15 +188,23 @@ const Chat: FC<ChatProps> = ({ chat, onChatEnd, onForwardToColleauge, onForwardT
                     });
                 }
             } else {
-                groupedMessages.push({
-                    name: message.authorRole === 'end-user'
+                if (!message.event || message.event === '' || message.event === 'greeting') {
+                    groupedMessages.push({
+                        name: message.authorRole === 'end-user'
                         ? endUserFullName
                         : message.authorRole === 'backoffice-user'
-                            ? `${message.authorFirstName} ${message.authorLastName}`
-                            : message.authorRole,
-                    type: message.authorRole,
-                    messages: [message],
-                });
+                        ? `${message.authorFirstName} ${message.authorLastName}`
+                        : message.authorRole,
+                        type: message.authorRole,
+                        messages: [message],
+                    });
+                } else {
+                    groupedMessages.push({
+                        name: '',
+                        type: 'event',
+                        messages: [message],
+                    });
+                }
             }
         });
         setMessageGroups(groupedMessages);
@@ -218,6 +237,16 @@ const Chat: FC<ChatProps> = ({ chat, onChatEnd, onForwardToColleauge, onForwardT
         };
     }, []
     );
+
+    const getCsaName = (message: Message) => {
+        return `${
+            isCsaNameVisible
+                ? `${message.authorFirstName} ${message.authorLastName}`
+                : ''
+            } ${
+            isCsaTitleVisible && chat.csaTitle !== null ? chat.csaTitle : ''
+            }`.trim();
+    }
 
     return (
         <div className='active-chat'>

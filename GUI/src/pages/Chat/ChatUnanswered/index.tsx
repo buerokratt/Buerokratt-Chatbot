@@ -29,6 +29,14 @@ const ChatUnanswered: FC = () => {
     },
   });
 
+  const { data: csaNameVisiblity } = useQuery<{isVisible: boolean}>({
+    queryKey: ['cs-get-csa-name-visibility', 'prod-2'],
+  });
+
+  const { data: csaTitleVisibility } = useQuery<{isVisible: boolean}>({
+    queryKey: ['cs-get-csa-title-visibility', 'prod-2'],
+  });
+
   const selectedChat = useMemo(() => activeChatsList && activeChatsList.find((c) => c.id === selectedChatId), [activeChatsList, selectedChatId]);
   const unansweredChats = useMemo(() => activeChatsList ? activeChatsList.filter((c) => c.customerSupportId === '') : [], [activeChatsList]);
 
@@ -112,6 +120,8 @@ const ChatUnanswered: FC = () => {
           {selectedChat && (
             <Chat
               chat={selectedChat}
+              isCsaNameVisible={csaNameVisiblity?.isVisible ?? false}
+              isCsaTitleVisible={csaTitleVisibility?.isVisible ?? false}
               onChatEnd={setEndChatModal}
               onForwardToColleauge={setForwardToColleaugeModal}
               onForwardToEstablishment={setForwardToEstablishmentModal}

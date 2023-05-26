@@ -16,13 +16,17 @@ const ChatEvent: FC<ChatEventProps> = ({ message }) => {
   return (
     <div className='historical-chat__event-message'>
       {event === CHAT_EVENTS.REDIRECTED ? (
-        <p>{t('chat.event.redirected', {
+        <p>{t('chat.events.redirected', {
           from: forwardedFromCsa,
           to: forwardedToCsa,
           date: format(new Date(authorTimestamp), 'dd.MM.yyyy HH:ii:ss'),
         })}</p>
       ) : (
-        <p>{t(`chat.event.${event}`)}</p>
+        <p>
+          {t(`chat.events.${event?.toLowerCase()}`, {
+            date: format(new Date(authorTimestamp), 'dd.MM.yyyy HH:ii:ss')
+          })}
+        </p>
       )}
     </div>
   );

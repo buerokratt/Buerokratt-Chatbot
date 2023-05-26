@@ -54,8 +54,7 @@
         "proceed": {
           "method": "post",
           "endpoint": "{resql_url}/get-active-chat-by-id",
-          "post_body_parameters": {
-          },
+          "post_body_parameters": {},
           "post_body_struct": {
             "id": "{#.reflect_input#.chatId}"
           }
@@ -221,6 +220,7 @@
               "name": "chatJwt",
               "maxAge": 0,
               "httpOnly": true,
+              "domain": "localhost",
               "setSecure": true,
               "value": null
             }
@@ -252,6 +252,7 @@
               "name": "clientCustomJwtCookie",
               "httpOnly": true,
               "maxAge": 0,
+              "domain": "localhost",
               "setSecure": true,
               "value": null
             }

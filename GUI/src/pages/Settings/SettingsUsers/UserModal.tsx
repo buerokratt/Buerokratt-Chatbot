@@ -120,6 +120,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
         <Controller
           name='authorities'
           control={control}
+          required
           render={({ field }) =>
             <FormSelect
               label={t('settings.users.userRoles')}

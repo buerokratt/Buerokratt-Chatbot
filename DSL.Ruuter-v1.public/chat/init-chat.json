@@ -23,7 +23,7 @@
             "endUserUrl": "{#.endUserTechnicalData#.endUserUrl}",
             "forwardedByUser": "",
             "forwardedFromCsa": "",
-            "forwardedToCsa":  ""
+            "forwardedToCsa": ""
           }
         },
         "response": {
@@ -167,6 +167,7 @@
               "maxAge": 7200,
               "httpOnly": true,
               "setSecure": true,
+              "domain": "localhost",
               "name": "chatJwt"
             }
           }
@@ -329,8 +330,7 @@
         "proceed": {
           "post_body_parameters": {
             "fill_notification_new_chat": {
-              "post_body_parameters": {
-              },
+              "post_body_parameters": {},
               "method": "post",
               "endpoint": "{dmapper_url}/json/v2/notification_new_chat",
               "post_body_struct": {
