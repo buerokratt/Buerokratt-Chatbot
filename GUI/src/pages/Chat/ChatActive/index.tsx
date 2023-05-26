@@ -173,7 +173,11 @@ const ChatActive: FC = () => {
           {activeChats?.myChats?.map((chat) => (
             <Tabs.Trigger
               key={chat.id}
-              className='vertical-tabs__trigger'
+              className={
+                clsx('vertical-tabs__trigger', {
+                  'active': chat.status === CHAT_STATUS.REDIRECTED && chat.customerSupportId === userInfo?.idCode,
+                })
+              }
               value={chat.id}
               style={{ borderBottom: '1px solid #D2D3D8' }}
             >
@@ -196,7 +200,7 @@ const ChatActive: FC = () => {
                   key={chat.id}
                   className={
                     clsx('vertical-tabs__trigger', {
-                      'active': chat.status === CHAT_STATUS.REDIRECTED && chat.customerSupportId !== userInfo?.idCode,
+                      'active': chat.status === CHAT_STATUS.REDIRECTED && chat.customerSupportId === userInfo?.idCode,
                     })
                   }
                   value={chat.id}
