@@ -4,11 +4,12 @@ import * as Tabs from '@radix-ui/react-tabs';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { Chat, Dialog, Button, FormRadios } from 'components';
-import { Chat as ChatType, CHAT_STATUS, GroupedChat } from 'types/chat';
+import { Chat as ChatType,CHAT_EVENTS, CHAT_STATUS, GroupedChat } from 'types/chat';
 import useUserInfoStore from 'store/store';
 import { User } from 'types/user';
 import { useToast } from 'hooks/useToast';
 import api from 'services/api';
+import apiDev from 'services/api-dev';
 import ForwardToColleaugeModal from '../ForwardToColleaugeModal';
 import ForwardToEstablishmentModal from '../ForwardToEstablishmentModal';
 import clsx from 'clsx';
@@ -17,10 +18,10 @@ import ChatTrigger from './ChatTrigger';
 import './ChatActive.scss';
 
 const CSAchatStatuses = [
-  'accepted',
-  'hate-speech',
-  'other',
-  'response-sent-to-client-email',
+  CHAT_EVENTS.ACCEPTED,
+  CHAT_EVENTS.HATE_SPEECH,
+  CHAT_EVENTS.OTHER,
+  CHAT_EVENTS.RESPONSE_SENT_TO_CLIENT_EMAIL,
 ];
 
 const ChatActive: FC = () => {
@@ -34,6 +35,7 @@ const ChatActive: FC = () => {
   const [sendToEmailModal, setSendToEmailModal] = useState<ChatType | null>(null);
   const [startAServiceModal, setStartAServiceModal] = useState<ChatType | null>(null);
   const [activeChatsList, setActiveChatsList] = useState<ChatType[]>([]);
+  const [selectedEndChatStatus, setSelectedEndChatStatus] = useState<string | null>(null);
 
   useQuery<ChatType[]>({
     queryKey: ['cs-get-all-active-chats', 'prod'],
@@ -124,14 +126,32 @@ const ChatActive: FC = () => {
     });
   };
 
-  const handleChatEnd = () => {
-    // TODO: Add endpoint for chat ending
+  const handleChatEnd = async () => {
+    if (!selectedEndChatStatus) return;
+
+    try {
+      await apiDev.post('cs-end-chat', {
+        chatId: selectedChatId,
+        event: selectedEndChatStatus.toUpperCase(),
+        authorTimestamp: new Date().toISOString(),
+        authorFirstName: userInfo!.firstName,
+        authorId: userInfo!.idCode,
+        authorRole: userInfo!.authorities
+      });
+      toast.open({
+        type: 'success',
+        title: t('global.notification'),
+        message: `Chat ended`,
+      });
+    } catch (error) {
+      toast.open({
+        type: 'warning',
+        title: t('global.notificationError'),
+        message: `Chat ended`,
+      });
+    }
     setEndChatModal(null);
-    toast.open({
-      type: 'success',
-      title: t('global.notification'),
-      message: `Chat ended`,
-    });
+    setSelectedEndChatStatus(null);
   };
 
   return (
@@ -268,10 +288,14 @@ const ChatActive: FC = () => {
             </>
           }
         >
-          <FormRadios name='endedChatStatuses' label={t('')} items={CSAchatStatuses.map((status) => ({
-            label: t(`chat.events.${status}`),
-            value: status,
-          }))} />
+          <FormRadios
+            name='endedChatStatuses'
+            label={t('')}
+            items={CSAchatStatuses.map((status) => ({
+              label: t(`chat.events.${status}`, {date: ''}),
+              value: status,
+            }))}
+            onChange={setSelectedEndChatStatus} />
         </Dialog>
       )}
     </>

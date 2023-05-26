@@ -18,6 +18,7 @@ SELECT c.base_id AS id,
        c.received_from,
        c.labels,
        m.content AS last_message,
+       (CASE WHEN m.event = '' THEN NULL ELSE LOWER(m.event) END) as last_message_event,
        (SELECT content
         FROM message
         WHERE id IN (
