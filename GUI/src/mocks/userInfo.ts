@@ -1,7 +1,7 @@
 export const userInfoData = {
   firstName: null,
   lastName: null,
-  idCode: 'EE60001019906',
+  idCode: 'EE30303039914',
   displayName: 'Admin',
   JWTCreated: 1674204041000,
   login: 'Admin',

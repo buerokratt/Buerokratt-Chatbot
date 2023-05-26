@@ -6,7 +6,7 @@ getUserEmailByChatId:
   call: http.post
   args:
     # TODO: replace with env variable
-    url: https://byk-resql:8443/get-user-email-by-chat-id
+    url: http://resql:8082/get-user-email-by-chat-id
     body:
       chatId: ${chatId}
   result: getUserEmailByChatIdResult
@@ -16,7 +16,7 @@ getMessagesByChatId:
   call: http.post
   args:
     # TODO: replace with env variable
-    url: https://byk-resql:8443/get-chat-messages
+    url: http://resql:8082/get-chat-messages
     body:
       chatId: ${chatId}
   result: getMessagesByChatIdResult
@@ -26,7 +26,7 @@ mapChatMessages:
   call: http.post
   args:
     # TODO: replace with env variable
-    url: https://byk-dmapper:8443/json/v2/format_chat_log
+    url: http://dmapper:3000/json/v2/format_chat_log
     body:
       data: ${getMessagesByChatIdResult.response.body}
   result: chatMessagesData
@@ -36,7 +36,7 @@ sendDataToEmail:
   call: http.post
   args:
     # TODO: replace with env variable
-    url: http://byk-datamapper:3100/js/email/sendMockEmail
+    url: http://dmapper-v2:3005/js/email/sendMockEmail
     body:
       to: ${getUserEmailByChatIdResult.response.body[0].csaEmail}
       subject: "Chat history"
@@ -48,7 +48,7 @@ registerEmailSentEvent:
   call: http.post
   args:
     # TODO: replace with env variable
-    url: https://byk-resql:8443/insert-message
+    url: http://resql:8082/insert-message
     body:
       chatId: ${chatId}
       messageId: ""
@@ -67,6 +67,5 @@ registerEmailSentEvent:
   next: returnSuccess
 
 returnSuccess:
-  return: ${emailResponseData.response.body}
+  return: "OK"
   next: end
-
