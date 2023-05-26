@@ -6,8 +6,8 @@ SELECT c.base_id AS id,
             WHEN (
                 SELECT value
                 FROM configuration
-                WHERE key = 'is_csa_title_visible'
-                    AND deleted = false
+                WHERE KEY = 'is_csa_title_visible'
+                    AND deleted = FALSE
                 ORDER BY created DESC
                 LIMIT 1
             ) = 'true' THEN c.csa_title

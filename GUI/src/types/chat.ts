@@ -35,6 +35,7 @@ export enum CHAT_EVENTS {
 
 export interface Chat {
   id: string;
+  csaTitle?: string | null;
   customerSupportId?: string;
   customerSupportDisplayName?: string;
   endUserId?: string;
@@ -57,6 +58,14 @@ export interface Chat {
   receivedFrom?: string;
   comment?: string;
   labels: string;
+}
+export interface GroupedChat {
+  myChats: Chat[];
+  otherChats: {
+    groupId: string;
+    name: string;
+    chats: Chat[];
+  }[];
 }
 
 export enum MessageSseEvent {
