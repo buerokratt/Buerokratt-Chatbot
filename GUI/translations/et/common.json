@@ -106,6 +106,7 @@
       "ended": "Lõpetatud"
     },
     "chatStatus": "Vestluse staatus",
+    "changeStatus": "Muuda staatust",
     "active": {
       "list": "Aktiivsed vestlused",
       "myChats": "Minu vestlused",
@@ -147,13 +148,13 @@
       "answered": "Vastatud {{date}}",
       "terminated": "Lõpetatud {{date}}",
       "client-left": "Klient lahkus {{date}}",
-      "client-left-with-accepted": "Klient lahkus aktsepteeritud vastusega {{date}}",
-      "client-left-with-no-resolution": "Klient lahkus vastuseta {{date}}",
-      "client-left-for-unknown-reason": "Klient lahkus määramata põhjustel {{date}}",
+      "client_left_with_accepted": "Klient lahkus aktsepteeritud vastusega {{date}}",
+      "client_left_with_no_resolution": "Klient lahkus vastuseta {{date}}",
+      "client_left_for_unknown_reasons": "Klient lahkus määramata põhjustel {{date}}",
       "accepted": "Aktsepteeritud {{date}}",
-      "hate-speech": "Vihakõne {{date}}",
+      "hate_speech": "Vihakõne {{date}}",
       "other": "Muud põhjused {{date}}",
-      "response-sent-to-client-email": "Kliendile vastati tema jäetud kontaktile {{date}}",
+      "response_sent_to_client_email": "Kliendile vastati tema jäetud kontaktile {{date}}",
       "greeting": "Tervitus",
       "requested-authentication": "Küsiti autentimist",
       "authentication_successful": "Autoriseerimine oli edukas {{date}}",
@@ -200,7 +201,9 @@
       "popupNotifications": "Pop-up märguanded",
       "newUnansweredChat": "Uus vastamata vestlus",
       "newForwardedChat": "Uus suunatud vestlus",
-      "useAutocorrect": "Teksti autokorrektor"
+      "useAutocorrect": "Teksti autokorrektor",
+      "required": "Nõutud",
+      "invalidemail": "Kehtetu e-posti"
     },
     "chat": {
       "chatActive": "Vestlusrobot aktiivne",

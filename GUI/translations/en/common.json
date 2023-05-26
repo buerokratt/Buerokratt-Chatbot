@@ -106,6 +106,7 @@
       "ended": "Ended"
     },
     "chatStatus": "Chat status",
+    "changeStatus": "Change status",
     "active": {
       "list": "Active chat list",
       "myChats": "My chats",
@@ -147,13 +148,13 @@
       "answered": "Answered {{date}}",
       "terminated": "Terminated {{date}}",
       "client-left": "Client left {{date}}",
-      "client-left-with-accepted": "Client left with accepted response {{date}}",
-      "client-left-with-no-resolution": "Client left with no resolution {{date}}",
-      "client-left-for-unknown-reason": "Client left for unknown reason {{date}}",
+      "client_left_with_accepted": "Client left with accepted response {{date}}",
+      "client_left_with_no_resolution": "Client left with no resolution {{date}}",
+      "client_left_for_unknown_reasons": "Client left for unknown reason {{date}}",
       "accepted": "Accepted response {{date}}",
-      "hate-speech": "Hatespeech {{date}}",
+      "hate_speech": "Hate speech {{date}}",
       "other": "Other reasons {{date}}",
-      "response-sent-to-client-email": "Response was sent to client email {{date}}",
+      "response_sent_to_client_email": "Response was sent to client email {{date}}",
       "greeting": "Greetings {{date}}",
       "requested-authentication": "Requested authentication {{date}}",
       "authentication_successful": "Authentication successful {{date}}",
@@ -200,7 +201,9 @@
       "popupNotifications": "Popup notifications",
       "newUnansweredChat": "New unanswered chat",
       "newForwardedChat": "New forwarded chat",
-      "useAutocorrect": "Text auto corrector"
+      "useAutocorrect": "Text auto corrector",
+      "required": "Required",
+      "invalidemail": "Invalid email"
     },
     "chat": {
       "chatActive": "Chatbot active",
