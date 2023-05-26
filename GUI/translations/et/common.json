@@ -199,7 +199,9 @@
       "popupNotifications": "Pop-up märguanded",
       "newUnansweredChat": "Uus vastamata vestlus",
       "newForwardedChat": "Uus suunatud vestlus",
-      "useAutocorrect": "Teksti autokorrektor"
+      "useAutocorrect": "Teksti autokorrektor",
+      "required": "Nõutud",
+      "invalidemail": "Kehtetu e-posti"
     },
     "chat": {
       "chatActive": "Vestlusrobot aktiivne",
