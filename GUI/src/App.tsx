@@ -23,25 +23,43 @@ import SettingsSessionLength from 'pages/Settings/SettingsSessionLength';
 const App: FC = () => {
   const store = useUserInfoStore();
   const { data: userInfo } = useQuery<UserInfo>({
-    queryKey: ['cs-custom-jwt-userinfo'],
-    onSuccess: (data) => store.setUserInfo(data),
+    queryKey: ['cs-custom-jwt-userinfo', 'prod'],
+    onSuccess: (data: any) => store.setUserInfo(data.data.custom_jwt_userinfo),
   });
 
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route index element={<Navigate to='/vestlus/aktiivsed' />} />
-        <Route path='/vestlus/vastamata' element={<ChatUnanswered />} />
-        <Route path='/vestlus/aktiivsed' element={<ChatActive />} />
-        <Route path='/vestlus/ajalugu' element={<ChatHistory />} />
-        <Route path='/haldus/kasutajad' element={<SettingsUsers />} />
-        <Route path='/haldus/vestlusrobot/seaded' element={<SettingsChatSettings />} />
-        <Route path='/haldus/vestlusrobot/tervitussõnum' element={<SettingsWelcomeMessage />} />
-        <Route path='/haldus/vestlusrobot/erakorralised-teated' element={<SettingsEmergencyNotices />} />
-        <Route path='/haldus/vestlusrobot/välimus-ja-kaitumine' element={<SettingsAppearance />} />
-        <Route path='/haldus/asutuse-tooaeg' element={<SettingsWorkingTime />} />
-        <Route path='/haldus/sessiooni-pikkus' element={<SettingsSessionLength />} />
-        <Route path='/seire/tooaeg' element={<MonitoringUptime />} />
+        <Route index element={<Navigate to="/vestlus/aktiivsed" />} />
+        <Route path="/vestlus/vastamata" element={<ChatUnanswered />} />
+        <Route path="/vestlus/aktiivsed" element={<ChatActive />} />
+        <Route path="/vestlus/ajalugu" element={<ChatHistory />} />
+        <Route path="/haldus/kasutajad" element={<SettingsUsers />} />
+        <Route
+          path="/haldus/vestlusrobot/seaded"
+          element={<SettingsChatSettings />}
+        />
+        <Route
+          path="/haldus/vestlusrobot/tervitussõnum"
+          element={<SettingsWelcomeMessage />}
+        />
+        <Route
+          path="/haldus/vestlusrobot/erakorralised-teated"
+          element={<SettingsEmergencyNotices />}
+        />
+        <Route
+          path="/haldus/vestlusrobot/välimus-ja-kaitumine"
+          element={<SettingsAppearance />}
+        />
+        <Route
+          path="/haldus/asutuse-tooaeg"
+          element={<SettingsWorkingTime />}
+        />
+        <Route
+          path="/haldus/sessiooni-pikkus"
+          element={<SettingsSessionLength />}
+        />
+        <Route path="/seire/tooaeg" element={<MonitoringUptime />} />
       </Route>
     </Routes>
   );

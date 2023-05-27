@@ -8,7 +8,7 @@ import {
   useTransition,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { et } from 'date-fns/locale';
 import clsx from 'clsx';
@@ -34,9 +34,11 @@ import ChatTextArea from './ChatTextArea';
 import TextareaAutosize, {
   TextareaAutosizeProps,
 } from 'react-textarea-autosize';
-import { MESSAGE_FILE_SIZE_LIMIT } from 'utils/constants';
+import { AUTHOR_ROLES, MESSAGE_FILE_SIZE_LIMIT } from 'utils/constants';
 import formatBytes from 'utils/format-bytes';
 import useSendAttachment from 'modules/attachment/hooks';
+import { AxiosError } from 'axios';
+import { useToast } from 'hooks/useToast';
 
 type ChatProps = {
   chat: ChatType;
@@ -74,6 +76,7 @@ const Chat: FC<ChatProps> = ({
     messageGroupsRef.current = data;
     _setMessageGroups(data);
   };
+  const toast = useToast();
   const [isPending, startTransition] = useTransition();
   const [responseText, setResponseText] = useState('');
   const [selectedMessages, setSelectedMessages] = useState<Message[]>([]);
@@ -117,6 +120,18 @@ const Chat: FC<ChatProps> = ({
       base64: base64,
     });
   };
+
+  const postMessageMutation = useMutation({
+    mutationFn: (message: Message) => apiDev.post('cs-post-message', message),
+    onSuccess: () => {},
+    onError: (error: AxiosError) => {
+      toast.open({
+        type: 'error',
+        title: t('global.notificationError'),
+        message: error.message,
+      });
+    },
+  });
 
   const [messageReadStatus, _setMessageReadStatus] = useState<MessageStatus>({
     messageId: null,
@@ -326,7 +341,21 @@ const Chat: FC<ChatProps> = ({
   }, [messageGroups]);
 
   const handleResponseTextSend = () => {
-    handleSendAttachment();
+    const newMessage: Message = {
+      chatId: chat.id,
+      authorRole: AUTHOR_ROLES.BACKOFFICE_USER,
+      content: responseText,
+      authorTimestamp: new Date().toISOString(),
+      authorFirstName: userInfo?.displayName ?? '',
+      authorLastName: '',
+      authorId: userInfo?.idCode ?? '',
+      forwardedByUser: chat.forwardedByUser ?? '',
+      forwardedFromCsa: chat.forwardedFromCsa ?? '',
+      forwardedToCsa: chat.forwardedToCsa ?? '',
+    };
+
+    postMessageMutation.mutate(newMessage);
+    setMessagesList((oldMessages) => [...oldMessages, newMessage]);
   };
 
   useEffect(() => {
