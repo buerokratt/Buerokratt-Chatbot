@@ -16,7 +16,12 @@ import { MdOutlineAttachFile, MdOutlineSend } from 'react-icons/all';
 import { Button, FormInput, FormTextarea, Icon, Track } from 'components';
 import { ReactComponent as BykLogoWhite } from 'assets/logo-white.svg';
 import useUserInfoStore from 'store/store';
-import { Chat as ChatType, MessageSseEvent, MessageStatus } from 'types/chat';
+import {
+  CHAT_EVENTS,
+  Chat as ChatType,
+  MessageSseEvent,
+  MessageStatus,
+} from 'types/chat';
 import {
   Attachment,
   AttachmentTypes,
@@ -133,6 +138,23 @@ const Chat: FC<ChatProps> = ({
     },
   });
 
+  const postEventMutation = useMutation({
+    mutationFn: (message: Message) =>
+      apiDev.post('cs-post-event-message', {
+        chatId: message.chatId ?? '',
+        event: message.event ?? '',
+        authorTimestamp: message.authorTimestamp ?? '',
+      }),
+    onSuccess: () => {},
+    onError: (error: AxiosError) => {
+      toast.open({
+        type: 'error',
+        title: t('global.notificationError'),
+        message: error.message,
+      });
+    },
+  });
+
   const takeOverChatMutation = useMutation({
     mutationFn: () =>
       apiDev.post('cs-redirect-chat', {
@@ -219,7 +241,13 @@ const Chat: FC<ChatProps> = ({
           {
             id: 'askAuthentication',
             button: (
-              <Button key="askAuthentication" appearance="secondary">
+              <Button
+                key="askAuthentication"
+                appearance="secondary"
+                onClick={() =>
+                  handleChatEvent(CHAT_EVENTS.REQUESTED_AUTHENTICATION)
+                }
+              >
                 {t('chat.active.askAuthentication')}
               </Button>
             ),
@@ -227,7 +255,11 @@ const Chat: FC<ChatProps> = ({
           {
             id: 'askForContact',
             button: (
-              <Button key="askForContact" appearance="secondary">
+              <Button
+                key="askForContact"
+                appearance="secondary"
+                onClick={() => handleChatEvent(CHAT_EVENTS.CONTACT_INFORMATION)}
+              >
                 {t('chat.active.askForContact')}
               </Button>
             ),
@@ -235,7 +267,11 @@ const Chat: FC<ChatProps> = ({
           {
             id: 'askPermission',
             button: (
-              <Button key="askPermission" appearance="secondary">
+              <Button
+                key="askPermission"
+                appearance="secondary"
+                onClick={() => handleChatEvent(CHAT_EVENTS.ASK_PERMISSION)}
+              >
                 {t('chat.active.askPermission')}
               </Button>
             ),
@@ -382,6 +418,26 @@ const Chat: FC<ChatProps> = ({
 
     postMessageMutation.mutate(newMessage);
     setMessagesList((oldMessages) => [...oldMessages, newMessage]);
+    setResponseText('');
+  };
+
+  const handleChatEvent = (event: string) => {
+    const newMessage: Message = {
+      chatId: chat.id,
+      authorRole: AUTHOR_ROLES.BACKOFFICE_USER,
+      content: '',
+      event: event,
+      authorTimestamp: new Date().toISOString(),
+      authorFirstName: userInfo?.displayName ?? '',
+      authorLastName: '',
+      authorId: userInfo?.idCode ?? '',
+      forwardedByUser: chat.forwardedByUser ?? '',
+      forwardedFromCsa: chat.forwardedFromCsa ?? '',
+      forwardedToCsa: chat.forwardedToCsa ?? '',
+    };
+
+    postEventMutation.mutate(newMessage);
+    setMessagesList((oldMessages) => [...oldMessages, newMessage]);
   };
 
   useEffect(() => {
@@ -492,6 +548,7 @@ const Chat: FC<ChatProps> = ({
                 placeholder={t('chat.reply') + '...'}
                 minRows={1}
                 maxRows={8}
+                value={responseText}
                 maxLength={CHAT_INPUT_LENGTH}
                 onChange={(e) => setResponseText(e.target.value)}
               />
@@ -551,13 +608,24 @@ const Chat: FC<ChatProps> = ({
             >
               {t('chat.active.endChat')}
             </Button>
-            <Button appearance="secondary">
+            <Button
+              appearance="secondary"
+              onClick={() =>
+                handleChatEvent(CHAT_EVENTS.REQUESTED_AUTHENTICATION)
+              }
+            >
               {t('chat.active.askAuthentication')}
             </Button>
-            <Button appearance="secondary">
+            <Button
+              appearance="secondary"
+              onClick={() => handleChatEvent(CHAT_EVENTS.CONTACT_INFORMATION)}
+            >
               {t('chat.active.askForContact')}
             </Button>
-            <Button appearance="secondary">
+            <Button
+              appearance="secondary"
+              onClick={() => handleChatEvent(CHAT_EVENTS.ASK_PERMISSION)}
+            >
               {t('chat.active.askPermission')}
             </Button>
             <Button
