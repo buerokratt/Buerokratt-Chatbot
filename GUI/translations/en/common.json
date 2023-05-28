@@ -113,6 +113,7 @@
       "newChats": "New Chats",
       "chooseChat": "Choose a chat to begin",
       "endChat": "End chat",
+      "takeOver": "Take Over",
       "askAuthentication": "Ask for authentication",
       "askForContact": "Ask for contact",
       "askPermission": "Ask permission",

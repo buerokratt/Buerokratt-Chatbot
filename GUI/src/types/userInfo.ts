@@ -11,4 +11,6 @@ export interface UserInfo {
   displayName: string;
   idCode: string;
   email: string;
+  csaEmail: string;
+  csaTitle: string;
 }
