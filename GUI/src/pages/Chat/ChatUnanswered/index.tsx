@@ -12,6 +12,7 @@ import { User } from 'types/user';
 import { useToast } from 'hooks/useToast';
 import './ChatUnanswered.scss';
 import apiDev from 'services/api-dev';
+import { format } from 'timeago.js';
 
 const ChatUnanswered: FC = () => {
   const { t } = useTranslation();
@@ -152,10 +153,9 @@ const ChatUnanswered: FC = () => {
                 )}
                 {chat.lastMessageTimestamp && (
                   <p style={{ color: '#4D4F5D' }}>
-                    {formatDistanceStrict(
-                      new Date(chat.lastMessageTimestamp),
-                      new Date(),
-                      { locale: et }
+                    {format(
+                      chat.lastMessageTimestamp ?? new Date().toISOString,
+                      'et_EE'
                     )}
                   </p>
                 )}

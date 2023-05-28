@@ -19,6 +19,7 @@ import ChatUnanswered from 'pages/Chat/ChatUnanswered';
 import MonitoringUptime from 'pages/Monitoring/MonitoringUptime';
 import SettingsWelcomeMessage from 'pages/Settings/SettingsWelcomeMessage';
 import SettingsSessionLength from 'pages/Settings/SettingsSessionLength';
+import './locale/et_EE';
 
 const App: FC = () => {
   const store = useUserInfoStore();
