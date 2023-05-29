@@ -29,6 +29,7 @@ import useUserInfoStore from '../../../store/store';
 import { Controller, useForm } from 'react-hook-form';
 import { getFromLocalStorage, setToLocalStorage } from 'utils/local-storage-utils';
 import { CHAT_HISTORY_PREFERENCES_KEY } from '../../../constants/config'
+import apiDevV2 from 'services/api-dev-v2';
 
 const ChatHistory: FC = () => {
   const { t } = useTranslation();
@@ -157,8 +158,12 @@ const ChatHistory: FC = () => {
 
   const chatCommentChangeMutation = useMutation({
     mutationFn: (data: { chatId: string | number, comment: string }) =>
-      api.post('/comments/comment-history', data),
-    onSuccess: () => {
+      apiDevV2.post('comments/comment-history', data),
+    onSuccess: (res, { chatId, comment }) => {
+      const updatedChatList = endedChatsList.map(chat => chat.id === chatId ? { ...chat, comment } : chat);
+      filterChatsList(updatedChatList)
+      if (selectedChat)
+        setSelectedChat({ ...selectedChat, comment });
       toast.open({
         type: 'success',
         title: t('global.notification'),
