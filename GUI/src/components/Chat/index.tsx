@@ -1,4 +1,12 @@
-import { FC, useEffect, useMemo, useRef, useState, useTransition } from 'react';
+import {
+  ChangeEvent,
+  FC,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { et } from 'date-fns/locale';
@@ -8,14 +16,23 @@ import { Button, Icon, Track } from 'components';
 import { ReactComponent as BykLogoWhite } from 'assets/logo-white.svg';
 import useUserInfoStore from 'store/store';
 import { Chat as ChatType, MessageSseEvent, MessageStatus } from 'types/chat';
-import { Message, MessagePreviewSseResponse } from 'types/message';
+import {
+  Attachment,
+  AttachmentTypes,
+  Message,
+  MessagePreviewSseResponse,
+} from 'types/message';
 import ChatMessage from './ChatMessage';
 import ChatEvent from '../ChatEvent';
-import handleSse from "../../mocks/handleSse";
+import handleSse from '../../mocks/handleSse';
 import { findIndex } from 'lodash';
 import { CHAT_INPUT_LENGTH } from 'constants/config';
 import apiDev from 'services/api-dev';
 import ChatTextArea from './ChatTextArea';
+import TextareaAutosize, { TextareaAutosizeProps } from 'react-textarea-autosize';
+import { MESSAGE_FILE_SIZE_LIMIT } from 'utils/constants';
+import formatBytes from 'utils/format-bytes';
+import useSendAttachment from 'modules/attachment/hooks';
 import './Chat.scss';
 
 type ChatProps = {
@@ -27,13 +44,13 @@ type ChatProps = {
   onForwardToEstablishment?: (chat: ChatType) => void;
   onSendToEmail?: (chat: ChatType) => void;
   onStartAService?: (chat: ChatType) => void;
-}
+};
 
 type GroupedMessage = {
   name: string;
   type: string;
   messages: Message[];
-}
+};
 
 const Chat: FC<ChatProps> = ({
   chat,
@@ -58,15 +75,44 @@ const Chat: FC<ChatProps> = ({
   const [responseText, setResponseText] = useState('');
   const [selectedMessages, setSelectedMessages] = useState<Message[]>([]);
   const [messagesList, setMessagesList] = useState<Message[]>([]);
+  const [userInput, setUserInput] = useState<string>('');
+  const [userInputFile, setUserInputFile] = useState<Attachment>();
+  const [errorMessage, setErrorMessage] = useState('');
+
   useEffect(() => {
     getMessages();
-  }, [])
+  }, []);
 
   const getMessages = async () => {
     const { data: res } = await apiDev.post('cs-get-messages-by-chat-id', {
-      'chatId': chat.id
+      chatId: chat.id,
     });
     setMessagesList(res.data.cs_get_messages_by_chat_id);
+  };
+
+  const sendAttachmentMutation = useSendAttachment();
+  const hiddenFileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const handleUploadClick = () => {
+    hiddenFileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) {
+      return;
+    }
+    const base64 = await handleFileRead(e.target.files[0]);
+
+    if (!base64) return;
+
+    setUserInput(e.target.files[0].name);
+    setUserInputFile({
+      chatId: chat.id, // TODO get chatId from the store
+      name: e.target.files[0].name,
+      type: e.target.files[0].type as AttachmentTypes,
+      size: e.target.files[0].size,
+      base64: base64,
+    });
   };
 
   const [messageReadStatus, _setMessageReadStatus] = useState<MessageStatus>({
@@ -79,7 +125,6 @@ const Chat: FC<ChatProps> = ({
     _setMessageReadStatus(data);
   };
 
-
   const setPreviewMessage = (event: MessagePreviewSseResponse) => {
     const PREVIEW_MESSAGE: GroupedMessage = {
       name: endUserFullName,
@@ -87,62 +132,118 @@ const Chat: FC<ChatProps> = ({
       messages: event.data as any, // TODO fix types
     };
     const CURRENT_MESSAGE_GROUPS = messageGroupsRef.current;
-    const index = findIndex(CURRENT_MESSAGE_GROUPS, (o) => o.messages[0].id === PREVIEW_MESSAGE.messages[0].id);
+    const index = findIndex(
+      CURRENT_MESSAGE_GROUPS,
+      (o) => o.messages[0].id === PREVIEW_MESSAGE.messages[0].id
+    );
 
     if (index === -1) {
       CURRENT_MESSAGE_GROUPS.push(PREVIEW_MESSAGE);
       startTransition(() => {
-        setMessageGroups(CURRENT_MESSAGE_GROUPS)
-      })
+        setMessageGroups(CURRENT_MESSAGE_GROUPS);
+      });
     } else {
       CURRENT_MESSAGE_GROUPS.splice(index, 1, PREVIEW_MESSAGE);
       startTransition(() => {
-        setMessageGroups(CURRENT_MESSAGE_GROUPS)
-      })
+        setMessageGroups(CURRENT_MESSAGE_GROUPS);
+      });
     }
   };
-
 
   const hasAccessToActions = useMemo(() => {
     if (chat.customerSupportId === userInfo?.idCode) return true;
     return false;
   }, [chat, userInfo]);
 
-  const endUserFullName = chat.endUserFirstName !== '' && chat.endUserLastName !== ''
-    ? `${chat.endUserFirstName} ${chat.endUserLastName}` : t('global.anonymous');
+  const endUserFullName =
+    chat.endUserFirstName !== '' && chat.endUserLastName !== ''
+      ? `${chat.endUserFirstName} ${chat.endUserLastName}`
+      : t('global.anonymous');
 
   const allSideButtons = [
     {
-      id: 'endChat', button: <Button
-        key='endChat'
-        appearance='success'
-        onClick={onChatEnd ? () => onChatEnd(chat) : undefined}>
-        {t('chat.active.endChat')}
-      </Button>
-    },
-    { id: 'askAuthentication', button: <Button key='askAuthentication' appearance='secondary'>{t('chat.active.askAuthentication')}</Button> },
-    { id: 'askForContact', button: <Button key='askForContact' appearance='secondary'>{t('chat.active.askForContact')}</Button> },
-    { id: 'askPermission', button: <Button key='askPermission' appearance='secondary'>{t('chat.active.askPermission')}</Button> },
-    {
-      id: 'forwardToColleague', button: <Button key='forwardToColleague' appearance='secondary' onClick={onForwardToColleauge ? () => {
-        onForwardToColleauge(chat);
-        setSelectedMessages([]);
-      } : undefined}>
-        {t('chat.active.forwardToColleague')}
-      </Button>
+      id: 'endChat',
+      button: (
+        <Button
+          key="endChat"
+          appearance="success"
+          onClick={onChatEnd ? () => onChatEnd(chat) : undefined}
+        >
+          {t('chat.active.endChat')}
+        </Button>
+      ),
     },
     {
-      id: 'forwardToOrganization', button: <Button key='forwardToOrganization' appearance='secondary'
-        onClick={onForwardToEstablishment ? () => onForwardToEstablishment(chat) : undefined}>{t('chat.active.forwardToOrganization')}</Button>
+      id: 'askAuthentication',
+      button: (
+        <Button key="askAuthentication" appearance="secondary">
+          {t('chat.active.askAuthentication')}
+        </Button>
+      ),
     },
     {
-      id: 'sendToEmail', button: <Button
-        key='sendToEmail'
-        appearance='secondary'
-        onClick={onSendToEmail ? () => onSendToEmail(chat) : undefined}>
-        {t('chat.active.sendToEmail')}
-      </Button>
-    }
+      id: 'askForContact',
+      button: (
+        <Button key="askForContact" appearance="secondary">
+          {t('chat.active.askForContact')}
+        </Button>
+      ),
+    },
+    {
+      id: 'askPermission',
+      button: (
+        <Button key="askPermission" appearance="secondary">
+          {t('chat.active.askPermission')}
+        </Button>
+      ),
+    },
+    {
+      id: 'forwardToColleague',
+      button: (
+        <Button
+          key="forwardToColleague"
+          appearance="secondary"
+          onClick={
+            onForwardToColleauge
+              ? () => {
+                onForwardToColleauge(chat);
+                setSelectedMessages([]);
+              }
+              : undefined
+          }
+        >
+          {t('chat.active.forwardToColleague')}
+        </Button>
+      ),
+    },
+    {
+      id: 'forwardToOrganization',
+      button: (
+        <Button
+          key="forwardToOrganization"
+          appearance="secondary"
+          onClick={
+            onForwardToEstablishment
+              ? () => onForwardToEstablishment(chat)
+              : undefined
+          }
+        >
+          {t('chat.active.forwardToOrganization')}
+        </Button>
+      ),
+    },
+    {
+      id: 'sendToEmail',
+      button: (
+        <Button
+          key="sendToEmail"
+          appearance="secondary"
+          onClick={onSendToEmail ? () => onSendToEmail(chat) : undefined}
+        >
+          {t('chat.active.sendToEmail')}
+        </Button>
+      ),
+    },
   ];
   const [sideButtons, setSideButtons] = useState([]);
   const [buttonsToAllow] = useState<any[]>([]);
@@ -175,7 +276,11 @@ const Chat: FC<ChatProps> = ({
     messagesList.forEach((message) => {
       const lastGroup = groupedMessages[groupedMessages.length - 1];
       if (lastGroup?.type === message.authorRole) {
-        if (!message.event || message.event === 'greeting') {
+        if (
+          !message.event ||
+          message.event === '' ||
+          message.event === 'greeting'
+        ) {
           lastGroup.messages.push(message);
         } else {
           groupedMessages.push({
@@ -185,15 +290,28 @@ const Chat: FC<ChatProps> = ({
           });
         }
       } else {
-        groupedMessages.push({
-          name: message.authorRole === 'end-user'
-            ? endUserFullName
-            : message.authorRole === 'backoffice-user'
-              ? getCsaName(message)
-              : message.authorRole,
-          type: message.authorRole,
-          messages: [message],
-        });
+        if (
+          !message.event ||
+          message.event === '' ||
+          message.event === 'greeting'
+        ) {
+          groupedMessages.push({
+            name:
+              message.authorRole === 'end-user'
+                ? endUserFullName
+                : message.authorRole === 'backoffice-user'
+                  ? `${message.authorFirstName} ${message.authorLastName}`
+                  : message.authorRole,
+            type: message.authorRole,
+            messages: [message],
+          });
+        } else {
+          groupedMessages.push({
+            name: '',
+            type: 'event',
+            messages: [message],
+          });
+        }
       }
     });
     setMessageGroups(groupedMessages);
@@ -205,7 +323,7 @@ const Chat: FC<ChatProps> = ({
   }, [messageGroups]);
 
   const handleResponseTextSend = () => {
-
+    handleSendAttachment();
   };
 
   useEffect(() => {
@@ -214,18 +332,20 @@ const Chat: FC<ChatProps> = ({
       setMessageReadStatus({
         messageId: event.data.id,
         readTime: event.data.created,
-      })
+      });
     });
 
-    sseResponse.addEventListener(MessageSseEvent.PREVIEW, (event: MessagePreviewSseResponse) => {
-      setPreviewMessage(event);
-    });
+    sseResponse.addEventListener(
+      MessageSseEvent.PREVIEW,
+      (event: MessagePreviewSseResponse) => {
+        setPreviewMessage(event);
+      }
+    );
 
     return () => {
       sseResponse.close();
     };
-  }, []
-  );
+  }, []);
 
   const getCsaName = (message: Message) => {
     return `${isCsaNameVisible
@@ -233,144 +353,257 @@ const Chat: FC<ChatProps> = ({
       : ''
       } ${isCsaTitleVisible && chat.csaTitle !== null ? chat.csaTitle : ''
       }`.trim();
-  }
+  };
 
   return (
-    <div className='active-chat'>
-      <div className='active-chat__body'>
-        <div className='active-chat__header'>
-          <Track direction='vertical' gap={8} align='left'>
+    <div className="active-chat">
+      <div className="active-chat__body">
+        <div className="active-chat__header">
+          <Track direction="vertical" gap={8} align="left">
             <p style={{ fontSize: 14, lineHeight: '1.5', color: '#4D4F5D' }}>
-              {t('chat.active.startedAt', { date: format(new Date(chat.created), 'dd. MMMM Y HH:ii:ss', { locale: et }) })}
+              {t('chat.active.startedAt', {
+                date: format(new Date(chat.created), 'dd. MMMM Y HH:ii:ss', {
+                  locale: et,
+                }),
+              })}
             </p>
             <h3>{endUserFullName}</h3>
           </Track>
         </div>
 
-        <div className='active-chat__group-wrapper'>
-          {messageGroups && messageGroups.map((group, index) => (
-            <div className={clsx(['active-chat__group', `active-chat__group--${group.type}`])}
-              key={`group-${index}`}>
-              {group.type === 'event' ? (
-                <ChatEvent message={group.messages[0]} />
-              ) : (
-                <>
-                  <div className='active-chat__group-initials'>
-                    {group.type === 'buerokratt' || group.type === 'chatbot' ? (
-                      <BykLogoWhite height={24} />
-                    ) : (
-                      <>{group.name.split(' ').map((n) => n[0]).join('').toUpperCase()}</>
-                    )}
-                  </div>
-                  <div className='active-chat__group-name'>{group.name}</div>
-                  <div className='active-chat__messages'>
-                    {group.messages.map((message, i) => (
-                      <ChatMessage
-                        message={message}
-                        readStatus={messageReadStatusRef}
-                        key={`message-${i}`}
-                        onSelect={(message) => setSelectedMessages(prevState => [...prevState, message])}
-                      />
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
-          ))}
-          <div id='anchor' ref={chatRef}></div>
+        <div className="active-chat__group-wrapper">
+          {messageGroups &&
+            messageGroups.map((group, index) => (
+              <div
+                className={clsx([
+                  'active-chat__group',
+                  `active-chat__group--${group.type}`,
+                ])}
+                key={`group-${index}`}
+              >
+                {group.type === 'event' ? (
+                  <ChatEvent message={group.messages[0]} />
+                ) : (
+                  <>
+                    <div className="active-chat__group-initials">
+                      {group.type === 'buerokratt' ||
+                        group.type === 'chatbot' ? (
+                        <BykLogoWhite height={24} />
+                      ) : (
+                        <>
+                          {group.name
+                            .split(' ')
+                            .map((n) => n[0])
+                            .join('')
+                            .toUpperCase()}
+                        </>
+                      )}
+                    </div>
+                    <div className="active-chat__group-name">{group.name}</div>
+                    <div className="active-chat__messages">
+                      {group.messages.map((message, i) => (
+                        <ChatMessage
+                          message={message}
+                          readStatus={messageReadStatusRef}
+                          key={`message-${i}`}
+                          onSelect={(message) =>
+                            setSelectedMessages((prevState) => [
+                              ...prevState,
+                              message,
+                            ])
+                          }
+                        />
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            ))}
+          <div id="anchor" ref={chatRef}></div>
         </div>
 
-        <div className='active-chat__toolbar'>
+        <div className="active-chat__toolbar">
           <Track>
             <ChatTextArea
-              name='message'
+              name="message"
               label={t('')}
-              id='chatArea'
+              id="chatArea"
               placeholder={t('chat.reply') + '...'}
               minRows={1}
               maxRows={8}
               maxLength={CHAT_INPUT_LENGTH}
               onChange={(e) => setResponseText(e.target.value)}
             />
-            <div className='active-chat__toolbar-actions'>
-              <Button id="myButton" appearance='primary' onClick={handleResponseTextSend}>
-                <Icon icon={<MdOutlineSend fontSize={18} />} size='medium' />
+            <div className="active-chat__toolbar-actions">
+              <Button
+                id="myButton"
+                appearance="primary"
+                onClick={handleResponseTextSend}
+              >
+                <Icon icon={<MdOutlineSend fontSize={18} />} size="medium" />
+                <input
+                  type="file"
+                  ref={hiddenFileInputRef}
+                  onChange={handleFileChange}
+                  style={{ display: 'none' }}
+                />
               </Button>
-              <Button appearance='secondary'>
-                <Icon icon={<MdOutlineAttachFile fontSize={18} />} size='medium' />
+              <Button appearance="secondary" onClick={handleUploadClick}>
+                <Icon
+                  icon={<MdOutlineAttachFile fontSize={18} />}
+                  size="medium"
+                />
               </Button>
             </div>
           </Track>
         </div>
       </div>
-      <div className='active-chat__side'>
-        <div className='active-chat__side-actions'>
+      <div className="active-chat__side">
+        <div className="active-chat__side-actions">
           <Button
-            appearance='success'
+            appearance="success"
             onClick={onChatEnd ? () => onChatEnd(chat) : undefined}
           >
             {t('chat.active.endChat')}
           </Button>
-          <Button appearance='secondary'>{t('chat.active.askAuthentication')}</Button>
-          <Button appearance='secondary'>{t('chat.active.askForContact')}</Button>
-          <Button appearance='secondary'>{t('chat.active.askPermission')}</Button>
-          <Button appearance='secondary' onClick={onForwardToColleauge ? () => {
-            onForwardToColleauge(chat);
-            setSelectedMessages([]);
-          } : undefined}>
+          <Button appearance="secondary">
+            {t('chat.active.askAuthentication')}
+          </Button>
+          <Button appearance="secondary">
+            {t('chat.active.askForContact')}
+          </Button>
+          <Button appearance="secondary">
+            {t('chat.active.askPermission')}
+          </Button>
+          <Button
+            appearance="secondary"
+            onClick={
+              onForwardToColleauge
+                ? () => {
+                  onForwardToColleauge(chat);
+                  setSelectedMessages([]);
+                }
+                : undefined
+            }
+          >
             {t('chat.active.forwardToColleague')}
           </Button>
-          <Button appearance='secondary'
-            onClick={onForwardToEstablishment ? () => onForwardToEstablishment(chat) : undefined}>{t('chat.active.forwardToOrganization')}</Button>
           <Button
-            appearance='secondary'
-            onClick={onSendToEmail ? () => onSendToEmail(chat) : undefined}>
+            appearance="secondary"
+            onClick={
+              onForwardToEstablishment
+                ? () => onForwardToEstablishment(chat)
+                : undefined
+            }
+          >
+            {t('chat.active.forwardToOrganization')}
+          </Button>
+          <Button
+            appearance="secondary"
+            onClick={onSendToEmail ? () => onSendToEmail(chat) : undefined}
+          >
             {t('chat.active.sendToEmail')}
           </Button>
           <Button
-            appearance='secondary'
-            onClick={onStartAService ? () => onStartAService(chat) : undefined}>
+            appearance="secondary"
+            onClick={onStartAService ? () => onStartAService(chat) : undefined}
+          >
             {t('chat.active.startService')}
           </Button>
         </div>
-        <div className='active-chat__side-meta'>
+        <div className="active-chat__side-meta">
           <div>
-            <p><strong>ID</strong></p>
+            <p>
+              <strong>ID</strong>
+            </p>
             <p>{chat.id}</p>
           </div>
           <div>
-            <p><strong>{t('chat.endUser')}</strong></p>
+            <p>
+              <strong>{t('chat.endUser')}</strong>
+            </p>
             <p>{endUserFullName}</p>
           </div>
           {chat.endUserId && (
             <div>
-              <p><strong>{t('chat.endUserId')}</strong></p>
+              <p>
+                <strong>{t('chat.endUserId')}</strong>
+              </p>
               <p>{chat.endUserId ?? ''}</p>
             </div>
           )}
           {chat.customerSupportDisplayName && (
             <div>
-              <p><strong>{t('chat.csaName')}</strong></p>
+              <p>
+                <strong>{t('chat.csaName')}</strong>
+              </p>
               <p>{chat.customerSupportDisplayName}</p>
             </div>
           )}
           <div>
-            <p><strong>{t('chat.startedAt')}</strong></p>
-            <p>{format(new Date(chat.created), 'dd. MMMM Y HH:ii:ss', { locale: et }).toLowerCase()}</p>
+            <p>
+              <strong>{t('chat.startedAt')}</strong>
+            </p>
+            <p>
+              {format(new Date(chat.created), 'dd. MMMM Y HH:ii:ss', {
+                locale: et,
+              }).toLowerCase()}
+            </p>
           </div>
           <div>
-            <p><strong>{t('chat.device')}</strong></p>
+            <p>
+              <strong>{t('chat.device')}</strong>
+            </p>
             <p>{chat.endUserOs}</p>
           </div>
           <div>
-            <p><strong>{t('chat.location')}</strong></p>
+            <p>
+              <strong>{t('chat.location')}</strong>
+            </p>
             <p>{chat.endUserUrl}</p>
           </div>
         </div>
       </div>
     </div>
   );
-}
-  ;
 
+  function handleSendAttachment() {
+    const mutationArgs = {
+      data: userInputFile!,
+    };
+    sendAttachmentMutation.mutate(mutationArgs as any);
+    sendAttachmentMutation.isLoading && console.log('Attachment sending...');
+    sendAttachmentMutation.isSuccess && console.log('Attachment sent');
+    sendAttachmentMutation.isError && console.log('Attachment sending error');
+  }
+
+  async function handleFileRead(file: File): Promise<string | null> {
+    if (!Object.values(AttachmentTypes).some((v) => v === file.type)) {
+      setErrorMessage(`${file.type} file type is not supported`);
+      return null;
+    }
+
+    if (file.size > MESSAGE_FILE_SIZE_LIMIT) {
+      setErrorMessage(
+        `Max allowed file size is ${formatBytes(MESSAGE_FILE_SIZE_LIMIT)}`
+      );
+      return null;
+    } else {
+      return await convertBase64(file);
+    }
+  }
+
+  async function convertBase64(file: File): Promise<any> {
+    return await new Promise((resolve, reject) => {
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(file);
+      fileReader.onload = () => {
+        resolve(fileReader.result);
+      };
+      fileReader.onerror = (error) => {
+        reject(error);
+      };
+    });
+  }
+};
 export default Chat;

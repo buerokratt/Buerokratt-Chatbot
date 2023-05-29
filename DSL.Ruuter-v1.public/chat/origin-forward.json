@@ -180,6 +180,7 @@
               "#.from_property": "{#.update_chat_jwt}",
               "maxAge": 7200,
               "httpOnly": true,
+              "domain": "localhost",
               "setSecure": true,
               "name": "chatJwt"
             }
@@ -236,6 +237,7 @@
               "maxAge": 7200,
               "httpOnly": true,
               "setSecure": true,
+              "domain": "localhost",
               "name": "redirectJwt"
             }
           }

@@ -20,6 +20,7 @@
             "#.from_property": "{#.custom_jwt_extend}",
             "maxAge": 28800,
             "setSecure": true,
+            "domain": "localhost",
             "name": "customJwtCookie"
           }
         },
