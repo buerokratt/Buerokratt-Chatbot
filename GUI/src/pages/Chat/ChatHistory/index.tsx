@@ -54,19 +54,19 @@ const ChatHistory: FC = () => {
     }
   });
 
-  const { data: endedChats } = useQuery<ChatType[]>({
+  useQuery<ChatType[]>({
     queryKey: ['cs-get-all-ended-chats', 'prod'],
     onSuccess(res: any) {
       setEndedChatsList(res.data.cs_get_all_ended_chats ?? []);
       filterChatsList(res.data.cs_get_all_ended_chats ?? [])
     },
   });
-  const { data: chatMessages } = useQuery<Message[]>({
+
+  useQuery<Message[]>({
     queryKey: ['cs-get-messages-by-chat-id', selectedChat?.id, 'prod'],
     enabled: !!selectedChat,
     onSuccess(res: any) {
       setchatMessagesList(res.data.cs_get_messages_by_chat_id);
-
     },
   });
 
@@ -253,7 +253,7 @@ const ChatHistory: FC = () => {
   const filterChatsList = (chatsList: ChatType[]) => {
     const startDate = control._formValues.startDate;
     const endDate = control._formValues.endDate;
-    setFilteredEndedChatsList(chatsList.filter((c) => new Date(c.created) >= startDate && new Date(c.created) <= endDate ));
+    setFilteredEndedChatsList(chatsList.filter((c) => new Date(c.created) >= startDate && new Date(c.created) <= endDate));
   }
 
   if (!filteredEndedChatsList) return <>Loading...</>;
@@ -271,7 +271,7 @@ const ChatHistory: FC = () => {
             placeholder={t('chat.history.searchChats') + '...'}
             onChange={(e) => e.target.value.length === 0 ? filterChatsList(endedChatsList) : searchChatsMutation.mutate(e.target.value)}
           />
-          <Track style={{width: '100%'}} gap={16}>
+          <Track style={{ width: '100%' }} gap={16}>
             <Track gap={10}>
               <p>{t("global.from")}</p>
               <Controller
@@ -280,13 +280,13 @@ const ChatHistory: FC = () => {
                 render={({ field }) => {
                   return (
                     <FormDatepicker
-                    {...field}
-                    label={""}
-                    value={field.value ?? new Date()}
-                    onChange={(v) => {
-                      field.onChange(v);
-                      filterChatsList(endedChatsList);
-                    }}
+                      {...field}
+                      label={""}
+                      value={field.value ?? new Date()}
+                      onChange={(v) => {
+                        field.onChange(v);
+                        filterChatsList(endedChatsList);
+                      }}
                     />
                   );
                 }}
