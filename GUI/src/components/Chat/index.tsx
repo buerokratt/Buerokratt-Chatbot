@@ -13,7 +13,14 @@ import { format } from 'date-fns';
 import { et } from 'date-fns/locale';
 import clsx from 'clsx';
 import { MdOutlineAttachFile, MdOutlineSend } from 'react-icons/all';
-import { Button, FormInput, FormTextarea, Icon, Label, Track } from 'components';
+import {
+  Button,
+  FormInput,
+  FormTextarea,
+  Icon,
+  Label,
+  Track,
+} from 'components';
 import { ReactComponent as BykLogoWhite } from 'assets/logo-white.svg';
 import useUserInfoStore from 'store/store';
 import {
@@ -36,7 +43,9 @@ import { findIndex } from 'lodash';
 import { CHAT_INPUT_LENGTH } from 'constants/config';
 import apiDev from 'services/api-dev';
 import ChatTextArea from './ChatTextArea';
-import TextareaAutosize, { TextareaAutosizeProps } from 'react-textarea-autosize';
+import TextareaAutosize, {
+  TextareaAutosizeProps,
+} from 'react-textarea-autosize';
 import { ROLES } from 'utils/constants';
 import newMessageSound from '../../assets/newMessageSound.mp3';
 import { AUTHOR_ROLES, MESSAGE_FILE_SIZE_LIMIT } from 'utils/constants';
@@ -96,19 +105,26 @@ const Chat: FC<ChatProps> = ({
   let messagesLength = 0;
 
   useEffect(() => {
+    getCsaStatus();
     const interval = setInterval(() => {
-        getMessages();
-        getCsaStatus();
+      getMessages();
     }, 3500);
     return () => clearInterval(interval);
   }, []);
 
-    const getCsaStatus = async () => {
-        const { data: res } = await apiDev.post('cs-get-customer-support-activity-by-id', {
-            'customerSupportId': chat.customerSupportId
-        });
-        setChatCsaActive(res.data.get_customer_support_activity[0].status === 'online' ? true : false);
-    };
+  const getCsaStatus = async () => {
+    const { data: res } = await apiDev.post(
+      'cs-get-customer-support-activity-by-id',
+      {
+        customerSupportId: chat.customerSupportId,
+      }
+    );
+    setChatCsaActive(
+      res.data.get_customer_support_activity[0]?.status === 'online'
+        ? true
+        : false
+    );
+  };
 
   const getMessages = async () => {
     const { data: res } = await apiDev.post('cs-get-messages-by-chat-id', {
@@ -126,6 +142,7 @@ const Chat: FC<ChatProps> = ({
     }
     messagesLength = res.data.cs_get_messages_by_chat_id.length;
     setMessagesList(res.data.cs_get_messages_by_chat_id);
+    console.log(chat, res.data.cs_get_messages_by_chat_id);
   };
 
   const sendAttachmentMutation = useSendAttachment();
@@ -606,30 +623,31 @@ const Chat: FC<ChatProps> = ({
         )}
 
         {(chat.customerSupportId === '' ||
-            (chat.customerSupportId !== userInfo?.idCode && !chatCsaActive)) && (
-            <div className="active-chat__toolbar">
-                <Track justify="center">
-                    <div className="active-chat__toolbar-actions">
-                    <Button
-                        appearance="primary"
-                        style={{
-                            backgroundColor: '#25599E',
-                            color: '#FFFFFF',
-                            borderRadius: '50px',
-                            paddingLeft: '40px',
-                            paddingRight: '40px',
-                        }}
-                        onClick={() => takeOverChatMutation.mutate()}
-                    >
-                    {t('chat.active.takeOver')}
-                    </Button>
-                    </div>
-                </Track>
-            </div>
+          (chat.customerSupportId !== userInfo?.idCode && !chatCsaActive)) && (
+          <div className="active-chat__toolbar">
+            <Track justify="center">
+              <div className="active-chat__toolbar-actions">
+                <Button
+                  appearance="primary"
+                  style={{
+                    backgroundColor: '#25599E',
+                    color: '#FFFFFF',
+                    borderRadius: '50px',
+                    paddingLeft: '40px',
+                    paddingRight: '40px',
+                  }}
+                  onClick={() => takeOverChatMutation.mutate()}
+                >
+                  {t('chat.active.takeOver')}
+                </Button>
+              </div>
+            </Track>
+          </div>
         )}
       </div>
       <div className="active-chat__side">
-      {chat.customerSupportId === userInfo?.idCode && (
+        {(chat.customerSupportId === '' ||
+          chat.customerSupportId === userInfo?.idCode) && (
           <div className="active-chat__side-actions">
             <Button
               appearance="success"
@@ -637,13 +655,27 @@ const Chat: FC<ChatProps> = ({
             >
               {t('chat.active.endChat')}
             </Button>
-            <Button appearance="secondary">
+            <Button
+              appearance="secondary"
+              disabled={chat.customerSupportId != userInfo?.idCode}
+              onClick={() =>
+                handleChatEvent(CHAT_EVENTS.REQUESTED_AUTHENTICATION)
+              }
+            >
               {t('chat.active.askAuthentication')}
             </Button>
-            <Button appearance="secondary">
+            <Button
+              appearance="secondary"
+              disabled={chat.customerSupportId != userInfo?.idCode}
+              onClick={() => handleChatEvent(CHAT_EVENTS.CONTACT_INFORMATION)}
+            >
               {t('chat.active.askForContact')}
             </Button>
-            <Button appearance="secondary">
+            <Button
+              appearance="secondary"
+              disabled={chat.customerSupportId != userInfo?.idCode}
+              onClick={() => handleChatEvent(CHAT_EVENTS.ASK_PERMISSION)}
+            >
               {t('chat.active.askPermission')}
             </Button>
             <Button
@@ -671,12 +703,14 @@ const Chat: FC<ChatProps> = ({
             </Button>
             <Button
               appearance="secondary"
+              disabled={chat.customerSupportId != userInfo?.idCode}
               onClick={onSendToEmail ? () => onSendToEmail(chat) : undefined}
             >
               {t('chat.active.sendToEmail')}
             </Button>
             <Button
               appearance="secondary"
+              disabled={chat.customerSupportId != userInfo?.idCode}
               onClick={
                 onStartAService ? () => onStartAService(chat) : undefined
               }
@@ -685,34 +719,36 @@ const Chat: FC<ChatProps> = ({
             </Button>
           </div>
         )}
-        {chat.customerSupportId !== userInfo?.idCode && !chatCsaActive && (
-          <div className="active-chat__side-actions">
-            <Track gap={8} style={{ marginBottom: 36 }}>
-              <Label type="warning">!</Label>
-              <p className="csa-away">Nõustaja on eemal.</p>
-            </Track>
-            {userInfo?.authorities.some((authority) =>
-              [
-                ROLES.ROLE_ADMINISTRATOR,
-                ROLES.ROLE_CUSTOMER_SUPPORT_AGENT,
-              ].includes(authority as ROLES)
-            ) && (
-              <Button
-                appearance="secondary"
-                onClick={
-                  onForwardToColleauge
-                    ? () => {
-                        onForwardToColleauge(chat);
-                        setSelectedMessages([]);
-                      }
-                    : undefined
-                }
-              >
-                {t('chat.active.forwardToColleague')}
-              </Button>
-            )}
-          </div>
-        )}
+        {chat.customerSupportId !== '' &&
+          chat.customerSupportId !== userInfo?.idCode &&
+          !chatCsaActive && (
+            <div className="active-chat__side-actions">
+              <Track gap={8} style={{ marginBottom: 36 }}>
+                <Label type="warning">!</Label>
+                <p className="csa-away">Nõustaja on eemal.</p>
+              </Track>
+              {userInfo?.authorities.some((authority) =>
+                [
+                  ROLES.ROLE_ADMINISTRATOR,
+                  ROLES.ROLE_CUSTOMER_SUPPORT_AGENT,
+                ].includes(authority as ROLES)
+              ) && (
+                <Button
+                  appearance="secondary"
+                  onClick={
+                    onForwardToColleauge
+                      ? () => {
+                          onForwardToColleauge(chat);
+                          setSelectedMessages([]);
+                        }
+                      : undefined
+                  }
+                >
+                  {t('chat.active.forwardToColleague')}
+                </Button>
+              )}
+            </div>
+          )}
         <div className="active-chat__side-meta">
           <div>
             <p>
