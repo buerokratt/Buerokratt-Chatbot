@@ -6,7 +6,7 @@ extractTokenData:
   call: http.post
   args:
     # TODO: replace with env variable and correct path to TIM endpoint
-    url: http://byk-private-ruuter-yml:8080/mocks/mock-tim-custom-jwt-userinfo
+    url: http://ruuter-v2-private:8088/mocks/mock-tim-custom-jwt-userinfo
     headers:
       cookie: ${cookie}
     body:
@@ -25,12 +25,12 @@ getWidgetConfig:
   call: http.post
   args:
     # TODO: replace with env variable
-    url: https://byk-resql:8443/get-widget-config
+    url: http://resql:8082/get-widget-config
   result: getWidgetConfigResult
 
 validateWidgetConfigExists:
   switch:
-    - condition: '${getWidgetConfigResult.response.body.length > 0}'
+    - condition: "${getWidgetConfigResult.response.body.length > 0}"
       next: mapWidgetConfigData
   next: returnNotFound
 
@@ -38,7 +38,7 @@ mapWidgetConfigData:
   call: http.post
   args:
     # TODO: replace with env variable
-    url: https://byk-dmapper:8443/json/v2/return_widget_config
+    url: http://dmapper:3000/json/v2/return_widget_config
     body:
       configurationArray: ${getWidgetConfigResult.response.body}
   result: widgetConfigData

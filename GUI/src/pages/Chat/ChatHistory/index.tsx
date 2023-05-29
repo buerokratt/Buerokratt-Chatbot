@@ -88,7 +88,8 @@ const ChatHistory: FC = () => {
   ], [t]);
 
   const sendToEmailMutation = useMutation({
-    mutationFn: (data: ChatType) => api.post('cs-send-chat-to-email', data),
+    mutationFn: (data: ChatType) => 
+      apiDevV2.post('history/cs-send-history-to-email', { chatId: data.id }),
     onSuccess: () => {
       toast.open({
         type: 'success',

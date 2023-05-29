@@ -56,9 +56,7 @@
           }
         },
         "proceed": {
-          "cookies": [
-            "chatJwt"
-          ],
+          "cookies": ["chatJwt"],
           "method": "post",
           "endpoint": "{tim_url}/jwt/custom-jwt-userinfo",
           "post_body_struct": "chatJwt",
@@ -92,9 +90,7 @@
         },
         "local_request": {
           "method": "post",
-          "cookies": [
-            "chatJwt"
-          ],
+          "cookies": ["chatJwt"],
           "endpoint": "{resql_url}/insert-message",
           "post_body_struct": {
             "messageId": "{#.get_message_by_id[0]#.baseId}",
@@ -107,7 +103,10 @@
             "created": "{#.get_message_by_id[0]#.created}",
             "content": "",
             "event": "{#.reflect_input#.event}",
-            "rating": ""
+            "rating": "",
+            "forwardedByUser": "{#.get_message_by_id[0]#.forwardedByUser}",
+            "forwardedFromCsa": "{#.get_message_by_id[0]#.forwardedFromCsa}",
+            "forwardedToCsa": "{#.get_message_by_id[0]#.forwardedToCsa}"
           },
           "response": {
             "ok": "proceed",
