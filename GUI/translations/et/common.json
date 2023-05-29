@@ -95,6 +95,8 @@
     "endUser": "Vestleja nimi",
     "endUserId": "Vestleja isikukood",
     "csaName": "Nõustaja nimi",
+    "endUserEmail": "Vestleja e-mail",
+    "endUserPhoneNumber": "Vestleja telefoninumber",
     "startedAt": "Vestlus alustatud",
     "device": "Seade",
     "location": "Lähtekoht",

@@ -706,6 +706,22 @@ const Chat: FC<ChatProps> = ({
               <p>{chat.endUserId ?? ''}</p>
             </div>
           )}
+          {chat.endUserEmail && (
+            <div>
+              <p>
+                <strong>{t('chat.endUserEmail')}</strong>
+              </p>
+              <p>{chat.endUserEmail}</p>
+            </div>
+          )}
+          {chat.endUserPhone && (
+            <div>
+              <p>
+                <strong>{t('chat.endUserPhoneNumber')}</strong>
+              </p>
+              <p>{chat.endUserPhone}</p>
+            </div>
+          )}
           {chat.customerSupportDisplayName && (
             <div>
               <p>
