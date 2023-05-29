@@ -2,6 +2,7 @@ import {
   ChangeEvent,
   FC,
   useEffect,
+  useMemo,
   useRef,
   useState,
   useTransition,
@@ -34,6 +35,7 @@ import formatBytes from 'utils/format-bytes';
 import useSendAttachment from 'modules/attachment/hooks';
 import { AxiosError } from 'axios';
 import { useToast } from 'hooks/useToast';
+import useUserInfoStore from 'store/store';
 import './Chat.scss';
 
 type ChatProps = {
@@ -66,6 +68,7 @@ const Chat: FC<ChatProps> = ({
   onRefresh,
 }) => {
   const { t } = useTranslation();
+  const { userInfo } = useUserInfoStore();
   const chatRef = useRef<HTMLDivElement>(null);
   const [messageGroups, _setMessageGroups] = useState<GroupedMessage[]>([]);
   const messageGroupsRef = useRef(messageGroups);
