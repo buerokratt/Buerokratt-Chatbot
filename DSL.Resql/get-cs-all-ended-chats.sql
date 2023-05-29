@@ -17,6 +17,7 @@ SELECT c.base_id AS id,
        c.forwarded_to_name,
        c.received_from,
        c.labels,
+       s.comment,
        m.content AS last_message,
        (CASE WHEN m.event = '' THEN NULL ELSE LOWER(m.event) END) as last_message_event,
        (SELECT content
@@ -25,6 +26,8 @@ SELECT c.base_id AS id,
             (SELECT MAX(id) FROM message WHERE event = 'contact-information-fulfilled' AND chat_base_id = c.base_id))) AS contacts_message,
        m.updated AS last_message_timestamp
 FROM (SELECT * FROM chat WHERE id IN (SELECT MAX(id) FROM chat GROUP BY base_id) AND ended IS NOT null) AS c
-         JOIN (SELECT * FROM message WHERE id IN (SELECT MAX(id) FROM message GROUP BY chat_base_id)) AS m
-              ON c.base_id = m.chat_base_id
+  JOIN (SELECT * FROM message WHERE id IN (SELECT MAX(id) FROM message GROUP BY chat_base_id)) AS m
+  ON c.base_id = m.chat_base_id
+  JOIN (SELECT chat_id, comment FROM chat_history_comments) AS s
+  ON s.chat_id =  m.chat_base_id
 ORDER BY created;
