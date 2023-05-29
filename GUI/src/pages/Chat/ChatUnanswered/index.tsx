@@ -72,8 +72,8 @@ const ChatUnanswered: FC = () => {
         customerSupportId: user?.idCode ?? '',
         customerSupportDisplayName: user?.displayName ?? '',
         csaTitle: user?.csaTitle ?? '',
-        forwardedByUser: user?.idCode ?? '',
-        forwardedFromCsa: user?.idCode ?? '',
+        forwardedByUser: userInfo?.idCode ?? '',
+        forwardedFromCsa: userInfo?.idCode ?? '',
         forwardedToCsa: user?.idCode ?? '',
       }),
         setForwardToColleaugeModal(null);
