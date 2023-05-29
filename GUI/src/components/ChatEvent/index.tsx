@@ -41,7 +41,6 @@ const ChatEvent: FC<ChatEventProps> = ({ message }) => {
         }
       }
       break;
-      break;
     case CHAT_EVENTS.ANSWERED:
       EVENT_PARAMS = t('chat.events.answered', {
         date: format(new Date(authorTimestamp), 'dd.MM.yyyy HH:ii:ss'),
