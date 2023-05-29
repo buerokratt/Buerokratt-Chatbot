@@ -55,6 +55,7 @@ type ChatProps = {
   onForwardToEstablishment?: (chat: ChatType) => void;
   onSendToEmail?: (chat: ChatType) => void;
   onStartAService?: (chat: ChatType) => void;
+  onRefresh: () => void;
 };
 
 type GroupedMessage = {
@@ -72,6 +73,7 @@ const Chat: FC<ChatProps> = ({
   onForwardToEstablishment,
   onSendToEmail,
   onStartAService,
+  onRefresh,
 }) => {
   const { t } = useTranslation();
   const { userInfo } = useUserInfoStore();
@@ -112,6 +114,7 @@ const Chat: FC<ChatProps> = ({
       ].authorId != userInfo?.idCode
     ) {
       audio.play();
+      onRefresh();
     }
     messagesLength = res.data.cs_get_messages_by_chat_id.length;
     setMessagesList(res.data.cs_get_messages_by_chat_id);
@@ -184,6 +187,7 @@ const Chat: FC<ChatProps> = ({
       }),
     onSuccess: async () => {
       chat.customerSupportId = userInfo?.idCode;
+      onRefresh();
     },
     onError: (error: AxiosError) => {
       toast.open({

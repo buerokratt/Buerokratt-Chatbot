@@ -37,7 +37,8 @@ const ChatUnanswered: FC = () => {
     CHAT_EVENTS.OTHER,
     CHAT_EVENTS.RESPONSE_SENT_TO_CLIENT_EMAIL,
   ];
-  const { data: activeChats } = useQuery<ChatType[]>({
+
+  const { refetch } = useQuery<ChatType[]>({
     queryKey: ['cs-get-all-active-chats', 'prod'],
     onSuccess(res: any) {
       setActiveChatsList(res.data.get_all_active_chats);
@@ -77,6 +78,7 @@ const ChatUnanswered: FC = () => {
         forwardedToCsa: user?.idCode ?? '',
       }),
         setForwardToColleaugeModal(null);
+      refetch();
       toast.open({
         type: 'success',
         title: t('global.notification'),
@@ -116,6 +118,7 @@ const ChatUnanswered: FC = () => {
         authorId: userInfo!.idCode,
         authorRole: userInfo!.authorities,
       });
+      refetch();
       toast.open({
         type: 'success',
         title: t('global.notification'),
@@ -195,6 +198,7 @@ const ChatUnanswered: FC = () => {
               onForwardToColleauge={setForwardToColleaugeModal}
               onForwardToEstablishment={setForwardToEstablishmentModal}
               onSendToEmail={setSendToEmailModal}
+              onRefresh={refetch}
             />
           )}
         </Tabs.Content>

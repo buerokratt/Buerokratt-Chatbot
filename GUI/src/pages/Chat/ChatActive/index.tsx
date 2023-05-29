@@ -50,7 +50,7 @@ const ChatActive: FC = () => {
     string | null
   >(null);
 
-  useQuery<ChatType[]>({
+  const { refetch } = useQuery<ChatType[]>({
     queryKey: ['cs-get-all-active-chats', 'prod'],
     onSuccess(res: any) {
       setActiveChatsList(res.data.get_all_active_chats);
@@ -135,6 +135,7 @@ const ChatActive: FC = () => {
         forwardedToCsa: user?.idCode ?? '',
       }),
         setForwardToColleaugeModal(null);
+      refetch();
       toast.open({
         type: 'success',
         title: t('global.notification'),
@@ -174,6 +175,7 @@ const ChatActive: FC = () => {
         authorId: userInfo!.idCode,
         authorRole: userInfo!.authorities,
       });
+      refetch();
       toast.open({
         type: 'success',
         title: t('global.notification'),
@@ -260,6 +262,7 @@ const ChatActive: FC = () => {
                 onForwardToEstablishment={setForwardToEstablishmentModal}
                 onSendToEmail={setSendToEmailModal}
                 onStartAService={setStartAServiceModal}
+                onRefresh={refetch}
               />
             )}
           </Tabs.Content>
