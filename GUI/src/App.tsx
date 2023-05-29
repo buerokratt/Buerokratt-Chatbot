@@ -23,9 +23,12 @@ import './locale/et_EE';
 
 const App: FC = () => {
   const store = useUserInfoStore();
-  const { data: userInfo } = useQuery<UserInfo>({
+  const { data: userInfo } = useQuery<{
+    data: { custom_jwt_userinfo: UserInfo };
+  }>({
     queryKey: ['cs-custom-jwt-userinfo', 'prod'],
-    onSuccess: (data: any) => store.setUserInfo(data.data.custom_jwt_userinfo),
+    onSuccess: (data: { data: { custom_jwt_userinfo: UserInfo } }) =>
+      store.setUserInfo(data.data.custom_jwt_userinfo),
   });
 
   return (
