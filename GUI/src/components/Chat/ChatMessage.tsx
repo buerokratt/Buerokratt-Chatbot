@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import { MdOutlineCheck } from 'react-icons/md';
 import { Message } from '../../types/message';
 import { CHAT_EVENTS, MessageStatus } from '../../types/chat';
+import Linkifier from './linkifier';
 
 type ChatMessageProps = {
   message: Message;
@@ -37,7 +38,7 @@ const ChatMessage: FC<ChatMessageProps> = ({
             onSelect(message);
           }}
         >
-          {message.content}
+          <Linkifier message={message.content} />
           {!!message.preview && message.preview}
         </div>
         <time

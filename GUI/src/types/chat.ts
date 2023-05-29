@@ -41,6 +41,8 @@ export interface Chat {
   customerSupportId?: string;
   customerSupportDisplayName?: string;
   endUserId?: string;
+  endUserEmail?: string;
+  endUserPhone?: string;
   endUserFirstName?: string;
   endUserLastName?: string;
   contactsMessage?: string;
