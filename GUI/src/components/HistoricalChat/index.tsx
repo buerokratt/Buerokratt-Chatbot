@@ -84,8 +84,6 @@ const HistoricalChat: FC<ChatProps> = ({ chat, onChatStatusChange, onCommentChan
       }
     });
 
-    console.log(groupedMessages)
-
     setMessageGroups(groupedMessages);
   }, [messagesList, endUserFullName]);
 

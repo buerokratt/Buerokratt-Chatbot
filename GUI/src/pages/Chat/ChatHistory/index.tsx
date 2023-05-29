@@ -176,6 +176,16 @@ const ChatHistory: FC = () => {
 
   const columnHelper = createColumnHelper<ChatType>();
 
+  const copyValueToClipboard = async (value: string) => {
+    await navigator.clipboard.writeText(value);
+
+    toast.open({
+      type: 'success',
+      title: t('global.notification'),
+      message: 'Copied',
+    });
+  }
+
   const endedChatsColumns = useMemo(() => [
     columnHelper.accessor('created', {
       id: 'created',
@@ -218,7 +228,6 @@ const ChatHistory: FC = () => {
     columnHelper.accessor('labels', {
       id: 'labels',
       header: t('chat.history.label') || '',
-      cell: (props) => <span></span>,
     }),
     // columnHelper.accessor('nps', {
     //   header: 'NPS',
@@ -231,6 +240,9 @@ const ChatHistory: FC = () => {
     columnHelper.accessor('id', {
       id: 'id',
       header: 'ID',
+      cell: (props) => (
+        <button onClick={() => copyValueToClipboard(props.getValue())}>{props.getValue()}</button>
+      ),
     }),
     columnHelper.display({
       id: 'detail',
