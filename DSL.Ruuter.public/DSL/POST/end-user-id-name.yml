@@ -8,7 +8,7 @@ assignIncoming:
 checkChatId:
   switch:
     - condition: ${!!chatId && chatId !== "" && chatId !== null}
-      next: insertEmailAndPhone
+      next: insertIdAndName
   next: returnNoChatId
 
 insertIdAndName:
@@ -20,7 +20,7 @@ insertIdAndName:
       endUserId: "${id ? id : ''}"
       endUserFirstName: "${firstName ? firstName : ''}"
       endUserLastName: "${lastName ? lastName : ''}"
-  result: insertEmailAndPhoneResult
+  result: insertIdAndNameResult
 
 returnSuccess:
   return: Updated ${chatId} with ${id} and ${firstName} ${lastName}.
