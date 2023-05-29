@@ -7,6 +7,7 @@ export enum CHAT_STATUS {
 export enum CHAT_EVENTS {
   ANSWERED = 'answered',
   TERMINATED = 'terminated',
+  CHAT_SENT_TO_CSA_EMAIL = 'chat_sent_to_csa_email',
   CLIENT_LEFT = 'client-left',
   CLIENT_LEFT_WITH_ACCEPTED = 'client_left_with_accepted',
   CLIENT_LEFT_WITH_NO_RESOLUTION = 'client_left_with_no_resolution',

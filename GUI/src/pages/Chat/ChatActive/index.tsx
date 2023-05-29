@@ -13,7 +13,6 @@ import {
 import useUserInfoStore from 'store/store';
 import { User } from 'types/user';
 import { useToast } from 'hooks/useToast';
-import api from 'services/api';
 import apiDev from 'services/api-dev';
 import ForwardToColleaugeModal from '../ForwardToColleaugeModal';
 import ForwardToEstablishmentModal from '../ForwardToEstablishmentModal';
@@ -21,6 +20,7 @@ import clsx from 'clsx';
 import StartAServiceModal from '../StartAServiceModal';
 import ChatTrigger from './ChatTrigger';
 import './ChatActive.scss';
+import apiDevV2 from 'services/api-dev-v2';
 
 const CSAchatStatuses = [
   CHAT_EVENTS.ACCEPTED,
@@ -66,7 +66,8 @@ const ChatActive: FC = () => {
   });
 
   const sendToEmailMutation = useMutation({
-    mutationFn: (data: ChatType) => apiDev.post('cs-send-chat-to-email', data),
+    mutationFn: (data: ChatType) => 
+      apiDevV2.post('history/cs-send-history-to-email', { chatId: data.id }),
     onSuccess: () => {
       toast.open({
         type: 'success',

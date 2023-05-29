@@ -1,6 +1,7 @@
 extractRequestData:
   assign:
     cookie: ${incoming.headers.cookie}
+    widgetAnimation: ${incoming.body.widgetAnimation}
     widgetProactiveSeconds: ${incoming.body.widgetProactiveSeconds}
     widgetDisplayBubbleMessageSeconds: ${incoming.body.widgetDisplayBubbleMessageSeconds}
     widgetBubbleMessageText: ${incoming.body.widgetBubbleMessageText}
@@ -11,7 +12,7 @@ extractTokenData:
   call: http.post
   args:
     # TODO: replace with env variable and correct path to TIM endpoint
-    url: http://byk-private-ruuter-yml:8080/mocks/mock-tim-custom-jwt-userinfo
+    url: http://ruuter-v2-private:8088/mocks/mock-tim-custom-jwt-userinfo
     headers:
       cookie: ${cookie}
     body:
@@ -30,13 +31,14 @@ setWidgetConfig:
   call: http.post
   args:
     # TODO: replace with env variable
-    url: https://byk-resql:8443/set-widget-config
+    url: http://resql:8082/set-widget-config
     body:
       widgetProactiveSeconds: ${widgetProactiveSeconds}
       widgetDisplayBubbleMessageSeconds: ${widgetDisplayBubbleMessageSeconds}
       widgetBubbleMessageText: ${widgetBubbleMessageText}
       widgetColor: ${widgetColor}
       isWidgetActive: ${isWidgetActive}
+      widgetAnimation: ${widgetAnimation}
       created: ${new Date().toISOString()}
   result: setWidgetConfigResult
 
@@ -44,7 +46,7 @@ mapWidgetConfigData:
   call: http.post
   args:
     # TODO: replace with env variable
-    url: https://byk-dmapper:8443/json/v2/return_widget_config
+    url: http://dmapper:3000/json/v2/return_widget_config
     body:
       configurationArray: ${setWidgetConfigResult.response.body}
   result: widgetConfigData

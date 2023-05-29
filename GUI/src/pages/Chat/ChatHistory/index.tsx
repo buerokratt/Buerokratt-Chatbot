@@ -29,6 +29,7 @@ import useUserInfoStore from '../../../store/store';
 import { Controller, useForm } from 'react-hook-form';
 import { getFromLocalStorage, setToLocalStorage } from 'utils/local-storage-utils';
 import { CHAT_HISTORY_PREFERENCES_KEY } from '../../../constants/config'
+import apiDevV2 from 'services/api-dev-v2';
 
 const ChatHistory: FC = () => {
   const { t } = useTranslation();
@@ -87,7 +88,8 @@ const ChatHistory: FC = () => {
   ], [t]);
 
   const sendToEmailMutation = useMutation({
-    mutationFn: (data: ChatType) => api.post('cs-send-chat-to-email', data),
+    mutationFn: (data: ChatType) => 
+      apiDevV2.post('history/cs-send-history-to-email', { chatId: data.id }),
     onSuccess: () => {
       toast.open({
         type: 'success',
