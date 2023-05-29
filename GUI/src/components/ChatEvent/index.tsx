@@ -12,17 +12,35 @@ type ChatEventProps = {
 
 const ChatEvent: FC<ChatEventProps> = ({ message }) => {
   const { t } = useTranslation();
-  const { event, authorTimestamp, forwardedFromCsa, forwardedToCsa } = message;
+  const { event, authorTimestamp, forwardedByUser, forwardedFromCsa, forwardedToCsa } = message;
 
   let EVENT_PARAMS;
 
   switch (event) {
     case CHAT_EVENTS.REDIRECTED:
-      EVENT_PARAMS = t('chat.redirectedMessage', {
-        from: forwardedFromCsa,
-        to: forwardedToCsa,
-        date: format(new Date(authorTimestamp), 'dd.MM.yyyy HH:ii:ss'),
-      })
+      {
+        if (forwardedByUser === forwardedFromCsa) {
+          EVENT_PARAMS = t('chat.redirectedMessageByOwner', {
+            from: forwardedFromCsa,
+            to: forwardedToCsa,
+            date: format(new Date(authorTimestamp), 'dd.MM.yyyy HH:ii:ss'),
+          });
+        } else if (forwardedByUser === forwardedToCsa) {
+          EVENT_PARAMS = t('chat.redirectedMessageClaimed', {
+            from: forwardedFromCsa,
+            to: forwardedToCsa,
+            date: format(new Date(authorTimestamp), 'dd.MM.yyyy HH:ii:ss'),
+          });
+        } else {
+          EVENT_PARAMS = t('chat.redirectedMessage', {
+            user: forwardedByUser,
+            from: forwardedFromCsa,
+            to: forwardedToCsa,
+            date: format(new Date(authorTimestamp), 'dd.MM.yyyy HH:ii:ss'),
+          });
+        }
+      }
+      break;
       break;
     case CHAT_EVENTS.ANSWERED:
       EVENT_PARAMS = t('chat.events.answered', {
@@ -147,6 +165,11 @@ const ChatEvent: FC<ChatEventProps> = ({ message }) => {
     case CHAT_EVENTS.REQUESTED_CHAT_FORWARD_REJECTED:
       EVENT_PARAMS = t('chat.events.requested-chat-forward-rejected', {
         date: format(new Date(authorTimestamp), 'dd.MM.yyyy HH:ii:ss'),
+      })
+      break;
+    default:
+      EVENT_PARAMS = t(`chat.events.${event?.toLowerCase()}`, {
+        date: format(new Date(authorTimestamp), 'dd.MM.yyyy HH:ii:ss')
       })
       break;
   }
