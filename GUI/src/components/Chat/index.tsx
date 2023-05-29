@@ -36,6 +36,7 @@ import { findIndex } from 'lodash';
 import { CHAT_INPUT_LENGTH } from 'constants/config';
 import apiDev from 'services/api-dev';
 import ChatTextArea from './ChatTextArea';
+import newMessageSound from '../../assets/newMessageSound.mp3';
 import TextareaAutosize, {
   TextareaAutosizeProps,
 } from 'react-textarea-autosize';
@@ -89,6 +90,8 @@ const Chat: FC<ChatProps> = ({
   const [userInput, setUserInput] = useState<string>('');
   const [userInputFile, setUserInputFile] = useState<Attachment>();
   const [errorMessage, setErrorMessage] = useState('');
+  const audio = useMemo(() => new Audio(newMessageSound), []);
+  let messagesLength = 0;
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -101,6 +104,16 @@ const Chat: FC<ChatProps> = ({
     const { data: res } = await apiDev.post('cs-get-messages-by-chat-id', {
       chatId: chat.id,
     });
+    if (
+      messagesLength != 0 &&
+      messagesLength < res.data.cs_get_messages_by_chat_id.length &&
+      res.data.cs_get_messages_by_chat_id[
+        res.data.cs_get_messages_by_chat_id.length - 1
+      ].authorId != userInfo?.idCode
+    ) {
+      audio.play();
+    }
+    messagesLength = res.data.cs_get_messages_by_chat_id.length;
     setMessagesList(res.data.cs_get_messages_by_chat_id);
   };
 
