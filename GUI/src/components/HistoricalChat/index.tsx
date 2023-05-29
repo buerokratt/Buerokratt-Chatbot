@@ -1,11 +1,10 @@
-import { FC, useEffect, useMemo, useRef, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import { MdOutlineModeEditOutline, MdOutlineSave } from 'react-icons/all';
 
 import { Button, FormSelect, FormTextarea, Icon, Track } from 'components';
 import { ReactComponent as BykLogoWhite } from 'assets/logo-white.svg';
-import useUserInfoStore from 'store/store';
 import { CHAT_EVENTS, Chat as ChatType } from 'types/chat';
 import { Message } from 'types/message';
 import ChatMessage from './ChatMessage';
@@ -37,11 +36,11 @@ const chatStatuses = [
 
 const HistoricalChat: FC<ChatProps> = ({ chat, onChatStatusChange, onCommentChange }) => {
   const { t } = useTranslation();
-  const { userInfo } = useUserInfoStore();
   const chatRef = useRef<HTMLDivElement>(null);
   const [messageGroups, setMessageGroups] = useState<GroupedMessage[]>([]);
   const [editingComment, setEditingComment] = useState<string | null>(null);
   const [messagesList, setMessagesList] = useState<Message[]>([]);
+
   useEffect(() => {
     getMessages();
   }, [])
@@ -52,12 +51,6 @@ const HistoricalChat: FC<ChatProps> = ({ chat, onChatStatusChange, onCommentChan
     });
     setMessagesList(res.data.cs_get_messages_by_chat_id);
   };
-
-
-  const hasAccessToActions = useMemo(() => {
-    if (chat.customerSupportId === userInfo?.idCode) return true;
-    return false;
-  }, [chat, userInfo]);
 
   const endUserFullName = chat.endUserFirstName !== '' && chat.endUserLastName !== ''
     ? `${chat.endUserFirstName} ${chat.endUserLastName}` : t('global.anonymous');
@@ -97,7 +90,6 @@ const HistoricalChat: FC<ChatProps> = ({ chat, onChatStatusChange, onCommentChan
     chatRef.current.scrollIntoView({ block: 'end', inline: 'end' });
   }, [messageGroups]);
 
-
   return (
     <div className='historical-chat'>
       <div className='historical-chat__body'>
@@ -131,7 +123,7 @@ const HistoricalChat: FC<ChatProps> = ({ chat, onChatStatusChange, onCommentChan
         <div className='historical-chat__toolbar'>
           <div className='historical-chat__toolbar-row'>
             <Track gap={16} justify='between'>
-              {editingComment ? (
+              {editingComment || editingComment === '' ? (
                 <FormTextarea
                   name='comment'
                   label={t('global.comment')}
@@ -144,7 +136,7 @@ const HistoricalChat: FC<ChatProps> = ({ chat, onChatStatusChange, onCommentChan
               ) : (
                 <p>{chat.comment}</p>
               )}
-              {editingComment ? (
+              {editingComment || editingComment === '' ? (
                 <Button
                   appearance='text'
                   onClick={() => {

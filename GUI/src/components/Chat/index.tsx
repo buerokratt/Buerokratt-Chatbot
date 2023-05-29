@@ -2,7 +2,6 @@ import {
   ChangeEvent,
   FC,
   useEffect,
-  useMemo,
   useRef,
   useState,
   useTransition,
@@ -14,7 +13,6 @@ import clsx from 'clsx';
 import { MdOutlineAttachFile, MdOutlineSend } from 'react-icons/all';
 import { Button, Icon, Track } from 'components';
 import { ReactComponent as BykLogoWhite } from 'assets/logo-white.svg';
-import useUserInfoStore from 'store/store';
 import { Chat as ChatType, MessageSseEvent, MessageStatus } from 'types/chat';
 import {
   Attachment,
@@ -29,7 +27,6 @@ import { findIndex } from 'lodash';
 import { CHAT_INPUT_LENGTH } from 'constants/config';
 import apiDev from 'services/api-dev';
 import ChatTextArea from './ChatTextArea';
-import TextareaAutosize, { TextareaAutosizeProps } from 'react-textarea-autosize';
 import { MESSAGE_FILE_SIZE_LIMIT } from 'utils/constants';
 import formatBytes from 'utils/format-bytes';
 import useSendAttachment from 'modules/attachment/hooks';
@@ -63,7 +60,6 @@ const Chat: FC<ChatProps> = ({
   onStartAService,
 }) => {
   const { t } = useTranslation();
-  const { userInfo } = useUserInfoStore();
   const chatRef = useRef<HTMLDivElement>(null);
   const [messageGroups, _setMessageGroups] = useState<GroupedMessage[]>([]);
   const messageGroupsRef = useRef(messageGroups);
@@ -150,125 +146,10 @@ const Chat: FC<ChatProps> = ({
     }
   };
 
-  const hasAccessToActions = useMemo(() => {
-    if (chat.customerSupportId === userInfo?.idCode) return true;
-    return false;
-  }, [chat, userInfo]);
-
   const endUserFullName =
     chat.endUserFirstName !== '' && chat.endUserLastName !== ''
       ? `${chat.endUserFirstName} ${chat.endUserLastName}`
       : t('global.anonymous');
-
-  const allSideButtons = [
-    {
-      id: 'endChat',
-      button: (
-        <Button
-          key="endChat"
-          appearance="success"
-          onClick={onChatEnd ? () => onChatEnd(chat) : undefined}
-        >
-          {t('chat.active.endChat')}
-        </Button>
-      ),
-    },
-    {
-      id: 'askAuthentication',
-      button: (
-        <Button key="askAuthentication" appearance="secondary">
-          {t('chat.active.askAuthentication')}
-        </Button>
-      ),
-    },
-    {
-      id: 'askForContact',
-      button: (
-        <Button key="askForContact" appearance="secondary">
-          {t('chat.active.askForContact')}
-        </Button>
-      ),
-    },
-    {
-      id: 'askPermission',
-      button: (
-        <Button key="askPermission" appearance="secondary">
-          {t('chat.active.askPermission')}
-        </Button>
-      ),
-    },
-    {
-      id: 'forwardToColleague',
-      button: (
-        <Button
-          key="forwardToColleague"
-          appearance="secondary"
-          onClick={
-            onForwardToColleauge
-              ? () => {
-                onForwardToColleauge(chat);
-                setSelectedMessages([]);
-              }
-              : undefined
-          }
-        >
-          {t('chat.active.forwardToColleague')}
-        </Button>
-      ),
-    },
-    {
-      id: 'forwardToOrganization',
-      button: (
-        <Button
-          key="forwardToOrganization"
-          appearance="secondary"
-          onClick={
-            onForwardToEstablishment
-              ? () => onForwardToEstablishment(chat)
-              : undefined
-          }
-        >
-          {t('chat.active.forwardToOrganization')}
-        </Button>
-      ),
-    },
-    {
-      id: 'sendToEmail',
-      button: (
-        <Button
-          key="sendToEmail"
-          appearance="secondary"
-          onClick={onSendToEmail ? () => onSendToEmail(chat) : undefined}
-        >
-          {t('chat.active.sendToEmail')}
-        </Button>
-      ),
-    },
-  ];
-  const [sideButtons, setSideButtons] = useState([]);
-  const [buttonsToAllow] = useState<any[]>([]);
-
-  useEffect(() => {
-    if (sideButtons.length > 0) return;
-    let buttons: any = [];
-    // userInfo?.authorities.forEach((authority) => {
-    //     // make role more uri friendly
-    //     let role = authority.substring(5).replaceAll('_', '-').toLowerCase();
-    //     // TODO: Replace '/active/admin.json' with '/<type>/<role>.json'.
-    //     axios({ url: `http://localhost:8085/cdn/buttons/chats/active/${role}.json` })
-    //         .then(res => {
-    //             res.data.buttons.forEach((btnId: any) => {
-    //                 if (!buttonsToAllow.includes(btnId))
-    //                     buttonsToAllow.push(btnId);
-    //             });
-    //         });
-    // });
-    // allSideButtons.forEach((button) => {
-    //     if (buttonsToAllow.includes(button.id))
-    //         buttons.push(button.button);
-    // });
-    // setSideButtons(buttons);
-  }, [buttonsToAllow, sideButtons]);
 
   useEffect(() => {
     if (!messagesList) return;

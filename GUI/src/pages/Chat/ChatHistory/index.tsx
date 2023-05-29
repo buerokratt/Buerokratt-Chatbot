@@ -156,7 +156,8 @@ const ChatHistory: FC = () => {
   });
 
   const chatCommentChangeMutation = useMutation({
-    mutationFn: (data: { chatId: string | number, comment: string }) => api.post('cs-comment-history', data),
+    mutationFn: (data: { chatId: string | number, comment: string }) =>
+      api.post('/comments/comment-history', data),
     onSuccess: () => {
       toast.open({
         type: 'success',

@@ -1,7 +1,7 @@
 extractRequestData:
   assign:
     cookie: ${incoming.headers.cookie}
-    chatId: ${incoming.body.chatId}
+    chatId: ${incoming.params.chatId}
 
 extractTokenData:
   call: http.post
