@@ -28,6 +28,7 @@
     "name": "Nimi",
     "idCode": "Isikukood",
     "status": "Staatus",
+    "statusChangeQuestion": "Kas soovid muuta staatuseks \"kohal\"?",
     "yes": "Jah",
     "no": "Ei",
     "removeValidation": "Oled sa kindel?",
