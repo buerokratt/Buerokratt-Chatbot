@@ -60,6 +60,7 @@ const HistoricalChat: FC<ChatProps> = ({ chat, onChatStatusChange, onCommentChan
     let groupedMessages: GroupedMessage[] = [];
     messagesList.forEach((message) => {
       const lastGroup = groupedMessages[groupedMessages.length - 1];
+
       if (lastGroup?.type === message.authorRole) {
         if (!message.event || message.event.toLowerCase() === 'greeting') {
           lastGroup.messages.push(message);
@@ -82,6 +83,9 @@ const HistoricalChat: FC<ChatProps> = ({ chat, onChatStatusChange, onCommentChan
         });
       }
     });
+
+    console.log(groupedMessages)
+
     setMessageGroups(groupedMessages);
   }, [messagesList, endUserFullName]);
 
@@ -90,6 +94,10 @@ const HistoricalChat: FC<ChatProps> = ({ chat, onChatStatusChange, onCommentChan
     chatRef.current.scrollIntoView({ block: 'end', inline: 'end' });
   }, [messageGroups]);
 
+  const isEvent = (group: GroupedMessage) => {
+    return group.type === 'event' || group.name.trim() === '' || (!group.messages[0].content && group.messages[0].event);
+  }
+
   return (
     <div className='historical-chat'>
       <div className='historical-chat__body'>
@@ -97,25 +105,25 @@ const HistoricalChat: FC<ChatProps> = ({ chat, onChatStatusChange, onCommentChan
           {messageGroups && messageGroups.map((group, index) => (
             <div className={clsx(['historical-chat__group', `historical-chat__group--${group.type}`])}
               key={`group-${index}`}>
-              {group.type === 'event' ? (
-                <ChatEvent message={group.messages[0]} />
-              ) : (
-                <>
-                  <div className='historical-chat__group-initials'>
-                    {group.type === 'buerokratt' || group.type === 'chatbot' ? (
-                      <BykLogoWhite height={24} />
-                    ) : (
-                      <>{group.name.split(' ').map((n) => n[0]).join('').toUpperCase()}</>
-                    )}
-                  </div>
-                  <div className='historical-chat__group-name'>{group.name}</div>
-                  <div className='historical-chat__messages'>
-                    {group.messages.map((message, i) => (
-                      <ChatMessage message={message} key={`message-${i}`} />
-                    ))}
-                  </div>
-                </>
-              )}
+              {isEvent(group)
+                ? <ChatEvent message={group.messages[0]} />
+                : (
+                  <>
+                    <div className='historical-chat__group-initials'>
+                      {group.type === 'buerokratt' || group.type === 'chatbot' ? (
+                        <BykLogoWhite height={24} />
+                      ) : (
+                        <>{group.name.split(' ').map((n) => n[0]).join('').toUpperCase()}</>
+                      )}
+                    </div>
+                    <div className='historical-chat__group-name'>{group.name}</div>
+                    <div className='historical-chat__messages'>
+                      {group.messages.map((message, i) => (
+                        <ChatMessage message={message} key={`message-${i}`} />
+                      ))}
+                    </div>
+                  </>
+                )}
             </div>
           ))}
           <div id='anchor' ref={chatRef}></div>
