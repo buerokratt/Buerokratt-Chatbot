@@ -50,6 +50,11 @@ const ChatEvent: FC<ChatEventProps> = ({message}) => {
                 date: format(new Date(authorTimestamp), 'dd.MM.yyyy HH:ii:ss'),
             })
             break;
+        case CHAT_EVENTS.CHAT_SENT_TO_CSA_EMAIL:
+            EVENT_PARAMS = t('chat.events.sent_to_csa_email', {
+                date: format(new Date(authorTimestamp), 'dd.MM.yyyy HH:ii:ss'),
+            })
+            break;
         case CHAT_EVENTS.CLIENT_LEFT:
             EVENT_PARAMS = t('chat.events.client-left', {
                 date: format(new Date(authorTimestamp), 'dd.MM.yyyy HH:ii:ss'),

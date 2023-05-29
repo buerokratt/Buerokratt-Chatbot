@@ -147,6 +147,7 @@
     "events": {
       "answered": "Vastatud {{date}}",
       "terminated": "Lõpetatud {{date}}",
+      "sent_to_csa_email": "Vestlus saadetud klienditeenindaja e-mailile {{date}}",
       "client-left": "Klient lahkus {{date}}",
       "client_left_with_accepted": "Klient lahkus aktsepteeritud vastusega {{date}}",
       "client_left_with_no_resolution": "Klient lahkus vastuseta {{date}}",
