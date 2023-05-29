@@ -196,9 +196,9 @@ const getMessages = async () => {
 
   const customerSupportActivityMutation = useMutation({
     mutationFn: (data: CustomerSupportActivityDTO) => apiDev.post('cs-set-customer-support-activity', {
-      "customerSupportId": data.customerSupportId,
-      "customerSupportActive": data.customerSupportActive,
-      "customerSupportStatus": data.customerSupportStatus
+      customerSupportId: data.customerSupportId,
+      customerSupportActive: data.customerSupportActive,
+      customerSupportStatus: data.customerSupportStatus
     }),
     onSuccess: () => {
       if (csaStatus === 'online') extendUserSessionMutation.mutate()
@@ -309,17 +309,9 @@ const getMessages = async () => {
                     textTransform: 'lowercase',
                   }}
                 >
-                  {unansweredChats && (
-                    <>
-                      <strong>{unansweredChats}</strong> {t('chat.unanswered')}
-                    </>
-                  )}
-                  {forwardedChats && (
-                    <>
-                      {' '}
-                      <strong>{forwardedChats}</strong> {t('chat.forwarded')}
-                    </>
-                  )}
+                  <strong>{unansweredChats}</strong> {t('chat.unanswered')}
+                  {' '}
+                  <strong>{forwardedChats}</strong> {t('chat.forwarded')}
                 </p>
                 <Switch
                   onCheckedChange={handleCsaStatusChange}
