@@ -224,7 +224,7 @@ const ChatHistory: FC = () => {
     columnHelper.accessor('comment', {
       id: "comment",
       header: t('chat.history.comment') || '',
-      cell: (props) => (
+      cell: (props) => !props.getValue() ? <></> : (
         <Tooltip content={props.getValue()}>
           <span>{props.getValue() === undefined ? '' : props.getValue()?.slice(0, 30) + '...'}</span>
         </Tooltip>

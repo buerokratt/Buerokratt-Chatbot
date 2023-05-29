@@ -28,6 +28,6 @@ SELECT c.base_id AS id,
 FROM (SELECT * FROM chat WHERE id IN (SELECT MAX(id) FROM chat GROUP BY base_id) AND ended IS NOT null) AS c
   JOIN (SELECT * FROM message WHERE id IN (SELECT MAX(id) FROM message GROUP BY chat_base_id)) AS m
   ON c.base_id = m.chat_base_id
-  JOIN (SELECT chat_id, comment FROM chat_history_comments) AS s
+  LEFT JOIN (SELECT chat_id, comment FROM chat_history_comments) AS s
   ON s.chat_id =  m.chat_base_id
 ORDER BY created;
