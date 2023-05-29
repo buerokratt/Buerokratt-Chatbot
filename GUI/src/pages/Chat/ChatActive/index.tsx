@@ -66,7 +66,7 @@ const ChatActive: FC = () => {
   });
 
   const sendToEmailMutation = useMutation({
-    mutationFn: (data: ChatType) => api.post('cs-send-chat-to-email', data),
+    mutationFn: (data: ChatType) => apiDev.post('cs-send-chat-to-email', data),
     onSuccess: () => {
       toast.open({
         type: 'success',
@@ -123,14 +123,30 @@ const ChatActive: FC = () => {
     return grouped;
   }, [activeChatsList]);
 
-  const handleCsaForward = (chat: ChatType, user: User) => {
-    // TODO: Add endpoint for chat forwarding
-    setForwardToColleaugeModal(null);
-    toast.open({
-      type: 'success',
-      title: t('global.notification'),
-      message: `Chat forwarded to ${user.displayName}`,
-    });
+  const handleCsaForward = async (chat: ChatType, user: User) => {
+    try {
+      await apiDev.post('cs-redirect-chat', {
+        id: chat.id ?? '',
+        customerSupportId: user?.idCode ?? '',
+        customerSupportDisplayName: user?.displayName ?? '',
+        csaTitle: user?.csaTitle ?? '',
+        forwardedByUser: userInfo?.idCode ?? '',
+        forwardedFromCsa: userInfo?.idCode ?? '',
+        forwardedToCsa: user?.idCode ?? '',
+      }),
+        setForwardToColleaugeModal(null);
+      toast.open({
+        type: 'success',
+        title: t('global.notification'),
+        message: `Chat forwarded to ${user.displayName}`,
+      });
+    } catch (error) {
+      toast.open({
+        type: 'warning',
+        title: t('global.notificationError'),
+        message: `Chat ended`,
+      });
+    }
   };
 
   const handleEstablishmentForward = (

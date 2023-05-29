@@ -114,7 +114,8 @@
                         "validate_against": {
                           "authorities": [
                             "ROLE_ADMINISTRATOR",
-                            "ROLE_CUSTOMER_SUPPORT_AGENT"
+                            "ROLE_CUSTOMER_SUPPORT_AGENT",
+                            "ROLE_SERVICE_MANAGER"
                           ]
                         },
                         "validation_type": "MUST_MATCH_ANY"
@@ -129,7 +130,7 @@
                   "endpoint": "{resql_url}/get-user-by-status-array",
                   "post_body_struct": {
                     "userIdCode": "{#.reflect_input#.customerSupportId}",
-                    "statuses": "{idle,online}"
+                    "statuses": "{idle,online,offline}"
                   }
                 }
               },

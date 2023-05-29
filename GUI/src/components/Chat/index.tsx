@@ -157,7 +157,7 @@ const Chat: FC<ChatProps> = ({
 
   const takeOverChatMutation = useMutation({
     mutationFn: () =>
-      apiDev.post('cs-redirect-chat', {
+      apiDev.post('cs-claim-chat', {
         id: chat.id ?? '',
         customerSupportId: userInfo?.idCode ?? '',
         customerSupportDisplayName: userInfo?.displayName ?? '',
@@ -600,92 +600,74 @@ const Chat: FC<ChatProps> = ({
         )}
       </div>
       <div className="active-chat__side">
-        {chat.customerSupportId == userInfo?.idCode && (
-          <div className="active-chat__side-actions">
-            <Button
-              appearance="success"
-              onClick={onChatEnd ? () => onChatEnd(chat) : undefined}
-            >
-              {t('chat.active.endChat')}
-            </Button>
-            <Button
-              appearance="secondary"
-              onClick={() =>
-                handleChatEvent(CHAT_EVENTS.REQUESTED_AUTHENTICATION)
-              }
-            >
-              {t('chat.active.askAuthentication')}
-            </Button>
-            <Button
-              appearance="secondary"
-              onClick={() => handleChatEvent(CHAT_EVENTS.CONTACT_INFORMATION)}
-            >
-              {t('chat.active.askForContact')}
-            </Button>
-            <Button
-              appearance="secondary"
-              onClick={() => handleChatEvent(CHAT_EVENTS.ASK_PERMISSION)}
-            >
-              {t('chat.active.askPermission')}
-            </Button>
-            <Button
-              appearance="secondary"
-              onClick={
-                onForwardToColleauge
-                  ? () => {
-                      onForwardToColleauge(chat);
-                      setSelectedMessages([]);
-                    }
-                  : undefined
-              }
-            >
-              {t('chat.active.forwardToColleague')}
-            </Button>
-            <Button
-              appearance="secondary"
-              onClick={
-                onForwardToEstablishment
-                  ? () => onForwardToEstablishment(chat)
-                  : undefined
-              }
-            >
-              {t('chat.active.forwardToOrganization')}
-            </Button>
-            <Button
-              appearance="secondary"
-              onClick={onSendToEmail ? () => onSendToEmail(chat) : undefined}
-            >
-              {t('chat.active.sendToEmail')}
-            </Button>
-            <Button
-              appearance="secondary"
-              onClick={
-                onStartAService ? () => onStartAService(chat) : undefined
-              }
-            >
-              {t('chat.active.startService')}
-            </Button>
-          </div>
-        )}
-
-        {chat.customerSupportId != userInfo?.idCode && (
-          <div className="active-chat__side-actions">
-            <Button
-              appearance="secondary"
-              style={{ marginTop: '35px' }}
-              onClick={
-                onForwardToColleauge
-                  ? () => {
-                      onForwardToColleauge(chat);
-                      setSelectedMessages([]);
-                    }
-                  : undefined
-              }
-            >
-              {t('chat.active.forwardToColleague')}
-            </Button>
-          </div>
-        )}
+        <div className="active-chat__side-actions">
+          <Button
+            appearance="success"
+            onClick={onChatEnd ? () => onChatEnd(chat) : undefined}
+          >
+            {t('chat.active.endChat')}
+          </Button>
+          <Button
+            appearance="secondary"
+            disabled={chat.customerSupportId != userInfo?.idCode}
+            onClick={() =>
+              handleChatEvent(CHAT_EVENTS.REQUESTED_AUTHENTICATION)
+            }
+          >
+            {t('chat.active.askAuthentication')}
+          </Button>
+          <Button
+            appearance="secondary"
+            disabled={chat.customerSupportId != userInfo?.idCode}
+            onClick={() => handleChatEvent(CHAT_EVENTS.CONTACT_INFORMATION)}
+          >
+            {t('chat.active.askForContact')}
+          </Button>
+          <Button
+            appearance="secondary"
+            disabled={chat.customerSupportId != userInfo?.idCode}
+            onClick={() => handleChatEvent(CHAT_EVENTS.ASK_PERMISSION)}
+          >
+            {t('chat.active.askPermission')}
+          </Button>
+          <Button
+            appearance="secondary"
+            onClick={
+              onForwardToColleauge
+                ? () => {
+                    onForwardToColleauge(chat);
+                    setSelectedMessages([]);
+                  }
+                : undefined
+            }
+          >
+            {t('chat.active.forwardToColleague')}
+          </Button>
+          <Button
+            appearance="secondary"
+            onClick={
+              onForwardToEstablishment
+                ? () => onForwardToEstablishment(chat)
+                : undefined
+            }
+          >
+            {t('chat.active.forwardToOrganization')}
+          </Button>
+          <Button
+            appearance="secondary"
+            disabled={chat.customerSupportId != userInfo?.idCode}
+            onClick={onSendToEmail ? () => onSendToEmail(chat) : undefined}
+          >
+            {t('chat.active.sendToEmail')}
+          </Button>
+          <Button
+            appearance="secondary"
+            disabled={chat.customerSupportId != userInfo?.idCode}
+            onClick={onStartAService ? () => onStartAService(chat) : undefined}
+          >
+            {t('chat.active.startService')}
+          </Button>
+        </div>
 
         <div className="active-chat__side-meta">
           <div>

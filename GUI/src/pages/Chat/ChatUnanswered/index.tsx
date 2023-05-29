@@ -65,14 +65,30 @@ const ChatUnanswered: FC = () => {
     [activeChatsList]
   );
 
-  const handleCsaForward = (chat: ChatType, user: User) => {
-    // TODO: Add endpoint for chat forwarding
-    setForwardToColleaugeModal(null);
-    toast.open({
-      type: 'success',
-      title: t('global.notification'),
-      message: `Chat forwarded to ${user.displayName}`,
-    });
+  const handleCsaForward = async (chat: ChatType, user: User) => {
+    try {
+      await apiDev.post('cs-redirect-chat', {
+        id: chat.id ?? '',
+        customerSupportId: user?.idCode ?? '',
+        customerSupportDisplayName: user?.displayName ?? '',
+        csaTitle: user?.csaTitle ?? '',
+        forwardedByUser: user?.idCode ?? '',
+        forwardedFromCsa: user?.idCode ?? '',
+        forwardedToCsa: user?.idCode ?? '',
+      }),
+        setForwardToColleaugeModal(null);
+      toast.open({
+        type: 'success',
+        title: t('global.notification'),
+        message: `Chat forwarded to ${user.displayName}`,
+      });
+    } catch (error) {
+      toast.open({
+        type: 'warning',
+        title: t('global.notificationError'),
+        message: `Chat ended`,
+      });
+    }
   };
 
   const handleEstablishmentForward = (
