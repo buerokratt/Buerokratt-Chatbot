@@ -2,7 +2,7 @@ getWidgetConfig:
   call: http.post
   args:
     # TODO: replace with env variable
-    url: https://byk-resql:8443/get-widget-config
+    url: http://resql:8082/get-widget-config
   result: getWidgetConfigResult
 
 validateWidgetConfigExists:
@@ -15,7 +15,7 @@ mapWidgetConfigData:
   call: http.post
   args:
     # TODO: replace with env variable
-    url: https://byk-dmapper:8443/json/v2/return_widget_config
+    url: http://dmapper:3000/json/v2/return_widget_config
     body:
       configurationArray: ${getWidgetConfigResult.response.body}
   result: widgetConfigData
