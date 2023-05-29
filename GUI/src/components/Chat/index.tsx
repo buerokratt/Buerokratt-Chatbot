@@ -605,26 +605,27 @@ const Chat: FC<ChatProps> = ({
           </div>
         )}
 
-        {chat.customerSupportId != userInfo?.idCode && (
-          <div className="active-chat__toolbar">
-            <Track justify="center">
-              <div className="active-chat__toolbar-actions">
-                <Button
-                  appearance="primary"
-                  style={{
-                    backgroundColor: '#25599E',
-                    color: '#FFFFFF',
-                    borderRadius: '50px',
-                    paddingLeft: '40px',
-                    paddingRight: '40px',
-                  }}
-                  onClick={() => takeOverChatMutation.mutate()}
-                >
-                  {t('chat.active.takeOver')}
-                </Button>
-              </div>
-            </Track>
-          </div>
+        {(chat.customerSupportId === '' ||
+            (chat.customerSupportId !== userInfo?.idCode && !chatCsaActive)) && (
+            <div className="active-chat__toolbar">
+                <Track justify="center">
+                    <div className="active-chat__toolbar-actions">
+                    <Button
+                        appearance="primary"
+                        style={{
+                            backgroundColor: '#25599E',
+                            color: '#FFFFFF',
+                            borderRadius: '50px',
+                            paddingLeft: '40px',
+                            paddingRight: '40px',
+                        }}
+                        onClick={() => takeOverChatMutation.mutate()}
+                    >
+                    {t('chat.active.takeOver')}
+                    </Button>
+                    </div>
+                </Track>
+            </div>
         )}
       </div>
       <div className="active-chat__side">
