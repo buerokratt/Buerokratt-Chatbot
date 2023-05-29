@@ -91,7 +91,10 @@ const Chat: FC<ChatProps> = ({
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
-    getMessages();
+    const interval = setInterval(() => {
+      getMessages();
+    }, 3500);
+    return () => clearInterval(interval);
   }, []);
 
   const getMessages = async () => {
