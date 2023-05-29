@@ -142,7 +142,6 @@ const Chat: FC<ChatProps> = ({
     }
     messagesLength = res.data.cs_get_messages_by_chat_id.length;
     setMessagesList(res.data.cs_get_messages_by_chat_id);
-    console.log(chat, res.data.cs_get_messages_by_chat_id);
   };
 
   const sendAttachmentMutation = useSendAttachment();
