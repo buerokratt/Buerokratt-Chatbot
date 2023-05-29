@@ -13,7 +13,7 @@ import { ROLES } from 'utils/constants';
 type UserModalProps = {
   onClose: () => void;
   user?: User;
-}
+};
 
 const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
   const { t } = useTranslation();
@@ -35,18 +35,33 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
     },
   });
 
-  const roles = useMemo(() => [
-    { label: t('roles.ROLE_ADMINISTRATOR'), value: ROLES.ROLE_ADMINISTRATOR },
-    { label: t('roles.ROLE_SERVICE_MANAGER'), value: ROLES.ROLE_SERVICE_MANAGER },
-    { label: t('roles.ROLE_CUSTOMER_SUPPORT_AGENT'), value: ROLES.ROLE_CUSTOMER_SUPPORT_AGENT },
-    { label: t('roles.ROLE_CHATBOT_TRAINER'), value: ROLES.ROLE_CHATBOT_TRAINER },
-    { label: t('roles.ROLE_ANALYST'), value: ROLES.ROLE_ANALYST },
-  ], []);
+  const roles = useMemo(
+    () => [
+      { label: t('roles.ROLE_ADMINISTRATOR'), value: ROLES.ROLE_ADMINISTRATOR },
+      {
+        label: t('roles.ROLE_SERVICE_MANAGER'),
+        value: ROLES.ROLE_SERVICE_MANAGER,
+      },
+      {
+        label: t('roles.ROLE_CUSTOMER_SUPPORT_AGENT'),
+        value: ROLES.ROLE_CUSTOMER_SUPPORT_AGENT,
+      },
+      {
+        label: t('roles.ROLE_CHATBOT_TRAINER'),
+        value: ROLES.ROLE_CHATBOT_TRAINER,
+      },
+      { label: t('roles.ROLE_ANALYST'), value: ROLES.ROLE_ANALYST },
+    ],
+    []
+  );
 
   const userCreateMutation = useMutation({
     mutationFn: (data: UserDTO) => createUser(data),
     onSuccess: async () => {
-      await queryClient.invalidateQueries(['cs-get-customer-support-agents', 'prod']);
+      await queryClient.invalidateQueries([
+        'cs-get-customer-support-agents',
+        'prod',
+      ]);
       toast.open({
         type: 'success',
         title: t('global.notification'),
@@ -64,9 +79,18 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
   });
 
   const userEditMutation = useMutation({
-    mutationFn: ({ id, userData }: { id: string | number, userData: UserDTO }) => editUser(id, userData),
+    mutationFn: ({
+      id,
+      userData,
+    }: {
+      id: string | number;
+      userData: UserDTO;
+    }) => editUser(id, userData),
     onSuccess: async () => {
-      await queryClient.invalidateQueries(['cs-get-customer-support-agents', 'prod']);
+      await queryClient.invalidateQueries([
+        'cs-get-customer-support-agents',
+        'prod',
+      ]);
       toast.open({
         type: 'success',
         title: t('global.notification'),
@@ -91,63 +115,90 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
     }
   });
 
+  const requiredText = t('settings.users.required') ?? '*';
+
   return (
     <Dialog
       title={user ? t('settings.users.editUser') : t('settings.users.addUser')}
       onClose={onClose}
       footer={
         <>
-          <Button appearance='secondary' onClick={onClose}>{t('global.cancel')}</Button>
+          <Button appearance="secondary" onClick={onClose}>
+            {t('global.cancel')}
+          </Button>
           <Button onClick={handleUserSubmit}>
             {user ? t('settings.users.editUser') : t('settings.users.addUser')}
           </Button>
         </>
       }
     >
-      <Track direction='vertical' gap={16} align='right'>
+      <Track direction="vertical" gap={16} align="right">
         <FormInput
-          {...register('login', { required: t('settings.users.required'), })}
+          {...register('login', { required: requiredText })}
           label={t('settings.users.fullName')}
         />
-        {errors.login && <span style={{ color: '#f00', marginTop: '-1.2rem' }}>{errors.login.message}</span>}
-        {!user && <FormInput
-          {...register('idCode', { required: t('settings.users.required'), })}
-          label={t('settings.users.idCode')}
-        />}
-        {!user && errors.idCode && <span style={{ color: '#f00', marginTop: '-1.2rem' }}>{errors.idCode.message}</span>}
+        {errors.login && (
+          <span style={{ color: '#f00', marginTop: '-1.2rem' }}>
+            {errors.login.message}
+          </span>
+        )}
+        {!user && (
+          <FormInput
+            {...register('idCode', { required: requiredText })}
+            label={t('settings.users.idCode')}
+          />
+        )}
+        {!user && errors.idCode && (
+          <span style={{ color: '#f00', marginTop: '-1.2rem' }}>
+            {errors.idCode.message}
+          </span>
+        )}
         <Controller
-          name='authorities'
+          name="authorities"
           control={control}
-          required
-          render={({ field }) =>
+          rules={{ required: true }}
+          render={({ field }) => (
             <FormSelect
               label={t('settings.users.userRoles')}
               onSelectionChange={field.onChange}
               options={roles}
               {...field}
             />
-          }
+          )}
         />
-        {errors.authorities && <span style={{ color: '#f00', marginTop: '-1.2rem' }}>{errors.authorities.message}</span>}
-        <FormInput {...register('displayName')} label={t('settings.users.displayName')} />
-        <FormInput {...register('csaTitle')} label={t('settings.users.userTitle')} />
+        {errors.authorities && (
+          <span style={{ color: '#f00', marginTop: '-1.2rem' }}>
+            {errors.authorities.message}
+          </span>
+        )}
+        <FormInput
+          {...register('displayName')}
+          label={t('settings.users.displayName')}
+        />
+        <FormInput
+          {...register('csaTitle')}
+          label={t('settings.users.userTitle')}
+        />
 
         <FormInput
           {...register('csaEmail', {
-            required: t('settings.users.required'),
+            required: requiredText,
             pattern: {
               value: /\S+@\S+\.\S+/,
-              message: t('settings.users.invalidemail')
-            }
+              message: t('settings.users.invalidemail'),
+            },
           })}
           label={t('settings.users.email')}
-          type='email'
+          type="email"
         />
-        {errors.csaEmail && <span style={{ color: '#f00', marginTop: '-1.2rem' }}>{errors.csaEmail.message}</span>}
+        {errors.csaEmail && (
+          <span style={{ color: '#f00', marginTop: '-1.2rem' }}>
+            {errors.csaEmail.message}
+          </span>
+        )}
       </Track>
     </Dialog>
   );
-
 };
 
 export default UserModal;

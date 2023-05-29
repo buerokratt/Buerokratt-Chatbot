@@ -7,6 +7,7 @@ export enum CHAT_STATUS {
 export enum CHAT_EVENTS {
   ANSWERED = 'answered',
   TERMINATED = 'terminated',
+  CHAT_SENT_TO_CSA_EMAIL = 'chat_sent_to_csa_email',
   CLIENT_LEFT = 'client-left',
   CLIENT_LEFT_WITH_ACCEPTED = 'client_left_with_accepted',
   CLIENT_LEFT_WITH_NO_RESOLUTION = 'client_left_with_no_resolution',
@@ -31,6 +32,7 @@ export enum CHAT_EVENTS {
   REQUESTED_CHAT_FORWARD = 'requested-chat-forward',
   REQUESTED_CHAT_FORWARD_ACCEPTED = 'requested-chat-forward-accepted',
   REQUESTED_CHAT_FORWARD_REJECTED = 'requested-chat-forward-rejected',
+  READ = 'message-read',
 }
 
 export interface Chat {
@@ -53,8 +55,8 @@ export interface Chat {
   lastMessageEvent?: CHAT_EVENTS | null;
   forwardedToName?: string;
   forwardedByUser?: string;
-  forwardedFromCsa?: string,
-  forwardedToCsa?: string,
+  forwardedFromCsa?: string;
+  forwardedToCsa?: string;
   receivedFrom?: string;
   comment?: string;
   labels: string;
