@@ -159,6 +159,13 @@
           background-color: get-color(sapphire-blue-10);
           color: get-color(white);
 
+          :any-link {
+              background: url("../../static/icons/link-external-blue.svg") no-repeat right center;
+              padding-right: 1.25em;
+              color: blue;
+              text-decoration: underline;
+          }
+
           &:hover {
             background-color: get-color(sapphire-blue-13);
           }
@@ -176,6 +183,13 @@
         &__message-text {
           background-color: get-color(black-coral-10);
           color: get-color(white);
+          
+          :any-link {
+              background: url("../../static/icons/link-external-white.svg") no-repeat right center;
+              padding-right: 1.25em;
+              color: white;
+              text-decoration: underline;
+          }
 
           &:hover {
             background-color: #535665;
@@ -270,6 +284,13 @@
 
     &:hover {
       background-color: get-color(black-coral-1);
+    }
+
+    :any-link {
+      background: url("../../static/icons/link-external-blue.svg") no-repeat right center;
+      padding-right: 1.25em;
+      color: blue;
+      text-decoration: underline;
     }
   }
 

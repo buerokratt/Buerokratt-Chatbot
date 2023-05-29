@@ -1,0 +1,31 @@
+assignIncoming:
+  assign:
+    chatId: "${incoming.body.chatId}"
+    id: "${incoming.body.endUserId}"
+    firstName: "${incoming.body.endUserFirstName}"
+    lastName: "${incoming.body.endUserLastName}"
+
+checkChatId:
+  switch:
+    - condition: ${!!chatId && chatId !== "" && chatId !== null}
+      next: insertIdAndName
+  next: returnNoChatId
+
+insertIdAndName:
+  call: http.post
+  args:
+    url: http://resql:8082/update-chat-with-end-user-id-and-name
+    body:
+      chatId: ${chatId}
+      endUserId: "${id ? id : ''}"
+      endUserFirstName: "${firstName ? firstName : ''}"
+      endUserLastName: "${lastName ? lastName : ''}"
+  result: insertIdAndNameResult
+
+returnSuccess:
+  return: Updated ${chatId} with ${id} and ${firstName} ${lastName}.
+  next: end
+
+returnNoChatId:
+  return: Missing chatId in request body.
+  next: end

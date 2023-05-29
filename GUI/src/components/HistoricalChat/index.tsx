@@ -1,7 +1,7 @@
 import { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
-import { MdOutlineModeEditOutline, MdOutlineSave } from 'react-icons/all';
+import { MdOutlineModeEditOutline, MdOutlineSave } from 'react-icons/md';
 
 import { Button, FormSelect, FormTextarea, Icon, Track } from 'components';
 import { ReactComponent as BykLogoWhite } from 'assets/logo-white.svg';

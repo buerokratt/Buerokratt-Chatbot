@@ -12,3 +12,8 @@ export enum ROLES {
 export enum RUUTER_ENDPOINTS {
   SEND_ATTACHMENT= '/attachments/add'
 }
+
+export enum AUTHOR_ROLES {
+  END_USER = 'end-user',
+  BACKOFFICE_USER = 'backoffice-user',
+}

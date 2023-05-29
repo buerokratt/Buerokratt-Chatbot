@@ -9,19 +9,19 @@ import {chatMessagesPreviewNew1Sse,chatMessagesPreviewNew2Sse,chatMessagesPrevie
 const handleSse = () => {
     new MockEvent({
         // TODO: set correct url
-        url: 'http://localhost:3000/cs-get-new-messages',
+        url: 'http://localhost:8080/cs-get-new-messages',
         setInterval: [3_000, 2_000, 3_000, 4_000],
         responses: [
             {type: MessageSseEvent.READ, data: chatMessagesSeenSse},
             // {type: MessageSseEvent.DELIVERED, data: chatMessagesSeen},
-            {type: MessageSseEvent.PREVIEW, data: chatMessagesPreviewNew1Sse },
-            {type: MessageSseEvent.PREVIEW, data: chatMessagesPreviewNew2Sse },
-            {type: MessageSseEvent.PREVIEW, data: chatMessagesPreviewNew3Sse },
+            // {type: MessageSseEvent.PREVIEW, data: chatMessagesPreviewNew1Sse },
+            // {type: MessageSseEvent.PREVIEW, data: chatMessagesPreviewNew2Sse },
+            // {type: MessageSseEvent.PREVIEW, data: chatMessagesPreviewNew3Sse },
         ]
     });
 
     // TODO: set correct url
-    return new EventSource('http://localhost:3000/cs-get-new-messages',{
+    return new EventSource('http://localhost:8080/cs-get-new-messages',{
         withCredentials: true
     });
 

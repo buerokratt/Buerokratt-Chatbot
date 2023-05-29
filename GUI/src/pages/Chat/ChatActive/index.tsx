@@ -4,7 +4,12 @@ import * as Tabs from '@radix-ui/react-tabs';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { Chat, Dialog, Button, FormRadios } from 'components';
-import { Chat as ChatType,CHAT_EVENTS, CHAT_STATUS, GroupedChat } from 'types/chat';
+import {
+  Chat as ChatType,
+  CHAT_EVENTS,
+  CHAT_STATUS,
+  GroupedChat,
+} from 'types/chat';
 import useUserInfoStore from 'store/store';
 import { User } from 'types/user';
 import { useToast } from 'hooks/useToast';
@@ -30,25 +35,33 @@ const ChatActive: FC = () => {
   const toast = useToast();
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
   const [endChatModal, setEndChatModal] = useState<ChatType | null>(null);
-  const [forwardToColleaugeModal, setForwardToColleaugeModal] = useState<ChatType | null>(null);
-  const [forwardToEstablishmentModal, setForwardToEstablishmentModal] = useState<ChatType | null>(null);
-  const [sendToEmailModal, setSendToEmailModal] = useState<ChatType | null>(null);
-  const [startAServiceModal, setStartAServiceModal] = useState<ChatType | null>(null);
+  const [forwardToColleaugeModal, setForwardToColleaugeModal] =
+    useState<ChatType | null>(null);
+  const [forwardToEstablishmentModal, setForwardToEstablishmentModal] =
+    useState<ChatType | null>(null);
+  const [sendToEmailModal, setSendToEmailModal] = useState<ChatType | null>(
+    null
+  );
+  const [startAServiceModal, setStartAServiceModal] = useState<ChatType | null>(
+    null
+  );
   const [activeChatsList, setActiveChatsList] = useState<ChatType[]>([]);
-  const [selectedEndChatStatus, setSelectedEndChatStatus] = useState<string | null>(null);
+  const [selectedEndChatStatus, setSelectedEndChatStatus] = useState<
+    string | null
+  >(null);
 
-  useQuery<ChatType[]>({
+  const { refetch } = useQuery<ChatType[]>({
     queryKey: ['cs-get-all-active-chats', 'prod'],
     onSuccess(res: any) {
       setActiveChatsList(res.data.get_all_active_chats);
     },
   });
 
-  const { data: csaNameVisiblity } = useQuery<{isVisible: boolean}>({
+  const { data: csaNameVisiblity } = useQuery<{ isVisible: boolean }>({
     queryKey: ['cs-get-csa-name-visibility', 'prod-2'],
   });
 
-  const { data: csaTitleVisibility } = useQuery<{isVisible: boolean}>({
+  const { data: csaTitleVisibility } = useQuery<{ isVisible: boolean }>({
     queryKey: ['cs-get-csa-title-visibility', 'prod-2'],
   });
 
@@ -72,7 +85,11 @@ const ChatActive: FC = () => {
     onSettled: () => setSendToEmailModal(null),
   });
 
-  const selectedChat = useMemo(() => activeChatsList && activeChatsList.find((c) => c.id === selectedChatId), [activeChatsList, selectedChatId]);
+  const selectedChat = useMemo(
+    () =>
+      activeChatsList && activeChatsList.find((c) => c.id === selectedChatId),
+    [activeChatsList, selectedChatId]
+  );
 
   const activeChats: GroupedChat = useMemo(() => {
     const grouped: GroupedChat = {
@@ -82,42 +99,62 @@ const ChatActive: FC = () => {
 
     if (!activeChatsList) return grouped;
 
-    activeChatsList
-      .forEach((c) => {
-        if (c.customerSupportId === userInfo?.idCode) {
-          grouped.myChats.push(c);
-          return;
-        }
+    activeChatsList.forEach((c) => {
+      if (c.customerSupportId === userInfo?.idCode) {
+        grouped.myChats.push(c);
+        return;
+      }
 
-        const groupIndex = grouped.otherChats.findIndex(x => x.groupId === c.customerSupportId);
-        if (groupIndex === -1) {
-          grouped.otherChats.push({
-            groupId: c.customerSupportId ?? "",
-            name: c.customerSupportDisplayName ?? "",
-            chats: [c],
-          });
-        }
-        else {
-          grouped.otherChats[groupIndex].chats.push(c)
-        }
-      });
+      const groupIndex = grouped.otherChats.findIndex(
+        (x) => x.groupId === c.customerSupportId
+      );
+      if (groupIndex === -1) {
+        grouped.otherChats.push({
+          groupId: c.customerSupportId ?? '',
+          name: c.customerSupportDisplayName ?? '',
+          chats: [c],
+        });
+      } else {
+        grouped.otherChats[groupIndex].chats.push(c);
+      }
+    });
 
     grouped.otherChats.sort((a, b) => a.name.localeCompare(b.name));
 
     return grouped;
   }, [activeChatsList]);
 
-  const handleCsaForward = (chat: ChatType, user: User) => {
-    // TODO: Add endpoint for chat forwarding
-    setForwardToColleaugeModal(null);
-    toast.open({
-      type: 'success',
-      title: t('global.notification'),
-      message: `Chat forwarded to ${user.displayName}`,
-    });
+  const handleCsaForward = async (chat: ChatType, user: User) => {
+    try {
+      await apiDev.post('cs-redirect-chat', {
+        id: chat.id ?? '',
+        customerSupportId: user?.idCode ?? '',
+        customerSupportDisplayName: user?.displayName ?? '',
+        csaTitle: user?.csaTitle ?? '',
+        forwardedByUser: userInfo?.idCode ?? '',
+        forwardedFromCsa: userInfo?.idCode ?? '',
+        forwardedToCsa: user?.idCode ?? '',
+      }),
+        setForwardToColleaugeModal(null);
+      refetch();
+      toast.open({
+        type: 'success',
+        title: t('global.notification'),
+        message: `Chat forwarded to ${user.displayName}`,
+      });
+    } catch (error) {
+      toast.open({
+        type: 'warning',
+        title: t('global.notificationError'),
+        message: `Chat ended`,
+      });
+    }
   };
 
-  const handleEstablishmentForward = (chat: ChatType, establishment: string) => {
+  const handleEstablishmentForward = (
+    chat: ChatType,
+    establishment: string
+  ) => {
     // TODO: Add endpoint for chat forwarding
     setForwardToEstablishmentModal(null);
     toast.open({
@@ -137,8 +174,9 @@ const ChatActive: FC = () => {
         authorTimestamp: new Date().toISOString(),
         authorFirstName: userInfo!.firstName,
         authorId: userInfo!.idCode,
-        authorRole: userInfo!.authorities
+        authorRole: userInfo!.authorities,
       });
+      refetch();
       toast.open({
         type: 'success',
         title: t('global.notification'),
@@ -158,52 +196,51 @@ const ChatActive: FC = () => {
   return (
     <>
       <Tabs.Root
-        className='vertical-tabs'
-        orientation='vertical'
+        className="vertical-tabs"
+        orientation="vertical"
         onValueChange={setSelectedChatId}
         style={{ height: '100%', overflow: 'hidden' }}
       >
         <Tabs.List
-          className='vertical-tabs__list'
+          className="vertical-tabs__list"
           aria-label={t('chat.active.list') || ''}
           style={{ overflow: 'auto' }}
         >
-          <div className='vertical-tabs__group-header'>
+          <div className="vertical-tabs__group-header">
             <p>{t('chat.active.myChats')}</p>
           </div>
           {activeChats?.myChats?.map((chat) => (
             <Tabs.Trigger
               key={chat.id}
-              className={
-                clsx('vertical-tabs__trigger', {
-                  'active': chat.status === CHAT_STATUS.REDIRECTED && chat.customerSupportId === userInfo?.idCode,
-                })
-              }
+              className={clsx('vertical-tabs__trigger', {
+                active:
+                  chat.status === CHAT_STATUS.REDIRECTED &&
+                  chat.customerSupportId === userInfo?.idCode,
+              })}
               value={chat.id}
               style={{ borderBottom: '1px solid #D2D3D8' }}
             >
               <ChatTrigger chat={chat} />
             </Tabs.Trigger>
           ))}
-          <div className='vertical-tabs__group-header'>
+          <div className="vertical-tabs__group-header">
             <p>{t('chat.active.newChats')}</p>
           </div>
           {activeChats?.otherChats?.map(({ name, chats }) => (
             <>
-              {
-                name &&
-                <div className='vertical-tabs__sub-group-header'>
+              {name && (
+                <div className="vertical-tabs__sub-group-header">
                   <p>{name}</p>
                 </div>
-              }
+              )}
               {chats.map((chat) => (
                 <Tabs.Trigger
                   key={chat.id}
-                  className={
-                    clsx('vertical-tabs__trigger', {
-                      'active': chat.status === CHAT_STATUS.REDIRECTED && chat.customerSupportId === userInfo?.idCode,
-                    })
-                  }
+                  className={clsx('vertical-tabs__trigger', {
+                    active:
+                      chat.status === CHAT_STATUS.REDIRECTED &&
+                      chat.customerSupportId === userInfo?.idCode,
+                  })}
                   value={chat.id}
                   style={{ borderBottom: '1px solid #D2D3D8' }}
                 >
@@ -215,10 +252,7 @@ const ChatActive: FC = () => {
         </Tabs.List>
 
         {selectedChatId ? (
-          <Tabs.Content
-            className='vertical-tabs__body'
-            value={selectedChatId}
-          >
+          <Tabs.Content className="vertical-tabs__body" value={selectedChatId}>
             {selectedChat && (
               <Chat
                 chat={selectedChat}
@@ -229,12 +263,15 @@ const ChatActive: FC = () => {
                 onForwardToEstablishment={setForwardToEstablishmentModal}
                 onSendToEmail={setSendToEmailModal}
                 onStartAService={setStartAServiceModal}
+                onRefresh={refetch}
               />
             )}
           </Tabs.Content>
         ) : (
-          <div className='vertical-tabs__body-placeholder'>
-            <p className='h3' style={{ color: '#9799A4' }}>{t('chat.active.chooseChat')}</p>
+          <div className="vertical-tabs__body-placeholder">
+            <p className="h3" style={{ color: '#9799A4' }}>
+              {t('chat.active.chooseChat')}
+            </p>
           </div>
         )}
       </Tabs.Root>
@@ -261,9 +298,14 @@ const ChatActive: FC = () => {
           onClose={() => setSendToEmailModal(null)}
           footer={
             <>
-              <Button appearance='secondary' onClick={() => setSendToEmailModal(null)}>{t('global.no')}</Button>
               <Button
-                appearance='error'
+                appearance="secondary"
+                onClick={() => setSendToEmailModal(null)}
+              >
+                {t('global.no')}
+              </Button>
+              <Button
+                appearance="error"
                 onClick={() => sendToEmailMutation.mutate(sendToEmailModal)}
               >
                 {t('global.yes')}
@@ -288,19 +330,27 @@ const ChatActive: FC = () => {
           onClose={() => setEndChatModal(null)}
           footer={
             <>
-              <Button appearance='secondary'>{t('global.cancel')}</Button>
-              <Button appearance='success' onClick={handleChatEnd}>{t('chat.active.endChat')}</Button>
+              <Button
+                appearance="secondary"
+                onClick={() => setEndChatModal(null)}
+              >
+                {t('global.cancel')}
+              </Button>
+              <Button appearance="success" onClick={handleChatEnd}>
+                {t('chat.active.endChat')}
+              </Button>
             </>
           }
         >
           <FormRadios
-            name='endedChatStatuses'
+            name="endedChatStatuses"
             label={t('')}
             items={CSAchatStatuses.map((status) => ({
-              label: t(`chat.events.${status}`, {date: ''}),
+              label: t(`chat.events.${status}`, { date: '' }),
               value: status,
             }))}
-            onChange={setSelectedEndChatStatus} />
+            onChange={setSelectedEndChatStatus}
+          />
         </Dialog>
       )}
     </>
