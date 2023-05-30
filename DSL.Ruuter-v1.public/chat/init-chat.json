@@ -167,7 +167,7 @@
               "maxAge": 7200,
               "httpOnly": true,
               "setSecure": true,
-              "domain": "localhost",
+              "domain": "{cookie_domain}",
               "name": "chatJwt"
             }
           }
