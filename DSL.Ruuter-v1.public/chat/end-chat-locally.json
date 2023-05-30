@@ -140,7 +140,7 @@
             "chatId": "{#.get_not_ended_chat[0]#.id}",
             "messageId": "{#.get_message_uuid#.output}",
             "content": "",
-            "event": "client-left",
+            "event": "{#.reflect_input#.event}",
             "authorTimestamp": "{#.reflect_input#.authorTimestamp}",
             "authorId": "",
             "authorFirstName": "",
