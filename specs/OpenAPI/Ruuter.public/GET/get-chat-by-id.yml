@@ -1,0 +1,119 @@
+openapi: 3.0.3
+
+info:
+  title: get-chat-by-id API
+  description: API for getting basic information about the chat based on id
+  version: 1.0.0
+  license:
+    name: MIT
+    url: https://github.com/buerokratt/Ruuter/blob/main/LICENSE
+
+servers:
+  - url: https://ruuter.test.buerokratt.ee/sse
+    description: Main server for the continuous database requests
+
+paths:
+  /get-chat-by-id:
+    get:
+      summary: Get chat information based on id
+      parameters:
+        - name: id
+          in: query
+          description: Id of the chat
+          schema:
+            type: string
+            example: '8cfbc32a-7244-4933-8a25-14422b557ad2'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  headers:
+                    type: object
+                    properties:
+                      Pragma:
+                        type: array
+                        items:
+                          type: string
+                          example: "no-cache"
+                      Cache-Control:
+                        type: array
+                        items:
+                          type: string
+                          example: "no-cache"
+                      Expires:
+                        type: array
+                        items:
+                          type: string
+                          example: "Wed, 31 Dec 1969 23:59:59 GMT"
+                      Content-Type:
+                        type: array
+                        items:
+                          type: string
+                          example: "application/json"
+                  body:
+                    type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          forwarding_validation:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                example: fbcccb1c-4dc7-4781-b87d-57a7ae6eb2a5
+                              customerSupportId:
+                                type: string
+                                example: meietest
+                              customerSupportDisplayName:
+                                type: string
+                                example: Bürokratt
+                              endUserId:
+                                type: string
+                              endUserFirstName:
+                                type: string
+                              endUserLastName:
+                                type: string
+                              status:
+                                type: string
+                                example: OPEN
+                              endUserOs:
+                                type: string
+                                example: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36'
+                              endUserUrl:
+                                type: string
+                                format: uri
+                                example: https://test.buerokratt.ee/
+                              lastMessage:
+                                type: string
+                              created:
+                                type: string
+                                format: date-time
+                                example: '2023-05-30T06:24:11.396+00:00'
+                              updated:
+                                type: string
+                                format: date-time
+                                example: '2023-05-30T06:24:11.398+00:00'
+                              ended:
+                                type: string
+                      error:
+                        example: null
+                  statusCode:
+                    type: string
+                    example: OK
+                  statusCodeValue:
+                    type: integer
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: customJwtCookie
+
+security:
+  - cookieAuth: []

@@ -15,7 +15,7 @@ paths:
   /cs-get-user-profile-settings:
     get:
       summary: Checks whether user is authorized and retrieves profile settings of the user
-      # TODO: Openapi 3.. does not allow requestBody for a GET operation, find an alternative (for example POST operation) way or use openapi 2.0
+      #Openapi 3 does not allow requestBody for a GET operation, maybe find an alternative (for example POST operation) or keep as is
       requestBody:
         required: true
         content:
@@ -28,11 +28,36 @@ paths:
                   description: The ID of the user
       responses:
         '200':
-          description: User profile settings retrieved successfully
+          description: successful operation
           content:
             application/json:
               schema:
                 type: object
+                properties:
+                  userId:
+                    type: integer
+                    example: 1
+                  forwardedChatPopupNotifications:
+                    type: boolean
+                    example: true
+                  forwardedChatSoundNotifications:
+                    type: boolean
+                    example: true
+                  forwardedChatEmailNotifications:
+                    type: boolean
+                    example: true
+                  newChatPopupNotifications:
+                    type: boolean
+                    example: true
+                  newChatSoundNotifications:
+                    type: boolean
+                    example: true
+                  newChatEmailNotifications:
+                    type: boolean
+                    example: true
+                  useAutocorrect:
+                    type: boolean
+                    example: false
         '401':
           description: Unauthorized request
 

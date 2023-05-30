@@ -17,11 +17,26 @@ paths:
       summary: Checks whether user has administrator access and retrieves the emergency notice
       responses:
         '200':
-          description: Emergency notice retrieved successfully
+          description: successful operation
           content:
             application/json:
               schema:
                 type: object
+                properties:
+                  emergencyNoticeText:
+                    type: string
+                    example: 'Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Aenean lacinia bibendum nulla sed consectetur.'
+                  emergencyNoticeStartISO:
+                    type: string
+                    format: date-time
+                    example: '2023-05-30T00:00:00Z'
+                  emergencyNoticeEndISO:
+                    type: string
+                    format: date-time
+                    example: '2023-05-30T00:00:00Z'
+                  isEmergencyNoticeVisible:
+                    type: boolean
+                    example: true
         '401':
           description: Unauthorized request
 

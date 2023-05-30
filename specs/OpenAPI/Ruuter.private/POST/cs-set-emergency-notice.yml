@@ -27,12 +27,12 @@ paths:
                   example: Example emergency notice
                 emergencyNoticeStartISO:
                   type: string
-                  format: date-time
+                  format: date
                   description: The start time of the emergency notice in ISO format
                   example: 01-17-2023
                 emergencyNoticeEndISO:
                   type: string
-                  format: date-time
+                  format: date
                   description: The end time of the emergency notice in ISO format
                   example: 01-18-2023
                 isEmergencyNoticeVisible:

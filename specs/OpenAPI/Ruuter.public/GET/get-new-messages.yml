@@ -1,0 +1,127 @@
+openapi: 3.0.3
+
+info:
+  title: get-new-messages API
+  description: API for getting basic information about the chatId
+  version: 1.0.0
+  license:
+    name: MIT
+    url: https://github.com/buerokratt/Ruuter/blob/main/LICENSE
+
+servers:
+  - url: https://ruuter.test.buerokratt.ee/sse
+    description: Main server for the database requests
+
+paths:
+  /get-new-messages:
+    get:
+      summary: Get new chat messages from database
+      parameters:
+        - name: id
+          in: query
+          description: Id of the chat
+          schema:
+            type: string
+            example: '8cfbc32a-7244-4933-8a25-14422b557ad2'
+        - name: timeRangeBegin
+          in: query
+          description: Time range when messages are received
+          schema:
+            type: string
+            format: date-time
+            example: '2023-05-30T06:24:15.453Z'
+      responses:
+        '200':
+          description: Successfully retrieved validation data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  headers:
+                    type: object
+                    properties:
+                      Pragma:
+                        type: array
+                        items:
+                          type: string
+                          example: no-cache
+                      Cache-Control:
+                        type: array
+                        items:
+                          type: string
+                          example: no-cache
+                      Expires:
+                        type: array
+                        items:
+                          type: string
+                          example: Wed, 31 Dec 1969 23:59:59 GMT
+                      Content-Type:
+                        type: array
+                        items:
+                          type: string
+                          example: application/json
+                  body:
+                    type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          forwarding_validation:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                  example: b7d11a49-f386-41e0-a91b-94ca9d32721d
+                                chatid:
+                                  type: string
+                                  example: a7be72fd-ed10-49ed-9f23-69887392b44e
+                                content:
+                                  type: string
+                                  example: Tere
+                                event:
+                                  type: string
+                                  example: greeting
+                                authorId:
+                                  type: string
+                                authorTimestamp:
+                                  type: string
+                                  format: date-time
+                                  example: 2023-05-29T09:42:59.797+00:00
+                                authorFirstName:
+                                  type: string
+                                authorLastName:
+                                  type: string
+                                authorRole:
+                                  type: string
+                                  example: buerokratt
+                                rating:
+                                  type: string
+                                created:
+                                  type: string
+                                  format: date-time
+                                  example: 2023-05-29T09:42:59.797+00:00
+                                updated:
+                                  type: string
+                                  format: date-time
+                                  example: 2023-05-29T09:42:59.839+00:00
+                      error:
+                        example: null
+                  statusCode:
+                    type: string
+                    example: OK
+                  statusCodeValue:
+                    type: integer
+                    example: 200
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: customJwtCookie
+
+security:
+  - cookieAuth: []

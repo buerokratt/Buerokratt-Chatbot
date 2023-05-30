@@ -14,7 +14,7 @@ paths:
   /comment-history:
     get:
       summary: Retrieve chat history comment
-      # TODO: Openapi 3.. does not allow requestBody for a GET operation, find an alternative (for example POST operation) way or use openapi 2.0
+      #Openapi 3 does not allow requestBody for a GET operation, maybe find an alternative (for example POST operation) or keep as is
       requestBody:
         required: true
         content:
@@ -57,7 +57,6 @@ components:
       type: apiKey
       in: cookie
       name: customJwtCookie
-      x-example: 'eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIiLCJjaGF0SWQiOiIzMzM1YTE1OS1iMmI1LTQ3NDctODJjZS02ZjgwMDFjOWE3NzAiLCJpc3MiOiJUZXN0LmJ1ZXJva3JhdHQuZWUiLCJmb3J3YXJkVG8iOiIiLCJleHAiOjE2ODM3MDkxNzMsImlhdCI6MTY4MzcwMTk3MywianRpIjoiMGZjMmU3ZjktNmU5Mi00YThhLTgzMGQtYTI0YjVjMGRhMzI1In0.TSVP8PStr4H_4bbD0JJTOMPHiLfQ93P3UgZyHMZoBL1E4YLznnWoMFjfh6yzYKC9GF3OxQYiraUv32HtBcO_H6jPvi0W_-nr95LrfjXIaIoNW2mjgKmudPfim-hEA3k5EI9G9M7KkMu97dHZBSmVo6B4tWLkgivCIDw_vzErM-rsgerfb3TKbLarDQBjMvQlxPjklb2LDRJ0P-dwyOzHoPE6jVAQ-ZJq7Ju3_uL_7mwVnH2IYpkae8wzUA99iYSbaC-TEPR043y8WkEcUj7TASwxr2Am-Sw_d2xrMWSKG0jWZ9cNoY8BTImc7ldU0YCftMIJPVXNtudYEsRWnJIc0g'
 
 security:
   - cookieAuth: []

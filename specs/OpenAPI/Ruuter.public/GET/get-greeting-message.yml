@@ -1,0 +1,50 @@
+openapi: 3.0.3
+
+info:
+  title: get-greeting-message API
+  description: API for receiving the greeting message from the chat-bot
+  version: 1.0.0
+  license:
+    name: MIT
+    url: https://github.com/buerokratt/Ruuter/blob/main/LICENSE
+
+servers:
+  - url: https://ruuter.test.buerokratt.ee
+    description: Main server for the database requests
+
+paths:
+  /get-greeting-message:
+    get:
+      summary: Get greeting message from the chat-bot
+      responses:
+        '200':
+          description: Greeting for the chat-bot
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      return_first_greeting_from_array:
+                        type: object
+                        properties:
+                          isActive:
+                            type: boolean
+                            example: true
+                          time:
+                            type: string
+                            example: Tere
+                  error:
+                    example: null
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: customJwtCookie
+
+security:
+  - cookieAuth: []

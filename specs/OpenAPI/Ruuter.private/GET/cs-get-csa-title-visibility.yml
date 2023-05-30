@@ -22,6 +22,10 @@ paths:
             application/json:
               schema:
                 type: object
+                properties:
+                  isVisible:
+                    type: boolean
+                    example: false
         '401':
           description: Unauthorized request
 

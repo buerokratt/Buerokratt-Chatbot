@@ -17,11 +17,27 @@ paths:
       summary: Checks whether user is authorized and retrieves configuration of the widget
       responses:
         '200':
-          description: Widget configuration retrieved successfully
+          description: successful operation
           content:
             application/json:
               schema:
                 type: object
+                properties:
+                  widgetProactiveSeconds:
+                    type: integer
+                    example: 3
+                  widgetDisplayBubbleMessageSeconds:
+                    type: integer
+                    example: 5
+                  widgetBubbleMessageText:
+                    type: string
+                    example: 'Küsi minult!'
+                  widgetColor:
+                    type: string
+                    example: '#E99B03'
+                  isWidgetActive:
+                    type: boolean
+                    example: true
         '401':
           description: Unauthorized request
 

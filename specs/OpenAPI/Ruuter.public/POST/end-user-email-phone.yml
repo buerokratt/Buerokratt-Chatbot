@@ -15,9 +15,9 @@ servers:
 paths:
   /end-user-email-phone:
     post:
-      summary: Get estimated waiting time for the response
+      summary: Set end-user email and phone
       requestBody:
-        description: Send users chatId, user email and phone
+        description: Based on chatId, set user email and phone
         content:
           application/json:
             schema:
