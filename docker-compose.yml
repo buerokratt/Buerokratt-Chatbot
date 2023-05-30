@@ -198,6 +198,9 @@ services:
       - NODE_ENV=development
       - BASE_URL=http://localhost:8080
       - REACT_APP_RUUTER_API_URL=http://localhost:8080
+      - REACT_APP_RUUTER_V1_PRIVATE_API_URL=http://localhost:8090
+      - REACT_APP_RUUTER_V2_PRIVATE_API_URL=http://localhost:8088
+      - REACT_APP_COOKIE_DOMAIN=localhost
       - CHOKIDAR_USEPOLLING=true
       - PORT=3001
     build:
