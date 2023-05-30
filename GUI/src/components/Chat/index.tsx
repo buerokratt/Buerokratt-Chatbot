@@ -116,15 +116,12 @@ const Chat: FC<ChatProps> = ({
       }),
       onmessage(event) {
         const data = JSON.parse(event.data);
-        if (data.type === MessageSseEvent.PREVIEW) {
-          setPreviewMessage(data)
-        }
-        else if (data.type === MessageSseEvent.READ) {
-          setMessageReadStatus({
-            messageId: data.id,
-            readTime: data.created,
-          });
-        }
+        const { preview } = data.body.data.cs_get_new_messages.at(-1)
+        setPreviewMessage(preview)
+        // setMessageReadStatus({
+        //   messageId: data.id,
+        //   readTime: data.created,
+        // });
       },
       signal: ctrl.signal,
     });
