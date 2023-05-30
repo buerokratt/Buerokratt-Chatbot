@@ -104,6 +104,7 @@ const Chat: FC<ChatProps> = ({
 
 
   useEffect(() => {
+    const ctrl = new AbortController();
     fetchEventSource('http://localhost:8090/sse/cs-get-new-messages', {
       method: 'POST',
       headers: {
@@ -125,7 +126,10 @@ const Chat: FC<ChatProps> = ({
           });
         }
       },
+      signal: ctrl.signal,
     });
+
+    return () => ctrl && ctrl.abort();
   }, []);
 
   const getMessages = async () => {
