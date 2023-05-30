@@ -111,39 +111,21 @@ const Chat: FC<ChatProps> = ({
       },
       body: JSON.stringify({
         chatId: chat.id,
-        lastRead: '2023-01-23T15:13:42.830+00:00',
+        lastRead: new Date().toISOString(),
       }),
-      onmessage(ev) {
-        console.log('-----msg-------->', ev.data);
+      onmessage(event) {
+        const data = JSON.parse(event.data);
+        if (data.type === MessageSseEvent.PREVIEW) {
+          setPreviewMessage(data)
+        }
+        else if (data.type === MessageSseEvent.READ) {
+          setMessageReadStatus({
+            messageId: data.id,
+            readTime: data.created,
+          });
+        }
       },
-      onerror(err) {
-        console.log('error----------->', err);
-      },
-      async onopen(response) {
-        console.log('error----------->', response);
-      }
     });
-
-    // const close = initializeSSE({
-    //   chatId: chat.id,
-    //   lastRead: '2023-01-23T15:13:42.830+00:00',
-    //   onPreview: (event) => console.log('-----preview------->', event),
-    //   onMessageRead: (event) => console.log('-----message------->', event),
-    //   onError: (error) => console.log('-----error------->', event),
-
-    //   // onPreview: (event) => setPreviewMessage(event),
-    //   // onMessageRead: (event) => setMessageReadStatus(event),
-    //   // onError: (error) => alert(JSON.stringify(error))
-    // })
-
-    // MessageSseEvent.PREVIEW
-    // MessageSseEvent.READ
-    //       onMessageRead({
-    //   messageId: event.data.id,
-    //   readTime: event.data.created,
-    // })
-
-    return () => close();
   }, []);
 
   const getMessages = async () => {
