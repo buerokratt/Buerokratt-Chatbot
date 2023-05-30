@@ -28,6 +28,7 @@
     "name": "Name",
     "idCode": "ID code",
     "status": "Status",
+    "statusChangeQuestion": "Would you like to change your status to \"present\"?",
     "yes": "Yes",
     "no": "No",
     "removeValidation": "Are you sure?",

@@ -13,7 +13,7 @@ import {
   Section,
   SwitchBox,
   Switch,
-  Toast,
+  Dialog
 } from 'components';
 import useUserInfoStore from 'store/store';
 import { ReactComponent as BykLogo } from 'assets/logo.svg';
@@ -51,6 +51,10 @@ const Header: FC = () => {
   const { t } = useTranslation();
   const { userInfo } = useUserInfoStore();
   const toast = useToast();
+  const [__, setSecondsUntilStatusPopup] = useState(300); // 5 minutes in seconds
+  const [statusPopupTimerHasStarted, setStatusPopupTimerHasStarted] = useState(false);
+  const [showStatusConfirmationModal, setShowStatusConfirmationModal] = useState(false);
+
   const queryClient = useQueryClient();
   const [userDrawerOpen, setUserDrawerOpen] = useState(false);
   const [csaStatus, setCsaStatus] = useState<'idle' | 'offline' | 'online'>(
@@ -68,27 +72,26 @@ const Header: FC = () => {
     newChatEmailNotifications: false,
     useAutocorrect: true
   });
+
   useEffect(() => {
     getMessages();
-}, [])
+  }, [])
 
-const getMessages = async () => {
+  const getMessages = async () => {
     const { data: res } = await apiDevV2.get('cs-get-user-profile-settings', {
       params: {
         // TODO: Use actual id from userInfo once it starts using real data
         userId: 1
       }
     });
-    if (res.response)  setUserProfileSettings(res.response);
-};
+    if (res.response) setUserProfileSettings(res.response);
+  };
   const { data: customerSupportActivity } = useQuery<CustomerSupportActivity>({
     queryKey: ['cs-get-customer-support-activity', 'prod'],
     onSuccess(res: any) {
-      setCsaActive(
-        res.data.get_customer_support_activity[0].active === 'true'
-          ? true
-          : false
-      );
+      const activity = res.data.get_customer_support_activity[0];
+      setCsaStatus(activity.status);
+      setCsaActive(activity.active === 'true');
     },
   });
   const [activeChatsList, setActiveChatsList] = useState<ChatType[]>([]);
@@ -113,10 +116,10 @@ const getMessages = async () => {
     () =>
       activeChatsList
         ? activeChatsList.filter(
-            (c) =>
-              c.status === CHAT_STATUS.REDIRECTED &&
-              c.customerSupportId === userInfo?.idCode
-          ).length
+          (c) =>
+            c.status === CHAT_STATUS.REDIRECTED &&
+            c.customerSupportId === userInfo?.idCode
+        ).length
         : 0,
     [activeChatsList]
   );
@@ -126,13 +129,13 @@ const getMessages = async () => {
     if (unansweredChats > 0) {
       if (userProfileSettings.newChatSoundNotifications) audio.play();
       if (userProfileSettings.newChatEmailNotifications) // TODO send email notification
-      if (userProfileSettings.newChatPopupNotifications) {
-        toast.open({
-          type: 'info',
-          title: t('settings.users.newUnansweredChat'),
-          message: '',
-        });
-      }
+        if (userProfileSettings.newChatPopupNotifications) {
+          toast.open({
+            type: 'info',
+            title: t('settings.users.newUnansweredChat'),
+            message: '',
+          });
+        }
       subscription = interval(2 * 60 * 1000).subscribe(() => {
         if (userProfileSettings.newChatSoundNotifications) audio.play();
         if (userProfileSettings.newChatPopupNotifications) {
@@ -155,13 +158,13 @@ const getMessages = async () => {
     if (forwardedChats > 0) {
       if (userProfileSettings.forwardedChatSoundNotifications) audio.play();
       if (userProfileSettings.forwardedChatEmailNotifications) // TODO send email notification
-      if (userProfileSettings.forwardedChatPopupNotifications) {
-        toast.open({
-          type: 'info',
-          title: t('settings.users.newForwardedChat'),
-          message: '',
-        });
-      }
+        if (userProfileSettings.forwardedChatPopupNotifications) {
+          toast.open({
+            type: 'info',
+            title: t('settings.users.newForwardedChat'),
+            message: '',
+          });
+        }
       subscription = interval(2 * 60 * 1000).subscribe(() => {
         if (userProfileSettings.forwardedChatSoundNotifications) audio.play();
         if (userProfileSettings.forwardedChatPopupNotifications) {
@@ -181,9 +184,9 @@ const getMessages = async () => {
 
   const userProfileSettingsMutation = useMutation({
     mutationFn: async (data: UserProfileSettings) => {
-        await apiDevV2.post('cs-set-user-profile-settings', data);
-        setUserProfileSettings(data);
-      },
+      await apiDevV2.post('cs-set-user-profile-settings', data);
+      setUserProfileSettings(data);
+    },
     onError: async (error: AxiosError) => {
       await queryClient.invalidateQueries(['cs-get-user-profile-settings']);
       toast.open({
@@ -248,6 +251,8 @@ const getMessages = async () => {
 
   const onIdle = () => {
     if (!customerSupportActivity) return;
+    if (csaStatus === 'offline') return;
+
     setCsaStatus('idle');
     customerSupportActivityMutation.mutate({
       customerSupportActive: customerSupportActivity.active,
@@ -258,6 +263,11 @@ const getMessages = async () => {
 
   const onActive = () => {
     if (!customerSupportActivity) return;
+    if (csaStatus === 'offline') {
+      setShowStatusConfirmationModal(value => !value);
+      return;
+    }
+
     setCsaStatus('online');
     customerSupportActivityMutation.mutate({
       customerSupportActive: customerSupportActivity.active,
@@ -290,7 +300,27 @@ const getMessages = async () => {
       customerSupportStatus: checked === true ? 'online' : 'offline',
       customerSupportId: '',
     });
+
+    if (!checked) showStatusChangePopup();
   };
+
+  const showStatusChangePopup = () => {
+    if (statusPopupTimerHasStarted) return;
+
+    setStatusPopupTimerHasStarted(value => !value);
+    const timer = setInterval(() => {
+      setSecondsUntilStatusPopup((prevSeconds) => {
+        if (prevSeconds > 0) {
+          return prevSeconds - 1;
+        } else {
+          clearInterval(timer);
+          setShowStatusConfirmationModal(value => !value);
+          setStatusPopupTimerHasStarted(value => !value);
+          return 0;
+        }
+      });
+    }, 1000);
+  }
 
   return (
     <>
@@ -343,18 +373,16 @@ const getMessages = async () => {
                 appearance="text"
                 onClick={() => setUserDrawerOpen(!userDrawerOpen)}
               >
-                {csaActive && (
-                  <span
-                    style={{
-                      display: 'block',
-                      width: 16,
-                      height: 16,
-                      borderRadius: '50%',
-                      backgroundColor: statusColors[csaStatus],
-                      marginRight: 8,
-                    }}
-                  ></span>
-                )}
+                <span
+                  style={{
+                    display: 'block',
+                    width: 16,
+                    height: 16,
+                    borderRadius: '50%',
+                    backgroundColor: statusColors[csaStatus],
+                    marginRight: 8,
+                  }}
+                ></span>
                 {userInfo.displayName}
                 <Icon icon={<MdOutlineExpandMore />} />
               </Button>
@@ -369,6 +397,32 @@ const getMessages = async () => {
           )}
         </Track>
       </header>
+
+      {showStatusConfirmationModal &&
+        <Dialog onClose={() => setShowStatusConfirmationModal(value => !value)}
+          footer={
+            <>
+              <Button appearance='secondary' onClick={() => setShowStatusConfirmationModal(value => !value)}>{t('global.cancel')}</Button>
+              <Button
+                appearance='primary'
+                onClick={() => {
+                  handleCsaStatusChange(true);
+                  setShowStatusConfirmationModal(value => !value)
+                }}
+              >
+                {t('global.yes')}
+              </Button>
+            </>
+          }>
+          <div className="dialog__body">
+            <h1
+              style={{ fontSize: '24px', fontWeight: '400', color: '#09090B' }}
+            >
+              {t('global.statusChangeQuestion')}
+            </h1>
+          </div>
+        </Dialog>
+      }
 
       {userInfo && userProfileSettings && userDrawerOpen && (
         <Drawer
