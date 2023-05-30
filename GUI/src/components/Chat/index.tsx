@@ -11,7 +11,12 @@ import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { et } from 'date-fns/locale';
 import clsx from 'clsx';
-import { Chat as ChatType, MessageSseEvent, MessageStatus, CHAT_EVENTS } from 'types/chat';
+import {
+  Chat as ChatType,
+  MessageSseEvent,
+  MessageStatus,
+  CHAT_EVENTS,
+} from 'types/chat';
 import { useMutation } from '@tanstack/react-query';
 import { MdOutlineAttachFile, MdOutlineSend } from 'react-icons/md';
 import { Button, Icon, Track } from 'components';
@@ -139,7 +144,7 @@ const Chat: FC<ChatProps> = ({
 
   const postMessageMutation = useMutation({
     mutationFn: (message: Message) => apiDev.post('cs-post-message', message),
-    onSuccess: () => { },
+    onSuccess: () => {},
     onError: (error: AxiosError) => {
       toast.open({
         type: 'error',
@@ -156,7 +161,7 @@ const Chat: FC<ChatProps> = ({
         event: message.event ?? '',
         authorTimestamp: message.authorTimestamp ?? '',
       }),
-    onSuccess: () => { },
+    onSuccess: () => {},
     onError: (error: AxiosError) => {
       toast.open({
         type: 'error',
@@ -233,104 +238,104 @@ const Chat: FC<ChatProps> = ({
   const allSideButtons =
     chat.customerSupportId === userInfo?.idCode
       ? [
-        {
-          id: 'endChat',
-          button: (
-            <Button
-              key="endChat"
-              appearance="success"
-              onClick={onChatEnd ? () => onChatEnd(chat) : undefined}
-            >
-              {t('chat.active.endChat')}
-            </Button>
-          ),
-        },
-        {
-          id: 'askAuthentication',
-          button: (
-            <Button
-              key="askAuthentication"
-              appearance="secondary"
-              onClick={() =>
-                handleChatEvent(CHAT_EVENTS.REQUESTED_AUTHENTICATION)
-              }
-            >
-              {t('chat.active.askAuthentication')}
-            </Button>
-          ),
-        },
-        {
-          id: 'askForContact',
-          button: (
-            <Button
-              key="askForContact"
-              appearance="secondary"
-              onClick={() => handleChatEvent(CHAT_EVENTS.CONTACT_INFORMATION)}
-            >
-              {t('chat.active.askForContact')}
-            </Button>
-          ),
-        },
-        {
-          id: 'askPermission',
-          button: (
-            <Button
-              key="askPermission"
-              appearance="secondary"
-              onClick={() => handleChatEvent(CHAT_EVENTS.ASK_PERMISSION)}
-            >
-              {t('chat.active.askPermission')}
-            </Button>
-          ),
-        },
-        {
-          id: 'forwardToColleague',
-          button: (
-            <Button
-              key="forwardToColleague"
-              appearance="secondary"
-              onClick={
-                onForwardToColleauge
-                  ? () => {
-                    onForwardToColleauge(chat);
-                    setSelectedMessages([]);
-                  }
-                  : undefined
-              }
-            >
-              {t('chat.active.forwardToColleague')}
-            </Button>
-          ),
-        },
-        {
-          id: 'forwardToOrganization',
-          button: (
-            <Button
-              key="forwardToOrganization"
-              appearance="secondary"
-              onClick={
-                onForwardToEstablishment
-                  ? () => onForwardToEstablishment(chat)
-                  : undefined
-              }
-            >
-              {t('chat.active.forwardToOrganization')}
-            </Button>
-          ),
-        },
-        {
-          id: 'sendToEmail',
-          button: (
-            <Button
-              key="sendToEmail"
-              appearance="secondary"
-              onClick={onSendToEmail ? () => onSendToEmail(chat) : undefined}
-            >
-              {t('chat.active.sendToEmail')}
-            </Button>
-          ),
-        },
-      ]
+          {
+            id: 'endChat',
+            button: (
+              <Button
+                key="endChat"
+                appearance="success"
+                onClick={onChatEnd ? () => onChatEnd(chat) : undefined}
+              >
+                {t('chat.active.endChat')}
+              </Button>
+            ),
+          },
+          {
+            id: 'askAuthentication',
+            button: (
+              <Button
+                key="askAuthentication"
+                appearance="secondary"
+                onClick={() =>
+                  handleChatEvent(CHAT_EVENTS.REQUESTED_AUTHENTICATION)
+                }
+              >
+                {t('chat.active.askAuthentication')}
+              </Button>
+            ),
+          },
+          {
+            id: 'askForContact',
+            button: (
+              <Button
+                key="askForContact"
+                appearance="secondary"
+                onClick={() => handleChatEvent(CHAT_EVENTS.CONTACT_INFORMATION)}
+              >
+                {t('chat.active.askForContact')}
+              </Button>
+            ),
+          },
+          {
+            id: 'askPermission',
+            button: (
+              <Button
+                key="askPermission"
+                appearance="secondary"
+                onClick={() => handleChatEvent(CHAT_EVENTS.ASK_PERMISSION)}
+              >
+                {t('chat.active.askPermission')}
+              </Button>
+            ),
+          },
+          {
+            id: 'forwardToColleague',
+            button: (
+              <Button
+                key="forwardToColleague"
+                appearance="secondary"
+                onClick={
+                  onForwardToColleauge
+                    ? () => {
+                        onForwardToColleauge(chat);
+                        setSelectedMessages([]);
+                      }
+                    : undefined
+                }
+              >
+                {t('chat.active.forwardToColleague')}
+              </Button>
+            ),
+          },
+          {
+            id: 'forwardToOrganization',
+            button: (
+              <Button
+                key="forwardToOrganization"
+                appearance="secondary"
+                onClick={
+                  onForwardToEstablishment
+                    ? () => onForwardToEstablishment(chat)
+                    : undefined
+                }
+              >
+                {t('chat.active.forwardToOrganization')}
+              </Button>
+            ),
+          },
+          {
+            id: 'sendToEmail',
+            button: (
+              <Button
+                key="sendToEmail"
+                appearance="secondary"
+                onClick={onSendToEmail ? () => onSendToEmail(chat) : undefined}
+              >
+                {t('chat.active.sendToEmail')}
+              </Button>
+            ),
+          },
+        ]
       : [];
   const [sideButtons, setSideButtons] = useState([]);
   const [buttonsToAllow] = useState<any[]>([]);
@@ -342,7 +347,7 @@ const Chat: FC<ChatProps> = ({
     //     // make role more uri friendly
     //     let role = authority.substring(5).replaceAll('_', '-').toLowerCase();
     //     // TODO: Replace '/active/admin.json' with '/<type>/<role>.json'.
-    //     axios({ url: `http://localhost:8085/cdn/buttons/chats/active/${role}.json` })
+    //     axios({ url: `import.meta.env.REACT_APP_RUUTER_V1_PRIVATE_API_URL/cdn/buttons/chats/active/${role}.json` })
     //         .then(res => {
     //             res.data.buttons.forEach((btnId: any) => {
     //                 if (!buttonsToAllow.includes(btnId))
@@ -387,8 +392,8 @@ const Chat: FC<ChatProps> = ({
               message.authorRole === 'end-user'
                 ? endUserFullName
                 : message.authorRole === 'backoffice-user'
-                  ? `${message.authorFirstName} ${message.authorLastName}`
-                  : message.authorRole,
+                ? `${message.authorFirstName} ${message.authorLastName}`
+                : message.authorRole,
             type: message.authorRole,
             messages: [message],
           });
@@ -469,11 +474,13 @@ const Chat: FC<ChatProps> = ({
   }, []);
 
   const getCsaName = (message: Message) => {
-    return `${isCsaNameVisible
-      ? `${message.authorFirstName} ${message.authorLastName}`
-      : ''
-      } ${isCsaTitleVisible && chat.csaTitle !== null ? chat.csaTitle : ''
-      }`.trim();
+    return `${
+      isCsaNameVisible
+        ? `${message.authorFirstName} ${message.authorLastName}`
+        : ''
+    } ${
+      isCsaTitleVisible && chat.csaTitle !== null ? chat.csaTitle : ''
+    }`.trim();
   };
 
   return (
@@ -508,7 +515,7 @@ const Chat: FC<ChatProps> = ({
                   <>
                     <div className="active-chat__group-initials">
                       {group.type === 'buerokratt' ||
-                        group.type === 'chatbot' ? (
+                      group.type === 'chatbot' ? (
                         <BykLogoWhite height={24} />
                       ) : (
                         <>
@@ -640,9 +647,9 @@ const Chat: FC<ChatProps> = ({
             onClick={
               onForwardToColleauge
                 ? () => {
-                  onForwardToColleauge(chat);
-                  setSelectedMessages([]);
-                }
+                    onForwardToColleauge(chat);
+                    setSelectedMessages([]);
+                  }
                 : undefined
             }
           >

@@ -5,6 +5,7 @@
   "resql_url": "http://resql:8082",
   "bot_url": "http://171.22.247.37:5005",
   "training_url": "TRAINIG_BOT",
+  "cookie_domain": "localhost",
   "training_user": "TRAINING_BOT_USERNAME",
   "training_prv_key": "TRAINIG_BOT_PRIVATE_SSH_KEY_PATH",
   "training_bot_directory_name": "TRAINING_DATA_DIRECTORY",
