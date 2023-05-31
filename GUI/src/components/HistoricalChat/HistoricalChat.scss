@@ -41,10 +41,6 @@
     }
   }
 
-  &__toolbar {
-
-  }
-
   &__toolbar-row {
     border-top: 1px solid get-color(black-coral-2);
     padding: get-spacing(paldiski) get-spacing(haapsalu);
@@ -59,38 +55,6 @@
 
     &:not(:last-child) {
       margin-bottom: 8px;
-    }
-
-    &--event {
-      #{$self} {
-        &__event-message {
-          display: flex;
-          position: relative;
-          isolation: isolate;
-          padding: 6px 0;
-
-          p {
-            color: get-color(black-coral-12);
-            font-size: $veera-font-size-80;
-            line-height: $veera-line-height-500;
-            padding: 4px 8px 4px 0;
-            background-color: get-color(white);
-          }
-
-          &::after {
-            content: '';
-            display: block;
-            height: 1px;
-            background-color: get-color(black-coral-2);
-            position: absolute;
-            top: 50%;
-            left: 56px;
-            right: 0;
-            transform: translateY(-50%);
-            z-index: -1;
-          }
-        }
-      }
     }
 
     &--buerokratt,

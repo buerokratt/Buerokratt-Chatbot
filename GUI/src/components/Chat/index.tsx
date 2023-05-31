@@ -8,20 +8,18 @@ import {
   useTransition,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useMutation, useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { et } from 'date-fns/locale';
 import clsx from 'clsx';
-import { MdOutlineAttachFile, MdOutlineSend } from 'react-icons/md';
-import { Button, FormInput, FormTextarea, Icon, Track } from 'components';
-import { ReactComponent as BykLogoWhite } from 'assets/logo-white.svg';
-import useUserInfoStore from 'store/store';
 import {
-  CHAT_EVENTS,
   Chat as ChatType,
-  MessageSseEvent,
   MessageStatus,
+  CHAT_EVENTS,
 } from 'types/chat';
+import { useMutation } from '@tanstack/react-query';
+import { MdOutlineAttachFile, MdOutlineSend } from 'react-icons/md';
+import { Button, Icon, Track } from 'components';
+import { ReactComponent as BykLogoWhite } from 'assets/logo-white.svg';
 import {
   Attachment,
   AttachmentTypes,
@@ -29,22 +27,20 @@ import {
   MessagePreviewSseResponse,
 } from 'types/message';
 import ChatMessage from './ChatMessage';
-import ChatEvent from './ChatEvent';
-import './Chat.scss';
+import ChatEvent from '../ChatEvent';
 import { findIndex } from 'lodash';
 import { CHAT_INPUT_LENGTH } from 'constants/config';
 import apiDev from 'services/api-dev';
 import ChatTextArea from './ChatTextArea';
 import newMessageSound from '../../assets/newMessageSound.mp3';
-import TextareaAutosize, {
-  TextareaAutosizeProps,
-} from 'react-textarea-autosize';
 import { AUTHOR_ROLES, MESSAGE_FILE_SIZE_LIMIT } from 'utils/constants';
 import formatBytes from 'utils/format-bytes';
 import useSendAttachment from 'modules/attachment/hooks';
 import { AxiosError } from 'axios';
 import { useToast } from 'hooks/useToast';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
+import useUserInfoStore from 'store/store';
+import './Chat.scss';
 
 type ChatProps = {
   chat: ChatType;
@@ -105,7 +101,7 @@ const Chat: FC<ChatProps> = ({
 
   useEffect(() => {
     const ctrl = new AbortController();
-    fetchEventSource('http://localhost:8090/sse/cs-get-new-messages', {
+    fetchEventSource(`${import.meta.env.BASE_URL}/sse/cs-get-new-messages`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -372,7 +368,7 @@ const Chat: FC<ChatProps> = ({
     //     // make role more uri friendly
     //     let role = authority.substring(5).replaceAll('_', '-').toLowerCase();
     //     // TODO: Replace '/active/admin.json' with '/<type>/<role>.json'.
-    //     axios({ url: `http://localhost:8085/cdn/buttons/chats/active/${role}.json` })
+    //     axios({ url: `import.meta.env.REACT_APP_RUUTER_V1_PRIVATE_API_URL/cdn/buttons/chats/active/${role}.json` })
     //         .then(res => {
     //             res.data.buttons.forEach((btnId: any) => {
     //                 if (!buttonsToAllow.includes(btnId))
@@ -780,6 +776,7 @@ const Chat: FC<ChatProps> = ({
       return await convertBase64(file);
     }
   }
+
   async function convertBase64(file: File): Promise<any> {
     return await new Promise((resolve, reject) => {
       const fileReader = new FileReader();

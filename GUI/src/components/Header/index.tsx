@@ -13,7 +13,7 @@ import {
   Section,
   SwitchBox,
   Switch,
-  Toast,
+  Dialog,
 } from 'components';
 import useUserInfoStore from 'store/store';
 import { ReactComponent as BykLogo } from 'assets/logo.svg';
@@ -51,6 +51,12 @@ const Header: FC = () => {
   const { t } = useTranslation();
   const { userInfo } = useUserInfoStore();
   const toast = useToast();
+  const [__, setSecondsUntilStatusPopup] = useState(300); // 5 minutes in seconds
+  const [statusPopupTimerHasStarted, setStatusPopupTimerHasStarted] =
+    useState(false);
+  const [showStatusConfirmationModal, setShowStatusConfirmationModal] =
+    useState(false);
+
   const queryClient = useQueryClient();
   const [userDrawerOpen, setUserDrawerOpen] = useState(false);
   const [csaStatus, setCsaStatus] = useState<'idle' | 'offline' | 'online'>(
@@ -58,37 +64,37 @@ const Header: FC = () => {
   );
   const audio = useMemo(() => new Audio(chatSound), []);
   const [csaActive, setCsaActive] = useState<boolean>(false);
-  const [userProfileSettings, setUserProfileSettings] = useState<UserProfileSettings>({
-    userId: 1,
-    forwardedChatPopupNotifications: false,
-    forwardedChatSoundNotifications: true,
-    forwardedChatEmailNotifications: false,
-    newChatPopupNotifications: false,
-    newChatSoundNotifications: true,
-    newChatEmailNotifications: false,
-    useAutocorrect: true
-  });
+  const [userProfileSettings, setUserProfileSettings] =
+    useState<UserProfileSettings>({
+      userId: 1,
+      forwardedChatPopupNotifications: false,
+      forwardedChatSoundNotifications: true,
+      forwardedChatEmailNotifications: false,
+      newChatPopupNotifications: false,
+      newChatSoundNotifications: true,
+      newChatEmailNotifications: false,
+      useAutocorrect: true,
+    });
+
   useEffect(() => {
     getMessages();
-}, [])
+  }, []);
 
-const getMessages = async () => {
+  const getMessages = async () => {
     const { data: res } = await apiDevV2.get('cs-get-user-profile-settings', {
       params: {
         // TODO: Use actual id from userInfo once it starts using real data
-        userId: 1
-      }
+        userId: 1,
+      },
     });
-    if (res.response)  setUserProfileSettings(res.response);
-};
+    if (res.response) setUserProfileSettings(res.response);
+  };
   const { data: customerSupportActivity } = useQuery<CustomerSupportActivity>({
     queryKey: ['cs-get-customer-support-activity', 'prod'],
     onSuccess(res: any) {
-      setCsaActive(
-        res.data.get_customer_support_activity[0].active === 'true'
-          ? true
-          : false
-      );
+      const activity = res.data.get_customer_support_activity[0];
+      setCsaStatus(activity.status);
+      setCsaActive(activity.active === 'true');
     },
   });
   const [activeChatsList, setActiveChatsList] = useState<ChatType[]>([]);
@@ -125,14 +131,15 @@ const getMessages = async () => {
     let subscription: Subscription;
     if (unansweredChats > 0) {
       if (userProfileSettings.newChatSoundNotifications) audio.play();
-      if (userProfileSettings.newChatEmailNotifications) // TODO send email notification
-      if (userProfileSettings.newChatPopupNotifications) {
-        toast.open({
-          type: 'info',
-          title: t('settings.users.newUnansweredChat'),
-          message: '',
-        });
-      }
+      if (userProfileSettings.newChatEmailNotifications)
+        if (userProfileSettings.newChatPopupNotifications) {
+          // TODO send email notification
+          toast.open({
+            type: 'info',
+            title: t('settings.users.newUnansweredChat'),
+            message: '',
+          });
+        }
       subscription = interval(2 * 60 * 1000).subscribe(() => {
         if (userProfileSettings.newChatSoundNotifications) audio.play();
         if (userProfileSettings.newChatPopupNotifications) {
@@ -154,14 +161,15 @@ const getMessages = async () => {
     let subscription: Subscription;
     if (forwardedChats > 0) {
       if (userProfileSettings.forwardedChatSoundNotifications) audio.play();
-      if (userProfileSettings.forwardedChatEmailNotifications) // TODO send email notification
-      if (userProfileSettings.forwardedChatPopupNotifications) {
-        toast.open({
-          type: 'info',
-          title: t('settings.users.newForwardedChat'),
-          message: '',
-        });
-      }
+      if (userProfileSettings.forwardedChatEmailNotifications)
+        if (userProfileSettings.forwardedChatPopupNotifications) {
+          // TODO send email notification
+          toast.open({
+            type: 'info',
+            title: t('settings.users.newForwardedChat'),
+            message: '',
+          });
+        }
       subscription = interval(2 * 60 * 1000).subscribe(() => {
         if (userProfileSettings.forwardedChatSoundNotifications) audio.play();
         if (userProfileSettings.forwardedChatPopupNotifications) {
@@ -181,9 +189,9 @@ const getMessages = async () => {
 
   const userProfileSettingsMutation = useMutation({
     mutationFn: async (data: UserProfileSettings) => {
-        await apiDevV2.post('cs-set-user-profile-settings', data);
-        setUserProfileSettings(data);
-      },
+      await apiDevV2.post('cs-set-user-profile-settings', data);
+      setUserProfileSettings(data);
+    },
     onError: async (error: AxiosError) => {
       await queryClient.invalidateQueries(['cs-get-user-profile-settings']);
       toast.open({
@@ -235,7 +243,7 @@ const getMessages = async () => {
   const logoutMutation = useMutation({
     mutationFn: () => apiDev.post('cs-logout'),
     onSuccess(_) {
-      window.location.href = 'http://localhost:3004/et/dev-auth';
+      window.location.href = import.meta.env.REACT_APP_CUSTOMER_SERVICE_LOGIN;
     },
     onError: async (error: AxiosError) => {
       toast.open({
@@ -248,6 +256,8 @@ const getMessages = async () => {
 
   const onIdle = () => {
     if (!customerSupportActivity) return;
+    if (csaStatus === 'offline') return;
+
     setCsaStatus('idle');
     customerSupportActivityMutation.mutate({
       customerSupportActive: customerSupportActivity.active,
@@ -258,6 +268,11 @@ const getMessages = async () => {
 
   const onActive = () => {
     if (!customerSupportActivity) return;
+    if (csaStatus === 'offline') {
+      setShowStatusConfirmationModal((value) => !value);
+      return;
+    }
+
     setCsaStatus('online');
     customerSupportActivityMutation.mutate({
       customerSupportActive: customerSupportActivity.active,
@@ -290,6 +305,26 @@ const getMessages = async () => {
       customerSupportStatus: checked === true ? 'online' : 'offline',
       customerSupportId: '',
     });
+
+    if (!checked) showStatusChangePopup();
+  };
+
+  const showStatusChangePopup = () => {
+    if (statusPopupTimerHasStarted) return;
+
+    setStatusPopupTimerHasStarted((value) => !value);
+    const timer = setInterval(() => {
+      setSecondsUntilStatusPopup((prevSeconds) => {
+        if (prevSeconds > 0) {
+          return prevSeconds - 1;
+        } else {
+          clearInterval(timer);
+          setShowStatusConfirmationModal((value) => !value);
+          setStatusPopupTimerHasStarted((value) => !value);
+          return 0;
+        }
+      });
+    }, 1000);
   };
 
   return (
@@ -343,18 +378,16 @@ const getMessages = async () => {
                 appearance="text"
                 onClick={() => setUserDrawerOpen(!userDrawerOpen)}
               >
-                {csaActive && (
-                  <span
-                    style={{
-                      display: 'block',
-                      width: 16,
-                      height: 16,
-                      borderRadius: '50%',
-                      backgroundColor: statusColors[csaStatus],
-                      marginRight: 8,
-                    }}
-                  ></span>
-                )}
+                <span
+                  style={{
+                    display: 'block',
+                    width: 16,
+                    height: 16,
+                    borderRadius: '50%',
+                    backgroundColor: statusColors[csaStatus],
+                    marginRight: 8,
+                  }}
+                ></span>
                 {userInfo.displayName}
                 <Icon icon={<MdOutlineExpandMore />} />
               </Button>
@@ -369,6 +402,41 @@ const getMessages = async () => {
           )}
         </Track>
       </header>
+
+      {showStatusConfirmationModal && (
+        <Dialog
+          onClose={() => setShowStatusConfirmationModal((value) => !value)}
+          footer={
+            <>
+              <Button
+                appearance="secondary"
+                onClick={() =>
+                  setShowStatusConfirmationModal((value) => !value)
+                }
+              >
+                {t('global.cancel')}
+              </Button>
+              <Button
+                appearance="primary"
+                onClick={() => {
+                  handleCsaStatusChange(true);
+                  setShowStatusConfirmationModal((value) => !value);
+                }}
+              >
+                {t('global.yes')}
+              </Button>
+            </>
+          }
+        >
+          <div className="dialog__body">
+            <h1
+              style={{ fontSize: '24px', fontWeight: '400', color: '#09090B' }}
+            >
+              {t('global.statusChangeQuestion')}
+            </h1>
+          </div>
+        </Dialog>
+      )}
 
       {userInfo && userProfileSettings && userDrawerOpen && (
         <Drawer
@@ -402,72 +470,110 @@ const getMessages = async () => {
             AUTHORITY.ADMINISTRATOR,
             AUTHORITY.CUSTOMER_SUPPORT_AGENT,
             AUTHORITY.SERVICE_MANAGER,
-          ].some((auth) => userInfo.authorities.includes(auth)) &&
+          ].some((auth) => userInfo.authorities.includes(auth)) && (
             <>
               <Section>
-                <Track gap={8} direction='vertical' align='left'>
-                  <p className='h6'>{t('settings.users.autoCorrector')}</p>
+                <Track gap={8} direction="vertical" align="left">
+                  <p className="h6">{t('settings.users.autoCorrector')}</p>
                   <SwitchBox
-                    name='useAutocorrect'
+                    name="useAutocorrect"
                     label={t('settings.users.useAutocorrect')}
                     checked={userProfileSettings.useAutocorrect}
-                    onCheckedChange={(checked) => handleUserProfileSettingsChange('useAutocorrect', checked)}
+                    onCheckedChange={(checked) =>
+                      handleUserProfileSettingsChange('useAutocorrect', checked)
+                    }
                   />
                 </Track>
               </Section>
               <Section>
-                <Track gap={8} direction='vertical' align='left'>
-                  <p className='h6'>{t('settings.users.emailNotifications')}</p>
+                <Track gap={8} direction="vertical" align="left">
+                  <p className="h6">{t('settings.users.emailNotifications')}</p>
                   <SwitchBox
-                    name='forwardedChatEmailNotifications'
+                    name="forwardedChatEmailNotifications"
                     label={t('settings.users.newForwardedChat')}
-                    checked={userProfileSettings.forwardedChatEmailNotifications}
-                    onCheckedChange={(checked) => handleUserProfileSettingsChange('forwardedChatEmailNotifications', checked)}
+                    checked={
+                      userProfileSettings.forwardedChatEmailNotifications
+                    }
+                    onCheckedChange={(checked) =>
+                      handleUserProfileSettingsChange(
+                        'forwardedChatEmailNotifications',
+                        checked
+                      )
+                    }
                   />
                   <SwitchBox
-                    name='newChatEmailNotifications'
+                    name="newChatEmailNotifications"
                     label={t('settings.users.newUnansweredChat')}
                     checked={userProfileSettings.newChatEmailNotifications}
-                    onCheckedChange={(checked) => handleUserProfileSettingsChange('newChatEmailNotifications', checked)}
+                    onCheckedChange={(checked) =>
+                      handleUserProfileSettingsChange(
+                        'newChatEmailNotifications',
+                        checked
+                      )
+                    }
                   />
                 </Track>
               </Section>
               <Section>
-                <Track gap={8} direction='vertical' align='left'>
-                  <p className='h6'>{t('settings.users.soundNotifications')}</p>
+                <Track gap={8} direction="vertical" align="left">
+                  <p className="h6">{t('settings.users.soundNotifications')}</p>
                   <SwitchBox
-                    name='forwardedChatSoundNotifications'
+                    name="forwardedChatSoundNotifications"
                     label={t('settings.users.newForwardedChat')}
-                    checked={userProfileSettings.forwardedChatSoundNotifications}
-                    onCheckedChange={(checked) => handleUserProfileSettingsChange('forwardedChatSoundNotifications', checked)}
+                    checked={
+                      userProfileSettings.forwardedChatSoundNotifications
+                    }
+                    onCheckedChange={(checked) =>
+                      handleUserProfileSettingsChange(
+                        'forwardedChatSoundNotifications',
+                        checked
+                      )
+                    }
                   />
                   <SwitchBox
-                    name='newChatSoundNotifications'
+                    name="newChatSoundNotifications"
                     label={t('settings.users.newUnansweredChat')}
                     checked={userProfileSettings.newChatSoundNotifications}
-                    onCheckedChange={(checked) => handleUserProfileSettingsChange('newChatSoundNotifications', checked)}
+                    onCheckedChange={(checked) =>
+                      handleUserProfileSettingsChange(
+                        'newChatSoundNotifications',
+                        checked
+                      )
+                    }
                   />
                 </Track>
               </Section>
               <Section>
-                <Track gap={8} direction='vertical' align='left'>
-                  <p className='h6'>{t('settings.users.popupNotifications')}</p>
+                <Track gap={8} direction="vertical" align="left">
+                  <p className="h6">{t('settings.users.popupNotifications')}</p>
                   <SwitchBox
-                    name='forwardedChatPopupNotifications'
+                    name="forwardedChatPopupNotifications"
                     label={t('settings.users.newForwardedChat')}
-                    checked={userProfileSettings.forwardedChatPopupNotifications}
-                    onCheckedChange={(checked) => handleUserProfileSettingsChange('forwardedChatPopupNotifications', checked)}
+                    checked={
+                      userProfileSettings.forwardedChatPopupNotifications
+                    }
+                    onCheckedChange={(checked) =>
+                      handleUserProfileSettingsChange(
+                        'forwardedChatPopupNotifications',
+                        checked
+                      )
+                    }
                   />
                   <SwitchBox
-                    name='newChatPopupNotifications'
+                    name="newChatPopupNotifications"
                     label={t('settings.users.newUnansweredChat')}
                     checked={userProfileSettings.newChatPopupNotifications}
-                    onCheckedChange={(checked) => handleUserProfileSettingsChange('newChatPopupNotifications', checked)}
+                    onCheckedChange={(checked) =>
+                      handleUserProfileSettingsChange(
+                        'newChatPopupNotifications',
+                        checked
+                      )
+                    }
                   />
                 </Track>
               </Section>
             </>
-          }
+          )}
         </Drawer>
       )}
     </>

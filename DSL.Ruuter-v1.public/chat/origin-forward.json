@@ -12,9 +12,7 @@
         "proceed": {
           "method": "post",
           "endpoint": "{tim_url}/jwt/custom-jwt-userinfo",
-          "cookies": [
-            "chatJwt"
-          ],
+          "cookies": ["chatJwt"],
           "post_body_struct": "chatJwt",
           "response": {
             "ok": "proceed",
@@ -117,9 +115,7 @@
             "ok": "proceed",
             "nok": "stop"
           },
-          "cookies": [
-            "redirectJwt"
-          ]
+          "cookies": ["redirectJwt"]
         },
         "response": {
           "ok": "proceed",
@@ -180,7 +176,7 @@
               "#.from_property": "{#.update_chat_jwt}",
               "maxAge": 7200,
               "httpOnly": true,
-              "domain": "localhost",
+              "domain": "{cookie_domain}",
               "setSecure": true,
               "name": "chatJwt"
             }
@@ -237,7 +233,7 @@
               "maxAge": 7200,
               "httpOnly": true,
               "setSecure": true,
-              "domain": "localhost",
+              "domain": "{cookie_domain}",
               "name": "redirectJwt"
             }
           }

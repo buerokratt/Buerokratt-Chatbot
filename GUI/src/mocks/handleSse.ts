@@ -7,7 +7,7 @@ import { MessageSseEvent } from "../types/chat";
 const handleMockSse = () => {
   new MockEvent({
     // TODO: set correct url
-    url: 'http://localhost:8080/cs-get-new-messages',
+    url: import.meta.env.BASE_URL + '/cs-get-new-messages',
     setInterval: [3_000, 2_000, 3_000, 4_000],
     responses: [
       { type: MessageSseEvent.READ, data: chatMessagesSeenSse },
@@ -19,7 +19,7 @@ const handleMockSse = () => {
   });
 
   // TODO: set correct url
-  return new EventSource('http://localhost:8080/cs-get-new-messages', {
+  return new EventSource(import.meta.env.BASE_URL + '/cs-get-new-messages', {
     withCredentials: true
   });
 
