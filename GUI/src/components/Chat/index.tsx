@@ -121,8 +121,6 @@ const Chat: FC<ChatProps> = ({
     );
     setChatCsaActive(
       res.data.get_customer_support_activity[0]?.status === 'online'
-        ? true
-        : false
     );
   };
 
