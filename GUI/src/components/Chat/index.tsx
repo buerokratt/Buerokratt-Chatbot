@@ -14,14 +14,11 @@ import clsx from 'clsx';
 import { MdOutlineAttachFile, MdOutlineSend } from 'react-icons/all';
 import {
   Button,
-  FormInput,
-  FormTextarea,
   Icon,
   Label,
   Track,
 } from 'components';
 import { ReactComponent as BykLogoWhite } from 'assets/logo-white.svg';
-import useUserInfoStore from 'store/store';
 import {
   Chat as ChatType,
   MessageSseEvent,
@@ -42,9 +39,6 @@ import { findIndex } from 'lodash';
 import { CHAT_INPUT_LENGTH } from 'constants/config';
 import apiDev from 'services/api-dev';
 import ChatTextArea from './ChatTextArea';
-import TextareaAutosize, {
-  TextareaAutosizeProps,
-} from 'react-textarea-autosize';
 import { ROLES } from 'utils/constants';
 import newMessageSound from '../../assets/newMessageSound.mp3';
 import { AUTHOR_ROLES, MESSAGE_FILE_SIZE_LIMIT } from 'utils/constants';
@@ -52,6 +46,7 @@ import formatBytes from 'utils/format-bytes';
 import useSendAttachment from 'modules/attachment/hooks';
 import { AxiosError } from 'axios';
 import { useToast } from 'hooks/useToast';
+import useUserInfoStore from 'store/store';
 import './Chat.scss';
 
 type ChatProps = {
