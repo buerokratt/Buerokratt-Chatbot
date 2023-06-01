@@ -367,6 +367,15 @@ const Chat: FC<ChatProps> = ({
     let groupedMessages: GroupedMessage[] = [];
     messagesList.forEach((message) => {
       const lastGroup = groupedMessages[groupedMessages.length - 1];
+      if (
+        lastGroup &&
+        lastGroup.type === AUTHOR_ROLES.BACKOFFICE_USER &&
+        lastGroup.messages.at(-1) &&
+        message.event === CHAT_EVENTS.READ
+      ) {
+        lastGroup.messages.at(-1)!.event = CHAT_EVENTS.READ;
+        return;
+      }
       if (lastGroup?.type === message.authorRole) {
         if (
           !message.event ||
