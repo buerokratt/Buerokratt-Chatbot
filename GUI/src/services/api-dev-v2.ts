@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios';
 
 const instance = axios.create({
-  baseURL: 'http://localhost:8088',
+  baseURL: import.meta.env.REACT_APP_RUUTER_V2_PRIVATE_API_URL,
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json',

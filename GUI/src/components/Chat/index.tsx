@@ -8,7 +8,6 @@ import {
   useTransition,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useMutation, useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { et } from 'date-fns/locale';
 import clsx from 'clsx';
@@ -24,11 +23,12 @@ import {
 import { ReactComponent as BykLogoWhite } from 'assets/logo-white.svg';
 import useUserInfoStore from 'store/store';
 import {
-  CHAT_EVENTS,
   Chat as ChatType,
   MessageSseEvent,
   MessageStatus,
+  CHAT_EVENTS,
 } from 'types/chat';
+import { useMutation } from '@tanstack/react-query';
 import {
   Attachment,
   AttachmentTypes,
@@ -36,8 +36,7 @@ import {
   MessagePreviewSseResponse,
 } from 'types/message';
 import ChatMessage from './ChatMessage';
-import ChatEvent from './ChatEvent';
-import './Chat.scss';
+import ChatEvent from '../ChatEvent';
 import handleSse from '../../mocks/handleSse';
 import { findIndex } from 'lodash';
 import { CHAT_INPUT_LENGTH } from 'constants/config';
@@ -53,6 +52,7 @@ import formatBytes from 'utils/format-bytes';
 import useSendAttachment from 'modules/attachment/hooks';
 import { AxiosError } from 'axios';
 import { useToast } from 'hooks/useToast';
+import './Chat.scss';
 
 type ChatProps = {
   chat: ChatType;
@@ -255,11 +255,6 @@ const Chat: FC<ChatProps> = ({
     }
   };
 
-  const hasAccessToActions = useMemo(() => {
-    if (chat.customerSupportId === userInfo?.idCode) return true;
-    return false;
-  }, [chat, userInfo]);
-
   const endUserFullName =
     chat.endUserFirstName !== '' && chat.endUserLastName !== ''
       ? `${chat.endUserFirstName} ${chat.endUserLastName}`
@@ -377,7 +372,7 @@ const Chat: FC<ChatProps> = ({
     //     // make role more uri friendly
     //     let role = authority.substring(5).replaceAll('_', '-').toLowerCase();
     //     // TODO: Replace '/active/admin.json' with '/<type>/<role>.json'.
-    //     axios({ url: `http://localhost:8085/cdn/buttons/chats/active/${role}.json` })
+    //     axios({ url: `import.meta.env.REACT_APP_RUUTER_V1_PRIVATE_API_URL/cdn/buttons/chats/active/${role}.json` })
     //         .then(res => {
     //             res.data.buttons.forEach((btnId: any) => {
     //                 if (!buttonsToAllow.includes(btnId))
@@ -843,6 +838,7 @@ const Chat: FC<ChatProps> = ({
       return await convertBase64(file);
     }
   }
+
   async function convertBase64(file: File): Promise<any> {
     return await new Promise((resolve, reject) => {
       const fileReader = new FileReader();

@@ -109,9 +109,7 @@
               "endpoint": "{ruuter_url}/match_input",
               "post_body_parameters": {
                 "chat_info": {
-                  "cookies": [
-                    "chatJwt"
-                  ],
+                  "cookies": ["chatJwt"],
                   "method": "post",
                   "endpoint": "{tim_url}/jwt/custom-jwt-userinfo",
                   "post_body_struct": "chatJwt",
@@ -209,9 +207,7 @@
           }
         },
         "proceed": {
-          "cookies": [
-            "chatJwt"
-          ],
+          "cookies": ["chatJwt"],
           "method": "post",
           "endpoint": "{tim_url}/jwt/custom-jwt-blacklist",
           "post_body_struct": "chatJwt",
@@ -220,7 +216,7 @@
               "name": "chatJwt",
               "maxAge": 0,
               "httpOnly": true,
-              "domain": "localhost",
+              "domain": "{cookie_domain}",
               "setSecure": true,
               "value": null
             }
@@ -241,9 +237,7 @@
           }
         },
         "proceed": {
-          "cookies": [
-            "clientCustomJwtCookie"
-          ],
+          "cookies": ["clientCustomJwtCookie"],
           "method": "post",
           "endpoint": "{tim_url}/jwt/custom-jwt-blacklist",
           "post_body_struct": "clientCustomJwtCookie",
@@ -252,7 +246,7 @@
               "name": "clientCustomJwtCookie",
               "httpOnly": true,
               "maxAge": 0,
-              "domain": "localhost",
+              "domain": "{cookie_domain}",
               "setSecure": true,
               "value": null
             }
