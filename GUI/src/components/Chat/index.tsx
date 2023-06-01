@@ -11,6 +11,14 @@ import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { et } from 'date-fns/locale';
 import clsx from 'clsx';
+import { MdOutlineAttachFile, MdOutlineSend } from 'react-icons/all';
+import {
+  Button,
+  Icon,
+  Label,
+  Track,
+} from 'components';
+import { ReactComponent as BykLogoWhite } from 'assets/logo-white.svg';
 import {
   Chat as ChatType,
   MessageSseEvent,
@@ -18,9 +26,6 @@ import {
   CHAT_EVENTS,
 } from 'types/chat';
 import { useMutation } from '@tanstack/react-query';
-import { MdOutlineAttachFile, MdOutlineSend } from 'react-icons/md';
-import { Button, Icon, Track } from 'components';
-import { ReactComponent as BykLogoWhite } from 'assets/logo-white.svg';
 import {
   Attachment,
   AttachmentTypes,
@@ -34,6 +39,7 @@ import { findIndex } from 'lodash';
 import { CHAT_INPUT_LENGTH } from 'constants/config';
 import apiDev from 'services/api-dev';
 import ChatTextArea from './ChatTextArea';
+import { ROLES } from 'utils/constants';
 import newMessageSound from '../../assets/newMessageSound.mp3';
 import { AUTHOR_ROLES, MESSAGE_FILE_SIZE_LIMIT } from 'utils/constants';
 import formatBytes from 'utils/format-bytes';
@@ -85,6 +91,7 @@ const Chat: FC<ChatProps> = ({
   const [isPending, startTransition] = useTransition();
   const [responseText, setResponseText] = useState('');
   const [selectedMessages, setSelectedMessages] = useState<Message[]>([]);
+  const [chatCsaActive, setChatCsaActive] = useState<boolean>(true);
   const [messagesList, setMessagesList] = useState<Message[]>([]);
   const [userInput, setUserInput] = useState<string>('');
   const [userInputFile, setUserInputFile] = useState<Attachment>();
@@ -93,11 +100,24 @@ const Chat: FC<ChatProps> = ({
   let messagesLength = 0;
 
   useEffect(() => {
+    getCsaStatus();
     const interval = setInterval(() => {
       getMessages();
     }, 3500);
     return () => clearInterval(interval);
   }, []);
+
+  const getCsaStatus = async () => {
+    const { data: res } = await apiDev.post(
+      'cs-get-customer-support-activity-by-id',
+      {
+        customerSupportId: chat.customerSupportId,
+      }
+    );
+    setChatCsaActive(
+      res.data.get_customer_support_activity[0]?.status === 'online'
+    );
+  };
 
   const getMessages = async () => {
     const { data: res } = await apiDev.post('cs-get-messages-by-chat-id', {
@@ -589,7 +609,8 @@ const Chat: FC<ChatProps> = ({
           </div>
         )}
 
-        {chat.customerSupportId != userInfo?.idCode && (
+        {(chat.customerSupportId === '' ||
+          (chat.customerSupportId !== userInfo?.idCode && !chatCsaActive)) && (
           <div className="active-chat__toolbar">
             <Track justify="center">
               <div className="active-chat__toolbar-actions">
@@ -612,75 +633,109 @@ const Chat: FC<ChatProps> = ({
         )}
       </div>
       <div className="active-chat__side">
-        <div className="active-chat__side-actions">
-          <Button
-            appearance="success"
-            onClick={onChatEnd ? () => onChatEnd(chat) : undefined}
-          >
-            {t('chat.active.endChat')}
-          </Button>
-          <Button
-            appearance="secondary"
-            disabled={chat.customerSupportId != userInfo?.idCode}
-            onClick={() =>
-              handleChatEvent(CHAT_EVENTS.REQUESTED_AUTHENTICATION)
-            }
-          >
-            {t('chat.active.askAuthentication')}
-          </Button>
-          <Button
-            appearance="secondary"
-            disabled={chat.customerSupportId != userInfo?.idCode}
-            onClick={() => handleChatEvent(CHAT_EVENTS.CONTACT_INFORMATION)}
-          >
-            {t('chat.active.askForContact')}
-          </Button>
-          <Button
-            appearance="secondary"
-            disabled={chat.customerSupportId != userInfo?.idCode}
-            onClick={() => handleChatEvent(CHAT_EVENTS.ASK_PERMISSION)}
-          >
-            {t('chat.active.askPermission')}
-          </Button>
-          <Button
-            appearance="secondary"
-            onClick={
-              onForwardToColleauge
-                ? () => {
-                    onForwardToColleauge(chat);
-                    setSelectedMessages([]);
+        {(chat.customerSupportId === '' ||
+          chat.customerSupportId === userInfo?.idCode) && (
+          <div className="active-chat__side-actions">
+            <Button
+              appearance="success"
+              onClick={onChatEnd ? () => onChatEnd(chat) : undefined}
+            >
+              {t('chat.active.endChat')}
+            </Button>
+            <Button
+              appearance="secondary"
+              disabled={chat.customerSupportId != userInfo?.idCode}
+              onClick={() =>
+                handleChatEvent(CHAT_EVENTS.REQUESTED_AUTHENTICATION)
+              }
+            >
+              {t('chat.active.askAuthentication')}
+            </Button>
+            <Button
+              appearance="secondary"
+              disabled={chat.customerSupportId != userInfo?.idCode}
+              onClick={() => handleChatEvent(CHAT_EVENTS.CONTACT_INFORMATION)}
+            >
+              {t('chat.active.askForContact')}
+            </Button>
+            <Button
+              appearance="secondary"
+              disabled={chat.customerSupportId != userInfo?.idCode}
+              onClick={() => handleChatEvent(CHAT_EVENTS.ASK_PERMISSION)}
+            >
+              {t('chat.active.askPermission')}
+            </Button>
+            <Button
+              appearance="secondary"
+              onClick={
+                onForwardToColleauge
+                  ? () => {
+                      onForwardToColleauge(chat);
+                      setSelectedMessages([]);
+                    }
+                  : undefined
+              }
+            >
+              {t('chat.active.forwardToColleague')}
+            </Button>
+            <Button
+              appearance="secondary"
+              onClick={
+                onForwardToEstablishment
+                  ? () => onForwardToEstablishment(chat)
+                  : undefined
+              }
+            >
+              {t('chat.active.forwardToOrganization')}
+            </Button>
+            <Button
+              appearance="secondary"
+              disabled={chat.customerSupportId != userInfo?.idCode}
+              onClick={onSendToEmail ? () => onSendToEmail(chat) : undefined}
+            >
+              {t('chat.active.sendToEmail')}
+            </Button>
+            <Button
+              appearance="secondary"
+              disabled={chat.customerSupportId != userInfo?.idCode}
+              onClick={
+                onStartAService ? () => onStartAService(chat) : undefined
+              }
+            >
+              {t('chat.active.startService')}
+            </Button>
+          </div>
+        )}
+        {chat.customerSupportId !== '' &&
+          chat.customerSupportId !== userInfo?.idCode &&
+          !chatCsaActive && (
+            <div className="active-chat__side-actions">
+              <Track gap={8} style={{ marginBottom: 36 }}>
+                <Label type="warning">!</Label>
+                <p className="csa-away">Nõustaja on eemal.</p>
+              </Track>
+              {userInfo?.authorities.some((authority) =>
+                [
+                  ROLES.ROLE_ADMINISTRATOR,
+                  ROLES.ROLE_CUSTOMER_SUPPORT_AGENT,
+                ].includes(authority as ROLES)
+              ) && (
+                <Button
+                  appearance="secondary"
+                  onClick={
+                    onForwardToColleauge
+                      ? () => {
+                          onForwardToColleauge(chat);
+                          setSelectedMessages([]);
+                        }
+                      : undefined
                   }
-                : undefined
-            }
-          >
-            {t('chat.active.forwardToColleague')}
-          </Button>
-          <Button
-            appearance="secondary"
-            onClick={
-              onForwardToEstablishment
-                ? () => onForwardToEstablishment(chat)
-                : undefined
-            }
-          >
-            {t('chat.active.forwardToOrganization')}
-          </Button>
-          <Button
-            appearance="secondary"
-            disabled={chat.customerSupportId != userInfo?.idCode}
-            onClick={onSendToEmail ? () => onSendToEmail(chat) : undefined}
-          >
-            {t('chat.active.sendToEmail')}
-          </Button>
-          <Button
-            appearance="secondary"
-            disabled={chat.customerSupportId != userInfo?.idCode}
-            onClick={onStartAService ? () => onStartAService(chat) : undefined}
-          >
-            {t('chat.active.startService')}
-          </Button>
-        </div>
-
+                >
+                  {t('chat.active.forwardToColleague')}
+                </Button>
+              )}
+            </div>
+          )}
         <div className="active-chat__side-meta">
           <div>
             <p>

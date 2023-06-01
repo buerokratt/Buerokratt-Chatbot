@@ -203,12 +203,14 @@ const Header: FC = () => {
   });
 
   const customerSupportActivityMutation = useMutation({
-    mutationFn: (data: CustomerSupportActivityDTO) =>
-      apiDev.post('cs-set-customer-support-activity', {
-        customerSupportId: data.customerSupportId,
-        customerSupportActive: data.customerSupportActive,
-        customerSupportStatus: data.customerSupportStatus,
-      }),
+    mutationFn: (data: CustomerSupportActivityDTO) => apiDev.post('cs-set-customer-support-activity', {
+      customerSupportId: data.customerSupportId,
+      customerSupportActive: data.customerSupportActive,
+      customerSupportStatus: data.customerSupportStatus
+    }),
+    onSuccess: () => {
+      if (csaStatus === 'online') extendUserSessionMutation.mutate()
+    },
     onError: async (error: AxiosError) => {
       await queryClient.invalidateQueries([
         'cs-get-customer-support-activity',
@@ -260,7 +262,7 @@ const Header: FC = () => {
 
     setCsaStatus('idle');
     customerSupportActivityMutation.mutate({
-      customerSupportActive: customerSupportActivity.active,
+      customerSupportActive: csaActive,
       customerSupportId: customerSupportActivity.idCode,
       customerSupportStatus: 'idle',
     });
@@ -275,11 +277,10 @@ const Header: FC = () => {
 
     setCsaStatus('online');
     customerSupportActivityMutation.mutate({
-      customerSupportActive: customerSupportActivity.active,
+      customerSupportActive: csaActive,
       customerSupportId: customerSupportActivity.idCode,
       customerSupportStatus: 'online',
-    });
-    extendUserSessionMutation.mutate();
+    });    
   };
 
   const { getRemainingTime } = useIdleTimer({
@@ -343,17 +344,9 @@ const Header: FC = () => {
                     textTransform: 'lowercase',
                   }}
                 >
-                  {unansweredChats && (
-                    <>
-                      <strong>{unansweredChats}</strong> {t('chat.unanswered')}
-                    </>
-                  )}
-                  {forwardedChats && (
-                    <>
-                      {' '}
-                      <strong>{forwardedChats}</strong> {t('chat.forwarded')}
-                    </>
-                  )}
+                  <strong>{unansweredChats}</strong> {t('chat.unanswered')}
+                  {' '}
+                  <strong>{forwardedChats}</strong> {t('chat.forwarded')}
                 </p>
                 <Switch
                   onCheckedChange={handleCsaStatusChange}
