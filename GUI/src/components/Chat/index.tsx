@@ -382,12 +382,12 @@ const Chat: FC<ChatProps> = ({
           message.event === '' ||
           message.event === 'greeting'
         ) {
-          lastGroup.messages.push(message);
+          lastGroup.messages.push({ ...message });
         } else {
           groupedMessages.push({
             name: '',
             type: 'event',
-            messages: [message],
+            messages: [{ ...message }],
           });
         }
       } else {
@@ -404,13 +404,13 @@ const Chat: FC<ChatProps> = ({
                 ? `${message.authorFirstName} ${message.authorLastName}`
                 : message.authorRole,
             type: message.authorRole,
-            messages: [message],
+            messages: [{ ...message }],
           });
         } else {
           groupedMessages.push({
             name: '',
             type: 'event',
-            messages: [message],
+            messages: [{ ...message }],
           });
         }
       }
