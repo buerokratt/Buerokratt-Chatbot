@@ -11,6 +11,7 @@ import ChatMessage from './ChatMessage';
 import './HistoricalChat.scss';
 import apiDev from 'services/api-dev';
 import ChatEvent from 'components/ChatEvent';
+import { AUTHOR_ROLES } from 'utils/constants';
 
 type ChatProps = {
   chat: ChatType;
@@ -60,15 +61,23 @@ const HistoricalChat: FC<ChatProps> = ({ chat, onChatStatusChange, onCommentChan
     let groupedMessages: GroupedMessage[] = [];
     messagesList.forEach((message) => {
       const lastGroup = groupedMessages[groupedMessages.length - 1];
-
+      if (
+        lastGroup &&
+        lastGroup.type === AUTHOR_ROLES.BACKOFFICE_USER &&
+        lastGroup.messages.at(-1) &&
+        message.event === CHAT_EVENTS.READ
+      ) {
+        lastGroup.messages.at(-1)!.event = CHAT_EVENTS.READ;
+        return;
+      }
       if (lastGroup?.type === message.authorRole) {
         if (!message.event || message.event.toLowerCase() === 'greeting') {
-          lastGroup.messages.push(message);
+          lastGroup.messages.push({ ...message });
         } else {
           groupedMessages.push({
             name: '',
             type: 'event',
-            messages: [message],
+            messages: [{ ...message }],
           });
         }
       } else {
@@ -79,7 +88,7 @@ const HistoricalChat: FC<ChatProps> = ({ chat, onChatStatusChange, onCommentChan
               ? `${message.authorFirstName} ${message.authorLastName}`
               : message.authorRole,
           type: message.authorRole,
-          messages: [message],
+          messages: [{ ...message }],
         });
       }
     });
