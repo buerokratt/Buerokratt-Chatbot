@@ -21,7 +21,6 @@ import {
 import { ReactComponent as BykLogoWhite } from 'assets/logo-white.svg';
 import {
   Chat as ChatType,
-  MessageSseEvent,
   MessageStatus,
   CHAT_EVENTS,
 } from 'types/chat';
@@ -34,7 +33,6 @@ import {
 } from 'types/message';
 import ChatMessage from './ChatMessage';
 import ChatEvent from '../ChatEvent';
-import handleSse from '../../mocks/handleSse';
 import { findIndex } from 'lodash';
 import { CHAT_INPUT_LENGTH } from 'constants/config';
 import apiDev from 'services/api-dev';
@@ -46,6 +44,7 @@ import formatBytes from 'utils/format-bytes';
 import useSendAttachment from 'modules/attachment/hooks';
 import { AxiosError } from 'axios';
 import { useToast } from 'hooks/useToast';
+import { fetchEventSource } from '@microsoft/fetch-event-source';
 import useUserInfoStore from 'store/store';
 import './Chat.scss';
 
@@ -119,6 +118,28 @@ const Chat: FC<ChatProps> = ({
     );
   };
 
+  useEffect(() => {
+    const ctrl = new AbortController();
+    fetchEventSource(`${import.meta.env.BASE_URL}/sse/cs-get-new-messages`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        chatId: chat.id,
+        lastRead: new Date().toISOString(),
+      }),
+      onmessage(event) {
+        const data = JSON.parse(event.data);
+        const { preview } = data.body.data.cs_get_new_messages.at(-1)
+        setPreviewMessage(preview)
+      },
+      signal: ctrl.signal,
+    });
+
+    return () => ctrl && ctrl.abort();
+  }, []);
+
   const getMessages = async () => {
     const { data: res } = await apiDev.post('cs-get-messages-by-chat-id', {
       chatId: chat.id,
@@ -164,7 +185,7 @@ const Chat: FC<ChatProps> = ({
 
   const postMessageMutation = useMutation({
     mutationFn: (message: Message) => apiDev.post('cs-post-message', message),
-    onSuccess: () => {},
+    onSuccess: () => { },
     onError: (error: AxiosError) => {
       toast.open({
         type: 'error',
@@ -181,7 +202,7 @@ const Chat: FC<ChatProps> = ({
         event: message.event ?? '',
         authorTimestamp: message.authorTimestamp ?? '',
       }),
-    onSuccess: () => {},
+    onSuccess: () => { },
     onError: (error: AxiosError) => {
       toast.open({
         type: 'error',
@@ -239,15 +260,10 @@ const Chat: FC<ChatProps> = ({
 
     if (index === -1) {
       CURRENT_MESSAGE_GROUPS.push(PREVIEW_MESSAGE);
-      startTransition(() => {
-        setMessageGroups(CURRENT_MESSAGE_GROUPS);
-      });
     } else {
       CURRENT_MESSAGE_GROUPS.splice(index, 1, PREVIEW_MESSAGE);
-      startTransition(() => {
-        setMessageGroups(CURRENT_MESSAGE_GROUPS);
-      });
     }
+    startTransition(() => setMessageGroups(CURRENT_MESSAGE_GROUPS));
   };
 
   const endUserFullName =
@@ -258,104 +274,104 @@ const Chat: FC<ChatProps> = ({
   const allSideButtons =
     chat.customerSupportId === userInfo?.idCode
       ? [
-          {
-            id: 'endChat',
-            button: (
-              <Button
-                key="endChat"
-                appearance="success"
-                onClick={onChatEnd ? () => onChatEnd(chat) : undefined}
-              >
-                {t('chat.active.endChat')}
-              </Button>
-            ),
-          },
-          {
-            id: 'askAuthentication',
-            button: (
-              <Button
-                key="askAuthentication"
-                appearance="secondary"
-                onClick={() =>
-                  handleChatEvent(CHAT_EVENTS.REQUESTED_AUTHENTICATION)
-                }
-              >
-                {t('chat.active.askAuthentication')}
-              </Button>
-            ),
-          },
-          {
-            id: 'askForContact',
-            button: (
-              <Button
-                key="askForContact"
-                appearance="secondary"
-                onClick={() => handleChatEvent(CHAT_EVENTS.CONTACT_INFORMATION)}
-              >
-                {t('chat.active.askForContact')}
-              </Button>
-            ),
-          },
-          {
-            id: 'askPermission',
-            button: (
-              <Button
-                key="askPermission"
-                appearance="secondary"
-                onClick={() => handleChatEvent(CHAT_EVENTS.ASK_PERMISSION)}
-              >
-                {t('chat.active.askPermission')}
-              </Button>
-            ),
-          },
-          {
-            id: 'forwardToColleague',
-            button: (
-              <Button
-                key="forwardToColleague"
-                appearance="secondary"
-                onClick={
-                  onForwardToColleauge
-                    ? () => {
-                        onForwardToColleauge(chat);
-                        setSelectedMessages([]);
-                      }
-                    : undefined
-                }
-              >
-                {t('chat.active.forwardToColleague')}
-              </Button>
-            ),
-          },
-          {
-            id: 'forwardToOrganization',
-            button: (
-              <Button
-                key="forwardToOrganization"
-                appearance="secondary"
-                onClick={
-                  onForwardToEstablishment
-                    ? () => onForwardToEstablishment(chat)
-                    : undefined
-                }
-              >
-                {t('chat.active.forwardToOrganization')}
-              </Button>
-            ),
-          },
-          {
-            id: 'sendToEmail',
-            button: (
-              <Button
-                key="sendToEmail"
-                appearance="secondary"
-                onClick={onSendToEmail ? () => onSendToEmail(chat) : undefined}
-              >
-                {t('chat.active.sendToEmail')}
-              </Button>
-            ),
-          },
-        ]
+        {
+          id: 'endChat',
+          button: (
+            <Button
+              key="endChat"
+              appearance="success"
+              onClick={onChatEnd ? () => onChatEnd(chat) : undefined}
+            >
+              {t('chat.active.endChat')}
+            </Button>
+          ),
+        },
+        {
+          id: 'askAuthentication',
+          button: (
+            <Button
+              key="askAuthentication"
+              appearance="secondary"
+              onClick={() =>
+                handleChatEvent(CHAT_EVENTS.REQUESTED_AUTHENTICATION)
+              }
+            >
+              {t('chat.active.askAuthentication')}
+            </Button>
+          ),
+        },
+        {
+          id: 'askForContact',
+          button: (
+            <Button
+              key="askForContact"
+              appearance="secondary"
+              onClick={() => handleChatEvent(CHAT_EVENTS.CONTACT_INFORMATION)}
+            >
+              {t('chat.active.askForContact')}
+            </Button>
+          ),
+        },
+        {
+          id: 'askPermission',
+          button: (
+            <Button
+              key="askPermission"
+              appearance="secondary"
+              onClick={() => handleChatEvent(CHAT_EVENTS.ASK_PERMISSION)}
+            >
+              {t('chat.active.askPermission')}
+            </Button>
+          ),
+        },
+        {
+          id: 'forwardToColleague',
+          button: (
+            <Button
+              key="forwardToColleague"
+              appearance="secondary"
+              onClick={
+                onForwardToColleauge
+                  ? () => {
+                    onForwardToColleauge(chat);
+                    setSelectedMessages([]);
+                  }
+                  : undefined
+              }
+            >
+              {t('chat.active.forwardToColleague')}
+            </Button>
+          ),
+        },
+        {
+          id: 'forwardToOrganization',
+          button: (
+            <Button
+              key="forwardToOrganization"
+              appearance="secondary"
+              onClick={
+                onForwardToEstablishment
+                  ? () => onForwardToEstablishment(chat)
+                  : undefined
+              }
+            >
+              {t('chat.active.forwardToOrganization')}
+            </Button>
+          ),
+        },
+        {
+          id: 'sendToEmail',
+          button: (
+            <Button
+              key="sendToEmail"
+              appearance="secondary"
+              onClick={onSendToEmail ? () => onSendToEmail(chat) : undefined}
+            >
+              {t('chat.active.sendToEmail')}
+            </Button>
+          ),
+        },
+      ]
       : [];
   const [sideButtons, setSideButtons] = useState([]);
   const [buttonsToAllow] = useState<any[]>([]);
@@ -412,8 +428,8 @@ const Chat: FC<ChatProps> = ({
               message.authorRole === 'end-user'
                 ? endUserFullName
                 : message.authorRole === 'backoffice-user'
-                ? `${message.authorFirstName} ${message.authorLastName}`
-                : message.authorRole,
+                  ? `${message.authorFirstName} ${message.authorLastName}`
+                  : message.authorRole,
             type: message.authorRole,
             messages: [message],
           });
@@ -472,35 +488,12 @@ const Chat: FC<ChatProps> = ({
     setMessagesList((oldMessages) => [...oldMessages, newMessage]);
   };
 
-  useEffect(() => {
-    const sseResponse = handleSse();
-    sseResponse.addEventListener(MessageSseEvent.READ, (event: any) => {
-      setMessageReadStatus({
-        messageId: event.data.id,
-        readTime: event.data.created,
-      });
-    });
-
-    sseResponse.addEventListener(
-      MessageSseEvent.PREVIEW,
-      (event: MessagePreviewSseResponse) => {
-        setPreviewMessage(event);
-      }
-    );
-
-    return () => {
-      sseResponse.close();
-    };
-  }, []);
-
   const getCsaName = (message: Message) => {
-    return `${
-      isCsaNameVisible
-        ? `${message.authorFirstName} ${message.authorLastName}`
-        : ''
-    } ${
-      isCsaTitleVisible && chat.csaTitle !== null ? chat.csaTitle : ''
-    }`.trim();
+    return `${isCsaNameVisible
+      ? `${message.authorFirstName} ${message.authorLastName}`
+      : ''
+      } ${isCsaTitleVisible && chat.csaTitle !== null ? chat.csaTitle : ''
+      }`.trim();
   };
 
   return (
@@ -535,7 +528,7 @@ const Chat: FC<ChatProps> = ({
                   <>
                     <div className="active-chat__group-initials">
                       {group.type === 'buerokratt' ||
-                      group.type === 'chatbot' ? (
+                        group.type === 'chatbot' ? (
                         <BykLogoWhite height={24} />
                       ) : (
                         <>
@@ -611,26 +604,26 @@ const Chat: FC<ChatProps> = ({
 
         {(chat.customerSupportId === '' ||
           (chat.customerSupportId !== userInfo?.idCode && !chatCsaActive)) && (
-          <div className="active-chat__toolbar">
-            <Track justify="center">
-              <div className="active-chat__toolbar-actions">
-                <Button
-                  appearance="primary"
-                  style={{
-                    backgroundColor: '#25599E',
-                    color: '#FFFFFF',
-                    borderRadius: '50px',
-                    paddingLeft: '40px',
-                    paddingRight: '40px',
-                  }}
-                  onClick={() => takeOverChatMutation.mutate()}
-                >
-                  {t('chat.active.takeOver')}
-                </Button>
-              </div>
-            </Track>
-          </div>
-        )}
+            <div className="active-chat__toolbar">
+              <Track justify="center">
+                <div className="active-chat__toolbar-actions">
+                  <Button
+                    appearance="primary"
+                    style={{
+                      backgroundColor: '#25599E',
+                      color: '#FFFFFF',
+                      borderRadius: '50px',
+                      paddingLeft: '40px',
+                      paddingRight: '40px',
+                    }}
+                    onClick={() => takeOverChatMutation.mutate()}
+                  >
+                    {t('chat.active.takeOver')}
+                  </Button>
+                </div>
+              </Track>
+            </div>
+          )}
       </div>
       <div className="active-chat__side">
         {(chat.customerSupportId === '' ||
@@ -804,47 +797,47 @@ const Chat: FC<ChatProps> = ({
             <p>{chat.endUserUrl}</p>
           </div>
         </div>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 
-  function handleSendAttachment() {
-    const mutationArgs = {
-      data: userInputFile!,
+function handleSendAttachment() {
+  const mutationArgs = {
+    data: userInputFile!,
+  };
+  sendAttachmentMutation.mutate(mutationArgs as any);
+  sendAttachmentMutation.isLoading && console.log('Attachment sending...');
+  sendAttachmentMutation.isSuccess && console.log('Attachment sent');
+  sendAttachmentMutation.isError && console.log('Attachment sending error');
+}
+
+async function handleFileRead(file: File): Promise<string | null> {
+  if (!Object.values(AttachmentTypes).some((v) => v === file.type)) {
+    setErrorMessage(`${file.type} file type is not supported`);
+    return null;
+  }
+
+  if (file.size > MESSAGE_FILE_SIZE_LIMIT) {
+    setErrorMessage(
+      `Max allowed file size is ${formatBytes(MESSAGE_FILE_SIZE_LIMIT)}`
+    );
+    return null;
+  } else {
+    return await convertBase64(file);
+  }
+}
+
+async function convertBase64(file: File): Promise<any> {
+  return await new Promise((resolve, reject) => {
+    const fileReader = new FileReader();
+    fileReader.readAsDataURL(file);
+    fileReader.onload = () => {
+      resolve(fileReader.result);
     };
-    sendAttachmentMutation.mutate(mutationArgs as any);
-    sendAttachmentMutation.isLoading && console.log('Attachment sending...');
-    sendAttachmentMutation.isSuccess && console.log('Attachment sent');
-    sendAttachmentMutation.isError && console.log('Attachment sending error');
-  }
-
-  async function handleFileRead(file: File): Promise<string | null> {
-    if (!Object.values(AttachmentTypes).some((v) => v === file.type)) {
-      setErrorMessage(`${file.type} file type is not supported`);
-      return null;
-    }
-
-    if (file.size > MESSAGE_FILE_SIZE_LIMIT) {
-      setErrorMessage(
-        `Max allowed file size is ${formatBytes(MESSAGE_FILE_SIZE_LIMIT)}`
-      );
-      return null;
-    } else {
-      return await convertBase64(file);
-    }
-  }
-
-  async function convertBase64(file: File): Promise<any> {
-    return await new Promise((resolve, reject) => {
-      const fileReader = new FileReader();
-      fileReader.readAsDataURL(file);
-      fileReader.onload = () => {
-        resolve(fileReader.result);
-      };
-      fileReader.onerror = (error) => {
-        reject(error);
-      };
-    });
-  }
+    fileReader.onerror = (error) => {
+      reject(error);
+    };
+  });
+}
 };
 export default Chat;
