@@ -2,7 +2,7 @@ openapi: 3.0.3
 
 info:
   title: cs-get-customer-support-agents API
-  description: YAML file defining an endpoint for retrieving the working time of the organization
+  description: YAML file for getting the customer support agents
   version: 1.0.0
   license:
     name: MIT
