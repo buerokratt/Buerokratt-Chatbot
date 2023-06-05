@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { et } from 'date-fns/locale';
 import clsx from 'clsx';
-import { MdOutlineAttachFile, MdOutlineSend } from 'react-icons/all';
+import { MdOutlineAttachFile, MdOutlineSend } from 'react-icons/md';
 import {
   Button,
   Icon,
