@@ -48,8 +48,9 @@ const SettingsUsers: FC = () => {
   });
 
   const usersColumns = useMemo(() => [
-    columnHelper.accessor('login', {
-      header: t('settings.users.name') || '',
+    columnHelper.accessor((row) => `${row.firstName ?? ""} ${row.lastName ?? ""}`, {
+      id: `name`,
+      header: t('global.name') || '',
     }),
     columnHelper.accessor('idCode', {
       header: t('settings.users.idCode') || '',
