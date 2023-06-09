@@ -66,7 +66,7 @@ const ChatActive: FC = () => {
   });
 
   const sendToEmailMutation = useMutation({
-    mutationFn: (data: ChatType) => 
+    mutationFn: (data: ChatType) =>
       apiDevV2.post('history/cs-send-history-to-email', { chatId: data.id }),
     onSuccess: () => {
       toast.open({
@@ -233,9 +233,9 @@ const ChatActive: FC = () => {
                   <p>{name}</p>
                 </div>
               )}
-              {chats.map((chat) => (
+              {chats.map((chat, i) => (
                 <Tabs.Trigger
-                  key={chat.id}
+                  key={chat.id + i}
                   className={clsx('vertical-tabs__trigger', {
                     active:
                       chat.status === CHAT_STATUS.REDIRECTED &&
