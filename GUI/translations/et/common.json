@@ -42,7 +42,8 @@
     "away": "Eemal",
     "today": "Täna",
     "forward": "Suuna",
-    "chosen": "Valitud"
+    "chosen": "Valitud",
+    "read": "Loetud"
   },
   "mainMenu": {
     "menuLabel": "Põhinavigatsioon",
@@ -174,7 +175,8 @@
       "contact-information-fulfilled": "Kontakti info täidetud {{date}}",
       "requested-chat-forward": "Küsiti vestluse suunamist",
       "requested-chat-forward-accepted": "Vestluse suunamine aktsepteeritud {{date}}",
-      "requested-chat-forward-rejected": "Vestluse suunamine tagasi lükatud {{date}}"
+      "requested-chat-forward-rejected": "Vestluse suunamine tagasi lükatud {{date}}",
+      "message-read": "Loetud"
     }
   },
   "roles": {
