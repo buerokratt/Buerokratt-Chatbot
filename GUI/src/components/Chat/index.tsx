@@ -100,10 +100,7 @@ const Chat: FC<ChatProps> = ({
 
   useEffect(() => {
     getCsaStatus();
-    const interval = setInterval(() => {
-      getMessages();
-    }, 3500);
-    return () => clearInterval(interval);
+    getMessages();
   }, []);
 
   const getCsaStatus = async () => {
@@ -120,7 +117,7 @@ const Chat: FC<ChatProps> = ({
 
   useEffect(() => {
     const ctrl = new AbortController();
-    fetchEventSource(`${import.meta.env.BASE_URL}/sse/cs-get-new-messages`, {
+    fetchEventSource(`${import.meta.env.REACT_APP_RUUTER_V1_PRIVATE_API_URL}/sse/cs-get-new-messages`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -175,7 +172,7 @@ const Chat: FC<ChatProps> = ({
 
     setUserInput(e.target.files[0].name);
     setUserInputFile({
-      chatId: chat.id, // TODO get chatId from the store
+      chatId: chat.id,
       name: e.target.files[0].name,
       type: e.target.files[0].type as AttachmentTypes,
       size: e.target.files[0].size,
@@ -637,77 +634,77 @@ const Chat: FC<ChatProps> = ({
       <div className="active-chat__side">
         {(chat.customerSupportId === '' ||
           chat.customerSupportId === userInfo?.idCode) && (
-          <div className="active-chat__side-actions">
-            <Button
-              appearance="success"
-              onClick={onChatEnd ? () => onChatEnd(chat) : undefined}
-            >
-              {t('chat.active.endChat')}
-            </Button>
-            <Button
-              appearance="secondary"
-              disabled={chat.customerSupportId != userInfo?.idCode}
-              onClick={() =>
-                handleChatEvent(CHAT_EVENTS.REQUESTED_AUTHENTICATION)
-              }
-            >
-              {t('chat.active.askAuthentication')}
-            </Button>
-            <Button
-              appearance="secondary"
-              disabled={chat.customerSupportId != userInfo?.idCode}
-              onClick={() => handleChatEvent(CHAT_EVENTS.CONTACT_INFORMATION)}
-            >
-              {t('chat.active.askForContact')}
-            </Button>
-            <Button
-              appearance="secondary"
-              disabled={chat.customerSupportId != userInfo?.idCode}
-              onClick={() => handleChatEvent(CHAT_EVENTS.ASK_PERMISSION)}
-            >
-              {t('chat.active.askPermission')}
-            </Button>
-            <Button
-              appearance="secondary"
-              onClick={
-                onForwardToColleauge
-                  ? () => {
+            <div className="active-chat__side-actions">
+              <Button
+                appearance="success"
+                onClick={onChatEnd ? () => onChatEnd(chat) : undefined}
+              >
+                {t('chat.active.endChat')}
+              </Button>
+              <Button
+                appearance="secondary"
+                disabled={chat.customerSupportId != userInfo?.idCode}
+                onClick={() =>
+                  handleChatEvent(CHAT_EVENTS.REQUESTED_AUTHENTICATION)
+                }
+              >
+                {t('chat.active.askAuthentication')}
+              </Button>
+              <Button
+                appearance="secondary"
+                disabled={chat.customerSupportId != userInfo?.idCode}
+                onClick={() => handleChatEvent(CHAT_EVENTS.CONTACT_INFORMATION)}
+              >
+                {t('chat.active.askForContact')}
+              </Button>
+              <Button
+                appearance="secondary"
+                disabled={chat.customerSupportId != userInfo?.idCode}
+                onClick={() => handleChatEvent(CHAT_EVENTS.ASK_PERMISSION)}
+              >
+                {t('chat.active.askPermission')}
+              </Button>
+              <Button
+                appearance="secondary"
+                onClick={
+                  onForwardToColleauge
+                    ? () => {
                       onForwardToColleauge(chat);
                       setSelectedMessages([]);
                     }
-                  : undefined
-              }
-            >
-              {t('chat.active.forwardToColleague')}
-            </Button>
-            <Button
-              appearance="secondary"
-              onClick={
-                onForwardToEstablishment
-                  ? () => onForwardToEstablishment(chat)
-                  : undefined
-              }
-            >
-              {t('chat.active.forwardToOrganization')}
-            </Button>
-            <Button
-              appearance="secondary"
-              disabled={chat.customerSupportId != userInfo?.idCode}
-              onClick={onSendToEmail ? () => onSendToEmail(chat) : undefined}
-            >
-              {t('chat.active.sendToEmail')}
-            </Button>
-            <Button
-              appearance="secondary"
-              disabled={chat.customerSupportId != userInfo?.idCode}
-              onClick={
-                onStartAService ? () => onStartAService(chat) : undefined
-              }
-            >
-              {t('chat.active.startService')}
-            </Button>
-          </div>
-        )}
+                    : undefined
+                }
+              >
+                {t('chat.active.forwardToColleague')}
+              </Button>
+              <Button
+                appearance="secondary"
+                onClick={
+                  onForwardToEstablishment
+                    ? () => onForwardToEstablishment(chat)
+                    : undefined
+                }
+              >
+                {t('chat.active.forwardToOrganization')}
+              </Button>
+              <Button
+                appearance="secondary"
+                disabled={chat.customerSupportId != userInfo?.idCode}
+                onClick={onSendToEmail ? () => onSendToEmail(chat) : undefined}
+              >
+                {t('chat.active.sendToEmail')}
+              </Button>
+              <Button
+                appearance="secondary"
+                disabled={chat.customerSupportId != userInfo?.idCode}
+                onClick={
+                  onStartAService ? () => onStartAService(chat) : undefined
+                }
+              >
+                {t('chat.active.startService')}
+              </Button>
+            </div>
+          )}
         {chat.customerSupportId !== '' &&
           chat.customerSupportId !== userInfo?.idCode &&
           !chatCsaActive && (
@@ -722,20 +719,20 @@ const Chat: FC<ChatProps> = ({
                   ROLES.ROLE_CUSTOMER_SUPPORT_AGENT,
                 ].includes(authority as ROLES)
               ) && (
-                <Button
-                  appearance="secondary"
-                  onClick={
-                    onForwardToColleauge
-                      ? () => {
+                  <Button
+                    appearance="secondary"
+                    onClick={
+                      onForwardToColleauge
+                        ? () => {
                           onForwardToColleauge(chat);
                           setSelectedMessages([]);
                         }
-                      : undefined
-                  }
-                >
-                  {t('chat.active.forwardToColleague')}
-                </Button>
-              )}
+                        : undefined
+                    }
+                  >
+                    {t('chat.active.forwardToColleague')}
+                  </Button>
+                )}
             </div>
           )}
         <div className="active-chat__side-meta">
@@ -810,43 +807,43 @@ const Chat: FC<ChatProps> = ({
     </div >
   );
 
-function handleSendAttachment() {
-  const mutationArgs = {
-    data: userInputFile!,
-  };
-  sendAttachmentMutation.mutate(mutationArgs as any);
-  sendAttachmentMutation.isLoading && console.log('Attachment sending...');
-  sendAttachmentMutation.isSuccess && console.log('Attachment sent');
-  sendAttachmentMutation.isError && console.log('Attachment sending error');
-}
-
-async function handleFileRead(file: File): Promise<string | null> {
-  if (!Object.values(AttachmentTypes).some((v) => v === file.type)) {
-    setErrorMessage(`${file.type} file type is not supported`);
-    return null;
+  function handleSendAttachment() {
+    const mutationArgs = {
+      data: userInputFile!,
+    };
+    sendAttachmentMutation.mutate(mutationArgs as any);
+    sendAttachmentMutation.isLoading && console.log('Attachment sending...');
+    sendAttachmentMutation.isSuccess && console.log('Attachment sent');
+    sendAttachmentMutation.isError && console.log('Attachment sending error');
   }
 
-  if (file.size > MESSAGE_FILE_SIZE_LIMIT) {
-    setErrorMessage(
-      `Max allowed file size is ${formatBytes(MESSAGE_FILE_SIZE_LIMIT)}`
-    );
-    return null;
-  } else {
-    return await convertBase64(file);
-  }
-}
+  async function handleFileRead(file: File): Promise<string | null> {
+    if (!Object.values(AttachmentTypes).some((v) => v === file.type)) {
+      setErrorMessage(`${file.type} file type is not supported`);
+      return null;
+    }
 
-async function convertBase64(file: File): Promise<any> {
-  return await new Promise((resolve, reject) => {
-    const fileReader = new FileReader();
-    fileReader.readAsDataURL(file);
-    fileReader.onload = () => {
-      resolve(fileReader.result);
-    };
-    fileReader.onerror = (error) => {
-      reject(error);
-    };
-  });
-}
+    if (file.size > MESSAGE_FILE_SIZE_LIMIT) {
+      setErrorMessage(
+        `Max allowed file size is ${formatBytes(MESSAGE_FILE_SIZE_LIMIT)}`
+      );
+      return null;
+    } else {
+      return await convertBase64(file);
+    }
+  }
+
+  async function convertBase64(file: File): Promise<any> {
+    return await new Promise((resolve, reject) => {
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(file);
+      fileReader.onload = () => {
+        resolve(fileReader.result);
+      };
+      fileReader.onerror = (error) => {
+        reject(error);
+      };
+    });
+  }
 };
 export default Chat;
