@@ -42,7 +42,8 @@
     "away": "Away",
     "today": "Today",
     "forward": "Forward",
-    "chosen": "Chosen"
+    "chosen": "Chosen",
+    "read": "Read"
   },
   "mainMenu": {
     "menuLabel": "Main navigation",
@@ -174,7 +175,8 @@
       "contact-information-fulfilled": "Contact information fulfilled {{date}}",
       "requested-chat-forward": "Requested chat forward {{date}}",
       "requested-chat-forward-accepted": "Requested chat forward accepted {{date}}",
-      "requested-chat-forward-rejected": "Requested chat forward rejected {{date}}"
+      "requested-chat-forward-rejected": "Requested chat forward rejected {{date}}",
+      "message-read": "Read"
     }
   },
   "roles": {

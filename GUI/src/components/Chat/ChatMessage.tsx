@@ -5,6 +5,7 @@ import { MdOutlineCheck } from 'react-icons/md';
 import { Message } from '../../types/message';
 import { CHAT_EVENTS, MessageStatus } from '../../types/chat';
 import Linkifier from './linkifier';
+import { useTranslation } from 'react-i18next';
 
 type ChatMessageProps = {
   message: Message;
@@ -19,6 +20,7 @@ const ChatMessage: FC<ChatMessageProps> = ({
   onSelect,
   readStatus,
 }) => {
+  const { t } = useTranslation();
   const [selected, setSelected] = useState(false);
 
   return (
@@ -55,7 +57,7 @@ const ChatMessage: FC<ChatMessageProps> = ({
       </div>
       {message.event === CHAT_EVENTS.READ ? (
         <span className="active-chat__message-status">
-          Loetud
+          {t('global.read')}
           <time dateTime={message.authorTimestamp}>
             {' '}
             {format(new Date(message.authorTimestamp), 'HH:ii:ss')}
