@@ -65,7 +65,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
       toast.open({
         type: 'success',
         title: t('global.notification'),
-        message: 'New user added',
+        message: t('toast.succes.newUserAdded'),
       });
       onClose();
     },
@@ -94,7 +94,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
       toast.open({
         type: 'success',
         title: t('global.notification'),
-        message: 'User updated',
+        message: t('toast.success.userUpdated'),
       });
       onClose();
     },

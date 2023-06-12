@@ -119,10 +119,10 @@ const Header: FC = () => {
     () =>
       activeChatsList
         ? activeChatsList.filter(
-            (c) =>
-              c.status === CHAT_STATUS.REDIRECTED &&
-              c.customerSupportId === userInfo?.idCode
-          ).length
+          (c) =>
+            c.status === CHAT_STATUS.REDIRECTED &&
+            c.customerSupportId === userInfo?.idCode
+        ).length
         : 0,
     [activeChatsList]
   );
@@ -136,8 +136,8 @@ const Header: FC = () => {
           // TODO send email notification
           toast.open({
             type: 'info',
-            title: t('settings.users.newUnansweredChat'),
-            message: '',
+            title: t('global.notification'),
+            message: t('settings.users.newUnansweredChat'),
           });
         }
       subscription = interval(2 * 60 * 1000).subscribe(() => {
@@ -145,8 +145,8 @@ const Header: FC = () => {
         if (userProfileSettings.newChatPopupNotifications) {
           toast.open({
             type: 'info',
-            title: t('settings.users.newUnansweredChat'),
-            message: '',
+            title: t('global.notification'),
+            message: t('settings.users.newUnansweredChat'),
           });
         }
       });
@@ -166,8 +166,8 @@ const Header: FC = () => {
           // TODO send email notification
           toast.open({
             type: 'info',
-            title: t('settings.users.newForwardedChat'),
-            message: '',
+            title: t('global.notification'),
+            message: t('settings.users.newForwardedChat'),
           });
         }
       subscription = interval(2 * 60 * 1000).subscribe(() => {
@@ -175,8 +175,8 @@ const Header: FC = () => {
         if (userProfileSettings.forwardedChatPopupNotifications) {
           toast.open({
             type: 'info',
-            title: t('settings.users.newForwardedChat'),
-            message: '',
+            title: t('global.notification'),
+            message: t('settings.users.newForwardedChat'),
           });
         }
       });
@@ -280,7 +280,7 @@ const Header: FC = () => {
       customerSupportActive: csaActive,
       customerSupportId: customerSupportActivity.idCode,
       customerSupportStatus: 'online',
-    });    
+    });
   };
 
   const { getRemainingTime } = useIdleTimer({
@@ -464,109 +464,109 @@ const Header: FC = () => {
             AUTHORITY.CUSTOMER_SUPPORT_AGENT,
             AUTHORITY.SERVICE_MANAGER,
           ].some((auth) => userInfo.authorities.includes(auth)) && (
-            <>
-              <Section>
-                <Track gap={8} direction="vertical" align="left">
-                  <p className="h6">{t('settings.users.autoCorrector')}</p>
-                  <SwitchBox
-                    name="useAutocorrect"
-                    label={t('settings.users.useAutocorrect')}
-                    checked={userProfileSettings.useAutocorrect}
-                    onCheckedChange={(checked) =>
-                      handleUserProfileSettingsChange('useAutocorrect', checked)
-                    }
-                  />
-                </Track>
-              </Section>
-              <Section>
-                <Track gap={8} direction="vertical" align="left">
-                  <p className="h6">{t('settings.users.emailNotifications')}</p>
-                  <SwitchBox
-                    name="forwardedChatEmailNotifications"
-                    label={t('settings.users.newForwardedChat')}
-                    checked={
-                      userProfileSettings.forwardedChatEmailNotifications
-                    }
-                    onCheckedChange={(checked) =>
-                      handleUserProfileSettingsChange(
-                        'forwardedChatEmailNotifications',
-                        checked
-                      )
-                    }
-                  />
-                  <SwitchBox
-                    name="newChatEmailNotifications"
-                    label={t('settings.users.newUnansweredChat')}
-                    checked={userProfileSettings.newChatEmailNotifications}
-                    onCheckedChange={(checked) =>
-                      handleUserProfileSettingsChange(
-                        'newChatEmailNotifications',
-                        checked
-                      )
-                    }
-                  />
-                </Track>
-              </Section>
-              <Section>
-                <Track gap={8} direction="vertical" align="left">
-                  <p className="h6">{t('settings.users.soundNotifications')}</p>
-                  <SwitchBox
-                    name="forwardedChatSoundNotifications"
-                    label={t('settings.users.newForwardedChat')}
-                    checked={
-                      userProfileSettings.forwardedChatSoundNotifications
-                    }
-                    onCheckedChange={(checked) =>
-                      handleUserProfileSettingsChange(
-                        'forwardedChatSoundNotifications',
-                        checked
-                      )
-                    }
-                  />
-                  <SwitchBox
-                    name="newChatSoundNotifications"
-                    label={t('settings.users.newUnansweredChat')}
-                    checked={userProfileSettings.newChatSoundNotifications}
-                    onCheckedChange={(checked) =>
-                      handleUserProfileSettingsChange(
-                        'newChatSoundNotifications',
-                        checked
-                      )
-                    }
-                  />
-                </Track>
-              </Section>
-              <Section>
-                <Track gap={8} direction="vertical" align="left">
-                  <p className="h6">{t('settings.users.popupNotifications')}</p>
-                  <SwitchBox
-                    name="forwardedChatPopupNotifications"
-                    label={t('settings.users.newForwardedChat')}
-                    checked={
-                      userProfileSettings.forwardedChatPopupNotifications
-                    }
-                    onCheckedChange={(checked) =>
-                      handleUserProfileSettingsChange(
-                        'forwardedChatPopupNotifications',
-                        checked
-                      )
-                    }
-                  />
-                  <SwitchBox
-                    name="newChatPopupNotifications"
-                    label={t('settings.users.newUnansweredChat')}
-                    checked={userProfileSettings.newChatPopupNotifications}
-                    onCheckedChange={(checked) =>
-                      handleUserProfileSettingsChange(
-                        'newChatPopupNotifications',
-                        checked
-                      )
-                    }
-                  />
-                </Track>
-              </Section>
-            </>
-          )}
+              <>
+                <Section>
+                  <Track gap={8} direction="vertical" align="left">
+                    <p className="h6">{t('settings.users.autoCorrector')}</p>
+                    <SwitchBox
+                      name="useAutocorrect"
+                      label={t('settings.users.useAutocorrect')}
+                      checked={userProfileSettings.useAutocorrect}
+                      onCheckedChange={(checked) =>
+                        handleUserProfileSettingsChange('useAutocorrect', checked)
+                      }
+                    />
+                  </Track>
+                </Section>
+                <Section>
+                  <Track gap={8} direction="vertical" align="left">
+                    <p className="h6">{t('settings.users.emailNotifications')}</p>
+                    <SwitchBox
+                      name="forwardedChatEmailNotifications"
+                      label={t('settings.users.newForwardedChat')}
+                      checked={
+                        userProfileSettings.forwardedChatEmailNotifications
+                      }
+                      onCheckedChange={(checked) =>
+                        handleUserProfileSettingsChange(
+                          'forwardedChatEmailNotifications',
+                          checked
+                        )
+                      }
+                    />
+                    <SwitchBox
+                      name="newChatEmailNotifications"
+                      label={t('settings.users.newUnansweredChat')}
+                      checked={userProfileSettings.newChatEmailNotifications}
+                      onCheckedChange={(checked) =>
+                        handleUserProfileSettingsChange(
+                          'newChatEmailNotifications',
+                          checked
+                        )
+                      }
+                    />
+                  </Track>
+                </Section>
+                <Section>
+                  <Track gap={8} direction="vertical" align="left">
+                    <p className="h6">{t('settings.users.soundNotifications')}</p>
+                    <SwitchBox
+                      name="forwardedChatSoundNotifications"
+                      label={t('settings.users.newForwardedChat')}
+                      checked={
+                        userProfileSettings.forwardedChatSoundNotifications
+                      }
+                      onCheckedChange={(checked) =>
+                        handleUserProfileSettingsChange(
+                          'forwardedChatSoundNotifications',
+                          checked
+                        )
+                      }
+                    />
+                    <SwitchBox
+                      name="newChatSoundNotifications"
+                      label={t('settings.users.newUnansweredChat')}
+                      checked={userProfileSettings.newChatSoundNotifications}
+                      onCheckedChange={(checked) =>
+                        handleUserProfileSettingsChange(
+                          'newChatSoundNotifications',
+                          checked
+                        )
+                      }
+                    />
+                  </Track>
+                </Section>
+                <Section>
+                  <Track gap={8} direction="vertical" align="left">
+                    <p className="h6">{t('settings.users.popupNotifications')}</p>
+                    <SwitchBox
+                      name="forwardedChatPopupNotifications"
+                      label={t('settings.users.newForwardedChat')}
+                      checked={
+                        userProfileSettings.forwardedChatPopupNotifications
+                      }
+                      onCheckedChange={(checked) =>
+                        handleUserProfileSettingsChange(
+                          'forwardedChatPopupNotifications',
+                          checked
+                        )
+                      }
+                    />
+                    <SwitchBox
+                      name="newChatPopupNotifications"
+                      label={t('settings.users.newUnansweredChat')}
+                      checked={userProfileSettings.newChatPopupNotifications}
+                      onCheckedChange={(checked) =>
+                        handleUserProfileSettingsChange(
+                          'newChatPopupNotifications',
+                          checked
+                        )
+                      }
+                    />
+                  </Track>
+                </Section>
+              </>
+            )}
         </Drawer>
       )}
     </>

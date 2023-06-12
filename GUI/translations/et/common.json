@@ -273,5 +273,16 @@
       "daysAgo": "{{days}} päeva tagasi",
       "uptimePercent": "{{percent}}% tööaeg"
     }
+  },
+  "toast": {
+    "success": {
+      "messageToUserEmail": "Sõnum saadeti kasutaja emailile",
+      "chatStatusChanged": "Vestluse staatus muudetud",
+      "chatCommentChanged": "Vestluse kommentaar muudetud",
+      "copied": "Kopeeritud",
+      "userDeleted": "Kasutaja kustutatud",
+      "newUserAdded": "Uus kasutaja lisatud",
+      "userUpdated": "Kasutaja uuendatud"
+    }
   }
 }

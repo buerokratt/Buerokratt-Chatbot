@@ -34,7 +34,7 @@ const SettingsUsers: FC = () => {
       toast.open({
         type: 'success',
         title: t('global.notification'),
-        message: 'User deleted',
+        message:  t('toast.success.userDeleted'),
       });
       setDeletableRow(null);
     },
