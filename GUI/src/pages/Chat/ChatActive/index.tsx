@@ -72,7 +72,7 @@ const ChatActive: FC = () => {
       toast.open({
         type: 'success',
         title: t('global.notification'),
-        message: 'Message sent to user email',
+        message: t('toast.success.messageToUserEmail'),
       });
     },
     onError: (error: AxiosError) => {

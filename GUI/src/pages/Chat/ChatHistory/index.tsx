@@ -94,7 +94,7 @@ const ChatHistory: FC = () => {
       toast.open({
         type: 'success',
         title: t('global.notification'),
-        message: 'Message sent to user email',
+        message: t('toast.success.messageToUserEmail'),
       });
     },
     onError: (error: AxiosError) => {
@@ -143,7 +143,7 @@ const ChatHistory: FC = () => {
       toast.open({
         type: 'success',
         title: t('global.notification'),
-        message: 'Chat status changed',
+        message: t('toast.success.chatStatusChanged'),
       });
       setStatusChangeModal(null);
     },
@@ -168,7 +168,7 @@ const ChatHistory: FC = () => {
       toast.open({
         type: 'success',
         title: t('global.notification'),
-        message: 'Chat comment changed',
+        message: t('toast.success.chatCommentChanged'),
       });
     },
     onError: (error: AxiosError) => {
@@ -188,7 +188,7 @@ const ChatHistory: FC = () => {
     toast.open({
       type: 'success',
       title: t('global.notification'),
-      message: 'Copied',
+      message: t('toast.succes.copied'),
     });
   }
 

@@ -273,5 +273,16 @@
       "daysAgo": "{{days}} ago",
       "uptimePercent": "{{percent}}% uptime"
     }
+  },
+  "toast": {
+    "success": {
+      "messageToUserEmail": "Message sent to user email",
+      "chatStatusChanged": "Chat status changed",
+      "chatCommentChanged": "Chat comment changed",
+      "copied": "Copied",
+      "userDeleted": "User deleted",
+      "newUserAdded": "New user added",
+      "userUpdated": "User updated" 
+    }
   }
 }
