@@ -51,12 +51,18 @@
   &__toolbar-actions {
     display: flex;
     gap: 8px;
-    position: absolute;
+    position: relative;
     right: 12px;
-    top: 8px;
+    left: 5px;
+    top: 0px;
+    bottom: 8px;
 
     .btn {
-      padding: 8px 20px;
+      padding-left: 20px;
+      padding-right: 20px;
+      padding-top: 9.5px;
+      padding-bottom: 9.5px;
+      border-radius: 15px;
     }
   }
 
@@ -67,7 +73,7 @@
     border-left: 1px solid get-color(black-coral-2);
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: start;
 
     .btn {
       justify-content: center;
@@ -80,6 +86,12 @@
     flex-direction: column;
     gap: 4px;
     padding: get-spacing(haapsalu);
+
+    .csa-away {
+      font-size: $veera-font-size-80;
+      line-height: $veera-line-height-500;
+      color: get-color(black-coral-12);
+    }
   }
 
   &__side-meta {
@@ -100,6 +112,7 @@
     }
 
     &--event {
+      padding-left: 0;
       #{$self} {
         &__event-message {
           display: flex;
@@ -146,6 +159,13 @@
           background-color: get-color(sapphire-blue-10);
           color: get-color(white);
 
+          :any-link {
+              background: url("../../static/icons/link-external-blue.svg") no-repeat right center;
+              padding-right: 1.25em;
+              color: blue;
+              text-decoration: underline;
+          }
+
           &:hover {
             background-color: get-color(sapphire-blue-13);
           }
@@ -163,6 +183,13 @@
         &__message-text {
           background-color: get-color(black-coral-10);
           color: get-color(white);
+          
+          :any-link {
+              background: url("../../static/icons/link-external-white.svg") no-repeat right center;
+              padding-right: 1.25em;
+              color: white;
+              text-decoration: underline;
+          }
 
           &:hover {
             background-color: #535665;
@@ -252,15 +279,31 @@
     border-radius: 8px 8px 8px 4px;
     font-size: $veera-font-size-100;
     line-height: $veera-line-height-500;
-    transition: all .25s ease-out;
+    transition: all 0.25s ease-out;
     cursor: pointer;
 
     &:hover {
       background-color: get-color(black-coral-1);
     }
+
+    :any-link {
+      background: url("../../static/icons/link-external-blue.svg") no-repeat right center;
+      padding-right: 1.25em;
+      color: blue;
+      text-decoration: underline;
+    }
   }
 
   &__message-preview {
+    display: flex;
+    align-items: center;
+    padding: 4px 8px;
+    border-radius: 8px 8px 8px 4px;
+    font-size: $veera-font-size-100;
+    line-height: $veera-line-height-500;
+    transition: all 0.25s ease-out;
+    cursor: pointer;
+
     color: #4472C4;
     background-color: #E7F3FF;
   }

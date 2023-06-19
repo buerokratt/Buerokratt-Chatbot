@@ -107,7 +107,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/insert-user",
+          "endpoint": "{resql_url}/update-user",
           "post_body_struct": {
             "created": "$_getInstant()",
             "status": "active",
@@ -129,7 +129,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/insert-user-role",
+          "endpoint": "{resql_url}/update-user-role",
           "post_body_struct": {
             "userIdCode": "{#.reflect_input#.userIdCode}",
             "roles": "{#.reflect_input#.roles}",

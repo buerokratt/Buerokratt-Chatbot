@@ -18,20 +18,25 @@ const SettingsUsers: FC = () => {
   const [newUserModal, setNewUserModal] = useState(false);
   const [editableRow, setEditableRow] = useState<User | null>(null);
   const [deletableRow, setDeletableRow] = useState<string | number | null>(null);
+  const [usersList, setUsersList] = useState<User[]>([]);
   const { data: users } = useQuery<User[]>({
-    queryKey: ['cs-get-admins'],
+    queryKey: ['cs-get-customer-support-agents', 'prod'],
+    onSuccess(res: any) {
+      setUsersList(res.data.get_customer_support_agents);
+    },
   });
   const columnHelper = createColumnHelper<User>();
 
   const deleteUserMutation = useMutation({
     mutationFn: ({ id }: { id: string | number }) => deleteUser(id),
     onSuccess: async () => {
-      await queryClient.invalidateQueries(['cs-get-admins']);
+      await queryClient.invalidateQueries(['cs-get-customer-support-agents', 'prod']);
       toast.open({
         type: 'success',
         title: t('global.notification'),
-        message: 'User deleted',
+        message:  t('toast.success.userDeleted'),
       });
+      setDeletableRow(null);
     },
     onError: (error: AxiosError) => {
       toast.open({
@@ -43,7 +48,8 @@ const SettingsUsers: FC = () => {
   });
 
   const usersColumns = useMemo(() => [
-    columnHelper.accessor('login', {
+    columnHelper.accessor((row) => `${row.firstName ?? ""} ${row.lastName ?? ""}`, {
+      id: `name`,
       header: t('settings.users.name') || '',
     }),
     columnHelper.accessor('idCode', {
@@ -55,6 +61,9 @@ const SettingsUsers: FC = () => {
     }),
     columnHelper.accessor('displayName', {
       header: t('settings.users.displayName') || '',
+    }),
+    columnHelper.accessor('csaTitle', {
+      header: t('settings.users.userTitle') || '',
     }),
     columnHelper.accessor('csaEmail', {
       header: t('settings.users.email') || '',
@@ -95,7 +104,7 @@ const SettingsUsers: FC = () => {
       </Track>
 
       <Card>
-        <DataTable data={users} columns={usersColumns} sortable filterable />
+        <DataTable data={usersList} columns={usersColumns} sortable filterable />
       </Card>
 
       {newUserModal && (
@@ -130,4 +139,3 @@ const SettingsUsers: FC = () => {
 };
 
 export default SettingsUsers;
-

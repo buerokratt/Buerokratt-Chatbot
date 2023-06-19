@@ -1,0 +1,40 @@
+@import 'src/styles/tools/spacing';
+@import 'src/styles/tools/color';
+@import 'src/styles/settings/variables/other';
+@import 'src/styles/settings/variables/typography';
+
+.active-chat {
+  $self: &;
+  display: flex;
+  justify-content: flex-end;
+  position: relative;
+  height: 100%;
+
+  &__event-message {
+    display: flex;
+    position: relative;
+    isolation: isolate;
+    padding: 6px 0;
+
+    p {
+      color: get-color(black-coral-12);
+      font-size: $veera-font-size-80;
+      line-height: $veera-line-height-500;
+      padding: 4px 8px 4px 0;
+      background-color: get-color(white);
+    }
+
+    &::after {
+      content: '';
+      display: block;
+      height: 1px;
+      background-color: get-color(black-coral-2);
+      position: absolute;
+      top: 50%;
+      left: 56px;
+      right: 0;
+      transform: translateY(-50%);
+      z-index: -1;
+    }
+  }
+}

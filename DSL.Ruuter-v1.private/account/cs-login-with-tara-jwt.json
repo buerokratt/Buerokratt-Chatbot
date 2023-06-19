@@ -41,6 +41,7 @@
                 "#.from_property": "{#.custom_jwt_cookie}",
                 "maxAge": 28800,
                 "setSecure": true,
+                "domain": "{cookie_domain}",
                 "name": "customJwtCookie"
               },
               {
@@ -77,9 +78,7 @@
                   },
                   "post_body_parameters": {
                     "tara_user_info": {
-                      "cookies": [
-                        "JWTTOKEN"
-                      ],
+                      "cookies": ["JWTTOKEN"],
                       "method": "get",
                       "endpoint": "{tim_url}/jwt/userinfo",
                       "response": {
@@ -118,9 +117,7 @@
         "proceed": {
           "method": "post",
           "endpoint": "{tim_url}/jwt/blacklist",
-          "cookies": [
-            "JWTTOKEN"
-          ],
+          "cookies": ["JWTTOKEN"],
           "post_body_struct": {},
           "response": {
             "ok": "proceed",

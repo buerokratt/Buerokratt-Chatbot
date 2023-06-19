@@ -164,6 +164,7 @@
               "#.from_property": "{#.generate_redirect_jwt}",
               "maxAge": 7200,
               "httpOnly": true,
+              "domain": "{cookie_domain}",
               "setSecure": true,
               "name": "redirectJwt"
             }

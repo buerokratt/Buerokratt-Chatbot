@@ -9,9 +9,7 @@
         }
       },
       "proceed": {
-        "cookies": [
-          "clientCustomJwtCookie"
-        ],
+        "cookies": ["clientCustomJwtCookie"],
         "method": "post",
         "endpoint": "{tim_url}/jwt/custom-jwt-blacklist",
         "post_body_struct": "clientCustomJwtCookie",
@@ -20,6 +18,7 @@
             "name": "clientCustomJwtCookie",
             "httpOnly": true,
             "maxAge": 0,
+            "domain": "{cookie_domain}",
             "setSecure": true,
             "value": null
           }

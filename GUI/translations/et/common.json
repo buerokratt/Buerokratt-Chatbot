@@ -28,6 +28,7 @@
     "name": "Nimi",
     "idCode": "Isikukood",
     "status": "Staatus",
+    "statusChangeQuestion": "Kas soovid muuta staatuseks \"kohal\"?",
     "yes": "Jah",
     "no": "Ei",
     "removeValidation": "Oled sa kindel?",
@@ -41,7 +42,8 @@
     "away": "Eemal",
     "today": "Täna",
     "forward": "Suuna",
-    "chosen": "Valitud"
+    "chosen": "Valitud",
+    "read": "Loetud"
   },
   "mainMenu": {
     "menuLabel": "Põhinavigatsioon",
@@ -49,28 +51,73 @@
     "openMenuIcon": "Ava menüü ikoon",
     "closeMenuIcon": "Sulge menüü ikoon"
   },
+  "menu": {
+    "conversations": "Vestlused",
+    "unanswered": "Vastamata",
+    "active": "Aktiivsed",
+    "history": "Ajalugu",
+    "training": "Treening",
+    "themes": "Teemad",
+    "answers": "Vastused",
+    "userStories": "Kasutaja lood",
+    "configuration": "Konfiguratsioon",
+    "forms": "Vormid",
+    "slots": "Pilud",
+    "historicalConversations": "Ajaloolised vestlused",
+    "modelBankAndAnalytics": "Mudelipank ja analüütika",
+    "overviewOfTopics": "Teemade ülevaade",
+    "comparisonOfModels": "Mudelite võrdlus",
+    "appeals": "Pöördumised",
+    "testTracks": "Testlood",
+    "trainNewModel": "Treeni uus mudel",
+    "analytics": "Analüütika",
+    "settings": "Seaded",
+    "overview": "Ülevaade",
+    "chats": "Vestlused",
+    "burokratt": "Bürokratt",
+    "feedback": "Tagasiside",
+    "advisors": "Nõustajad",
+    "reports": "Avaandmed",
+    "users": "Kasutajad",
+    "administration": "Haldus",
+    "chatbot": "Vestlusbot",
+    "welcomeMessage": "Tervitussõnum",
+    "appearanceAndBehavior": "Välimus ja käitumine",
+    "emergencyNotices": "Erakorralised teated",
+    "officeOpeningHours": "Asutuse tööaeg",
+    "sessionLength": "Sessiooni pikkus",
+    "monitoring": "Seire",
+    "workingHours": "Tööaeg"
+  },
   "chat": {
     "reply": "Vasta",
     "unansweredChats": "Vastamata vestlused",
     "unanswered": "Vastamata",
     "forwarded": "Suunatud",
-    "endUser": "Vestleja",
+    "endUser": "Vestleja nimi",
+    "endUserId": "Vestleja isikukood",
     "csaName": "Nõustaja nimi",
+    "endUserEmail": "Vestleja e-mail",
+    "endUserPhoneNumber": "Vestleja telefoninumber",
     "startedAt": "Vestlus alustatud",
     "device": "Seade",
     "location": "Lähtekoht",
-    "redirectedMessage": "{{from}} suunas vestluse kasutajale {{to}} {{date}}",
+    "redirectedMessageByOwner": "{{from}} suunas vestluse kasutajale {{to}} {{date}}",
+    "redirectedMessageClaimed": "{{to}} võttis vestluse üle kasutajalt {{from}} {{date}}",
+    "redirectedMessage": "{{user}} suunas vestluse kasutajalt {{from}} kasutajale {{to}} {{date}}",
     "status": {
       "active": "Aktiivne",
       "ended": "Lõpetatud"
     },
     "chatStatus": "Vestluse staatus",
+    "changeStatus": "Muuda staatust",
     "active": {
       "list": "Aktiivsed vestlused",
       "myChats": "Minu vestlused",
       "newChats": "Uued vestlused",
       "chooseChat": "Alustamiseks vali vestlus",
       "endChat": "Lõpeta vestlus",
+      "takeOver": "Võta üle",
       "askAuthentication": "Küsi autentimist",
       "askForContact": "Küsi kontaktandmeid",
       "askPermission": "Küsi nõusolekut",
@@ -84,7 +131,11 @@
       "searchByEstablishmentName": "Otsi asutuse nime järgi",
       "sendToEmail": "Saada e-mailile",
       "chooseChatStatus": "Vali vestluse staatus",
-      "statusChange": "Vestluse staatus"
+      "statusChange": "Vestluse staatus",
+      "startService": "Alusta teenust",
+      "selectService": "Vali teenus",
+      "start": "Alusta",
+      "service": "Teenus"
     },
     "history": {
       "title": "Ajalugu",
@@ -99,13 +150,33 @@
       "forwarded": "Suunatud"
     },
     "events": {
-      "client-left-with-accepted": "Klient lahkus aktsepteeritud vastusega",
-      "client-left-with-no-resolution": "Klient lahkus vastuseta",
-      "client-left-for-unknown-reason": "Klient lahkus määramata põhjustel",
-      "accepted": "Aktsepteeritud vastusega",
-      "hate-speech": "Vihakõne",
-      "other": "Muudel põhjustel",
-      "response-sent-to-client-email": "Kliendile vastati tema jäetud kontaktile"
+      "answered": "Vastatud {{date}}",
+      "terminated": "Lõpetatud {{date}}",
+      "sent_to_csa_email": "Vestlus saadetud klienditeenindaja e-mailile {{date}}",
+      "client-left": "Klient lahkus {{date}}",
+      "client_left_with_accepted": "Klient lahkus aktsepteeritud vastusega {{date}}",
+      "client_left_with_no_resolution": "Klient lahkus vastuseta {{date}}",
+      "client_left_for_unknown_reasons": "Klient lahkus määramata põhjustel {{date}}",
+      "accepted": "Aktsepteeritud {{date}}",
+      "hate_speech": "Vihakõne {{date}}",
+      "other": "Muud põhjused {{date}}",
+      "response_sent_to_client_email": "Kliendile vastati tema jäetud kontaktile {{date}}",
+      "greeting": "Tervitus",
+      "requested-authentication": "Küsiti autentimist",
+      "authentication_successful": "Autoriseerimine oli edukas {{date}}",
+      "authentication_failed": "Autoriseerimine ei olnud edukas {{date}}",
+      "ask-permission": "Küsiti nõusolekut",
+      "ask-permission-accepted": "Nõusolek aktsepteeritud {{date}}",
+      "ask-permission-rejected": "Nõusolek tagasi lükatud {{date}}",
+      "ask-permission-ignored": "Nõusolek ignoreeritud {{date}}",
+      "rating": "Hinnang {{date}}",
+      "contact-information": "Küsiti kontakti infot {{date}}",
+      "contact-information-rejected": "Kontakti info tagasi lükatud {{date}}",
+      "contact-information-fulfilled": "Kontakti info täidetud {{date}}",
+      "requested-chat-forward": "Küsiti vestluse suunamist",
+      "requested-chat-forward-accepted": "Vestluse suunamine aktsepteeritud {{date}}",
+      "requested-chat-forward-rejected": "Vestluse suunamine tagasi lükatud {{date}}",
+      "message-read": "Loetud"
     }
   },
   "roles": {
@@ -123,7 +194,8 @@
       "name": "Nimi",
       "idCode": "Isikukood",
       "role": "Roll",
-      "displayName": "Tiitel",
+      "displayName": "Kuvatav nimi",
+      "userTitle": "Tiitel",
       "email": "E-post",
       "addUser": "Lisa kasutaja",
       "editUser": "Muuda kasutajat",
@@ -136,7 +208,9 @@
       "popupNotifications": "Pop-up märguanded",
       "newUnansweredChat": "Uus vastamata vestlus",
       "newForwardedChat": "Uus suunatud vestlus",
-      "useAutocorrect": "Teksti autokorrektor"
+      "useAutocorrect": "Teksti autokorrektor",
+      "required": "Nõutud",
+      "invalidemail": "Kehtetu e-posti"
     },
     "chat": {
       "chatActive": "Vestlusrobot aktiivne",
@@ -164,7 +238,12 @@
     },
     "userSession": {
       "title": "Kasutaja sessioon",
-      "sessionLength": "Sessiooni pikkus"
+      "sessionLength": "Sessiooni pikkus",
+      "description": "Kasutaja sessiooni pikkus, mille möödumisel logitakse inaktiivsed kasutajad välja.",
+      "rule": "Sessiooni pikkus on lubatud vahemikus 30 min - 480 min (8h)",
+      "minutes": "minutit",
+      "sessionChanged": "Seansi pikkuse muutmine õnnestus",
+      "emptySession": "Seansi pikkuse väli ei tohi olla tühi"
     },
     "greeting": {
       "title": "Tervitussõnum"
@@ -179,13 +258,31 @@
       "saturday": "Laupäev",
       "sunday": "Pühapäev"
     },
-    "nationalHolidays": "Riiklikud pühad"
+    "nationalHolidays": "Riiklikud pühad",
+    "welcomeMessage": {
+      "welcomeMessage": "Tervitussõnum",
+      "description": "Bürokrati automaatne tervitussõnum, mida kuvatakse esimese sõnumina vestlusakna avamisel.",
+      "greetingActive": "Tervitus aktiivne",
+      "messageChanged": "Tervitusteadet muudeti edukalt",
+      "emptyMessage": "Tervitusteate väli ei tohi olla tühi"
+    }
   },
   "monitoring": {
     "uptime": {
       "title": "Tööaeg",
       "daysAgo": "{{days}} päeva tagasi",
       "uptimePercent": "{{percent}}% tööaeg"
+    }
+  },
+  "toast": {
+    "success": {
+      "messageToUserEmail": "Sõnum saadeti kasutaja emailile",
+      "chatStatusChanged": "Vestluse staatus muudetud",
+      "chatCommentChanged": "Vestluse kommentaar muudetud",
+      "copied": "Kopeeritud",
+      "userDeleted": "Kasutaja kustutatud",
+      "newUserAdded": "Uus kasutaja lisatud",
+      "userUpdated": "Kasutaja uuendatud"
     }
   }
 }

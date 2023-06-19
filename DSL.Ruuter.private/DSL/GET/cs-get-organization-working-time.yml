@@ -6,7 +6,7 @@ extractTokenData:
   call: http.post
   args:
     # TODO: replace with env variable and correct path to TIM endpoint
-    url: http://byk-private-ruuter-yml:8080/mocks/mock-tim-custom-jwt-userinfo
+    url: http://ruuter-v2-private:8088/mocks/mock-tim-custom-jwt-userinfo
     headers:
       cookie: ${cookie}
     body:
@@ -25,12 +25,12 @@ getOrganizationWorkingTime:
   call: http.post
   args:
     # TODO: replace with env variable
-    url: https://byk-resql:8443/get-organization-working-time
+    url: http://resql:8082/get-organization-working-time
   result: getOrganizationWorkingTimeValueResult
 
 validateOrganizationWorkingTimeExists:
   switch:
-    - condition: '${getOrganizationWorkingTimeValueResult.response.body.length > 0}'
+    - condition: "${getOrganizationWorkingTimeValueResult.response.body.length > 0}"
       next: mapWorkingTimeData
   next: returnNotFound
 
@@ -38,7 +38,9 @@ mapWorkingTimeData:
   call: http.post
   args:
     # TODO: replace with env variable
-    url: https://byk-dmapper:8443/json/v2/return_organization_working_time
+    url: http://dmapper-v2:3005/hbs/chat-bot/return_organization_working_time
+    headers:
+      type: json
     body:
       configurationArray: ${getOrganizationWorkingTimeValueResult.response.body}
   result: workingTimeData

@@ -54,8 +54,7 @@
         "proceed": {
           "method": "post",
           "endpoint": "{resql_url}/get-active-chat-by-id",
-          "post_body_parameters": {
-          },
+          "post_body_parameters": {},
           "post_body_struct": {
             "id": "{#.reflect_input#.chatId}"
           }
@@ -110,9 +109,7 @@
               "endpoint": "{ruuter_url}/match_input",
               "post_body_parameters": {
                 "chat_info": {
-                  "cookies": [
-                    "chatJwt"
-                  ],
+                  "cookies": ["chatJwt"],
                   "method": "post",
                   "endpoint": "{tim_url}/jwt/custom-jwt-userinfo",
                   "post_body_struct": "chatJwt",
@@ -141,7 +138,7 @@
             "chatId": "{#.get_not_ended_chat[0]#.id}",
             "messageId": "{#.get_message_uuid#.output}",
             "content": "",
-            "event": "client-left",
+            "event": "{#.reflect_input#.event}",
             "authorTimestamp": "{#.reflect_input#.authorTimestamp}",
             "authorId": "",
             "authorFirstName": "",
@@ -210,9 +207,7 @@
           }
         },
         "proceed": {
-          "cookies": [
-            "chatJwt"
-          ],
+          "cookies": ["chatJwt"],
           "method": "post",
           "endpoint": "{tim_url}/jwt/custom-jwt-blacklist",
           "post_body_struct": "chatJwt",
@@ -221,6 +216,7 @@
               "name": "chatJwt",
               "maxAge": 0,
               "httpOnly": true,
+              "domain": "{cookie_domain}",
               "setSecure": true,
               "value": null
             }
@@ -241,9 +237,7 @@
           }
         },
         "proceed": {
-          "cookies": [
-            "clientCustomJwtCookie"
-          ],
+          "cookies": ["clientCustomJwtCookie"],
           "method": "post",
           "endpoint": "{tim_url}/jwt/custom-jwt-blacklist",
           "post_body_struct": "clientCustomJwtCookie",
@@ -252,6 +246,7 @@
               "name": "clientCustomJwtCookie",
               "httpOnly": true,
               "maxAge": 0,
+              "domain": "{cookie_domain}",
               "setSecure": true,
               "value": null
             }

@@ -1,13 +1,13 @@
 extractRequestData:
   assign:
     cookie: ${incoming.headers.cookie}
-    chatId: ${incoming.body.chatId}
+    chatId: ${incoming.params.chatId}
 
 extractTokenData:
   call: http.post
   args:
     # TODO: replace with env variable and correct path to TIM endpoint
-    url: http://byk-private-ruuter-yml:8080/mocks/mock-tim-custom-jwt-userinfo
+    url: http://ruuter-v2-private:8088/mocks/mock-tim-custom-jwt-userinfo
     headers:
       cookie: ${cookie}
     body:
@@ -26,7 +26,7 @@ getChatHistoryComment:
   call: http.post
   args:
     # TODO: replace with env variable
-    url: https://byk-resql:8443/get-chat-history-comment-by-id
+    url: http://resql:8082/get-chat-history-comment-by-id
     body:
       chatId: ${chatId}
   result: getChatHistoryCommentResult
@@ -35,7 +35,7 @@ mapChatHistoryCommentData:
   call: http.post
   args:
     # TODO: replace with env variable
-    url: https://byk-dmapper:8443/json/v2/return_chat_history_comment
+    url: http://dmapper:3000/json/v2/return_chat_history_comment
     body:
       historyComment: ${getChatHistoryCommentResult.response.body}
   result: chatHistoryCommentData

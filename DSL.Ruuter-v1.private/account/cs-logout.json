@@ -10,9 +10,7 @@
           }
         },
         "proceed": {
-          "cookies": [
-            "customJwtCookie"
-          ],
+          "cookies": ["customJwtCookie"],
           "method": "post",
           "endpoint": "{resql_url}/set-customer-support-status",
           "post_body_parameters": {
@@ -37,9 +35,7 @@
               },
               "post_body_parameters": {
                 "userinfo": {
-                  "cookies": [
-                    "customJwtCookie"
-                  ],
+                  "cookies": ["customJwtCookie"],
                   "method": "post",
                   "endpoint": "{tim_url}/jwt/custom-jwt-userinfo",
                   "post_body_struct": "customJwtCookie"
@@ -51,9 +47,7 @@
               }
             },
             "userinfo": {
-              "cookies": [
-                "customJwtCookie"
-              ],
+              "cookies": ["customJwtCookie"],
               "method": "post",
               "endpoint": "{ruuter_url}/cs-custom-jwt-userinfo",
               "post_body_struct": "customJwtCookie",
@@ -74,6 +68,7 @@
               "name": "customJwtCookie",
               "httpOnly": true,
               "maxAge": 0,
+              "domain": "{cookie_domain}",
               "setSecure": true,
               "value": null
             }
@@ -94,9 +89,7 @@
           }
         },
         "proceed": {
-          "cookies": [
-            "customJwtCookie"
-          ],
+          "cookies": ["customJwtCookie"],
           "method": "post",
           "endpoint": "{tim_url}/jwt/custom-jwt-blacklist",
           "post_body_struct": "customJwtCookie",
@@ -105,6 +98,7 @@
               "name": "customJwtCookie",
               "httpOnly": true,
               "maxAge": 0,
+              "domain": "{cookie_domain}",
               "setSecure": true,
               "value": null
             }

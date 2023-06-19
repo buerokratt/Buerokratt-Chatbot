@@ -70,6 +70,18 @@
     &.active {
       background-color: #FCEEEE;
       box-shadow: inset 0 0 0 1px get-color(jasper-10);
+      animation: blink-animation 0.5s steps(100, start) 3;
+      -webkit-animation: blink-animation 0.5s steps(100, start) 3;
+      @keyframes blink-animation {
+        to {
+          background: get-color(jasper-8);
+        }
+      }
+      @-webkit-keyframes blink-animation {
+        to {
+          background: #FCEEEE;
+        }
+      }
     }
 
     &[aria-selected=true] {
@@ -91,6 +103,14 @@
     text-transform: uppercase;
     font-weight: 700;
     font-size: $veera-font-size-100;
+    line-height: 24px;
+    padding: 16px 16px 4px;
+    color: get-color(black-coral-20);
+    border-bottom: 1px solid get-color(black-coral-2);
+  }
+
+  &__sub-group-header {
+    font-weight: 700;
     line-height: 24px;
     padding: 16px 16px 4px;
     color: get-color(black-coral-20);

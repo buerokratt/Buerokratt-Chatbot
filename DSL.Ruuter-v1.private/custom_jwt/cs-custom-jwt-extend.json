@@ -9,9 +9,7 @@
         }
       },
       "proceed": {
-        "cookies": [
-          "customJwtCookie"
-        ],
+        "cookies": ["customJwtCookie"],
         "method": "post",
         "endpoint": "{tim_url}/jwt/custom-jwt-extend",
         "post_body_struct": "customJwtCookie",
@@ -20,6 +18,7 @@
             "#.from_property": "{#.custom_jwt_extend}",
             "maxAge": 28800,
             "setSecure": true,
+            "domain": "{cookie_domain}",
             "name": "customJwtCookie"
           }
         },

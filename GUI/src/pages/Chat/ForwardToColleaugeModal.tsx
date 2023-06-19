@@ -22,11 +22,15 @@ const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({ chat, onMod
     pageIndex: 0,
     pageSize: 10,
   });
+  const [usersList, setUsersList] = useState<User[]>([]);
   const { data: users } = useQuery<User[]>({
-    queryKey: ['cs-get-customer-support-agents'],
+    queryKey: ['/cs-get-customer-support-agents', 'prod'],
+    onSuccess(res: any) {
+      setUsersList(res.data.get_customer_support_agents);
+    },
   });
 
-  const filteredUsers = useMemo(() => users && showActiveAgents ? users?.filter((u) => u.customerSupportStatus === 'online') : users, [users, showActiveAgents]);
+  const filteredUsers = useMemo(() => usersList && showActiveAgents ? usersList?.filter((u) => u.customerSupportStatus === 'online') : usersList, [usersList, showActiveAgents]);
 
   const columnHelper = createColumnHelper<User>();
 

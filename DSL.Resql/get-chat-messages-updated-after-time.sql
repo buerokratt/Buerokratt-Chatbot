@@ -15,7 +15,7 @@ SELECT m.base_id      AS id,
        created,
        updated
 FROM message m
-INNER JOIN message_preview mp ON m.chat_base_id = mp.chat_base_id
+LEFT JOIN message_preview mp ON m.chat_base_id = mp.chat_base_id
 WHERE id IN (SELECT max(id) FROM message WHERE chat_base_id = :chatId GROUP BY base_id)
   AND :timeRangeBegin::timestamp
     with time zone < m.updated
