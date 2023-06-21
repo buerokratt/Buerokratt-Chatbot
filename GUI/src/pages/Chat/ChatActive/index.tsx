@@ -21,6 +21,7 @@ import StartAServiceModal from '../StartAServiceModal';
 import ChatTrigger from './ChatTrigger';
 import './ChatActive.scss';
 import apiDevV2 from 'services/api-dev-v2';
+import { v4 as uuidv4 } from 'uuid';
 
 const CSAchatStatuses = [
   CHAT_EVENTS.ACCEPTED,
@@ -227,7 +228,7 @@ const ChatActive: FC = () => {
             <p>{t('chat.active.newChats')}</p>
           </div>
           {activeChats?.otherChats?.map(({ name, chats }) => (
-            <>
+            <div key={uuidv4()}>
               {name && (
                 <div className="vertical-tabs__sub-group-header">
                   <p>{name}</p>
@@ -247,7 +248,7 @@ const ChatActive: FC = () => {
                   <ChatTrigger chat={chat} />
                 </Tabs.Trigger>
               ))}
-            </>
+            </div>
           ))}
         </Tabs.List>
 
