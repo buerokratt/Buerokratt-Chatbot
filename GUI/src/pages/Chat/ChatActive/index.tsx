@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import * as Tabs from '@radix-ui/react-tabs';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import { Chat, Dialog, Button, FormRadios } from 'components';
+import { Chat, Dialog, Button, FormRadios, Track } from 'components';
 import {
   Chat as ChatType,
   CHAT_EVENTS,
@@ -227,29 +227,31 @@ const ChatActive: FC = () => {
           <div className="vertical-tabs__group-header">
             <p>{t('chat.active.newChats')}</p>
           </div>
-          {activeChats?.otherChats?.map(({ name, chats }) => (
-            <div key={uuidv4()}>
-              {name && (
-                <div className="vertical-tabs__sub-group-header">
-                  <p>{name}</p>
-                </div>
-              )}
-              {chats.map((chat, i) => (
-                <Tabs.Trigger
-                  key={chat.id + i}
-                  className={clsx('vertical-tabs__trigger', {
-                    active:
-                      chat.status === CHAT_STATUS.REDIRECTED &&
-                      chat.customerSupportId === userInfo?.idCode,
-                  })}
-                  value={chat.id}
-                  style={{ borderBottom: '1px solid #D2D3D8' }}
-                >
-                  <ChatTrigger chat={chat} />
-                </Tabs.Trigger>
-              ))}
-            </div>
-          ))}
+          <Track direction="vertical" justify="center" align="right">
+            {activeChats?.otherChats?.map(({ name, chats }) => (
+              <div key={uuidv4()}>
+                {name && (
+                  <div className="vertical-tabs__sub-group-header">
+                    <p>{name}</p>
+                  </div>
+                )}
+                {chats.map((chat, i) => (
+                  <Tabs.Trigger
+                    key={chat.id + i}
+                    className={clsx('vertical-tabs__trigger', {
+                      active:
+                        chat.status === CHAT_STATUS.REDIRECTED &&
+                        chat.customerSupportId === userInfo?.idCode,
+                    })}
+                    value={chat.id}
+                    style={{ borderBottom: '1px solid #D2D3D8' }}
+                  >
+                    <ChatTrigger chat={chat} />
+                  </Tabs.Trigger>
+                ))}
+              </div>
+            ))}
+          </Track>
         </Tabs.List>
 
         {selectedChatId ? (
