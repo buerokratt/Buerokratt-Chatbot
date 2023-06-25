@@ -577,6 +577,7 @@ const Chat: FC<ChatProps> = ({
                 minRows={1}
                 maxRows={8}
                 value={responseText}
+                onSubmit={(e) => handleResponseTextSend()}
                 maxLength={CHAT_INPUT_LENGTH}
                 onChange={(e) => setResponseText(e.target.value)}
               />
