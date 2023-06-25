@@ -227,14 +227,14 @@ const ChatActive: FC = () => {
           <div className="vertical-tabs__group-header">
             <p>{t('chat.active.newChats')}</p>
           </div>
-          <Track direction="vertical" justify="center" align="right">
-            {activeChats?.otherChats?.map(({ name, chats }) => (
-              <div key={uuidv4()}>
-                {name && (
-                  <div className="vertical-tabs__sub-group-header">
-                    <p>{name}</p>
-                  </div>
-                )}
+          {activeChats?.otherChats?.map(({ name, chats }) => (
+            <div key={uuidv4()}>
+              {name && (
+                <div className="vertical-tabs__sub-group-header">
+                  <p>{name}</p>
+                </div>
+              )}
+              <Track align="stretch" direction="vertical" justify="between">
                 {chats.map((chat, i) => (
                   <Tabs.Trigger
                     key={chat.id + i}
@@ -249,9 +249,9 @@ const ChatActive: FC = () => {
                     <ChatTrigger chat={chat} />
                   </Tabs.Trigger>
                 ))}
-              </div>
-            ))}
-          </Track>
+              </Track>
+            </div>
+          ))}
         </Tabs.List>
 
         {selectedChatId ? (
