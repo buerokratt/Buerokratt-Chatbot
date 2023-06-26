@@ -117,17 +117,14 @@ const Chat: FC<ChatProps> = ({
 
     sseInstance.onMessage((messages: Message[]) => {
       const newDisplayableMessages = messages.filter(
-        (msg) =>
-          msg.event !== CHAT_EVENTS.READ && msg.authorId != userInfo?.idCode
+        (msg) => msg.authorId != userInfo?.idCode
       );
-      // TODO: Handle Event Messages
-      const stateChangingEventMessages = messages.filter((msg) =>
-        isStateChangingEventMessage(msg)
-      );
-      setMessagesList((oldMessages) => [
-        ...oldMessages,
-        ...newDisplayableMessages,
-      ]);
+      if (newDisplayableMessages.length > 0) {
+        setMessagesList((oldMessages) => [
+          ...oldMessages,
+          ...newDisplayableMessages,
+        ]);
+      }
     });
 
     return () => sseInstance.close();
