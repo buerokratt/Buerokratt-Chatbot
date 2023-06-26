@@ -11,4 +11,5 @@ const useUserInfoStore = create<StoreState>((set) => ({
   setUserInfo: (data: UserInfo) => set({ userInfo: data }),
 }));
 
+
 export default useUserInfoStore;
