@@ -35,9 +35,11 @@ import formatBytes from 'utils/format-bytes';
 import useSendAttachment from 'modules/attachment/hooks';
 import { AxiosError } from 'axios';
 import { useToast } from 'hooks/useToast';
-import { fetchEventSource } from '@microsoft/fetch-event-source';
+import { fetchEventSource } from '@fortaine/fetch-event-source';
 import useUserInfoStore from 'store/store';
 import './Chat.scss';
+import sse from '../../services/sse-service';
+import { isStateChangingEventMessage } from 'utils/state-management-utils';
 
 type ChatProps = {
   chat: ChatType;
@@ -107,30 +109,29 @@ const Chat: FC<ChatProps> = ({
   };
 
   useEffect(() => {
-    const sse = new EventSource(
-      `${
-        import.meta.env.REACT_APP_RUUTER_V1_PRIVATE_API_URL
-      }/sse/cs-get-new-messages?chatId=${
+    const sseInstance = sse(
+      `cs-get-new-messages?chatId=${
         chat.id
-      }&timeRangeBegin=${new Date().toISOString()}`,
-      {
-        withCredentials: true,
-      }
+      }&lastRead=${new Date().toISOString()}`
     );
-    sse.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      console.log(data.body.data);
-      const { preview } = data.body.data.cs_get_new_messages.at(-1);
-      setPreviewMessage(preview);
-    };
 
-    sse.onerror = () => {
-      sse.close();
-    };
-    return () => {
-      sse.close();
-    };
-  }, []);
+    sseInstance.onMessage((messages: Message[]) => {
+      const newDisplayableMessages = messages.filter(
+        (msg) =>
+          msg.event !== CHAT_EVENTS.READ && msg.authorId != userInfo?.idCode
+      );
+      // TODO: Handle Event Messages
+      const stateChangingEventMessages = messages.filter((msg) =>
+        isStateChangingEventMessage(msg)
+      );
+      setMessagesList((oldMessages) => [
+        ...oldMessages,
+        ...newDisplayableMessages,
+      ]);
+    });
+
+    return () => sseInstance.close();
+  }, [messagesList]);
 
   const getMessages = async () => {
     const { data: res } = await apiDev.post('cs-get-messages-by-chat-id', {
@@ -238,7 +239,7 @@ const Chat: FC<ChatProps> = ({
     _setMessageReadStatus(data);
   };
 
-  const setPreviewMessage = (event: MessagePreviewSseResponse) => {
+  const setPreviewMessage = (event: MessageEvent<any>) => {
     const PREVIEW_MESSAGE: GroupedMessage = {
       name: endUserFullName,
       type: event.data.authorRole,

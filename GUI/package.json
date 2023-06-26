@@ -13,7 +13,7 @@
   "dependencies": {
     "@fontsource/roboto": "^4.5.8",
     "@formkit/auto-animate": "^1.0.0-beta.5",
-    "@microsoft/fetch-event-source": "^2.0.1",
+    "@fortaine/fetch-event-source": "^3.0.6",
     "@radix-ui/react-accessible-icon": "^1.0.1",
     "@radix-ui/react-collapsible": "^1.0.1",
     "@radix-ui/react-dialog": "^1.0.2",
@@ -44,6 +44,7 @@
     "react-i18next": "^12.1.1",
     "react-icons": "^4.7.1",
     "react-idle-timer": "^5.5.2",
+    "react-redux": "^8.1.1",
     "react-router-dom": "^6.5.0",
     "react-text-selection-popover": "^2.0.2",
     "react-textarea-autosize": "^8.4.0",
