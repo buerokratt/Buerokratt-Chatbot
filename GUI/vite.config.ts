@@ -8,6 +8,7 @@ import path from 'path';
 export default defineConfig({
   envPrefix: 'REACT_APP_',
   plugins: [react(), tsconfigPaths(), svgr()],
+  base: 'chat',
   build: {
     outDir: './build',
     target: 'es2015',
