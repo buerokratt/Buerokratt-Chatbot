@@ -8,7 +8,6 @@ import { CHAT_INPUT_LENGTH } from 'constants/config';
 
 type InputProps = InputHTMLAttributes<HTMLInputElement> & {
   label: string;
-  placeholder: string;
   name: string;
   hideLabel?: boolean;
   colorInput?: boolean;
@@ -17,16 +16,7 @@ type InputProps = InputHTMLAttributes<HTMLInputElement> & {
 
 const FieldInput = forwardRef<HTMLInputElement, InputProps>(
   (
-    {
-      label,
-      placeholder,
-      name,
-      disabled,
-      hideLabel,
-      colorInput,
-      maxLength,
-      ...rest
-    },
+    { label, name, disabled, hideLabel, colorInput, maxLength, ...rest },
     ref
   ) => {
     const id = useId();
@@ -44,7 +34,7 @@ const FieldInput = forwardRef<HTMLInputElement, InputProps>(
           <input
             className={inputClasses}
             name={name}
-            placeholder={placeholder}
+            // placeholder={placeholderr}
             maxLength={CHAT_INPUT_LENGTH}
             id={id}
             ref={ref}
