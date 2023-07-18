@@ -210,7 +210,8 @@
       "newForwardedChat": "Uus suunatud vestlus",
       "useAutocorrect": "Teksti autokorrektor",
       "required": "Nõutud",
-      "invalidemail": "Kehtetu e-posti"
+      "invalidemail": "Kehtetu e-posti",
+      "idCodePlaceholder": "Isikukood peab algama riigi eesliitega, (eg.EE12345678910)"
     },
     "chat": {
       "chatActive": "Vestlusrobot aktiivne",

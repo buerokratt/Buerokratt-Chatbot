@@ -146,8 +146,10 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
           <FormInput
             {...register('idCode', { required: requiredText })}
             label={t('settings.users.idCode')}
+            placeholder={t('settings.users.idCodePlaceholder')}
           />
         )}
+
         {!user && errors.idCode && (
           <span style={{ color: '#f00', marginTop: '-1.2rem' }}>
             {errors.idCode.message}
