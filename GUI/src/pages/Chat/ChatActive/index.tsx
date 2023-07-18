@@ -1,4 +1,4 @@
-import { FC, useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Tabs from '@radix-ui/react-tabs';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -22,6 +22,7 @@ import ChatTrigger from './ChatTrigger';
 import './ChatActive.scss';
 import apiDevV2 from 'services/api-dev-v2';
 import { v4 as uuidv4 } from 'uuid';
+import { useLocation } from 'react-router-dom';
 
 const CSAchatStatuses = [
   CHAT_EVENTS.ACCEPTED,
@@ -32,6 +33,7 @@ const CSAchatStatuses = [
 
 const ChatActive: FC = () => {
   const { t } = useTranslation();
+  const { state } = useLocation();
   const { userInfo } = useUserInfoStore();
   const toast = useToast();
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
@@ -127,6 +129,13 @@ const ChatActive: FC = () => {
     return grouped;
   }, [activeChatsList]);
 
+  useEffect(() => {
+    if (state?.chatId && activeChatsList?.length > 0) {
+      setSelectedChatId(state?.chatId);
+      window.history.replaceState(null, '');
+    }
+  }, [activeChatsList]);
+
   const handleCsaForward = async (chat: ChatType, user: User) => {
     try {
       await apiDev.post('cs-redirect-chat', {
@@ -202,6 +211,7 @@ const ChatActive: FC = () => {
         className="vertical-tabs"
         orientation="vertical"
         onValueChange={setSelectedChatId}
+        defaultValue={state?.chatId}
         style={{ height: '100%', overflow: 'hidden' }}
       >
         <Tabs.List

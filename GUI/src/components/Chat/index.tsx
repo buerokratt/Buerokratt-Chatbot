@@ -40,6 +40,7 @@ import useUserInfoStore from 'store/store';
 import './Chat.scss';
 import sse from '../../services/sse-service';
 import { isStateChangingEventMessage } from 'utils/state-management-utils';
+import { useNavigate } from 'react-router-dom';
 
 type ChatProps = {
   chat: ChatType;
@@ -90,6 +91,7 @@ const Chat: FC<ChatProps> = ({
   const [errorMessage, setErrorMessage] = useState('');
   const audio = useMemo(() => new Audio(newMessageSound), []);
   let messagesLength = 0;
+  const navigate = useNavigate();
 
   useEffect(() => {
     getCsaStatus();
@@ -214,7 +216,15 @@ const Chat: FC<ChatProps> = ({
         forwardedToCsa: userInfo?.idCode ?? '',
       }),
     onSuccess: async () => {
-      chat.customerSupportId = userInfo?.idCode;
+      if (chat.customerSupportId === '') {
+        navigate('/vestlus/aktiivsed', {
+          state: {
+            chatId: chat.id,
+          },
+        });
+      } else {
+        chat.customerSupportId = userInfo?.idCode;
+      }
       onRefresh();
     },
     onError: (error: AxiosError) => {
