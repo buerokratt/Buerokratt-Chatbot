@@ -243,7 +243,8 @@
       "rule": "Session length is allowed between 30 min - 480 min (8h)",
       "minutes": "Minutes",
       "sessionChanged": "Session length changed successfully",
-      "emptySession": "Session length can't be empty"
+      "emptySession": "Session length can't be empty",
+      "invalidSession": "Session length must be between 30 and 480 minuites"
     },
     "greeting": {
       "title": "Greeting message"
@@ -282,7 +283,7 @@
       "copied": "Copied",
       "userDeleted": "User deleted",
       "newUserAdded": "New user added",
-      "userUpdated": "User updated" 
+      "userUpdated": "User updated"
     }
   }
 }

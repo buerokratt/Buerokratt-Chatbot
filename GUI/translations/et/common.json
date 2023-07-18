@@ -243,7 +243,8 @@
       "rule": "Sessiooni pikkus on lubatud vahemikus 30 min - 480 min (8h)",
       "minutes": "minutit",
       "sessionChanged": "Seansi pikkuse muutmine õnnestus",
-      "emptySession": "Seansi pikkuse väli ei tohi olla tühi"
+      "emptySession": "Seansi pikkuse väli ei tohi olla tühi",
+      "invalidSession": "Seansi pikkus peab olema 30 ja 480 minutit"
     },
     "greeting": {
       "title": "Tervitussõnum"
