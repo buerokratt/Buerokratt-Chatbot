@@ -109,14 +109,16 @@ const ChatActive: FC = () => {
       const groupIndex = grouped.otherChats.findIndex(
         (x) => x.groupId === c.customerSupportId
       );
-      if (groupIndex === -1) {
-        grouped.otherChats.push({
-          groupId: c.customerSupportId ?? '',
-          name: c.customerSupportDisplayName ?? '',
-          chats: [c],
-        });
-      } else {
-        grouped.otherChats[groupIndex].chats.push(c);
+      if (c.customerSupportId !== '') {
+        if (groupIndex === -1) {
+          grouped.otherChats.push({
+            groupId: c.customerSupportId ?? '',
+            name: c.customerSupportDisplayName ?? '',
+            chats: [c],
+          });
+        } else {
+          grouped.otherChats[groupIndex].chats.push(c);
+        }
       }
     });
 
@@ -224,9 +226,6 @@ const ChatActive: FC = () => {
               <ChatTrigger chat={chat} />
             </Tabs.Trigger>
           ))}
-          <div className="vertical-tabs__group-header">
-            <p>{t('chat.active.newChats')}</p>
-          </div>
           {activeChats?.otherChats?.map(({ name, chats }) => (
             <div key={uuidv4()}>
               {name && (
