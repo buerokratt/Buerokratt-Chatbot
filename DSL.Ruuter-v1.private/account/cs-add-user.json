@@ -13,6 +13,8 @@
           "method": "post",
           "endpoint": "{dmapper_url}/json/v2/reflect_user",
           "post_body_struct": {
+            "firstName": "{#.firstName}",
+            "lastName": "{#.lastName}",
             "userIdCode": "{#.userIdCode}",
             "displayName": "{#.displayName}",
             "csaTitle": "{#.csaTitle}",
@@ -28,17 +30,13 @@
                   "authorities": "{$.userinfo$.authorities}"
                 },
                 "validate_against": {
-                  "authorities": [
-                    "ROLE_ADMINISTRATOR"
-                  ]
+                  "authorities": ["ROLE_ADMINISTRATOR"]
                 },
                 "validation_type": "MUST_MATCH_ANY"
               },
               "post_body_parameters": {
                 "userinfo": {
-                  "cookies": [
-                    "customJwtCookie"
-                  ],
+                  "cookies": ["customJwtCookie"],
                   "method": "post",
                   "endpoint": "{tim_url}/jwt/custom-jwt-userinfo",
                   "post_body_struct": "customJwtCookie",
@@ -126,6 +124,8 @@
           "post_body_struct": {
             "created": "$_getInstant()",
             "status": "active",
+            "first_name": "{#.reflect_input#.firstName}",
+            "last_name": "{#.reflect_input#.lastName}",
             "userIdCode": "{#.reflect_input#.userIdCode}",
             "displayName": "{#.reflect_input#.displayName}",
             "csaTitle": "{#.reflect_input#.csaTitle}",

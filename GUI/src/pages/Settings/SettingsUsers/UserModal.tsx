@@ -32,6 +32,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
       displayName: user?.displayName,
       csaTitle: user?.csaTitle,
       csaEmail: user?.csaEmail,
+      fullName: user?.fullName,
     },
   });
 
@@ -134,7 +135,8 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
     >
       <Track direction="vertical" gap={16} align="right">
         <FormInput
-          {...register('login', { required: requiredText })}
+          defaultValue={`${user?.firstName ?? ''} ${user?.lastName ?? ''}`}
+          {...register('fullName', { required: requiredText })}
           label={t('settings.users.fullName')}
         />
         {errors.login && (
