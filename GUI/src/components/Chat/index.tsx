@@ -473,9 +473,11 @@ const Chat: FC<ChatProps> = ({
       forwardedToCsa: chat.forwardedToCsa ?? '',
     };
 
-    postMessageMutation.mutate(newMessage);
-    setMessagesList((oldMessages) => [...oldMessages, newMessage]);
-    setResponseText('');
+    if (responseText !== '') {
+     postMessageMutation.mutate(newMessage);
+     setMessagesList((oldMessages) => [...oldMessages, newMessage]);
+     setResponseText('');
+    }
   };
 
   const handleChatEvent = (event: string) => {
