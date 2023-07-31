@@ -211,7 +211,9 @@
       "useAutocorrect": "Teksti autokorrektor",
       "required": "Nõutud",
       "invalidemail": "Kehtetu e-posti",
-      "idCodePlaceholder": "Isikukood peab algama riigi eesliitega, (eg.EE12345678910)"
+      "idCodePlaceholder": "Isikukood peab algama riigi eesliitega, (eg.EE12345678910)",
+      "choose": "Vali",
+      "userExists": "Kasutaja on olemas"
     },
     "chat": {
       "chatActive": "Vestlusrobot aktiivne",

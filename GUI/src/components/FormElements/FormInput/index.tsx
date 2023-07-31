@@ -34,7 +34,6 @@ const FieldInput = forwardRef<HTMLInputElement, InputProps>(
           <input
             className={inputClasses}
             name={name}
-            // placeholder={placeholderr}
             maxLength={CHAT_INPUT_LENGTH}
             id={id}
             ref={ref}

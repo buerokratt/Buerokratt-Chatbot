@@ -211,7 +211,9 @@
       "useAutocorrect": "Text auto corrector",
       "required": "Required",
       "invalidemail": "Invalid email",
-      "idCodePlaceholder": "The personal identification number must start with a country prefix, (eg.EE12345678910)"
+      "idCodePlaceholder": "The personal identification number must start with a country prefix, (eg.EE12345678910)",
+      "choose": "Choose",
+      "userExists": "User Exists"
     },
     "chat": {
       "chatActive": "Chatbot active",
