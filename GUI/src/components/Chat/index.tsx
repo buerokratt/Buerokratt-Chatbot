@@ -84,7 +84,7 @@ const Chat: FC<ChatProps> = ({
   const [isPending, startTransition] = useTransition();
   const [responseText, setResponseText] = useState('');
   const [selectedMessages, setSelectedMessages] = useState<Message[]>([]);
-  const [chatCsaActive, setChatCsaActive] = useState<boolean>(true);
+  const [chatCsaActive, setChatCsaActive] = useState<boolean>(false);
   const [messagesList, setMessagesList] = useState<Message[]>([]);
   const [userInput, setUserInput] = useState<string>('');
   const [userInputFile, setUserInputFile] = useState<Attachment>();
@@ -102,7 +102,7 @@ const Chat: FC<ChatProps> = ({
     const { data: res } = await apiDev.post(
       'cs-get-customer-support-activity-by-id',
       {
-        customerSupportId: chat.customerSupportId,
+        customerSupportId: userInfo?.idCode ?? '',
       }
     );
     setChatCsaActive(
@@ -615,7 +615,7 @@ const Chat: FC<ChatProps> = ({
         )}
 
         {(chat.customerSupportId === '' ||
-          (chat.customerSupportId !== userInfo?.idCode && !chatCsaActive)) && (
+          chat.customerSupportId !== userInfo?.idCode) && chatCsaActive === true && (
           <div className="active-chat__toolbar">
             <Track justify="center">
               <div className="active-chat__toolbar-actions">

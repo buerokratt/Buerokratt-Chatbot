@@ -301,6 +301,7 @@ const Header: FC = () => {
 
   const handleCsaStatusChange = (checked: boolean) => {
     setCsaActive(checked);
+    setCsaStatus(checked === true ? 'online' : 'offline')
     customerSupportActivityMutation.mutate({
       customerSupportActive: checked,
       customerSupportStatus: checked === true ? 'online' : 'offline',
@@ -387,7 +388,14 @@ const Header: FC = () => {
               <Button
                 appearance="text"
                 style={{ textDecoration: 'underline' }}
-                onClick={() => logoutMutation.mutate()}
+                onClick={() => {
+                 customerSupportActivityMutation.mutate({
+                  customerSupportActive: false,
+                  customerSupportStatus: 'offline',
+                  customerSupportId: userInfo.idCode,
+                  });
+                  logoutMutation.mutate();
+                }}
               >
                 {t('global.logout')}
               </Button>
