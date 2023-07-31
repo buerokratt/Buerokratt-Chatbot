@@ -106,7 +106,7 @@ const Chat: FC<ChatProps> = ({
       }
     );
     setChatCsaActive(
-      res.data.get_customer_support_activity[0]?.status === 'online'
+      res.data.get_customer_support_activity[0]?.status === 'online' || res.data.get_customer_support_activity[0]?.status === 'idle'
     );
   };
 
@@ -672,6 +672,7 @@ const Chat: FC<ChatProps> = ({
             </Button>
             <Button
               appearance="secondary"
+              disabled={!chatCsaActive}
               onClick={
                 onForwardToColleauge
                   ? () => {
@@ -685,6 +686,7 @@ const Chat: FC<ChatProps> = ({
             </Button>
             <Button
               appearance="secondary"
+              disabled={!chatCsaActive}
               onClick={
                 onForwardToEstablishment
                   ? () => onForwardToEstablishment(chat)
