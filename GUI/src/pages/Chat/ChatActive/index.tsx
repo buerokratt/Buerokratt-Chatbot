@@ -143,9 +143,9 @@ const ChatActive: FC = () => {
         customerSupportId: user?.idCode ?? '',
         customerSupportDisplayName: user?.displayName ?? '',
         csaTitle: user?.csaTitle ?? '',
-        forwardedByUser: userInfo?.idCode ?? '',
-        forwardedFromCsa: userInfo?.idCode ?? '',
-        forwardedToCsa: user?.idCode ?? '',
+        forwardedByUser: userInfo?.displayName ?? '',
+        forwardedFromCsa: userInfo?.displayName ?? '',
+        forwardedToCsa: user?.displayName ?? '',
       }),
         setForwardToColleaugeModal(null);
       refetch();
