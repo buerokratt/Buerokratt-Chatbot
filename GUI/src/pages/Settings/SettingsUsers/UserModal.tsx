@@ -167,15 +167,16 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
     >
       <Track direction="vertical" gap={16} align="right">
         <FormInput
-          defaultValue={`${user?.firstName ?? ''} ${user?.lastName ?? ''}`}
+          defaultValue={`${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim()}
           {...register('fullName', { required: requiredText })}
           label={t('settings.users.fullName')}
         />
-        {errors.login && (
-          <span style={{ color: '#f00', marginTop: '-1.2rem' }}>
-            {errors.login.message}
+        {errors.fullName  && (
+          <span style={{ color: '#f00', marginTop: '-1rem' }}>
+            {errors.fullName.message}
           </span>
         )}
+
         {!user && (
           <FormInput
             {...register('idCode', { required: requiredText })}
@@ -184,7 +185,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
         )}
 
         {!user && errors.idCode && (
-          <span style={{ color: '#f00', marginTop: '-1.2rem' }}>
+          <span style={{ color: '#f00', marginTop: '-1rem' }}>
             {errors.idCode.message}
           </span>
         )}
@@ -225,20 +226,32 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
 />
 
         {errors.authorities && (
-          <span style={{ color: '#f00', marginTop: '-1.2rem' }}>
+          <span style={{ color: '#f00', marginTop: '-1rem' }}>
             {errors.authorities.message}
           </span>
         )}
         <FormInput
           {...register('displayName', {
-            required: requiredText
+            required: requiredText,
           })}
           label={t('settings.users.displayName')}
         />
+        {errors.displayName && (
+          <span style={{ color: '#f00', marginTop: '-1rem' }}>
+            {errors.displayName.message}
+          </span>
+        )}
+
         <FormInput
-          {...register('csaTitle')}
+          {...register('csaTitle', {required: requiredText})}
           label={t('settings.users.userTitle')}
         />
+
+        {errors.csaTitle && (
+          <span style={{ color: '#f00', marginTop: '-1rem' }}>
+            {errors.csaTitle.message}
+          </span>
+        )}
 
         <FormInput
           {...register('csaEmail', {
@@ -252,7 +265,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
           type="email"
         />
         {errors.csaEmail && (
-          <span style={{ color: '#f00', marginTop: '-1.2rem' }}>
+          <span style={{ color: '#f00', marginTop: '-1rem' }}>
             {errors.csaEmail.message}
           </span>
         )}
