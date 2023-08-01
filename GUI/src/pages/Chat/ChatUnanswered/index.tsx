@@ -1,4 +1,4 @@
-import { FC, useMemo, useState } from 'react';
+import { FC, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Tabs from '@radix-ui/react-tabs';
 import { useQuery } from '@tanstack/react-query';
@@ -6,18 +6,28 @@ import { formatDistanceStrict } from 'date-fns';
 import { et } from 'date-fns/locale';
 
 import { Track, Chat, Dialog, Button, FormRadios } from 'components';
-import { CHAT_EVENTS, Chat as ChatType } from 'types/chat';
+import {
+  CHAT_EVENTS,
+  CHAT_STATUS,
+  Chat as ChatType,
+  GroupedChat,
+} from 'types/chat';
 import useUserInfoStore from 'store/store';
 import { User } from 'types/user';
 import { useToast } from 'hooks/useToast';
 import './ChatUnanswered.scss';
 import apiDev from 'services/api-dev';
 import { format } from 'timeago.js';
+import CsaActivityContext from 'providers/CsaActivityContext';
+import ChatTrigger from '../ChatActive/ChatTrigger';
+import clsx from 'clsx';
+import { v4 as uuidv4 } from 'uuid';
 
 const ChatUnanswered: FC = () => {
   const { t } = useTranslation();
   const { userInfo } = useUserInfoStore();
   const toast = useToast();
+  const { chatCsaActive } = useContext(CsaActivityContext);
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
   const [endChatModal, setEndChatModal] = useState<ChatType | null>(null);
   const [forwardToColleaugeModal, setForwardToColleaugeModal] =
@@ -45,6 +55,10 @@ const ChatUnanswered: FC = () => {
     },
   });
 
+  useEffect(() => {
+    refetch();
+  }, [chatCsaActive]);
+
   const { data: csaNameVisiblity } = useQuery<{ isVisible: boolean }>({
     queryKey: ['cs-get-csa-name-visibility', 'prod-2'],
   });
@@ -58,13 +72,59 @@ const ChatUnanswered: FC = () => {
       activeChatsList && activeChatsList.find((c) => c.id === selectedChatId),
     [activeChatsList, selectedChatId]
   );
-  const unansweredChats = useMemo(
-    () =>
-      activeChatsList
-        ? activeChatsList.filter((c) => c.customerSupportId === '')
-        : [],
-    [activeChatsList]
-  );
+
+  const unansweredChats: GroupedChat = useMemo(() => {
+    const grouped: GroupedChat = {
+      myChats: [],
+      otherChats: [],
+    };
+
+    if (!activeChatsList) return grouped;
+
+    const filteredActiveChatsList = activeChatsList;
+    if (chatCsaActive === true) {
+      filteredActiveChatsList.filter((c) => c.customerSupportId === '');
+    }
+
+    if (chatCsaActive === true) {
+      filteredActiveChatsList.forEach((c) => {
+        if (c.customerSupportId === '') {
+          grouped.myChats.push(c);
+          return;
+        }
+      });
+    } else {
+      filteredActiveChatsList.forEach((c) => {
+        if (
+          c.customerSupportId === userInfo?.idCode ||
+          c.customerSupportId === ''
+        ) {
+          grouped.myChats.push(c);
+          return;
+        }
+
+        grouped.myChats.sort((a, b) => a.created.localeCompare(b.created));
+        const groupIndex = grouped.otherChats.findIndex(
+          (x) => x.groupId === c.customerSupportId
+        );
+        if (c.customerSupportId !== '') {
+          if (groupIndex === -1) {
+            grouped.otherChats.push({
+              groupId: c.customerSupportId ?? '',
+              name: c.customerSupportDisplayName ?? '',
+              chats: [c],
+            });
+          } else {
+            grouped.otherChats[groupIndex].chats.push(c);
+          }
+        }
+      });
+
+      grouped.otherChats.sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    return grouped;
+  }, [activeChatsList, chatCsaActive]);
 
   const handleCsaForward = async (chat: ChatType, user: User) => {
     try {
@@ -150,40 +210,44 @@ const ChatUnanswered: FC = () => {
         <div className="vertical-tabs__group-header">
           <p>{t('chat.unansweredChats')}</p>
         </div>
-        {unansweredChats.map((chat) => (
+        {unansweredChats?.myChats?.map((chat) => (
           <Tabs.Trigger
             key={chat.id}
-            className="vertical-tabs__trigger"
+            className={clsx('vertical-tabs__trigger', {
+              active:
+                chat.status === CHAT_STATUS.REDIRECTED &&
+                chat.customerSupportId === userInfo?.idCode,
+            })}
             value={chat.id}
             style={{ borderBottom: '1px solid #D2D3D8' }}
           >
-            <div style={{ fontSize: 14, lineHeight: '1.5', color: '#09090B' }}>
-              <Track justify="between">
-                {chat.endUserFirstName !== '' && chat.endUserLastName !== '' ? (
-                  <p>
-                    <strong>
-                      {chat.endUserFirstName} {chat.endUserLastName}
-                    </strong>
-                  </p>
-                ) : (
-                  <p>
-                    <strong>{t('global.anonymous')}</strong>
-                  </p>
-                )}
-                {chat.lastMessageTimestamp && (
-                  <p style={{ color: '#4D4F5D' }}>
-                    {format(
-                      chat.lastMessageTimestamp ?? new Date().toISOString,
-                      'et_EE'
-                    )}
-                  </p>
-                )}
-              </Track>
-              <div className="wrapper">
-                <p className="last_message">{chat.lastMessage}.</p>
-              </div>
-            </div>
+            <ChatTrigger chat={chat} />
           </Tabs.Trigger>
+        ))}
+        {unansweredChats?.otherChats?.map(({ name, chats }) => (
+          <div key={uuidv4()}>
+            {name && (
+              <div className="vertical-tabs__sub-group-header">
+                <p>{name}</p>
+              </div>
+            )}
+            <Track align="stretch" direction="vertical" justify="between">
+              {chats.map((chat, i) => (
+                <Tabs.Trigger
+                  key={chat.id + i}
+                  className={clsx('vertical-tabs__trigger', {
+                    active:
+                      chat.status === CHAT_STATUS.REDIRECTED &&
+                      chat.customerSupportId === userInfo?.idCode,
+                  })}
+                  value={chat.id}
+                  style={{ borderBottom: '1px solid #D2D3D8' }}
+                >
+                  <ChatTrigger chat={chat} />
+                </Tabs.Trigger>
+              ))}
+            </Track>
+          </div>
         ))}
       </Tabs.List>
 
