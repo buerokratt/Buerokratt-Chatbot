@@ -1,0 +1,33 @@
+@import 'src/styles/tools/spacing';
+@import 'src/styles/tools/color';
+@import 'src/styles/settings/variables/other';
+@import 'src/styles/settings/variables/typography';
+
+.multiSelect {
+    $self: &;
+    display: flex;
+    align-items: center;
+    gap: get-spacing(paldiski);
+    width: 100%;
+    &::placeholder {
+      color: get-color(black-coral-6);
+      font-size: small;
+    }
+
+    &__label {
+        flex: 0 0 170px;
+        font-size: $veera-font-size-100;
+        line-height: 24px;
+    }
+
+
+    &__wrapper {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        position: relative;
+        border: 0.15px solid get-color(black-coral-6);
+        border-radius: $veera-radius-s;
+    }
+}

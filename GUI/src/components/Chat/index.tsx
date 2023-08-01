@@ -1,6 +1,7 @@
 import {
   ChangeEvent,
   FC,
+  useContext,
   useEffect,
   useMemo,
   useRef,
@@ -40,6 +41,8 @@ import useUserInfoStore from 'store/store';
 import './Chat.scss';
 import sse from '../../services/sse-service';
 import { isStateChangingEventMessage } from 'utils/state-management-utils';
+import { useNavigate } from 'react-router-dom';
+import CsaActivityContext from 'providers/CsaActivityContext';
 
 type ChatProps = {
   chat: ChatType;
@@ -83,13 +86,16 @@ const Chat: FC<ChatProps> = ({
   const [isPending, startTransition] = useTransition();
   const [responseText, setResponseText] = useState('');
   const [selectedMessages, setSelectedMessages] = useState<Message[]>([]);
-  const [chatCsaActive, setChatCsaActive] = useState<boolean>(true);
+  const { chatCsaActive, setChatCsaActive } = useContext(CsaActivityContext);
   const [messagesList, setMessagesList] = useState<Message[]>([]);
+  const [latestPermissionMessage, setLatestPermissionMessage] =
+    useState<number>(0);
   const [userInput, setUserInput] = useState<string>('');
   const [userInputFile, setUserInputFile] = useState<Attachment>();
   const [errorMessage, setErrorMessage] = useState('');
   const audio = useMemo(() => new Audio(newMessageSound), []);
   let messagesLength = 0;
+  const navigate = useNavigate();
 
   useEffect(() => {
     getCsaStatus();
@@ -100,11 +106,12 @@ const Chat: FC<ChatProps> = ({
     const { data: res } = await apiDev.post(
       'cs-get-customer-support-activity-by-id',
       {
-        customerSupportId: chat.customerSupportId,
+        customerSupportId: userInfo?.idCode ?? '',
       }
     );
     setChatCsaActive(
-      res.data.get_customer_support_activity[0]?.status === 'online'
+      res.data.get_customer_support_activity[0]?.status === 'online' ||
+        res.data.get_customer_support_activity[0]?.status === 'idle'
     );
   };
 
@@ -119,14 +126,31 @@ const Chat: FC<ChatProps> = ({
       const newDisplayableMessages = messages.filter(
         (msg) => msg.authorId != userInfo?.idCode
       );
+
       if (newDisplayableMessages.length > 0) {
         setMessagesList((oldMessages) => [
           ...oldMessages,
           ...newDisplayableMessages,
         ]);
       }
-    });
 
+      const askingPermissionsMessages: Message[] = messagesList.filter(
+        (e: Message) =>
+          e.event === 'ask-permission' ||
+          e.event === 'ask-permission-accepted' ||
+          e.event === 'ask-permission-rejected'
+      );
+      const lastestPermissionDate = new Date(
+        askingPermissionsMessages[askingPermissionsMessages.length - 1]
+          ?.created ?? new Date()
+      );
+
+      const lastPermissionMesageSecondsDiff = Math.round(
+        (new Date().getTime() - lastestPermissionDate.getTime()) / 1000
+      );
+
+      setLatestPermissionMessage(lastPermissionMesageSecondsDiff ?? 0);
+    });
     return () => sseInstance.close();
   }, [messagesList]);
 
@@ -145,6 +169,27 @@ const Chat: FC<ChatProps> = ({
       onRefresh();
     }
     messagesLength = res.data.cs_get_messages_by_chat_id.length;
+    const askingPermissionsMessages: Message[] =
+      res.data.cs_get_messages_by_chat_id
+        .map((e: Message[]) => e)
+        .filter(
+          (e: Message) =>
+            e.event === 'ask-permission' ||
+            e.event === 'ask-permission-accepted' ||
+            e.event === 'ask-permission-rejected'
+        );
+
+    const lastestPermissionDate = new Date(
+      askingPermissionsMessages[askingPermissionsMessages.length - 1]
+        ?.created ?? new Date()
+    );
+
+    const lastPermissionMesageSecondsDiff = Math.round(
+      (new Date().getTime() - lastestPermissionDate.getTime()) / 1000
+    );
+
+    setLatestPermissionMessage(lastPermissionMesageSecondsDiff ?? 0);
+
     setMessagesList(res.data.cs_get_messages_by_chat_id);
   };
 
@@ -214,7 +259,15 @@ const Chat: FC<ChatProps> = ({
         forwardedToCsa: userInfo?.idCode ?? '',
       }),
     onSuccess: async () => {
-      chat.customerSupportId = userInfo?.idCode;
+      if (chat.customerSupportId === '') {
+        navigate('/vestlus/aktiivsed', {
+          state: {
+            chatId: chat.id,
+          },
+        });
+      } else {
+        chat.customerSupportId = userInfo?.idCode;
+      }
       onRefresh();
     },
     onError: (error: AxiosError) => {
@@ -453,7 +506,7 @@ const Chat: FC<ChatProps> = ({
     const newMessage: Message = {
       chatId: chat.id,
       authorRole: AUTHOR_ROLES.BACKOFFICE_USER,
-      content: responseText,
+      content: encodeURIComponent(responseText),
       authorTimestamp: new Date().toISOString(),
       authorFirstName: userInfo?.displayName ?? '',
       authorLastName: '',
@@ -463,9 +516,11 @@ const Chat: FC<ChatProps> = ({
       forwardedToCsa: chat.forwardedToCsa ?? '',
     };
 
-    postMessageMutation.mutate(newMessage);
-    setMessagesList((oldMessages) => [...oldMessages, newMessage]);
-    setResponseText('');
+    if (responseText !== '') {
+      postMessageMutation.mutate(newMessage);
+      setMessagesList((oldMessages) => [...oldMessages, newMessage]);
+      setResponseText('');
+    }
   };
 
   const handleChatEvent = (event: string) => {
@@ -474,6 +529,7 @@ const Chat: FC<ChatProps> = ({
       authorRole: AUTHOR_ROLES.BACKOFFICE_USER,
       content: '',
       event: event,
+      created: new Date().toLocaleString(),
       authorTimestamp: new Date().toISOString(),
       authorFirstName: userInfo?.displayName ?? '',
       authorLastName: '',
@@ -605,27 +661,28 @@ const Chat: FC<ChatProps> = ({
         )}
 
         {(chat.customerSupportId === '' ||
-          (chat.customerSupportId !== userInfo?.idCode && !chatCsaActive)) && (
-          <div className="active-chat__toolbar">
-            <Track justify="center">
-              <div className="active-chat__toolbar-actions">
-                <Button
-                  appearance="primary"
-                  style={{
-                    backgroundColor: '#25599E',
-                    color: '#FFFFFF',
-                    borderRadius: '50px',
-                    paddingLeft: '40px',
-                    paddingRight: '40px',
-                  }}
-                  onClick={() => takeOverChatMutation.mutate()}
-                >
-                  {t('chat.active.takeOver')}
-                </Button>
-              </div>
-            </Track>
-          </div>
-        )}
+          chat.customerSupportId !== userInfo?.idCode) &&
+          chatCsaActive === true && (
+            <div className="active-chat__toolbar">
+              <Track justify="center">
+                <div className="active-chat__toolbar-actions">
+                  <Button
+                    appearance="primary"
+                    style={{
+                      backgroundColor: '#25599E',
+                      color: '#FFFFFF',
+                      borderRadius: '50px',
+                      paddingLeft: '40px',
+                      paddingRight: '40px',
+                    }}
+                    onClick={() => takeOverChatMutation.mutate()}
+                  >
+                    {t('chat.active.takeOver')}
+                  </Button>
+                </div>
+              </Track>
+            </div>
+          )}
       </div>
       <div className="active-chat__side">
         {(chat.customerSupportId === '' ||
@@ -655,13 +712,18 @@ const Chat: FC<ChatProps> = ({
             </Button>
             <Button
               appearance="secondary"
-              disabled={chat.customerSupportId != userInfo?.idCode}
+              disabled={
+                chat.customerSupportId != userInfo?.idCode ||
+                (latestPermissionMessage <= 60 && latestPermissionMessage != 0)
+              }
               onClick={() => handleChatEvent(CHAT_EVENTS.ASK_PERMISSION)}
             >
               {t('chat.active.askPermission')}
             </Button>
+
             <Button
               appearance="secondary"
+              disabled={!chatCsaActive}
               onClick={
                 onForwardToColleauge
                   ? () => {
@@ -675,6 +737,7 @@ const Chat: FC<ChatProps> = ({
             </Button>
             <Button
               appearance="secondary"
+              disabled={!chatCsaActive}
               onClick={
                 onForwardToEstablishment
                   ? () => onForwardToEstablishment(chat)

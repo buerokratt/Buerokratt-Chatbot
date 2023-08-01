@@ -201,7 +201,7 @@ const MainNavigation: FC = () => {
           case 'ROLE_SERVICE_MANAGER': return item.id != 'settings' && item.id != 'training'
           case 'ROLE_CUSTOMER_SUPPORT_AGENT': return item.id != 'settings' && item.id != 'analytics'
           case 'ROLE_CHATBOT_TRAINER': return item.id != 'settings' && item.id != 'conversations'
-          case 'ROLE_ANALYST': return item.id == 'analytics'
+          case 'ROLE_ANALYST': return item.id == 'analytics' || item.id == 'monitoring'
           case 'ROLE_UNAUTHENTICATED': return
           default: return
         }

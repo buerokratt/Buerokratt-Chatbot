@@ -46,6 +46,7 @@
     "react-idle-timer": "^5.5.2",
     "react-redux": "^8.1.1",
     "react-router-dom": "^6.5.0",
+    "react-select": "^5.7.4",
     "react-text-selection-popover": "^2.0.2",
     "react-textarea-autosize": "^8.4.0",
     "reactflow": "^11.4.0",

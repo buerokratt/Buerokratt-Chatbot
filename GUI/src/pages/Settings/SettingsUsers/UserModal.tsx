@@ -6,9 +6,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { Button, Dialog, FormInput, FormSelect, Track } from 'components';
 import { User, UserDTO } from 'types/user';
-import { createUser, editUser } from 'services/users';
+import { checkIfUserExists, createUser, editUser } from 'services/users';
 import { useToast } from 'hooks/useToast';
 import { ROLES } from 'utils/constants';
+import Select from 'react-select';
+import './SettingsUsers.scss';
 
 type UserModalProps = {
   onClose: () => void;
@@ -32,6 +34,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
       displayName: user?.displayName,
       csaTitle: user?.csaTitle,
       csaEmail: user?.csaEmail,
+      fullName: user?.fullName,
     },
   });
 
@@ -65,7 +68,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
       toast.open({
         type: 'success',
         title: t('global.notification'),
-        message: t('toast.succes.newUserAdded'),
+        message: t('toast.success.newUserAdded'),
       });
       onClose();
     },
@@ -107,11 +110,41 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
     },
   });
 
+  const checkIfUserExistsMutation = useMutation({
+    mutationFn: ({
+      userData
+    }: {
+      userData: UserDTO;
+    }) => checkIfUserExists(userData),
+    onSuccess: async (data) => {
+      if (data.data.check_user_exists !== undefined) {
+        toast.open({
+          type: 'error',
+          title: t('global.notificationError'),
+          message: t('settings.users.userExists'),
+        });
+      } else {
+        createNewUser();
+      }
+    },
+    onError: (error: AxiosError) => {
+      toast.open({
+        type: 'error',
+        title: t('global.notificationError'),
+        message: error.message,
+      });
+    },
+  });
+
+  const createNewUser = handleSubmit((userData) => {
+      userCreateMutation.mutate(userData);
+  })
+
   const handleUserSubmit = handleSubmit((data) => {
     if (user) {
       userEditMutation.mutate({ id: user.idCode, userData: data });
     } else {
-      userCreateMutation.mutate(data);
+      checkIfUserExistsMutation.mutate({userData: data});
     }
   });
 
@@ -134,51 +167,91 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
     >
       <Track direction="vertical" gap={16} align="right">
         <FormInput
-          {...register('login', { required: requiredText })}
+          defaultValue={`${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim()}
+          {...register('fullName', { required: requiredText })}
           label={t('settings.users.fullName')}
         />
-        {errors.login && (
-          <span style={{ color: '#f00', marginTop: '-1.2rem' }}>
-            {errors.login.message}
+        {errors.fullName  && (
+          <span style={{ color: '#f00', marginTop: '-1rem' }}>
+            {errors.fullName.message}
           </span>
         )}
+
         {!user && (
           <FormInput
             {...register('idCode', { required: requiredText })}
             label={t('settings.users.idCode')}
           />
         )}
+
         {!user && errors.idCode && (
-          <span style={{ color: '#f00', marginTop: '-1.2rem' }}>
+          <span style={{ color: '#f00', marginTop: '-1rem' }}>
             {errors.idCode.message}
           </span>
         )}
+
         <Controller
-          name="authorities"
-          control={control}
-          rules={{ required: true }}
-          render={({ field }) => (
-            <FormSelect
-              label={t('settings.users.userRoles')}
-              onSelectionChange={field.onChange}
+           control={control}
+           name="authorities"
+           rules={{ required: requiredText }}
+           render={({
+            field: { onChange, onBlur, name, ref },
+           }) => (
+          <div className="multiSelect">
+          <label className="multiSelect__label">
+            {t('settings.users.userRoles')}
+          </label>
+          <div>
+          <div className="multiSelect__wrapper">
+            <Select
+              name={name}
+              ref={ref}
+              onBlur={onBlur}
+              required={true}
               options={roles}
-              {...field}
+              defaultValue={user?.authorities.map((v) => {
+                 return {label: t(`roles.${v}` ?? ''), value: v}
+              })}
+              isMulti={true}
+              placeholder={t('global.choose')}
+              onChange={onChange}
             />
-          )}
-        />
+          </div>
+          <div>
+            <label style={{fontSize: '14.7px', color: '#9799a4'}}>{t('settings.users.idCodePlaceholder')}</label>
+          </div>
+          </div>
+        </div>
+    )}
+/>
+
         {errors.authorities && (
-          <span style={{ color: '#f00', marginTop: '-1.2rem' }}>
+          <span style={{ color: '#f00', marginTop: '-1rem' }}>
             {errors.authorities.message}
           </span>
         )}
         <FormInput
-          {...register('displayName')}
+          {...register('displayName', {
+            required: requiredText,
+          })}
           label={t('settings.users.displayName')}
         />
+        {errors.displayName && (
+          <span style={{ color: '#f00', marginTop: '-1rem' }}>
+            {errors.displayName.message}
+          </span>
+        )}
+
         <FormInput
-          {...register('csaTitle')}
+          {...register('csaTitle', {required: requiredText})}
           label={t('settings.users.userTitle')}
         />
+
+        {errors.csaTitle && (
+          <span style={{ color: '#f00', marginTop: '-1rem' }}>
+            {errors.csaTitle.message}
+          </span>
+        )}
 
         <FormInput
           {...register('csaEmail', {
@@ -192,7 +265,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
           type="email"
         />
         {errors.csaEmail && (
-          <span style={{ color: '#f00', marginTop: '-1.2rem' }}>
+          <span style={{ color: '#f00', marginTop: '-1rem' }}>
             {errors.csaEmail.message}
           </span>
         )}

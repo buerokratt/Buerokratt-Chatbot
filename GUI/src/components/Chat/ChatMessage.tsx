@@ -40,7 +40,7 @@ const ChatMessage: FC<ChatMessageProps> = ({
             onSelect(message);
           }}
         >
-          <Linkifier message={message.content} />
+          <Linkifier message={decodeURIComponent(message.content ?? '')} />
           {!!message.preview && message.preview}
         </div>
         <time

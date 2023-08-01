@@ -1,0 +1,45 @@
+{
+  "action_type": "BLOGIC",
+  "destination": [
+    {
+      "check_user_exists": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "proceed"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{ruuter_url}/match_input",
+          "post_body_struct": {
+            "input": {
+              "id_code": "{$.get_user[0]$.idCode}"
+            },
+            "validate_against": {
+              "id_code": "{#.userIdCode}"
+            },
+            "validation_type": "MUST_MATCH_ANY"
+          },
+          "post_body_parameters": {
+            "get_user": {
+              "method": "post",
+              "endpoint": "{resql_url}/get-user",
+              "post_body_struct": {
+                "userIdCode": "{#.userIdCode}"
+              }
+            }
+          },
+          "response": {
+            "nok": "proceed",
+            "ok": "proceed"
+          }
+        },
+        "response": {
+          "nok": "proceed",
+          "ok": "proceed"
+        }
+      }
+    }
+  ]
+}

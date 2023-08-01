@@ -17,7 +17,9 @@ const SettingsUsers: FC = () => {
   const toast = useToast();
   const [newUserModal, setNewUserModal] = useState(false);
   const [editableRow, setEditableRow] = useState<User | null>(null);
-  const [deletableRow, setDeletableRow] = useState<string | number | null>(null);
+  const [deletableRow, setDeletableRow] = useState<string | number | null>(
+    null
+  );
   const [usersList, setUsersList] = useState<User[]>([]);
   const { data: users } = useQuery<User[]>({
     queryKey: ['cs-get-customer-support-agents', 'prod'],
@@ -30,11 +32,14 @@ const SettingsUsers: FC = () => {
   const deleteUserMutation = useMutation({
     mutationFn: ({ id }: { id: string | number }) => deleteUser(id),
     onSuccess: async () => {
-      await queryClient.invalidateQueries(['cs-get-customer-support-agents', 'prod']);
+      await queryClient.invalidateQueries([
+        'cs-get-customer-support-agents',
+        'prod',
+      ]);
       toast.open({
         type: 'success',
         title: t('global.notification'),
-        message:  t('toast.success.userDeleted'),
+        message: t('toast.success.userDeleted'),
       });
       setDeletableRow(null);
     },
@@ -47,69 +52,90 @@ const SettingsUsers: FC = () => {
     },
   });
 
-  const usersColumns = useMemo(() => [
-    columnHelper.accessor((row) => `${row.firstName ?? ""} ${row.lastName ?? ""}`, {
-      id: `name`,
-      header: t('settings.users.name') || '',
-    }),
-    columnHelper.accessor('idCode', {
-      header: t('settings.users.idCode') || '',
-    }),
-    columnHelper.accessor('authorities', {
-      header: t('settings.users.role') || '',
-      cell: (props) => props.getValue().map((r) => t(`roles.${r}`)).join(', '),
-    }),
-    columnHelper.accessor('displayName', {
-      header: t('settings.users.displayName') || '',
-    }),
-    columnHelper.accessor('csaTitle', {
-      header: t('settings.users.userTitle') || '',
-    }),
-    columnHelper.accessor('csaEmail', {
-      header: t('settings.users.email') || '',
-    }),
-    columnHelper.display({
-      id: 'edit',
-      cell: (props) => (
-        <Button appearance='text' onClick={() => setEditableRow(props.row.original)}>
-          <Icon icon={<MdOutlineEdit />} />
-          {t('global.edit')}
-        </Button>
+  const usersColumns = useMemo(
+    () => [
+      columnHelper.accessor(
+        (row) => `${row.firstName ?? ''} ${row.lastName ?? ''}`,
+        {
+          id: `name`,
+          header: t('settings.users.name') || '',
+        }
       ),
-      meta: {
-        size: '1%',
-      },
-    }),
-    columnHelper.display({
-      id: 'delete',
-      cell: (props) => (
-        <Button appearance='text' onClick={() => setDeletableRow(props.row.original.idCode)}>
-          <Icon icon={<MdOutlineDeleteOutline />} />
-          {t('global.delete')}
-        </Button>
-      ),
-      meta: {
-        size: '1%',
-      },
-    }),
-  ], []);
+      columnHelper.accessor('idCode', {
+        header: t('settings.users.idCode') || '',
+      }),
+      columnHelper.accessor('authorities', {
+        header: t('settings.users.role') || '',
+        cell: (props) =>
+          props
+            .getValue()
+            .map((r) => t(`roles.${r}`))
+            .join(', '),
+      }),
+      columnHelper.accessor('displayName', {
+        header: t('settings.users.displayName') || '',
+      }),
+      columnHelper.accessor('csaTitle', {
+        header: t('settings.users.userTitle') || '',
+      }),
+      columnHelper.accessor('csaEmail', {
+        header: t('settings.users.email') || '',
+      }),
+      columnHelper.display({
+        id: 'edit',
+        cell: (props) => (
+          <Button
+            appearance="text"
+            onClick={() => setEditableRow(props.row.original)}
+          >
+            <Icon icon={<MdOutlineEdit />} />
+            {t('global.edit')}
+          </Button>
+        ),
+        meta: {
+          size: '1%',
+        },
+      }),
+      columnHelper.display({
+        id: 'delete',
+        cell: (props) => (
+          <Button
+            appearance="text"
+            onClick={() => setDeletableRow(props.row.original.idCode)}
+          >
+            <Icon icon={<MdOutlineDeleteOutline />} />
+            {t('global.delete')}
+          </Button>
+        ),
+        meta: {
+          size: '1%',
+        },
+      }),
+    ],
+    []
+  );
 
   if (!users) return <>Loading...</>;
 
   return (
     <>
-      <Track gap={16} justify='between'>
+      <Track gap={16} justify="between">
         <h1>{t('settings.users.title')}</h1>
-        <Button onClick={() => setNewUserModal(true)}>{t('settings.users.addUser')}</Button>
+        <Button onClick={() => setNewUserModal(true)}>
+          {t('settings.users.addUser')}
+        </Button>
       </Track>
 
       <Card>
-        <DataTable data={usersList} columns={usersColumns} sortable filterable />
+        <DataTable
+          data={usersList}
+          columns={usersColumns}
+          sortable
+          filterable
+        />
       </Card>
 
-      {newUserModal && (
-        <UserModal onClose={() => setNewUserModal(false)} />
-      )}
+      {newUserModal && <UserModal onClose={() => setNewUserModal(false)} />}
 
       {editableRow && (
         <UserModal user={editableRow} onClose={() => setEditableRow(null)} />
@@ -121,9 +147,14 @@ const SettingsUsers: FC = () => {
           onClose={() => setDeletableRow(null)}
           footer={
             <>
-              <Button appearance='secondary' onClick={() => setDeletableRow(null)}>{t('global.no')}</Button>
               <Button
-                appearance='error'
+                appearance="secondary"
+                onClick={() => setDeletableRow(null)}
+              >
+                {t('global.no')}
+              </Button>
+              <Button
+                appearance="error"
                 onClick={() => deleteUserMutation.mutate({ id: deletableRow })}
               >
                 {t('global.yes')}
