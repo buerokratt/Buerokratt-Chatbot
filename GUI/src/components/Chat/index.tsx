@@ -88,6 +88,8 @@ const Chat: FC<ChatProps> = ({
   const [selectedMessages, setSelectedMessages] = useState<Message[]>([]);
   const { chatCsaActive, setChatCsaActive } = useContext(CsaActivityContext);
   const [messagesList, setMessagesList] = useState<Message[]>([]);
+  const [latestPermissionMessage, setLatestPermissionMessage] =
+    useState<number>(0);
   const [userInput, setUserInput] = useState<string>('');
   const [userInputFile, setUserInputFile] = useState<Attachment>();
   const [errorMessage, setErrorMessage] = useState('');
@@ -124,14 +126,31 @@ const Chat: FC<ChatProps> = ({
       const newDisplayableMessages = messages.filter(
         (msg) => msg.authorId != userInfo?.idCode
       );
+
       if (newDisplayableMessages.length > 0) {
         setMessagesList((oldMessages) => [
           ...oldMessages,
           ...newDisplayableMessages,
         ]);
       }
-    });
 
+      const askingPermissionsMessages: Message[] = messagesList.filter(
+        (e: Message) =>
+          e.event === 'ask-permission' ||
+          e.event === 'ask-permission-accepted' ||
+          e.event === 'ask-permission-rejected'
+      );
+      const lastestPermissionDate = new Date(
+        askingPermissionsMessages[askingPermissionsMessages.length - 1]
+          ?.created ?? new Date()
+      );
+
+      const lastPermissionMesageSecondsDiff = Math.round(
+        (new Date().getTime() - lastestPermissionDate.getTime()) / 1000
+      );
+
+      setLatestPermissionMessage(lastPermissionMesageSecondsDiff ?? 0);
+    });
     return () => sseInstance.close();
   }, [messagesList]);
 
@@ -150,6 +169,27 @@ const Chat: FC<ChatProps> = ({
       onRefresh();
     }
     messagesLength = res.data.cs_get_messages_by_chat_id.length;
+    const askingPermissionsMessages: Message[] =
+      res.data.cs_get_messages_by_chat_id
+        .map((e: Message[]) => e)
+        .filter(
+          (e: Message) =>
+            e.event === 'ask-permission' ||
+            e.event === 'ask-permission-accepted' ||
+            e.event === 'ask-permission-rejected'
+        );
+
+    const lastestPermissionDate = new Date(
+      askingPermissionsMessages[askingPermissionsMessages.length - 1]
+        ?.created ?? new Date()
+    );
+
+    const lastPermissionMesageSecondsDiff = Math.round(
+      (new Date().getTime() - lastestPermissionDate.getTime()) / 1000
+    );
+
+    setLatestPermissionMessage(lastPermissionMesageSecondsDiff ?? 0);
+
     setMessagesList(res.data.cs_get_messages_by_chat_id);
   };
 
@@ -489,6 +529,7 @@ const Chat: FC<ChatProps> = ({
       authorRole: AUTHOR_ROLES.BACKOFFICE_USER,
       content: '',
       event: event,
+      created: new Date().toLocaleString(),
       authorTimestamp: new Date().toISOString(),
       authorFirstName: userInfo?.displayName ?? '',
       authorLastName: '',
@@ -671,11 +712,15 @@ const Chat: FC<ChatProps> = ({
             </Button>
             <Button
               appearance="secondary"
-              disabled={chat.customerSupportId != userInfo?.idCode}
+              disabled={
+                chat.customerSupportId != userInfo?.idCode ||
+                (latestPermissionMessage <= 60 && latestPermissionMessage != 0)
+              }
               onClick={() => handleChatEvent(CHAT_EVENTS.ASK_PERMISSION)}
             >
               {t('chat.active.askPermission')}
             </Button>
+
             <Button
               appearance="secondary"
               disabled={!chatCsaActive}
