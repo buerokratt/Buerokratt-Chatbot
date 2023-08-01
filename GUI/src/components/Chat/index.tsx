@@ -106,7 +106,8 @@ const Chat: FC<ChatProps> = ({
       }
     );
     setChatCsaActive(
-      res.data.get_customer_support_activity[0]?.status === 'online' || res.data.get_customer_support_activity[0]?.status === 'idle'
+      res.data.get_customer_support_activity[0]?.status === 'online' ||
+        res.data.get_customer_support_activity[0]?.status === 'idle'
     );
   };
 
@@ -176,7 +177,8 @@ const Chat: FC<ChatProps> = ({
   };
 
   const postMessageMutation = useMutation({
-    mutationFn: (message: Message) => apiDev.post('cs-post-message', message),
+    mutationFn: (message: Message) =>
+      apiDev.post('cs-post-message', message),
     onSuccess: () => {},
     onError: (error: AxiosError) => {
       toast.open({
@@ -463,7 +465,7 @@ const Chat: FC<ChatProps> = ({
     const newMessage: Message = {
       chatId: chat.id,
       authorRole: AUTHOR_ROLES.BACKOFFICE_USER,
-      content: responseText,
+      content: encodeURIComponent(responseText),
       authorTimestamp: new Date().toISOString(),
       authorFirstName: userInfo?.displayName ?? '',
       authorLastName: '',
@@ -474,9 +476,9 @@ const Chat: FC<ChatProps> = ({
     };
 
     if (responseText !== '') {
-     postMessageMutation.mutate(newMessage);
-     setMessagesList((oldMessages) => [...oldMessages, newMessage]);
-     setResponseText('');
+      postMessageMutation.mutate(newMessage);
+      setMessagesList((oldMessages) => [...oldMessages, newMessage]);
+      setResponseText('');
     }
   };
 
@@ -617,27 +619,28 @@ const Chat: FC<ChatProps> = ({
         )}
 
         {(chat.customerSupportId === '' ||
-          chat.customerSupportId !== userInfo?.idCode) && chatCsaActive === true && (
-          <div className="active-chat__toolbar">
-            <Track justify="center">
-              <div className="active-chat__toolbar-actions">
-                <Button
-                  appearance="primary"
-                  style={{
-                    backgroundColor: '#25599E',
-                    color: '#FFFFFF',
-                    borderRadius: '50px',
-                    paddingLeft: '40px',
-                    paddingRight: '40px',
-                  }}
-                  onClick={() => takeOverChatMutation.mutate()}
-                >
-                  {t('chat.active.takeOver')}
-                </Button>
-              </div>
-            </Track>
-          </div>
-        )}
+          chat.customerSupportId !== userInfo?.idCode) &&
+          chatCsaActive === true && (
+            <div className="active-chat__toolbar">
+              <Track justify="center">
+                <div className="active-chat__toolbar-actions">
+                  <Button
+                    appearance="primary"
+                    style={{
+                      backgroundColor: '#25599E',
+                      color: '#FFFFFF',
+                      borderRadius: '50px',
+                      paddingLeft: '40px',
+                      paddingRight: '40px',
+                    }}
+                    onClick={() => takeOverChatMutation.mutate()}
+                  >
+                    {t('chat.active.takeOver')}
+                  </Button>
+                </div>
+              </Track>
+            </div>
+          )}
       </div>
       <div className="active-chat__side">
         {(chat.customerSupportId === '' ||
