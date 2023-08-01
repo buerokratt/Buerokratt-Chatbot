@@ -1,7 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
-import { QueryClient, QueryClientProvider, QueryFunction } from '@tanstack/react-query';
+import {
+  QueryClient,
+  QueryClientProvider,
+  QueryFunction,
+} from '@tanstack/react-query';
 
 import App from './App';
 import api from 'services/api';
@@ -22,7 +26,7 @@ const defaultQueryFn: QueryFunction | undefined = async ({ queryKey }) => {
     const { data } = await apiDevV2.get(queryKey[0] as string);
     return data?.response;
   }
-  
+
   const { data } = await api.get(queryKey[0] as string);
   return data;
 };
@@ -46,5 +50,5 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
         </ToastProvider>
       </BrowserRouter>
     </QueryClientProvider>
-  </React.StrictMode>,
+  </React.StrictMode>
 );

@@ -1,6 +1,7 @@
 import {
   ChangeEvent,
   FC,
+  useContext,
   useEffect,
   useMemo,
   useRef,
@@ -41,6 +42,7 @@ import './Chat.scss';
 import sse from '../../services/sse-service';
 import { isStateChangingEventMessage } from 'utils/state-management-utils';
 import { useNavigate } from 'react-router-dom';
+import CsaActivityContext from 'providers/CsaActivityContext';
 
 type ChatProps = {
   chat: ChatType;
@@ -84,7 +86,7 @@ const Chat: FC<ChatProps> = ({
   const [isPending, startTransition] = useTransition();
   const [responseText, setResponseText] = useState('');
   const [selectedMessages, setSelectedMessages] = useState<Message[]>([]);
-  const [chatCsaActive, setChatCsaActive] = useState<boolean>(false);
+  const { chatCsaActive, setChatCsaActive } = useContext(CsaActivityContext);
   const [messagesList, setMessagesList] = useState<Message[]>([]);
   const [userInput, setUserInput] = useState<string>('');
   const [userInputFile, setUserInputFile] = useState<Attachment>();
@@ -177,8 +179,7 @@ const Chat: FC<ChatProps> = ({
   };
 
   const postMessageMutation = useMutation({
-    mutationFn: (message: Message) =>
-      apiDev.post('cs-post-message', message),
+    mutationFn: (message: Message) => apiDev.post('cs-post-message', message),
     onSuccess: () => {},
     onError: (error: AxiosError) => {
       toast.open({
