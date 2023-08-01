@@ -27,6 +27,11 @@ const defaultQueryFn: QueryFunction | undefined = async ({ queryKey }) => {
     return data?.response;
   }
 
+  if (checkNotNullOrUndefined(queryKey[1]) && (queryKey[1] as string).startsWith('http') ) {
+    const  response  = await api({ url: queryKey[0] as string, baseURL: queryKey[1] as string });
+    return response;
+  }
+
   const { data } = await api.get(queryKey[0] as string);
   return data;
 };
@@ -38,6 +43,22 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+function checkNotNullOrUndefined(variable: any) {
+  if (variable == null) {
+      return false;
+  }
+
+  if (variable === null) {
+      return false;
+  }
+
+  if (typeof variable === 'undefined') {
+      return false;
+  }
+
+  return true;
+}
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
