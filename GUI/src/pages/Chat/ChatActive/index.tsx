@@ -1,9 +1,9 @@
-import { FC, useMemo, useState } from 'react';
+import { FC, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Tabs from '@radix-ui/react-tabs';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import { Chat, Dialog, Button, FormRadios } from 'components';
+import { Chat, Dialog, Button, FormRadios, Track } from 'components';
 import {
   Chat as ChatType,
   CHAT_EVENTS,
@@ -21,6 +21,9 @@ import StartAServiceModal from '../StartAServiceModal';
 import ChatTrigger from './ChatTrigger';
 import './ChatActive.scss';
 import apiDevV2 from 'services/api-dev-v2';
+import { v4 as uuidv4 } from 'uuid';
+import { useLocation } from 'react-router-dom';
+import CsaActivityContext from 'providers/CsaActivityContext';
 
 const CSAchatStatuses = [
   CHAT_EVENTS.ACCEPTED,
@@ -31,8 +34,10 @@ const CSAchatStatuses = [
 
 const ChatActive: FC = () => {
   const { t } = useTranslation();
+  const { state } = useLocation();
   const { userInfo } = useUserInfoStore();
   const toast = useToast();
+  const { chatCsaActive } = useContext(CsaActivityContext);
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
   const [endChatModal, setEndChatModal] = useState<ChatType | null>(null);
   const [forwardToColleaugeModal, setForwardToColleaugeModal] =
@@ -56,6 +61,10 @@ const ChatActive: FC = () => {
       setActiveChatsList(res.data.get_all_active_chats);
     },
   });
+
+  useEffect(() => {
+    refetch();
+  }, [chatCsaActive]);
 
   const { data: csaNameVisiblity } = useQuery<{ isVisible: boolean }>({
     queryKey: ['cs-get-csa-name-visibility', 'prod-2'],
@@ -99,6 +108,11 @@ const ChatActive: FC = () => {
 
     if (!activeChatsList) return grouped;
 
+    if (chatCsaActive === false) {
+      setSelectedChatId(null);
+      return grouped;
+    }
+
     activeChatsList.forEach((c) => {
       if (c.customerSupportId === userInfo?.idCode) {
         grouped.myChats.push(c);
@@ -108,20 +122,29 @@ const ChatActive: FC = () => {
       const groupIndex = grouped.otherChats.findIndex(
         (x) => x.groupId === c.customerSupportId
       );
-      if (groupIndex === -1) {
-        grouped.otherChats.push({
-          groupId: c.customerSupportId ?? '',
-          name: c.customerSupportDisplayName ?? '',
-          chats: [c],
-        });
-      } else {
-        grouped.otherChats[groupIndex].chats.push(c);
+      if (c.customerSupportId !== '') {
+        if (groupIndex === -1) {
+          grouped.otherChats.push({
+            groupId: c.customerSupportId ?? '',
+            name: c.customerSupportDisplayName ?? '',
+            chats: [c],
+          });
+        } else {
+          grouped.otherChats[groupIndex].chats.push(c);
+        }
       }
     });
 
     grouped.otherChats.sort((a, b) => a.name.localeCompare(b.name));
 
     return grouped;
+  }, [activeChatsList, chatCsaActive]);
+
+  useEffect(() => {
+    if (state?.chatId && activeChatsList?.length > 0) {
+      setSelectedChatId(state?.chatId);
+      window.history.replaceState(null, '');
+    }
   }, [activeChatsList]);
 
   const handleCsaForward = async (chat: ChatType, user: User) => {
@@ -131,9 +154,9 @@ const ChatActive: FC = () => {
         customerSupportId: user?.idCode ?? '',
         customerSupportDisplayName: user?.displayName ?? '',
         csaTitle: user?.csaTitle ?? '',
-        forwardedByUser: userInfo?.idCode ?? '',
-        forwardedFromCsa: userInfo?.idCode ?? '',
-        forwardedToCsa: user?.idCode ?? '',
+        forwardedByUser: userInfo?.displayName ?? '',
+        forwardedFromCsa: userInfo?.displayName ?? '',
+        forwardedToCsa: user?.displayName ?? '',
       }),
         setForwardToColleaugeModal(null);
       refetch();
@@ -199,6 +222,7 @@ const ChatActive: FC = () => {
         className="vertical-tabs"
         orientation="vertical"
         onValueChange={setSelectedChatId}
+        defaultValue={state?.chatId}
         style={{ height: '100%', overflow: 'hidden' }}
       >
         <Tabs.List
@@ -223,31 +247,30 @@ const ChatActive: FC = () => {
               <ChatTrigger chat={chat} />
             </Tabs.Trigger>
           ))}
-          <div className="vertical-tabs__group-header">
-            <p>{t('chat.active.newChats')}</p>
-          </div>
           {activeChats?.otherChats?.map(({ name, chats }) => (
-            <>
+            <div key={uuidv4()}>
               {name && (
                 <div className="vertical-tabs__sub-group-header">
                   <p>{name}</p>
                 </div>
               )}
-              {chats.map((chat, i) => (
-                <Tabs.Trigger
-                  key={chat.id + i}
-                  className={clsx('vertical-tabs__trigger', {
-                    active:
-                      chat.status === CHAT_STATUS.REDIRECTED &&
-                      chat.customerSupportId === userInfo?.idCode,
-                  })}
-                  value={chat.id}
-                  style={{ borderBottom: '1px solid #D2D3D8' }}
-                >
-                  <ChatTrigger chat={chat} />
-                </Tabs.Trigger>
-              ))}
-            </>
+              <Track align="stretch" direction="vertical" justify="between">
+                {chats.map((chat, i) => (
+                  <Tabs.Trigger
+                    key={chat.id + i}
+                    className={clsx('vertical-tabs__trigger', {
+                      active:
+                        chat.status === CHAT_STATUS.REDIRECTED &&
+                        chat.customerSupportId === userInfo?.idCode,
+                    })}
+                    value={chat.id}
+                    style={{ borderBottom: '1px solid #D2D3D8' }}
+                  >
+                    <ChatTrigger chat={chat} />
+                  </Tabs.Trigger>
+                ))}
+              </Track>
+            </div>
           ))}
         </Tabs.List>
 

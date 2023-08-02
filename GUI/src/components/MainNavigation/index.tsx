@@ -17,19 +17,19 @@ const MainNavigation: FC = () => {
     {
       id: 'conversations',
       label: t('menu.conversations'),
-      path: '/vestlus',
+      path: '/chat',
       children: [
         {
           label: t('menu.unanswered'),
-          path: '/vestlus/vastamata',
+          path: '/chat/unanswered',
         },
         {
           label: t('menu.active'),
-          path: '/vestlus/aktiivsed',
+          path: '/chat/active',
         },
         {
           label: t('menu.history'),
-          path: '/vestlus/ajalugu',
+          path: '/chat/history',
         },
       ],
     },
@@ -140,52 +140,52 @@ const MainNavigation: FC = () => {
     {
       id: 'settings',
       label: t('menu.administration'),
-      path: '/haldus',
+      path: '/settings',
       children: [
         {
           label: t('menu.users'),
-          path: '/haldus/kasutajad',
+          path: '/settings/users',
         },
         {
           label: t('menu.chatbot'),
-          path: '/haldus/vestlusrobot',
+          path: '/settings/chatbot',
           children: [
             {
               label: t('menu.settings'),
-              path: '/haldus/vestlusrobot/seaded',
+              path: '/settings/chatbot/settings',
             },
             {
               label: t('menu.welcomeMessage'),
-              path: '/haldus/vestlusrobot/tervitussõnum',
+              path: '/settings/chatbot/welcome-message',
             },
             {
               label: t('menu.appearanceAndBehavior'),
-              path: '/haldus/vestlusrobot/välimus-ja-kaitumine',
+              path: '/settings/chatbot/appearance',
             },
             {
               label: t('menu.emergencyNotices'),
-              path: '/haldus/vestlusrobot/erakorralised-teated',
+              path: '/settings/chatbot/emergency-notices',
             },
           ],
         },
         {
           label: t('menu.officeOpeningHours'),
-          path: '/haldus/asutuse-tooaeg',
+          path: '/settings/working-time',
         },
         {
           label: t('menu.sessionLength'),
-          path: '/haldus/sessiooni-pikkus',
+          path: '/settings/session-length',
         },
       ],
     },
     {
       id: 'monitoring',
       label: t('menu.monitoring'),
-      path: '/seire',
+      path: '/monitoring',
       children: [
         {
           label: t('menu.workingHours'),
-          path: '/seire/tooaeg',
+          path: '/monitoring/uptime',
         },
       ],
     },
@@ -201,7 +201,7 @@ const MainNavigation: FC = () => {
           case 'ROLE_SERVICE_MANAGER': return item.id != 'settings' && item.id != 'training'
           case 'ROLE_CUSTOMER_SUPPORT_AGENT': return item.id != 'settings' && item.id != 'analytics'
           case 'ROLE_CHATBOT_TRAINER': return item.id != 'settings' && item.id != 'conversations'
-          case 'ROLE_ANALYST': return item.id == 'analytics'
+          case 'ROLE_ANALYST': return item.id == 'analytics' || item.id == 'monitoring'
           case 'ROLE_UNAUTHENTICATED': return
           default: return
         }

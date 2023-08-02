@@ -1,5 +1,7 @@
 UPDATE "user"
 SET login = :userIdCode,
+    first_name = :first_name,
+    last_name = :last_name,
     display_name = :displayName,
     password_hash = :displayName, 
     status = :status,    

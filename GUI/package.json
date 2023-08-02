@@ -13,7 +13,7 @@
   "dependencies": {
     "@fontsource/roboto": "^4.5.8",
     "@formkit/auto-animate": "^1.0.0-beta.5",
-    "@microsoft/fetch-event-source": "^2.0.1",
+    "@fortaine/fetch-event-source": "^3.0.6",
     "@radix-ui/react-accessible-icon": "^1.0.1",
     "@radix-ui/react-collapsible": "^1.0.1",
     "@radix-ui/react-dialog": "^1.0.2",
@@ -44,7 +44,9 @@
     "react-i18next": "^12.1.1",
     "react-icons": "^4.7.1",
     "react-idle-timer": "^5.5.2",
+    "react-redux": "^8.1.1",
     "react-router-dom": "^6.5.0",
+    "react-select": "^5.7.4",
     "react-text-selection-popover": "^2.0.2",
     "react-textarea-autosize": "^8.4.0",
     "reactflow": "^11.4.0",
@@ -52,6 +54,7 @@
     "rxjs": "^7.8.1",
     "timeago.js": "^4.0.2",
     "usehooks-ts": "^2.9.1",
+    "uuid": "^9.0.0",
     "zustand": "^4.3.2"
   },
   "devDependencies": {
@@ -61,6 +64,7 @@
     "@types/react": "^18.0.26",
     "@types/react-datepicker": "^4.8.0",
     "@types/react-dom": "^18.0.9",
+    "@types/uuid": "^9.0.2",
     "@vitejs/plugin-react": "^3.0.0",
     "eslint": "^8.30.0",
     "eslint-config-react-app": "^7.0.1",

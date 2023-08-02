@@ -18,9 +18,7 @@
               "endpoint": "{ruuter_url}/match_input",
               "post_body_parameters": {
                 "userinfo": {
-                  "cookies": [
-                    "customJwtCookie"
-                  ],
+                  "cookies": ["customJwtCookie"],
                   "method": "post",
                   "endpoint": "{tim_url}/jwt/custom-jwt-userinfo",
                   "post_body_struct": "customJwtCookie",
@@ -53,7 +51,9 @@
             "roles": [
               "ROLE_ADMINISTRATOR",
               "ROLE_CUSTOMER_SUPPORT_AGENT",
-              "ROLE_SERVICE_MANAGER"
+              "ROLE_SERVICE_MANAGER",
+              "ROLE_CHATBOT_TRAINER",
+              "ROLE_ANALYST"
             ]
           },
           "response": {
