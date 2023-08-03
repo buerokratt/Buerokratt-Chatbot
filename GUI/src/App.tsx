@@ -37,36 +37,36 @@ const App: FC = () => {
     <CsaActivityContext.Provider value={{ chatCsaActive, setChatCsaActive }}>
       <Routes>
         <Route element={<Layout />}>
-          <Route index element={<Navigate to="/vestlus/aktiivsed" />} />
-          <Route path="/vestlus/vastamata" element={<ChatUnanswered />} />
-          <Route path="/vestlus/aktiivsed" element={<ChatActive />} />
-          <Route path="/vestlus/ajalugu" element={<ChatHistory />} />
-          <Route path="/haldus/kasutajad" element={<SettingsUsers />} />
+          <Route index element={<Navigate to="/chat/active" />} />
+          <Route path="/chat/unanswered" element={<ChatUnanswered />} />
+          <Route path="/chat/active" element={<ChatActive />} />
+          <Route path="/chat/history" element={<ChatHistory />} />
+          <Route path="/settings/users" element={<SettingsUsers />} />
           <Route
-            path="/haldus/vestlusrobot/seaded"
+            path="/settings/chatbot/settings"
             element={<SettingsChatSettings />}
           />
           <Route
-            path="/haldus/vestlusrobot/tervitussõnum"
+            path="/settings/chatbot/welcome-message"
             element={<SettingsWelcomeMessage />}
           />
           <Route
-            path="/haldus/vestlusrobot/erakorralised-teated"
+            path="/settings/chatbot/emergency-notices"
             element={<SettingsEmergencyNotices />}
           />
           <Route
-            path="/haldus/vestlusrobot/välimus-ja-kaitumine"
+            path="/settings/chatbot/appearance"
             element={<SettingsAppearance />}
           />
           <Route
-            path="/haldus/asutuse-tooaeg"
+            path="/settings/working-time"
             element={<SettingsWorkingTime />}
           />
           <Route
-            path="/haldus/sessiooni-pikkus"
+            path="/settings/session-length"
             element={<SettingsSessionLength />}
           />
-          <Route path="/seire/tooaeg" element={<MonitoringUptime />} />
+          <Route path="/monitoring/uptime" element={<MonitoringUptime />} />
         </Route>
       </Routes>
     </CsaActivityContext.Provider>
