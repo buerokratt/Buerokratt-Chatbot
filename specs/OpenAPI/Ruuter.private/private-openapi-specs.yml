@@ -1,0 +1,899 @@
+openapi: 3.0.3
+
+info:
+  title: Chatbot private API endpoints
+  version: 1.0.0
+  license:
+    name: MIT
+    url: https://github.com/buerokratt/Ruuter/blob/main/LICENSE
+
+servers:
+  - url: https://ruuter.play.buerokratt.ee/priv2
+  - url: https://ruuter.play.buerokratt.ee/priv1
+  - url: http://ruuter.test.buerokratt.ee
+
+
+tags:
+  - name: Ruuter-v1.private
+    description: Use https://ruuter.play.buerokratt.ee/priv1 url for this endpoint
+  - name: Customer Support
+    description: Endpoints related to customer support activity
+  - name: Comments
+    description: Endpoints related to comments
+  - name: Labels
+    description: Endpoints related to labels
+  - name: Mocks
+    description: Endpoints related to mocks
+
+paths:
+  /comments/comment-history:
+    get:
+      tags:
+        - Comments
+      summary: Retrieve chat history comment
+      operationId: getCommentHistory
+      parameters:
+        - name: chatId
+          in: query
+          description: The ID of the chat.
+          required: true
+          schema:
+            type: string
+            example: "8cecdc84-57fb-4f18-845e-5ca0be3d6223"
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  comment:
+                    type: object
+                    description: Chat history comment data.
+        '401':
+          description: Unauthorized
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "error: unauthorized"
+        '404':
+          description: Not Found
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "error: not found"
+    post:
+      tags:
+        - Comments
+      summary: Add a new comment to the chat history
+      operationId: postCommentHistory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                comment:
+                  type: string
+                  description: The comment text
+                chatId:
+                  type: string
+                  description: The chat ID
+                  example: "8cecdc84-57fb-4f18-845e-5ca0be3d6223"
+              required:
+                - comment
+                - chatId
+      responses:
+        '200':
+          description: Successfully added the comment
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+                    description: Response from inserting chat history comment
+        '401':
+          description: Unauthorized - user does not have the required ROLE_ADMINISTRATOR
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "error: unauthorized"
+  /cs-get-csa-name-visibility:
+    get:
+      tags:
+        - Customer Support
+      summary: Checks whether user has administrator access and retrieves the name visibility setting for csa
+      operationId: getCsGetCsaNameVisibility
+      responses:
+        '200':
+          description: Csa name visibility retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isVisible:
+                    type: boolean
+                    example: true
+        '401':
+          description: Unauthorized request
+  /cs-get-csa-title-visibility:
+    get:
+      tags:
+        - Customer Support
+      summary: Checks whether user has administrator access and retrieves the title visibility setting for csa
+      operationId: getCsGetCsaTitleVisibility
+      responses:
+        '200':
+          description: Csa title visibility retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isVisible:
+                    type: boolean
+                    example: false
+        '401':
+          description: Unauthorized request
+  /cs-get-customer-support-agents:
+    get:
+      tags:
+        - Customer Support
+        - Ruuter-v1.private
+      summary: Get list of customer support agents
+      operationId: getCsGetCustomerSupportAgents
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    login:
+                      type: string
+                      example: Anne Clowd
+                    firstName:
+                      type: string
+                      nullable: true
+                    lastName:
+                      type: string
+                      nullable: true
+                    idCode:
+                      type: string
+                      example: EE49002124277
+                    displayName:
+                      type: string
+                      example: Anne Clowd
+                    authorities:
+                      type: array
+                      items:
+                        type: string
+                      example: [ "ROLE_ADMINISTRATOR", "ROLE_SERVICE_MANAGER", "ROLE_CUSTOMER_SUPPORT_AGENT", "ROLE_CHATBOT_TRAINER", "ROLE_ANALYST" ]
+                    csaTitle:
+                      type: string
+                      example: nõustaja
+                    customerSupportStatus:
+                      type: string
+                      example: idle
+        '401':
+          description: Unauthorized request
+  /cs-get-emergency-notice:
+    get:
+      tags:
+        - Customer Support
+      summary: Checks whether user has administrator access and retrieves the emergency notice
+      operationId: getCsGetEmergencyNotice
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  emergencyNoticeText:
+                    type: string
+                    example: 'Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Aenean lacinia bibendum nulla sed consectetur.'
+                  emergencyNoticeStartISO:
+                    type: string
+                    format: date-time
+                    example: '2023-05-30T00:00:00Z'
+                  emergencyNoticeEndISO:
+                    type: string
+                    format: date-time
+                    example: '2023-05-30T00:00:00Z'
+                  isEmergencyNoticeVisible:
+                    type: boolean
+                    example: true
+        '401':
+          description: Unauthorized request
+  /cs-get-end-user-session-length:
+    get:
+      tags:
+        - Customer Support
+      summary: Checks whether user is authorized and retrieves the end user session length
+      operationId: getCsGetEndUserSessionLength
+      responses:
+        '200':
+          description: End user session length retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+        '401':
+          description: Unauthorized request
+  /cs-get-organization-working-time:
+    get:
+      tags:
+        - Customer Support
+      summary: Checks whether user is authorized and retrieves the working time of the organization
+      operationId: getCsGetOrganizationWorkingTime
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  organizationWorkingTimeStartISO:
+                    type: string
+                    format: date-time
+                    example: '2023-05-30T08:00:00Z'
+                  organizationWorkingTimeEndISO:
+                    type: string
+                    format: date-time
+                    example: '2023-05-30T17:00:00Z'
+        '401':
+          description: Unauthorized request
+  /cs-get-user-profile-settings:
+    get:
+      tags:
+        - Customer Support
+      summary: Checks whether user is authorized and retrieves profile settings of the user
+      operationId: getCsGetUserProfileSettings
+      parameters:
+        - name: userId
+          in: query
+          description: The ID of the user
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  userId:
+                    type: integer
+                    example: 1
+                  forwardedChatPopupNotifications:
+                    type: boolean
+                    example: true
+                  forwardedChatSoundNotifications:
+                    type: boolean
+                    example: true
+                  forwardedChatEmailNotifications:
+                    type: boolean
+                    example: true
+                  newChatPopupNotifications:
+                    type: boolean
+                    example: true
+                  newChatSoundNotifications:
+                    type: boolean
+                    example: true
+                  newChatEmailNotifications:
+                    type: boolean
+                    example: true
+                  useAutocorrect:
+                    type: boolean
+                    example: false
+        '401':
+          description: Unauthorized request
+  /cs-get-widget-config:
+    get:
+      tags:
+        - Customer Support
+      summary: Checks whether user is authorized and retrieves configuration of the widget
+      operationId: getCsGetWidgetConfig
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  widgetProactiveSeconds:
+                    type: integer
+                    example: 3
+                  widgetDisplayBubbleMessageSeconds:
+                    type: integer
+                    example: 5
+                  widgetBubbleMessageText:
+                    type: string
+                    example: 'Küsi minult!'
+                  widgetColor:
+                    type: string
+                    example: '#E99B03'
+                  isWidgetActive:
+                    type: boolean
+                    example: true
+        '401':
+          description: Unauthorized request
+  /history/cs-send-history-to-email:
+    post:
+      tags:
+        - Customer Support
+      summary: Send chat history to the email associated with the given chat ID
+      operationId: postCsSendHistoryToEmail
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                chatId:
+                  type: string
+                  description: The chat ID
+              required:
+                - chatId
+      responses:
+        '200':
+          description: Successfully sent chat history to the email
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+                    description: Response from sending email with chat history
+  /labels/label-history:
+    post:
+      tags:
+        - Labels
+      summary: Add labels to the chat history
+      operationId: postLabelHistory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                labels:
+                  type: array
+                  items:
+                    type: string
+                  description: Array of labels
+                chatId:
+                  type: string
+                  description: The chat ID
+              required:
+                - labels
+                - chatId
+      responses:
+        '200':
+          description: Successfully added the labels
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+                    description: Response from inserting chat history labels
+        '401':
+          description: Unauthorized - user does not have the required ROLE_ADMINISTRATOR
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "error: unauthorized"
+  /mocks/mock-tim-custom-jwt-userinfo:
+    post:
+      tags:
+        - Mocks
+      summary: Return a mocked JWT user info object
+      operationId: postGetMockTimCustomJwtUserinfo
+      responses:
+        '200':
+          description: Successfully returned the mocked JWT user info object
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sub:
+                    type: string
+                  firstName:
+                    type: string
+                    example: 'MARY ÄNN'
+                  idCode:
+                    type: string
+                    example: 'EE60001019906'
+                  displayName:
+                    type: string
+                    example: 'MARY ÄNN'
+                  iss:
+                    type: string
+                    example: 'test.buerokratt.ee'
+                  exp:
+                    type: integer
+                    format: int64
+                    example: 1670250948
+                  login:
+                    type: string
+                    example: 'EE60001019906'
+                  iat:
+                    type: integer
+                    format: int64
+                    example: 1670243748
+                  jti:
+                    type: string
+                    example: 'e14a5084-3b30-4a55-8720-c2ee22f43c2c'
+                  authorities:
+                    type: array
+                    items:
+                      type: string
+                      example: 'ROLE_ADMINISTRATOR'
+  /cs-set-csa-name-visibility:
+    post:
+      tags:
+        - Customer Support
+      summary: Set the visibility of the csa Name
+      operationId: postSetCsaNameVisibility
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                isVisible:
+                  type: boolean
+                  description: The visibility status of the csa Name
+      responses:
+        '200':
+          description: The visibility of the csa Name was successfully set
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  created:
+                    type: string
+                    format: date-time
+                  key:
+                    type: string
+                  value:
+                    type: boolean
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /cs-set-csa-title-visibility:
+    post:
+      tags:
+        - Customer Support
+      summary: Set the visibility of the csa title
+      operationId: postSetCsaTitleVisibility
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                isVisible:
+                  type: boolean
+                  description: The visibility status of the csa title
+      responses:
+        '200':
+          description: The visibility of the csa title was successfully set
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  created:
+                    type: string
+                    format: date-time
+                  key:
+                    type: string
+                  value:
+                    type: boolean
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /cs-set-emergency-notice:
+    post:
+      tags:
+        - Customer Support
+      summary: Set the emergency notice details
+      operationId: postSetEmergnecyNotice
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                emergencyNoticeText:
+                  type: string
+                  description: The text content of the emergency notice
+                  example: Example emergency notice
+                emergencyNoticeStartISO:
+                  type: string
+                  format: date
+                  description: The start time of the emergency notice in ISO format
+                  example: 01-17-2023
+                emergencyNoticeEndISO:
+                  type: string
+                  format: date
+                  description: The end time of the emergency notice in ISO format
+                  example: 01-18-2023
+                isEmergencyNoticeVisible:
+                  type: boolean
+                  description: The visibility status of the emergency notice
+                  example: false
+      responses:
+        '200':
+          description: The emergency notice details were successfully set
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  emergencyNoticeData:
+                    type: array
+                    items:
+                      type: object
+        '400':
+          description: Invalid body
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /cs-set-end-user-session-length:
+    post:
+      tags:
+        - Customer Support
+      summary: Set the end user session length
+      operationId: postSetEndUserSessionLength
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sessionLength:
+                  type: integer
+                  format: int32
+                  description: The length of the end user session in minutes
+      responses:
+        '200':
+          description: The end user session length was successfully set
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  created:
+                    type: string
+                    format: date-time
+                  key:
+                    type: string
+                  value:
+                    type: integer
+                    format: int32
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /cs-set-organization-working-time:
+    post:
+      tags:
+        - Customer Support
+      summary: Set the working time of an organization
+      operationId: postSetOrganizationWorkingTime
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                organizationWorkingTimeStartISO:
+                  type: string
+                  format: date-time
+                organizationWorkingTimeEndISO:
+                  type: string
+                  format: date-time
+      responses:
+        '200':
+          description: Organization working time data added successfully
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: Invalid body
+          content:
+            application/json:
+              schema:
+                type: object
+                example: "error: invalid body"
+        '401':
+          description: Unauthorized
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "error: Unauthorized"
+  /cs-set-user-profile-settings:
+    post:
+      tags:
+        - Customer Support
+      summary: Request to set the user profile settings
+      operationId: postSetUserProfileSettings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                forwardedChatPopupNotifications:
+                  type: boolean
+                forwardedChatSoundNotifications:
+                  type: boolean
+                forwardedChatEmailNotifications:
+                  type: boolean
+                newChatPopupNotifications:
+                  type: boolean
+                newChatSoundNotifications:
+                  type: boolean
+                newChatEmailNotifications:
+                  type: boolean
+                useAutocorrect:
+                  type: boolean
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  forwardedChatPopupNotifications:
+                    type: boolean
+        '400':
+          description: Invalid body
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "error: invalid body"
+        '401':
+          description: Unauthorized
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "error: unauthorized"
+  /cs-set-widget-config:
+    post:
+      tags:
+        - Customer Support
+      summary: Set widget configuration
+      operationId: postGetWidgetConfig
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                widgetProactiveSeconds:
+                  type: integer
+                  format: int32
+                widgetDisplayBubbleMessageSeconds:
+                  type: integer
+                  format: int32
+                widgetBubbleMessageText:
+                  type: string
+                widgetColor:
+                  type: string
+                isWidgetActive:
+                  type: boolean
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  widgetProactiveSeconds:
+                    type: integer
+                    format: int32
+                  widgetDisplayBubbleMessageSeconds:
+                    type: integer
+                    format: int32
+                  widgetBubbleMessageText:
+                    type: string
+                  widgetColor:
+                    type: string
+                  isWidgetActive:
+                    type: boolean
+                  created:
+                    type: string
+                    format: date-time
+        '400':
+          description: Invalid body
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "error: invalid body"
+        '401':
+          description: Unauthorized
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "error: unauthorized"
+  /end-user-email-phone:
+    post:
+      summary: Update chat with end-user email and phone
+      description: Updates the chat with the end-user's email and phone, based on the provided chat ID.
+      operationId: updateEndUserEmailAndPhone
+      tags:
+        - Customer Support
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                chatId:
+                  type: string
+                  description: The ID of the chat to be updated.
+                endUserEmail:
+                  type: string
+                  description: The end user's email.
+                  format: email
+                endUserPhone:
+                  type: string
+                  description: The end user's phone number.
+                  format: tel
+              required:
+                - chatId
+      responses:
+        '200':
+          description: Chat updated successfully.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Updated <chatId> with <email> and <phone>."
+        '400':
+          description: Missing chatId in request body.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Missing chatId in request body."
+  /end-user-id-name:
+    post:
+      summary: Update chat with end-user ID and name
+      description: Updates the chat with the end-user's ID and name, based on the provided chat ID.
+      operationId: updateEndUserIdAndName
+      tags:
+        - Customer Support
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                chatId:
+                  type: string
+                  description: The ID of the chat to be updated.
+                endUserId:
+                  type: string
+                  description: The end user's ID.
+                endUserFirstName:
+                  type: string
+                  description: The end user's first name.
+                endUserLastName:
+                  type: string
+                  description: The end user's last name.
+              required:
+                - chatId
+      responses:
+        '200':
+          description: Chat updated successfully.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Updated <chatId> with <id> and <firstName> <lastName>."
+        '400':
+          description: Missing chatId in request body.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Missing chatId in request body."
+  /reload:
+    post:
+      summary: Reload the DSL
+      description: Triggers a reload of the DSL.
+      operationId: reloadDsl
+      responses:
+        '200':
+          description: DSL reloaded successfully.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: ""
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: customJwtCookie
+security:
+  - cookieAuth: []
