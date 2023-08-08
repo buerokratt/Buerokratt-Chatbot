@@ -280,6 +280,7 @@
   },
   "toast": {
     "success": {
+      "updateSuccess": "Updated Successfully",
       "messageToUserEmail": "Message sent to user email",
       "chatStatusChanged": "Chat status changed",
       "chatCommentChanged": "Chat comment changed",
