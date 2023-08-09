@@ -1,0 +1,761 @@
+openapi: 3.0.3
+
+info:
+  title: OpenAPI specifications for chatbot public endpoints
+  description: OpenAPI 3.0.3 specifications for chatbot public endpoints
+  version: 0.1.0
+  license:
+    name: MIT
+    url: https://github.com/buerokratt/Ruuter/blob/main/LICENSE
+
+servers:
+  - url: https://ruuter.test.buerokratt.ee
+    description: Main server for the database requests
+
+tags:
+  - name: chatbot
+    description: Chatbot public endpoints
+  - name: ruuter.public v1
+    description: Endpoints that belong to ruuter v1
+
+paths:
+  /get-all-available-customer-support-agents:
+    get:
+      tags:
+        - chatbot
+      summary: Send a request for all available customer support agents
+      operationId: findAvailableCustomerSupportAgents
+
+      responses:
+        '200':
+          description: Successful request for customer support agents
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  returnSuccess:
+                    type: array
+                    items:
+                      type: object
+                      example: {customerSupportAgent}
+                    description: Return an array of available customer support agents
+                  returnNotFound:
+                    type: string
+                    example: 'No available customer support agents found'
+                    description: Response when no available customer support agents found
+  /get-chat-by-id:
+    get:
+      tags:
+        - chatbot
+        - ruuter.public v1
+      summary: Get chat information based on id
+      operationId: findChatInformationById
+      parameters:
+        - name: id
+          in: query
+          description: Id of the chat
+          schema:
+            type: string
+            example: '8cfbc32a-7244-4933-8a25-14422b557ad2'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  headers:
+                    type: object
+                    properties:
+                      Pragma:
+                        type: array
+                        items:
+                          type: string
+                          example: "no-cache"
+                      Cache-Control:
+                        type: array
+                        items:
+                          type: string
+                          example: "no-cache"
+                      Expires:
+                        type: array
+                        items:
+                          type: string
+                          example: "Wed, 31 Dec 1969 23:59:59 GMT"
+                      Content-Type:
+                        type: array
+                        items:
+                          type: string
+                          example: "application/json"
+                  body:
+                    type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          forwarding_validation:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                example: fbcccb1c-4dc7-4781-b87d-57a7ae6eb2a5
+                              customerSupportId:
+                                type: string
+                                example: meietest
+                              customerSupportDisplayName:
+                                type: string
+                                example: Bürokratt
+                              endUserId:
+                                type: string
+                              endUserFirstName:
+                                type: string
+                              endUserLastName:
+                                type: string
+                              status:
+                                type: string
+                                example: OPEN
+                              endUserOs:
+                                type: string
+                                example: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36'
+                              endUserUrl:
+                                type: string
+                                format: uri
+                                example: https://test.buerokratt.ee/
+                              lastMessage:
+                                type: string
+                              created:
+                                type: string
+                                format: date-time
+                                example: '2023-05-30T06:24:11.396+00:00'
+                              updated:
+                                type: string
+                                format: date-time
+                                example: '2023-05-30T06:24:11.398+00:00'
+                              ended:
+                                type: string
+                      error:
+                        example: null
+                  statusCode:
+                    type: string
+                    example: OK
+                  statusCodeValue:
+                    type: integer
+  /get-emergency-notice:
+    get:
+      tags:
+        - chatbot
+      summary: Send a request for emergency response when a valid one exists
+      responses:
+        '200':
+          description: Return emergency responseData
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  emergencyNoticeData:
+                    type: object
+  /estimated-waiting-time:
+    get:
+      tags:
+        - chatbot
+      summary: Get estimated waiting time for the response
+      operationId: getEstimatedWaitingTime
+      parameters:
+        - name: id
+          in: query
+          description: Id of the chat
+          schema:
+            type: string
+            example: '8cfbc32a-7244-4933-8a25-14422b557ad2'
+      responses:
+        '200':
+          description: Estimated waiting time of the chat
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      return_first_estimated_time_from_array:
+                        type: object
+                        properties:
+                          isActive:
+                            type: boolean
+                            example: true
+                          time:
+                            type: string
+                            example: '1'
+                  error:
+                    example: null
+    post:
+      summary: Get estimated waiting time for the response
+      tags:
+        - chatbot
+      parameters:
+        - name: id
+          in: query
+          description: Id of the chat
+          schema:
+            type: string
+            example: '8cfbc32a-7244-4933-8a25-14422b557ad2'
+      responses:
+        '200':
+          description: Estimated waiting time of the chat
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      return_first_estimated_time_from_array:
+                        type: object
+                        properties:
+                          isActive:
+                            type: boolean
+                            example: true
+                          time:
+                            type: string
+                            example: '1'
+                  error:
+                    example: null
+  /get-greeting-message:
+    get:
+      tags:
+        - chatbot
+        - ruuter.public v1
+      summary: Get greeting message from the chat-bot
+      operationId: getGreetingMessage
+      responses:
+        '200':
+          description: Greeting for the chat-bot
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      return_first_greeting_from_array:
+                        type: object
+                        properties:
+                          isActive:
+                            type: boolean
+                            example: true
+                          time:
+                            type: string
+                            example: Tere
+                  error:
+                    example: null
+  /get-new-messages:
+    get:
+      tags:
+        - chatbot
+        - ruuter.public v1
+      summary: Get new chat messages from database
+      operationId: findNewMessages
+      parameters:
+        - name: id
+          in: query
+          description: Id of the chat
+          schema:
+            type: string
+            example: '8cfbc32a-7244-4933-8a25-14422b557ad2'
+        - name: timeRangeBegin
+          in: query
+          description: Time range when messages are received
+          schema:
+            type: string
+            format: date-time
+            example: '2023-05-30T06:24:15.453Z'
+      responses:
+        '200':
+          description: Successfully retrieved validation data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  headers:
+                    type: object
+                    properties:
+                      Pragma:
+                        type: array
+                        items:
+                          type: string
+                          example: no-cache
+                      Cache-Control:
+                        type: array
+                        items:
+                          type: string
+                          example: no-cache
+                      Expires:
+                        type: array
+                        items:
+                          type: string
+                          example: Wed, 31 Dec 1969 23:59:59 GMT
+                      Content-Type:
+                        type: array
+                        items:
+                          type: string
+                          example: application/json
+                  body:
+                    type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          forwarding_validation:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                  example: b7d11a49-f386-41e0-a91b-94ca9d32721d
+                                chatid:
+                                  type: string
+                                  example: a7be72fd-ed10-49ed-9f23-69887392b44e
+                                content:
+                                  type: string
+                                  example: Tere
+                                event:
+                                  type: string
+                                  example: greeting
+                                authorId:
+                                  type: string
+                                authorTimestamp:
+                                  type: string
+                                  format: date-time
+                                  example: 2023-05-29T09:42:59.797+00:00
+                                authorFirstName:
+                                  type: string
+                                authorLastName:
+                                  type: string
+                                authorRole:
+                                  type: string
+                                  example: buerokratt
+                                rating:
+                                  type: string
+                                created:
+                                  type: string
+                                  format: date-time
+                                  example: 2023-05-29T09:42:59.797+00:00
+                                updated:
+                                  type: string
+                                  format: date-time
+                                  example: 2023-05-29T09:42:59.839+00:00
+                      error:
+                        example: null
+                  statusCode:
+                    type: string
+                    example: OK
+                  statusCodeValue:
+                    type: integer
+                    example: 200
+  /get-organization-working-time:
+    get:
+      tags:
+        - chatbot
+      summary: Send a request for organization working time
+      operationId: findOrganizationWorkingTime
+      responses:
+        '200':
+          description: Return emergency response data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  organizationWorkingTimeData:
+                    type: string
+        '400':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  returnNotFound:
+                    type: string
+                    example: 'error: not found'
+  /get-widget-config:
+    get:
+      tags:
+        - chatbot
+      summary: Send a request for widget config
+      operationId: getWidgetConfig
+      responses:
+        '200':
+          description: Return widget config
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  widgetConfigData:
+                    type: object
+        '400':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  returnNotFound:
+                    type: string
+                    example: 'error: not found'
+  /download-chat:
+    post:
+      summary: Download chat messages as PDF.
+      tags:
+        - chatbot
+      description: >-
+        Extracts chat messages for a given chatId, formats them, and either returns a PDF download link 
+        or sends the PDF directly to the provided email address.
+      operationId: downloadChat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                chatId:
+                  type: string
+                  description: ID of the chat whose messages are to be retrieved.
+                email:
+                  type: string
+                  format: email
+                  description: Email address where the chat messages PDF should be sent.
+                  nullable: true
+              required:
+                - chatId
+      responses:
+        '200':
+          description: PDF returned successfully or email sent.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+            application/pdf:
+              schema:
+                type: string
+                format: base64
+                description: >-
+                  The base64 encoded content of the PDF, to be handled and downloaded by the client.
+          headers:
+            Content-disposition:
+              schema:
+                type: string
+                example: "attachment;filename=chat-history.pdf"
+        '400':
+          description: Unable to generate the PDF or some other error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /custom-jwt-userinfo:
+    post:
+      tags:
+        - chatbot
+        - ruuter.public v1
+      summary: receive a security cookie
+      operationId: postRequestForClientCustomJwtCookie
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+              example: '"clientCustomJwtCookie"'
+      responses:
+        '200':
+          description: custom jwt userinfo api
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      custom_jwt_userinfo:
+                        example: null
+                  error:
+                    example: null
+  /end-user-email-phone:
+    post:
+      tags:
+        - chatbot
+      summary: Set end-user email and phone
+      operationId: setEndUserEmailAndPhone
+      requestBody:
+        description: Based on chatId, set user email and phone
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  example: '8cfbc32a-7244-4933-8a25-14422b557ad2'
+                email:
+                  type: string
+                  example: example@example.com
+                phone:
+                  type: string
+                  example: '+37255555555'
+      responses:
+        '200':
+          description: Return successful request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  returnSuccess:
+                    type: string
+                    example: 'Updated 8cfbc32a-7244-4933-8a25-14422b557ad2 with example@example.com and +37255555555'
+        '400':
+          description: Missing chatId in request body
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  returnNoChatId:
+                    type: string
+                    example: 'Missing chatID in request body'
+  /end-user-id-name:
+    post:
+      summary: Update end user's ID and name.
+      tags:
+        - chatbot
+      description: >-
+        Given a chatId, endUserId, endUserFirstName, and endUserLastName in the request body, this operation updates the 
+        chat with the provided end user's ID and name.
+      operationId: updateEndUserIdName
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                chatId:
+                  type: string
+                  description: ID of the chat which needs to be updated.
+                endUserId:
+                  type: string
+                  description: End user's ID.
+                endUserFirstName:
+                  type: string
+                  description: End user's first name.
+                endUserLastName:
+                  type: string
+                  description: End user's last name.
+              required:
+                - chatId
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Missing chatId in request body.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /init-chat:
+    post:
+      tags:
+        - chatbot
+        - ruuter.public v1
+      summary: Initial user chat message
+      operationId: initialChatMessage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: object
+                  properties:
+                    chatId:
+                      type: string
+                      example: null
+                    content:
+                      type: string
+                      example: tere
+                    authorTimestamp:
+                      type: string
+                      format: date-time
+                      example: '2023-05-22T05:55:44.592Z'
+                    authorRole:
+                      type: string
+                      example: 'end-user'
+                endUserTechnicalData:
+                  type: object
+                  properties:
+                    endUserUrl:
+                      type: string
+                      format: uri
+                      example: 'https://test.buerokratt.ee/'
+                    endUserOs:
+                      type: string
+                      example: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36'
+      responses:
+        '200':
+          description: Chat successfully initialized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      get_inserted_chat:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            example: '488a4171-5e23-4735-93fa-8da8097eed8f'
+                          customerSupportId:
+                            type: string
+                            example: meietest
+                          customerSupportDisplayName:
+                            type: string
+                            example: Bürokratt
+                          endUserId:
+                            type: string
+                            example: ''
+                          endUserFirstName:
+                            type: string
+                            example: ''
+                          endUserLastName:
+                            type: string
+                            example: ''
+                          status:
+                            type: string
+                            example: OPEN
+                          endUserOs:
+                            type: string
+                            example: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36'
+                          endUserUrl:
+                            type: string
+                            format: uri
+                            example: 'https://test.buerokratt.ee/'
+                          lastMessage:
+                            type: string
+                            example: ''
+                          created:
+                            type: string
+                            format: date-time
+                            example: '2023-05-24T08:17:46.107+00:00'
+                          updated:
+                            type: string
+                            format: date-time
+                            example: '2023-05-24T08:17:46.111+00:00'
+                          ended:
+                            type: string
+                            example: ''
+                  error:
+                    example: null
+  /post-message:
+    post:
+      tags:
+        - chatbot
+        - ruuter.public v1
+      summary: Post a message
+      operationId: postAMessage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                chatId:
+                  type: string
+                  example: '488a4171-5e23-4735-93fa-8da8097eed8f'
+                content:
+                  type: string
+                  example: 'Kuidas läheb?'
+                authorTimestamp:
+                  type: string
+                  format: date-time
+                  example: '2023-05-22T05:55:44.592Z'
+                authorRole:
+                  type: string
+                  example: end-user
+      responses:
+        '200':
+          description: Message successfully posted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      forwarding_validation:
+                        type: object
+                        properties:
+                          data:
+                            type: object
+                            properties:
+                              post_message_to_bot:
+                                example: null
+                          error:
+                            example: null
+                  error:
+                    example: null
+  /reload:
+    post:
+      tags:
+        - chatbot
+      summary: Reload the DSL
+      description: Triggers a reload of the DSL.
+      operationId: reloadDsl
+      responses:
+        '200':
+          description: DSL reloaded successfully.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: ""
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: customJwtCookie
+security:
+  - cookieAuth: []
