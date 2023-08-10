@@ -178,7 +178,13 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
 
         {!user && (
           <FormInput
-            {...register('idCode', { required: requiredText })}
+            {...register('idCode', {
+              required: requiredText,
+              pattern: {
+                value: /\bEE\d+\b/,
+                message: t('settings.users.invalidIdCode'),
+              },
+            })}
             label={t('settings.users.idCode')}
           >
             <div>
