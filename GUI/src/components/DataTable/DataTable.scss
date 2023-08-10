@@ -51,9 +51,10 @@
 
   &__filter {
     position: absolute;
-    top: 100%;
+    top: auto;
     left: 0;
     right: 0;
+    bottom: 100%;
     padding: get-spacing(paldiski);
     background-color: get-color(white);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.14);

@@ -119,7 +119,7 @@ const SettingsUsers: FC = () => {
 
   return (
     <>
-      <Track gap={16} justify="between">
+      <Track gap={16} justify="between" style={{ paddingBottom: '10px' }}>
         <h1>{t('settings.users.title')}</h1>
         <Button onClick={() => setNewUserModal(true)}>
           {t('settings.users.addUser')}

@@ -8,9 +8,9 @@ import useDocumentEscapeListener from 'hooks/useDocumentEscapeListener';
 import DebouncedInput from './DebouncedInput';
 
 type FilterProps = {
-  column: Column<any, unknown>
-  table: Table<any>
-}
+  column: Column<any, unknown>;
+  table: Table<any>;
+};
 
 const Filter: FC<FilterProps> = ({ column, table }) => {
   const { t } = useTranslation();
@@ -28,7 +28,7 @@ const Filter: FC<FilterProps> = ({ column, table }) => {
       typeof firstValue === 'number'
         ? []
         : Array.from(column.getFacetedUniqueValues().keys()).sort(),
-    [column.getFacetedUniqueValues()],
+    [column.getFacetedUniqueValues()]
   );
 
   const handleFilterToggle = (e: MouseEvent) => {
@@ -39,7 +39,7 @@ const Filter: FC<FilterProps> = ({ column, table }) => {
   return (
     <>
       <button onClick={handleFilterToggle}>
-        <Icon icon={<MdOutlineSearch fontSize={16} />} size='medium' />
+        <Icon icon={<MdOutlineSearch fontSize={16} />} size="medium" />
       </button>
       {filterOpen && (
         <div className='data-table__filter'>
