@@ -111,11 +111,8 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
   });
 
   const checkIfUserExistsMutation = useMutation({
-    mutationFn: ({
-      userData
-    }: {
-      userData: UserDTO;
-    }) => checkIfUserExists(userData),
+    mutationFn: ({ userData }: { userData: UserDTO }) =>
+      checkIfUserExists(userData),
     onSuccess: async (data) => {
       if (data.data.check_user_exists !== undefined) {
         toast.open({
@@ -137,14 +134,14 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
   });
 
   const createNewUser = handleSubmit((userData) => {
-      userCreateMutation.mutate(userData);
-  })
+    userCreateMutation.mutate(userData);
+  });
 
   const handleUserSubmit = handleSubmit((data) => {
     if (user) {
       userEditMutation.mutate({ id: user.idCode, userData: data });
     } else {
-      checkIfUserExistsMutation.mutate({userData: data});
+      checkIfUserExistsMutation.mutate({ userData: data });
     }
   });
 
@@ -167,11 +164,13 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
     >
       <Track direction="vertical" gap={16} align="right">
         <FormInput
-          defaultValue={`${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim()}
+          defaultValue={`${user?.firstName ?? ''} ${
+            user?.lastName ?? ''
+          }`.trim()}
           {...register('fullName', { required: requiredText })}
           label={t('settings.users.fullName')}
         />
-        {errors.fullName  && (
+        {errors.fullName && (
           <span style={{ color: '#f00', marginTop: '-1rem' }}>
             {errors.fullName.message}
           </span>
@@ -181,7 +180,13 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
           <FormInput
             {...register('idCode', { required: requiredText })}
             label={t('settings.users.idCode')}
-          />
+          >
+            <div>
+              <label style={{ fontSize: '14.7px', color: '#9799a4' }}>
+                {t('settings.users.idCodePlaceholder')}
+              </label>
+            </div>
+          </FormInput>
         )}
 
         {!user && errors.idCode && (
@@ -191,39 +196,32 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
         )}
 
         <Controller
-           control={control}
-           name="authorities"
-           rules={{ required: requiredText }}
-           render={({
-            field: { onChange, onBlur, name, ref },
-           }) => (
-          <div className="multiSelect">
-          <label className="multiSelect__label">
-            {t('settings.users.userRoles')}
-          </label>
-          <div>
-          <div className="multiSelect__wrapper">
-            <Select
-              name={name}
-              ref={ref}
-              onBlur={onBlur}
-              required={true}
-              options={roles}
-              defaultValue={user?.authorities.map((v) => {
-                 return {label: t(`roles.${v}` ?? ''), value: v}
-              })}
-              isMulti={true}
-              placeholder={t('global.choose')}
-              onChange={onChange}
-            />
-          </div>
-          <div>
-            <label style={{fontSize: '14.7px', color: '#9799a4'}}>{t('settings.users.idCodePlaceholder')}</label>
-          </div>
-          </div>
-        </div>
-    )}
-/>
+          control={control}
+          name="authorities"
+          rules={{ required: requiredText }}
+          render={({ field: { onChange, onBlur, name, ref } }) => (
+            <div className="multiSelect">
+              <label className="multiSelect__label">
+                {t('settings.users.userRoles')}
+              </label>
+              <div className="multiSelect__wrapper">
+                <Select
+                  name={name}
+                  ref={ref}
+                  onBlur={onBlur}
+                  required={true}
+                  options={roles}
+                  defaultValue={user?.authorities.map((v) => {
+                    return { label: t(`roles.${v}` ?? ''), value: v };
+                  })}
+                  isMulti={true}
+                  placeholder={t('global.choose')}
+                  onChange={onChange}
+                />
+              </div>
+            </div>
+          )}
+        />
 
         {errors.authorities && (
           <span style={{ color: '#f00', marginTop: '-1rem' }}>
@@ -243,7 +241,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
         )}
 
         <FormInput
-          {...register('csaTitle', {required: requiredText})}
+          {...register('csaTitle', { required: requiredText })}
           label={t('settings.users.userTitle')}
         />
 

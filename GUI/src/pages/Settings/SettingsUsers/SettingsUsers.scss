@@ -22,8 +22,9 @@
 
 
     &__wrapper {
+        width: 390px;
         flex: 1;
-        display: flex;
+        display: block;
         flex-direction: column;
         gap: 7px;
         position: relative;
