@@ -10,6 +10,7 @@ import { User } from 'types/user';
 import { deleteUser } from 'services/users';
 import { useToast } from 'hooks/useToast';
 import UserModal from './UserModal';
+import { ROLES } from 'utils/constants';
 
 const SettingsUsers: FC = () => {
   const { t } = useTranslation();
@@ -64,14 +65,19 @@ const SettingsUsers: FC = () => {
       columnHelper.accessor('idCode', {
         header: t('settings.users.idCode') || '',
       }),
-      columnHelper.accessor('authorities', {
-        header: t('settings.users.role') || '',
-        cell: (props) =>
-          props
-            .getValue()
-            .map((r) => t(`roles.${r}`))
-            .join(', '),
-      }),
+      columnHelper.accessor(
+        (data: { authorities: ROLES[] }) => {
+          const output: string[] = [];
+          data.authorities.map((role) => {
+            return output.push(t(`roles.${role}`));
+          });
+          return output;
+        },
+        {
+          header: t('settings.users.role') || '',
+          cell: (props) => props.getValue().join(', '),
+        }
+      ),
       columnHelper.accessor('displayName', {
         header: t('settings.users.displayName') || '',
       }),

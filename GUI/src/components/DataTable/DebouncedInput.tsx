@@ -1,14 +1,13 @@
 import { FC, InputHTMLAttributes, useEffect, useState } from 'react';
 import './DeboucedInput.scss';
-import SearchIcon from './CloseIcon';
 import CloseIcon from './CloseIcon';
 
 type DebouncedInputProps = Omit<
   InputHTMLAttributes<HTMLInputElement>,
   'onChange'
 > & {
-  value: string | number;
-  onChange: (value: string | number) => void;
+  value: string | number | string[];
+  onChange: (value: string | number | string[]) => void;
   debounce?: number;
 };
 

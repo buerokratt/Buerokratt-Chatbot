@@ -42,22 +42,35 @@ const Filter: FC<FilterProps> = ({ column, table }) => {
         <Icon icon={<MdOutlineSearch fontSize={16} />} size="medium" />
       </button>
       {filterOpen && (
-        <div className='data-table__filter'>
+        <div className="data-table__filter">
           {typeof firstValue === 'number' ? (
             <DebouncedInput
-              type='number'
+              type="number"
               min={Number(column.getFacetedMinMaxValues()?.[0] ?? '')}
               max={Number(column.getFacetedMinMaxValues()?.[1] ?? '')}
               value={(columnFilterValue as [number, number])?.[0] ?? ''}
-              onChange={value =>
-                column.setFilterValue((old: [number, number]) => [value, old?.[1]])
+              onChange={(value) =>
+                column.setFilterValue((old: [number, number]) => [
+                  value,
+                  old?.[1],
+                ])
               }
             />
           ) : (
+            // : typeof firstValue === 'object' ? (
+            //   <DebouncedInput
+            //     type="object"
+            //     value={columnFilterValue as string[]}
+            //     onChange={(value) => {
+            //       column.setFilterValue(value);
+            //     }}
+            //     placeholder={t('global.search') + '...'}
+            //   />
+            // ) :
             <DebouncedInput
-              type='text'
+              type="text"
               value={(columnFilterValue ?? '') as string}
-              onChange={value => column.setFilterValue(value)}
+              onChange={(value) => column.setFilterValue(value)}
               placeholder={t('global.search') + '...'}
               // list={column.id + 'list'}
             />
