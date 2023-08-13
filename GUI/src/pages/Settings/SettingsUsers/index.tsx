@@ -1,7 +1,7 @@
 import { FC, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createColumnHelper } from '@tanstack/react-table';
+import { Row, createColumnHelper } from '@tanstack/react-table';
 import { AxiosError } from 'axios';
 import { MdOutlineEdit, MdOutlineDeleteOutline } from 'react-icons/md';
 
@@ -76,6 +76,16 @@ const SettingsUsers: FC = () => {
         {
           header: t('settings.users.role') || '',
           cell: (props) => props.getValue().join(', '),
+          filterFn: (row: Row<User>, _, filterValue) => {
+            const rowAuthorities: string[] = [];
+            row.original.authorities.map((role) => {
+              return rowAuthorities.push(t(`roles.${role}`));
+            });
+            const filteredArray = rowAuthorities.filter((word) =>
+              word.toLowerCase().includes(filterValue.toLowerCase())
+            );
+            return filteredArray.length > 0;
+          },
         }
       ),
       columnHelper.accessor('displayName', {

@@ -57,19 +57,9 @@ const Filter: FC<FilterProps> = ({ column, table }) => {
               }
             />
           ) : (
-            // : typeof firstValue === 'object' ? (
-            //   <DebouncedInput
-            //     type="object"
-            //     value={columnFilterValue as string[]}
-            //     onChange={(value) => {
-            //       column.setFilterValue(value);
-            //     }}
-            //     placeholder={t('global.search') + '...'}
-            //   />
-            // ) :
             <DebouncedInput
               type="text"
-              value={(columnFilterValue ?? '') as string}
+              value={''}
               onChange={(value) => column.setFilterValue(value)}
               placeholder={t('global.search') + '...'}
               // list={column.id + 'list'}
