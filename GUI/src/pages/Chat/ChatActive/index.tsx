@@ -58,7 +58,18 @@ const ChatActive: FC = () => {
   const { refetch } = useQuery<ChatType[]>({
     queryKey: ['cs-get-all-active-chats', 'prod'],
     onSuccess(res: any) {
-      setActiveChatsList(res.data.get_all_active_chats);
+      const isChatStillExists = res.data.get_all_active_chats.filter(function (
+        e: any
+      ) {
+        return e.id === selectedChatId;
+      });
+      if (isChatStillExists.length === 0 && activeChatsList.length > 0) {
+        setTimeout(function () {
+          setActiveChatsList(res.data.get_all_active_chats);
+        }, 3000);
+      } else {
+        setActiveChatsList(res.data.get_all_active_chats);
+      }
     },
   });
 

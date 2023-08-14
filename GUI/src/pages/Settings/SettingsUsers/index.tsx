@@ -1,7 +1,7 @@
 import { FC, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createColumnHelper } from '@tanstack/react-table';
+import { Row, createColumnHelper } from '@tanstack/react-table';
 import { AxiosError } from 'axios';
 import { MdOutlineEdit, MdOutlineDeleteOutline } from 'react-icons/md';
 
@@ -10,6 +10,7 @@ import { User } from 'types/user';
 import { deleteUser } from 'services/users';
 import { useToast } from 'hooks/useToast';
 import UserModal from './UserModal';
+import { ROLES } from 'utils/constants';
 
 const SettingsUsers: FC = () => {
   const { t } = useTranslation();
@@ -64,14 +65,29 @@ const SettingsUsers: FC = () => {
       columnHelper.accessor('idCode', {
         header: t('settings.users.idCode') || '',
       }),
-      columnHelper.accessor('authorities', {
-        header: t('settings.users.role') || '',
-        cell: (props) =>
-          props
-            .getValue()
-            .map((r) => t(`roles.${r}`))
-            .join(', '),
-      }),
+      columnHelper.accessor(
+        (data: { authorities: ROLES[] }) => {
+          const output: string[] = [];
+          data.authorities.map((role) => {
+            return output.push(t(`roles.${role}`));
+          });
+          return output;
+        },
+        {
+          header: t('settings.users.role') || '',
+          cell: (props) => props.getValue().join(', '),
+          filterFn: (row: Row<User>, _, filterValue) => {
+            const rowAuthorities: string[] = [];
+            row.original.authorities.map((role) => {
+              return rowAuthorities.push(t(`roles.${role}`));
+            });
+            const filteredArray = rowAuthorities.filter((word) =>
+              word.toLowerCase().includes(filterValue.toLowerCase())
+            );
+            return filteredArray.length > 0;
+          },
+        }
+      ),
       columnHelper.accessor('displayName', {
         header: t('settings.users.displayName') || '',
       }),
@@ -119,7 +135,7 @@ const SettingsUsers: FC = () => {
 
   return (
     <>
-      <Track gap={16} justify="between">
+      <Track gap={16} justify="between" style={{ paddingBottom: '10px' }}>
         <h1>{t('settings.users.title')}</h1>
         <Button onClick={() => setNewUserModal(true)}>
           {t('settings.users.addUser')}

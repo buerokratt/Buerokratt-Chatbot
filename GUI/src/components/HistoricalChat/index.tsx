@@ -179,6 +179,7 @@ const HistoricalChat: FC<ChatProps> = ({ chat, onChatStatusChange, onCommentChan
             <FormSelect
               name='chatStatus'
               label={t('chat.chatStatus')}
+              direction='up'
               onSelectionChange={(selection) => selection ? onChatStatusChange(selection.value) : null}
               options={chatStatuses.map((status) => ({
                 label: t(`chat.events.${status}`, { date: '' }),
