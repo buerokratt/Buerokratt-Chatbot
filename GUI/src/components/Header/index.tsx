@@ -120,10 +120,10 @@ const Header: FC = () => {
     () =>
       activeChatsList
         ? activeChatsList.filter(
-          (c) =>
-            c.status === CHAT_STATUS.REDIRECTED &&
-            c.customerSupportId === userInfo?.idCode
-        ).length
+            (c) =>
+              c.status === CHAT_STATUS.REDIRECTED &&
+              c.customerSupportId === userInfo?.idCode
+          ).length
         : 0,
     [activeChatsList]
   );
@@ -204,13 +204,14 @@ const Header: FC = () => {
   });
 
   const customerSupportActivityMutation = useMutation({
-    mutationFn: (data: CustomerSupportActivityDTO) => apiDev.post('cs-set-customer-support-activity', {
-      customerSupportId: data.customerSupportId,
-      customerSupportActive: data.customerSupportActive,
-      customerSupportStatus: data.customerSupportStatus
-    }),
+    mutationFn: (data: CustomerSupportActivityDTO) =>
+      apiDev.post('cs-set-customer-support-activity', {
+        customerSupportId: data.customerSupportId,
+        customerSupportActive: data.customerSupportActive,
+        customerSupportStatus: data.customerSupportStatus,
+      }),
     onSuccess: () => {
-      if (csaStatus === 'online') extendUserSessionMutation.mutate()
+      if (csaStatus === 'online') extendUserSessionMutation.mutate();
     },
     onError: async (error: AxiosError) => {
       await queryClient.invalidateQueries([
@@ -302,7 +303,7 @@ const Header: FC = () => {
 
   const handleCsaStatusChange = (checked: boolean) => {
     setChatCsaActive(checked);
-    setCsaStatus(checked === true ? 'online' : 'offline')
+    setCsaStatus(checked === true ? 'online' : 'offline');
     customerSupportActivityMutation.mutate({
       customerSupportActive: checked,
       customerSupportStatus: checked === true ? 'online' : 'offline',
@@ -458,7 +459,11 @@ const Header: FC = () => {
                     .map((r) => t(`roles.${r}`))
                     .join(', '),
                 },
-                { label: t('settings.users.email'), value: userInfo.email },
+                {
+                  label: t('settings.users.userTitle'),
+                  value: userInfo.csaTitle.replaceAll(' ', '\xa0'),
+                },
+                { label: t('settings.users.email'), value: userInfo.csaEmail },
               ].map((meta, index) => (
                 <Track key={`${meta.label}-${index}`} gap={24} align="left">
                   <p style={{ flex: '0 0 120px' }}>{meta.label}:</p>
