@@ -21,7 +21,6 @@ import { Button, Icon, Label, Track } from 'components';
 import { ReactComponent as BykLogoWhite } from 'assets/logo-white.svg';
 import { Chat as ChatType, MessageStatus, CHAT_EVENTS } from 'types/chat';
 import { useMutation } from '@tanstack/react-query';
-import { DateTime } from 'luxon';
 import {
   Attachment,
   AttachmentTypes,
