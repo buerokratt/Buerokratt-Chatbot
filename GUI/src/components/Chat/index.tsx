@@ -12,11 +12,16 @@ import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { et } from 'date-fns/locale';
 import clsx from 'clsx';
-import { MdOutlineAttachFile, MdOutlineSend } from 'react-icons/md';
+import {
+  MdAssignmentReturned,
+  MdOutlineAttachFile,
+  MdOutlineSend,
+} from 'react-icons/md';
 import { Button, Icon, Label, Track } from 'components';
 import { ReactComponent as BykLogoWhite } from 'assets/logo-white.svg';
 import { Chat as ChatType, MessageStatus, CHAT_EVENTS } from 'types/chat';
 import { useMutation } from '@tanstack/react-query';
+import { DateTime } from 'luxon';
 import {
   Attachment,
   AttachmentTypes,
@@ -117,16 +122,40 @@ const Chat: FC<ChatProps> = ({
 
   useEffect(() => {
     const sseInstance = sse(
-      `cs-get-new-messages?chatId=${
-        chat.id
-      }&lastRead=${new Date().toISOString()}`
+      `cs-get-new-messages?chatId=${chat.id}&lastRead=${new Date(
+        chat.lastMessageTimestamp ?? ''
+      ).toISOString()}`
     );
 
     sseInstance.onMessage((messages: Message[]) => {
-      const newDisplayableMessages = messages.filter(
+      let newDisplayableMessages = messages.filter(
         (msg) => msg.authorId != userInfo?.idCode
       );
 
+      messages.map((existingMessage) => {
+        const matchingMessage = findMatchingMessageFromMessageList(
+          existingMessage,
+          messagesList
+        );
+
+        if (!matchingMessage) return;
+        const fullMessage = newDisplayableMessages.find(
+          (message) => message.id === matchingMessage.id
+        );
+
+        if (fullMessage?.preview !== undefined) {
+          setPreviewMessage(newDisplayableMessages);
+        } else {
+          setPreviewMessage([]);
+        }
+
+        newDisplayableMessages = newDisplayableMessages.filter(
+          (message) => message.id !== matchingMessage?.id
+        );
+      });
+
+      // console.log(newDisplayableMessages);
+      // console.log(newDisplayableMessages.length);
       if (newDisplayableMessages.length > 0) {
         setMessagesList((oldMessages) => [
           ...oldMessages,
@@ -153,6 +182,18 @@ const Chat: FC<ChatProps> = ({
     });
     return () => sseInstance.close();
   }, [messagesList]);
+
+  const findMatchingMessageFromMessageList = (
+    messageToMatch: Message,
+    messages: Message[]
+  ): Message | undefined =>
+    messages.find(
+      (message) =>
+        message.authorTimestamp?.trim() !== '' &&
+        DateTime.fromISO(message.authorTimestamp).toString() ===
+          DateTime.fromISO(messageToMatch.authorTimestamp).toString() &&
+        message.authorRole === messageToMatch.authorRole
+    );
 
   const getMessages = async () => {
     const { data: res } = await apiDev.post('cs-get-messages-by-chat-id', {
@@ -289,12 +330,13 @@ const Chat: FC<ChatProps> = ({
     _setMessageReadStatus(data);
   };
 
-  const setPreviewMessage = (event: MessageEvent<any>) => {
+  const setPreviewMessage = (messages: Message[]) => {
     const PREVIEW_MESSAGE: GroupedMessage = {
       name: endUserFullName,
-      type: event.data.authorRole,
-      messages: event.data as any, // TODO fix types
+      type: messages[0].authorRole ?? '',
+      messages: messages,
     };
+
     const CURRENT_MESSAGE_GROUPS = messageGroupsRef.current;
     const index = findIndex(
       CURRENT_MESSAGE_GROUPS,
