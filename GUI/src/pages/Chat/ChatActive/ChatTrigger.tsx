@@ -1,6 +1,5 @@
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { formatDistanceStrict } from 'date-fns';
 import { Track } from 'components';
 import { Chat as ChatType } from 'types/chat';
 import { format } from 'timeago.js';
