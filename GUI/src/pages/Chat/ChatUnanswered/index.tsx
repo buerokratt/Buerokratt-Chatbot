@@ -22,6 +22,8 @@ import CsaActivityContext from 'providers/CsaActivityContext';
 import ChatTrigger from '../ChatActive/ChatTrigger';
 import clsx from 'clsx';
 import { v4 as uuidv4 } from 'uuid';
+import ForwardToColleaugeModal from '../ForwardToColleaugeModal';
+import ForwardToEstablishmentModal from '../ForwardToEstablishmentModal';
 
 const ChatUnanswered: FC = () => {
   const { t } = useTranslation();
@@ -272,6 +274,22 @@ const ChatUnanswered: FC = () => {
             {t('chat.active.chooseChat')}
           </p>
         </div>
+      )}
+
+      {forwardToColleaugeModal && (
+        <ForwardToColleaugeModal
+          chat={forwardToColleaugeModal}
+          onModalClose={() => setForwardToColleaugeModal(null)}
+          onForward={handleCsaForward}
+        />
+      )}
+
+      {forwardToEstablishmentModal && (
+        <ForwardToEstablishmentModal
+          chat={forwardToEstablishmentModal}
+          onModalClose={() => setForwardToEstablishmentModal(null)}
+          onForward={handleEstablishmentForward}
+        />
       )}
 
       {endChatModal && (

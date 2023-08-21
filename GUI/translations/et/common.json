@@ -211,6 +211,7 @@
       "useAutocorrect": "Teksti autokorrektor",
       "required": "Nõutud",
       "invalidemail": "Kehtetu e-posti",
+      "invalidIdCode": "Kehtetu isikukood",
       "idCodePlaceholder": "Isikukood peab algama riigi eesliitega, (eg.EE12345678910)",
       "choose": "Vali",
       "userExists": "Kasutaja on olemas"
@@ -280,6 +281,7 @@
   },
   "toast": {
     "success": {
+      "updateSuccess": "Värskendamine õnnestus",
       "messageToUserEmail": "Sõnum saadeti kasutaja emailile",
       "chatStatusChanged": "Vestluse staatus muudetud",
       "chatCommentChanged": "Vestluse kommentaar muudetud",

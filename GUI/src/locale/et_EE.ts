@@ -1,6 +1,11 @@
 import * as timeago from 'timeago.js';
 
-function locale(number: number, index: number) {
+/* To Add Weeks Support Please add the following in index 8 & 9
+  ['nädal tagasi', 'nädala pärast'],
+  ['%s nädalat tagasi', '%s nädala pärast'], 
+*/
+
+function locale(number: number, index: number, totalSec: number | undefined) {
   return [
     ['just nüüd', 'praegu'],
     ['%s sekundit tagasi', '%s sekundi pärast'],
@@ -10,8 +15,8 @@ function locale(number: number, index: number) {
     ['%s tundi tagasi', '%s tunni pärast'],
     ['päev tagasi', 'päeva pärast'],
     ['%s päeva tagasi', '%s päeva pärast'],
-    ['nädal tagasi', 'nädala pärast'],
-    ['%s nädalat tagasi', '%s nädala pärast'],
+    [`${Math.round(Math.round(totalSec ?? 0) / (3600 * 24))} päev tagasi`, 'nädala pärast'],
+    [`${Math.round(Math.round(totalSec ?? 0) / (3600 * 24))} päev tagasi`, '%s nädala pärast'],
     ['kuu tagasi', 'kuu pärast'],
     ['%s kuud tagasi', '%s kuu pärast'],
     ['aasta tagasi', 'aasta pärast'],

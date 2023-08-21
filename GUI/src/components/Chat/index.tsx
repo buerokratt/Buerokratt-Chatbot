@@ -260,7 +260,7 @@ const Chat: FC<ChatProps> = ({
       }),
     onSuccess: async () => {
       if (chat.customerSupportId === '') {
-        navigate('/vestlus/aktiivsed', {
+        navigate('/chat/active', {
           state: {
             chatId: chat.id,
           },

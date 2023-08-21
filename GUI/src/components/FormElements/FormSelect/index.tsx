@@ -12,6 +12,7 @@ type FormSelectProps = Partial<ControllerRenderProps> & SelectHTMLAttributes<HTM
   label: ReactNode;
   name: string;
   hideLabel?: boolean;
+  direction?: 'down' | 'up';
   options: {
     label: string;
     value: string;
@@ -27,6 +28,7 @@ const FormSelect= forwardRef<HTMLSelectElement, FormSelectProps>((
   {
     label,
     hideLabel,
+    direction = 'down',
     options,
     disabled,
     placeholder,
@@ -73,7 +75,7 @@ const FormSelect= forwardRef<HTMLSelectElement, FormSelectProps>((
           {selectedItem?.label ?? placeholderValue}
           <Icon label='Dropdown icon' size='medium' icon={<MdArrowDropDown color='#5D6071' />} />
         </div>
-        <ul ref={ref} className='select__menu' {...getMenuProps()}>
+        <ul ref={ref} className={direction === 'down' ? 'select__menu' : 'select__menu_up'} {...getMenuProps()}>
           {isOpen && (
             options.map((item, index) => (
               <li className={clsx('select__option', { 'select__option--selected': highlightedIndex === index })}

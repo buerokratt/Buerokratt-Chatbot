@@ -353,13 +353,19 @@ const ChatHistory: FC = () => {
   };
 
   const filterChatsList = (chatsList: ChatType[]) => {
-    const startDate = control._formValues.startDate;
-    const endDate = control._formValues.endDate;
+    const startDate = Date.parse(
+      format(new Date(control._formValues.startDate), 'MM/dd/yyyy')
+    );
+
+    const endDate = Date.parse(
+      format(new Date(control._formValues.endDate), 'MM/dd/yyyy')
+    );
+
     setFilteredEndedChatsList(
-      chatsList.filter(
-        (c) =>
-          new Date(c.created) >= startDate && new Date(c.created) <= endDate
-      )
+      chatsList.filter((c) => {
+        const created = Date.parse(format(new Date(c.created), 'MM/dd/yyyy'));
+        return created >= startDate && created <= endDate;
+      })
     );
   };
 

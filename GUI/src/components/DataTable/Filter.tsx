@@ -8,9 +8,9 @@ import useDocumentEscapeListener from 'hooks/useDocumentEscapeListener';
 import DebouncedInput from './DebouncedInput';
 
 type FilterProps = {
-  column: Column<any, unknown>
-  table: Table<any>
-}
+  column: Column<any, unknown>;
+  table: Table<any>;
+};
 
 const Filter: FC<FilterProps> = ({ column, table }) => {
   const { t } = useTranslation();
@@ -28,7 +28,7 @@ const Filter: FC<FilterProps> = ({ column, table }) => {
       typeof firstValue === 'number'
         ? []
         : Array.from(column.getFacetedUniqueValues().keys()).sort(),
-    [column.getFacetedUniqueValues()],
+    [column.getFacetedUniqueValues()]
   );
 
   const handleFilterToggle = (e: MouseEvent) => {
@@ -39,25 +39,28 @@ const Filter: FC<FilterProps> = ({ column, table }) => {
   return (
     <>
       <button onClick={handleFilterToggle}>
-        <Icon icon={<MdOutlineSearch fontSize={16} />} size='medium' />
+        <Icon icon={<MdOutlineSearch fontSize={16} />} size="medium" />
       </button>
       {filterOpen && (
-        <div className='data-table__filter'>
+        <div className="data-table__filter">
           {typeof firstValue === 'number' ? (
             <DebouncedInput
-              type='number'
+              type="number"
               min={Number(column.getFacetedMinMaxValues()?.[0] ?? '')}
               max={Number(column.getFacetedMinMaxValues()?.[1] ?? '')}
               value={(columnFilterValue as [number, number])?.[0] ?? ''}
-              onChange={value =>
-                column.setFilterValue((old: [number, number]) => [value, old?.[1]])
+              onChange={(value) =>
+                column.setFilterValue((old: [number, number]) => [
+                  value,
+                  old?.[1],
+                ])
               }
             />
           ) : (
             <DebouncedInput
-              type='text'
-              value={(columnFilterValue ?? '') as string}
-              onChange={value => column.setFilterValue(value)}
+              type="text"
+              value={''}
+              onChange={(value) => column.setFilterValue(value)}
               placeholder={t('global.search') + '...'}
               // list={column.id + 'list'}
             />
