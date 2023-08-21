@@ -147,7 +147,6 @@ const ChatActive: FC = () => {
     });
 
     grouped.otherChats.sort((a, b) => a.name.localeCompare(b.name));
-
     return grouped;
   }, [activeChatsList, chatCsaActive]);
 
@@ -250,7 +249,7 @@ const ChatActive: FC = () => {
               className={clsx('vertical-tabs__trigger', {
                 active:
                   chat.status === CHAT_STATUS.REDIRECTED &&
-                  chat.customerSupportId === userInfo?.idCode,
+                  chat.customerSupportId === userInfo?.idCode && chat.lastMessageEvent === 'redirected'
               })}
               value={chat.id}
               style={{ borderBottom: '1px solid #D2D3D8' }}
@@ -272,7 +271,7 @@ const ChatActive: FC = () => {
                     className={clsx('vertical-tabs__trigger', {
                       active:
                         chat.status === CHAT_STATUS.REDIRECTED &&
-                        chat.customerSupportId === userInfo?.idCode,
+                        chat.customerSupportId === userInfo?.idCode && chat.lastMessageEvent === 'redirected'
                     })}
                     value={chat.id}
                     style={{ borderBottom: '1px solid #D2D3D8' }}

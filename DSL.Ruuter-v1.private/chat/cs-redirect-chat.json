@@ -159,7 +159,7 @@
             "endUserId": "{#.get_not_ended_chat[0]#.endUserId}",
             "endUserFirstName": "{#.get_not_ended_chat[0]#.endUserFirstName}",
             "endUserLastName": "{#.get_not_ended_chat[0]#.endUserLastName}",
-            "status": "{#.get_not_ended_chat[0]#.status}",
+            "status": "REDIRECTED",
             "endUserEmail": "{#.get_not_ended_chat[0]#.endUserEmail}",
             "endUserPhone": "{#.get_not_ended_chat[0]#.endUserPhone}",
             "endUserOs": "{#.get_not_ended_chat[0]#.endUserOs}",
