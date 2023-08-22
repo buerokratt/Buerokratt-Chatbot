@@ -218,7 +218,7 @@ const ChatUnanswered: FC = () => {
             className={clsx('vertical-tabs__trigger', {
               active:
                 chat.status === CHAT_STATUS.REDIRECTED &&
-                chat.customerSupportId === userInfo?.idCode,
+                chat.customerSupportId === userInfo?.idCode && chat.lastMessageEvent === 'redirected'
             })}
             value={chat.id}
             style={{ borderBottom: '1px solid #D2D3D8' }}
@@ -240,7 +240,7 @@ const ChatUnanswered: FC = () => {
                   className={clsx('vertical-tabs__trigger', {
                     active:
                       chat.status === CHAT_STATUS.REDIRECTED &&
-                      chat.customerSupportId === userInfo?.idCode,
+                      chat.customerSupportId === userInfo?.idCode && chat.lastMessageEvent === 'redirected'
                   })}
                   value={chat.id}
                   style={{ borderBottom: '1px solid #D2D3D8' }}
