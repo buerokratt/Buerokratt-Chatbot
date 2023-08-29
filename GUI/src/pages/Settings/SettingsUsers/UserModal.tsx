@@ -213,6 +213,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
               <div className="multiSelect__wrapper">
                 <Select
                   name={name}
+                  maxMenuHeight={165}
                   ref={ref}
                   onBlur={onBlur}
                   required={true}
