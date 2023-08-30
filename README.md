@@ -47,4 +47,3 @@ This repo will primarily contain:
 
 - For PDF generation (Saving chat in Chat-Widget) to work - Datamapper image has to be built using this PR https://github.com/buerokratt/DataMapper/pull/12
 
-- flowtest
