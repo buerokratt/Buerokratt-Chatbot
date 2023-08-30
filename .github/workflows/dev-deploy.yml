@@ -1,4 +1,4 @@
-name: Deploy Docker Compose
+name: Deploy
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 jobs:
   deploy-dev-test:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/dev'  # Only run for the 'feature' branch
+    if: github.ref == 'refs/heads/dev'  # Only run for the 'dev' branch
 
     steps:
       - name: Checkout repository
@@ -17,15 +17,11 @@ jobs:
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
 
       - name: Check if directory exists on remote server and create if neccecary
         id: check-directory
         run: |
-            ssh -i $HOME/.ssh/id_rsa ubuntu@${{ secrets.SERVER_IP }} 'if [ -d "/home/ubuntu/install/DEV/Buerokratt-Chatbot" ]; then echo "Directory exists"; else mkdir -p /home/ubuntu/install/DEV/Buerokratt-Chatbot && echo "Made directory"; fi'
-
-      - name: Push repository to MAIN server
-        run: rsync -az --exclude='.git/' -e "ssh -i $HOME/.ssh/id_rsa" $GITHUB_WORKSPACE/ ubuntu@${{ secrets.SERVER_IP }}:/home/ubuntu/install/DEV/Buerokratt-Chatbot
-      
+            ssh ubuntu@${{ secrets.SERVER_IP }} 'if [ -d "/opt/etapp2/uptodate/PIPELINE/Buerokratt-Chatbot" ]; then echo "Directory exists"; else mkdir -p /opt/etapp2/uptodate/PIPELINE/Buerokratt-Chatbot && echo "Made directory"; fi'
