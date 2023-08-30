@@ -1,6 +1,6 @@
 # Bürokratt's Chat Bot
 
-# Scope
+# Scope 
 
 This repo will primarily contain:
 
