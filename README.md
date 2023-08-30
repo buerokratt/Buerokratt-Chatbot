@@ -4,7 +4,7 @@
 
 This repo will primarily contain:
 
-1. Architectural and other documentation;
+1. Architectural and other documentation;   
 2. Docker Compose file to set up and run Bürokratt's Chat Bot as a fully functional service;    
 
 ## Dev setup
