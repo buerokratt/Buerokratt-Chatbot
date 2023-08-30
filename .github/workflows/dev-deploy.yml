@@ -24,4 +24,5 @@ jobs:
       - name: Check if directory exists on remote server and create if neccecary
         id: check-directory
         run: |
-            ssh ubuntu@${{ secrets.SERVER_IP }} 'if [ -d "/opt/etapp2/uptodate/PIPELINE/Buerokratt-Chatbot" ]; then echo "Directory exists"; else mkdir -p /opt/etapp2/uptodate/PIPELINE/Buerokratt-Chatbot && echo "Made directory"; fi'
+            ssh ubuntu@${{ secrets.SERVER_IP }} 'cd /opt/etapp2/uptodate/PIPELINE && bash Buerokratt-Chatbot.sh'
+            ssh ubuntu@${{ secrets.SERVER_IP }} 'cd /opt/etapp2/uptodate/PIPELINE/Buerokratt-Chatbot && docker-compose up -d --build'
