@@ -21,8 +21,7 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
 
-      - name: Check if directory exists on remote server and create if neccecary
+      - name: Setup and run containers
         id: check-directory
         run: |
             ssh ubuntu@${{ secrets.SERVER_IP }} 'cd /opt/etapp2/uptodate/PIPELINE && bash Buerokratt-Chatbot.sh'
-            ssh ubuntu@${{ secrets.SERVER_IP }} 'cd /opt/etapp2/uptodate/PIPELINE/Buerokratt-Chatbot && docker-compose up -d --build'
