@@ -241,7 +241,11 @@ const ChatActive: FC = () => {
           style={{ overflow: 'auto' }}
         >
           <div className="vertical-tabs__group-header">
-            <p>{t('chat.active.myChats')}</p>
+            <p>{`${t('chat.active.myChats')} ${
+              (activeChats?.myChats?.length ?? 0) == 0
+                ? ''
+                : `(${activeChats?.myChats?.length ?? 0})`
+            }`}</p>
           </div>
           {activeChats?.myChats?.map((chat) => (
             <Tabs.Trigger
@@ -249,7 +253,8 @@ const ChatActive: FC = () => {
               className={clsx('vertical-tabs__trigger', {
                 active:
                   chat.status === CHAT_STATUS.REDIRECTED &&
-                  chat.customerSupportId === userInfo?.idCode && chat.lastMessageEvent === 'redirected'
+                  chat.customerSupportId === userInfo?.idCode &&
+                  chat.lastMessageEvent === 'redirected',
               })}
               value={chat.id}
               style={{ borderBottom: '1px solid #D2D3D8' }}
@@ -261,7 +266,7 @@ const ChatActive: FC = () => {
             <div key={uuidv4()}>
               {name && (
                 <div className="vertical-tabs__sub-group-header">
-                  <p>{name}</p>
+                  <p>{`${name} (${chats.length ?? 0})`}</p>
                 </div>
               )}
               <Track align="stretch" direction="vertical" justify="between">
@@ -271,7 +276,8 @@ const ChatActive: FC = () => {
                     className={clsx('vertical-tabs__trigger', {
                       active:
                         chat.status === CHAT_STATUS.REDIRECTED &&
-                        chat.customerSupportId === userInfo?.idCode && chat.lastMessageEvent === 'redirected'
+                        chat.customerSupportId === userInfo?.idCode &&
+                        chat.lastMessageEvent === 'redirected',
                     })}
                     value={chat.id}
                     style={{ borderBottom: '1px solid #D2D3D8' }}
