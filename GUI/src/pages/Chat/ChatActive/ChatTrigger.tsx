@@ -1,6 +1,5 @@
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { formatDistanceStrict } from 'date-fns';
 import { Track } from 'components';
 import { Chat as ChatType } from 'types/chat';
 import { format } from 'timeago.js';
@@ -30,7 +29,9 @@ const ChatTrigger: FC<{ chat: ChatType }> = ({ chat }) => {
         )}
       </Track>
       <div className="wrapper">
-        <p className="last_message">{chat.lastMessage}.</p>
+        <p className="last_message">
+          {decodeURIComponent(`${chat.lastMessage}.` ?? '')}
+        </p>
       </div>
     </div>
   );

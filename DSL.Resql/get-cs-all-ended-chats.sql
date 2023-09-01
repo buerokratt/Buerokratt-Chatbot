@@ -18,7 +18,7 @@ SELECT c.base_id AS id,
        c.received_from,
        c.labels,
        s.comment,
-       m.content AS last_message,
+       last_content_message.content AS last_message,
        (CASE WHEN m.event = '' THEN NULL ELSE LOWER(m.event) END) as last_message_event,
        (SELECT content
         FROM message
@@ -30,4 +30,8 @@ FROM (SELECT * FROM chat WHERE id IN (SELECT MAX(id) FROM chat GROUP BY base_id)
   ON c.base_id = m.chat_base_id
   LEFT JOIN (SELECT chat_id, comment FROM chat_history_comments) AS s
   ON s.chat_id =  m.chat_base_id
+  JOIN (SELECT * FROM message WHERE id IN (SELECT MAX(id) FROM message 
+          WHERE content <> ''
+          AND content <> 'message-read' GROUP BY chat_base_id)) AS last_content_message
+  ON c.base_id = last_content_message.chat_base_id
 ORDER BY created;

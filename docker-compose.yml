@@ -105,8 +105,7 @@ services:
       - application.httpCodesAllowList=200,201,202,400,401,403,500
       - server.port=8088
     volumes:
-      - ./DSL.Ruuter.private/DSL:/DSL
-      - ./DSL.Ruuter.public/DSL:/DSL
+      - ./DSL.Ruuter.private/DSL:/DSL      - .
     ports:
       - 8088:8088
     networks:
@@ -223,66 +222,6 @@ services:
     networks:
       - bykstack
 
-  # train-bot:
-  #   container_name: train-bot
-  #   image: riaee/byk:bot-20220728
-  #   ports:
-  #     - 5005:5005
-  #   volumes:
-  #     - ./loba/:/app
-  #   command:
-  #     - train
-  #     - --fixed-model-name
-  #     - loba-model
-  #   networks:
-  #     - bykstack
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "50m"
-  #       max-file: "3"
-
-  # run-action-server:
-  #   container_name: bot-action-server
-  #   image: riaee/byk:bot-action-server-20220728
-  #   ports:
-  #     - 5055:5055
-  #   volumes:
-  #     - ./loba/actions:/app/actions
-  #     - ./loba/data:/app/data
-  #   command:
-  #     - start
-  #     - --actions
-  #     - actions
-  #   restart: always
-  #   networks:
-  #     - bykstack
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "50m"
-  #       max-file: "3"
-
-  # bot:
-  #   container_name: bot
-  #   image: riaee/byk:bot-20220728
-  #   ports:
-  #     - 5005:5005
-  #   volumes:
-  #     - ./loba/:/app
-  #   command:
-  #     - run
-  #   depends_on:
-  #     train-bot:
-  #       condition: service_completed_successfully
-  #   restart: always
-  #   networks:
-  #     - bykstack
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "50m"
-  #       max-file: "3"
 
   customer-service:
     container_name: customer-service
