@@ -6,6 +6,8 @@ import * as timeago from 'timeago.js';
 */
 
 function locale(number: number, index: number, totalSec: number | undefined) {
+  const days = Math.round(Math.round(totalSec ?? 0) / (3600 * 24));
+  const monthRemainingDays = days - (number * 30);
   return [
     ['just nüüd', 'praegu'],
     ['%s sekundit tagasi', '%s sekundi pärast'],
@@ -15,10 +17,10 @@ function locale(number: number, index: number, totalSec: number | undefined) {
     ['%s tundi tagasi', '%s tunni pärast'],
     ['päev tagasi', 'päeva pärast'],
     ['%s päeva tagasi', '%s päeva pärast'],
-    [`${Math.round(Math.round(totalSec ?? 0) / (3600 * 24))} päev tagasi`, 'nädala pärast'],
-    [`${Math.round(Math.round(totalSec ?? 0) / (3600 * 24))} päev tagasi`, '%s nädala pärast'],
-    ['kuu tagasi', 'kuu pärast'],
-    ['%s kuud tagasi', '%s kuu pärast'],
+    [`${days} päev tagasi`, 'nädala pärast'],
+    [`${days} päev tagasi`, '%s nädala pärast'],
+    [`%s kuu ja ${monthRemainingDays != 0 ? `${monthRemainingDays} päev${monthRemainingDays != 1 ? 'a' : ''}` : ''}`, 'kuu pärast'],
+    [`%s kuud ja ${monthRemainingDays != 0 ? `${monthRemainingDays} päev${monthRemainingDays != 1 ? 'a' : ''}` : ''}`, '%s kuu pärast'],
     ['aasta tagasi', 'aasta pärast'],
     ['%s aastat tagasi', '%s aasta pärast'],
   ][index] as [string, string];
