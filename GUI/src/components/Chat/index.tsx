@@ -150,6 +150,15 @@ const Chat: FC<ChatProps> = ({
       );
 
       setLatestPermissionMessage(lastPermissionMesageSecondsDiff ?? 0);
+
+      const permissionsHandeledMessages: Message[] = messages.filter(
+        (e: Message) =>
+          e.event === 'ask-permission-accepted' ||
+          e.event === 'ask-permission-rejected'
+      );
+      if (permissionsHandeledMessages.length > 0) {
+        getMessages();
+      }
     });
     return () => sseInstance.close();
   }, [messagesList]);
