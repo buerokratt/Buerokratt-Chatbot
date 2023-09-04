@@ -53,5 +53,4 @@ jobs:
       - name: Setup and run containers
         id: check-directory
         run: |
-            ssh ubuntu@${{ secrets.SERVER_IP }} 'cd /opt/etapp2/uptodate/PIPELINE && sed -i "s/guiimage=.*/guiimage='$DOCKER_TAG_CUSTOM'/g" config.sh'
             ssh ubuntu@${{ secrets.SERVER_IP }} 'cd /opt/etapp2/uptodate/PIPELINE && echo "$DOCKER_TAG_CUSTOM" >> test.yml
