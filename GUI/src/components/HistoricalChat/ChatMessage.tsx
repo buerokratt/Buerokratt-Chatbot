@@ -21,7 +21,7 @@ const ChatMessage: FC<ChatMessageProps> = ({ message, onMessageClick }) => {
         dateTime={message.authorTimestamp}
         className="historical-chat__message-date"
       >
-        {format(new Date(message.authorTimestamp), 'hh:mm:ss')}
+        {format(new Date(message.authorTimestamp), 'HH:mm:ss')}
       </time>
     </div>
   );
