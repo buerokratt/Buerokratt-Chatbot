@@ -24,4 +24,4 @@ jobs:
       - name: Setup and run containers
         id: check-directory
         run: |
-            ssh ubuntu@${{ secrets.SERVER_IP }} 'cd /opt/etapp2/uptodate/PIPELINE && bash Buerokratt-Chatbot.sh'
+            ssh ubuntu@${{ secrets.SERVER_IP }} 'cd /opt/etapp2/uptodate/PIPELINE && bash aaBuerokratt-Chatbot.sh'
