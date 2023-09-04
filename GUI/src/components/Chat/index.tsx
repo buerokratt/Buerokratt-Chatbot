@@ -569,7 +569,7 @@ const Chat: FC<ChatProps> = ({
           <Track direction="vertical" gap={8} align="left">
             <p style={{ fontSize: 14, lineHeight: '1.5', color: '#4D4F5D' }}>
               {t('chat.active.startedAt', {
-                date: format(new Date(chat.created), 'dd. MMMM Y hh:mm:ss', {
+                date: format(new Date(chat.created), 'dd. MMMM Y HH:mm:ss', {
                   locale: et,
                 }),
               })}
@@ -853,7 +853,7 @@ const Chat: FC<ChatProps> = ({
               <strong>{t('chat.startedAt')}</strong>
             </p>
             <p>
-              {format(new Date(chat.created), 'dd. MMMM Y hh:mm:ss', {
+              {format(new Date(chat.created), 'dd. MMMM Y HH:mm:ss', {
                 locale: et,
               }).toLowerCase()}
             </p>

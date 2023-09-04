@@ -232,13 +232,13 @@ const ChatHistory: FC = () => {
         id: 'created',
         header: t('chat.history.startTime') || '',
         cell: (props) =>
-          format(new Date(props.getValue()), 'd. MMM yyyy hh:mm:ss'),
+          format(new Date(props.getValue()), 'd. MMM yyyy HH:mm:ss'),
       }),
       columnHelper.accessor('ended', {
         id: 'ended',
         header: t('chat.history.endTime') || '',
         cell: (props) =>
-          format(new Date(props.getValue()), 'd. MMM yyyy hh:mm:ss'),
+          format(new Date(props.getValue()), 'd. MMM yyyy HH:mm:ss'),
       }),
       columnHelper.accessor('customerSupportDisplayName', {
         id: 'customerSupportDisplayName',
