@@ -68,7 +68,7 @@ const Header: FC = () => {
   const [userProfileSettings, setUserProfileSettings] =
     useState<UserProfileSettings>({
       userId: 1,
-      forwardedChatPopupNotifications: false,
+      forwardedChatPopupNotifications: true,
       forwardedChatSoundNotifications: true,
       forwardedChatEmailNotifications: false,
       newChatPopupNotifications: false,
@@ -84,8 +84,7 @@ const Header: FC = () => {
   const getMessages = async () => {
     const { data: res } = await apiDevV2.get('cs-get-user-profile-settings', {
       params: {
-        // TODO: Use actual id from userInfo once it starts using real data
-        userId: 1,
+        userId: userInfo?.idCode ?? '',
       },
     });
     if (res.response) setUserProfileSettings(res.response);
