@@ -31,6 +31,8 @@ services:
     restart: always
     networks:
       - bykstack
+    cpus: '0.5'  # Example CPU limit
+    mem_limit: '512M'  # Example memory limit
 
   ruuter-v1-private:
     container_name: ruuter-v1-private
@@ -69,6 +71,8 @@ services:
     restart: always
     networks:
       - bykstack
+    cpus: '0.5'  # Example CPU limit
+    mem_limit: '512M'  # Example memory limit
 
   tim:
     container_name: tim
@@ -81,6 +85,8 @@ services:
       - bykstack
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    cpus: '0.5'  # Example CPU limit
+    mem_limit: '512M'  # Example memory limit
 
   tim-postgresql:
     container_name: tim-postgresql
@@ -111,6 +117,8 @@ services:
       - 8088:8088
     networks:
       - bykstack
+    cpus: '0.5'  # Example CPU limit
+    mem_limit: '512M'  # Example memory limit
 
   ruuter-v2-public:
     container_name: ruuter-v2-public
@@ -125,6 +133,8 @@ services:
       - 8086:8086
     networks:
       - bykstack
+    cpus: '0.5'  # Example CPU limit
+    mem_limit: '512M'  # Example memory limit
 
   dmapper:
     container_name: dmapper
@@ -214,6 +224,8 @@ services:
       - ./GUI:/app
     networks:
       - bykstack
+    cpus: '0.5'  # Example CPU limit
+    mem_limit: '1G'  # Example memory limit
 
   chat-widget:
     container_name: chat-widget
