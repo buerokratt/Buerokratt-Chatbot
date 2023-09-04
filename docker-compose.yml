@@ -1,7 +1,6 @@
-version: '3.9'
+version: "3.9"
 
 services:
-
   ruuter-v1-public:
     container_name: ruuter-v1-public
     image: riaee/byk-chatbot-public-ruuter:05
@@ -103,9 +102,11 @@ services:
     environment:
       - application.cors.allowedOrigins=http://localhost:8082,http://localhost:3001,http://localhost:3003
       - application.httpCodesAllowList=200,201,202,400,401,403,500
+      - application.logging.displayRequestContent=true
+      - application.logging.displayResponseContent=true
       - server.port=8088
     volumes:
-      - ./DSL.Ruuter.private/DSL:/DSL      - .
+      - ./DSL.Ruuter.private/DSL:/DSL
     ports:
       - 8088:8088
     networks:
@@ -117,6 +118,8 @@ services:
     environment:
       - application.cors.allowedOrigins=http://localhost:8086,http://localhost:3001,http://localhost:3003
       - application.httpCodesAllowList=200,201,202,400,401,403,500
+      - application.logging.displayRequestContent=true
+      - application.logging.displayResponseContent=true
       - server.port=8086
     volumes:
       - ./DSL.Ruuter.public/DSL:/DSL
@@ -221,7 +224,6 @@ services:
       - 3003:3003
     networks:
       - bykstack
-
 
   customer-service:
     container_name: customer-service
