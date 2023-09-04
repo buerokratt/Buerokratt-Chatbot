@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - dev
-#    paths:
-#      - '.env'
+    paths:
+      - '.env'
 
 jobs:
   PackageDeploy:
@@ -53,4 +53,4 @@ jobs:
       - name: Setup and run containers
         id: check-directory
         run: |
-            ssh ubuntu@${{ secrets.SERVER_IP }} "cd /opt/etapp2/uptodate/PIPELINE && >> image.yml && echo "$DOCKER_TAG_CUSTOM" >> image.yml"
+            ssh ubuntu@${{ secrets.SERVER_IP }} "cd /opt/etapp2/uptodate/PIPELINE && > image.yml && echo "$DOCKER_TAG_CUSTOM" >> image.yml"
