@@ -670,7 +670,8 @@ const Chat: FC<ChatProps> = ({
         )}
 
         {(chat.customerSupportId === '' ||
-          chat.customerSupportId !== userInfo?.idCode) &&
+          (chat.customerSupportId !== userInfo?.idCode &&
+            userInfo?.authorities.includes('ROLE_ADMINISTRATOR'))) &&
           chatCsaActive === true && (
             <div className="active-chat__toolbar">
               <Track justify="center">
