@@ -79,15 +79,15 @@ const Header: FC = () => {
 
   useEffect(() => {
     getMessages();
-  }, []);
+  }, [userInfo?.idCode]);
 
   const getMessages = async () => {
-    const { data: res } = await apiDevV2.get('cs-get-user-profile-settings', {
-      params: {
-        userId: userInfo?.idCode ?? '',
-      },
+    const { data: res } = await apiDevV2.post('cs-get-user-profile-settings', {
+      userId: userInfo?.idCode ?? '',
     });
-    if (res.response) setUserProfileSettings(res.response);
+
+    if (res.response && res.response != 'error: not found')
+      setUserProfileSettings(res.response[0]);
   };
   const { data: customerSupportActivity } = useQuery<CustomerSupportActivity>({
     queryKey: ['cs-get-customer-support-activity', 'prod'],
@@ -189,7 +189,16 @@ const Header: FC = () => {
 
   const userProfileSettingsMutation = useMutation({
     mutationFn: async (data: UserProfileSettings) => {
-      await apiDevV2.post('cs-set-user-profile-settings', data);
+      await apiDevV2.post('cs-set-user-profile-settings', {
+        userId: userInfo?.idCode ?? '',
+        forwardedChatPopupNotifications: data.forwardedChatPopupNotifications,
+        forwardedChatSoundNotifications: data.forwardedChatSoundNotifications,
+        forwardedChatEmailNotifications: data.newChatEmailNotifications,
+        newChatPopupNotifications: data.newChatPopupNotifications,
+        newChatSoundNotifications: data.newChatSoundNotifications,
+        newChatEmailNotifications: data.newChatEmailNotifications,
+        useAutocorrect: data.useAutocorrect,
+      });
       setUserProfileSettings(data);
     },
     onError: async (error: AxiosError) => {
@@ -238,9 +247,7 @@ const Header: FC = () => {
       if (data.custom_jwt_extend === null) return;
       setNewCookie(data.custom_jwt_extend);
     },
-    onError: (error: AxiosError) => {
-      console.log('E: ', error);
-    },
+    onError: (error: AxiosError) => {},
   });
 
   const logoutMutation = useMutation({
