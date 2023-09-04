@@ -53,4 +53,4 @@ jobs:
       - name: Setup and run containers
         id: check-directory
         run: |
-            ssh ubuntu@${{ secrets.SERVER_IP }} 'cd /opt/etapp2/uptodate/PIPELINE && echo "ghcr.io/${LOWER_CASE_GITHUB_REPOSITORY}:$RELEASE-$VERSION.$BUILD.$FIX" >> test.yml'
+            ssh ubuntu@${{ secrets.SERVER_IP }} 'cd /opt/etapp2/uptodate/PIPELINE && echo "$DOCKER_TAG_CUSTOM" >> test.yml'
