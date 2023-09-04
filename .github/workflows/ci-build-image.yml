@@ -53,4 +53,4 @@ jobs:
       - name: Setup and run containers
         id: check-directory
         run: |
-            ssh ubuntu@${{ secrets.SERVER_IP }} 'cd /opt/etapp2/uptodate/PIPELINE && echo "test" >> test.yml
+            ssh ubuntu@${{ secrets.SERVER_IP }} 'cd /opt/etapp2/uptodate/PIPELINE && echo "test" >> test.yml'
