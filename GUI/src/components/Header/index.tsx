@@ -211,6 +211,14 @@ const Header: FC = () => {
     },
   });
 
+  const unClaimAllAssignedChats = useMutation({
+    mutationFn: async () => {
+      await apiDev.post('cs-unclaim-all-assigned-chats', {
+        userId: userInfo?.idCode ?? '',
+      });
+    },
+  });
+
   const customerSupportActivityMutation = useMutation({
     mutationFn: (data: CustomerSupportActivityDTO) =>
       apiDev.post('cs-set-customer-support-activity', {
@@ -308,6 +316,8 @@ const Header: FC = () => {
   };
 
   const handleCsaStatusChange = (checked: boolean) => {
+    if (checked === false) unClaimAllAssignedChats.mutate();
+
     setChatCsaActive(checked);
     setCsaStatus(checked === true ? 'online' : 'offline');
     customerSupportActivityMutation.mutate({
