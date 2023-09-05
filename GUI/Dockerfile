@@ -27,7 +27,7 @@ RUN npm run build
 
 # Production stage
 FROM nginx:1.21.3-alpine as production
-COPY ./nginx/https-nginx.conf.template /etc/nginx/conf.d/default.conf.template
+COPY ./nginx/https-nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /usr/buerokratt-chatbot/build /usr/share/nginx/html
 
 # Copy the entrypoint script
