@@ -34,4 +34,5 @@ FROM (SELECT * FROM chat WHERE id IN (SELECT MAX(id) FROM chat GROUP BY base_id)
           WHERE content <> ''
           AND content <> 'message-read' GROUP BY chat_base_id)) AS last_content_message
   ON c.base_id = last_content_message.chat_base_id
+WHERE c.created::date BETWEEN :start::date AND :end::date
 ORDER BY created;

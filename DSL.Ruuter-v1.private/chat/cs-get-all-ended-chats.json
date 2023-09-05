@@ -18,9 +18,7 @@
               "endpoint": "{ruuter_url}/match_input",
               "post_body_parameters": {
                 "userinfo": {
-                  "cookies": [
-                    "customJwtCookie"
-                  ],
+                  "cookies": ["customJwtCookie"],
                   "method": "post",
                   "endpoint": "{tim_url}/jwt/custom-jwt-userinfo",
                   "post_body_struct": "customJwtCookie",
@@ -50,6 +48,8 @@
             }
           },
           "post_body_struct": {
+            "start": "{#.startDate}",
+            "end": "{#.endDate}"
           }
         },
         "response": {

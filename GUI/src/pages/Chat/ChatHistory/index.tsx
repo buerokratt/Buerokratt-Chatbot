@@ -1,4 +1,4 @@
-import { FC, useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { createColumnHelper, PaginationState } from '@tanstack/react-table';
@@ -60,7 +60,7 @@ const ChatHistory: FC = () => {
   const [selectedColumns, setSelectedColumns] = useState<string[]>(
     preferences ?? []
   );
-  const { control } = useForm<{
+  const { control, watch } = useForm<{
     startDate: Date | string;
     endDate: Date | string;
   }>({
@@ -78,11 +78,25 @@ const ChatHistory: FC = () => {
     },
   });
 
-  useQuery<ChatType[]>({
-    queryKey: ['cs-get-all-ended-chats', 'prod'],
-    onSuccess(res: any) {
-      setEndedChatsList(res.data.cs_get_all_ended_chats ?? []);
-      filterChatsList(res.data.cs_get_all_ended_chats ?? []);
+  const startDate = watch('startDate');
+  const endDate = watch('endDate');
+
+  useEffect(() => {
+    getAllEndedChats.mutate({
+      startDate: format(new Date(), 'yyyy-MM-dd'),
+      endDate: format(new Date(), 'yyyy-MM-dd'),
+    });
+  }, []);
+
+  const getAllEndedChats = useMutation({
+    mutationFn: (data: { startDate: string; endDate: string }) =>
+      apiDev.post('cs-get-all-ended-chats', {
+        startDate: data.startDate,
+        endDate: data.endDate,
+      }),
+    onSuccess: (res: any) => {
+      setEndedChatsList(res.data.data.cs_get_all_ended_chats ?? []);
+      filterChatsList(res.data.data.cs_get_all_ended_chats ?? []);
     },
   });
 
@@ -402,7 +416,10 @@ const ChatHistory: FC = () => {
                       value={field.value ?? new Date()}
                       onChange={(v) => {
                         field.onChange(v);
-                        filterChatsList(endedChatsList);
+                        getAllEndedChats.mutate({
+                          startDate: format(new Date(v), 'yyyy-MM-dd'),
+                          endDate: format(new Date(endDate), 'yyyy-MM-dd'),
+                        });
                       }}
                     />
                   );
@@ -422,7 +439,10 @@ const ChatHistory: FC = () => {
                       value={field.value ?? new Date()}
                       onChange={(v) => {
                         field.onChange(v);
-                        filterChatsList(endedChatsList);
+                        getAllEndedChats.mutate({
+                          startDate: format(new Date(startDate), 'yyyy-MM-dd'),
+                          endDate: format(new Date(v), 'yyyy-MM-dd'),
+                        });
                       }}
                     />
                   );
