@@ -8,7 +8,7 @@ COPY ./package*.json ./
 FROM image AS build
 RUN npm ci --legacy-peer-deps --mode=development
 COPY . .
-RUN ./node_modules/.bin/vite build --mode=development
+RUN ./node_modules/.bin/vite build
 
 FROM $nginx_version AS web
 COPY ./nginx/https-nginx.conf /etc/nginx/conf.d/default.conf
