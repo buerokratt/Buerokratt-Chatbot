@@ -301,7 +301,15 @@ const ChatHistory: FC = () => {
         id: 'status',
         header: t('global.status') || '',
         cell: (props) =>
-          props.getValue() === CHAT_STATUS.ENDED ? t('chat.status.ended') : '',
+          props.getValue() === CHAT_STATUS.ENDED
+            ? props.row.original.lastMessageEvent != null &&
+              props.row.original.lastMessageEvent !== 'message-read'
+              ? t(
+                  'chat.plainEvents.' + props.row.original.lastMessageEvent ??
+                    ''
+                )
+              : t('chat.status.ended')
+            : '',
       }),
       columnHelper.accessor('id', {
         id: 'id',
