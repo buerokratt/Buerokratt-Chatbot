@@ -83,8 +83,8 @@ const ChatHistory: FC = () => {
 
   useEffect(() => {
     getAllEndedChats.mutate({
-      startDate: format(new Date(), 'yyyy-MM-dd'),
-      endDate: format(new Date(), 'yyyy-MM-dd'),
+      startDate: format(new Date(startDate), 'yyyy-MM-dd'),
+      endDate: format(new Date(endDate), 'yyyy-MM-dd'),
     });
   }, []);
 
