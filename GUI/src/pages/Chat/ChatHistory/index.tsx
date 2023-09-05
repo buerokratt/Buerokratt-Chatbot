@@ -166,15 +166,19 @@ const ChatHistory: FC = () => {
       const changeableTo = [
         CHAT_EVENTS.CLIENT_LEFT_WITH_ACCEPTED.toUpperCase(),
         CHAT_EVENTS.CLIENT_LEFT_WITH_NO_RESOLUTION.toUpperCase(),
+        CHAT_EVENTS.ACCEPTED.toUpperCase(),
+        CHAT_EVENTS.ANSWERED.toUpperCase(),
+        CHAT_EVENTS.CLIENT_LEFT_FOR_UNKNOWN_REASONS.toUpperCase(),
+        CHAT_EVENTS.CLIENT_LEFT.toUpperCase(),
+        CHAT_EVENTS.HATE_SPEECH.toUpperCase(),
+        CHAT_EVENTS.OTHER.toUpperCase(),
+        CHAT_EVENTS.TERMINATED.toUpperCase(),
+        CHAT_EVENTS.RESPONSE_SENT_TO_CLIENT_EMAIL.toUpperCase(),
       ];
       const isChangeable = changeableTo.includes(data.event);
 
       if (selectedChat?.lastMessageEvent === data.event.toLowerCase()) return;
-      if (
-        selectedChat?.lastMessageEvent !==
-        CHAT_EVENTS.CLIENT_LEFT_FOR_UNKNOWN_REASONS
-      )
-        return;
+
       if (!isChangeable) return;
 
       await apiDev.post('cs-end-chat', {
