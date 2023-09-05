@@ -2,6 +2,47 @@
   "action_type": "BLOGIC",
   "destination": [
     {
+      "reflect_input": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{tim_url}/jwt/custom-jwt-userinfo",
+          "cookies": ["customJwtCookie"],
+          "post_body_struct": "customJwtCookie"
+        },
+        "response": {
+          "nok": "stop",
+          "ok": "proceed"
+        }
+      }
+    },
+    {
+      "unassign_all_claimed_chats": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{resql_url}/update-chats-assignee-by-user-id",
+          "post_body_struct": {
+            "userId": "{#.reflect_input#.idCode}"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
       "set_customer_support_agent_away": {
         "verify": {
           "response": {
@@ -59,7 +100,7 @@
           },
           "post_body_struct": {
             "active": false,
-            "userIdCode": "{$.userinfo$.data$.custom_jwt_userinfo$.idCode}",
+            "userIdCode": "{#.reflect_input#.idCode}",
             "created": "$_getInstant()",
             "status": "offline"
           },
