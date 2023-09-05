@@ -50,7 +50,12 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
 
-      - name: Setup and run containers
-        id: check-directory
+      - name: Setup image name
+        id: Setup image name
         run: |
             ssh ubuntu@${{ secrets.SERVER_IP }} "cd /opt/etapp2/uptodate/PIPELINE && > image.yml && echo "$DOCKER_TAG_CUSTOM | tr '[:upper:]' '[:lower:]'" >> image.yml"
+
+      - name: Setup and run containers
+        id: Setup and run containers
+        run: |
+            ssh ubuntu@${{ secrets.SERVER_IP }} 'cd /opt/etapp2/uptodate/PIPELINE && bash Buerokratt-Chatbot.sh'
