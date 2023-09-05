@@ -32,7 +32,7 @@ RUN npm run build
 # Stage 2: Serve the application using Nginx
 FROM $nginx_version AS web
 COPY ./nginx/https-nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=build /usr/buerokratt-chatbot/dist /usr/share/nginx/html/buerokratt-chatbot
+COPY --from=build /usr/buerokratt-chatbot/build /usr/share/nginx/html/buerokratt-chatbot
 EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]
