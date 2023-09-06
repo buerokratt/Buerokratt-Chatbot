@@ -119,7 +119,10 @@ const ChatActive: FC = () => {
 
     if (!activeChatsList) return grouped;
 
-    if (chatCsaActive === false) {
+    if (
+      chatCsaActive === false &&
+      !userInfo?.authorities.includes('ROLE_ADMINISTRATOR')
+    ) {
       setSelectedChatId(null);
       return grouped;
     }

@@ -231,32 +231,6 @@ const ChatUnanswered: FC = () => {
             <ChatTrigger chat={chat} />
           </Tabs.Trigger>
         ))}
-        {unansweredChats?.otherChats?.map(({ name, chats }) => (
-          <div key={uuidv4()}>
-            {name && (
-              <div className="vertical-tabs__sub-group-header">
-                <p>{`${name} (${chats.length ?? 0})`}</p>
-              </div>
-            )}
-            <Track align="stretch" direction="vertical" justify="between">
-              {chats.map((chat, i) => (
-                <Tabs.Trigger
-                  key={chat.id + i}
-                  className={clsx('vertical-tabs__trigger', {
-                    active:
-                      chat.status === CHAT_STATUS.REDIRECTED &&
-                      chat.customerSupportId === userInfo?.idCode &&
-                      chat.lastMessageEvent === 'redirected',
-                  })}
-                  value={chat.id}
-                  style={{ borderBottom: '1px solid #D2D3D8' }}
-                >
-                  <ChatTrigger chat={chat} />
-                </Tabs.Trigger>
-              ))}
-            </Track>
-          </div>
-        ))}
       </Tabs.List>
 
       {selectedChatId ? (
