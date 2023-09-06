@@ -57,6 +57,7 @@ const ChatHistory: FC = () => {
     ChatType[]
   >([]);
   const [chatMessagesList, setchatMessagesList] = useState<Message[]>([]);
+  const [messagesTrigger, setMessagesTrigger] = useState(false);
   const [selectedColumns, setSelectedColumns] = useState<string[]>(
     preferences ?? []
   );
@@ -166,15 +167,19 @@ const ChatHistory: FC = () => {
       const changeableTo = [
         CHAT_EVENTS.CLIENT_LEFT_WITH_ACCEPTED.toUpperCase(),
         CHAT_EVENTS.CLIENT_LEFT_WITH_NO_RESOLUTION.toUpperCase(),
+        CHAT_EVENTS.ACCEPTED.toUpperCase(),
+        CHAT_EVENTS.ANSWERED.toUpperCase(),
+        CHAT_EVENTS.CLIENT_LEFT_FOR_UNKNOWN_REASONS.toUpperCase(),
+        CHAT_EVENTS.CLIENT_LEFT.toUpperCase(),
+        CHAT_EVENTS.HATE_SPEECH.toUpperCase(),
+        CHAT_EVENTS.OTHER.toUpperCase(),
+        CHAT_EVENTS.TERMINATED.toUpperCase(),
+        CHAT_EVENTS.RESPONSE_SENT_TO_CLIENT_EMAIL.toUpperCase(),
       ];
       const isChangeable = changeableTo.includes(data.event);
 
       if (selectedChat?.lastMessageEvent === data.event.toLowerCase()) return;
-      if (
-        selectedChat?.lastMessageEvent !==
-        CHAT_EVENTS.CLIENT_LEFT_FOR_UNKNOWN_REASONS
-      )
-        return;
+
       if (!isChangeable) return;
 
       await apiDev.post('cs-end-chat', {
@@ -187,6 +192,11 @@ const ChatHistory: FC = () => {
       });
     },
     onSuccess: () => {
+      setMessagesTrigger(!messagesTrigger);
+      getAllEndedChats.mutate({
+        startDate: format(new Date(startDate), 'yyyy-MM-dd'),
+        endDate: format(new Date(endDate), 'yyyy-MM-dd'),
+      });
       toast.open({
         type: 'success',
         title: t('global.notification'),
@@ -301,7 +311,15 @@ const ChatHistory: FC = () => {
         id: 'status',
         header: t('global.status') || '',
         cell: (props) =>
-          props.getValue() === CHAT_STATUS.ENDED ? t('chat.status.ended') : '',
+          props.getValue() === CHAT_STATUS.ENDED
+            ? props.row.original.lastMessageEvent != null &&
+              props.row.original.lastMessageEvent !== 'message-read'
+              ? t(
+                  'chat.plainEvents.' + props.row.original.lastMessageEvent ??
+                    ''
+                )
+              : t('chat.status.ended')
+            : '',
       }),
       columnHelper.accessor('id', {
         id: 'id',
@@ -488,6 +506,7 @@ const ChatHistory: FC = () => {
         >
           <HistoricalChat
             chat={selectedChat}
+            trigger={messagesTrigger}
             onChatStatusChange={setStatusChangeModal}
             onCommentChange={handleCommentChange}
           />

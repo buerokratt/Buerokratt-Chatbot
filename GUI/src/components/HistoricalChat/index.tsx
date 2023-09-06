@@ -15,15 +15,16 @@ import { AUTHOR_ROLES } from 'utils/constants';
 
 type ChatProps = {
   chat: ChatType;
+  trigger: boolean;
   onChatStatusChange: (event: string) => void;
   onCommentChange: (comment: string) => void;
-}
+};
 
 type GroupedMessage = {
   name: string;
   type: string;
   messages: Message[];
-}
+};
 
 const chatStatuses = [
   CHAT_EVENTS.ACCEPTED,
@@ -35,7 +36,12 @@ const chatStatuses = [
   CHAT_EVENTS.RESPONSE_SENT_TO_CLIENT_EMAIL,
 ];
 
-const HistoricalChat: FC<ChatProps> = ({ chat, onChatStatusChange, onCommentChange }) => {
+const HistoricalChat: FC<ChatProps> = ({
+  chat,
+  trigger,
+  onChatStatusChange,
+  onCommentChange,
+}) => {
   const { t } = useTranslation();
   const chatRef = useRef<HTMLDivElement>(null);
   const [messageGroups, setMessageGroups] = useState<GroupedMessage[]>([]);
@@ -44,17 +50,19 @@ const HistoricalChat: FC<ChatProps> = ({ chat, onChatStatusChange, onCommentChan
 
   useEffect(() => {
     getMessages();
-  }, [])
+  }, [trigger]);
 
   const getMessages = async () => {
     const { data: res } = await apiDev.post('cs-get-messages-by-chat-id', {
-      'chatId': chat.id
+      chatId: chat.id,
     });
     setMessagesList(res.data.cs_get_messages_by_chat_id);
   };
 
-  const endUserFullName = chat.endUserFirstName !== '' && chat.endUserLastName !== ''
-    ? `${chat.endUserFirstName} ${chat.endUserLastName}` : t('global.anonymous');
+  const endUserFullName =
+    chat.endUserFirstName !== '' && chat.endUserLastName !== ''
+      ? `${chat.endUserFirstName} ${chat.endUserLastName}`
+      : t('global.anonymous');
 
   useEffect(() => {
     if (!messagesList) return;
@@ -82,9 +90,10 @@ const HistoricalChat: FC<ChatProps> = ({ chat, onChatStatusChange, onCommentChan
         }
       } else {
         groupedMessages.push({
-          name: message.authorRole === 'end-user'
-            ? endUserFullName
-            : message.authorRole === 'backoffice-user'
+          name:
+            message.authorRole === 'end-user'
+              ? endUserFullName
+              : message.authorRole === 'backoffice-user'
               ? `${message.authorFirstName} ${message.authorLastName}`
               : message.authorRole,
           type: message.authorRole,
@@ -102,58 +111,75 @@ const HistoricalChat: FC<ChatProps> = ({ chat, onChatStatusChange, onCommentChan
   }, [messageGroups]);
 
   const isEvent = (group: GroupedMessage) => {
-    return group.type === 'event' || group.name.trim() === '' || (!group.messages[0].content && group.messages[0].event);
-  }
+    return (
+      group.type === 'event' ||
+      group.name.trim() === '' ||
+      (!group.messages[0].content && group.messages[0].event)
+    );
+  };
 
   return (
-    <div className='historical-chat'>
-      <div className='historical-chat__body'>
-        <div className='historical-chat__group-wrapper'>
-          {messageGroups && messageGroups.map((group, index) => (
-            <div className={clsx(['historical-chat__group', `historical-chat__group--${group.type}`])}
-              key={`group-${index}`}>
-              {isEvent(group)
-                ? <ChatEvent message={group.messages[0]} />
-                : (
+    <div className="historical-chat">
+      <div className="historical-chat__body">
+        <div className="historical-chat__group-wrapper">
+          {messageGroups &&
+            messageGroups.map((group, index) => (
+              <div
+                className={clsx([
+                  'historical-chat__group',
+                  `historical-chat__group--${group.type}`,
+                ])}
+                key={`group-${index}`}
+              >
+                {isEvent(group) ? (
+                  <ChatEvent message={group.messages[0]} />
+                ) : (
                   <>
-                    <div className='historical-chat__group-initials'>
-                      {group.type === 'buerokratt' || group.type === 'chatbot' ? (
+                    <div className="historical-chat__group-initials">
+                      {group.type === 'buerokratt' ||
+                      group.type === 'chatbot' ? (
                         <BykLogoWhite height={24} />
                       ) : (
-                        <>{group.name.split(' ').map((n) => n[0]).join('').toUpperCase()}</>
+                        <>
+                          {group.name
+                            .split(' ')
+                            .map((n) => n[0])
+                            .join('')
+                            .toUpperCase()}
+                        </>
                       )}
                     </div>
-                    <div className='historical-chat__group-name'>{group.name}</div>
-                    <div className='historical-chat__messages'>
+                    <div className="historical-chat__group-name">
+                      {group.name}
+                    </div>
+                    <div className="historical-chat__messages">
                       {group.messages.map((message, i) => (
                         <ChatMessage message={message} key={`message-${i}`} />
                       ))}
                     </div>
                   </>
                 )}
-            </div>
-          ))}
-          <div id='anchor' ref={chatRef}></div>
+              </div>
+            ))}
+          <div id="anchor" ref={chatRef}></div>
         </div>
-        <div className='historical-chat__toolbar'>
-          <div className='historical-chat__toolbar-row'>
-            <Track gap={16} justify='between'>
+        <div className="historical-chat__toolbar">
+          <div className="historical-chat__toolbar-row">
+            <Track gap={16} justify="between">
               {editingComment || editingComment === '' ? (
                 <FormTextarea
-                  name='comment'
+                  name="comment"
                   label={t('global.comment')}
                   value={editingComment}
                   hideLabel
-                  onChange={(e) =>
-                    setEditingComment(e.target.value)
-                  }
+                  onChange={(e) => setEditingComment(e.target.value)}
                 />
               ) : (
                 <p>{chat.comment}</p>
               )}
               {editingComment || editingComment === '' ? (
                 <Button
-                  appearance='text'
+                  appearance="text"
                   onClick={() => {
                     onCommentChange(editingComment);
                     setEditingComment(null);
@@ -164,10 +190,8 @@ const HistoricalChat: FC<ChatProps> = ({ chat, onChatStatusChange, onCommentChan
                 </Button>
               ) : (
                 <Button
-                  appearance='text'
-                  onClick={() =>
-                    setEditingComment(chat.comment ?? '')
-                  }
+                  appearance="text"
+                  onClick={() => setEditingComment(chat.comment ?? '')}
                 >
                   <Icon icon={<MdOutlineModeEditOutline />} />
                   {t('global.edit')}
@@ -175,21 +199,23 @@ const HistoricalChat: FC<ChatProps> = ({ chat, onChatStatusChange, onCommentChan
               )}
             </Track>
           </div>
-          <div className='historical-chat__toolbar-row'>
+          <div className="historical-chat__toolbar-row">
             <FormSelect
-              name='chatStatus'
+              name="chatStatus"
               label={t('chat.chatStatus')}
-              direction='up'
-              onSelectionChange={(selection) => selection ? onChatStatusChange(selection.value) : null}
+              direction="up"
+              onSelectionChange={(selection) =>
+                selection ? onChatStatusChange(selection.value) : null
+              }
               options={chatStatuses.map((status) => ({
                 label: t(`chat.events.${status}`, { date: '' }),
-                value: status
+                value: status,
               }))}
             />
           </div>
         </div>
       </div>
-      <div id='anchor' ref={chatRef}></div>
+      <div id="anchor" ref={chatRef}></div>
     </div>
   );
 };
