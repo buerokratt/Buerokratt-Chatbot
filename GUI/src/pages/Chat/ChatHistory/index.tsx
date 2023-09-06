@@ -57,6 +57,7 @@ const ChatHistory: FC = () => {
     ChatType[]
   >([]);
   const [chatMessagesList, setchatMessagesList] = useState<Message[]>([]);
+  const [messagesTrigger, setMessagesTrigger] = useState(false);
   const [selectedColumns, setSelectedColumns] = useState<string[]>(
     preferences ?? []
   );
@@ -191,6 +192,11 @@ const ChatHistory: FC = () => {
       });
     },
     onSuccess: () => {
+      setMessagesTrigger(!messagesTrigger);
+      getAllEndedChats.mutate({
+        startDate: format(new Date(startDate), 'yyyy-MM-dd'),
+        endDate: format(new Date(endDate), 'yyyy-MM-dd'),
+      });
       toast.open({
         type: 'success',
         title: t('global.notification'),
@@ -500,6 +506,7 @@ const ChatHistory: FC = () => {
         >
           <HistoricalChat
             chat={selectedChat}
+            trigger={messagesTrigger}
             onChatStatusChange={setStatusChangeModal}
             onCommentChange={handleCommentChange}
           />
