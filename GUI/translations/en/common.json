@@ -319,6 +319,9 @@
       "userDeleted": "User deleted",
       "newUserAdded": "New user added",
       "userUpdated": "User updated"
+    },
+    "alert": {
+      "sessionExpired": "Session Expired"
     }
   }
 }

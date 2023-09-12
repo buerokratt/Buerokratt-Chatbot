@@ -319,6 +319,9 @@
       "userDeleted": "Kasutaja kustutatud",
       "newUserAdded": "Uus kasutaja lisatud",
       "userUpdated": "Kasutaja uuendatud"
+    },
+    "alert": {
+      "sessionExpired": "Seanss aegunud"
     }
   }
 }
