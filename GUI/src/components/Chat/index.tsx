@@ -229,9 +229,7 @@ const Chat: FC<ChatProps> = ({
 
   const postMessageMutation = useMutation({
     mutationFn: (message: Message) => apiDev.post('cs-post-message', message),
-    onSuccess: () => {
-      
-    },
+    onSuccess: () => {},
     onError: (error: AxiosError) => {
       toast.open({
         type: 'error',
@@ -245,23 +243,6 @@ const Chat: FC<ChatProps> = ({
     mutationFn: (message: Message) =>
       apiDev.post('cs-post-event-message', {
         chatId: message.chatId ?? '',
-        event: message.event ?? '',
-        authorTimestamp: message.authorTimestamp ?? '',
-      }),
-    onSuccess: () => {},
-    onError: (error: AxiosError) => {
-      toast.open({
-        type: 'error',
-        title: t('global.notificationError'),
-        message: error.message,
-      });
-    },
-  });
-
-  const postMessageWithNewEventMutation = useMutation({
-    mutationFn: (message: Message) =>
-      apiDev.post('cs-post-message-with-new-event', {
-        id: message.id ?? '',
         event: message.event ?? '',
         authorTimestamp: message.authorTimestamp ?? '',
       }),
@@ -567,30 +548,8 @@ const Chat: FC<ChatProps> = ({
       forwardedToCsa: chat.forwardedToCsa ?? '',
     };
 
-    const previousPermissionMessage = messagesList.find(
-      (e) => e.event === CHAT_EVENTS.ASK_PERMISSION
-    );
-
-    if (previousPermissionMessage?.id === undefined) {
-      getMessages();
-    }
-
-    if (previousPermissionMessage !== undefined) {
-      const responseMessage: Message = {
-        ...newMessage,
-        id: previousPermissionMessage.id,
-        event: CHAT_EVENTS.ASK_PERMISSION_IGNORED,
-        authorTimestamp: new Date().toISOString(),
-        authorRole: AUTHOR_ROLES.BACKOFFICE_USER,
-      };
-      postMessageWithNewEventMutation.mutate(responseMessage);
-    } else {
-      postEventMutation.mutate(newMessage);
-      setMessagesList((oldMessages) => [...oldMessages, newMessage]);
-    }
-    console.log(
-      messagesList.find((e) => e.event === CHAT_EVENTS.ASK_PERMISSION)
-    );
+    postEventMutation.mutate(newMessage);
+    setMessagesList((oldMessages) => [...oldMessages, newMessage]);
   };
 
   const getCsaName = (message: Message) => {
@@ -763,10 +722,10 @@ const Chat: FC<ChatProps> = ({
             </Button>
             <Button
               appearance="secondary"
-              // disabled={
-              //   chat.customerSupportId != userInfo?.idCode ||
-              //   (latestPermissionMessage <= 60 && latestPermissionMessage != 0)
-              // }
+              disabled={
+                chat.customerSupportId != userInfo?.idCode ||
+                (latestPermissionMessage <= 60 && latestPermissionMessage != 0)
+              }
               onClick={() => handleChatEvent(CHAT_EVENTS.ASK_PERMISSION)}
             >
               {t('chat.active.askPermission')}
