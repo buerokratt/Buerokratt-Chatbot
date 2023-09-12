@@ -1,4 +1,8 @@
+WITH active_chats as (
 SELECT c.base_id AS id,
+       last_content_message.chat_base_id as base_id,
+       c.feedback_text as feedback_text,
+       c.feedback_rating as feedback_rating,
        c.customer_support_id,
        c.customer_support_display_name,
        (CASE
@@ -84,4 +88,14 @@ JOIN
           AND content <> ''
           AND content <> 'message-read'
         GROUP BY chat_base_id)) AS last_content_message ON c.base_id = last_content_message.chat_base_id
-ORDER BY created;
+ORDER BY created
+)
+INSERT INTO chat(base_id, customer_support_id, customer_support_display_name, end_user_id, end_user_first_name,
+                 end_user_last_name, status, created, ended, end_user_email, end_user_phone, end_user_os, end_user_url, feedback_text, feedback_rating,
+                 external_id, forwarded_to, forwarded_to_name, received_from, received_from_name, csa_title)
+SELECT base_id, '', '', end_user_id, end_user_first_name,
+       end_user_last_name, status, created, ended, end_user_email,
+       end_user_phone, end_user_os, end_user_url, feedback_text, feedback_rating,
+       external_id, forwarded_to, forwarded_to_name, received_from, received_from_name, ''
+FROM active_chats
+WHERE customer_support_id = :userId;

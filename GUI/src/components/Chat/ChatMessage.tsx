@@ -47,7 +47,7 @@ const ChatMessage: FC<ChatMessageProps> = ({
           dateTime={message.authorTimestamp}
           className="active-chat__message-date"
         >
-          {format(new Date(message.authorTimestamp), 'hh:mm:ss')}
+          {format(new Date(message.authorTimestamp), 'HH:mm:ss')}
         </time>
         {selected && (
           <div className="active-chat__selection-icon">
@@ -60,7 +60,7 @@ const ChatMessage: FC<ChatMessageProps> = ({
           {t('global.read')}
           <time dateTime={message.authorTimestamp}>
             {' '}
-            {format(new Date(message.authorTimestamp), 'hh:mm:ss')}
+            {format(new Date(message.authorTimestamp), 'HH:mm:ss')}
           </time>
         </span>
       ) : null}{' '}

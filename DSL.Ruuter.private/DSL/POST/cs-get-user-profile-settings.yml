@@ -1,7 +1,7 @@
 extractRequestData:
   assign:
     cookie: ${incoming.headers.cookie}
-    userId: ${incoming.params.userId}
+    userId: ${incoming.body.userId}
 
 extractTokenData:
   call: http.post
@@ -34,21 +34,11 @@ getUserSettings:
 validateUserSettingsResultExists:
   switch:
     - condition: "${getUserSettingsResult.response.body.length > 0}"
-      next: mapUserSettingsData
+      next: returnSuccess
   next: returnNotFound
 
-mapUserSettingsData:
-  call: http.post
-  args:
-    # TODO: replace with env variable
-    url: http://dmapper:3000/json/v2/return_user_profile_settings
-    body:
-      settingsArray: ${getUserSettingsResult.response.body}
-  result: userSettingsData
-  next: returnSuccess
-
 returnSuccess:
-  return: ${userSettingsData.response.body}
+  return: ${getUserSettingsResult.response.body}
   next: end
 
 returnUnauthorized:

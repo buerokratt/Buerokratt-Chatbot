@@ -1,0 +1,26 @@
+{
+  "action_type": "BLOGIC",
+  "destination": [
+    {
+      "unassign_all_claimed_chats": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{resql_url}/update-chats-assignee-by-user-id",
+          "post_body_struct": {
+            "userId": "{#.userId}"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    }
+  ]
+}

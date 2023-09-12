@@ -210,7 +210,11 @@ const ChatUnanswered: FC = () => {
         style={{ overflow: 'auto' }}
       >
         <div className="vertical-tabs__group-header">
-          <p>{t('chat.unansweredChats')}</p>
+          <p>{`${t('chat.unansweredChats')} ${
+            (unansweredChats?.myChats?.length ?? 0) == 0
+              ? ''
+              : `(${unansweredChats?.myChats?.length ?? 0})`
+          }`}</p>
         </div>
         {unansweredChats?.myChats?.map((chat) => (
           <Tabs.Trigger
@@ -218,38 +222,14 @@ const ChatUnanswered: FC = () => {
             className={clsx('vertical-tabs__trigger', {
               active:
                 chat.status === CHAT_STATUS.REDIRECTED &&
-                chat.customerSupportId === userInfo?.idCode && chat.lastMessageEvent === 'redirected'
+                chat.customerSupportId === userInfo?.idCode &&
+                chat.lastMessageEvent === 'redirected',
             })}
             value={chat.id}
             style={{ borderBottom: '1px solid #D2D3D8' }}
           >
             <ChatTrigger chat={chat} />
           </Tabs.Trigger>
-        ))}
-        {unansweredChats?.otherChats?.map(({ name, chats }) => (
-          <div key={uuidv4()}>
-            {name && (
-              <div className="vertical-tabs__sub-group-header">
-                <p>{name}</p>
-              </div>
-            )}
-            <Track align="stretch" direction="vertical" justify="between">
-              {chats.map((chat, i) => (
-                <Tabs.Trigger
-                  key={chat.id + i}
-                  className={clsx('vertical-tabs__trigger', {
-                    active:
-                      chat.status === CHAT_STATUS.REDIRECTED &&
-                      chat.customerSupportId === userInfo?.idCode && chat.lastMessageEvent === 'redirected'
-                  })}
-                  value={chat.id}
-                  style={{ borderBottom: '1px solid #D2D3D8' }}
-                >
-                  <ChatTrigger chat={chat} />
-                </Tabs.Trigger>
-              ))}
-            </Track>
-          </div>
         ))}
       </Tabs.List>
 

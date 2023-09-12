@@ -2,6 +2,7 @@ import { FC } from 'react';
 import { format } from 'date-fns';
 
 import { Message } from 'types/message';
+import Linkifier from 'components/Chat/linkifier';
 
 type ChatMessageProps = {
   message: Message;
@@ -15,13 +16,13 @@ const ChatMessage: FC<ChatMessageProps> = ({ message, onMessageClick }) => {
         className="historical-chat__message-text"
         onClick={onMessageClick ? () => onMessageClick(message) : undefined}
       >
-        {message.content}
+        <Linkifier message={decodeURIComponent(message.content ?? '')} />
       </div>
       <time
         dateTime={message.authorTimestamp}
         className="historical-chat__message-date"
       >
-        {format(new Date(message.authorTimestamp), 'hh:mm:ss')}
+        {format(new Date(message.authorTimestamp), 'HH:mm:ss')}
       </time>
     </div>
   );

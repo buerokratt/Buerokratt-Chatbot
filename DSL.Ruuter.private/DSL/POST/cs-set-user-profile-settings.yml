@@ -46,7 +46,7 @@ setUserSettingValue:
   result: returnSuccess
 
 returnSuccess:
-  return: ${forwardedChatPopupNotifications}
+  return: ${returnSuccess.response.body}
   next: end
 
 returnInvalidBody:
