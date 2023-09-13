@@ -24,6 +24,7 @@ import apiDevV2 from 'services/api-dev-v2';
 import { v4 as uuidv4 } from 'uuid';
 import { useLocation } from 'react-router-dom';
 import CsaActivityContext from 'providers/CsaActivityContext';
+import sse from 'services/sse-service';
 
 const CSAchatStatuses = [
   CHAT_EVENTS.ACCEPTED,
@@ -72,6 +73,23 @@ const ChatActive: FC = () => {
       }
     },
   });
+
+  useEffect(() => {
+    const sseInstance = sse(`cs-get-all-active-chats`);
+    sseInstance.onMessage((chats: any) => {
+      const isChatStillExists = chats.filter(function (e: any) {
+        return e.id === selectedChatId;
+      });
+      if (isChatStillExists.length === 0 && activeChatsList.length > 0) {
+        setTimeout(function () {
+          setActiveChatsList(chats);
+        }, 3000);
+      } else {
+        setActiveChatsList(chats);
+      }
+    });
+    return () => sseInstance.close();
+  }, []);
 
   useEffect(() => {
     refetch();
