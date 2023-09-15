@@ -150,6 +150,15 @@ const Chat: FC<ChatProps> = ({
       );
 
       setLatestPermissionMessage(lastPermissionMesageSecondsDiff ?? 0);
+
+      const permissionsHandeledMessages: Message[] = messages.filter(
+        (e: Message) =>
+          e.event === 'ask-permission-accepted' ||
+          e.event === 'ask-permission-rejected'
+      );
+      if (permissionsHandeledMessages.length > 0) {
+        getMessages();
+      }
     });
     return () => sseInstance.close();
   }, [messagesList]);
@@ -560,7 +569,7 @@ const Chat: FC<ChatProps> = ({
           <Track direction="vertical" gap={8} align="left">
             <p style={{ fontSize: 14, lineHeight: '1.5', color: '#4D4F5D' }}>
               {t('chat.active.startedAt', {
-                date: format(new Date(chat.created), 'dd. MMMM Y hh:mm:ss', {
+                date: format(new Date(chat.created), 'dd. MMMM Y HH:mm:ss', {
                   locale: et,
                 }),
               })}
@@ -661,7 +670,8 @@ const Chat: FC<ChatProps> = ({
         )}
 
         {(chat.customerSupportId === '' ||
-          chat.customerSupportId !== userInfo?.idCode) &&
+          (chat.customerSupportId !== userInfo?.idCode &&
+            userInfo?.authorities.includes('ROLE_ADMINISTRATOR'))) &&
           chatCsaActive === true && (
             <div className="active-chat__toolbar">
               <Track justify="center">
@@ -844,7 +854,7 @@ const Chat: FC<ChatProps> = ({
               <strong>{t('chat.startedAt')}</strong>
             </p>
             <p>
-              {format(new Date(chat.created), 'dd. MMMM Y hh:mm:ss', {
+              {format(new Date(chat.created), 'dd. MMMM Y HH:mm:ss', {
                 locale: et,
               }).toLowerCase()}
             </p>

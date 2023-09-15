@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Track } from 'components';
 import { Chat as ChatType } from 'types/chat';
@@ -7,6 +7,29 @@ import './ChatActive.scss';
 
 const ChatTrigger: FC<{ chat: ChatType }> = ({ chat }) => {
   const { t } = useTranslation();
+  const [timeStamp, setTimeStamp] = useState<string>(
+    format(chat.lastMessageTimestamp ?? '' ?? new Date().toISOString, 'et_EE')
+  );
+
+  const timeStampRef = useRef<string>(timeStamp);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      const currentTimestamp = format(
+        chat.lastMessageTimestamp ?? '' ?? new Date().toISOString(),
+        'et_EE'
+      );
+
+      if (timeStampRef.current !== currentTimestamp) {
+        setTimeStamp(currentTimestamp);
+        timeStampRef.current = currentTimestamp;
+      }
+    }, 1000);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [chat.lastMessageTimestamp]);
 
   const name =
     chat.endUserFirstName !== '' && chat.endUserLastName !== ''
@@ -19,17 +42,12 @@ const ChatTrigger: FC<{ chat: ChatType }> = ({ chat }) => {
         <p>
           <strong>{name}</strong>
         </p>
-        {chat.lastMessageTimestamp && (
-          <p>
-            {format(
-              chat.lastMessageTimestamp ?? new Date().toISOString,
-              'et_EE'
-            )}
-          </p>
-        )}
+        {chat.lastMessageTimestamp && <p>{timeStamp}</p>}
       </Track>
       <div className="wrapper">
-        <p className="last_message">{chat.lastMessage}.</p>
+        <p className="last_message">
+          {decodeURIComponent(`${chat.lastMessage}.` ?? '')}
+        </p>
       </div>
     </div>
   );

@@ -213,6 +213,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
               <div className="multiSelect__wrapper">
                 <Select
                   name={name}
+                  maxMenuHeight={165}
                   ref={ref}
                   onBlur={onBlur}
                   required={true}
@@ -247,15 +248,9 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
         )}
 
         <FormInput
-          {...register('csaTitle', { required: requiredText })}
+          {...register('csaTitle')}
           label={t('settings.users.userTitle')}
         />
-
-        {errors.csaTitle && (
-          <span style={{ color: '#f00', marginTop: '-1rem' }}>
-            {errors.csaTitle.message}
-          </span>
-        )}
 
         <FormInput
           {...register('csaEmail', {

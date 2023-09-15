@@ -27,8 +27,10 @@ import './Header.scss';
 import chatSound from '../../assets/chatSound.mp3';
 import { Subscription, interval } from 'rxjs';
 import { AUTHORITY } from 'types/authorities';
-import { useCookies } from 'react-cookie';
+import { Cookies, useCookies } from 'react-cookie';
 import CsaActivityContext from 'providers/CsaActivityContext';
+import Alert from '../Alert';
+import { format } from 'date-fns';
 
 type CustomerSupportActivity = {
   idCode: string;
@@ -63,12 +65,13 @@ const Header: FC = () => {
   const [csaStatus, setCsaStatus] = useState<'idle' | 'offline' | 'online'>(
     'online'
   );
+  const [showSessionExpireAlert, setShowSessionExpireAlert] = useState(false);
   const audio = useMemo(() => new Audio(chatSound), []);
   const { chatCsaActive, setChatCsaActive } = useContext(CsaActivityContext);
   const [userProfileSettings, setUserProfileSettings] =
     useState<UserProfileSettings>({
       userId: 1,
-      forwardedChatPopupNotifications: false,
+      forwardedChatPopupNotifications: true,
       forwardedChatSoundNotifications: true,
       forwardedChatEmailNotifications: false,
       newChatPopupNotifications: false,
@@ -76,19 +79,40 @@ const Header: FC = () => {
       newChatEmailNotifications: false,
       useAutocorrect: true,
     });
+  const customJwtCookieKey = 'customJwtCookie';
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const expirationTimeStamp = localStorage.getItem('exp');
+      if (
+        expirationTimeStamp !== 'null' &&
+        expirationTimeStamp !== null &&
+        expirationTimeStamp !== undefined
+      ) {
+        const expirationDate = new Date(parseInt(expirationTimeStamp) ?? '');
+        const currentDate = new Date(Date.now());
+        if (expirationDate < currentDate) {
+          if (showSessionExpireAlert === false) {
+            setShowSessionExpireAlert(true);
+          }
+        } else {
+        }
+      }
+    }, 2000);
+    return () => clearInterval(interval);
+  }, [userInfo]);
 
   useEffect(() => {
     getMessages();
-  }, []);
+  }, [userInfo?.idCode]);
 
   const getMessages = async () => {
-    const { data: res } = await apiDevV2.get('cs-get-user-profile-settings', {
-      params: {
-        // TODO: Use actual id from userInfo once it starts using real data
-        userId: 1,
-      },
+    const { data: res } = await apiDevV2.post('cs-get-user-profile-settings', {
+      userId: userInfo?.idCode ?? '',
     });
-    if (res.response) setUserProfileSettings(res.response);
+
+    if (res.response && res.response != 'error: not found')
+      setUserProfileSettings(res.response[0]);
   };
   const { data: customerSupportActivity } = useQuery<CustomerSupportActivity>({
     queryKey: ['cs-get-customer-support-activity', 'prod'],
@@ -106,7 +130,6 @@ const Header: FC = () => {
       setActiveChatsList(res.data.get_all_active_chats);
     },
   });
-  const customJwtCookieKey = 'customJwtCookie';
   const [_, setCookie] = useCookies([customJwtCookieKey]);
 
   const unansweredChats = useMemo(
@@ -190,7 +213,16 @@ const Header: FC = () => {
 
   const userProfileSettingsMutation = useMutation({
     mutationFn: async (data: UserProfileSettings) => {
-      await apiDevV2.post('cs-set-user-profile-settings', data);
+      await apiDevV2.post('cs-set-user-profile-settings', {
+        userId: userInfo?.idCode ?? '',
+        forwardedChatPopupNotifications: data.forwardedChatPopupNotifications,
+        forwardedChatSoundNotifications: data.forwardedChatSoundNotifications,
+        forwardedChatEmailNotifications: data.newChatEmailNotifications,
+        newChatPopupNotifications: data.newChatPopupNotifications,
+        newChatSoundNotifications: data.newChatSoundNotifications,
+        newChatEmailNotifications: data.newChatEmailNotifications,
+        useAutocorrect: data.useAutocorrect,
+      });
       setUserProfileSettings(data);
     },
     onError: async (error: AxiosError) => {
@@ -199,6 +231,14 @@ const Header: FC = () => {
         type: 'error',
         title: t('global.notificationError'),
         message: error.message,
+      });
+    },
+  });
+
+  const unClaimAllAssignedChats = useMutation({
+    mutationFn: async () => {
+      await apiDev.post('cs-unclaim-all-assigned-chats', {
+        userId: userInfo?.idCode ?? '',
       });
     },
   });
@@ -239,9 +279,7 @@ const Header: FC = () => {
       if (data.custom_jwt_extend === null) return;
       setNewCookie(data.custom_jwt_extend);
     },
-    onError: (error: AxiosError) => {
-      console.log('E: ', error);
-    },
+    onError: (error: AxiosError) => {},
   });
 
   const logoutMutation = useMutation({
@@ -302,6 +340,8 @@ const Header: FC = () => {
   };
 
   const handleCsaStatusChange = (checked: boolean) => {
+    if (checked === false) unClaimAllAssignedChats.mutate();
+
     setChatCsaActive(checked);
     setCsaStatus(checked === true ? 'online' : 'offline');
     customerSupportActivityMutation.mutate({
@@ -331,12 +371,23 @@ const Header: FC = () => {
     }, 1000);
   };
 
+  function handleCloseAlert(): void {
+    setShowSessionExpireAlert(false);
+    localStorage.removeItem('exp');
+    window.location.href = import.meta.env.REACT_APP_CUSTOMER_SERVICE_LOGIN;
+  }
+
   return (
     <>
       <header className="header">
         <Track justify="between">
           <BykLogo height={50} />
-
+          {showSessionExpireAlert && (
+            <Alert
+              message={t('toast.alert.sessionExpired')}
+              onClose={handleCloseAlert}
+            />
+          )}
           {userInfo && (
             <Track gap={32}>
               <Track gap={16}>
@@ -395,6 +446,7 @@ const Header: FC = () => {
                     customerSupportStatus: 'offline',
                     customerSupportId: userInfo.idCode,
                   });
+                  localStorage.removeItem('exp');
                   logoutMutation.mutate();
                 }}
               >

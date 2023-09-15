@@ -24,6 +24,7 @@ import clsx from 'clsx';
 import { v4 as uuidv4 } from 'uuid';
 import ForwardToColleaugeModal from '../ForwardToColleaugeModal';
 import ForwardToEstablishmentModal from '../ForwardToEstablishmentModal';
+import sse from 'services/sse-service';
 
 const ChatUnanswered: FC = () => {
   const { t } = useTranslation();
@@ -56,6 +57,23 @@ const ChatUnanswered: FC = () => {
       setActiveChatsList(res.data.get_all_active_chats);
     },
   });
+
+  useEffect(() => {
+    const sseInstance = sse(`cs-get-all-active-chats`);
+    sseInstance.onMessage((chats: any) => {
+      const isChatStillExists = chats.filter(function (e: any) {
+        return e.id === selectedChatId;
+      });
+      if (isChatStillExists.length === 0 && activeChatsList.length > 0) {
+        setTimeout(function () {
+          setActiveChatsList(chats);
+        }, 3000);
+      } else {
+        setActiveChatsList(chats);
+      }
+    });
+    return () => sseInstance.close();
+  }, []);
 
   useEffect(() => {
     refetch();
@@ -210,7 +228,11 @@ const ChatUnanswered: FC = () => {
         style={{ overflow: 'auto' }}
       >
         <div className="vertical-tabs__group-header">
-          <p>{t('chat.unansweredChats')}</p>
+          <p>{`${t('chat.unansweredChats')} ${
+            (unansweredChats?.myChats?.length ?? 0) == 0
+              ? ''
+              : `(${unansweredChats?.myChats?.length ?? 0})`
+          }`}</p>
         </div>
         {unansweredChats?.myChats?.map((chat) => (
           <Tabs.Trigger
@@ -218,38 +240,14 @@ const ChatUnanswered: FC = () => {
             className={clsx('vertical-tabs__trigger', {
               active:
                 chat.status === CHAT_STATUS.REDIRECTED &&
-                chat.customerSupportId === userInfo?.idCode && chat.lastMessageEvent === 'redirected'
+                chat.customerSupportId === userInfo?.idCode &&
+                chat.lastMessageEvent === 'redirected',
             })}
             value={chat.id}
             style={{ borderBottom: '1px solid #D2D3D8' }}
           >
             <ChatTrigger chat={chat} />
           </Tabs.Trigger>
-        ))}
-        {unansweredChats?.otherChats?.map(({ name, chats }) => (
-          <div key={uuidv4()}>
-            {name && (
-              <div className="vertical-tabs__sub-group-header">
-                <p>{name}</p>
-              </div>
-            )}
-            <Track align="stretch" direction="vertical" justify="between">
-              {chats.map((chat, i) => (
-                <Tabs.Trigger
-                  key={chat.id + i}
-                  className={clsx('vertical-tabs__trigger', {
-                    active:
-                      chat.status === CHAT_STATUS.REDIRECTED &&
-                      chat.customerSupportId === userInfo?.idCode && chat.lastMessageEvent === 'redirected'
-                  })}
-                  value={chat.id}
-                  style={{ borderBottom: '1px solid #D2D3D8' }}
-                >
-                  <ChatTrigger chat={chat} />
-                </Tabs.Trigger>
-              ))}
-            </Track>
-          </div>
         ))}
       </Tabs.List>
 

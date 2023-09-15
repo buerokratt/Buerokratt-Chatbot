@@ -172,6 +172,30 @@
           }
         }
       }
+    },
+    {
+      "set_user_profile_settings": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{resql_url}/set-user-profile-settings",
+          "post_body_struct": {
+            "userId": "{#.reflect_input#.userIdCode}",
+            "forwardedChatPopupNotifications": false,
+            "forwardedChatSoundNotifications": true,
+            "forwardedChatEmailNotifications": false,
+            "newChatPopupNotifications": false,
+            "newChatSoundNotifications": true,
+            "newChatEmailNotifications": false,
+            "useAutocorrect": true
+          }
+        }
+      }
     }
   ]
 }

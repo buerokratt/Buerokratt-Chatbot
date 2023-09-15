@@ -149,6 +149,36 @@
       "nps": "NPS",
       "forwarded": "Suunatud"
     },
+    "plainEvents": {
+      "answered": "Vastatud",
+      "terminated": "Lõpetatud",
+      "sent_to_csa_email": "Vestlus saadetud klienditeenindaja e-mailile",
+      "client-left": "Klient lahkus",
+      "client_left_with_accepted": "Klient lahkus aktsepteeritud vastusega",
+      "client_left_with_no_resolution": "Klient lahkus vastuseta",
+      "client_left_for_unknown_reasons": "Klient lahkus määramata põhjustel",
+      "accepted": "Aktsepteeritud",
+      "hate_speech": "Vihakõne",
+      "other": "Muud põhjused",
+      "response_sent_to_client_email": "Kliendile vastati tema jäetud kontaktile",
+      "greeting": "Tervitus",
+      "requested-authentication": "Küsiti autentimist",
+      "authentication_successful": "Autoriseerimine oli edukas",
+      "authentication_failed": "Autoriseerimine ei olnud edukas",
+      "ask-permission": "Küsiti nõusolekut",
+      "ask-permission-accepted": "Nõusolek aktsepteeritud",
+      "ask-permission-rejected": "Nõusolek tagasi lükatud",
+      "ask-permission-ignored": "Nõusolek ignoreeritud",
+      "rating": "Hinnang",
+      "contact-information": "Küsiti kontakti infot",
+      "contact-information-rejected": "Kontakti info tagasi lükatud",
+      "contact-information-fulfilled": "Kontakti info täidetud",
+      "requested-chat-forward": "Küsiti vestluse suunamist",
+      "requested-chat-forward-accepted": "Vestluse suunamine aktsepteeritud",
+      "requested-chat-forward-rejected": "Vestluse suunamine tagasi lükatud",
+      "inactive-chat-ended": "Lõpetatud tegevusetuse tõttu",
+      "message-read": "Loetud"
+    },
     "events": {
       "answered": "Vastatud {{date}}",
       "terminated": "Lõpetatud {{date}}",
@@ -289,6 +319,9 @@
       "userDeleted": "Kasutaja kustutatud",
       "newUserAdded": "Uus kasutaja lisatud",
       "userUpdated": "Kasutaja uuendatud"
+    },
+    "alert": {
+      "sessionExpired": "Seanss aegunud"
     }
   }
 }

@@ -29,8 +29,13 @@ const App: FC = () => {
     data: { custom_jwt_userinfo: UserInfo };
   }>({
     queryKey: ['cs-custom-jwt-userinfo', 'prod'],
-    onSuccess: (data: { data: { custom_jwt_userinfo: UserInfo } }) =>
-      store.setUserInfo(data.data.custom_jwt_userinfo),
+    onSuccess: (data: { data: { custom_jwt_userinfo: UserInfo } }) => {
+      localStorage.setItem(
+        'exp',
+        data.data.custom_jwt_userinfo.JWTExpirationTimestamp
+      );
+      return store.setUserInfo(data.data.custom_jwt_userinfo);
+    },
   });
 
   return (

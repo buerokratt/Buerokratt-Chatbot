@@ -1,4 +1,4 @@
-import { FC, useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { createColumnHelper, PaginationState } from '@tanstack/react-table';
@@ -57,10 +57,11 @@ const ChatHistory: FC = () => {
     ChatType[]
   >([]);
   const [chatMessagesList, setchatMessagesList] = useState<Message[]>([]);
+  const [messagesTrigger, setMessagesTrigger] = useState(false);
   const [selectedColumns, setSelectedColumns] = useState<string[]>(
     preferences ?? []
   );
-  const { control } = useForm<{
+  const { control, watch } = useForm<{
     startDate: Date | string;
     endDate: Date | string;
   }>({
@@ -78,11 +79,25 @@ const ChatHistory: FC = () => {
     },
   });
 
-  useQuery<ChatType[]>({
-    queryKey: ['cs-get-all-ended-chats', 'prod'],
-    onSuccess(res: any) {
-      setEndedChatsList(res.data.cs_get_all_ended_chats ?? []);
-      filterChatsList(res.data.cs_get_all_ended_chats ?? []);
+  const startDate = watch('startDate');
+  const endDate = watch('endDate');
+
+  useEffect(() => {
+    getAllEndedChats.mutate({
+      startDate: format(new Date(startDate), 'yyyy-MM-dd'),
+      endDate: format(new Date(endDate), 'yyyy-MM-dd'),
+    });
+  }, []);
+
+  const getAllEndedChats = useMutation({
+    mutationFn: (data: { startDate: string; endDate: string }) =>
+      apiDev.post('cs-get-all-ended-chats', {
+        startDate: data.startDate,
+        endDate: data.endDate,
+      }),
+    onSuccess: (res: any) => {
+      setEndedChatsList(res.data.data.cs_get_all_ended_chats ?? []);
+      filterChatsList(res.data.data.cs_get_all_ended_chats ?? []);
     },
   });
 
@@ -152,15 +167,19 @@ const ChatHistory: FC = () => {
       const changeableTo = [
         CHAT_EVENTS.CLIENT_LEFT_WITH_ACCEPTED.toUpperCase(),
         CHAT_EVENTS.CLIENT_LEFT_WITH_NO_RESOLUTION.toUpperCase(),
+        CHAT_EVENTS.ACCEPTED.toUpperCase(),
+        CHAT_EVENTS.ANSWERED.toUpperCase(),
+        CHAT_EVENTS.CLIENT_LEFT_FOR_UNKNOWN_REASONS.toUpperCase(),
+        CHAT_EVENTS.CLIENT_LEFT.toUpperCase(),
+        CHAT_EVENTS.HATE_SPEECH.toUpperCase(),
+        CHAT_EVENTS.OTHER.toUpperCase(),
+        CHAT_EVENTS.TERMINATED.toUpperCase(),
+        CHAT_EVENTS.RESPONSE_SENT_TO_CLIENT_EMAIL.toUpperCase(),
       ];
       const isChangeable = changeableTo.includes(data.event);
 
       if (selectedChat?.lastMessageEvent === data.event.toLowerCase()) return;
-      if (
-        selectedChat?.lastMessageEvent !==
-        CHAT_EVENTS.CLIENT_LEFT_FOR_UNKNOWN_REASONS
-      )
-        return;
+
       if (!isChangeable) return;
 
       await apiDev.post('cs-end-chat', {
@@ -173,6 +192,11 @@ const ChatHistory: FC = () => {
       });
     },
     onSuccess: () => {
+      setMessagesTrigger(!messagesTrigger);
+      getAllEndedChats.mutate({
+        startDate: format(new Date(startDate), 'yyyy-MM-dd'),
+        endDate: format(new Date(endDate), 'yyyy-MM-dd'),
+      });
       toast.open({
         type: 'success',
         title: t('global.notification'),
@@ -232,13 +256,13 @@ const ChatHistory: FC = () => {
         id: 'created',
         header: t('chat.history.startTime') || '',
         cell: (props) =>
-          format(new Date(props.getValue()), 'd. MMM yyyy hh:mm:ss'),
+          format(new Date(props.getValue()), 'd. MMM yyyy HH:mm:ss'),
       }),
       columnHelper.accessor('ended', {
         id: 'ended',
         header: t('chat.history.endTime') || '',
         cell: (props) =>
-          format(new Date(props.getValue()), 'd. MMM yyyy hh:mm:ss'),
+          format(new Date(props.getValue()), 'd. MMM yyyy HH:mm:ss'),
       }),
       columnHelper.accessor('customerSupportDisplayName', {
         id: 'customerSupportDisplayName',
@@ -287,7 +311,15 @@ const ChatHistory: FC = () => {
         id: 'status',
         header: t('global.status') || '',
         cell: (props) =>
-          props.getValue() === CHAT_STATUS.ENDED ? t('chat.status.ended') : '',
+          props.getValue() === CHAT_STATUS.ENDED
+            ? props.row.original.lastMessageEvent != null &&
+              props.row.original.lastMessageEvent !== 'message-read'
+              ? t(
+                  'chat.plainEvents.' + props.row.original.lastMessageEvent ??
+                    ''
+                )
+              : t('chat.status.ended')
+            : '',
       }),
       columnHelper.accessor('id', {
         id: 'id',
@@ -402,7 +434,10 @@ const ChatHistory: FC = () => {
                       value={field.value ?? new Date()}
                       onChange={(v) => {
                         field.onChange(v);
-                        filterChatsList(endedChatsList);
+                        getAllEndedChats.mutate({
+                          startDate: format(new Date(v), 'yyyy-MM-dd'),
+                          endDate: format(new Date(endDate), 'yyyy-MM-dd'),
+                        });
                       }}
                     />
                   );
@@ -422,7 +457,10 @@ const ChatHistory: FC = () => {
                       value={field.value ?? new Date()}
                       onChange={(v) => {
                         field.onChange(v);
-                        filterChatsList(endedChatsList);
+                        getAllEndedChats.mutate({
+                          startDate: format(new Date(startDate), 'yyyy-MM-dd'),
+                          endDate: format(new Date(v), 'yyyy-MM-dd'),
+                        });
                       }}
                     />
                   );
@@ -468,6 +506,7 @@ const ChatHistory: FC = () => {
         >
           <HistoricalChat
             chat={selectedChat}
+            trigger={messagesTrigger}
             onChatStatusChange={setStatusChangeModal}
             onCommentChange={handleCommentChange}
           />

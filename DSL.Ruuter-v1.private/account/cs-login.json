@@ -81,6 +81,32 @@
           "nok": "stop"
         }
       }
+    },
+    {
+      "set_customer_support_agent_away": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "cookies": ["customJwtCookie"],
+          "method": "post",
+          "endpoint": "{resql_url}/set-customer-support-status",
+          "post_body_parameters": {},
+          "post_body_struct": {
+            "active": false,
+            "userIdCode": "{#.cs_login[0]#.login}",
+            "created": "$_getInstant()",
+            "status": "offline"
+          },
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        }
+      }
     }
   ]
 }

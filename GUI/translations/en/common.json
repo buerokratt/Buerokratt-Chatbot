@@ -149,6 +149,36 @@
       "nps": "NPS",
       "forwarded": "Forwarded"
     },
+    "plainEvents": {
+      "answered": "Answered",
+      "terminated": "Terminated",
+      "sent_to_csa_email": "Chat sent to CSA email",
+      "client-left": "Client left",
+      "client_left_with_accepted": "Client left with accepted response",
+      "client_left_with_no_resolution": "Client left with no resolution",
+      "client_left_for_unknown_reasons": "Client left for unknown reason",
+      "accepted": "Accepted response",
+      "hate_speech": "Hate speech",
+      "other": "Other reasons",
+      "response_sent_to_client_email": "Response was sent to client email",
+      "greeting": "Greetings",
+      "requested-authentication": "Requested authentication",
+      "authentication_successful": "Authentication successful",
+      "authentication_failed": "Authentication failed",
+      "ask-permission": "Asked permission",
+      "ask-permission-accepted": "Permission accepted",
+      "ask-permission-rejected": "Permission rejected",
+      "ask-permission-ignored": "Permission ignored",
+      "rating": "Rating",
+      "contact-information": "Requested contact information",
+      "contact-information-rejected": "Contact information rejected",
+      "contact-information-fulfilled": "Contact information fulfilled",
+      "requested-chat-forward": "Requested chat forward",
+      "requested-chat-forward-accepted": "Requested chat forward accepted",
+      "requested-chat-forward-rejected": "Requested chat forward rejected",
+      "inactive-chat-ended": "Ended cue to inactivity",
+      "message-read": "Read"
+    },
     "events": {
       "answered": "Answered {{date}}",
       "terminated": "Terminated {{date}}",
@@ -289,6 +319,9 @@
       "userDeleted": "User deleted",
       "newUserAdded": "New user added",
       "userUpdated": "User updated"
+    },
+    "alert": {
+      "sessionExpired": "Session Expired"
     }
   }
 }
