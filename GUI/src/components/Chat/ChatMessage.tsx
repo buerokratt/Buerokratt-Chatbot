@@ -6,6 +6,8 @@ import { Message } from '../../types/message';
 import { CHAT_EVENTS, MessageStatus } from '../../types/chat';
 import Linkifier from './linkifier';
 import { useTranslation } from 'react-i18next';
+import Track from 'components/Track';
+import './Typing.scss';
 
 type ChatMessageProps = {
   message: Message;
@@ -31,17 +33,13 @@ const ChatMessage: FC<ChatMessageProps> = ({
         })}
       >
         <div
-          className={clsx(
-            'active-chat__message-text',
-            !!message.preview && 'active-chat__message-preview'
-          )}
+          className={clsx('active-chat__message-text')}
           onClick={() => {
             setSelected(!selected);
             onSelect(message);
           }}
         >
           <Linkifier message={decodeURIComponent(message.content ?? '')} />
-          {!!message.preview && message.preview}
         </div>
         <time
           dateTime={message.authorTimestamp}
