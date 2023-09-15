@@ -24,7 +24,6 @@ import clsx from 'clsx';
 import { v4 as uuidv4 } from 'uuid';
 import ForwardToColleaugeModal from '../ForwardToColleaugeModal';
 import ForwardToEstablishmentModal from '../ForwardToEstablishmentModal';
-import sse from 'services/sse-service';
 
 const ChatUnanswered: FC = () => {
   const { t } = useTranslation();
@@ -57,23 +56,6 @@ const ChatUnanswered: FC = () => {
       setActiveChatsList(res.data.get_all_active_chats);
     },
   });
-
-  useEffect(() => {
-    const sseInstance = sse(`cs-get-all-active-chats`);
-    sseInstance.onMessage((chats: any) => {
-      const isChatStillExists = chats.filter(function (e: any) {
-        return e.id === selectedChatId;
-      });
-      if (isChatStillExists.length === 0 && activeChatsList.length > 0) {
-        setTimeout(function () {
-          setActiveChatsList(chats);
-        }, 3000);
-      } else {
-        setActiveChatsList(chats);
-      }
-    });
-    return () => sseInstance.close();
-  }, []);
 
   useEffect(() => {
     refetch();
