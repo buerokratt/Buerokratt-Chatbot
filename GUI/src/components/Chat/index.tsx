@@ -120,7 +120,6 @@ const Chat: FC<ChatProps> = ({
     );
 
     sseInstance.onMessage((messages: Message[]) => {
-      console.log(messages);
       if (messages.length > 0)
         setPreviewTypingMessage(messages[messages.length - 1]);
       const filteredMessages = messages?.filter((newMessage) => {
