@@ -17,12 +17,7 @@ import { Button, Icon, Label, Track } from 'components';
 import { ReactComponent as BykLogoWhite } from 'assets/logo-white.svg';
 import { Chat as ChatType, MessageStatus, CHAT_EVENTS } from 'types/chat';
 import { useMutation } from '@tanstack/react-query';
-import {
-  Attachment,
-  AttachmentTypes,
-  Message,
-  MessagePreviewSseResponse,
-} from 'types/message';
+import { Attachment, AttachmentTypes, Message } from 'types/message';
 import ChatMessage from './ChatMessage';
 import ChatEvent from '../ChatEvent';
 import { findIndex } from 'lodash';
@@ -44,6 +39,7 @@ import { isStateChangingEventMessage } from 'utils/state-management-utils';
 import { useNavigate } from 'react-router-dom';
 import CsaActivityContext from 'providers/CsaActivityContext';
 import CountdownOverlay from './CountdownOverlay';
+import PreviewMessage from './PreviewMessage';
 
 type ChatProps = {
   chat: ChatType;
@@ -99,6 +95,7 @@ const Chat: FC<ChatProps> = ({
   const navigate = useNavigate();
   const [countPermissionSeconds, setCountPermissionSeconds] = useState(0);
   const [totalPermissionSeconds] = useState(60);
+  const [previewTypingMessage, setPreviewTypingMessage] = useState<Message>();
 
   useEffect(() => {
     getCsaStatus();
@@ -134,24 +131,32 @@ const Chat: FC<ChatProps> = ({
 
   useEffect(() => {
     const sseInstance = sse(
-      `cs-get-new-messages?chatId=${
-        chat.id
-      }&lastRead=${new Date().toISOString()}`
+      `cs-get-new-messages?chatId=${chat.id}&lastRead=${new Date(
+        chat.lastMessageTimestamp ?? ''
+      ).toISOString()}`
     );
 
     sseInstance.onMessage((messages: Message[]) => {
-      const newDisplayableMessages = messages.filter(
+      if (messages.length > 0)
+        setPreviewTypingMessage(messages[messages.length - 1]);
+      const filteredMessages = messages?.filter((newMessage) => {
+        return !messagesList.some(
+          (existingMessage) => existingMessage.id === newMessage.id
+        );
+      });
+
+      const newDisplayableMessages = filteredMessages?.filter(
         (msg) => msg.authorId != userInfo?.idCode
       );
 
-      if (newDisplayableMessages.length > 0) {
+      if (newDisplayableMessages?.length > 0) {
         setMessagesList((oldMessages) => [
           ...oldMessages,
           ...newDisplayableMessages,
         ]);
       }
 
-      const askingPermissionsMessages: Message[] = messagesList.filter(
+      const askingPermissionsMessages: Message[] = messagesList?.filter(
         (e: Message) =>
           e.event === 'ask-permission' ||
           e.event === 'ask-permission-accepted' ||
@@ -169,16 +174,17 @@ const Chat: FC<ChatProps> = ({
 
       setLatestPermissionMessage(lastPermissionMesageSecondsDiff ?? 0);
 
-      const permissionsHandeledMessages: Message[] = messages.filter(
+      const permissionsHandeledMessages: Message[] = filteredMessages?.filter(
         (e: Message) =>
           e.event === 'ask-permission-accepted' ||
           e.event === 'ask-permission-rejected' ||
           e.event === 'ask-permission-ignored'
       );
-      if (permissionsHandeledMessages.length > 0) {
+      if (permissionsHandeledMessages?.length > 0) {
         getMessages();
       }
     });
+
     return () => sseInstance.close();
   }, [messagesList]);
 
@@ -318,11 +324,11 @@ const Chat: FC<ChatProps> = ({
     _setMessageReadStatus(data);
   };
 
-  const setPreviewMessage = (event: MessageEvent<any>) => {
+  const setPreviewMessage = (messages: Message[]) => {
     const PREVIEW_MESSAGE: GroupedMessage = {
       name: endUserFullName,
-      type: event.data.authorRole,
-      messages: event.data as any, // TODO fix types
+      type: messages[0].authorRole ?? '',
+      messages: messages,
     };
     const CURRENT_MESSAGE_GROUPS = messageGroupsRef.current;
     const index = findIndex(
@@ -529,7 +535,7 @@ const Chat: FC<ChatProps> = ({
   useEffect(() => {
     if (!chatRef.current || !messageGroups) return;
     chatRef.current.scrollIntoView({ block: 'end', inline: 'end' });
-  }, [messageGroups]);
+  }, [messageGroups, previewTypingMessage]);
 
   const handleResponseTextSend = () => {
     const newMessage: Message = {
@@ -646,6 +652,25 @@ const Chat: FC<ChatProps> = ({
                 )}
               </div>
             ))}
+          {previewTypingMessage?.preview && (
+            <>
+              <div className={clsx(['active-chat__group'])} key={`group`}>
+                <div className="active-chat__group-initials">
+                  {<BykLogoWhite height={24} />}
+                </div>
+                <div className="active-chat__group-name">{'User Typing'}</div>
+                <div className="active-chat__messages">
+                  <PreviewMessage
+                    message={previewTypingMessage}
+                    readStatus={messageReadStatusRef}
+                    key={`preview-message`}
+                    onSelect={(_) => {}}
+                  />
+                </div>
+              </div>
+            </>
+          )}
+
           <div id="anchor" ref={chatRef}></div>
         </div>
 

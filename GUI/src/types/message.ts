@@ -33,9 +33,8 @@ export interface Message {
   forwardedToCsa: string;
   rating?: string;
   created?: string;
-  updated?: string;
-
   preview?: string;
+  updated?: string;
 }
 
 export interface MessagePreviewSseResponse {

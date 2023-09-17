@@ -61,7 +61,7 @@ const ChatUnanswered: FC = () => {
   useEffect(() => {
     const sseInstance = sse(`cs-get-all-active-chats`);
     sseInstance.onMessage((chats: any) => {
-      const isChatStillExists = chats.filter(function (e: any) {
+      const isChatStillExists = chats?.filter(function (e: any) {
         return e.id === selectedChatId;
       });
       if (isChatStillExists.length === 0 && activeChatsList.length > 0) {
