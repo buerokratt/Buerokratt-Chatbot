@@ -38,8 +38,9 @@ import sse from '../../services/sse-service';
 import { isStateChangingEventMessage } from 'utils/state-management-utils';
 import { useNavigate } from 'react-router-dom';
 import CsaActivityContext from 'providers/CsaActivityContext';
-import CountdownOverlay from './CountdownOverlay';
+import CountdownOverlay from './LoaderOverlay';
 import PreviewMessage from './PreviewMessage';
+import LoaderOverlay from './LoaderOverlay';
 
 type ChatProps = {
   chat: ChatType;
@@ -93,28 +94,12 @@ const Chat: FC<ChatProps> = ({
   const audio = useMemo(() => new Audio(newMessageSound), []);
   let messagesLength = 0;
   const navigate = useNavigate();
-  const [countPermissionSeconds, setCountPermissionSeconds] = useState(0);
-  const [totalPermissionSeconds] = useState(60);
   const [previewTypingMessage, setPreviewTypingMessage] = useState<Message>();
 
   useEffect(() => {
     getCsaStatus();
     getMessages();
   }, []);
-
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (
-      latestPermissionMessage &&
-      latestPermissionMessage < totalPermissionSeconds
-    ) {
-      timer = setInterval(() => {
-        setCountPermissionSeconds((prevSeconds) => prevSeconds + 1);
-      }, 1000);
-    }
-
-    return () => clearInterval(timer);
-  }, [latestPermissionMessage, countPermissionSeconds, totalPermissionSeconds]);
 
   const getCsaStatus = async () => {
     const { data: res } = await apiDev.post(
@@ -141,7 +126,9 @@ const Chat: FC<ChatProps> = ({
         setPreviewTypingMessage(messages[messages.length - 1]);
       const filteredMessages = messages?.filter((newMessage) => {
         return !messagesList.some(
-          (existingMessage) => existingMessage.id === newMessage.id
+          (existingMessage) =>
+            existingMessage.id === newMessage.id &&
+            existingMessage.event === newMessage.event
         );
       });
 
@@ -272,7 +259,29 @@ const Chat: FC<ChatProps> = ({
         event: message.event ?? '',
         authorTimestamp: message.authorTimestamp ?? '',
       }),
-    onSuccess: () => {},
+    onSuccess: () => {
+      getMessages();
+    },
+    onError: (error: AxiosError) => {
+      toast.open({
+        type: 'error',
+        title: t('global.notificationError'),
+        message: error.message,
+      });
+    },
+  });
+
+  const postMessageWithNewEventMutation = useMutation({
+    mutationFn: (message: Message) =>
+      apiDev.post('cs-post-message-with-new-event', {
+        id: message.id ?? '',
+        event: CHAT_EVENTS.ASK_PERMISSION_IGNORED,
+        authorTimestamp: message.authorTimestamp ?? '',
+      }),
+    onSuccess: () => {
+      getMessages();
+      handleChatEvent(CHAT_EVENTS.ASK_PERMISSION);
+    },
     onError: (error: AxiosError) => {
       toast.open({
         type: 'error',
@@ -769,23 +778,32 @@ const Chat: FC<ChatProps> = ({
               <Button
                 appearance="secondary"
                 style={{ width: '100%' }}
-                disabled={
-                  chat.customerSupportId != userInfo?.idCode ||
-                  (latestPermissionMessage <= 60 &&
-                    latestPermissionMessage != 0)
-                }
-                onClick={() => handleChatEvent(CHAT_EVENTS.ASK_PERMISSION)}
+                disabled={chat.customerSupportId != userInfo?.idCode}
+                onClick={() => {
+                  if (
+                    latestPermissionMessage > 60 &&
+                    latestPermissionMessage != 0
+                  ) {
+                    const message: Message | undefined = messagesList.findLast(
+                      (e) => e.event === CHAT_EVENTS.ASK_PERMISSION
+                    );
+                    if (message != undefined) {
+                      postMessageWithNewEventMutation.mutate(message);
+                    } else {
+                      handleChatEvent(CHAT_EVENTS.ASK_PERMISSION);
+                    }
+                  }
+                }}
               >
                 {t('chat.active.askPermission')}
               </Button>
-              {
-                <CountdownOverlay
-                  totalSeconds={totalPermissionSeconds}
-                  currentSeconds={countPermissionSeconds}
+              {latestPermissionMessage <= 60 && (
+                <LoaderOverlay
+                  maxPercent={60}
+                  currentPercent={latestPermissionMessage}
                 />
-              }
+              )}
             </div>
-
             <Button
               appearance="secondary"
               disabled={!chatCsaActive}

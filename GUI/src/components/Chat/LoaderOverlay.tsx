@@ -1,25 +1,25 @@
 import React from 'react';
 
-interface CountdownOverlayProps {
-  totalSeconds: number;
-  currentSeconds: number;
+interface LoaderOverlayProps {
+  maxPercent: number;
+  currentPercent: number;
 }
 
-const CountdownOverlay: React.FC<CountdownOverlayProps> = ({
-  totalSeconds,
-  currentSeconds,
+const LoaderOverlay: React.FC<LoaderOverlayProps> = ({
+  maxPercent,
+  currentPercent,
 }) => {
   const overlayStyle: React.CSSProperties = {
     position: 'absolute',
     top: 0,
     left: 0,
     height: '100%',
-    width: `${(currentSeconds / totalSeconds) * 100}%`,
+    width: `${((maxPercent - currentPercent) / maxPercent) * 100}%`, // Modified: Deduct from the full width
     maxWidth: '100%',
     backgroundColor: 'rgba(211, 211, 211, 0.7)',
     transition: 'width 1s linear',
-    visibility: currentSeconds > 0 ? 'visible' : 'hidden',
-    borderRadius: '30px 0 0 30px',
+    visibility: currentPercent > 0 ? 'visible' : 'hidden',
+    borderRadius: '30px 0px 0px 30px',
   };
 
   return (
@@ -36,4 +36,4 @@ const CountdownOverlay: React.FC<CountdownOverlayProps> = ({
   );
 };
 
-export default CountdownOverlay;
+export default LoaderOverlay;
