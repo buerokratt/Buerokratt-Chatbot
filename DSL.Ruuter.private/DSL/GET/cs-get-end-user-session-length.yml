@@ -24,7 +24,7 @@ getConfigurationValue:
   call: http.post
   args:
     # TODO: replace with env variable
-    url: https://byk-resql:8443/get-configuration
+    url: http://resql:8082/get-configuration
     body:
       key: "end_user_session_length"
   result: getConfigurationValueResult

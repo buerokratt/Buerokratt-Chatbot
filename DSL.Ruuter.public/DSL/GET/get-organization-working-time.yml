@@ -2,7 +2,7 @@ getEmergencyNotice:
   call: http.post
   args:
     # TODO: replace with env variable
-    url: https://byk-resql:8443/get-organization-working-time
+    url: http://resql:8082/get-organization-working-time
   result: getOrganizationWorkingTimeResult
 
 validateOrganizationWorkingTimeExists:
