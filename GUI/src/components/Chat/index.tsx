@@ -43,6 +43,7 @@ import sse from '../../services/sse-service';
 import { isStateChangingEventMessage } from 'utils/state-management-utils';
 import { useNavigate } from 'react-router-dom';
 import CsaActivityContext from 'providers/CsaActivityContext';
+import CountdownOverlay from './CountdownOverlay';
 
 type ChatProps = {
   chat: ChatType;
@@ -96,11 +97,27 @@ const Chat: FC<ChatProps> = ({
   const audio = useMemo(() => new Audio(newMessageSound), []);
   let messagesLength = 0;
   const navigate = useNavigate();
+  const [countPermissionSeconds, setCountPermissionSeconds] = useState(0);
+  const [totalPermissionSeconds] = useState(60);
 
   useEffect(() => {
     getCsaStatus();
     getMessages();
   }, []);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (
+      latestPermissionMessage &&
+      latestPermissionMessage < totalPermissionSeconds
+    ) {
+      timer = setInterval(() => {
+        setCountPermissionSeconds((prevSeconds) => prevSeconds + 1);
+      }, 1000);
+    }
+
+    return () => clearInterval(timer);
+  }, [latestPermissionMessage, countPermissionSeconds, totalPermissionSeconds]);
 
   const getCsaStatus = async () => {
     const { data: res } = await apiDev.post(
@@ -138,7 +155,8 @@ const Chat: FC<ChatProps> = ({
         (e: Message) =>
           e.event === 'ask-permission' ||
           e.event === 'ask-permission-accepted' ||
-          e.event === 'ask-permission-rejected'
+          e.event === 'ask-permission-rejected' ||
+          e.event === 'ask-permission-ignored'
       );
       const lastestPermissionDate = new Date(
         askingPermissionsMessages[askingPermissionsMessages.length - 1]
@@ -154,7 +172,8 @@ const Chat: FC<ChatProps> = ({
       const permissionsHandeledMessages: Message[] = messages.filter(
         (e: Message) =>
           e.event === 'ask-permission-accepted' ||
-          e.event === 'ask-permission-rejected'
+          e.event === 'ask-permission-rejected' ||
+          e.event === 'ask-permission-ignored'
       );
       if (permissionsHandeledMessages.length > 0) {
         getMessages();
@@ -185,7 +204,8 @@ const Chat: FC<ChatProps> = ({
           (e: Message) =>
             e.event === 'ask-permission' ||
             e.event === 'ask-permission-accepted' ||
-            e.event === 'ask-permission-rejected'
+            e.event === 'ask-permission-rejected' ||
+            e.event === 'ask-permission-ignored'
         );
 
     const lastestPermissionDate = new Date(
@@ -720,16 +740,26 @@ const Chat: FC<ChatProps> = ({
             >
               {t('chat.active.askForContact')}
             </Button>
-            <Button
-              appearance="secondary"
-              disabled={
-                chat.customerSupportId != userInfo?.idCode ||
-                (latestPermissionMessage <= 60 && latestPermissionMessage != 0)
+            <div style={{ position: 'relative', display: 'inline-block' }}>
+              <Button
+                appearance="secondary"
+                style={{ width: '100%' }}
+                disabled={
+                  chat.customerSupportId != userInfo?.idCode ||
+                  (latestPermissionMessage <= 60 &&
+                    latestPermissionMessage != 0)
+                }
+                onClick={() => handleChatEvent(CHAT_EVENTS.ASK_PERMISSION)}
+              >
+                {t('chat.active.askPermission')}
+              </Button>
+              {
+                <CountdownOverlay
+                  totalSeconds={totalPermissionSeconds}
+                  currentSeconds={countPermissionSeconds}
+                />
               }
-              onClick={() => handleChatEvent(CHAT_EVENTS.ASK_PERMISSION)}
-            >
-              {t('chat.active.askPermission')}
-            </Button>
+            </div>
 
             <Button
               appearance="secondary"
