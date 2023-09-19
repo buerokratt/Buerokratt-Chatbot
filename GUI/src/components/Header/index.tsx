@@ -27,10 +27,8 @@ import './Header.scss';
 import chatSound from '../../assets/chatSound.mp3';
 import { Subscription, interval } from 'rxjs';
 import { AUTHORITY } from 'types/authorities';
-import { Cookies, useCookies } from 'react-cookie';
+import { useCookies } from 'react-cookie';
 import CsaActivityContext from 'providers/CsaActivityContext';
-import Alert from '../Alert';
-import { format } from 'date-fns';
 
 type CustomerSupportActivity = {
   idCode: string;
@@ -65,7 +63,6 @@ const Header: FC = () => {
   const [csaStatus, setCsaStatus] = useState<'idle' | 'offline' | 'online'>(
     'online'
   );
-  const [showSessionExpireAlert, setShowSessionExpireAlert] = useState(false);
   const audio = useMemo(() => new Audio(chatSound), []);
   const { chatCsaActive, setChatCsaActive } = useContext(CsaActivityContext);
   const [userProfileSettings, setUserProfileSettings] =
@@ -92,9 +89,9 @@ const Header: FC = () => {
         const expirationDate = new Date(parseInt(expirationTimeStamp) ?? '');
         const currentDate = new Date(Date.now());
         if (expirationDate < currentDate) {
-          if (showSessionExpireAlert === false) {
-            setShowSessionExpireAlert(true);
-          }
+          localStorage.removeItem('exp');
+          window.location.href =
+            import.meta.env.REACT_APP_CUSTOMER_SERVICE_LOGIN;
         } else {
         }
       }
@@ -130,6 +127,7 @@ const Header: FC = () => {
       setActiveChatsList(res.data.get_all_active_chats);
     },
   });
+
   const [_, setCookie] = useCookies([customJwtCookieKey]);
 
   const unansweredChats = useMemo(
@@ -371,23 +369,11 @@ const Header: FC = () => {
     }, 1000);
   };
 
-  function handleCloseAlert(): void {
-    setShowSessionExpireAlert(false);
-    localStorage.removeItem('exp');
-    window.location.href = import.meta.env.REACT_APP_CUSTOMER_SERVICE_LOGIN;
-  }
-
   return (
     <>
       <header className="header">
         <Track justify="between">
           <BykLogo height={50} />
-          {showSessionExpireAlert && (
-            <Alert
-              message={t('toast.alert.sessionExpired')}
-              onClose={handleCloseAlert}
-            />
-          )}
           {userInfo && (
             <Track gap={32}>
               <Track gap={16}>
