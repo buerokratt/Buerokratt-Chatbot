@@ -58,6 +58,13 @@ const SettingsWorkingTime: FC = () => {
         'cs-set-organization-working-time',
         data
       ),
+    onSuccess: () => {
+      toast.open({
+        type: 'success',
+        title: t('global.notification'),
+        message: t('toast.success.updateSuccess'),
+      });
+    },
     onError: (error: AxiosError) => {
       toast.open({
         type: 'error',
