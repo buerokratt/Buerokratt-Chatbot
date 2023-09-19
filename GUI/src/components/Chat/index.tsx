@@ -38,7 +38,9 @@ import sse from '../../services/sse-service';
 import { isStateChangingEventMessage } from 'utils/state-management-utils';
 import { useNavigate } from 'react-router-dom';
 import CsaActivityContext from 'providers/CsaActivityContext';
+import CountdownOverlay from './LoaderOverlay';
 import PreviewMessage from './PreviewMessage';
+import LoaderOverlay from './LoaderOverlay';
 
 type ChatProps = {
   chat: ChatType;
@@ -124,7 +126,9 @@ const Chat: FC<ChatProps> = ({
         setPreviewTypingMessage(messages[messages.length - 1]);
       const filteredMessages = messages?.filter((newMessage) => {
         return !messagesList.some(
-          (existingMessage) => existingMessage.id === newMessage.id
+          (existingMessage) =>
+            existingMessage.id === newMessage.id &&
+            existingMessage.event === newMessage.event
         );
       });
 
@@ -143,7 +147,8 @@ const Chat: FC<ChatProps> = ({
         (e: Message) =>
           e.event === 'ask-permission' ||
           e.event === 'ask-permission-accepted' ||
-          e.event === 'ask-permission-rejected'
+          e.event === 'ask-permission-rejected' ||
+          e.event === 'ask-permission-ignored'
       );
       const lastestPermissionDate = new Date(
         askingPermissionsMessages[askingPermissionsMessages.length - 1]
@@ -159,7 +164,8 @@ const Chat: FC<ChatProps> = ({
       const permissionsHandeledMessages: Message[] = filteredMessages?.filter(
         (e: Message) =>
           e.event === 'ask-permission-accepted' ||
-          e.event === 'ask-permission-rejected'
+          e.event === 'ask-permission-rejected' ||
+          e.event === 'ask-permission-ignored'
       );
       if (permissionsHandeledMessages?.length > 0) {
         getMessages();
@@ -191,7 +197,8 @@ const Chat: FC<ChatProps> = ({
           (e: Message) =>
             e.event === 'ask-permission' ||
             e.event === 'ask-permission-accepted' ||
-            e.event === 'ask-permission-rejected'
+            e.event === 'ask-permission-rejected' ||
+            e.event === 'ask-permission-ignored'
         );
 
     const lastestPermissionDate = new Date(
@@ -252,7 +259,29 @@ const Chat: FC<ChatProps> = ({
         event: message.event ?? '',
         authorTimestamp: message.authorTimestamp ?? '',
       }),
-    onSuccess: () => {},
+    onSuccess: () => {
+      getMessages();
+    },
+    onError: (error: AxiosError) => {
+      toast.open({
+        type: 'error',
+        title: t('global.notificationError'),
+        message: error.message,
+      });
+    },
+  });
+
+  const postMessageWithNewEventMutation = useMutation({
+    mutationFn: (message: Message) =>
+      apiDev.post('cs-post-message-with-new-event', {
+        id: message.id ?? '',
+        event: CHAT_EVENTS.ASK_PERMISSION_IGNORED,
+        authorTimestamp: message.authorTimestamp ?? '',
+      }),
+    onSuccess: () => {
+      getMessages();
+      handleChatEvent(CHAT_EVENTS.ASK_PERMISSION);
+    },
     onError: (error: AxiosError) => {
       toast.open({
         type: 'error',
@@ -745,17 +774,36 @@ const Chat: FC<ChatProps> = ({
             >
               {t('chat.active.askForContact')}
             </Button>
-            <Button
-              appearance="secondary"
-              disabled={
-                chat.customerSupportId != userInfo?.idCode ||
-                (latestPermissionMessage <= 60 && latestPermissionMessage != 0)
-              }
-              onClick={() => handleChatEvent(CHAT_EVENTS.ASK_PERMISSION)}
-            >
-              {t('chat.active.askPermission')}
-            </Button>
-
+            <div style={{ position: 'relative', display: 'inline-block' }}>
+              <Button
+                appearance="secondary"
+                style={{ width: '100%' }}
+                disabled={chat.customerSupportId != userInfo?.idCode}
+                onClick={() => {
+                  if (
+                    latestPermissionMessage > 60 &&
+                    latestPermissionMessage != 0
+                  ) {
+                    const message: Message | undefined = messagesList.findLast(
+                      (e) => e.event === CHAT_EVENTS.ASK_PERMISSION
+                    );
+                    if (message != undefined) {
+                      postMessageWithNewEventMutation.mutate(message);
+                    } else {
+                      handleChatEvent(CHAT_EVENTS.ASK_PERMISSION);
+                    }
+                  }
+                }}
+              >
+                {t('chat.active.askPermission')}
+              </Button>
+              {latestPermissionMessage <= 60 && (
+                <LoaderOverlay
+                  maxPercent={60}
+                  currentPercent={latestPermissionMessage}
+                />
+              )}
+            </div>
             <Button
               appearance="secondary"
               disabled={!chatCsaActive}
