@@ -46,3 +46,15 @@ This repo will primarily contain:
 ### PR dependencies
 
 - For PDF generation (Saving chat in Chat-Widget) to work - Datamapper image has to be built using this PR https://github.com/buerokratt/DataMapper/pull/12
+
+### Use external header component in GUI.
+
+The external header component and its version is defined in the package.json file located inside GUI folder.
+That line must be updated when header version or location changes.
+```  
+ "@exirain/header": "file:exirain-header-0.0.21.tgz"
+```
+Current solution uses the module from packed file. This means that when building docker image, a line to the docker script needs to be added for copying the file.
+``` 
+COPY ./exirain-header-0.0.21.tgz .
+```
