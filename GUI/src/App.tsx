@@ -42,36 +42,36 @@ const App: FC = () => {
     <CsaActivityContext.Provider value={{ chatCsaActive, setChatCsaActive }}>
       <Routes>
         <Route element={<Layout />}>
-          <Route index element={<Navigate to="/active" />} />
-          <Route path="/unanswered" element={<ChatUnanswered />} />
-          <Route path="/active" element={<ChatActive />} />
-          <Route path="/history" element={<ChatHistory />} />
-          <Route path="/users" element={<SettingsUsers />} />
+          <Route index element={<Navigate to="/chat/active" />} />
+          <Route path="/chat/unanswered" element={<ChatUnanswered />} />
+          <Route path="/chat/active" element={<ChatActive />} />
+          <Route path="/chat/history" element={<ChatHistory />} />
+          <Route path="/settings/users" element={<SettingsUsers />} />
           <Route
-            path="/chatbot/settings"
+            path="/settings/chatbot/settings"
             element={<SettingsChatSettings />}
           />
           <Route
-            path="/chatbot/welcome-message"
+            path="/settings/chatbot/welcome-message"
             element={<SettingsWelcomeMessage />}
           />
           <Route
-            path="/chatbot/emergency-notices"
+            path="/settings/chatbot/emergency-notices"
             element={<SettingsEmergencyNotices />}
           />
           <Route
-            path="/chatbot/appearance"
+            path="/settings/chatbot/appearance"
             element={<SettingsAppearance />}
           />
           <Route
-            path="/working-time"
+            path="/settings/working-time"
             element={<SettingsWorkingTime />}
           />
           <Route
-            path="/session-length"
+            path="/settings/session-length"
             element={<SettingsSessionLength />}
           />
-          <Route path="/uptime" element={<MonitoringUptime />} />
+          <Route path="/monitoring/uptime" element={<MonitoringUptime />} />
         </Route>
       </Routes>
     </CsaActivityContext.Provider>
