@@ -778,20 +778,20 @@ const Chat: FC<ChatProps> = ({
               <Button
                 appearance="secondary"
                 style={{ width: '100%' }}
+                disabledWithoutStyle={
+                  chat.customerSupportId != userInfo?.idCode ||
+                  (latestPermissionMessage <= 60 &&
+                    latestPermissionMessage != 0)
+                }
                 disabled={chat.customerSupportId != userInfo?.idCode}
                 onClick={() => {
-                  if (
-                    latestPermissionMessage > 60 &&
-                    latestPermissionMessage != 0
-                  ) {
-                    const message: Message | undefined = messagesList.findLast(
-                      (e) => e.event === CHAT_EVENTS.ASK_PERMISSION
-                    );
-                    if (message != undefined) {
-                      postMessageWithNewEventMutation.mutate(message);
-                    } else {
-                      handleChatEvent(CHAT_EVENTS.ASK_PERMISSION);
-                    }
+                  const message: Message | undefined = messagesList.findLast(
+                    (e) => e.event === CHAT_EVENTS.ASK_PERMISSION
+                  );
+                  if (message != undefined) {
+                    postMessageWithNewEventMutation.mutate(message);
+                  } else {
+                    handleChatEvent(CHAT_EVENTS.ASK_PERMISSION);
                   }
                 }}
               >
