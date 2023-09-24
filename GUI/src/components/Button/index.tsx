@@ -6,28 +6,33 @@ import './Button.scss';
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   appearance?: 'primary' | 'secondary' | 'text' | 'icon' | 'error' | 'success';
   size?: 'm' | 's';
+  disabledWithoutStyle?: boolean;
 };
 
-const Button: FC<PropsWithChildren<ButtonProps>> = (
-  {
-    appearance = 'primary',
-    size = 'm',
-    disabled,
-    children,
-    ...rest
-  },
-) => {
+const Button: FC<PropsWithChildren<ButtonProps>> = ({
+  appearance = 'primary',
+  size = 'm',
+  disabled,
+  disabledWithoutStyle = false,
+  children,
+  ...rest
+}) => {
   const ref = useRef<HTMLButtonElement>(null);
 
   const buttonClasses = clsx(
     'btn',
     `btn--${appearance}`,
     `btn--${size}`,
-    disabled && 'btn--disabled',
+    disabled && 'btn--disabled'
   );
 
   return (
-    <button className={buttonClasses} ref={ref} disabled={disabled} {...rest}>
+    <button
+      className={buttonClasses}
+      ref={ref}
+      disabled={disabled || disabledWithoutStyle}
+      {...rest}
+    >
       {children}
     </button>
   );
