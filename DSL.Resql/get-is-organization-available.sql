@@ -45,8 +45,8 @@ WITH organization_time AS
    FROM current_day),
      is_today_holiday AS
   (SELECT CASE
-              WHEN TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD') IN (:holidays) THEN format('Today %s is a national holiday "%s"', TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD'), holiday_names)
-              ELSE 'Today is not a national holiday'
+              WHEN TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD') IN (:holidays) THEN format('Bürokratt pole saadaval, kuna täna on %s rahvuspüha "%s", palun jätke oma kontaktandmed ja me võtame teiega esimesel võimalusel ühendust', TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD'), holiday_names)
+              ELSE 'Täna pole riigipüha'
           END AS holiday_message,
           CASE
               WHEN TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD') IN (:holidays) THEN TRUE

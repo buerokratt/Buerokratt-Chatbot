@@ -7,3 +7,7 @@ export function stringToList(str, block) {
   });
   return out;
 }
+
+export function getInstant() {
+  return new Date().toISOString();
+}
