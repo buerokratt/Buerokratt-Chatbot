@@ -13,11 +13,11 @@
           "method": "post",
           "endpoint": "{dmapper_url}/json/v2/reflect_post_message",
           "post_body_struct": {
-            "chatId": "{#.chatId}",
-            "authorTimestamp": "{#.authorTimestamp}",
-            "authorRole": "{#.authorRole}",
-            "content": "{#.content}",
-            "event": "{#.event}",
+            "chatId": "{#.message#chatId}",
+            "authorTimestamp": "{#.message#.authorTimestamp}",
+            "authorRole": "{#.message#.authorRole}",
+            "content": "{#.message#.content}",
+            "event": "{#.message#.event}",
             "holidays": "{#.holidays}",
             "holidayNames": "{#.holidayNames}"
           }
