@@ -13,11 +13,13 @@
           "method": "post",
           "endpoint": "{dmapper_url}/json/v2/reflect_post_message",
           "post_body_struct": {
-            "chatId": "{#.chatId}",
-            "authorTimestamp": "{#.authorTimestamp}",
-            "authorRole": "{#.authorRole}",
-            "content": "{#.content}",
-            "event": "{#.event}"
+            "chatId": "{#.message#chatId}",
+            "authorTimestamp": "{#.message#.authorTimestamp}",
+            "authorRole": "{#.message#.authorRole}",
+            "content": "{#.message#.content}",
+            "event": "{#.message#.event}",
+            "holidays": "{#.holidays}",
+            "holidayNames": "{#.holidayNames}"
           }
         },
         "response": {
@@ -35,9 +37,7 @@
           }
         },
         "proceed": {
-          "cookies": [
-            "chatJwt"
-          ],
+          "cookies": ["chatJwt"],
           "method": "post",
           "endpoint": "{tim_url}/jwt/custom-jwt-userinfo",
           "post_body_struct": "chatJwt",
@@ -71,16 +71,16 @@
         },
         "local_request": {
           "method": "post",
-          "cookies": [
-            "chatJwt"
-          ],
+          "cookies": ["chatJwt"],
           "endpoint": "{ruuter_url}/post-message-locally",
           "post_body_struct": {
             "chatId": "{#.chat_info#.chatId}",
             "authorTimestamp": "{#.reflect_input#.authorTimestamp}",
             "authorRole": "{#.reflect_input#.authorRole}",
             "content": "{#.reflect_input#.content}",
-            "event": "{#.reflect_input#.event}"
+            "event": "{#.reflect_input#.event}",
+            "holidays": "{#.reflect_input#.holidays}",
+            "holidayNames": "{#.reflect_input#.holidayNames}"
           },
           "response": {
             "ok": "proceed",
@@ -102,7 +102,9 @@
                 "authorTimestamp": "{#.reflect_input#.authorTimestamp}",
                 "authorRole": "{#.reflect_input#.authorRole}",
                 "content": "{#.reflect_input#.content}",
-                "event": "{#.reflect_input#.event}"
+                "event": "{#.reflect_input#.event}",
+                "holidays": "{#.reflect_input#.holidays}",
+                "holidayNames": "{#.reflect_input#.holidayNames}"
               },
               "response": {
                 "ok": "proceed",

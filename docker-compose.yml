@@ -10,7 +10,7 @@ services:
       - csrf.ruuter_services_whitelist=
       - legacy-portal-integration.sessionCookieDomain=buerokratt.ee
       - allowed.requested.method.types=POST,GET
-      - ruuter.cors.allowedOrigins=https://buerokratt.ee,https://admin.buerokratt.ee,https://tim.buerokratt.ee,http://localhost:3001,http://localhost:3002,http://localhost:3003,http://localhost:3004
+      - ruuter.cors.allowedOrigins=https://buerokratt.ee,https://admin.buerokratt.ee,https://tim.buerokratt.ee,http://localhost:3001,http://localhost:3002,http://localhost:3003,http://localhost:3004,http://localhost:8086
       - maxRequestSizeBytes=10000000000
       - default.requested.method.type=POST
       - incoming.request.external.validation.enabled=false
@@ -30,8 +30,8 @@ services:
     restart: always
     networks:
       - bykstack
-    cpus: '0.5'  # Example CPU limit
-    mem_limit: '512M'  # Example memory limit
+    cpus: "0.5" # Example CPU limit
+    mem_limit: "512M" # Example memory limit
 
   ruuter-v1-private:
     container_name: ruuter-v1-private
@@ -70,8 +70,8 @@ services:
     restart: always
     networks:
       - bykstack
-    cpus: '0.5'  # Example CPU limit
-    mem_limit: '512M'  # Example memory limit
+    cpus: "0.5" # Example CPU limit
+    mem_limit: "512M" # Example memory limit
 
   tim:
     container_name: tim
@@ -84,8 +84,8 @@ services:
       - bykstack
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    cpus: '0.5'  # Example CPU limit
-    mem_limit: '512M'  # Example memory limit
+    cpus: "0.5" # Example CPU limit
+    mem_limit: "512M" # Example memory limit
 
   tim-postgresql:
     container_name: tim-postgresql
@@ -117,14 +117,14 @@ services:
       - 8088:8088
     networks:
       - bykstack
-    cpus: '0.5'  # Example CPU limit
-    mem_limit: '512M'  # Example memory limit
+    cpus: "0.5" # Example CPU limit
+    mem_limit: "512M" # Example memory limit
 
   ruuter-v2-public:
     container_name: ruuter-v2-public
     image: ruuter
     environment:
-      - application.cors.allowedOrigins=http://localhost:8086,http://localhost:3001,http://localhost:3003
+      - application.cors.allowedOrigins=http://localhost:8086,http://localhost:3001,http://localhost:3003,http://localhost:8080
       - application.httpCodesAllowList=200,201,202,400,401,403,500
       - application.logging.displayRequestContent=true
       - application.logging.displayResponseContent=true
@@ -135,8 +135,8 @@ services:
       - 8086:8086
     networks:
       - bykstack
-    cpus: '0.5'  # Example CPU limit
-    mem_limit: '512M'  # Example memory limit
+    cpus: "0.5" # Example CPU limit
+    mem_limit: "512M" # Example memory limit
 
   dmapper:
     container_name: dmapper
@@ -226,8 +226,8 @@ services:
       - ./GUI:/app
     networks:
       - bykstack
-    cpus: '0.5'  # Example CPU limit
-    mem_limit: '1G'  # Example memory limit
+    cpus: "0.5" # Example CPU limit
+    mem_limit: "1G" # Example memory limit
 
   chat-widget:
     container_name: chat-widget

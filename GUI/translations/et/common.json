@@ -177,7 +177,12 @@
       "requested-chat-forward-accepted": "Vestluse suunamine aktsepteeritud",
       "requested-chat-forward-rejected": "Vestluse suunamine tagasi lükatud",
       "inactive-chat-ended": "Lõpetatud tegevusetuse tõttu",
-      "message-read": "Loetud"
+      "message-read": "Loetud",
+      "contact-information-skipped": "Kontaktandmeid pole esitatud",
+      "unavailable-contact-information-fulfilled": "Kontaktandmed on antud",
+      "unavailable_organization": "Organisatsioon pole saadaval",
+      "unavailable_csas": "CSA-d pole saadaval",
+      "unavailable_holiday": "Puhkus"
     },
     "events": {
       "answered": "Vastatud {{date}}",
@@ -206,7 +211,12 @@
       "requested-chat-forward": "Küsiti vestluse suunamist",
       "requested-chat-forward-accepted": "Vestluse suunamine aktsepteeritud {{date}}",
       "requested-chat-forward-rejected": "Vestluse suunamine tagasi lükatud {{date}}",
-      "message-read": "Loetud"
+      "message-read": "Loetud",
+      "contact-information-skipped": "Kontaktandmeid pole esitatud",
+      "unavailable-contact-information-fulfilled": "Kontaktandmed on antud",
+      "unavailable_organization": "Organisatsioon pole saadaval",
+      "unavailable_csas": "CSA-d pole saadaval",
+      "unavailable_holiday": "Puhkus"
     }
   },
   "roles": {

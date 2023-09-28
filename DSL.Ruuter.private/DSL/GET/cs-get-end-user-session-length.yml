@@ -24,7 +24,7 @@ getConfigurationValue:
   call: http.post
   args:
     # TODO: replace with env variable
-    url: https://byk-resql:8443/get-configuration
+    url: http://resql:8082/get-configuration
     body:
       key: "end_user_session_length"
   result: getConfigurationValueResult
@@ -33,7 +33,7 @@ mapData:
   call: http.post
   args:
     # TODO: replace with env variable
-    url: https://byk-dmapper:8443/json/v2/return_first_configuration_from_array
+    url: http://dmapper:3000/json/v2/return_first_configuration_from_array
     body:
       configurationArray: ${getConfigurationValueResult.response.body}
   result: dataMapperData

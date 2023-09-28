@@ -144,6 +144,7 @@
                 "botMessages": "{#.format_end_user_response}",
                 "chatId": "{#.reflect_input#.chatId}",
                 "authorId": "{#.reflect_input#.authorId}",
+                "event": "",
                 "authorFirstName": "",
                 "authorLastName": "",
                 "authorTimestamp": "$_getInstant()",

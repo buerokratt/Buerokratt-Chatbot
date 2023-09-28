@@ -227,6 +227,7 @@
                 "botMessages": "{#.post_client_message_to_bot}",
                 "chatId": "{#.reflect_input#.chatId}",
                 "authorId": "{#.get_bot_name[0]#.value}",
+                "event": "",
                 "authorFirstName": "",
                 "authorLastName": "",
                 "authorTimestamp": "$_getInstant()",

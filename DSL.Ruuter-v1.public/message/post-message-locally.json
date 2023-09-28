@@ -17,7 +17,9 @@
             "authorTimestamp": "{#.authorTimestamp}",
             "authorRole": "{#.authorRole}",
             "content": "{#.content}",
-            "event": "{#.event}"
+            "event": "{#.event}",
+            "holidays": "{#.holidays}",
+            "holidayNames": "{#.holidayNames}"
           }
         },
         "response": {
@@ -111,9 +113,7 @@
               },
               "post_body_parameters": {
                 "chat_info": {
-                  "cookies": [
-                    "chatJwt"
-                  ],
+                  "cookies": ["chatJwt"],
                   "method": "post",
                   "endpoint": "{tim_url}/jwt/custom-jwt-userinfo",
                   "post_body_struct": "chatJwt",
@@ -177,11 +177,13 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{ruuter_url}/post-message-to-bot",
+          "endpoint": "{ruuter_v2_url}/post-message-to-bot",
           "post_body_struct": {
             "chatId": "{#.reflect_input#.chatId}",
             "content": "{#.reflect_input#.content}",
-            "authorId": ""
+            "authorId": "",
+            "holidays": "{#.reflect_input#.holidays}",
+            "holiday_names": "{#.reflect_input#.holidayNames}"
           },
           "response": {
             "ok": "proceed",

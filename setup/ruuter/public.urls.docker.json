@@ -1,6 +1,7 @@
 {
   "dmapper_url": "http://dmapper:3000",
   "ruuter_url": "http://localhost:8080",
+  "ruuter_v2_url": "http://ruuter-v2-public:8086",
   "tim_url": "http://tim:8085",
   "resql_url": "http://resql:8082",
   "bot_url": "http://171.22.247.37:5005",

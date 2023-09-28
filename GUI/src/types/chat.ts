@@ -29,9 +29,14 @@ export enum CHAT_EVENTS {
   CONTACT_INFORMATION = 'contact-information',
   CONTACT_INFORMATION_REJECTED = 'contact-information-rejected',
   CONTACT_INFORMATION_FULFILLED = 'contact-information-fulfilled',
+  UNAVAILABLE_CONTACT_INFORMATION_FULFILLED = 'unavailable-contact-information-fulfilled',
+  CONTACT_INFORMATION_SKIPPED = 'contact-information-skipped',
   REQUESTED_CHAT_FORWARD = 'requested-chat-forward',
   REQUESTED_CHAT_FORWARD_ACCEPTED = 'requested-chat-forward-accepted',
   REQUESTED_CHAT_FORWARD_REJECTED = 'requested-chat-forward-rejected',
+  UNAVAILABLE_ORGANIZATION = 'unavailable_organization',
+  UNAVAILABLE_CSAS = 'unavailable_csas',
+  UNAVAILABLE_HOLIDAY = 'unavailable_holiday',
   READ = 'message-read',
 }
 

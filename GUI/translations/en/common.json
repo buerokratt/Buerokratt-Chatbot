@@ -177,6 +177,11 @@
       "requested-chat-forward-accepted": "Requested chat forward accepted",
       "requested-chat-forward-rejected": "Requested chat forward rejected",
       "inactive-chat-ended": "Ended cue to inactivity",
+      "contact-information-skipped": "Contact Information Skipped",
+      "unavailable-contact-information-fulfilled": "Contact information provided",
+      "unavailable_organization": "Organization Unavailable",
+      "unavailable_csas": "CSA's Unavailable",
+      "unavailable_holiday": "Holiday",
       "message-read": "Read"
     },
     "events": {
@@ -206,7 +211,12 @@
       "requested-chat-forward": "Requested chat forward {{date}}",
       "requested-chat-forward-accepted": "Requested chat forward accepted {{date}}",
       "requested-chat-forward-rejected": "Requested chat forward rejected {{date}}",
-      "message-read": "Read"
+      "message-read": "Read",
+      "contact-information-skipped": "Contact Information Skipped",
+      "unavailable-contact-information-fulfilled": "Contact information provided",
+      "unavailable_organization": "Organization Unavailable",
+      "unavailable_csas": "CSA's Unavailable",
+      "unavailable_holiday": "Holiday"
     }
   },
   "roles": {

@@ -23,7 +23,9 @@
             "endUserUrl": "{#.endUserTechnicalData#.endUserUrl}",
             "forwardedByUser": "",
             "forwardedFromCsa": "",
-            "forwardedToCsa": ""
+            "forwardedToCsa": "",
+            "holidays": "{#.holidays}",
+            "holidayNames": "{#.holidayNames}"
           }
         },
         "response": {
@@ -283,11 +285,13 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{ruuter_url}/post-message-to-bot",
+          "endpoint": "{ruuter_v2_url}/post-message-to-bot",
           "post_body_struct": {
             "chatId": "{#.get_chat_uuid#.output}",
             "content": "{#.reflect_input#.content}",
-            "authorId": "{#.reflect_input#.endUserId}"
+            "authorId": "{#.reflect_input#.endUserId}",
+            "holidays": "{#.reflect_input#.holidays}",
+            "holiday_names": "{#.reflect_input#.holidayNames}"
           },
           "response": {
             "ok": "proceed",
