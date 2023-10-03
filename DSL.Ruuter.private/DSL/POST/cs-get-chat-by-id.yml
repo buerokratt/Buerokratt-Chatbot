@@ -1,0 +1,49 @@
+extractRequestData:
+  assign:
+    cookie: ${incoming.headers.cookie}
+    chatId: ${incoming.body.chatId}
+
+extractTokenData:
+  call: http.post
+  args:
+    # TODO: replace with env variable and correct path to TIM endpoint
+    url: http://ruuter-v2-private:8088/mocks/mock-tim-custom-jwt-userinfo
+    headers:
+      cookie: ${cookie}
+    body:
+      # TODO: pass cookie name correctly to TIM
+      cookieName: "customJwtCookie"
+  result: jwtResult
+
+validateAdministrator:
+  switch:
+    # TODO: use correct structure when request is made against TIM
+    - condition: ${jwtResult.response.body.response.authorities.includes("ROLE_ADMINISTRATOR")}
+      next: getChatById
+  next: returnUnauthorized
+
+getChatById:
+  call: http.post
+  args:
+    url: http://resql:8082/get-chat-by-id
+    body:
+      id: ${chatId}
+  result: chatResult
+  next: formatChatArray
+
+formatChatArray:
+  call: http.post
+  args:
+    url: http://dmapper:3000/json/v2/return_first_chat_from_array
+    body:
+      chatArray: ${chatResult.response.body}
+  result: formattedChat
+  next: returnChat
+
+returnChat:
+   return: ${formattedChat.response.body}  
+   next: end
+
+returnUnauthorized:
+  return: "error: unauthorized"
+  next: end

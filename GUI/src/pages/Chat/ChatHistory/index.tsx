@@ -23,7 +23,6 @@ import {
 import { CHAT_EVENTS, CHAT_STATUS, Chat as ChatType } from 'types/chat';
 import { Message } from 'types/message';
 import { useToast } from 'hooks/useToast';
-import api from 'services/api';
 import apiDev from 'services/api-dev';
 import useUserInfoStore from '../../../store/store';
 import { Controller, useForm } from 'react-hook-form';
@@ -38,6 +37,7 @@ const ChatHistory: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
   const { userInfo } = useUserInfoStore();
+  let passedChatId = new URLSearchParams(location.search).get('chat');
   const preferences = getFromLocalStorage(
     CHAT_HISTORY_PREFERENCES_KEY
   ) as string[];
@@ -83,6 +83,13 @@ const ChatHistory: FC = () => {
   const endDate = watch('endDate');
 
   useEffect(() => {
+    if (passedChatId != null) {
+      getChatById.mutate();
+      passedChatId = null;
+    }
+  }, [passedChatId]);
+
+  useEffect(() => {
     getAllEndedChats.mutate({
       startDate: format(new Date(startDate), 'yyyy-MM-dd'),
       endDate: format(new Date(endDate), 'yyyy-MM-dd'),
@@ -98,6 +105,16 @@ const ChatHistory: FC = () => {
     onSuccess: (res: any) => {
       setEndedChatsList(res.data.data.cs_get_all_ended_chats ?? []);
       filterChatsList(res.data.data.cs_get_all_ended_chats ?? []);
+    },
+  });
+
+  const getChatById = useMutation({
+    mutationFn: () =>
+      apiDevV2.post('cs-get-chat-by-id', {
+        chatId: passedChatId,
+      }),
+    onSuccess: (res: any) => {
+      setSelectedChat(res.data.response);
     },
   });
 
