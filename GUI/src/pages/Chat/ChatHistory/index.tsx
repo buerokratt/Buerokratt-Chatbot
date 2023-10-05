@@ -32,12 +32,14 @@ import {
 } from 'utils/local-storage-utils';
 import { CHAT_HISTORY_PREFERENCES_KEY } from '../../../constants/config';
 import apiDevV2 from 'services/api-dev-v2';
+import { useLocation } from 'react-router-dom';
 
 const ChatHistory: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
   const { userInfo } = useUserInfoStore();
-  let passedChatId = new URLSearchParams(location.search).get('chat');
+  const routerLocation = useLocation();
+  let passedChatId = new URLSearchParams(routerLocation.search).get('chat');
   const preferences = getFromLocalStorage(
     CHAT_HISTORY_PREFERENCES_KEY
   ) as string[];
