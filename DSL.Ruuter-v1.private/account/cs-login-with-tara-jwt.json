@@ -74,6 +74,8 @@
                     "userIdCode": "{$.tara_user_info$.personalCode}",
                     "firstName": "{$.tara_user_info$.firstName}",
                     "lastName": "{$.tara_user_info$.lastName}",
+                    "csa_title": "{$.tara_user_info$.firstName}",
+                    "csa_email": null,
                     "initialUserRole": "ROLE_ADMINISTRATOR"
                   },
                   "post_body_parameters": {
