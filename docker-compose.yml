@@ -75,17 +75,42 @@ services:
 
   tim:
     container_name: tim
-    image: tim
-    depends_on:
-      - tim-postgresql
+    image: ghcr.io/buerokratt/tim:pre-apha-2.1.1
+    environment:
+      - security.allowlist.jwt=ruuter-v1-public,ruuter-v1-private,dmapper,chat-widget,customer-service,resql,ruuter-v2-public,ruuter-v2-private
+      - spring.datasource.url=jdbc:postgresql://171.22.247.156:5432/tim
+      - spring.datasource.username=tim
+      - spring.datasource.password=123
+      - security.oauth2.client.client-id=
+      - security.oauth2.client.client-secret=
+      - security.oauth2.client.registered-redirect-uri=https://tim..buerokratt.ee/authenticate
+      - security.oauth2.client.user-authorization-uri=https://tara-test.ria.ee/oidc/authorize
+      - security.oauth2.client.access-token-uri=https://tara-test.ria.ee/oidc/token
+      - security.oauth2.resource.jwk.key-set-uri=https://tara-test.ria.ee/oidc/jwks
+      - auth.success.redirect.whitelist=https://admin..buerokratt.ee/auth/callback,https://.buerokratt.ee,https://.buerokratt.ee/auth/callback,https://admin..buerokratt.ee
+      - frontpage.redirect.url=https://admin..buerokratt.ee/chat
+      - headers.contentSecurityPolicy=upgrade-insecure-requests; default-src 'self' 'unsafe-inline' 'unsafe-eval' https://tim..buerokratt.ee https://admin..buerokratt.ee/chat https://ruuter.dv.buerokratt.ee/pub1 https://ruuter..buerokratt.ee/priv1 tim byk-ruuter-v1-public ruuter-v1-private customer-service; object-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://.buerokratt.ee https://admin..buerokratt.ee/chat https://tim..buerokratt.ee; connect-src 'self' https://.buerokratt.ee https://tim..buerokratt.ee https://admin..buerokratt.ee/chat https://ruuter..buerokratt.ee/pub1/ https://ruuter..buerokratt.ee/priv1/; frame-src 'self'; media-src 'none'
+      - legacy-portal-integration.legacyUrl=arendus.eesti.ee
+      - legacy-portal-integration.legacyPortalRefererMarker=https://arendus.eesti.ee/portaal
+      - cors.allowedOrigins=https://test.buerokratt.ee,https://admin..buerokratt.ee/chat,https://ruuter..buerokratt.ee/pub1/,https://ruuter..buerokratt.ee/priv1/,https://tim..buerokratt.ee
+      - jwt-integration.signature.issuer=.buerokratt.ee
+      - jwt-integration.signature.key-store-password=123456
+      - jwt-integration.signature.key-store=file:/usr/local/tomcat/jwtkeystore.jks
+      - spring.profiles.active=dev
+      - legacy-portal-integration.sessionCookieDomain=buerokratt.ee
+      - logging.level.root=TRACE
+      - server.port=8085
     ports:
-      - 8085:8085
+      - 8085:8443
+
+    volumes:
+      - ./setup/tim/server.xml:/usr/local/tomcat/conf/server.xml:ro
+      - ./setup/tim/jwtkeystore.jks:/usr/local/tomcat/jwtkeystore.jks:ro
+      - ./setup/tim/cert.crt:/usr/local/tomcat/conf/cert.crt:ro
+      - ./setup/tim/key.key:/usr/local/tomcat/conf/key.key:ro
+    restart: always
     networks:
       - bykstack
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    cpus: "0.5" # Example CPU limit
-    mem_limit: "512M" # Example memory limit
 
   tim-postgresql:
     container_name: tim-postgresql
@@ -207,18 +232,18 @@ services:
   gui:
     container_name: gui
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=elopment
       - BASE_URL=http://localhost:8080
       - REACT_APP_RUUTER_API_URL=http://localhost:8080
       - REACT_APP_RUUTER_V1_PRIVATE_API_URL=http://localhost:8090
       - REACT_APP_RUUTER_V2_PRIVATE_API_URL=http://localhost:8088
-      - REACT_APP_CUSTOMER_SERVICE_LOGIN=http://localhost:3004/et/dev-auth
+      - REACT_APP_CUSTOMER_SERVICE_LOGIN=http://localhost:3004/et/-auth
       - CHOKIDAR_USEPOLLING=true
       - PORT=3001
     build:
       context: ./GUI
       # target: web // To be used in production (Dockerfile)
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile.
     ports:
       - 3001:3001
     volumes:
