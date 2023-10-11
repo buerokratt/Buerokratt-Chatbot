@@ -6,7 +6,7 @@ extractTokenData:
   call: http.post
   args:
     # TODO: replace with env variable and correct path to TIM endpoint
-    url: http://byk-private-ruuter-yml:8080/mocks/mock-tim-custom-jwt-userinfo
+    url: "[CHATBOT_BYK_RUUTER]:[CHATBOT_BYK_RUUTER_PORT]:8080/mocks/mock-tim-custom-jwt-userinfo"
     headers:
       cookie: ${cookie}
     body:
@@ -24,7 +24,7 @@ getConfigurationValue:
   call: http.post
   args:
     # TODO: replace with env variable
-    url: https://byk-resql:8443/get-configuration
+    url: "[CHATBOT_BYK_RESQL]:[CHATBOT_BYK_RESQL_PORT]/get-configuration"
     body:
       key: "end_user_session_length"
   result: getConfigurationValueResult
@@ -33,7 +33,7 @@ mapData:
   call: http.post
   args:
     # TODO: replace with env variable
-    url: https://byk-dmapper:8443/json/v2/return_first_configuration_from_array
+    url: "[CHATBOT_BYK_DMAPPER]:[CHATBOT_BYK_DMAPPER_PORT]/json/v2/return_first_configuration_from_array"
     body:
       configurationArray: ${getConfigurationValueResult.response.body}
   result: dataMapperData

@@ -14,7 +14,7 @@ checkChatId:
 insertIdAndName:
   call: http.post
   args:
-    url: http://resql:8082/update-chat-with-end-user-id-and-name
+    url: "[CHATBOT_RESQL]:[CHATBOT_RESQL_PORT]/update-chat-with-end-user-id-and-name"
     body:
       chatId: ${chatId}
       endUserId: "${id ? id : ''}"
