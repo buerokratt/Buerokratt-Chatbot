@@ -117,7 +117,7 @@ services:
       - headers.contentSecurityPolicy=
       - cors.allowedOrigins=ruuter.test.buerokratt.ee,https://ruuter.aadress.ee
     ports:
-      - 3000:3000
+      - 3000:8443
     volumes:
       - ./setup/dmapper/server.xml:/usr/local/tomcat/conf/server.xml:ro
       - ./setup/dmapper/cert.crt:/usr/local/tomcat/conf/tls.crt:ro
