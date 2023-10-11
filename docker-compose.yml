@@ -268,7 +268,7 @@ services:
 
   customer-service:
     container_name: customer-service
-    image: ghcr.io/buerokratt/resql:pre-alpha-2.1.0
+    image: ghcr.io/buerokratt/customer-service:pre-apha-2.0.1
     ports:
       - 3004:443
     volumes:
