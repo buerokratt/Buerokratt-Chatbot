@@ -1,9 +1,9 @@
 {
-  "dmapper_url": "http://dmapper:3000",
-  "ruuter_url": "http://localhost:8080",
+  "dmapper_url": "https://dmapper:3443",
+  "ruuter_url": "https://localhost:8443",
   "ruuter_v2_url": "http://ruuter-v2-public:8086",
-  "tim_url": "http://tim:8085",
-  "resql_url": "http://resql:8082",
+  "tim_url": "https://tim:8443",
+  "resql_url": "https://resql:8443",
   "bot_url": "http://171.22.247.37:5005",
   "training_url": "TRAINIG_BOT",
   "cookie_domain": "localhost",
