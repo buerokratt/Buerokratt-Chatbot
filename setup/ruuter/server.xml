@@ -111,14 +111,14 @@
             </SSLHostConfig>
         </Connector>
         -->
-        <Connector port="8080"
+        <Connector port="8443"
                    protocol="org.apache.coyote.http11.Http11NioProtocol"
                    clientAuth="false"
                    sslProtocol="TLSv1.2, TLSv1.3"
-                   SSLEnabled="false"
+                   SSLEnabled="true"
                    maxThreads="150"
-                   scheme="http"
-                   secure="false"
+                   scheme="https"
+                   secure="true"
                    SSLCertificateFile="${catalina.base}/conf/cert.crt"
                    SSLCertificateKeyFile="${catalina.base}/conf/key.key"
         />
