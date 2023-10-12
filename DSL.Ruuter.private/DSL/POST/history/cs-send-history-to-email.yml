@@ -36,7 +36,7 @@ sendDataToEmail:
   call: http.post
   args:
     # TODO: replace with env variable
-    url: http://dmapper-v2:3005/js/email/sendMockEmail
+    url: "[CHATBOT_DMAPPER_V2]:[CHATBOT_DMAPPER_V2_PORT]/js/email/sendMockEmail"
     body:
       to: ${getUserEmailByChatIdResult.response.body[0].csaEmail}
       subject: "Chat history"

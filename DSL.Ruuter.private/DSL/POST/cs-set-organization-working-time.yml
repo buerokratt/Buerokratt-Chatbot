@@ -48,7 +48,7 @@ mapOrganizationWorkingTimeData:
   call: http.post
   args:
     # TODO: replace with env variable
-    url: http://dmapper-v2:3005/hbs/chat-bot/return_organization_working_time
+    url: "[CHATBOT_DMAPPER_V2]:[CHATBOT_DMAPPER_V2_PORT]/hbs/chat-bot/return_organization_working_time"
     headers:
       type: json
     body:
