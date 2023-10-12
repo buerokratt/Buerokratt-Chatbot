@@ -7,7 +7,7 @@ extractTokenData:
   call: http.post
   args:
     # TODO: replace with env variable and correct path to TIM endpoint
-    url: http://ruuter-v2-private:8088/mocks/mock-tim-custom-jwt-userinfo
+    url: "[CHATBOT_RUUTER]:[CHATBOT_RUUTER_PORT]/mocks/mock-tim-custom-jwt-userinfo"
     headers:
       cookie: ${cookie}
     body:
@@ -26,7 +26,7 @@ getChatHistoryComment:
   call: http.post
   args:
     # TODO: replace with env variable
-    url: http://resql:8082/get-chat-history-comment-by-id
+    url: "[CHATBOT_RESQL]:[CHATBOT_RESQL_PORT]/get-chat-history-comment-by-id"
     body:
       chatId: ${chatId}
   result: getChatHistoryCommentResult
@@ -35,7 +35,7 @@ mapChatHistoryCommentData:
   call: http.post
   args:
     # TODO: replace with env variable
-    url: http://dmapper:3000/json/v2/return_chat_history_comment
+    url: "[CHATBOT_DMAPPER]:[CHATBOT_DMAPPER_PORT]/json/v2/return_chat_history_comment"
     body:
       historyComment: ${getChatHistoryCommentResult.response.body}
   result: chatHistoryCommentData

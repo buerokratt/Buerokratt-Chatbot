@@ -10,7 +10,7 @@ extractTokenData:
   call: http.post
   args:
     # TODO: replace with env variable and correct path to TIM endpoint
-    url: http://ruuter-v2-private:8088/mocks/mock-tim-custom-jwt-userinfo
+    url: "[CHATBOT_RUUTER]:[CHATBOT_RUUTER_PORT]/mocks/mock-tim-custom-jwt-userinfo"
     headers:
       cookie: ${cookie}
     body:
@@ -35,7 +35,7 @@ setOrganizationWorkingTime:
   call: http.post
   args:
     # TODO: replace with env variable
-    url: http://resql:8082/set-organization-working-time
+    url: "[CHATBOT_RESQL]:[CHATBOT_RESQL_PORT]/set-organization-working-time"
     body:
       organizationWorkingTimeStartISO: ${organizationWorkingTimeStartISO}
       organizationWorkingTimeEndISO: ${organizationWorkingTimeEndISO}
