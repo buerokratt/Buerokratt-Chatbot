@@ -10,7 +10,7 @@ extractTokenData:
   call: http.post
   args:
     # TODO: replace with env variable and correct path to TIM endpoint
-    url: "[CHATBOT_RUUTER]:[CHATBOT_RUUTER_PORT]/mocks/mock-tim-custom-jwt-userinfo"
+    url: "[#CHATBOT_RUUTER]:[#CHATBOT_RUUTER_PORT]/mocks/mock-tim-custom-jwt-userinfo"
     headers:
       cookie: ${cookie}
     body:
@@ -35,7 +35,7 @@ setEmergencyNotice:
   call: http.post
   args:
     # TODO: replace with env variable
-    url: "[CHATBOT_RESQL]:[CHATBOT_RESQL_PORT]/set-emergency-notice"
+    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/set-emergency-notice"
     body:
       emergencyNoticeText: ${emergencyNoticeText}
       emergencyNoticeStartISO: ${emergencyNoticeStartISO}
@@ -48,7 +48,7 @@ mapEmergencyNoticeData:
   call: http.post
   args:
     # TODO: replace with env variable
-    url: "[CHATBOT_DMAPPER]:[CHATBOT_DMAPPER_PORT]/json/v2/return_emergency_notice"
+    url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/json/v2/return_emergency_notice"
     body:
       configurationArray: ${setEmergencyNoticeResult.response.body}
   result: emergencyNoticeData
