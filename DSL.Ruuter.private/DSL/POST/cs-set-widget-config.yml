@@ -12,7 +12,7 @@ extractTokenData:
   call: http.post
   args:
     # TODO: replace with env variable and correct path to TIM endpoint
-    url: "[CHATBOT_RUUTER]:[CHATBOT_RUUTER_PORT]/mocks/mock-tim-custom-jwt-userinfo"
+    url: "[#CHATBOT_RUUTER]:[#CHATBOT_RUUTER_PORT]/mocks/mock-tim-custom-jwt-userinfo"
     headers:
       cookie: ${cookie}
     body:
@@ -31,7 +31,7 @@ setWidgetConfig:
   call: http.post
   args:
     # TODO: replace with env variable
-    url: "[CHATBOT_RESQL]:[CHATBOT_RESQL_PORT]/set-widget-config"
+    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/set-widget-config"
     body:
       widgetProactiveSeconds: ${widgetProactiveSeconds}
       widgetDisplayBubbleMessageSeconds: ${widgetDisplayBubbleMessageSeconds}
@@ -46,7 +46,7 @@ mapWidgetConfigData:
   call: http.post
   args:
     # TODO: replace with env variable
-    url: "[CHATBOT_DMAPPER]:[CHATBOT_DMAPPER_PORT]/json/v2/return_widget_config"
+    url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/json/v2/return_widget_config"
     body:
       configurationArray: ${setWidgetConfigResult.response.body}
   result: widgetConfigData

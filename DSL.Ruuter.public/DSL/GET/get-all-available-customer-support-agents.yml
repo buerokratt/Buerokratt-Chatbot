@@ -2,7 +2,7 @@ getAvailableCustomerSupportAgents:
   call: http.post
   args:
     # TODO: replace with env variable
-    url: "[CHATBOT_RESQL]:[CHATBOT_RESQL_PORT]/get-all-available-customer-support-agents"
+    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-all-available-customer-support-agents"
   result: getAvailableCustomerSupportAgentsResult
 
 return_result:

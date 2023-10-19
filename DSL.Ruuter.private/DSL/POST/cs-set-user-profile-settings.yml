@@ -14,7 +14,7 @@ extractTokenData:
   call: http.post
   args:
     # TODO: replace with env variable and correct path to TIM endpoint
-    url: "[CHATBOT_RUUTER]:[CHATBOT_RUUTER_PORT]/mocks/mock-tim-custom-jwt-userinfo"
+    url: "[#CHATBOT_RUUTER]:[#CHATBOT_RUUTER_PORT]/mocks/mock-tim-custom-jwt-userinfo"
     headers:
       cookie: ${cookie}
     body:
@@ -33,7 +33,7 @@ setUserSettingValue:
   call: http.post
   args:
     # TODO: replace with env variable
-    url: "[CHATBOT_RESQL]:[CHATBOT_RESQL_PORT]/set-user-profile-settings"
+    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/set-user-profile-settings"
     body:
       userId: ${userId}
       forwardedChatPopupNotifications: ${forwardedChatPopupNotifications}
