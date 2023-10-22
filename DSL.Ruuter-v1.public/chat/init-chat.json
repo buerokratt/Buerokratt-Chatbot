@@ -165,7 +165,7 @@
           },
           "response_header": {
             "Set-Cookie": {
-              "#.from_property": "{#.chat_jwt}",
+              "#.from_property": "{#.chat_jwt#.token}",
               "maxAge": 7200,
               "httpOnly": true,
               "setSecure": true,

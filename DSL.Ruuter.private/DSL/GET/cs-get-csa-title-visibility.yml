@@ -1,39 +1,34 @@
 extractRequestData:
   assign:
     cookie: ${incoming.headers.cookie}
+  next: check_if_authorized
 
-extractTokenData:
-  call: http.post
-  args:
-    # TODO: replace with env variable and correct path to TIM endpoint
-    url: "[#CHATBOT_RUUTER]:[#CHATBOT_RUUTER_PORT]/mocks/mock-tim-custom-jwt-userinfo"
-    headers:
-      cookie: ${cookie}
-    body:
-      # TODO: pass cookie name correctly to TIM
-      cookieName: "customJwtCookie"
-  result: jwtResult
+check_if_authorized:
+  template: templates/check-user-authority
+  requestType: post
+  headers:
+    cookie: ${cookie}
+  result: authority_result
+  next: check_authority_result
 
-validateAdministrator:
+check_authority_result:
   switch:
-    # TODO: use correct structure when request is made against TIM
-    - condition: ${jwtResult.response.body.response.authorities.includes("ROLE_ADMINISTRATOR")}
+    - condition: ${authority_result !== "false"}
       next: getConfigurationValue
   next: returnUnauthorized
 
 getConfigurationValue:
   call: http.post
   args:
-    # TODO: replace with env variable
     url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-configuration"
     body:
       key: "is_csa_title_visible"
   result: getConfigurationValueResult
+  next: mapData
 
 mapData:
   call: http.post
   args:
-    # TODO: replace with env variable
     url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/json/v2/return_first_is_csa_title_visible_from_array"
     body:
       configurationArray: ${getConfigurationValueResult.response.body}
@@ -46,3 +41,4 @@ returnSuccess:
 
 returnUnauthorized:
   return: "error: unauthorized"
+  next: end

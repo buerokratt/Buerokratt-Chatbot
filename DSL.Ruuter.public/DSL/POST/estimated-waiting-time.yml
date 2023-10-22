@@ -5,14 +5,12 @@ assignIncoming:
 getDurationTotalInSeconds:
   call: http.post
   args:
-    # TODO: replace with env variable
     url: "[#CHATBOT_BYK_RESQL]:[#CHATBOT_BYK_RESQL_PORT]/get-ended-chats-total-duration-in-seconds"
   result: durationTotalInSeconds
 
 getUnassignedChats:
   call: http.post
   args:
-    # TODO: replace with env variable
     url: "[#CHATBOT_BYK_RESQL]:[#CHATBOT_BYK_RESQL_PORT]/get-unassigned-chat-total-with-position-by-chat-id"
     body:
       chatId: "${chatId ? chatId : ''}"
@@ -35,7 +33,6 @@ calculateDuration:
 getEstimatedWaitingTime:
   call: http.post
   args:
-    # TODO: replace with env variable
     url: "[#CHATBOT_BYK_DMAPPER]:[#CHATBOT_BYK_DMAPPER_PORT]/json/v2/reflect_waiting_time"
     body:
       durationInSeconds: '${calculatedDuration}'

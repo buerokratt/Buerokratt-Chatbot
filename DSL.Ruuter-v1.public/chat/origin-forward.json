@@ -173,7 +173,7 @@
           },
           "response_header": {
             "Set-Cookie": {
-              "#.from_property": "{#.update_chat_jwt}",
+              "#.from_property": "{#.update_chat_jwt#.token}",
               "maxAge": 7200,
               "httpOnly": true,
               "domain": "{cookie_domain}",
