@@ -20,7 +20,6 @@ check_authority_result:
 getConfigurationValue:
   call: http.post
   args:
-    # TODO: replace with env variable
     url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-configuration"
     body:
       key: "is_csa_name_visible"
@@ -30,7 +29,6 @@ getConfigurationValue:
 mapData:
   call: http.post
   args:
-    # TODO: replace with env variable
     url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/json/v2/return_first_is_csa_name_visible_from_array"
     body:
       configurationArray: ${getConfigurationValueResult.response.body}
