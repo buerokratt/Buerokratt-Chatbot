@@ -5,7 +5,6 @@ extractRequestData:
 getUserEmailByChatId:
   call: http.post
   args:
-    # TODO: replace with env variable
     url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-user-email-by-chat-id"
     body:
       chatId: ${chatId}
@@ -15,7 +14,6 @@ getUserEmailByChatId:
 getMessagesByChatId:
   call: http.post
   args:
-    # TODO: replace with env variable
     url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-chat-messages"
     body:
       chatId: ${chatId}
@@ -25,7 +23,6 @@ getMessagesByChatId:
 mapChatMessages:
   call: http.post
   args:
-    # TODO: replace with env variable
     url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/json/v2/format_chat_log"
     body:
       data: ${getMessagesByChatIdResult.response.body}
@@ -35,7 +32,6 @@ mapChatMessages:
 sendDataToEmail:
   call: http.post
   args:
-    # TODO: replace with env variable
     url: "[#CHATBOT_DMAPPER_V2]:[#CHATBOT_DMAPPER_V2_PORT]/js/email/sendMockEmail"
     body:
       to: ${getUserEmailByChatIdResult.response.body[0].csaEmail}
@@ -47,7 +43,6 @@ sendDataToEmail:
 registerEmailSentEvent:
   call: http.post
   args:
-    # TODO: replace with env variable
     url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/insert-message"
     body:
       chatId: ${chatId}

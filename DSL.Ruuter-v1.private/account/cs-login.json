@@ -59,7 +59,7 @@
           "endpoint": "{tim_url}/jwt/custom-jwt-generate",
           "response_header": {
             "Set-Cookie": {
-              "#.from_property": "{#.custom_jwt_cookie}",
+              "#.from_property": "{#.custom_jwt_cookie#.token}",
               "maxAge": 28800,
               "setSecure": true,
               "domain": "{cookie_domain}",

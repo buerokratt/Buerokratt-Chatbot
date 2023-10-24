@@ -5,23 +5,19 @@ extractRequestData:
     organizationWorkingTimeEndISO: ${incoming.body.organizationWorkingTimeEndISO}
     organizationWorkingTimeWeekdays: ${incoming.body.organizationWorkingTimeWeekdays}
     organizationWorkingTimeNationalHolidays: ${incoming.body.organizationWorkingTimeNationalHolidays}
+  next: check_if_authorized
 
-extractTokenData:
-  call: http.post
-  args:
-    # TODO: replace with env variable and correct path to TIM endpoint
-    url: "[#CHATBOT_RUUTER]:[#CHATBOT_RUUTER_PORT]/mocks/mock-tim-custom-jwt-userinfo"
-    headers:
-      cookie: ${cookie}
-    body:
-      # TODO: pass cookie name correctly to TIM
-      cookieName: "customJwtCookie"
-  result: jwtResult
+check_if_authorized:
+  template: templates/check-user-authority
+  requestType: post
+  headers:
+    cookie: ${cookie}
+  result: authority_result
+  next: check_authority_result
 
-validateAdministrator:
+check_authority_result:
   switch:
-    # TODO: use correct structure when request is made against TIM
-    - condition: ${jwtResult.response.body.response.authorities.includes("ROLE_ADMINISTRATOR")}
+    - condition: ${authority_result !== "false"}
       next: validateBody
   next: returnUnauthorized
 
@@ -34,7 +30,6 @@ validateBody:
 setOrganizationWorkingTime:
   call: http.post
   args:
-    # TODO: replace with env variable
     url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/set-organization-working-time"
     body:
       organizationWorkingTimeStartISO: ${organizationWorkingTimeStartISO}
@@ -43,11 +38,11 @@ setOrganizationWorkingTime:
       organizationWorkingTimeNationalHolidays: ${organizationWorkingTimeNationalHolidays}
       created: ${new Date().toISOString()}
   result: setOrganizationWorkingTimeResult
+  next: mapOrganizationWorkingTimeData
 
 mapOrganizationWorkingTimeData:
   call: http.post
   args:
-    # TODO: replace with env variable
     url: "[#CHATBOT_DMAPPER_V2]:[#CHATBOT_DMAPPER_V2_PORT]/hbs/chat-bot/return_organization_working_time"
     headers:
       type: json

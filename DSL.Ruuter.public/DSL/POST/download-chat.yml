@@ -6,7 +6,6 @@ extractRequestData:
 getMessagesByChatId:
   call: http.post
   args:
-    # TODO: replace with env variable
     url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-chat-messages"
     body:
       chatId: ${chatId}
@@ -16,7 +15,6 @@ getMessagesByChatId:
 mapChatMessages:
   call: http.post
   args:
-    # TODO: replace with env variable
     url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/json/v2/format_chat_log"
     body:
       data: ${getMessagesByChatIdResult.response.body}
@@ -26,7 +24,6 @@ mapChatMessages:
 convertDataToPdf:
   call: http.post
   args:
-    # TODO: replace with env variable
     url: "[#CHATBOT_DMAPPER_V2]:[#CHATBOT_DMAPPER_V2_PORT]/js/convert/pdf"
     body:
       data: ${formattedChatMessages.response.body}
@@ -49,7 +46,6 @@ checkIsEmailPresent:
 sendPdfToEmail:
   call: http.post
   args:
-    # TODO: replace with env variable
     url: "[#CHATBOT_DMAPPER_V2]:[#CHATBOT_DMAPPER_V2_PORT]/js/email/sendMockEmail"
     body:
       to: ${email}

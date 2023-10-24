@@ -1,7 +1,6 @@
 getWidgetConfig:
   call: http.post
   args:
-    # TODO: replace with env variable
     url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-widget-config"
   result: getWidgetConfigResult
 
@@ -14,7 +13,6 @@ validateWidgetConfigExists:
 mapWidgetConfigData:
   call: http.post
   args:
-    # TODO: replace with env variable
     url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/json/v2/return_widget_config"
     body:
       configurationArray: ${getWidgetConfigResult.response.body}

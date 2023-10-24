@@ -2,39 +2,34 @@ extractRequestData:
   assign:
     cookie: ${incoming.headers.cookie}
     chatId: ${incoming.params.chatId}
+  next: check_if_authorized
 
-extractTokenData:
-  call: http.post
-  args:
-    # TODO: replace with env variable and correct path to TIM endpoint
-    url: "[#CHATBOT_RUUTER]:[#CHATBOT_RUUTER_PORT]/mocks/mock-tim-custom-jwt-userinfo"
-    headers:
-      cookie: ${cookie}
-    body:
-      # TODO: pass cookie name correctly to TIM
-      cookieName: "customJwtCookie"
-  result: jwtResult
+check_if_authorized:
+  template: templates/check-user-authority
+  requestType: post
+  headers:
+    cookie: ${cookie}
+  result: authority_result
+  next: check_authority_result
 
-validateAdministrator:
+check_authority_result:
   switch:
-    # TODO: use correct structure when request is made against TIM
-    - condition: ${jwtResult.response.body.response.authorities.includes("ROLE_ADMINISTRATOR")}
+    - condition: ${authority_result !== "false"}
       next: getChatHistoryComment
-  next: returnUnauthorized
+  next: returnUnauthorized     
 
 getChatHistoryComment:
   call: http.post
   args:
-    # TODO: replace with env variable
     url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-chat-history-comment-by-id"
     body:
       chatId: ${chatId}
   result: getChatHistoryCommentResult
+  next: mapChatHistoryCommentData
 
 mapChatHistoryCommentData:
   call: http.post
   args:
-    # TODO: replace with env variable
     url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/json/v2/return_chat_history_comment"
     body:
       historyComment: ${getChatHistoryCommentResult.response.body}

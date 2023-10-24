@@ -113,6 +113,7 @@ services:
       - server.port=8088
     volumes:
       - ./DSL.Ruuter.private/DSL:/DSL
+      - ./constants.ini:/app/constants.ini
     ports:
       - 8088:8088
     networks:
@@ -131,6 +132,7 @@ services:
       - server.port=8086
     volumes:
       - ./DSL.Ruuter.public/DSL:/DSL
+      - ./constants.ini:/app/constants.ini
     ports:
       - 8086:8086
     networks:
