@@ -31,14 +31,10 @@ import formatBytes from 'utils/format-bytes';
 import useSendAttachment from 'modules/attachment/hooks';
 import { AxiosError } from 'axios';
 import { useToast } from 'hooks/useToast';
-import { fetchEventSource } from '@fortaine/fetch-event-source';
-import useUserInfoStore from 'store/store';
+import useStore from 'store';
 import './Chat.scss';
 import sse from '../../services/sse-service';
-import { isStateChangingEventMessage } from 'utils/state-management-utils';
 import { useNavigate } from 'react-router-dom';
-import CsaActivityContext from 'providers/CsaActivityContext';
-import CountdownOverlay from './LoaderOverlay';
 import PreviewMessage from './PreviewMessage';
 import LoaderOverlay from './LoaderOverlay';
 
@@ -72,7 +68,7 @@ const Chat: FC<ChatProps> = ({
   onRefresh,
 }) => {
   const { t } = useTranslation();
-  const { userInfo } = useUserInfoStore();
+  const userInfo = useStore(state => state.userInfo);
   const chatRef = useRef<HTMLDivElement>(null);
   const [messageGroups, _setMessageGroups] = useState<GroupedMessage[]>([]);
   const messageGroupsRef = useRef(messageGroups);
@@ -84,7 +80,7 @@ const Chat: FC<ChatProps> = ({
   const [isPending, startTransition] = useTransition();
   const [responseText, setResponseText] = useState('');
   const [selectedMessages, setSelectedMessages] = useState<Message[]>([]);
-  const { chatCsaActive, setChatCsaActive } = useContext(CsaActivityContext);
+  const chatCsaActive = useStore(state => state.chatCsaActive);
   const [messagesList, setMessagesList] = useState<Message[]>([]);
   const [latestPermissionMessage, setLatestPermissionMessage] =
     useState<number>(0);
@@ -108,7 +104,7 @@ const Chat: FC<ChatProps> = ({
         customerSupportId: userInfo?.idCode ?? '',
       }
     );
-    setChatCsaActive(
+    useStore.getState().setChatCsaActive(
       res.data.get_customer_support_activity[0]?.status === 'online' ||
         res.data.get_customer_support_activity[0]?.status === 'idle'
     );

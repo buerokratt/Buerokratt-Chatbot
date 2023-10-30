@@ -3,7 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 
 import { Layout } from 'components';
-import useUserInfoStore from 'store/store';
+import useStore from 'store';
 import { UserInfo } from 'types/userInfo';
 
 import ChatActive from 'pages/Chat/ChatActive';
@@ -20,12 +20,9 @@ import MonitoringUptime from 'pages/Monitoring/MonitoringUptime';
 import SettingsWelcomeMessage from 'pages/Settings/SettingsWelcomeMessage';
 import SettingsSessionLength from 'pages/Settings/SettingsSessionLength';
 import './locale/et_EE';
-import CsaActivityContext from 'providers/CsaActivityContext';
 
 const App: FC = () => {
-  const store = useUserInfoStore();
-  const [chatCsaActive, setChatCsaActive] = useState<boolean>(false);
-  const { data: userInfo } = useQuery<{
+  useQuery<{
     data: { custom_jwt_userinfo: UserInfo };
   }>({
     queryKey: ['cs-custom-jwt-userinfo', 'prod'],
@@ -34,47 +31,45 @@ const App: FC = () => {
         'exp',
         data.data.custom_jwt_userinfo.JWTExpirationTimestamp
       );
-      return store.setUserInfo(data.data.custom_jwt_userinfo);
+      return useStore.getState().setUserInfo(data.data.custom_jwt_userinfo);
     },
   });
 
   return (
-    <CsaActivityContext.Provider value={{ chatCsaActive, setChatCsaActive }}>
-      <Routes>
-        <Route element={<Layout />}>
-          <Route index element={<Navigate to="/chat/active" />} />
-          <Route path="/chat/unanswered" element={<ChatUnanswered />} />
-          <Route path="/chat/active" element={<ChatActive />} />
-          <Route path="/chat/history" element={<ChatHistory />} />
-          <Route path="/settings/users" element={<SettingsUsers />} />
-          <Route
-            path="/settings/chatbot/settings"
-            element={<SettingsChatSettings />}
-          />
-          <Route
-            path="/settings/chatbot/welcome-message"
-            element={<SettingsWelcomeMessage />}
-          />
-          <Route
-            path="/settings/chatbot/emergency-notices"
-            element={<SettingsEmergencyNotices />}
-          />
-          <Route
-            path="/settings/chatbot/appearance"
-            element={<SettingsAppearance />}
-          />
-          <Route
-            path="/settings/working-time"
-            element={<SettingsWorkingTime />}
-          />
-          <Route
-            path="/settings/session-length"
-            element={<SettingsSessionLength />}
-          />
-          <Route path="/monitoring/uptime" element={<MonitoringUptime />} />
-        </Route>
-      </Routes>
-    </CsaActivityContext.Provider>
+    <Routes>
+      <Route element={<Layout />}>
+        <Route index element={<Navigate to="/chat/active" />} />
+        <Route path="/chat/unanswered" element={<ChatUnanswered />} />
+        <Route path="/chat/active" element={<ChatActive />} />
+        <Route path="/chat/history" element={<ChatHistory />} />
+        <Route path="/settings/users" element={<SettingsUsers />} />
+        <Route
+          path="/settings/chatbot/settings"
+          element={<SettingsChatSettings />}
+        />
+        <Route
+          path="/settings/chatbot/welcome-message"
+          element={<SettingsWelcomeMessage />}
+        />
+        <Route
+          path="/settings/chatbot/emergency-notices"
+          element={<SettingsEmergencyNotices />}
+        />
+        <Route
+          path="/settings/chatbot/appearance"
+          element={<SettingsAppearance />}
+        />
+        <Route
+          path="/settings/working-time"
+          element={<SettingsWorkingTime />}
+        />
+        <Route
+          path="/settings/session-length"
+          element={<SettingsSessionLength />}
+        />
+        <Route path="/monitoring/uptime" element={<MonitoringUptime />} />
+      </Route>
+    </Routes>
   );
 };
 

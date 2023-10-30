@@ -1,37 +1,32 @@
-import { FC, useContext, useEffect, useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Tabs from '@radix-ui/react-tabs';
 import { useQuery } from '@tanstack/react-query';
-import { formatDistanceStrict } from 'date-fns';
-import { et } from 'date-fns/locale';
 
-import { Track, Chat, Dialog, Button, FormRadios } from 'components';
+import { Chat, Dialog, Button, FormRadios } from 'components';
 import {
   CHAT_EVENTS,
   CHAT_STATUS,
   Chat as ChatType,
   GroupedChat,
 } from 'types/chat';
-import useUserInfoStore from 'store/store';
+import useStore from 'store';
 import { User } from 'types/user';
 import { useToast } from 'hooks/useToast';
 import './ChatUnanswered.scss';
 import apiDev from 'services/api-dev';
-import { format } from 'timeago.js';
-import CsaActivityContext from 'providers/CsaActivityContext';
 import ChatTrigger from '../ChatActive/ChatTrigger';
 import clsx from 'clsx';
-import { v4 as uuidv4 } from 'uuid';
 import ForwardToColleaugeModal from '../ForwardToColleaugeModal';
 import ForwardToEstablishmentModal from '../ForwardToEstablishmentModal';
-import sse from 'services/sse-service';
+import sse, { SseInstance } from 'services/sse-service';
+import { v4 as uuidv4 } from 'uuid';
 
 const ChatUnanswered: FC = () => {
   const { t } = useTranslation();
-  const { userInfo } = useUserInfoStore();
+  const userInfo = useStore(state => state.userInfo);
   const toast = useToast();
-  const { chatCsaActive } = useContext(CsaActivityContext);
-  const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
+  const chatCsaActive = useStore(state => state.chatCsaActive);
   const [endChatModal, setEndChatModal] = useState<ChatType | null>(null);
   const [forwardToColleaugeModal, setForwardToColleaugeModal] =
     useState<ChatType | null>(null);
@@ -40,7 +35,6 @@ const ChatUnanswered: FC = () => {
   const [sendToEmailModal, setSendToEmailModal] = useState<ChatType | null>(
     null
   );
-  const [activeChatsList, setActiveChatsList] = useState<ChatType[]>([]);
   const [selectedEndChatStatus, setSelectedEndChatStatus] = useState<
     string | null
   >(null);
@@ -51,12 +45,23 @@ const ChatUnanswered: FC = () => {
     CHAT_EVENTS.RESPONSE_SENT_TO_CLIENT_EMAIL,
   ];
 
+  const activeChats = useStore(state => state.activeChats);
+  const selectedChatId = useStore(state => state.selectedChatId);
+  const selectedChat = useStore(state => state.selectedChat());
+  const setActiveChats = useStore.getState().setActiveChats;
+
   const { refetch } = useQuery<ChatType[]>({
     queryKey: ['cs-get-all-active-chats', 'prod'],
     onSuccess(res: any) {
-      setActiveChatsList(res.data.get_all_active_chats);
+      setActiveChats(res.data.get_all_active_chats);
     },
   });
+  
+  useEffect(() => {
+    refetch();
+  }, [chatCsaActive]);
+
+  const [sseInstance, setSseInstance] = useState<SseInstance>();
 
   useEffect(() => {
     const sseInstance = sse(`cs-get-all-active-chats`);
@@ -64,20 +69,18 @@ const ChatUnanswered: FC = () => {
       const isChatStillExists = chats?.filter(function (e: any) {
         return e.id === selectedChatId;
       });
-      if (isChatStillExists.length === 0 && activeChatsList.length > 0) {
+      if (isChatStillExists.length === 0 && activeChats.length > 0) {
         setTimeout(function () {
-          setActiveChatsList(chats);
+          setActiveChats(chats);
         }, 3000);
       } else {
-        setActiveChatsList(chats);
+        setActiveChats(chats);
       }
     });
+
+    setSseInstance(sseInstance);
     return () => sseInstance.close();
   }, []);
-
-  useEffect(() => {
-    refetch();
-  }, [chatCsaActive]);
 
   const { data: csaNameVisiblity } = useQuery<{ isVisible: boolean }>({
     queryKey: ['cs-get-csa-name-visibility', 'prod-2'],
@@ -87,34 +90,23 @@ const ChatUnanswered: FC = () => {
     queryKey: ['cs-get-csa-title-visibility', 'prod-2'],
   });
 
-  const selectedChat = useMemo(
-    () =>
-      activeChatsList && activeChatsList.find((c) => c.id === selectedChatId),
-    [activeChatsList, selectedChatId]
-  );
-
-  const unansweredChats: GroupedChat = useMemo(() => {
+  const groupedUnansweredChats: GroupedChat = useMemo(() => {
     const grouped: GroupedChat = {
       myChats: [],
       otherChats: [],
     };
 
-    if (!activeChatsList) return grouped;
-
-    const filteredActiveChatsList = activeChatsList;
-    if (chatCsaActive === true) {
-      filteredActiveChatsList.filter((c) => c.customerSupportId === '');
-    }
+    if (!activeChats) return grouped;
 
     if (chatCsaActive === true) {
-      filteredActiveChatsList.forEach((c) => {
+      activeChats.forEach((c) => {
         if (c.customerSupportId === '') {
           grouped.myChats.push(c);
           return;
         }
       });
     } else {
-      filteredActiveChatsList.forEach((c) => {
+      activeChats.forEach((c) => {
         if (
           c.customerSupportId === userInfo?.idCode ||
           c.customerSupportId === ''
@@ -144,7 +136,7 @@ const ChatUnanswered: FC = () => {
     }
 
     return grouped;
-  }, [activeChatsList, chatCsaActive]);
+  }, [activeChats, chatCsaActive]);
 
   const handleCsaForward = async (chat: ChatType, user: User) => {
     try {
@@ -219,7 +211,7 @@ const ChatUnanswered: FC = () => {
     <Tabs.Root
       className="vertical-tabs"
       orientation="vertical"
-      onValueChange={setSelectedChatId}
+      onValueChange={useStore.getState().setSelectedChatId}
       style={{ height: '100%', overflow: 'hidden' }}
     >
       <Tabs.List
@@ -229,12 +221,12 @@ const ChatUnanswered: FC = () => {
       >
         <div className="vertical-tabs__group-header">
           <p>{`${t('chat.unansweredChats')} ${
-            (unansweredChats?.myChats?.length ?? 0) == 0
+            (groupedUnansweredChats?.myChats?.length ?? 0) == 0
               ? ''
-              : `(${unansweredChats?.myChats?.length ?? 0})`
+              : `(${groupedUnansweredChats?.myChats?.length ?? 0})`
           }`}</p>
         </div>
-        {unansweredChats?.myChats?.map((chat) => (
+        {groupedUnansweredChats?.myChats?.map((chat) => (
           <Tabs.Trigger
             key={chat.id}
             className={clsx('vertical-tabs__trigger', {

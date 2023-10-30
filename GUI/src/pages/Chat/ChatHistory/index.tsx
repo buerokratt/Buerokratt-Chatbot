@@ -24,20 +24,20 @@ import { CHAT_EVENTS, CHAT_STATUS, Chat as ChatType } from 'types/chat';
 import { Message } from 'types/message';
 import { useToast } from 'hooks/useToast';
 import apiDev from 'services/api-dev';
-import useUserInfoStore from '../../../store/store';
+import useStore from 'store';
 import { Controller, useForm } from 'react-hook-form';
 import {
   getFromLocalStorage,
   setToLocalStorage,
 } from 'utils/local-storage-utils';
-import { CHAT_HISTORY_PREFERENCES_KEY } from '../../../constants/config';
+import { CHAT_HISTORY_PREFERENCES_KEY } from 'constants/config';
 import apiDevV2 from 'services/api-dev-v2';
 import { useLocation } from 'react-router-dom';
 
 const ChatHistory: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
-  const { userInfo } = useUserInfoStore();
+  const userInfo = useStore(state => state.userInfo);
   const routerLocation = useLocation();
   let passedChatId = new URLSearchParams(routerLocation.search).get('chat');
   const preferences = getFromLocalStorage(

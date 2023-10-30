@@ -10,7 +10,7 @@ import {
   CHAT_STATUS,
   GroupedChat,
 } from 'types/chat';
-import useUserInfoStore from 'store/store';
+import useStore from 'store';
 import { User } from 'types/user';
 import { useToast } from 'hooks/useToast';
 import apiDev from 'services/api-dev';
@@ -23,7 +23,6 @@ import './ChatActive.scss';
 import apiDevV2 from 'services/api-dev-v2';
 import { v4 as uuidv4 } from 'uuid';
 import { useLocation } from 'react-router-dom';
-import CsaActivityContext from 'providers/CsaActivityContext';
 import sse from 'services/sse-service';
 
 const CSAchatStatuses = [
@@ -36,9 +35,9 @@ const CSAchatStatuses = [
 const ChatActive: FC = () => {
   const { t } = useTranslation();
   const { state } = useLocation();
-  const { userInfo } = useUserInfoStore();
+  const userInfo = useStore(state => state.userInfo);
   const toast = useToast();
-  const { chatCsaActive } = useContext(CsaActivityContext);
+  const chatCsaActive = useStore(state => state.chatCsaActive);
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
   const [endChatModal, setEndChatModal] = useState<ChatType | null>(null);
   const [forwardToColleaugeModal, setForwardToColleaugeModal] =
