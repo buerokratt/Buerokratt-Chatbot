@@ -1,4 +1,4 @@
-import { FC, useContext, useEffect, useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
@@ -15,20 +15,19 @@ import {
   Switch,
   Dialog,
 } from 'components';
-import useUserInfoStore from 'store/store';
+import useStore from 'store';
 import { ReactComponent as BykLogo } from 'assets/logo.svg';
 import { UserProfileSettings } from 'types/userProfileSettings';
-import { CHAT_STATUS, Chat as ChatType } from 'types/chat';
+import { Chat as ChatType } from 'types/chat';
 import { useToast } from 'hooks/useToast';
 import { USER_IDLE_STATUS_TIMEOUT } from 'constants/config';
 import apiDev from 'services/api-dev';
 import apiDevV2 from 'services/api-dev-v2';
 import './Header.scss';
 import chatSound from '../../assets/chatSound.mp3';
-import { Subscription, interval } from 'rxjs';
+import { interval } from 'rxjs';
 import { AUTHORITY } from 'types/authorities';
 import { useCookies } from 'react-cookie';
-import CsaActivityContext from 'providers/CsaActivityContext';
 
 type CustomerSupportActivity = {
   idCode: string;
@@ -50,7 +49,7 @@ const statusColors: Record<string, string> = {
 
 const Header: FC = () => {
   const { t } = useTranslation();
-  const { userInfo } = useUserInfoStore();
+  const userInfo = useStore(state => state.userInfo);
   const toast = useToast();
   const [__, setSecondsUntilStatusPopup] = useState(300); // 5 minutes in seconds
   const [statusPopupTimerHasStarted, setStatusPopupTimerHasStarted] =
@@ -64,7 +63,7 @@ const Header: FC = () => {
     'online'
   );
   const audio = useMemo(() => new Audio(chatSound), []);
-  const { chatCsaActive, setChatCsaActive } = useContext(CsaActivityContext);
+  const chatCsaActive = useStore(state => state.chatCsaActive);
   const [userProfileSettings, setUserProfileSettings] =
     useState<UserProfileSettings>({
       userId: 1,
@@ -116,98 +115,78 @@ const Header: FC = () => {
     onSuccess(res: any) {
       const activity = res.data.get_customer_support_activity[0];
       setCsaStatus(activity.status);
-      setChatCsaActive(activity.active === 'true');
+      useStore.getState().setChatCsaActive(activity.active === 'true');
     },
   });
-  const [activeChatsList, setActiveChatsList] = useState<ChatType[]>([]);
 
   useQuery<ChatType[]>({
     queryKey: ['cs-get-all-active-chats', 'prod'],
     onSuccess(res: any) {
-      setActiveChatsList(res.data.get_all_active_chats);
+      useStore.getState().setActiveChats(res.data.get_all_active_chats);
     },
   });
 
   const [_, setCookie] = useCookies([customJwtCookieKey]);
+  const unansweredChatsLength = useStore(state => state.unansweredChatsLength());
+  const forwardedChatsLength = useStore(state => state.forwordedChatsLength());
 
-  const unansweredChats = useMemo(
-    () =>
-      activeChatsList
-        ? activeChatsList.filter((c) => c.customerSupportId === '').length
-        : 0,
-    [activeChatsList]
-  );
-  const forwardedChats = useMemo(
-    () =>
-      activeChatsList
-        ? activeChatsList.filter(
-            (c) =>
-              c.status === CHAT_STATUS.REDIRECTED &&
-              c.customerSupportId === userInfo?.idCode
-          ).length
-        : 0,
-    [activeChatsList]
-  );
+  const handleNewMessage = () => {
+    if (unansweredChatsLength <= 0){
+      return;
+    } 
 
-  useEffect(() => {
-    let subscription: Subscription;
-    if (unansweredChats > 0) {
-      if (userProfileSettings.newChatSoundNotifications) audio.play();
-      if (userProfileSettings.newChatEmailNotifications)
-        if (userProfileSettings.newChatPopupNotifications) {
-          // TODO send email notification
-          toast.open({
-            type: 'info',
-            title: t('global.notification'),
-            message: t('settings.users.newUnansweredChat'),
-          });
-        }
-      subscription = interval(2 * 60 * 1000).subscribe(() => {
-        if (userProfileSettings.newChatSoundNotifications) audio.play();
-        if (userProfileSettings.newChatPopupNotifications) {
-          toast.open({
-            type: 'info',
-            title: t('global.notification'),
-            message: t('settings.users.newUnansweredChat'),
-          });
-        }
+    if (userProfileSettings.newChatSoundNotifications) {
+      audio.play();
+    }
+    if(userProfileSettings.newChatEmailNotifications) {
+      // TODO send email notification
+    }
+    if (userProfileSettings.newChatPopupNotifications) {
+      toast.open({
+        type: 'info',
+        title: t('global.notification'),
+        message: t('settings.users.newUnansweredChat'),
       });
     }
-    return () => {
-      if (subscription) subscription.unsubscribe();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [unansweredChats]);
+  }
 
   useEffect(() => {
-    let subscription: Subscription;
-    if (forwardedChats > 0) {
-      if (userProfileSettings.forwardedChatSoundNotifications) audio.play();
-      if (userProfileSettings.forwardedChatEmailNotifications)
-        if (userProfileSettings.forwardedChatPopupNotifications) {
-          // TODO send email notification
-          toast.open({
-            type: 'info',
-            title: t('global.notification'),
-            message: t('settings.users.newForwardedChat'),
-          });
-        }
-      subscription = interval(2 * 60 * 1000).subscribe(() => {
-        if (userProfileSettings.forwardedChatSoundNotifications) audio.play();
-        if (userProfileSettings.forwardedChatPopupNotifications) {
-          toast.open({
-            type: 'info',
-            title: t('global.notification'),
-            message: t('settings.users.newForwardedChat'),
-          });
-        }
+    handleNewMessage();
+
+    const subscription = interval(2 * 60 * 1000).subscribe(()=>handleNewMessage());
+    return () => {
+      subscription?.unsubscribe();
+    };
+  }, [unansweredChatsLength, userProfileSettings]);
+
+  const handleForwordMessage = () => {
+    if (forwardedChatsLength <= 0) {
+      return;
+    }
+
+    if (userProfileSettings.forwardedChatSoundNotifications) {
+      audio.play();
+    }
+    if (userProfileSettings.forwardedChatEmailNotifications){
+        // TODO send email notification
+    }
+    if (userProfileSettings.forwardedChatPopupNotifications) {
+      toast.open({
+        type: 'info',
+        title: t('global.notification'),
+        message: t('settings.users.newForwardedChat'),
       });
     }
+  }
+
+  useEffect(() => {
+    handleForwordMessage();
+
+    const subscription = interval(2 * 60 * 1000).subscribe(()=>handleForwordMessage);
     return () => {
-      if (subscription) subscription.unsubscribe();
+      subscription?.unsubscribe();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [forwardedChats]);
+  }, [forwardedChatsLength, userProfileSettings]);
 
   const userProfileSettingsMutation = useMutation({
     mutationFn: async (data: UserProfileSettings) => {
@@ -340,7 +319,7 @@ const Header: FC = () => {
   const handleCsaStatusChange = (checked: boolean) => {
     if (checked === false) unClaimAllAssignedChats.mutate();
 
-    setChatCsaActive(checked);
+    useStore.getState().setChatCsaActive(checked);
     setCsaStatus(checked === true ? 'online' : 'offline');
     customerSupportActivityMutation.mutate({
       customerSupportActive: checked,
@@ -384,8 +363,8 @@ const Header: FC = () => {
                     textTransform: 'lowercase',
                   }}
                 >
-                  <strong>{unansweredChats}</strong> {t('chat.unanswered')}{' '}
-                  <strong>{forwardedChats}</strong> {t('chat.forwarded')}
+                  <strong>{unansweredChatsLength}</strong> {t('chat.unanswered')}{' '}
+                  <strong>{forwardedChatsLength}</strong> {t('chat.forwarded')}
                 </p>
                 <Switch
                   onCheckedChange={handleCsaStatusChange}
@@ -499,7 +478,7 @@ const Header: FC = () => {
                 },
                 {
                   label: t('settings.users.userTitle'),
-                  value: userInfo.csaTitle.replaceAll(' ', '\xa0'),
+                  value: userInfo.csaTitle?.replaceAll(' ', '\xa0'),
                 },
                 { label: t('settings.users.email'), value: userInfo.csaEmail },
               ].map((meta, index) => (
