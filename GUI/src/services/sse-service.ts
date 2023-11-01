@@ -15,6 +15,10 @@ const sse = <T>(url: string, onMessage: (data: T) => void): EventSource => {
     }
   };
 
+  eventSource.onopen = () => {
+    console.log("SSE connection Opened");
+  };
+  
   eventSource.onerror = () => {
     console.error('SSE error');
   };
