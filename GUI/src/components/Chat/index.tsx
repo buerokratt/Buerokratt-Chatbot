@@ -111,13 +111,11 @@ const Chat: FC<ChatProps> = ({
   };
 
   useEffect(() => {
-    const sseInstance = sse(
-      `cs-get-new-messages?chatId=${chat.id}&lastRead=${new Date(
-        chat.lastMessageTimestamp ?? ''
-      ).toISOString()}`
-    );
+    const sseUrl = `cs-get-new-messages?chatId=${chat.id}&lastRead=${new Date(
+      chat.lastMessageTimestamp ?? ''
+    ).toISOString()}`;
 
-    sseInstance.onMessage((messages: Message[]) => {
+    const onMessage = (messages: Message[]) => {
       if (messages.length > 0)
         setPreviewTypingMessage(messages[messages.length - 1]);
       const filteredMessages = messages?.filter((newMessage) => {
@@ -166,9 +164,13 @@ const Chat: FC<ChatProps> = ({
       if (permissionsHandeledMessages?.length > 0) {
         getMessages();
       }
-    });
+    };
 
-    return () => sseInstance.close();
+    const events = sse(sseUrl, onMessage);
+
+    return () => {
+       events.close();
+    };
   }, [messagesList]);
 
   const getMessages = async () => {

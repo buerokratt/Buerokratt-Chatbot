@@ -19,8 +19,7 @@ import ChatTrigger from '../ChatActive/ChatTrigger';
 import clsx from 'clsx';
 import ForwardToColleaugeModal from '../ForwardToColleaugeModal';
 import ForwardToEstablishmentModal from '../ForwardToEstablishmentModal';
-import sse, { SseInstance } from 'services/sse-service';
-import { v4 as uuidv4 } from 'uuid';
+import sse from 'services/sse-service';
 
 const ChatUnanswered: FC = () => {
   const { t } = useTranslation();
@@ -61,11 +60,8 @@ const ChatUnanswered: FC = () => {
     refetch();
   }, [chatCsaActive]);
 
-  const [sseInstance, setSseInstance] = useState<SseInstance>();
-
   useEffect(() => {
-    const sseInstance = sse(`cs-get-all-active-chats`);
-    sseInstance.onMessage((chats: any) => {
+    const onMessage = (chats: any) => {
       const isChatStillExists = chats?.filter(function (e: any) {
         return e.id === selectedChatId;
       });
@@ -76,10 +72,13 @@ const ChatUnanswered: FC = () => {
       } else {
         setActiveChats(chats);
       }
-    });
+    };
 
-    setSseInstance(sseInstance);
-    return () => sseInstance.close();
+    const events = sse(`cs-get-all-active-chats`, onMessage);
+
+    return () => {
+      events.close();
+    };
   }, []);
 
   const { data: csaNameVisiblity } = useQuery<{ isVisible: boolean }>({

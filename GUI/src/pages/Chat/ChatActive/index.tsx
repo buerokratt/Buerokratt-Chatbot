@@ -74,8 +74,7 @@ const ChatActive: FC = () => {
   });
 
   useEffect(() => {
-    const sseInstance = sse(`cs-get-all-active-chats`);
-    sseInstance.onMessage((chats: any) => {
+    const onMessage = (chats: any) => {
       const isChatStillExists = chats?.filter(function (e: any) {
         return e.id === selectedChatId;
       });
@@ -86,8 +85,13 @@ const ChatActive: FC = () => {
       } else {
         setActiveChatsList(chats);
       }
-    });
-    return () => sseInstance.close();
+    };
+
+    const events = sse(`cs-get-all-active-chats`, onMessage);
+
+    return () => {
+      events.close();
+    };
   }, []);
 
   useEffect(() => {
