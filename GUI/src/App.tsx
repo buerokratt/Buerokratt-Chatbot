@@ -38,9 +38,9 @@ const App: FC = () => {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route index element={<Navigate to="/chat/active" />} />
+        <Route index element={<Navigate to="/active" />} />
         <Route path="/chat/unanswered" element={<ChatUnanswered />} />
-        <Route path="/chat/active" element={<ChatActive />} />
+        <Route path="/active" element={<ChatActive />} />
         <Route path="/chat/history" element={<ChatHistory />} />
         <Route path="/settings/users" element={<SettingsUsers />} />
         <Route
