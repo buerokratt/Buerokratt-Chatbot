@@ -79,11 +79,7 @@ const SettingsWorkingTime: FC = () => {
     },
   });
 
-  const handleFormSubmit = handleSubmit((data) => {
-    console.log(new Date(data.organizationWorkingTimeStartISO).toISOString());
-    console.log(new Date(data.organizationWorkingTimeEndISO).toISOString());
-    workingTimeMutation.mutate(data);
-  });
+  const handleFormSubmit = handleSubmit((data) => workingTimeMutation.mutate(data));
 
   if (!workingTime || Object.keys(control._formValues).length === 0) {
     return <>Loading...</>;
