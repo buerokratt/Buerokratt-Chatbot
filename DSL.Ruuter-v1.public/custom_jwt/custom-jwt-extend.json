@@ -38,7 +38,7 @@
         },
         "response_header": {
           "Set-Cookie": {
-            "#.from_property": "{#.custom_jwt_extend}",
+            "#.from_property": "{#.custom_jwt_extend#.token}",
             "maxAge": "#.get_end_user_session_length",
             "setSecure": true,
             "domain": "{cookie_domain}",
