@@ -39,9 +39,9 @@ const App: FC = () => {
     <Routes>
       <Route element={<Layout />}>
         <Route index element={<Navigate to="/active" />} />
-        <Route path="/chat/unanswered" element={<ChatUnanswered />} />
+        <Route path="/unanswered" element={<ChatUnanswered />} />
         <Route path="/active" element={<ChatActive />} />
-        <Route path="/chat/history" element={<ChatHistory />} />
+        <Route path="/history" element={<ChatHistory />} />
         <Route path="/settings/users" element={<SettingsUsers />} />
         <Route
           path="/settings/chatbot/settings"
