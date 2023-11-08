@@ -56,7 +56,12 @@ const SettingsWorkingTime: FC = () => {
     mutationFn: (data: OrganizationWorkingTime) =>
       apiDevV2.post<OrganizationWorkingTime>(
         'cs-set-organization-working-time',
-        data
+        {
+          'organizationWorkingTimeStartISO': new Date(data.organizationWorkingTimeStartISO).toISOString(),
+          'organizationWorkingTimeEndISO': new Date(data.organizationWorkingTimeEndISO).toISOString(),
+          'organizationWorkingTimeNationalHolidays': data.organizationWorkingTimeNationalHolidays,
+          'organizationWorkingTimeWeekdays': data.organizationWorkingTimeWeekdays
+        }
       ),
     onSuccess: () => {
       toast.open({
@@ -74,9 +79,7 @@ const SettingsWorkingTime: FC = () => {
     },
   });
 
-  const handleFormSubmit = handleSubmit((data) => {
-    workingTimeMutation.mutate(data);
-  });
+  const handleFormSubmit = handleSubmit((data) => workingTimeMutation.mutate(data));
 
   if (!workingTime || Object.keys(control._formValues).length === 0) {
     return <>Loading...</>;

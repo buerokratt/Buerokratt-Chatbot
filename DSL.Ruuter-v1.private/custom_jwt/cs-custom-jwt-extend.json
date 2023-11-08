@@ -15,7 +15,7 @@
         "post_body_struct": "customJwtCookie",
         "response_header": {
           "Set-Cookie": {
-            "#.from_property": "{#.custom_jwt_extend}",
+            "#.from_property": "{#.custom_jwt_extend#.token}",
             "maxAge": 28800,
             "setSecure": true,
             "domain": "{cookie_domain}",
