@@ -21,15 +21,15 @@ const MainNavigation: FC = () => {
       children: [
         {
           label: t('menu.unanswered'),
-          path: '/chat/unanswered',
+          path: '/unanswered',
         },
         {
           label: t('menu.active'),
-          path: '/chat/active',
+          path: '/active',
         },
         {
           label: t('menu.history'),
-          path: '/chat/history',
+          path: '/history',
         },
       ],
     },
