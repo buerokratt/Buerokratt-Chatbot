@@ -107,7 +107,7 @@
     "redirectedMessage": "{{user}} forwarded chat from {{from}} to {{to}} {{date}}",
     "status": {
       "active": "Active",
-      "ended": "Ended"
+      "ended": "Unspecified"
     },
     "chatStatus": "Chat status",
     "changeStatus": "Change status",
@@ -151,7 +151,7 @@
     },
     "plainEvents": {
       "answered": "Answered",
-      "terminated": "Terminated",
+      "terminated": "Unspecified",
       "sent_to_csa_email": "Chat sent to CSA email",
       "client-left": "Client left",
       "client_left_with_accepted": "Client left with accepted response",
@@ -186,7 +186,7 @@
     },
     "events": {
       "answered": "Answered {{date}}",
-      "terminated": "Terminated {{date}}",
+      "terminated": "Unspecified {{date}}",
       "sent_to_csa_email": "Chat sent to CSA email {{date}}",
       "client-left": "Client left {{date}}",
       "client_left_with_accepted": "Client left with accepted response {{date}}",
