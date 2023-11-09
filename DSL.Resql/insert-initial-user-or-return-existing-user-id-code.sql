@@ -1,6 +1,6 @@
 WITH initial_user AS (
     INSERT INTO "user" (login, id_code, first_name, last_name, display_name, status, created, csa_title, csa_email)
-        SELECT :userIdCode, :userIdCode, :firstName, :lastName, :firstName, 'active', :created::timestamp with time zone, :csaTitle, :csa_email
+        SELECT :userIdCode, :userIdCode, :firstName, :lastName, :firstName, 'active', :created::timestamp with time zone, null, null
         WHERE NOT exists(SELECT 1 FROM "user")
         RETURNING id_code),
      initial_user_authority AS (
