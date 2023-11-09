@@ -107,7 +107,7 @@
     "redirectedMessage": "{{user}} suunas vestluse kasutajalt {{from}} kasutajale {{to}} {{date}}",
     "status": {
       "active": "Aktiivne",
-      "ended": "Lõpetatud"
+      "ended": "Määramata"
     },
     "chatStatus": "Vestluse staatus",
     "changeStatus": "Muuda staatust",
@@ -151,7 +151,7 @@
     },
     "plainEvents": {
       "answered": "Vastatud",
-      "terminated": "Lõpetatud",
+      "terminated": "Määramata",
       "sent_to_csa_email": "Vestlus saadetud klienditeenindaja e-mailile",
       "client-left": "Klient lahkus",
       "client_left_with_accepted": "Klient lahkus aktsepteeritud vastusega",
@@ -186,7 +186,7 @@
     },
     "events": {
       "answered": "Vastatud {{date}}",
-      "terminated": "Lõpetatud {{date}}",
+      "terminated": "Määramata {{date}}",
       "sent_to_csa_email": "Vestlus saadetud klienditeenindaja e-mailile {{date}}",
       "client-left": "Klient lahkus {{date}}",
       "client_left_with_accepted": "Klient lahkus aktsepteeritud vastusega {{date}}",
