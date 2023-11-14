@@ -337,9 +337,20 @@ const ChatHistory: FC = () => {
               : t('chat.status.ended')
             : '',
         sortingFn: (a, b, isAsc) => {
-          const statusA = a.getValue('status') === CHAT_STATUS.ENDED ? 1 : 0;
-          const statusB = b.getValue('status') === CHAT_STATUS.ENDED ? 1 : 0;
-          return isAsc ? statusA - statusB : statusB - statusA;
+          const statusA =
+            a.getValue('status') === CHAT_STATUS.ENDED
+              ? t('chat.plainEvents.' + (a.original.lastMessageEvent ?? ''))
+              : '';
+          const statusB =
+            b.getValue('status') === CHAT_STATUS.ENDED
+              ? t('chat.plainEvents.' + (b.original.lastMessageEvent ?? ''))
+              : '';
+          return (
+            statusA.localeCompare(statusB, undefined, {
+              numeric: true,
+              sensitivity: 'base',
+            }) * (isAsc ? 1 : -1)
+          );
         },
       }),
       columnHelper.accessor('id', {
