@@ -1,9 +1,25 @@
 extractRequestData:
   assign:
     cookie: ${incoming.headers.cookie}
-    organizationWorkingTimeStartISO: ${incoming.body.organizationWorkingTimeStartISO}
-    organizationWorkingTimeEndISO: ${incoming.body.organizationWorkingTimeEndISO}
+    organizationMondayWorkingTimeStartISO: ${incoming.body.organizationMondayWorkingTimeStartISO}
+    organizationMondayWorkingTimeEndISO: ${incoming.body.organizationMondayWorkingTimeEndISO}
+    organizationTuesdayWorkingTimeStartISO: ${incoming.body.organizationTuesdayWorkingTimeStartISO}
+    organizationTuesdayWorkingTimeEndISO: ${incoming.body.organizationTuesdayWorkingTimeEndISO}
+    organizationWednesdayWorkingTimeStartISO: ${incoming.body.organizationWednesdayWorkingTimeStartISO}
+    organizationWednesdayWorkingTimeEndISO: ${incoming.body.organizationWednesdayWorkingTimeEndISO}
+    organizationThursdayWorkingTimeStartISO: ${incoming.body.organizationThursdayWorkingTimeStartISO}
+    organizationThursdayWorkingTimeEndISO: ${incoming.body.organizationThursdayWorkingTimeEndISO}
+    organizationFridayWorkingTimeStartISO: ${incoming.body.organizationFridayWorkingTimeStartISO}
+    organizationFridayWorkingTimeEndISO: ${incoming.body.organizationFridayWorkingTimeEndISO}
+    organizationSaturdayWorkingTimeStartISO: ${incoming.body.organizationSaturdayWorkingTimeStartISO}
+    organizationSaturdayWorkingTimeEndISO: ${incoming.body.organizationSaturdayWorkingTimeEndISO}
+    organizationSundayWorkingTimeStartISO: ${incoming.body.organizationSundayWorkingTimeStartISO}
+    organizationSundayWorkingTimeEndISO: ${incoming.body.organizationSundayWorkingTimeEndISO}
+    organizationAllWeekdaysTimeStartISO: ${incoming.body.organizationAllWeekdaysTimeStartISO}
+    organizationAllWeekdaysTimeEndISO: ${incoming.body.organizationAllWeekdaysTimeEndISO}
     organizationWorkingTimeWeekdays: ${incoming.body.organizationWorkingTimeWeekdays}
+    organizationClosedOnWeekEnds: ${incoming.body.organizationClosedOnWeekEnds}
+    organizationTheSameOnAllWorkingDays: ${incoming.body.organizationTheSameOnAllWorkingDays}
     organizationWorkingTimeNationalHolidays: ${incoming.body.organizationWorkingTimeNationalHolidays}
   next: check_if_authorized
 
@@ -18,23 +34,33 @@ check_if_authorized:
 check_authority_result:
   switch:
     - condition: ${authority_result !== "false"}
-      next: validateBody
-  next: returnUnauthorized
-
-validateBody:
-  switch:
-    - condition: "${!!(new Date(organizationWorkingTimeStartISO) && new Date(organizationWorkingTimeEndISO)) && typeof organizationWorkingTimeNationalHolidays === 'boolean' && typeof organizationWorkingTimeWeekdays === 'object'}"
       next: setOrganizationWorkingTime
-  next: returnInvalidBody
+  next: returnUnauthorized
 
 setOrganizationWorkingTime:
   call: http.post
   args:
     url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/set-organization-working-time"
     body:
-      organizationWorkingTimeStartISO: ${organizationWorkingTimeStartISO}
-      organizationWorkingTimeEndISO: ${organizationWorkingTimeEndISO}
-      organizationWorkingTimeWeekdays: ${organizationWorkingTimeWeekdays.join(",")}
+      organizationMondayWorkingTimeStartISO: ${organizationMondayWorkingTimeStartISO}
+      organizationMondayWorkingTimeEndISO: ${organizationMondayWorkingTimeEndISO}
+      organizationTuesdayWorkingTimeStartISO: ${organizationTuesdayWorkingTimeStartISO}
+      organizationTuesdayWorkingTimeEndISO: ${organizationTuesdayWorkingTimeEndISO}
+      organizationWednesdayWorkingTimeStartISO: ${organizationWednesdayWorkingTimeStartISO}
+      organizationWednesdayWorkingTimeEndISO: ${organizationWednesdayWorkingTimeEndISO}
+      organizationThursdayWorkingTimeStartISO: ${organizationThursdayWorkingTimeStartISO}
+      organizationThursdayWorkingTimeEndISO: ${organizationThursdayWorkingTimeEndISO}
+      organizationFridayWorkingTimeStartISO: ${organizationFridayWorkingTimeStartISO}
+      organizationFridayWorkingTimeEndISO: ${organizationFridayWorkingTimeEndISO}
+      organizationSaturdayWorkingTimeStartISO: ${organizationSaturdayWorkingTimeStartISO}
+      organizationSaturdayWorkingTimeEndISO: ${organizationSaturdayWorkingTimeEndISO}
+      organizationSundayWorkingTimeStartISO: ${organizationSundayWorkingTimeStartISO}
+      organizationSundayWorkingTimeEndISO: ${organizationSundayWorkingTimeEndISO}
+      organizationAllWeekdaysTimeStartISO: ${organizationAllWeekdaysTimeStartISO}
+      organizationAllWeekdaysTimeEndISO: ${organizationAllWeekdaysTimeEndISO}
+      organizationWorkingTimeWeekdays: ${organizationWorkingTimeWeekdays}
+      organizationClosedOnWeekEnds: ${organizationClosedOnWeekEnds}
+      organizationTheSameOnAllWorkingDays: ${organizationTheSameOnAllWorkingDays}
       organizationWorkingTimeNationalHolidays: ${organizationWorkingTimeNationalHolidays}
       created: ${new Date().toISOString()}
   result: setOrganizationWorkingTimeResult

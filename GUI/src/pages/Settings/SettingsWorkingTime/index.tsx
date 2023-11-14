@@ -4,19 +4,12 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { useTranslation } from 'react-i18next';
 
-import {
-  Button,
-  Card,
-  FormCheckbox,
-  FormDatepicker,
-  Label,
-  Switch,
-  Track,
-} from 'components';
+import { Button, Card, FormDatepicker, Switch, Track } from 'components';
 import { OrganizationWorkingTime } from 'types/organizationWorkingTime';
 import { useToast } from 'hooks/useToast';
 import apiDevV2 from 'services/api-dev-v2';
 import './SettingsWorkingTime.scss';
+import { getOrganizationTimeData, setOrganizationTimeData } from './data';
 
 const weekdaysOptions = [
   'Monday',
@@ -31,24 +24,21 @@ const weekdaysOptions = [
 const SettingsWorkingTime: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
-  const { control, handleSubmit, reset } = useForm<OrganizationWorkingTime>();
+  const { control, handleSubmit, reset, watch } =
+    useForm<OrganizationWorkingTime>();
   const [key, setKey] = useState(0);
+  const isOrganizationClosedOnWeekEnds = watch('organizationClosedOnWeekEnds');
+  const isOrganizationTheSameOnAllWorkingDays = watch(
+    'organizationTheSameOnAllWorkingDays'
+  );
+  const organizationWorkingTimeWeekdays = watch(
+    'organizationWorkingTimeWeekdays'
+  );
   const { data: workingTime } = useQuery<OrganizationWorkingTime>({
     queryKey: ['cs-get-organization-working-time', 'prod-2'],
     onSuccess: (data) => {
       if (Object.keys(control._formValues).length > 0) return;
-      reset({
-        // organizationWorkingTimeStartISO: data.organizationWorkingTimeStartISO
-        //   ? new Date(data.organizationWorkingTimeStartISO)
-        //   : new Date(),
-        // organizationWorkingTimeEndISO: data.organizationWorkingTimeEndISO
-        //   ? new Date(data.organizationWorkingTimeEndISO)
-        //   : new Date(),
-        organizationWorkingTimeNationalHolidays:
-          data.organizationWorkingTimeNationalHolidays ?? false,
-        organizationWorkingTimeWeekdays:
-          data.organizationWorkingTimeWeekdays ?? [],
-      });
+      reset(getOrganizationTimeData(data));
       setKey(key + 1);
     },
   });
@@ -57,17 +47,7 @@ const SettingsWorkingTime: FC = () => {
     mutationFn: (data: OrganizationWorkingTime) =>
       apiDevV2.post<OrganizationWorkingTime>(
         'cs-set-organization-working-time',
-        {
-          // organizationWorkingTimeStartISO: new Date(
-          //   data.organizationWorkingTimeStartISO
-          // ).toISOString(),
-          // organizationWorkingTimeEndISO: new Date(
-          //   data.organizationWorkingTimeEndISO
-          // ).toISOString(),
-          organizationWorkingTimeNationalHolidays:
-            data.organizationWorkingTimeNationalHolidays,
-          organizationWorkingTimeWeekdays: data.organizationWorkingTimeWeekdays,
-        }
+        setOrganizationTimeData(data)
       ),
     onSuccess: () => {
       toast.open({
@@ -98,182 +78,194 @@ const SettingsWorkingTime: FC = () => {
       <p>{t('settings.workingTime.description')}</p>
       <Card
         key={key}
+        isHeaderLight={true}
+        isBodyDivided={true}
         footer={
           <Track justify="end">
             <Button onClick={handleFormSubmit}>{t('global.save')}</Button>
           </Track>
         }
-      >
-        <Track gap={8} direction="vertical" align="left">
-          <Controller
-            name="organizationWorkingTimeNationalHolidays"
-            control={control}
-            render={({ field }) => (
-              <Switch
-                label={t('settings.workingTime.publicHolidays')}
-                onLabel={t('settings.workingTime.consider').toString()}
-                offLabel={t('settings.workingTime.dontConsider').toString()}
-                onCheckedChange={field.onChange}
-                checked={field.value}
-                {...field}
-              />
-            )}
-          />
-          <Controller
-            name="organizationClosedOnWeekEnds"
-            control={control}
-            render={({ field }) => (
-              <Switch
-                label={t('settings.workingTime.closedOnWeekends')}
-                onLabel={t('global.yes').toString()}
-                offLabel={t('global.no').toString()}
-                onCheckedChange={field.onChange}
-                checked={field.value}
-                {...field}
-              />
-            )}
-          />
-          <Controller
-            name="organizationTheSameOnAllWorkingDays"
-            control={control}
-            render={({ field }) => (
-              <Switch
-                label={t('settings.workingTime.theSameOnAllWorkingDays')}
-                onLabel={t('global.yes').toString()}
-                offLabel={t('global.no').toString()}
-                onCheckedChange={field.onChange}
-                checked={field.value}
-                {...field}
-              />
-            )}
-          />
-          <Controller
-            name={
-              `organizationMondayWorkingTimeEndISO` as keyof OrganizationWorkingTime
-            }
-            control={control}
-            render={({ field }) => {
-              return (
-                <div
-                  style={{
-                    width: '45%',
-                    // display: 'inline-flex',
-                    flex: '1',
-                  }}
-                >
-                  <FormDatepicker
-                    {...field}
-                    timePicker
-                    label="s"
-                    value={field.value ?? new Date('0')}
-                  />
-                  <label style={{ paddingRight: '20px' }}>
-                    {t('settings.workingTime.until')}
-                  </label>
-                  <FormDatepicker
-                    {...field}
-                    timePicker
-                    label=""
-                    value={field.value ?? new Date('0')}
-                  />
-                </div>
-              );
-            }}
-          />
-          <div style={{ borderTop: '1px solid black',  width: '100%'}}></div>
-          {/* <label>{t('settings.workingTime.until')}</label> */}
-          {/* <Controller
-            name={
-              `organizationMondayWorkingTimeEndISO` as keyof OrganizationWorkingTime
-            }
-            control={control}
-            render={({ field }) => {
-              return (
-                <FormDatepicker
+        header={
+          <Track gap={8} direction="vertical" align="left">
+            <Controller
+              name="organizationWorkingTimeNationalHolidays"
+              control={control}
+              render={({ field }) => (
+                <Switch
+                  label={t('settings.workingTime.publicHolidays')}
+                  onLabel={t('settings.workingTime.consider').toString()}
+                  offLabel={t('settings.workingTime.dontConsider').toString()}
+                  onCheckedChange={field.onChange}
+                  checked={field.value}
                   {...field}
-                  timePicker
-                  label=""
-                  value={field.value ?? new Date('0')}
                 />
-              );
-            }}
-          /> */}
-
-          <Controller
-            name="organizationWorkingTimeWeekdays"
-            control={control}
-            render={({ field }) => (
-              <>
-                <div className="weekdays">
-                  <div
-                    id="organizationWorkingTimeWeekdaysWrapper"
-                    className="weekdays__wrapper"
-                  >
-                    {weekdaysOptions.map((d) => {
-                      return (
-                        <div>
-                          <Switch
-                            key={`organizationWorkingTimeWeekdays-${d}`}
-                            label={t(`settings.weekdays.${d}`.toLowerCase())}
-                            onLabel={t('settings.workingTime.open').toString()}
-                            offLabel={t(
-                              'settings.workingTime.closed'
-                            ).toString()}
-                            onCheckedChange={(e) => {
-                              field.onChange(
-                                e
-                                  ? [...field.value, d.toLowerCase()]
-                                  : field.value.filter(
-                                      (pd) =>
-                                        pd.toLowerCase() !== d.toLowerCase()
-                                    )
-                              );
-                            }}
-                            checked={field.value?.includes(d.toLowerCase())}
-                            {...field}
-                          />
-                          <Controller
-                            name={
-                              `organization${d}WorkingTimeStartISO` as keyof OrganizationWorkingTime
-                            }
-                            control={control}
-                            render={({ field }) => {
-                              return (
-                                <FormDatepicker
-                                  {...field}
-                                  timePicker
-                                  label=""
-                                  value={field.value ?? new Date('0')}
-                                />
-                              );
-                            }}
-                          />
-                          <label>{t('settings.workingTime.until')}</label>
-                          <Controller
-                            name={
-                              `organization${d}WorkingTimeEndISO` as keyof OrganizationWorkingTime
-                            }
-                            control={control}
-                            render={({ field }) => {
-                              return (
-                                <FormDatepicker
-                                  {...field}
-                                  timePicker
-                                  label=""
-                                  value={field.value ?? new Date('0')}
-                                />
-                              );
-                            }}
-                          />
-                        </div>
-                      );
-                    })}
+              )}
+            />
+            <Controller
+              name="organizationClosedOnWeekEnds"
+              control={control}
+              render={({ field }) => (
+                <Switch
+                  label={t('settings.workingTime.closedOnWeekends')}
+                  onLabel={t('global.yes').toString()}
+                  offLabel={t('global.no').toString()}
+                  onCheckedChange={field.onChange}
+                  checked={field.value}
+                  {...field}
+                />
+              )}
+            />
+            <Controller
+              name="organizationTheSameOnAllWorkingDays"
+              control={control}
+              render={({ field }) => (
+                <Switch
+                  label={t('settings.workingTime.theSameOnAllWorkingDays')}
+                  onLabel={t('global.yes').toString()}
+                  offLabel={t('global.no').toString()}
+                  onCheckedChange={field.onChange}
+                  checked={field.value}
+                  {...field}
+                />
+              )}
+            />
+          </Track>
+        }
+      >
+        {isOrganizationTheSameOnAllWorkingDays && (
+          <Track>
+            <label className="Label">
+              {t(
+                `${
+                  isOrganizationClosedOnWeekEnds
+                    ? 'settings.workingTime.allWeekdaysExceptWeekend'
+                    : 'settings.workingTime.allWeekdays'
+                }`
+              )}
+            </label>
+            <Controller
+              name={'organizationAllWeekdaysTimeStartISO'}
+              control={control}
+              render={({ field }) => {
+                return (
+                  <div className="startTime">
+                    <FormDatepicker
+                      {...field}
+                      timePicker
+                      hideLabel
+                      direction="row"
+                      label=""
+                      value={field.value ?? new Date('0')}
+                    />
                   </div>
-                </div>
-              </>
-            )}
-          />
-        </Track>
+                );
+              }}
+            />
+            <label>{t('settings.workingTime.until')}</label>
+            <Controller
+              name={'organizationAllWeekdaysTimeEndISO'}
+              control={control}
+              render={({ field }) => {
+                return (
+                  <div className="endTime">
+                    <FormDatepicker
+                      {...field}
+                      timePicker
+                      hideLabel
+                      direction="row"
+                      label=""
+                      value={field.value ?? new Date('0')}
+                    />
+                  </div>
+                );
+              }}
+            />
+          </Track>
+        )}
+        {!isOrganizationTheSameOnAllWorkingDays &&
+          weekdaysOptions.map((d) => {
+            return isOrganizationClosedOnWeekEnds &&
+              (d === 'Saturday' || d === 'Sunday') ? (
+              <></>
+            ) : (
+              <Track>
+                <label className="Label switch">
+                  {t(`settings.weekdays.${d}`.toLowerCase())}
+                </label>
+                <Controller
+                  name="organizationWorkingTimeWeekdays"
+                  control={control}
+                  render={({ field }) => (
+                    <div>
+                      <Switch
+                        label=""
+                        onLabel={t('settings.workingTime.consider').toString()}
+                        offLabel={t(
+                          'settings.workingTime.dontConsider'
+                        ).toString()}
+                        onCheckedChange={(e) => {
+                          field.onChange(
+                            e
+                              ? [...field.value, d.toLowerCase()]
+                              : field.value.filter(
+                                  (pd) => pd !== d.toLowerCase()
+                                )
+                          );
+                        }}
+                        checked={field.value?.includes(d.toLowerCase())}
+                        {...field}
+                      />
+                    </div>
+                  )}
+                />
+                {organizationWorkingTimeWeekdays.includes(d.toLowerCase()) && (
+                  <Track>
+                    <Controller
+                      name={
+                        `organization${d}WorkingTimeStartISO` as keyof OrganizationWorkingTime
+                      }
+                      control={control}
+                      render={({ field }) => {
+                        return (
+                          <div className="startTime">
+                            <FormDatepicker
+                              {...field}
+                              timePicker
+                              hideLabel
+                              direction="row"
+                              label=""
+                              value={field.value ?? new Date('0')}
+                            />
+                          </div>
+                        );
+                      }}
+                    />
+                    <label>{t('settings.workingTime.until')}</label>
+                    <Controller
+                      name={
+                        `organization${d}WorkingTimeEndISO` as keyof OrganizationWorkingTime
+                      }
+                      control={control}
+                      render={({ field }) => {
+                        return (
+                          <div className="endTime">
+                            <FormDatepicker
+                              {...field}
+                              timePicker
+                              hideLabel
+                              direction="row"
+                              label=""
+                              value={field.value ?? new Date('0')}
+                            />
+                          </div>
+                        );
+                      }}
+                    />
+                  </Track>
+                )}
+              </Track>
+            );
+          })}
       </Card>
     </>
   );
