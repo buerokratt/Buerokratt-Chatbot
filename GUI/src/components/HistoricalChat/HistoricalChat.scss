@@ -156,4 +156,12 @@
     font-size: 11px;
     line-height: 20px;
   }
+
+  &__comment-text {
+    color: get-color(black);
+
+    &.placeholder {
+      color: get-color(black-coral-6);
+    }
+  }
 }
