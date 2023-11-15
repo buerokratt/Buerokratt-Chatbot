@@ -2,69 +2,54 @@ import { OrganizationWorkingTime } from 'types/organizationWorkingTime';
 
 export function getOrganizationTimeData(data: OrganizationWorkingTime) {
   return {
-    organizationMondayWorkingTimeStartISO:
+    organizationMondayWorkingTimeStartISO: convertDate(
       data.organizationMondayWorkingTimeStartISO
-        ? new Date(data.organizationMondayWorkingTimeStartISO)
-        : new Date(),
-    organizationMondayWorkingTimeEndISO:
+    ),
+    organizationMondayWorkingTimeEndISO: convertDate(
       data.organizationMondayWorkingTimeEndISO
-        ? new Date(data.organizationMondayWorkingTimeEndISO)
-        : new Date(),
-    organizationTuesdayWorkingTimeStartISO:
+    ),
+    organizationTuesdayWorkingTimeStartISO: convertDate(
       data.organizationTuesdayWorkingTimeStartISO
-        ? new Date(data.organizationTuesdayWorkingTimeStartISO)
-        : new Date(),
-    organizationTuesdayWorkingTimeEndISO:
+    ),
+    organizationTuesdayWorkingTimeEndISO: convertDate(
       data.organizationTuesdayWorkingTimeEndISO
-        ? new Date(data.organizationTuesdayWorkingTimeEndISO)
-        : new Date(),
-    organizationWednesdayWorkingTimeStartISO:
+    ),
+    organizationWednesdayWorkingTimeStartISO: convertDate(
       data.organizationWednesdayWorkingTimeStartISO
-        ? new Date(data.organizationWednesdayWorkingTimeStartISO)
-        : new Date(),
-    organizationWednesdayWorkingTimeEndISO:
+    ),
+    organizationWednesdayWorkingTimeEndISO: convertDate(
       data.organizationWednesdayWorkingTimeEndISO
-        ? new Date(data.organizationWednesdayWorkingTimeEndISO)
-        : new Date(),
-    organizationThursdayWorkingTimeStartISO:
+    ),
+    organizationThursdayWorkingTimeStartISO: convertDate(
       data.organizationThursdayWorkingTimeStartISO
-        ? new Date(data.organizationThursdayWorkingTimeStartISO)
-        : new Date(),
-    organizationThursdayWorkingTimeEndISO:
+    ),
+    organizationThursdayWorkingTimeEndISO: convertDate(
       data.organizationThursdayWorkingTimeEndISO
-        ? new Date(data.organizationThursdayWorkingTimeEndISO)
-        : new Date(),
-    organizationFridayWorkingTimeStartISO:
+    ),
+    organizationFridayWorkingTimeStartISO: convertDate(
       data.organizationFridayWorkingTimeStartISO
-        ? new Date(data.organizationFridayWorkingTimeStartISO)
-        : new Date(),
-    organizationFridayWorkingTimeEndISO:
+    ),
+    organizationFridayWorkingTimeEndISO: convertDate(
       data.organizationFridayWorkingTimeEndISO
-        ? new Date(data.organizationFridayWorkingTimeEndISO)
-        : new Date(),
-    organizationSaturdayWorkingTimeStartISO:
+    ),
+    organizationSaturdayWorkingTimeStartISO: convertDate(
       data.organizationSaturdayWorkingTimeStartISO
-        ? new Date(data.organizationSaturdayWorkingTimeStartISO)
-        : new Date(),
-    organizationSaturdayWorkingTimeEndISO:
+    ),
+    organizationSaturdayWorkingTimeEndISO: convertDate(
       data.organizationSaturdayWorkingTimeEndISO
-        ? new Date(data.organizationSaturdayWorkingTimeEndISO)
-        : new Date(),
-    organizationSundayWorkingTimeStartISO:
+    ),
+    organizationSundayWorkingTimeStartISO: convertDate(
       data.organizationSundayWorkingTimeStartISO
-        ? new Date(data.organizationSundayWorkingTimeStartISO)
-        : new Date(),
-    organizationSundayWorkingTimeEndISO:
+    ),
+    organizationSundayWorkingTimeEndISO: convertDate(
       data.organizationSundayWorkingTimeEndISO
-        ? new Date(data.organizationSundayWorkingTimeEndISO)
-        : new Date(),
-    organizationAllWeekdaysTimeStartISO:
+    ),
+    organizationAllWeekdaysTimeStartISO: convertDate(
       data.organizationAllWeekdaysTimeStartISO
-        ? new Date(data.organizationAllWeekdaysTimeStartISO)
-        : new Date(),
-    organizationAllWeekdaysTimeEndISO: data.organizationAllWeekdaysTimeEndISO
-      ? new Date(data.organizationAllWeekdaysTimeEndISO)
-      : new Date(),
+    ),
+    organizationAllWeekdaysTimeEndISO: convertDate(
+      data.organizationAllWeekdaysTimeEndISO
+    ),
     organizationClosedOnWeekEnds:
       data.organizationClosedOnWeekEnds.toString() === 'true',
     organizationTheSameOnAllWorkingDays:
@@ -77,37 +62,7 @@ export function getOrganizationTimeData(data: OrganizationWorkingTime) {
 
 export function setOrganizationTimeData(data: OrganizationWorkingTime) {
   return {
-    organizationMondayWorkingTimeStartISO:
-      data.organizationMondayWorkingTimeStartISO,
-    organizationMondayWorkingTimeEndISO:
-      data.organizationMondayWorkingTimeEndISO,
-    organizationTuesdayWorkingTimeStartISO:
-      data.organizationTuesdayWorkingTimeStartISO,
-    organizationTuesdayWorkingTimeEndISO:
-      data.organizationTuesdayWorkingTimeEndISO,
-    organizationWednesdayWorkingTimeStartISO:
-      data.organizationWednesdayWorkingTimeStartISO,
-    organizationWednesdayWorkingTimeEndISO:
-      data.organizationWednesdayWorkingTimeEndISO,
-    organizationThursdayWorkingTimeStartISO:
-      data.organizationThursdayWorkingTimeStartISO,
-    organizationThursdayWorkingTimeEndISO:
-      data.organizationThursdayWorkingTimeEndISO,
-    organizationFridayWorkingTimeStartISO:
-      data.organizationFridayWorkingTimeStartISO,
-    organizationFridayWorkingTimeEndISO:
-      data.organizationFridayWorkingTimeEndISO,
-    organizationSaturdayWorkingTimeStartISO:
-      data.organizationSaturdayWorkingTimeStartISO,
-    organizationSaturdayWorkingTimeEndISO:
-      data.organizationSaturdayWorkingTimeEndISO,
-    organizationSundayWorkingTimeStartISO:
-      data.organizationSundayWorkingTimeStartISO,
-    organizationSundayWorkingTimeEndISO:
-      data.organizationSundayWorkingTimeEndISO,
-    organizationAllWeekdaysTimeStartISO:
-      data.organizationAllWeekdaysTimeStartISO,
-    organizationAllWeekdaysTimeEndISO: data.organizationAllWeekdaysTimeEndISO,
+    ...data,
     organizationClosedOnWeekEnds: data.organizationClosedOnWeekEnds.toString(),
     organizationTheSameOnAllWorkingDays:
       data.organizationTheSameOnAllWorkingDays.toString(),
@@ -116,3 +71,6 @@ export function setOrganizationTimeData(data: OrganizationWorkingTime) {
     organizationWorkingTimeWeekdays: data.organizationWorkingTimeWeekdays ?? [],
   };
 }
+
+const convertDate = (dateAsString?: string | Date): Date =>
+  dateAsString ? new Date(dateAsString) : new Date();
