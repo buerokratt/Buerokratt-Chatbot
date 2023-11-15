@@ -203,7 +203,14 @@ const HistoricalChat: FC<ChatProps> = ({
                     onChange={(e) => setEditingComment(e.target.value)}
                   />
                 ) : (
-                  <p>{chat.comment}</p>
+                  <p
+                    className={`historical-chat__comment-text ${
+                      chat.comment ? '' : 'placeholder'
+                    }`}
+                  >
+                    {chat.comment ??
+                      t('chat.history.addACommentToTheConversation')}
+                  </p>
                 )}
                 {editingComment || editingComment === '' ? (
                   <Button

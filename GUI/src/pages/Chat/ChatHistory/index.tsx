@@ -37,7 +37,7 @@ import { useLocation } from 'react-router-dom';
 const ChatHistory: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
-  const userInfo = useStore(state => state.userInfo);
+  const userInfo = useStore((state) => state.userInfo);
   const routerLocation = useLocation();
   let passedChatId = new URLSearchParams(routerLocation.search).get('chat');
   const preferences = getFromLocalStorage(
@@ -323,9 +323,6 @@ const ChatHistory: FC = () => {
         id: 'labels',
         header: t('chat.history.label') || '',
       }),
-      // columnHelper.accessor('nps', {
-      //   header: 'NPS',
-      // }),
       columnHelper.accessor('status', {
         id: 'status',
         header: t('global.status') || '',
@@ -339,6 +336,22 @@ const ChatHistory: FC = () => {
                 )
               : t('chat.status.ended')
             : '',
+        sortingFn: (a, b, isAsc) => {
+          const statusA =
+            a.getValue('status') === CHAT_STATUS.ENDED
+              ? t('chat.plainEvents.' + (a.original.lastMessageEvent ?? ''))
+              : '';
+          const statusB =
+            b.getValue('status') === CHAT_STATUS.ENDED
+              ? t('chat.plainEvents.' + (b.original.lastMessageEvent ?? ''))
+              : '';
+          return (
+            statusA.localeCompare(statusB, undefined, {
+              numeric: true,
+              sensitivity: 'base',
+            }) * (isAsc ? 1 : -1)
+          );
+        },
       }),
       columnHelper.accessor('id', {
         id: 'id',
