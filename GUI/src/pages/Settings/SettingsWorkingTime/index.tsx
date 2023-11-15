@@ -199,17 +199,20 @@ const SettingsWorkingTime: FC = () => {
                     <div>
                       <Switch
                         label=""
-                        onLabel={t('settings.workingTime.consider').toString()}
-                        offLabel={t(
-                          'settings.workingTime.dontConsider'
-                        ).toString()}
-                        onCheckedChange={(e) => {
+                        onLabel={t('settings.workingTime.open').toString()}
+                        offLabel={t('settings.workingTime.closed').toString()}
+                        onCheckedChange={(value) => {
                           field.onChange(
-                            e
-                              ? [...field.value, d.toLowerCase()]
-                              : field.value.filter(
-                                  (pd) => pd !== d.toLowerCase()
-                                )
+                            value
+                              ? [...field.value.split(','), d.toLowerCase()]
+                                  .sort()
+                                  .join(',')
+                              : field.value
+                                  .split(',')
+                                  .filter(
+                                    (pd: string) => pd !== d.toLowerCase()
+                                  )
+                                  .join(',')
                           );
                         }}
                         checked={field.value?.includes(d.toLowerCase())}
