@@ -28,6 +28,30 @@
     border-bottom: 1px solid get-color(black-coral-2);
     background-color: get-color(extra-light);
     border-radius: $veera-radius-s $veera-radius-s 0 0;
+
+    &.white {
+      background-color: white
+    }
+  }
+
+  &__body {
+    &.divided {
+      display: flex;
+      flex-direction: column;
+      padding-left: 0px;
+      padding-right: 0px;
+
+      > :not(:last-child) {
+        margin-bottom: get-spacing(haapsalu);
+        border-bottom: 1px solid get-color(black-coral-2);
+        padding-bottom: get-spacing(haapsalu);
+        padding-left: get-spacing(haapsalu);
+      }
+
+      > :is(:last-child) {
+        padding-left: get-spacing(haapsalu);
+      }
+    }
   }
 
   &__footer {

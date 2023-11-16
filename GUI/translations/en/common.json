@@ -278,8 +278,19 @@
     },
     "workingTime": {
       "title": "Organization working time",
+      "description": "After the end of the working hours, if the chatbot cannot answer the customer's questions by itself, it will ask for the customer's contact details.",
       "openFrom": "Open from",
-      "openUntil": "Open until"
+      "openUntil": "Open until",
+      "publicHolidays": "Consider public holidays",
+      "consider": "Consider",
+      "dontConsider": "Don't Consider",
+      "closedOnWeekends": "Closed on weekends",
+      "theSameOnAllWorkingDays": "The same on all working days",
+      "open": "Open",
+      "closed": "Closed",
+      "until": "Until",
+      "allWeekdaysExceptWeekend": "M-F",
+      "allWeekdays": "M-S"
     },
     "userSession": {
       "title": "User session",

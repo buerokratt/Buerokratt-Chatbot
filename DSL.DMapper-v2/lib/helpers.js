@@ -11,3 +11,12 @@ export function stringToList(str, block) {
 export function getInstant() {
   return new Date().toISOString();
 }
+
+export function lookup(configurationArray, key) {
+  for (let i = 0; i < configurationArray.length; i++) {
+    if (configurationArray[i].key === key) {
+      return configurationArray[i].value;
+    }
+  }
+  return "";
+}
