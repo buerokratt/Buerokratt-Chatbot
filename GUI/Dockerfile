@@ -7,7 +7,7 @@ COPY ./package*.json ./
 COPY ./exirain-header-0.0.27.tgz .
 
 FROM image AS build
-RUN npm ci --legacy-peer-deps --mode=development
+RUN npm install --legacy-peer-deps --mode=development
 COPY . .
 RUN ./node_modules/.bin/vite build --mode=development
 VOLUME /usr/buerokratt-chatbot
