@@ -1,6 +1,7 @@
 SELECT m.base_id      AS id,
        m.chat_base_id AS chat_id,
        m.content,
+       m.buttons,
        m.event,
        m.author_id,
        m.author_timestamp,
