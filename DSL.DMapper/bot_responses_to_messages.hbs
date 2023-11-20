@@ -1,16 +1,14 @@
 [
-    {{#each botMessages}}
-        {
-            "chatId": "{{chatId}}",
-            "content": "{{{escape_special_chars text}}}",
-            "authorTimestamp": "{{authorTimestamp}}",
-            "authorId": "{{authorId}}",
-            "authorFirstName": "{{authorFirstName}}",
-            "authorLastName": "{{authorLastName}}",
-            "created": "{{created}}"
-        }
-        {{#unless @last}}
-            ,
-        {{/unless}}
-    {{/each}}
+  {{#each botMessages}}
+    {
+        "chatId": "{{chatId}}",
+        "content": "{{{escape_special_chars text}}}",
+        "buttons": "[{{#each buttons}}{\"title\": \"{{{escape_special_chars title}}}\",\"payload\": \"{{{escape_special_chars payload}}}\"}{{#unless @last}},{{/unless}}{{/each}}]",
+        "authorTimestamp": "{{authorTimestamp}}",
+        "authorId": "{{authorId}}",
+        "authorFirstName": "{{authorFirstName}}",
+        "authorLastName": "{{authorLastName}}",
+        "created": "{{created}}"
+    }{{#unless @last}},{{/unless}}
+  {{/each}}
 ]
