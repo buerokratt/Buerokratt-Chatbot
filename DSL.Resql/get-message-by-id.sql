@@ -2,6 +2,7 @@ SELECT
     chat_base_id,
     base_id,
     content,
+    buttons,
     author_id,
     author_timestamp,
     author_first_name,
