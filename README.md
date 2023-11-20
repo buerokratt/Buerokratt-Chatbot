@@ -29,6 +29,7 @@ This repo will primarily contain:
 - Install Python
 - Navigate to setup and run `python3 generate-certs.py`
 - Navigate to current repo and run `docker-compose up -d`
+- For GUI make sure that Dockerfile.dev have header package include with version specified in package.json `COPY ./exirain-header-0.0.27.tgz ./`
 - Go to http://localhost:3004/et/dev-auth
 
 ### Database setup

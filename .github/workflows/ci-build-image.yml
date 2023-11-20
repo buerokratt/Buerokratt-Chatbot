@@ -1,4 +1,4 @@
-name: Build and publish GUI
+name: Build and publish GUI with nginx
 
 on:
   push:
@@ -19,8 +19,8 @@ jobs:
 
       - name: Load environment variables and set them
         run: |
-          if [ -f .env ]; then
-            export $(cat .env | grep -v '^#' | xargs)
+          if [ -f .env.test ]; then
+            export $(cat .env.test | grep -v '^#' | xargs)
           fi
           echo "RELEASE=$RELEASE" >> $GITHUB_ENV
           echo "VERSION=$VERSION" >> $GITHUB_ENV
@@ -34,7 +34,7 @@ jobs:
       - name: Docker Build
         run: | 
            cd GUI
-           docker image build --tag $DOCKER_TAG_CUSTOM .
+           docker image build -f Dockerfile.test --tag $DOCKER_TAG_CUSTOM .
 
       - name: Log in to GitHub container registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
@@ -42,20 +42,3 @@ jobs:
       - name: Push Docker image to ghcr
         run: docker push $DOCKER_TAG_CUSTOM
 
-
-      - name: Setup SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
-
-      - name: Setup image name
-#        id: Setup image name
-        run: |
-            ssh ubuntu@${{ secrets.SERVER_IP }} "cd /opt/etapp2/uptodate/PIPELINE && > image.yml && echo "$DOCKER_TAG_CUSTOM" >> image.yml"
-
-      - name: Setup and run containers
-#        id: Setup and run containers
-        run: |
-            ssh ubuntu@${{ secrets.SERVER_IP }} 'cd /opt/etapp2/uptodate/PIPELINE && bash Buerokratt-Chatbot.sh'

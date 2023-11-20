@@ -147,7 +147,8 @@
       "comment": "Comment",
       "label": "Label",
       "nps": "NPS",
-      "forwarded": "Forwarded"
+      "forwarded": "Forwarded",
+      "addACommentToTheConversation": "Add a comment to the conversation"
     },
     "plainEvents": {
       "answered": "Answered",

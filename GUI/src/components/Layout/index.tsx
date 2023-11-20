@@ -1,7 +1,8 @@
 import { FC, useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import  Header from '../Header';
+import useStore from 'store';
 import {
+    Header,
     MainNavigation
 } from '@exirain/header/src';
 import './Layout.scss';
@@ -37,7 +38,9 @@ const Layout: FC = () => {   const CACHE_NAME = 'mainmenu-cache';
         <div className="layout">
             <MainNavigation serviceId={import.meta.env.REACT_APP_SERVICE_ID.split(',')} items={MainMenuItems}/>
             <div className="layout__wrapper">
-                <Header />
+               <Header
+                    user={useStore.getState().userInfo}
+                />
                 <main className="layout__main">
                     <Outlet />
                 </main>

@@ -147,7 +147,8 @@
       "comment": "Kommentaar",
       "label": "Märksõna",
       "nps": "NPS",
-      "forwarded": "Suunatud"
+      "forwarded": "Suunatud",
+      "addACommentToTheConversation": "Lisa vestlusele kommentaar"
     },
     "plainEvents": {
       "answered": "Vastatud",
