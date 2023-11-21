@@ -25,18 +25,18 @@ import { CHAT_INPUT_LENGTH } from 'constants/config';
 import apiDev from 'services/api-dev';
 import ChatTextArea from './ChatTextArea';
 import { ROLES } from 'utils/constants';
-import newMessageSound from '../../assets/newMessageSound.mp3';
 import { AUTHOR_ROLES, MESSAGE_FILE_SIZE_LIMIT } from 'utils/constants';
 import formatBytes from 'utils/format-bytes';
 import useSendAttachment from 'modules/attachment/hooks';
 import { AxiosError } from 'axios';
 import { useToast } from 'hooks/useToast';
 import useStore from 'store';
-import './Chat.scss';
 import sse from '../../services/sse-service';
 import { useNavigate } from 'react-router-dom';
 import PreviewMessage from './PreviewMessage';
 import LoaderOverlay from './LoaderOverlay';
+import { useNewMessageSound } from 'hooks/useAudio';
+import './Chat.scss';
 
 type ChatProps = {
   chat: ChatType;
@@ -87,7 +87,7 @@ const Chat: FC<ChatProps> = ({
   const [userInput, setUserInput] = useState<string>('');
   const [userInputFile, setUserInputFile] = useState<Attachment>();
   const [errorMessage, setErrorMessage] = useState('');
-  const audio = useMemo(() => new Audio(newMessageSound), []);
+  const [newMessage] = useNewMessageSound();
   let messagesLength = 0;
   const navigate = useNavigate();
   const [previewTypingMessage, setPreviewTypingMessage] = useState<Message>();
@@ -184,7 +184,7 @@ const Chat: FC<ChatProps> = ({
         res.data.cs_get_messages_by_chat_id.length - 1
       ].authorId != userInfo?.idCode
     ) {
-      audio.play();
+      newMessage?.play();
       onRefresh();
     }
     messagesLength = res.data.cs_get_messages_by_chat_id.length;
