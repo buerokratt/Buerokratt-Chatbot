@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Howl } from 'howler';
-import ding from '../../assets/ding.mp3';
-import newMessageSound from '../../assets/newMessageSound.mp3';
+import ding from '../assets/ding.mp3';
+import newMessageSound from '../assets/newMessageSound.mp3';
 
 export const useAudio = (audiosrc: string) => {
   const [audio, setAudio] = useState<Howl | null>(null);
