@@ -92,6 +92,7 @@ get_organization_working_details:
     body:
       holidays: ${holidays}
       holiday_names: ${holiday_names}
+      current_timestamp: ${new Date().toISOString()}
   result: org_res
   next: assign_organization_details
 
