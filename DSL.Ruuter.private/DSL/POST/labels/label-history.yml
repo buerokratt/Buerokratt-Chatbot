@@ -1,24 +1,9 @@
 extractRequestData:
   assign:
-    cookie: ${incoming.headers.cookie}
     labels: ${incoming.body.labels}
     chatId: ${incoming.body.chatId}
-  next: check_if_authorized
-
-check_if_authorized:
-  template: templates/check-user-authority
-  requestType: post
-  headers:
-    cookie: ${cookie}
-  result: authority_result
-  next: check_authority_result
-
-check_authority_result:
-  switch:
-    - condition: ${authority_result !== "false"}
-      next: setChatLabels
-  next: returnUnauthorized    
-
+  next: setChatLabels
+ 
 setChatLabels:
   call: http.post
   args:
@@ -31,8 +16,4 @@ setChatLabels:
 
 returnSuccess:
   return: ${setLabelsResult.response.body}
-  next: end
-
-returnUnauthorized:
-  return: "error: unauthorized"
   next: end

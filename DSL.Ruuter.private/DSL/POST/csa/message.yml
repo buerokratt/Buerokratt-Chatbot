@@ -1,0 +1,93 @@
+extractRequestData:
+  assign:
+    chatId: ${incoming.body.chatId}
+    authorId: ${incoming.body.authorId}
+    authorFirstName: ${incoming.body.authorFirstName}
+    authorRole: ${incoming.body.authorRole}
+    authorTimestamp: ${incoming.body.authorTimestamp}
+    content: ${incoming.body.content}
+    cookie: ${incoming.headers.cookie}
+  next: get_user_info
+
+get_user_info:
+  call: http.post
+  args:
+   url: "[#CHATBOT_TIM]:[#CHATBOT_TIM_PORT]/jwt/custom-jwt-userinfo"
+   contentType: plaintext
+   headers:
+    cookie: ${cookie}
+   plaintext: 
+      "customJwtCookie"
+  result: res
+  next: check_user_info_response
+
+check_user_info_response:
+  switch:
+    - condition: ${200 <= res.response.statusCodeValue && res.response.statusCodeValue < 300}
+      next: assignIdCode
+  next: return_bad_request
+
+assignIdCode:
+  assign:
+    idCode: ${res.response.body.idCode}
+  next: getInstant
+
+getInstant:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_V2]:[#CHATBOT_DMAPPER_V2_PORT]/hbs/chat-bot/return_instant"
+    headers:
+      type: json
+  result: instant_result
+  next: assignInstant
+
+assignInstant:
+  assign:
+    instant: ${instant_result.response.body.instant}
+  next: getUuid
+
+getUuid:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_V2]:[#CHATBOT_DMAPPER_V2_PORT]/hbs/chat-bot/return_uuid"
+    headers:
+      type: json
+  result: uuid_result
+  next: assignUuid
+
+assignUuid:
+  assign:
+    uuid: ${uuid_result.response.body.uuid}
+  next: insertMessage  
+
+insertMessage:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/insert-message"
+    body:
+      chatId: ${chatId}
+      messageId: ${uuid}
+      content: ${content}
+      authorTimestamp: ${authorTimestamp}
+      authorId: ${idCode}
+      authorFirstName: ${authorFirstName}
+      authorRole: ${authorRole}
+      created: ${instant}
+      authorLastName: ""
+      rating: ""
+      event: ""
+      forwardedByUser: ""
+      forwardedFromCsa: ""
+      forwardedToCsa: ""
+  result: insertMessageResult
+  next: returnSuccess  
+
+returnSuccess:
+  return: "Message Sent Successfully"
+  next: end
+
+return_bad_request:
+  status: 400
+  return: false
+  next: end  
+

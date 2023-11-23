@@ -1,0 +1,22 @@
+authenticate:
+  template: check-user-authority
+  requestType: post
+  headers:
+    cookie: ${incoming.headers.cookie}
+  result: authority_result
+  next: check_authority_result
+
+check_authority_result:
+  switch:
+    - condition: ${authority_result !== "false"}
+      next: guard_success
+  next: guard_fail
+
+guard_success:
+  return: "success"
+  status: 200
+  next: end
+
+guard_fail:
+  return: "unauthorized"
+  status: 403
