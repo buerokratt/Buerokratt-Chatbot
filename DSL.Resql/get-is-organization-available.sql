@@ -27,7 +27,7 @@ WITH organization_time AS
         GROUP BY KEY)
      AND deleted = FALSE ),
      current_day AS
-  (SELECT to_char(CURRENT_DATE, 'day') AS current_day),
+  (SELECT TRIM(to_char(CURRENT_DATE, 'day')) AS current_day),
      working_week_days AS
   (SELECT value
    FROM organization_time
@@ -110,45 +110,45 @@ WITH organization_time AS
    WHERE KEY = 'organizationWorkingTimeNationalHolidays'),
      is_within_working_time AS (
                                   (SELECT CASE
-                                              WHEN is_the_same_on_all_working_days THEN TO_CHAR(CURRENT_TIMESTAMP, 'HH24:MI:SS') BETWEEN
-                                                     (SELECT TO_CHAR(value, 'HH24:MI:SS')
+                                              WHEN is_the_same_on_all_working_days THEN TO_CHAR(:current_timestamp::timestamp, 'HH24:MI:SS')::time BETWEEN
+                                                     (SELECT TO_CHAR(value, 'HH24:MI:SS')::time
                                                       FROM all_weekdays_start_time) AND
-                                                     (SELECT TO_CHAR(value, 'HH24:MI:SS')
+                                                     (SELECT TO_CHAR(value, 'HH24:MI:SS')::time
                                                       FROM all_weekdays_end_time)
-                                              WHEN current_day.current_day = 'monday' THEN TO_CHAR(CURRENT_TIMESTAMP, 'HH24:MI:SS') BETWEEN
-                                                     (SELECT TO_CHAR(value, 'HH24:MI:SS')
+                                              WHEN current_day.current_day = 'monday' THEN TO_CHAR(:current_timestamp::timestamp, 'HH24:MI:SS')::time BETWEEN
+                                                     (SELECT TO_CHAR(value, 'HH24:MI:SS')::time
                                                       FROM monday_start_time) AND
-                                                     (SELECT TO_CHAR(value, 'HH24:MI:SS')
+                                                     (SELECT TO_CHAR(value, 'HH24:MI:SS')::time
                                                       FROM monday_end_time)
-                                              WHEN current_day.current_day = 'tuesday' THEN TO_CHAR(CURRENT_TIMESTAMP, 'HH24:MI:SS') BETWEEN
-                                                     (SELECT TO_CHAR(value, 'HH24:MI:SS')
+                                              WHEN current_day.current_day = 'tuesday' THEN TO_CHAR(:current_timestamp::timestamp, 'HH24:MI:SS')::time BETWEEN
+                                                     (SELECT TO_CHAR(value, 'HH24:MI:SS')::time
                                                       FROM tuesday_start_time) AND
-                                                     (SELECT TO_CHAR(value, 'HH24:MI:SS')
+                                                     (SELECT TO_CHAR(value, 'HH24:MI:SS')::time
                                                       FROM tuesday_end_time)
-                                              WHEN current_day.current_day = 'wednesday' THEN TO_CHAR(CURRENT_TIMESTAMP, 'HH24:MI:SS') BETWEEN
-                                                     (SELECT TO_CHAR(value, 'HH24:MI:SS')
+                                              WHEN current_day.current_day = 'wednesday' THEN TO_CHAR(:current_timestamp::timestamp, 'HH24:MI:SS')::time BETWEEN
+                                                     (SELECT TO_CHAR(value, 'HH24:MI:SS')::time
                                                       FROM wednesday_start_time) AND
-                                                     (SELECT TO_CHAR(value, 'HH24:MI:SS')
+                                                     (SELECT TO_CHAR(value, 'HH24:MI:SS')::time
                                                       FROM wednesday_end_time)
-                                              WHEN current_day.current_day = 'thursday' THEN TO_CHAR(CURRENT_TIMESTAMP, 'HH24:MI:SS') BETWEEN
-                                                     (SELECT TO_CHAR(value, 'HH24:MI:SS')
+                                              WHEN current_day.current_day = 'thursday' THEN TO_CHAR(:current_timestamp::timestamp, 'HH24:MI:SS')::time BETWEEN
+                                                     (SELECT TO_CHAR(value, 'HH24:MI:SS')::time
                                                       FROM thursday_start_time) AND
-                                                     (SELECT TO_CHAR(value, 'HH24:MI:SS')
+                                                     (SELECT TO_CHAR(value, 'HH24:MI:SS')::time
                                                       FROM thursday_end_time)
-                                              WHEN current_day.current_day = 'friday' THEN TO_CHAR(CURRENT_TIMESTAMP, 'HH24:MI:SS') BETWEEN
-                                                     (SELECT TO_CHAR(value, 'HH24:MI:SS')
+                                              WHEN current_day.current_day = 'friday' THEN TO_CHAR(:current_timestamp::timestamp, 'HH24:MI:SS')::time BETWEEN
+                                                     (SELECT TO_CHAR(value, 'HH24:MI:SS')::time
                                                       FROM friday_start_time) AND
-                                                     (SELECT TO_CHAR(value, 'HH24:MI:SS')
+                                                     (SELECT TO_CHAR(value, 'HH24:MI:SS')::time
                                                       FROM friday_end_time)
-                                              WHEN current_day.current_day = 'saturday' THEN TO_CHAR(CURRENT_TIMESTAMP, 'HH24:MI:SS') BETWEEN
-                                                     (SELECT TO_CHAR(value, 'HH24:MI:SS')
+                                              WHEN current_day.current_day = 'saturday' THEN TO_CHAR(:current_timestamp::timestamp, 'HH24:MI:SS')::time BETWEEN
+                                                     (SELECT TO_CHAR(value, 'HH24:MI:SS')::time
                                                       FROM saturday_start_time) AND
-                                                     (SELECT TO_CHAR(value, 'HH24:MI:SS')
+                                                     (SELECT TO_CHAR(value, 'HH24:MI:SS')::time
                                                       FROM saturday_end_time)
-                                              WHEN current_day.current_day = 'sunday' THEN TO_CHAR(CURRENT_TIMESTAMP, 'HH24:MI:SS') BETWEEN
-                                                     (SELECT TO_CHAR(value, 'HH24:MI:SS')
+                                              WHEN current_day.current_day = 'sunday' THEN TO_CHAR(:current_timestamp::timestamp, 'HH24:MI:SS')::time BETWEEN
+                                                     (SELECT TO_CHAR(value, 'HH24:MI:SS')::time
                                                       FROM sunday_start_time) AND
-                                                     (SELECT TO_CHAR(value, 'HH24:MI:SS')
+                                                     (SELECT TO_CHAR(value, 'HH24:MI:SS')::time
                                                       FROM sunday_end_time)
                                           END AS is_within_working_time
                                    FROM current_day,
