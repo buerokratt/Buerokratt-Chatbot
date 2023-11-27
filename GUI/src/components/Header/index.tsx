@@ -23,11 +23,11 @@ import { useToast } from 'hooks/useToast';
 import { USER_IDLE_STATUS_TIMEOUT } from 'constants/config';
 import apiDev from 'services/api-dev';
 import apiDevV2 from 'services/api-dev-v2';
-import './Header.scss';
-import chatSound from '../../assets/chatSound.mp3';
 import { interval } from 'rxjs';
 import { AUTHORITY } from 'types/authorities';
 import { useCookies } from 'react-cookie';
+import { useDing } from 'hooks/useAudio';
+import './Header.scss';
 
 type CustomerSupportActivity = {
   idCode: string;
@@ -62,7 +62,7 @@ const Header: FC = () => {
   const [csaStatus, setCsaStatus] = useState<'idle' | 'offline' | 'online'>(
     'online'
   );
-  const audio = useMemo(() => new Audio(chatSound), []);
+  const [ding] = useDing();
   const chatCsaActive = useStore(state => state.chatCsaActive);
   const [userProfileSettings, setUserProfileSettings] =
     useState<UserProfileSettings>({
@@ -136,7 +136,7 @@ const Header: FC = () => {
     } 
 
     if (userProfileSettings.newChatSoundNotifications) {
-      audio.play();
+      ding?.play();
     }
     if(userProfileSettings.newChatEmailNotifications) {
       // TODO send email notification
@@ -165,7 +165,7 @@ const Header: FC = () => {
     }
 
     if (userProfileSettings.forwardedChatSoundNotifications) {
-      audio.play();
+      ding?.play();
     }
     if (userProfileSettings.forwardedChatEmailNotifications){
         // TODO send email notification

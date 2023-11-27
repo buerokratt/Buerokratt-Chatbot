@@ -33,6 +33,7 @@
     "downshift": "^7.0.5",
     "esbuild": "^0.19.5",
     "framer-motion": "^8.5.5",
+    "howler": "^2.2.4",
     "i18next": "^22.4.5",
     "i18next-browser-languagedetector": "^7.0.1",
     "linkify-react": "^4.1.1",
@@ -62,6 +63,7 @@
     "zustand": "^4.4.4"
   },
   "devDependencies": {
+    "@types/howler": "^2.2.11",
     "@types/lodash": "^4.14.191",
     "@types/lodash.debounce": "^4.0.7",
     "@types/node": "^18.11.17",
