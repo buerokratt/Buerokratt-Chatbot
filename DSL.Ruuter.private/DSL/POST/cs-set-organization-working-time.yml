@@ -1,6 +1,5 @@
 extractRequestData:
   assign:
-    cookie: ${incoming.headers.cookie}
     organizationMondayWorkingTimeStartISO: ${incoming.body.organizationMondayWorkingTimeStartISO}
     organizationMondayWorkingTimeEndISO: ${incoming.body.organizationMondayWorkingTimeEndISO}
     organizationTuesdayWorkingTimeStartISO: ${incoming.body.organizationTuesdayWorkingTimeStartISO}
@@ -21,21 +20,7 @@ extractRequestData:
     organizationClosedOnWeekEnds: ${incoming.body.organizationClosedOnWeekEnds}
     organizationTheSameOnAllWorkingDays: ${incoming.body.organizationTheSameOnAllWorkingDays}
     organizationWorkingTimeNationalHolidays: ${incoming.body.organizationWorkingTimeNationalHolidays}
-  next: check_if_authorized
-
-check_if_authorized:
-  template: templates/check-user-authority
-  requestType: post
-  headers:
-    cookie: ${cookie}
-  result: authority_result
-  next: check_authority_result
-
-check_authority_result:
-  switch:
-    - condition: ${authority_result !== "false"}
-      next: setOrganizationWorkingTime
-  next: returnUnauthorized
+  next: setOrganizationWorkingTime
 
 setOrganizationWorkingTime:
   call: http.post
@@ -79,12 +64,4 @@ mapOrganizationWorkingTimeData:
 
 returnSuccess:
   return: ${organizationWorkingTimeData.response.body}
-  next: end
-
-returnInvalidBody:
-  return: "error: invalid body"
-  next: end
-
-returnUnauthorized:
-  return: "error: unauthorized"
   next: end

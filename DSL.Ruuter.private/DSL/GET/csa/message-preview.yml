@@ -1,0 +1,17 @@
+extractRequestData:
+  assign:
+    chatId: ${incoming.body.chatId}
+  next: getMessagePreview
+
+getMessagePreview:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-message-preview"
+    body:
+      chatId: ${chatId}
+  result: res
+  next: returnSuccess
+
+returnSuccess:
+  return: ${res.response.body}
+  next: end

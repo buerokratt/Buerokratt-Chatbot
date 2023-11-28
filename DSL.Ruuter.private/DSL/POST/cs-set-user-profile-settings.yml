@@ -1,6 +1,5 @@
 extractRequestData:
   assign:
-    cookie: ${incoming.headers.cookie}
     userId: ${incoming.body.userId}
     forwardedChatPopupNotifications: ${incoming.body.forwardedChatPopupNotifications}
     forwardedChatSoundNotifications: ${incoming.body.forwardedChatSoundNotifications}
@@ -9,21 +8,7 @@ extractRequestData:
     newChatSoundNotifications: ${incoming.body.newChatSoundNotifications}
     newChatEmailNotifications: ${incoming.body.newChatEmailNotifications}
     useAutocorrect: ${incoming.body.useAutocorrect}
-  next: check_if_authorized
-
-check_if_authorized:
-  template: templates/check-user-authority
-  requestType: post
-  headers:
-    cookie: ${cookie}
-  result: authority_result
-  next: check_authority_result
-
-check_authority_result:
-  switch:
-    - condition: ${authority_result !== "false"}
-      next: setUserSettingValue
-  next: returnUnauthorized    
+  next: setUserSettingValue  
 
 setUserSettingValue:
   call: http.post
@@ -42,12 +27,4 @@ setUserSettingValue:
 
 returnSuccess:
   return: ${returnSuccess.response.body}
-  next: end
-
-returnInvalidBody:
-  return: "error: invalid body"
-  next: end
-
-returnUnauthorized:
-  return: "error: unauthorized"
   next: end

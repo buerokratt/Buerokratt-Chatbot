@@ -1,22 +1,7 @@
 extractRequestData:
   assign:
-    cookie: ${incoming.headers.cookie}
     chatId: ${incoming.body.chatId}
-  next: check_if_authorized
-
-check_if_authorized:
-  template: templates/check-user-authority
-  requestType: post
-  headers:
-    cookie: ${cookie}
-  result: authority_result
-  next: check_authority_result
-
-check_authority_result:
-  switch:
-    - condition: ${authority_result !== "false"}
-      next: getChatById
-  next: returnUnauthorized 
+  next: getChatById
 
 getChatById:
   call: http.post
@@ -39,7 +24,3 @@ formatChatArray:
 returnChat:
    return: ${formattedChat.response.body}  
    next: end
-
-returnUnauthorized:
-  return: "error: unauthorized"
-  next: end
