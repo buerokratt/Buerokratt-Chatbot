@@ -11,7 +11,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/hbs/backoffice/reflect_cs_post_message",
+          "endpoint": "{dmapper_url}/json/v2/reflect_cs_post_message",
           "post_body_struct": {
             "chatId": "{#.chatId}",
             "authorId": "{#.authorId}",
@@ -81,7 +81,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/backoffice/insert-message",
+          "endpoint": "{resql_url}/insert-message",
           "post_body_parameters": {
             "check_roles": {
               "method": "post",
@@ -138,7 +138,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/backoffice/get-active-chat-by-id",
+          "endpoint": "{resql_url}/get-active-chat-by-id",
           "post_body_struct": {
             "id": "{#.reflect_input#.chatId}"
           }

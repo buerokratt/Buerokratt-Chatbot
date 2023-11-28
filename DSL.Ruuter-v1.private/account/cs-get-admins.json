@@ -11,7 +11,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/backoffice/get-users-with-roles",
+          "endpoint": "{resql_url}/get-users-with-roles",
           "post_body_parameters": {
             "check_roles": {
               "method": "post",

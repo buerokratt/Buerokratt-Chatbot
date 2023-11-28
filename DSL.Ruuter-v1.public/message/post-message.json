@@ -11,7 +11,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/hbs/backoffice/reflect_post_message",
+          "endpoint": "{dmapper_url}/json/v2/reflect_post_message",
           "post_body_struct": {
             "chatId": "{#.message#chatId}",
             "authorTimestamp": "{#.message#.authorTimestamp}",
@@ -89,7 +89,7 @@
         },
         "external_request": {
           "method": "post",
-          "endpoint": "{dmapper_url}/hbs/backoffice/reflect_data_arr",
+          "endpoint": "{dmapper_url}/json/v2/reflect_data_arr",
           "post_body_parameters": {
             "data": {
               "method": "post",

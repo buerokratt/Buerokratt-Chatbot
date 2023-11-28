@@ -11,11 +11,11 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/hbs/backoffice/return_first_configuration_from_array",
+          "endpoint": "{dmapper_url}/json/v2/return_first_configuration_from_array",
           "post_body_parameters": {
             "get_configuration_value": {
               "method": "post",
-              "endpoint": "{resql_url}/backoffice/get-configuration",
+              "endpoint": "{resql_url}/get-configuration",
               "post_body_parameters": {},
               "post_body_struct": {
                 "key": "is_bot_active"

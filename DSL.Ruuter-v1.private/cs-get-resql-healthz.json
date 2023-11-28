@@ -3,7 +3,7 @@
   "destination": {
     "resql_healthz": {
       "method": "get",
-      "endpoint": "{resql_url}/backoffice/healthz",
+      "endpoint": "{resql_url}/healthz",
       "response": {
         "ok": "proceed",
         "nok": "stop"

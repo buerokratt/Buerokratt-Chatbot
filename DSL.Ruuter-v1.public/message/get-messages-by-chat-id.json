@@ -46,7 +46,7 @@
         },
         "local_request": {
           "method": "post",
-          "endpoint": "{resql_url}/backoffice/get-chat-messages",
+          "endpoint": "{resql_url}/get-chat-messages",
           "post_body_struct": {
             "chatId": "{#.chat_info#.chatId}"
           },
@@ -57,7 +57,7 @@
         },
         "external_request": {
           "method": "post",
-          "endpoint": "{dmapper_url}/hbs/backoffice/reflect_data_arr",
+          "endpoint": "{dmapper_url}/json/v2/reflect_data_arr",
           "post_body_parameters": {
             "data": {
               "method": "post",

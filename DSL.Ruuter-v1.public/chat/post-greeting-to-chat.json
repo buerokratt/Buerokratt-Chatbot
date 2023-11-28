@@ -11,7 +11,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/hbs/backoffice/reflect_chat_id_timestamp",
+          "endpoint": "{dmapper_url}/json/v2/reflect_chat_id_timestamp",
           "post_body_struct": {
             "chatId": "{#.chatId}",
             "clientTimestamp": "{#.clientTimestamp}"
@@ -68,7 +68,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/backoffice/insert-message",
+          "endpoint": "{resql_url}/insert-message",
           "post_body_parameters": {
             "validate_greeting_status": {
               "method": "post",
