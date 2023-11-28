@@ -78,6 +78,8 @@ services:
     image: tim
     depends_on:
       - tim-postgresql
+    environment:
+      - SECURITY_ALLOWLIST_JWT=ruuter-v1-public,ruuter-v1-private,ruuter-v2-private,ruuter-v2-public,dmapper,resql,tim,tim-postgresql,chat-widget,customer-service,127.0.0.1,::1
     ports:
       - 8085:8085
     networks:
