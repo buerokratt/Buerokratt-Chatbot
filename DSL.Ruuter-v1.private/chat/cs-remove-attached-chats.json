@@ -11,7 +11,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/remove-agent-from-chats",
+          "endpoint": "{resql_url}/backoffice/remove-agent-from-chats",
           "post_body_parameters": {
             "check_roles": {
               "method": "post",

@@ -91,7 +91,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/json/v2/healthz_response",
+          "endpoint": "{dmapper_url}/hbs/backoffice/healthz_response",
           "post_body_struct": {
             "tim": "{#.get_tim_healthz_status}",
             "dmapper": "{#.get_dmapper_healthz_status}",

@@ -11,7 +11,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/json/v2/reflect_user",
+          "endpoint": "{dmapper_url}/hbs/backoffice/reflect_user",
           "post_body_parameters": {
             "check_roles": {
               "method": "post",
@@ -69,7 +69,7 @@
           "post_body_parameters": {
             "get_user": {
               "method": "post",
-              "endpoint": "{resql_url}/get-user",
+              "endpoint": "{resql_url}/backoffice/get-user",
               "post_body_struct": {
                 "userIdCode": "{#.reflect_input#.userIdCode}"
               }
@@ -105,7 +105,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/update-user",
+          "endpoint": "{resql_url}/backoffice/update-user",
           "post_body_struct": {
             "created": "$_getInstant()",
             "status": "active",
@@ -129,7 +129,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/update-user-role",
+          "endpoint": "{resql_url}/backoffice/update-user-role",
           "post_body_struct": {
             "userIdCode": "{#.reflect_input#.userIdCode}",
             "roles": "{#.reflect_input#.roles}",

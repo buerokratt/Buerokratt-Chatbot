@@ -11,7 +11,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/json/v2/reflect_chat_id",
+          "endpoint": "{dmapper_url}/hbs/backoffice/reflect_chat_id",
           "post_body_struct": {
             "chatId": "{#.chatId}"
           },
@@ -32,7 +32,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/get-chat-by-id",
+          "endpoint": "{resql_url}/backoffice/get-chat-by-id",
           "post_body_struct": {
             "id": "{#.reflect_input#.chatId}"
           },
@@ -99,7 +99,7 @@
           "post_body_parameters": {
             "insert_chat_with_tara_user_info": {
               "method": "post",
-              "endpoint": "{resql_url}/insert-chat",
+              "endpoint": "{resql_url}/backoffice/insert-chat",
               "post_body_struct": {
                 "id": "{#.get_chat_by_id[0]#.id}",
                 "customerSupportId": "{#.get_chat_by_id[0]#.customerSupportId}",
@@ -163,7 +163,7 @@
     {
       "post_authentication_success_event": {
         "method": "post",
-        "endpoint": "{resql_url}/insert-message",
+        "endpoint": "{resql_url}/backoffice/insert-message",
         "post_body_struct": {
           "chatId": "{#.reflect_input#.chatId}",
           "messageId": "",

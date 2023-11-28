@@ -11,7 +11,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/json/v2/reflect_post_message",
+          "endpoint": "{dmapper_url}/hbs/backoffice/reflect_post_message",
           "post_body_struct": {
             "chatId": "{#.chatId}",
             "authorRole": "",
@@ -39,7 +39,7 @@
           "post_body_parameters": {
             "get_configuration_value": {
               "method": "post",
-              "endpoint": "{resql_url}/get-configuration",
+              "endpoint": "{resql_url}/backoffice/get-configuration",
               "post_body_parameters": {},
               "post_body_struct": {
                 "key": "is_bot_active"
@@ -76,7 +76,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/get-configuration",
+          "endpoint": "{resql_url}/backoffice/get-configuration",
           "post_body_parameters": {},
           "post_body_struct": {
             "key": "bot_institution_id"
@@ -94,11 +94,11 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/json/v2/return_first_chat_from_array",
+          "endpoint": "{dmapper_url}/hbs/backoffice/return_first_chat_from_array",
           "post_body_parameters": {
             "get_chat_by_id": {
               "method": "post",
-              "endpoint": "{resql_url}/get-chat-by-id",
+              "endpoint": "{resql_url}/backoffice/get-chat-by-id",
               "post_body_struct": {
                 "id": "{#.reflect_input#.chatId}"
               },
@@ -218,11 +218,11 @@
         },
         "regular_message": {
           "method": "post",
-          "endpoint": "{resql_url}/insert-bot-message",
+          "endpoint": "{resql_url}/backoffice/insert-bot-message",
           "post_body_parameters": {
             "convert_bot_responses_to_messages": {
               "method": "post",
-              "endpoint": "{dmapper_url}/json/v2/bot_responses_to_messages",
+              "endpoint": "{dmapper_url}/hbs/backoffice/bot_responses_to_messages",
               "post_body_struct": {
                 "botMessages": "{#.post_client_message_to_bot}",
                 "chatId": "{#.reflect_input#.chatId}",
@@ -259,7 +259,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/remove_cs_agent_from_chat",
+          "endpoint": "{resql_url}/backoffice/remove_cs_agent_from_chat",
           "post_body_parameters": {
             "check_if_bot_unable_to_respond": {
               "method": "post",

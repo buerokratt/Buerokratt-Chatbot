@@ -37,7 +37,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/get-active-chat-by-id",
+          "endpoint": "{resql_url}/backoffice/get-active-chat-by-id",
           "post_body_struct": {
             "id": "{#.get_chatId#.chatId}"
           }
@@ -58,7 +58,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/insert-chat",
+          "endpoint": "{resql_url}/backoffice/insert-chat",
           "post_body_struct": {
             "id": "{#.get_chatId#.chatId}",
             "customerSupportId": "{#.get_not_ended_chat[0]#.customerSupportId}",

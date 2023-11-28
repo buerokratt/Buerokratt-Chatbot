@@ -11,7 +11,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/json/v2/reflect_add_forward_value",
+          "endpoint": "{dmapper_url}/hbs/backoffice/reflect_add_forward_value",
           "post_body_struct": {
             "chatId": "{#.chatId}",
             "establishmentName": "{#.establishmentName}"
@@ -90,7 +90,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/get-active-chat-by-id",
+          "endpoint": "{resql_url}/backoffice/get-active-chat-by-id",
           "post_body_struct": {
             "id": "{#.reflect_input#.chatId}"
           }
@@ -111,7 +111,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/get-establishment-value",
+          "endpoint": "{resql_url}/backoffice/get-establishment-value",
           "post_body_struct": {
             "establishmentName": "{#.reflect_input#.establishmentName}"
           }
@@ -132,7 +132,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/insert-chat",
+          "endpoint": "{resql_url}/backoffice/insert-chat",
           "post_body_struct": {
             "id": "{#.reflect_input#.chatId}",
             "customerSupportId": "{#.get_not_ended_chat[0]#.customerSupportId}",

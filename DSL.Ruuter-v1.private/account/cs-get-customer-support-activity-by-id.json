@@ -11,7 +11,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/get-customer-support-activity-by-id-code",
+          "endpoint": "{resql_url}/backoffice/get-customer-support-activity-by-id-code",
           "post_body_parameters": {
             "check_roles": {
               "method": "post",

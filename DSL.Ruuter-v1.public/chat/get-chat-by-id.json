@@ -46,11 +46,11 @@
         },
         "local_request": {
           "method": "post",
-          "endpoint": "{dmapper_url}/json/v2/return_first_chat_from_array",
+          "endpoint": "{dmapper_url}/hbs/backoffice/return_first_chat_from_array",
           "post_body_parameters": {
             "data": {
               "method": "post",
-              "endpoint": "{resql_url}/get-chat-by-id",
+              "endpoint": "{resql_url}/backoffice/get-chat-by-id",
               "post_body_struct": {
                 "id": "{#.chat_info#.chatId}"
               },

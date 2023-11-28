@@ -11,7 +11,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/get-user-with-roles",
+          "endpoint": "{resql_url}/backoffice/get-user-with-roles",
           "post_body_struct": {
             "login": "{#.login}",
             "password": "{#.password}"
@@ -93,7 +93,7 @@
         "proceed": {
           "cookies": ["customJwtCookie"],
           "method": "post",
-          "endpoint": "{resql_url}/set-customer-support-status",
+          "endpoint": "{resql_url}/backoffice/set-customer-support-status",
           "post_body_parameters": {},
           "post_body_struct": {
             "active": false,

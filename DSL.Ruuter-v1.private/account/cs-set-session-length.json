@@ -11,7 +11,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/set-configuration-value",
+          "endpoint": "{resql_url}/backoffice/set-configuration-value",
           "post_body_parameters": {
             "check_params": {
               "method": "post",

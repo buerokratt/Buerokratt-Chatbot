@@ -11,7 +11,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/json/v2/reflect_feedback",
+          "endpoint": "{dmapper_url}/hbs/backoffice/reflect_feedback",
           "post_body_struct": {
             "chatId": "{#.chatId}",
             "feedback": "{#.feedbackText}"
@@ -68,7 +68,7 @@
         },
         "local_request": {
           "method": "post",
-          "endpoint": "{resql_url}/update-chat-with-feedback-text",
+          "endpoint": "{resql_url}/backoffice/update-chat-with-feedback-text",
           "post_body_parameters": {
             "validate_text_length": {
               "method": "post",
@@ -92,7 +92,7 @@
         },
         "external_request": {
           "method": "post",
-          "endpoint": "{dmapper_url}/json/v2/reflect_data_arr",
+          "endpoint": "{dmapper_url}/hbs/backoffice/reflect_data_arr",
           "post_body_parameters": {
             "data": {
               "method": "post",

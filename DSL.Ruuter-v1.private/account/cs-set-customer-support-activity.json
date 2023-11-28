@@ -11,7 +11,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/set-customer-support-status",
+          "endpoint": "{resql_url}/backoffice/set-customer-support-status",
           "post_body_parameters": {
             "userinfo": {
               "cookies": [

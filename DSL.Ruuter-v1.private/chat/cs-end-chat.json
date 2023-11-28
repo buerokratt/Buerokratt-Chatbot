@@ -11,7 +11,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/json/v2/reflect_end_chat",
+          "endpoint": "{dmapper_url}/hbs/backoffice/reflect_end_chat",
           "post_body_struct": {
             "chatId": "{#.chatId}",
             "event": "{#.event}",
@@ -34,7 +34,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/get-active-chat-by-id",
+          "endpoint": "{resql_url}/backoffice/get-active-chat-by-id",
           "post_body_struct": {
             "id": "{#.reflect_input#.chatId}"
           }
@@ -123,7 +123,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/delete-message-preview",
+          "endpoint": "{resql_url}/backoffice/delete-message-preview",
           "post_body_struct": {
             "chatId": "{#.reflect_input#.chatId}"
           }
@@ -144,7 +144,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/get-allowed-statuses",
+          "endpoint": "{resql_url}/backoffice/get-allowed-statuses",
           "post_body_struct": {}
         },
         "response": {
@@ -163,7 +163,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/json/v2/reflect_allowed_statuses",
+          "endpoint": "{dmapper_url}/hbs/backoffice/reflect_allowed_statuses",
           "post_body_struct": {
             "statuses": "{#.get_allowed_statuses}"
           }
@@ -226,7 +226,7 @@
             }
           },
           "method": "post",
-          "endpoint": "{resql_url}/insert-message",
+          "endpoint": "{resql_url}/backoffice/insert-message",
           "post_body_struct": {
             "chatId": "{#.reflect_input#.chatId}",
             "messageId": "{#.get_message_uuid#.output}",
@@ -260,7 +260,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/insert-chat",
+          "endpoint": "{resql_url}/backoffice/insert-chat",
           "post_body_struct": {
             "id": "{#.get_not_ended_chat[0]#.id}",
             "customerSupportId": "{#.get_not_ended_chat[0]#.customerSupportId}",
@@ -301,11 +301,11 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/json/v2/return_first_chat_from_array",
+          "endpoint": "{dmapper_url}/hbs/backoffice/return_first_chat_from_array",
           "post_body_parameters": {
             "get_chat_by_id": {
               "method": "post",
-              "endpoint": "{resql_url}/get-chat-by-id",
+              "endpoint": "{resql_url}/backoffice/get-chat-by-id",
               "post_body_struct": {
                 "id": "{#.reflect_input#.chatId}"
               },
