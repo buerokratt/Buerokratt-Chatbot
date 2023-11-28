@@ -1,14 +1,4 @@
 {"index":{"_id":"1"}}
-{
-  "event_id": "1",
-  "event_type": "notification",
-  "data": "This is an SSE event.",
-  "timestamp": "2023-11-28T12:00:00Z"
-}
+{"event_id": "1","event_type": "notification","data": "This is an SSE event.","timestamp": "2023-11-28T12:00:00Z"}
 {"index":{"_id":"2"}}
-{
-  "event_id": "1",
-  "event_type": "message",
-  "data": "This is an SSE event.",
-  "timestamp": "2023-11-28T12:00:00Z"
-}
+{"event_id": "1","event_type": "message","data": "This is an SSE event.","timestamp": "2023-11-28T12:00:00Z"}
