@@ -1,0 +1,19 @@
+extractRequestData:
+  assign:
+    chatId: ${incoming.body.chatId}
+    lastRead: ${incoming.body.lastRead}
+  next: getNewMessages
+
+getNewMessages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-chat-messages-updated-after-time"
+    body:
+      chatId: ${chatId}
+      timeRangeBegin: ${lastRead}
+  result: res
+  next: returnSuccess
+
+returnSuccess:
+  return: ${res.response.body}
+  next: end

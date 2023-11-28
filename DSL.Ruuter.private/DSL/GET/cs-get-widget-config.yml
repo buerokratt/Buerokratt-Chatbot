@@ -1,22 +1,3 @@
-extractRequestData:
-  assign:
-    cookie: ${incoming.headers.cookie}
-  next: check_if_authorized
-
-check_if_authorized:
-  template: templates/check-user-authority
-  requestType: post
-  headers:
-    cookie: ${cookie}
-  result: authority_result
-  next: check_authority_result
-
-check_authority_result:
-  switch:
-    - condition: ${authority_result !== "false"}
-      next: getWidgetConfig
-  next: returnUnauthorized
-
 getWidgetConfig:
   call: http.post
   args:
@@ -41,10 +22,6 @@ mapWidgetConfigData:
 
 returnSuccess:
   return: ${widgetConfigData.response.body}
-  next: end
-
-returnUnauthorized:
-  return: "error: unauthorized"
   next: end
 
 returnNotFound:

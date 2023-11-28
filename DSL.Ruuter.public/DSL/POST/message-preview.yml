@@ -1,0 +1,19 @@
+extractRequestData:
+  assign:
+    chatId: ${incoming.body.chatId}
+    content: ${incoming.body.content}
+  next: insertMessagePreview
+
+insertMessagePreview:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/insert-message-preview"
+    body:
+      chatId: ${chatId}
+      content: ${content}
+  result: res
+  next: returnSuccess  
+
+returnSuccess:
+  return: "Message Event Sent Successfully"
+  next: end

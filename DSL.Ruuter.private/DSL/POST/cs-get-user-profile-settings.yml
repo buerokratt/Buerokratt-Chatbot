@@ -1,22 +1,7 @@
 extractRequestData:
   assign:
-    cookie: ${incoming.headers.cookie}
     userId: ${incoming.body.userId}
-  next: check_if_authorized
-
-check_if_authorized:
-  template: templates/check-user-authority
-  requestType: post
-  headers:
-    cookie: ${cookie}
-  result: authority_result
-  next: check_authority_result
-
-check_authority_result:
-  switch:
-    - condition: ${authority_result !== "false"}
-      next: getUserSettings
-  next: returnUnauthorized 
+  next: getUserSettings
 
 getUserSettings:
   call: http.post
@@ -35,10 +20,6 @@ validateUserSettingsResultExists:
 
 returnSuccess:
   return: ${getUserSettingsResult.response.body}
-  next: end
-
-returnUnauthorized:
-  return: "error: unauthorized"
   next: end
 
 returnNotFound:
