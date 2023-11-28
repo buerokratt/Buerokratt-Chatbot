@@ -11,7 +11,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/delete-configuration",
+          "endpoint": "{resql_url}/backoffice/delete-configuration",
           "post_body_parameters": {
             "check_roles": {
               "method": "post",

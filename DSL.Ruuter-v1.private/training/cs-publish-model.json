@@ -11,7 +11,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/json/v2/return_helper_function_output",
+          "endpoint": "{dmapper_url}/hbs/backoffice/return_helper_function_output",
           "post_body_parameters": {
             "query_helper_function": {
               "method": "post",

@@ -11,7 +11,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/json/v2/reflect_end_chat",
+          "endpoint": "{dmapper_url}/hbs/backoffice/reflect_end_chat",
           "post_body_struct": {
             "chatId": "{#.chatId}",
             "event": "{#.event}",
@@ -60,7 +60,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/delete-message-preview",
+          "endpoint": "{resql_url}/backoffice/delete-message-preview",
           "post_body_struct": {
             "chatId": "{#.reflect_input#.chatId}"
           }
@@ -107,7 +107,7 @@
         },
         "external_request": {
           "method": "post",
-          "endpoint": "{dmapper_url}/json/v2/reflect_data_arr",
+          "endpoint": "{dmapper_url}/hbs/backoffice/reflect_data_arr",
           "post_body_parameters": {
             "data": {
               "method": "post",

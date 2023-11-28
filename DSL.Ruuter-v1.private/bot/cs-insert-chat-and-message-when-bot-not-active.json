@@ -11,11 +11,11 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/json/v2/return_first_configuration_from_array",
+          "endpoint": "{dmapper_url}/hbs/backoffice/return_first_configuration_from_array",
           "post_body_parameters": {
             "get_configuration_value": {
               "method": "post",
-              "endpoint": "{resql_url}/get-configuration",
+              "endpoint": "{resql_url}/backoffice/get-configuration",
               "post_body_parameters": {
                 "check_roles": {
                   "cookies": [
@@ -85,7 +85,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/get-configuration",
+          "endpoint": "{resql_url}/backoffice/get-configuration",
           "post_body_parameters": {},
           "post_body_struct": {
             "key": "bot_institution_id"
@@ -103,7 +103,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/insert-chat-ended-by-last-message-datetime",
+          "endpoint": "{resql_url}/backoffice/insert-chat-ended-by-last-message-datetime",
           "post_body_parameters": {
             "proceed_when_state_false": {
               "method": "post",
@@ -151,7 +151,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/insert-message-content-by-customer-support-id",
+          "endpoint": "{resql_url}/backoffice/insert-message-content-by-customer-support-id",
           "post_body_parameters": {
             "proceed_when_state_false": {
               "method": "post",
@@ -196,7 +196,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/insert-chat-customer-support-by-customer-support-id",
+          "endpoint": "{resql_url}/backoffice/insert-chat-customer-support-by-customer-support-id",
           "post_body_parameters": {
             "proceed_when_state_false": {
               "method": "post",

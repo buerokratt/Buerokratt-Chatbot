@@ -61,14 +61,14 @@
           "post_body_parameters": {
             "user_with_roles": {
               "method": "post",
-              "endpoint": "{resql_url}/get-user-with-roles-by-id-code",
+              "endpoint": "{resql_url}/backoffice/get-user-with-roles-by-id-code",
               "post_body_struct": {
                 "userIdCode": "{$.user_id_code[0]$.userIdCode}"
               },
               "post_body_parameters": {
                 "user_id_code": {
                   "method": "post",
-                  "endpoint": "{resql_url}/insert-initial-user-or-return-existing-user-id-code",
+                  "endpoint": "{resql_url}/backoffice/insert-initial-user-or-return-existing-user-id-code",
                   "post_body_struct": {
                     "created": "$_getInstant()",
                     "userIdCode": "{$.tara_user_info$.personalCode}",

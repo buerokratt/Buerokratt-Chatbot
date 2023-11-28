@@ -11,7 +11,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/get-chat-messages",
+          "endpoint": "{resql_url}/backoffice/get-chat-messages",
           "post_body_parameters": {
             "check_roles": {
               "method": "post",

@@ -11,7 +11,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/get-configuration",
+          "endpoint": "{resql_url}/backoffice/get-configuration",
           "post_body_parameters": {},
           "post_body_struct": {
             "key": "session_length"

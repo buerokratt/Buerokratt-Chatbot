@@ -11,7 +11,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/json/v2/reflect_destination_forward",
+          "endpoint": "{dmapper_url}/hbs/backoffice/reflect_destination_forward",
           "post_body_struct": {
             "messages": "{#.messages}",
             "endUserEmail": "{#.endUserEmail}",
@@ -61,7 +61,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/insert-messages",
+          "endpoint": "{resql_url}/backoffice/insert-messages",
           "post_body_struct": {
             "messages": "{#.reflect_input#.messages}",
             "destinationChatId": "{#.get_chat_uuid#.output}"
@@ -106,7 +106,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/init-chat",
+          "endpoint": "{resql_url}/backoffice/init-chat",
           "post_body_struct": {
             "id": "{#.get_chat_uuid#.output}",
             "externalId": "{#.reflect_input#.originChatId}",
@@ -186,11 +186,11 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/json/v2/return_first_chat_from_array",
+          "endpoint": "{dmapper_url}/hbs/backoffice/return_first_chat_from_array",
           "post_body_parameters": {
             "get_chat_by_id": {
               "method": "post",
-              "endpoint": "{resql_url}/get-chat-by-id",
+              "endpoint": "{resql_url}/backoffice/get-chat-by-id",
               "post_body_struct": {
                 "id": "{#.get_chat_uuid#.output}"
               },
@@ -220,7 +220,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/json/v2/format_forward_destination_response",
+          "endpoint": "{dmapper_url}/hbs/backoffice/format_forward_destination_response",
           "post_body_struct": {
             "generatedChatId": "{#.get_inserted_chat#.id}",
             "redirectJwt": "{#.generate_redirect_jwt}"

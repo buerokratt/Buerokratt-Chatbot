@@ -11,7 +11,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/json/v2/reflect_user",
+          "endpoint": "{dmapper_url}/hbs/backoffice/reflect_user",
           "post_body_struct": {
             "firstName": "{#.firstName}",
             "lastName": "{#.lastName}",
@@ -93,7 +93,7 @@
           "post_body_parameters": {
             "get_user": {
               "method": "post",
-              "endpoint": "{resql_url}/get-user",
+              "endpoint": "{resql_url}/backoffice/get-user",
               "post_body_struct": {
                 "userIdCode": "{#.reflect_input#.userIdCode}"
               }
@@ -120,7 +120,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/insert-user",
+          "endpoint": "{resql_url}/backoffice/insert-user",
           "post_body_struct": {
             "created": "$_getInstant()",
             "status": "active",
@@ -144,7 +144,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/insert-user-role",
+          "endpoint": "{resql_url}/backoffice/insert-user-role",
           "post_body_struct": {
             "userIdCode": "{#.reflect_input#.userIdCode}",
             "roles": "{#.reflect_input#.roles}",
@@ -163,7 +163,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/set-customer-support-status",
+          "endpoint": "{resql_url}/backoffice/set-customer-support-status",
           "post_body_struct": {
             "userIdCode": "{#.reflect_input#.userIdCode}",
             "active": "false",
@@ -183,7 +183,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/set-user-profile-settings",
+          "endpoint": "{resql_url}/backoffice/set-user-profile-settings",
           "post_body_struct": {
             "userId": "{#.reflect_input#.userIdCode}",
             "forwardedChatPopupNotifications": false,

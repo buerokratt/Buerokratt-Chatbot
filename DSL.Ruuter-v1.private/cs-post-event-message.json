@@ -11,7 +11,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/json/v2/reflect_end_chat",
+          "endpoint": "{dmapper_url}/hbs/backoffice/reflect_end_chat",
           "post_body_struct": {
             "chatId": "{#.chatId}",
             "event": "{#.event}",
@@ -34,7 +34,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/get-active-chat-by-id",
+          "endpoint": "{resql_url}/backoffice/get-active-chat-by-id",
           "post_body_struct": {
             "id": "{#.reflect_input#.chatId}"
           }
@@ -123,7 +123,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/insert-message",
+          "endpoint": "{resql_url}/backoffice/insert-message",
           "post_body_parameters": {
             "check_roles": {
               "method": "post",
@@ -180,11 +180,11 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/json/v2/return_first_chat_from_array",
+          "endpoint": "{dmapper_url}/hbs/backoffice/return_first_chat_from_array",
           "post_body_parameters": {
             "get_chat_by_id": {
               "method": "post",
-              "endpoint": "{resql_url}/get-chat-by-id",
+              "endpoint": "{resql_url}/backoffice/get-chat-by-id",
               "post_body_struct": {
                 "id": "{#.reflect_input#.chatId}"
               },

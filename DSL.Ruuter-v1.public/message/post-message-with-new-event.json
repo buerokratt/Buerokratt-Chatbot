@@ -11,7 +11,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/json/v2/reflect_message_event",
+          "endpoint": "{dmapper_url}/hbs/backoffice/reflect_message_event",
           "post_body_struct": {
             "id": "{#.id}",
             "event": "{#.event}",
@@ -36,7 +36,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/get-message-by-id",
+          "endpoint": "{resql_url}/backoffice/get-message-by-id",
           "post_body_struct": {
             "id": "{#.reflect_input#.id}"
           },
@@ -91,7 +91,7 @@
         "local_request": {
           "method": "post",
           "cookies": ["chatJwt"],
-          "endpoint": "{resql_url}/insert-message",
+          "endpoint": "{resql_url}/backoffice/insert-message",
           "post_body_struct": {
             "messageId": "{#.get_message_by_id[0]#.baseId}",
             "chatId": "{#.get_message_by_id[0]#.chatBaseId}",
@@ -115,7 +115,7 @@
         },
         "external_request": {
           "method": "post",
-          "endpoint": "{dmapper_url}/json/v2/reflect_data_arr",
+          "endpoint": "{dmapper_url}/hbs/backoffice/reflect_data_arr",
           "post_body_parameters": {
             "data": {
               "method": "post",

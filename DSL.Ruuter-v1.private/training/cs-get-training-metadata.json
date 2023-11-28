@@ -138,7 +138,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/json/v2/return_training_metadata",
+          "endpoint": "{dmapper_url}/hbs/backoffice/return_training_metadata",
           "post_body_struct": {
             "areTrainingResultsPositive": "{#.get_are_latest_training_results_positive#.output}",
             "isBotTraining": "{#.get_is_bot_training#.output}"

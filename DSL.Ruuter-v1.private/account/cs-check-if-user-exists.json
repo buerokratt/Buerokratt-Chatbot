@@ -24,7 +24,7 @@
           "post_body_parameters": {
             "get_user": {
               "method": "post",
-              "endpoint": "{resql_url}/get-user",
+              "endpoint": "{resql_url}/backoffice/get-user",
               "post_body_struct": {
                 "userIdCode": "{#.userIdCode}"
               }

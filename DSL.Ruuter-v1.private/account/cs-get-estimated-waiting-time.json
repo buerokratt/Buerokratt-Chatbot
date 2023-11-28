@@ -11,7 +11,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/get-estimated-waiting-time",
+          "endpoint": "{resql_url}/backoffice/get-estimated-waiting-time",
           "post_body_parameters": {},
           "post_body_struct": {
             "key": "estimated_waiting_time"
@@ -33,7 +33,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/json/v2/return_first_estimated_time_from_array",
+          "endpoint": "{dmapper_url}/hbs/backoffice/return_first_estimated_time_from_array",
           "post_body_struct": {
             "estimatedTimeArray": "{#.get_estimated_waiting_time}"
           }

@@ -11,7 +11,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/json/v2/reflect_forward_message",
+          "endpoint": "{dmapper_url}/hbs/backoffice/reflect_forward_message",
           "post_body_struct": {
             "chatId": "{#.chatId}",
             "event": "{#.event}",
@@ -89,7 +89,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/get-active-chat-by-id",
+          "endpoint": "{resql_url}/backoffice/get-active-chat-by-id",
           "post_body_struct": {
             "id": "{#.reflect_input#.chatId}"
           }
@@ -129,7 +129,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/insert-message-with-array-content",
+          "endpoint": "{resql_url}/backoffice/insert-message-with-array-content",
           "post_body_struct": {
             "chatId": "{#.reflect_input#.chatId}",
             "messageId": "{#.get_message_uuid#.output}",

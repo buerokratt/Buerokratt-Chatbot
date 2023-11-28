@@ -33,7 +33,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/json/v2/format_weather_station_response",
+          "endpoint": "{dmapper_url}/hbs/backoffice/format_weather_station_response",
           "post_body_struct": {
             "queryResponse": "{#.get_station_id#.entries#.entry}"
           },

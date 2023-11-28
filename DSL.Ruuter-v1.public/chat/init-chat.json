@@ -11,7 +11,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/json/v2/reflect_init_chat",
+          "endpoint": "{dmapper_url}/hbs/backoffice/reflect_init_chat",
           "post_body_struct": {
             "authorRole": "{#.message#.authorRole}",
             "authorTimestamp": "{#.message#.authorTimestamp}",
@@ -212,7 +212,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/insert-message",
+          "endpoint": "{resql_url}/backoffice/insert-message",
           "post_body_struct": {
             "chatId": "{#.get_chat_uuid#.output}",
             "messageId": "{#.get_message_uuid#.output}",
@@ -246,7 +246,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/init-chat",
+          "endpoint": "{resql_url}/backoffice/init-chat",
           "post_body_struct": {
             "id": "{#.get_chat_uuid#.output}",
             "endUserId": "{#.reflect_input#.endUserId}",
@@ -310,7 +310,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/get-all-available-customer-support-agents-with-email-notifications-enabled",
+          "endpoint": "{resql_url}/backoffice/get-all-available-customer-support-agents-with-email-notifications-enabled",
           "post_body_struct": {},
           "response": {
             "ok": "proceed",
@@ -336,7 +336,7 @@
             "fill_notification_new_chat": {
               "post_body_parameters": {},
               "method": "post",
-              "endpoint": "{dmapper_url}/json/v2/notification_new_chat",
+              "endpoint": "{dmapper_url}/hbs/backoffice/notification_new_chat",
               "post_body_struct": {
                 "authorTimestamp": "{#.reflect_input#.authorTimestamp}",
                 "content": "#.reflect_input#.content",
@@ -369,11 +369,11 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/json/v2/return_first_chat_from_array",
+          "endpoint": "{dmapper_url}/hbs/backoffice/return_first_chat_from_array",
           "post_body_parameters": {
             "get_chat_by_id": {
               "method": "post",
-              "endpoint": "{resql_url}/get-chat-by-id",
+              "endpoint": "{resql_url}/backoffice/get-chat-by-id",
               "post_body_struct": {
                 "id": "{#.get_chat_uuid#.output}"
               },

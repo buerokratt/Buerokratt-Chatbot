@@ -11,7 +11,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/json/v2/reflect_intent_name",
+          "endpoint": "{dmapper_url}/hbs/backoffice/reflect_intent_name",
           "post_body_struct": {
             "intentName": "{#.intent}"
           }
@@ -154,7 +154,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/json/v2/convert_intent_data_to_object",
+          "endpoint": "{dmapper_url}/hbs/backoffice/convert_intent_data_to_object",
           "post_body_struct": {
             "intentName": "{#.reflect_input#.intentName}",
             "intentResponse": "{#.get_intent_response#.output}",

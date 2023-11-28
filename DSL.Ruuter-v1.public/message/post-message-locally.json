@@ -11,7 +11,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/json/v2/reflect_post_message",
+          "endpoint": "{dmapper_url}/hbs/backoffice/reflect_post_message",
           "post_body_struct": {
             "chatId": "{#.chatId}",
             "authorTimestamp": "{#.authorTimestamp}",
@@ -51,7 +51,7 @@
           "post_body_parameters": {
             "get_not_ended_chat": {
               "method": "post",
-              "endpoint": "{resql_url}/get-active-chat-by-id",
+              "endpoint": "{resql_url}/backoffice/get-active-chat-by-id",
               "post_body_struct": {
                 "id": "{#.reflect_input#.chatId}"
               },
@@ -97,7 +97,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/insert-message",
+          "endpoint": "{resql_url}/backoffice/insert-message",
           "post_body_parameters": {
             "match_user_chat_id": {
               "method": "post",
