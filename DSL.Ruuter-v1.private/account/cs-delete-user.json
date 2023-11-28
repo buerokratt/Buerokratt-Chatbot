@@ -10,7 +10,7 @@
       },
       "proceed": {
         "method": "post",
-        "endpoint": "{resql_url}/backoffice/delete-user",
+        "endpoint": "{resql_url}/delete-user",
         "post_body_struct": {
           "userIdCode": "{#.userIdCode}",
           "created": "$_getInstant()"

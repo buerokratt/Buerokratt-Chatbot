@@ -11,7 +11,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/hbs/backoffice/reflect_json_data",
+          "endpoint": "{dmapper_url}/json/v2/reflect_json_data",
           "post_body_struct": {
             "data": "{$cookies$}"
           },

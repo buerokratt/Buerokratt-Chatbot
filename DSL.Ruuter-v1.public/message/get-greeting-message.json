@@ -11,7 +11,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/backoffice/get-greeting-message",
+          "endpoint": "{resql_url}/get-greeting-message",
           "post_body_struct": {
           }
         },
@@ -31,7 +31,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/hbs/backoffice/return_first_greeting_from_array",
+          "endpoint": "{dmapper_url}/json/v2/return_first_greeting_from_array",
           "post_body_struct": {
             "greetingArray": "{#.get_greeting_message}"
           }

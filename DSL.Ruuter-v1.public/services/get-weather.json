@@ -11,7 +11,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/hbs/backoffice/reflect_weather",
+          "endpoint": "{dmapper_url}/json/v2/reflect_weather",
           "post_body_struct": {
             "chatId": "{#.chatId}",
             "authorId": "{#.authorId}",
@@ -112,7 +112,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/hbs/backoffice/format_weather_response",
+          "endpoint": "{dmapper_url}/json/v2/format_weather_response",
           "post_body_struct": {
             "tains": "{#.get_weather_data#.data#.get_weather_data#.entries#.entry[0]#.tains}",
             "ws10ma": "{#.get_weather_data#.data#.get_weather_data#.entries#.entry[0]#.ws10ma}",
@@ -135,11 +135,11 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/backoffice/insert-bot-message",
+          "endpoint": "{resql_url}/insert-bot-message",
           "post_body_parameters": {
             "convert_bot_responses_to_messages": {
               "method": "post",
-              "endpoint": "{dmapper_url}/hbs/backoffice/bot_responses_to_messages",
+              "endpoint": "{dmapper_url}/json/v2/bot_responses_to_messages",
               "post_body_struct": {
                 "botMessages": "{#.format_end_user_response}",
                 "chatId": "{#.reflect_input#.chatId}",

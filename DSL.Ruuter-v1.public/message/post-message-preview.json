@@ -11,7 +11,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/hbs/backoffice/reflect_message_preview",
+          "endpoint": "{dmapper_url}/json/v2/reflect_message_preview",
           "post_body_struct": {
             "chatId": "{#.chatId}",
             "content": "{#.content}"
@@ -29,7 +29,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/backoffice/insert-message-preview",
+          "endpoint": "{resql_url}/insert-message-preview",
           "post_body_struct": {
             "chatId": "{#.reflect_input#.chatId}",
             "content": "{#.reflect_input#.content}"

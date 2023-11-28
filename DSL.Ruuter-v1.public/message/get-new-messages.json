@@ -11,7 +11,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/hbs/backoffice/reflect_timerange",
+          "endpoint": "{dmapper_url}/json/v2/reflect_timerange",
           "post_body_struct": {
             "timeRangeBegin": "{#.timeRangeBegin}"
           }
@@ -67,7 +67,7 @@
         },
         "local_request": {
           "method": "post",
-          "endpoint": "{resql_url}/backoffice/get-chat-messages-updated-after-time",
+          "endpoint": "{resql_url}/get-chat-messages-updated-after-time",
           "post_body_struct": {
             "chatId": "{#.chat_info#.chatId}",
             "timeRangeBegin": "{#.reflect_input#.timeRangeBegin}"
@@ -79,7 +79,7 @@
         },
         "external_request": {
           "method": "post",
-          "endpoint": "{dmapper_url}/hbs/backoffice/reflect_data_arr",
+          "endpoint": "{dmapper_url}/json/v2/reflect_data_arr",
           "post_body_parameters": {
             "data": {
               "method": "post",

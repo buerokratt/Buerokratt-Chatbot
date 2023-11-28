@@ -11,7 +11,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/hbs/backoffice/reflect_cs_claim_chat",
+          "endpoint": "{dmapper_url}/json/v2/reflect_cs_claim_chat",
           "post_body_struct": {
             "id": "{#.id}",
             "customerSupportId": "{#.customerSupportId}",
@@ -38,7 +38,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/backoffice/get-active-chat-by-id",
+          "endpoint": "{resql_url}/get-active-chat-by-id",
           "post_body_struct": {
             "id": "{#.reflect_input#.id}"
           }
@@ -86,7 +86,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/backoffice/insert-chat",
+          "endpoint": "{resql_url}/insert-chat",
           "post_body_parameters": {
             "check_roles": {
               "method": "post",
@@ -164,11 +164,11 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/hbs/backoffice/return_first_chat_from_array",
+          "endpoint": "{dmapper_url}/json/v2/return_first_chat_from_array",
           "post_body_parameters": {
             "get_active_chat_by_id": {
               "method": "post",
-              "endpoint": "{resql_url}/backoffice/get-active-chat-by-id",
+              "endpoint": "{resql_url}/get-active-chat-by-id",
               "post_body_struct": {
                 "id": "{#.reflect_input#.id}"
               },

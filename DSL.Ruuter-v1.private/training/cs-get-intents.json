@@ -131,7 +131,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/hbs/backoffice/return_blacklisted_and_regular_intents",
+          "endpoint": "{dmapper_url}/json/v2/return_blacklisted_and_regular_intents",
           "post_body_struct": {
             "blacklistedIntentNames": "{#.get_blacklisted_intents#.output}",
             "intents": "{#.get_intents#.output}"

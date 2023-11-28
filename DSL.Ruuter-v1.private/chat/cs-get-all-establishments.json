@@ -11,7 +11,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/backoffice/get-all-establishments",
+          "endpoint": "{resql_url}/get-all-establishments",
           "post_body_parameters": {
             "check_roles": {
               "cookies": [
@@ -71,7 +71,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{dmapper_url}/hbs/backoffice/format-institution-connections",
+          "endpoint": "{dmapper_url}/json/v2/format-institution-connections",
           "post_body_struct": {
             "establishments": "{#.get_all_active_establishments}"
           }

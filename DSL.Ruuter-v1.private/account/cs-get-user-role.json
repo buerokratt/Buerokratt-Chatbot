@@ -33,7 +33,7 @@
                 },
                 "proceed": {
                     "method": "post",
-                    "endpoint": "{resql_url}/backoffice/get-user-role",
+                    "endpoint": "{resql_url}/get-user-role",
                     "post_body_struct": {
                         "userIdCode": "{#.reflect_input#.idCode}"
                     }
