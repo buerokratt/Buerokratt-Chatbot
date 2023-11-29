@@ -1,4 +1,6 @@
 {"index":{"_id":"1"}}
-{"event_id": "1","event_type": "notification","data": "This is an SSE event.","timestamp": "2023-11-28T12:00:00Z"}
+{"event_id": "1","event_type": "has-new-messages","data": "{\"chatId:\":\"abc123456789\"}","timestamp": "2023-11-28T12:00:00Z"}
 {"index":{"_id":"2"}}
-{"event_id": "1","event_type": "message","data": "This is an SSE event.","timestamp": "2023-11-28T12:00:00Z"}
+{"event_id": "2","event_type": "is-user-typing","data": "{\"chatId:\":\"abc123456789\"}","timestamp": "2023-11-28T12:00:00Z"}
+{"index":{"_id":"3"}}
+{"event_id": "3","event_type": "is-chat-list-updated","data": "{\"chatId:\":\"00000001\"}","timestamp": "2023-11-28T12:00:00Z"}
