@@ -103,9 +103,7 @@ const Header: FC = () => {
   }, [userInfo?.idCode]);
 
   const getMessages = async () => {
-    const { data: res } = await apiDevV2.post('cs-get-user-profile-settings', {
-      userId: userInfo?.idCode ?? '',
-    });
+    const { data: res } = await apiDevV2.get('user-profile-settings');
 
     if (res.response && res.response != 'error: not found')
       setUserProfileSettings(res.response[0]);
@@ -190,8 +188,7 @@ const Header: FC = () => {
 
   const userProfileSettingsMutation = useMutation({
     mutationFn: async (data: UserProfileSettings) => {
-      await apiDevV2.post('cs-set-user-profile-settings', {
-        userId: userInfo?.idCode ?? '',
+      await apiDevV2.post('user-profile-settings', {
         forwardedChatPopupNotifications: data.forwardedChatPopupNotifications,
         forwardedChatSoundNotifications: data.forwardedChatSoundNotifications,
         forwardedChatEmailNotifications: data.newChatEmailNotifications,
@@ -203,7 +200,7 @@ const Header: FC = () => {
       setUserProfileSettings(data);
     },
     onError: async (error: AxiosError) => {
-      await queryClient.invalidateQueries(['cs-get-user-profile-settings']);
+      await queryClient.invalidateQueries(['user-profile-settings']);
       toast.open({
         type: 'error',
         title: t('global.notificationError'),

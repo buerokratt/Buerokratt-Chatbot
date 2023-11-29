@@ -1,6 +1,24 @@
-extractRequestData:
+get_user_info:
+  call: http.post
+  args:
+   url: "[#CHATBOT_TIM]:[#CHATBOT_TIM_PORT]/jwt/custom-jwt-userinfo"
+   contentType: plaintext
+   headers:
+    cookie: ${cookie}
+   plaintext: 
+      "customJwtCookie"
+  result: res
+  next: check_user_info_response
+
+check_user_info_response:
+  switch:
+    - condition: ${200 <= res.response.statusCodeValue && res.response.statusCodeValue < 300}
+      next: assignIdCode
+  next: return_bad_request
+
+assignIdCode:
   assign:
-    userId: ${incoming.body.userId}
+    idCode: ${res.response.body.idCode}
   next: getUserSettings
 
 getUserSettings:
@@ -8,7 +26,7 @@ getUserSettings:
   args:
     url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-user-profile-settings"
     body:
-      userId: ${userId}
+      userId: ${idCode}
   result: getUserSettingsResult
   next: validateUserSettingsResultExists
 
