@@ -4,7 +4,7 @@ get_user_info:
    url: "[#CHATBOT_TIM]:[#CHATBOT_TIM_PORT]/jwt/custom-jwt-userinfo"
    contentType: plaintext
    headers:
-    cookie: ${cookie}
+    cookie: ${incoming.headers.cookie}
    plaintext: 
       "customJwtCookie"
   result: res
