@@ -249,7 +249,7 @@ services:
   
   nginx:
     image: nginx:latest
-    container_name: nginx_container
+    container_name: nginx-node
     ports:
       - "80:80"
     volumes:
