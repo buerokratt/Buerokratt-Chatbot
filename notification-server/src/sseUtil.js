@@ -19,8 +19,6 @@ function buildSSEResponse({
   const lastTimestamp = Date.now();
   const writer = (data) => res.write(`data: ${JSON.stringify(data)}\n\n`);
   
-  console.log({ connectionId });
-
   const intervalHandle = setInterval(() => 
     searchNotification(
       searchParms,
