@@ -1,14 +1,14 @@
 {
   "mappings": {
     "properties": {
-      "event_id": {
+      "userId": {
         "type": "keyword"
       },
-      "event_type": {
-        "type": "keyword"
-      },
-      "data": {
+      "payload": {
         "type": "text"
+      },
+      "state": {
+        "type": "keyword"
       },
       "timestamp": {
         "type": "date"
