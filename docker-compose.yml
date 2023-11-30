@@ -1,251 +1,251 @@
 version: "3.9"
 
 services:
-  # ruuter-v1-public:
-  #   container_name: ruuter-v1-public
-  #   image: riaee/byk-chatbot-public-ruuter:05
-  #   environment:
-  #     - csrf.enabled=false
-  #     - csrf.tim_userinfo_url=
-  #     - csrf.ruuter_services_whitelist=
-  #     - legacy-portal-integration.sessionCookieDomain=buerokratt.ee
-  #     - allowed.requested.method.types=POST,GET
-  #     - ruuter.cors.allowedOrigins=https://buerokratt.ee,https://admin.buerokratt.ee,https://tim.buerokratt.ee,http://localhost:3001,http://localhost:3002,http://localhost:3003,http://localhost:3004,http://localhost:8086
-  #     - maxRequestSizeBytes=10000000000
-  #     - default.requested.method.type=POST
-  #     - incoming.request.external.validation.enabled=false
-  #     - requested.method.type.error.http.response.code=200
-  #     - verify.requested.method.type=false
-  #     - incoming.request.external.validation.endpoint=
-  #     - headers.contentSecurityPolicy=
-  #     - logging.level.root=INFO
-  #   volumes:
-  #     - ./setup/ruuter/server.xml:/usr/local/tomcat/conf/server.xml:ro
-  #     - ./setup/ruuter/public.urls.docker.json:/usr/local/tomcat/urls.env.json:ro
-  #     - ./setup/ruuter/cert.crt:/usr/local/tomcat/conf/cert.crt:ro
-  #     - ./setup/ruuter/key.key:/usr/local/tomcat/conf/key.key:ro
-  #     - ./DSL.Ruuter-v1.public:/usr/local/tomcat/configurations
-  #   ports:
-  #     - 8080:8080
-  #   restart: always
-  #   networks:
-  #     - bykstack
-  #   cpus: "0.5" # Example CPU limit
-  #   mem_limit: "512M" # Example memory limit
+  ruuter-v1-public:
+    container_name: ruuter-v1-public
+    image: riaee/byk-chatbot-public-ruuter:05
+    environment:
+      - csrf.enabled=false
+      - csrf.tim_userinfo_url=
+      - csrf.ruuter_services_whitelist=
+      - legacy-portal-integration.sessionCookieDomain=buerokratt.ee
+      - allowed.requested.method.types=POST,GET
+      - ruuter.cors.allowedOrigins=https://buerokratt.ee,https://admin.buerokratt.ee,https://tim.buerokratt.ee,http://localhost:3001,http://localhost:3002,http://localhost:3003,http://localhost:3004,http://localhost:8086
+      - maxRequestSizeBytes=10000000000
+      - default.requested.method.type=POST
+      - incoming.request.external.validation.enabled=false
+      - requested.method.type.error.http.response.code=200
+      - verify.requested.method.type=false
+      - incoming.request.external.validation.endpoint=
+      - headers.contentSecurityPolicy=
+      - logging.level.root=INFO
+    volumes:
+      - ./setup/ruuter/server.xml:/usr/local/tomcat/conf/server.xml:ro
+      - ./setup/ruuter/public.urls.docker.json:/usr/local/tomcat/urls.env.json:ro
+      - ./setup/ruuter/cert.crt:/usr/local/tomcat/conf/cert.crt:ro
+      - ./setup/ruuter/key.key:/usr/local/tomcat/conf/key.key:ro
+      - ./DSL.Ruuter-v1.public:/usr/local/tomcat/configurations
+    ports:
+      - 8080:8080
+    restart: always
+    networks:
+      - bykstack
+    cpus: "0.5" # Example CPU limit
+    mem_limit: "512M" # Example memory limit
 
-  # ruuter-v1-private:
-  #   container_name: ruuter-v1-private
-  #   image: riaee/byk-chatbot-private-ruuter:05
-  #   environment:
-  #     - legacy-portal-integration.sessionCookieDomain=buerokratt.ee
-  #     - logging.level.root=INFO
-  #     - ruuter.cors.allowedOrigins=https://buerokratt.ee,https://admin.buerokratt.ee,https://tim.buerokratt.ee,http://localhost:3001,http://localhost:3002,http://localhost:3003,http://localhost:3004
-  #     - headers.contentSecurityPolicy=
-  #     - maxRequestSizeBytes=10000000000
-  #     - incoming.request.external.validation.enabled=false
-  #     - incoming.request.external.validation.endpoint=
-  #     - verify.requested.method.type=false
-  #     - allowed.requested.method.types=POST
-  #     - default.requested.method.type=POST
-  #     - requested.method.type.error.http.response.code=200
-  #     - csrf.enabled=false
-  #     - csrf.tim_userinfo_url=
-  #     - csrf.ruuter_services_whitelist=
-  #     - ip-whitelist.routes[0].ips[0]=127.0.0.1
-  #     - ip-whitelist.routes[0].patterns[0]=/functions/*
-  #     - ip-whitelist.routes[1].ips[0]=127.0.0.1
-  #     - ip-whitelist.routes[1].patterns[0]=/get-location-coordinates
-  #     - ip-whitelist.routes[1].patterns[1]=/get-weather-data
-  #     - ip-whitelist.routes[1].patterns[2]=/get-weather-station-id
-  #     - ip-whitelist.routes[1].patterns[3]=/get-weather
-  #     - ip-whitelist.routes[1].patterns[4]=/param_string_length
-  #   volumes:
-  #     - ./setup/ruuter/server.xml:/usr/local/tomcat/conf/server.xml:ro
-  #     - ./setup/ruuter/private.urls.docker.json:/usr/local/tomcat/urls.env.json:ro
-  #     - ./setup/ruuter/cert.crt:/usr/local/tomcat/conf/cert.crt:ro
-  #     - ./setup/ruuter/key.key:/usr/local/tomcat/conf/key.key:ro
-  #     - ./DSL.Ruuter-v1.private:/usr/local/tomcat/configurations
-  #   ports:
-  #     - 8090:8080
-  #   restart: always
-  #   networks:
-  #     - bykstack
-  #   cpus: "0.5" # Example CPU limit
-  #   mem_limit: "512M" # Example memory limit
+  ruuter-v1-private:
+    container_name: ruuter-v1-private
+    image: riaee/byk-chatbot-private-ruuter:05
+    environment:
+      - legacy-portal-integration.sessionCookieDomain=buerokratt.ee
+      - logging.level.root=INFO
+      - ruuter.cors.allowedOrigins=https://buerokratt.ee,https://admin.buerokratt.ee,https://tim.buerokratt.ee,http://localhost:3001,http://localhost:3002,http://localhost:3003,http://localhost:3004
+      - headers.contentSecurityPolicy=
+      - maxRequestSizeBytes=10000000000
+      - incoming.request.external.validation.enabled=false
+      - incoming.request.external.validation.endpoint=
+      - verify.requested.method.type=false
+      - allowed.requested.method.types=POST
+      - default.requested.method.type=POST
+      - requested.method.type.error.http.response.code=200
+      - csrf.enabled=false
+      - csrf.tim_userinfo_url=
+      - csrf.ruuter_services_whitelist=
+      - ip-whitelist.routes[0].ips[0]=127.0.0.1
+      - ip-whitelist.routes[0].patterns[0]=/functions/*
+      - ip-whitelist.routes[1].ips[0]=127.0.0.1
+      - ip-whitelist.routes[1].patterns[0]=/get-location-coordinates
+      - ip-whitelist.routes[1].patterns[1]=/get-weather-data
+      - ip-whitelist.routes[1].patterns[2]=/get-weather-station-id
+      - ip-whitelist.routes[1].patterns[3]=/get-weather
+      - ip-whitelist.routes[1].patterns[4]=/param_string_length
+    volumes:
+      - ./setup/ruuter/server.xml:/usr/local/tomcat/conf/server.xml:ro
+      - ./setup/ruuter/private.urls.docker.json:/usr/local/tomcat/urls.env.json:ro
+      - ./setup/ruuter/cert.crt:/usr/local/tomcat/conf/cert.crt:ro
+      - ./setup/ruuter/key.key:/usr/local/tomcat/conf/key.key:ro
+      - ./DSL.Ruuter-v1.private:/usr/local/tomcat/configurations
+    ports:
+      - 8090:8080
+    restart: always
+    networks:
+      - bykstack
+    cpus: "0.5" # Example CPU limit
+    mem_limit: "512M" # Example memory limit
 
-  # tim:
-  #   container_name: tim
-  #   image: tim
-  #   depends_on:
-  #     - tim-postgresql
-  #   ports:
-  #     - 8085:8085
-  #   networks:
-  #     - bykstack
-  #   extra_hosts:
-  #     - "host.docker.internal:host-gateway"
-  #   cpus: "0.5" # Example CPU limit
-  #   mem_limit: "512M" # Example memory limit
+  tim:
+    container_name: tim
+    image: tim
+    depends_on:
+      - tim-postgresql
+    ports:
+      - 8085:8085
+    networks:
+      - bykstack
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    cpus: "0.5" # Example CPU limit
+    mem_limit: "512M" # Example memory limit
 
-  # tim-postgresql:
-  #   container_name: tim-postgresql
-  #   image: postgres:14.1
-  #   environment:
-  #     - POSTGRES_USER=tim
-  #     - POSTGRES_PASSWORD=123
-  #     - POSTGRES_DB=tim
-  #     - POSTGRES_HOST_AUTH_METHOD=trust
-  #   volumes:
-  #     - ./tim-db:/var/lib/postgresql/data
-  #   ports:
-  #     - 9876:5432
-  #   networks:
-  #     - bykstack
+  tim-postgresql:
+    container_name: tim-postgresql
+    image: postgres:14.1
+    environment:
+      - POSTGRES_USER=tim
+      - POSTGRES_PASSWORD=123
+      - POSTGRES_DB=tim
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    volumes:
+      - ./tim-db:/var/lib/postgresql/data
+    ports:
+      - 9876:5432
+    networks:
+      - bykstack
 
-  # ruuter-v2-private:
-  #   container_name: ruuter-v2-private
-  #   image: ruuter
-  #   environment:
-  #     - application.cors.allowedOrigins=http://localhost:8082,http://localhost:3001,http://localhost:3003
-  #     - application.httpCodesAllowList=200,201,202,400,401,403,500
-  #     - application.logging.displayRequestContent=true
-  #     - application.logging.displayResponseContent=true
-  #     - server.port=8088
-  #   volumes:
-  #     - ./DSL.Ruuter.private/DSL:/DSL
-  #     - ./constants.ini:/app/constants.ini
-  #   ports:
-  #     - 8088:8088
-  #   networks:
-  #     - bykstack
-  #   cpus: "0.5" # Example CPU limit
-  #   mem_limit: "512M" # Example memory limit
+  ruuter-v2-private:
+    container_name: ruuter-v2-private
+    image: ruuter
+    environment:
+      - application.cors.allowedOrigins=http://localhost:8082,http://localhost:3001,http://localhost:3003
+      - application.httpCodesAllowList=200,201,202,400,401,403,500
+      - application.logging.displayRequestContent=true
+      - application.logging.displayResponseContent=true
+      - server.port=8088
+    volumes:
+      - ./DSL.Ruuter.private/DSL:/DSL
+      - ./constants.ini:/app/constants.ini
+    ports:
+      - 8088:8088
+    networks:
+      - bykstack
+    cpus: "0.5" # Example CPU limit
+    mem_limit: "512M" # Example memory limit
 
-  # ruuter-v2-public:
-  #   container_name: ruuter-v2-public
-  #   image: ruuter
-  #   environment:
-  #     - application.cors.allowedOrigins=http://localhost:8086,http://localhost:3001,http://localhost:3003,http://localhost:8080
-  #     - application.httpCodesAllowList=200,201,202,400,401,403,500
-  #     - application.logging.displayRequestContent=true
-  #     - application.logging.displayResponseContent=true
-  #     - server.port=8086
-  #   volumes:
-  #     - ./DSL.Ruuter.public/DSL:/DSL
-  #     - ./constants.ini:/app/constants.ini
-  #   ports:
-  #     - 8086:8086
-  #   networks:
-  #     - bykstack
-  #   cpus: "0.5" # Example CPU limit
-  #   mem_limit: "512M" # Example memory limit
+  ruuter-v2-public:
+    container_name: ruuter-v2-public
+    image: ruuter
+    environment:
+      - application.cors.allowedOrigins=http://localhost:8086,http://localhost:3001,http://localhost:3003,http://localhost:8080
+      - application.httpCodesAllowList=200,201,202,400,401,403,500
+      - application.logging.displayRequestContent=true
+      - application.logging.displayResponseContent=true
+      - server.port=8086
+    volumes:
+      - ./DSL.Ruuter.public/DSL:/DSL
+      - ./constants.ini:/app/constants.ini
+    ports:
+      - 8086:8086
+    networks:
+      - bykstack
+    cpus: "0.5" # Example CPU limit
+    mem_limit: "512M" # Example memory limit
 
-  # dmapper:
-  #   container_name: dmapper
-  #   image: riaee/byk-dmapper:11
-  #   environment:
-  #     - logging.level.root=INFO
-  #     - headers.contentSecurityPolicy=
-  #     - cors.allowedOrigins=ruuter.test.buerokratt.ee,https://ruuter.aadress.ee
-  #   ports:
-  #     - 3000:3000
-  #   volumes:
-  #     - ./setup/dmapper/server.xml:/usr/local/tomcat/conf/server.xml:ro
-  #     - ./setup/dmapper/cert.crt:/usr/local/tomcat/conf/tls.crt:ro
-  #     - ./setup/dmapper/key.key:/usr/local/tomcat/conf/tls.key:ro
-  #     - ./DSL.DMapper:/usr/local/tomcat/templates/v2/
-  #   restart: always
-  #   networks:
-  #     - bykstack
+  dmapper:
+    container_name: dmapper
+    image: riaee/byk-dmapper:11
+    environment:
+      - logging.level.root=INFO
+      - headers.contentSecurityPolicy=
+      - cors.allowedOrigins=ruuter.test.buerokratt.ee,https://ruuter.aadress.ee
+    ports:
+      - 3000:3000
+    volumes:
+      - ./setup/dmapper/server.xml:/usr/local/tomcat/conf/server.xml:ro
+      - ./setup/dmapper/cert.crt:/usr/local/tomcat/conf/tls.crt:ro
+      - ./setup/dmapper/key.key:/usr/local/tomcat/conf/tls.key:ro
+      - ./DSL.DMapper:/usr/local/tomcat/templates/v2/
+    restart: always
+    networks:
+      - bykstack
 
-  # dmapper-v2:
-  #   container_name: dmapper-v2
-  #   image: datamapper-node
-  #   environment:
-  #     - PORT=3005
-  #     - CONTENT_FOLDER=/data
-  #   volumes:
-  #     - ./DSL:/data
-  #     - ./DSL.DMapper-v2/hbs:/workspace/app/views/chat-bot
-  #     - ./DSL.DMapper-v2/js:/workspace/app/js/chat-bot
-  #     - ./DSL.DMapper-v2/lib:/workspace/app/lib
-  #   ports:
-  #     - 3005:3005
-  #   networks:
-  #     - bykstack
+  dmapper-v2:
+    container_name: dmapper-v2
+    image: datamapper-node
+    environment:
+      - PORT=3005
+      - CONTENT_FOLDER=/data
+    volumes:
+      - ./DSL:/data
+      - ./DSL.DMapper-v2/hbs:/workspace/app/views/chat-bot
+      - ./DSL.DMapper-v2/js:/workspace/app/js/chat-bot
+      - ./DSL.DMapper-v2/lib:/workspace/app/lib
+    ports:
+      - 3005:3005
+    networks:
+      - bykstack
 
-  # resql:
-  #   container_name: resql
-  #   image: resql
-  #   depends_on:
-  #     - users_db
-  #   environment:
-  #     - sqlms.datasources.[0].name=byk
-  #     - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://171.22.247.13:5433/byk?sslmode=require
-  #     - sqlms.datasources.[0].username=byk
-  #     - sqlms.datasources.[0].password=2nH09n6Gly
-  #     - logging.level.org.springframework.boot=INFO
-  #   ports:
-  #     - 8082:8082
-  #   volumes:
-  #     - ./DSL.Resql:/workspace/app/templates/byk
-  #   networks:
-  #     - bykstack
+  resql:
+    container_name: resql
+    image: resql
+    depends_on:
+      - users_db
+    environment:
+      - sqlms.datasources.[0].name=byk
+      - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://171.22.247.13:5433/byk?sslmode=require
+      - sqlms.datasources.[0].username=byk
+      - sqlms.datasources.[0].password=2nH09n6Gly
+      - logging.level.org.springframework.boot=INFO
+    ports:
+      - 8082:8082
+    volumes:
+      - ./DSL.Resql:/workspace/app/templates/byk
+    networks:
+      - bykstack
 
-  # users_db:
-  #   container_name: users_db
-  #   image: postgres:14.1
-  #   environment:
-  #     - POSTGRES_USER=byk
-  #     - POSTGRES_PASSWORD=01234
-  #     - POSTGRES_DB=byk
-  #   ports:
-  #     - 5433:5432
-  #   volumes:
-  #     - ./data:/var/lib/postgresql/data
-  #   networks:
-  #     - bykstack
+  users_db:
+    container_name: users_db
+    image: postgres:14.1
+    environment:
+      - POSTGRES_USER=byk
+      - POSTGRES_PASSWORD=01234
+      - POSTGRES_DB=byk
+    ports:
+      - 5433:5432
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    networks:
+      - bykstack
 
-  # gui:
-  #   container_name: gui
-  #   environment:
-  #     - NODE_ENV=development
-  #     - BASE_URL=http://localhost:8080
-  #     - REACT_APP_RUUTER_API_URL=http://localhost:8080
-  #     - REACT_APP_RUUTER_V1_PRIVATE_API_URL=http://localhost:8090
-  #     - REACT_APP_RUUTER_V2_PRIVATE_API_URL=http://localhost:8088
-  #     - REACT_APP_CUSTOMER_SERVICE_LOGIN=http://localhost:3004/et/dev-auth
-  #     - CHOKIDAR_USEPOLLING=true
-  #     - PORT=3001
-  #   build:
-  #     context: ./GUI
-  #     # target: web // To be used in production (Dockerfile)
-  #     dockerfile: Dockerfile.dev
-  #   ports:
-  #     - 3001:3001
-  #   volumes:
-  #     - /app/node_modules
-  #     - ./GUI:/app
-  #   networks:
-  #     - bykstack
-  #   cpus: "0.5" # Example CPU limit
-  #   mem_limit: "1G" # Example memory limit
+  gui:
+    container_name: gui
+    environment:
+      - NODE_ENV=development
+      - BASE_URL=http://localhost:8080
+      - REACT_APP_RUUTER_API_URL=http://localhost:8080
+      - REACT_APP_RUUTER_V1_PRIVATE_API_URL=http://localhost:8090
+      - REACT_APP_RUUTER_V2_PRIVATE_API_URL=http://localhost:8088
+      - REACT_APP_CUSTOMER_SERVICE_LOGIN=http://localhost:3004/et/dev-auth
+      - CHOKIDAR_USEPOLLING=true
+      - PORT=3001
+    build:
+      context: ./GUI
+      # target: web // To be used in production (Dockerfile)
+      dockerfile: Dockerfile.dev
+    ports:
+      - 3001:3001
+    volumes:
+      - /app/node_modules
+      - ./GUI:/app
+    networks:
+      - bykstack
+    cpus: "0.5" # Example CPU limit
+    mem_limit: "1G" # Example memory limit
 
-  # chat-widget:
-  #   container_name: chat-widget
-  #   image: chat-widget
-  #   ports:
-  #     - 3003:3003
-  #   networks:
-  #     - bykstack
+  chat-widget:
+    container_name: chat-widget
+    image: chat-widget
+    ports:
+      - 3003:3003
+    networks:
+      - bykstack
 
-  # customer-service:
-  #   container_name: customer-service
-  #   image: customer-service
-  #   ports:
-  #     - 3004:3004
-  #   networks:
-  #     - bykstack
+  customer-service:
+    container_name: customer-service
+    image: customer-service
+    ports:
+      - 3004:3004
+    networks:
+      - bykstack
 
   opensearch-node:
     image: opensearchproject/opensearch:latest
@@ -274,6 +274,7 @@ services:
       - bykstack
 
   notifications-node:
+    container_name: notifications-node
     build:
       context: ./notification-server
       dockerfile: Dockerfile
@@ -282,15 +283,20 @@ services:
     depends_on:
       - opensearch-node
     environment:
-      OPENSEARCH_NODE: http://opensearch-node:9200
+      OPENSEARCH_PROTOCOL: http
+      OPENSEARCH_HOST: opensearch-node
+      OPENSEARCH_PORT: 9200
       OPENSEARCH_USERNAME: admin
       OPENSEARCH_PASSWORD: admin
       PORT: 4040
+      REFRESH_INTERVAL: 1000
     volumes:
       - ./notification-server:/app
       - ./notification-server/node_modules:/app/node_modules
     command: ["npm", "run", "dev"]
-  
+    networks:
+      - bykstack
+
   nginx:
     image: nginx:latest
     container_name: nginx-node
@@ -300,7 +306,9 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - notifications-node
-
+    networks:
+      - bykstack
+  
 volumes:
   opensearch-data:
 networks:
