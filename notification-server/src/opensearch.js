@@ -1,51 +1,63 @@
-const { Client } = require('@elastic/elasticsearch');
+const { Client } = require('@opensearch-project/opensearch');
 const { openSearchConfig } = require('./config');
 
 const client = new Client({
-  node: openSearchConfig.node,
-  auth: openSearchConfig.auth,
+  node: openSearchConfig.getUrl(),
+  ssl: openSearchConfig.ssl,
 });
 
-// await client.indices.putSettings({
-//   index: 'notifications',
-//   body: {
-//     refresh_interval: '5s',
-//   },
-// });
+async function searchNotification(match, connectionId, lastTimestamp, callback) {
+  const body = {
+    query: {
+      bool: {
+        must: [
+          {
+            range: {
+              timestamp: {
+                gt: lastTimestamp
+              }
+            }
+          },
+          { match }
+        ],
+        must_not: { 
+          match: { sentTo: connectionId }
+        }
+      }
+    }
+  }
 
-async function listenToChanges(callback) {
-  const { body } = await client.helpers.scrollSearch({
-    index: 'notifications',
-    scroll: '30s',
-    body: {
-      query: {
-        bool: {
-          filter: { term: { state: 'new' } },
-        },
-      },
-    },
+  const response = await client.search({
+    index: openSearchConfig.notificationIndex,
+    body
   });
 
-  for (const hit of body.hits.hits) {
-    callback(hit._source);
-    markNotificationAsSent(hit._source._id);
+  for (const hit of response.body.hits.hits) {
+    await callback(hit._source);
+    await markAsSeen(hit, connectionId);
   }
 }
 
-async function markNotificationAsSent(notificationId) {
+async function markAsSeen(hit, connectionId) {
+  const { _index, _id } = hit;
+
   await client.update({
-    index: 'notifications',
-    id: notificationId,
+    index: _index,
+    id: _id,
     body: {
-      doc: {
-        state: 'sent',
-      },
-    },
+      script: {
+        source: `if (ctx._source.sentTo == null) {
+          ctx._source.sentTo = [params.connectionId];
+        } else {
+          ctx._source.sentTo.add(params.connectionId);
+        }`,
+        lang: 'painless',
+        params: { connectionId}
+      }
+    }
   });
 }
 
-module.exports = { 
-  client,
-  listenToChanges,
-  markNotificationAsSent,
+module.exports = {
+  searchNotification,
 };

@@ -1,22 +1,18 @@
 const express = require('express');
-const { listenToChanges } = require('./openSearch');
+const { buildSSEResponse } = require('./sseUtil');
 
 const app = express();
 const port = process.env.PORT || 4040;
 
-app.get('/sse/notifications', async (req, res) => {
-  res.setHeader('Content-Type', 'text/event-stream');
-  res.setHeader('Cache-Control', 'no-cache');
-  res.setHeader('Connection', 'keep-alive');
+app.get('/sse/notifications/users/:userId', (req, res) => {
+  const { userId } = req.params; // TODO: extract userId from TIM
+  buildSSEResponse({req, res, searchParms: { userId }});
+});
 
-  listenToChanges((notification) => {
-    res.write(`data: ${JSON.stringify(notification)}\n\n`);;
-  });
-
-  req.on('close', () => {
-    console.log('Client disconnected from SSE');
-  });
-})
+app.get('/sse/notifications/chats/:chatId', (req, res) => {
+  const { chatId } = req.params;
+  buildSSEResponse({req, res, searchParms: { chatId }});
+});
 
 const server = app.listen(port, () => {
   console.log(`Server running on port ${port}`);
