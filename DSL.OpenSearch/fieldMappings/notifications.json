@@ -4,14 +4,17 @@
       "userId": {
         "type": "keyword"
       },
+      "chatId": {
+        "type": "keyword"
+      },
       "payload": {
         "type": "text"
       },
-      "state": {
-        "type": "keyword"
-      },
       "timestamp": {
-        "type": "date"
+        "type": "long"
+      },
+      "sentTo": {
+        "type": "keyword"
       }
     }
   }
