@@ -33,7 +33,6 @@ async function markAsSeen(hit, connectionId) {
   await client.update({
     index: _index,
     id: _id,
-    refresh: 'wait_for',
     retry_on_conflict: 6,
     body: {
       script: {
