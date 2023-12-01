@@ -6,34 +6,36 @@ const client = new Client({
   ssl: openSearchConfig.ssl,
 });
 
-async function searchNotification(match, connectionId, callback) {
-  const body = {
-    query: {
-      bool: {
-        must: [{ match }],
-        must_not: { match: { sentTo: connectionId }}
-      }
-    }
-  }
-
+async function searchNotification({
+  channelId,
+  connectionId,
+  callback
+}) {
   const response = await client.search({
     index: openSearchConfig.notificationIndex,
-    body
+    body: {
+      query: {
+        bool: {
+          must: { match: { channelId }},
+          must_not: { match: { sentTo: connectionId }}
+        },
+      },
+      sort: { timestamp: { order: 'asc' }},
+    }
   });
 
   for (const hit of response.body.hits.hits) {
     await callback(hit._source.payload);
-    await markAsSeen(hit, connectionId);
+    await markAsSent(hit, connectionId);
   }
 }
 
-async function markAsSeen(hit, connectionId) {
-  const { _index, _id } = hit;
+async function markAsSent({ _index, _id }, connectionId) {
 
   await client.update({
     index: _index,
     id: _id,
-    retry_on_conflict: 6,
+    retry_on_conflict: openSearchConfig.retry_on_conflict,
     body: {
       script: {
         source: `if (ctx._source.sentTo == null) {
@@ -42,7 +44,7 @@ async function markAsSeen(hit, connectionId) {
           ctx._source.sentTo.add(params.connectionId);
         }`,
         lang: 'painless',
-        params: { connectionId}
+        params: { connectionId }
       }
     }
   });

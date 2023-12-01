@@ -1,21 +1,17 @@
 const express = require('express');
 const { buildSSEResponse } = require('./sseUtil');
+const { serverConfig } = require('./config');
 
 const app = express();
-const port = process.env.PORT || 4040;
 
-app.get('/sse/notifications/users/:userId', (req, res) => {
-  const { userId } = req.params; // TODO: extract userId from TIM
-  buildSSEResponse({req, res, searchParms: { userId }});
+app.get('/sse/notifications/:channelId', (req, res) => {
+  const { channelId } = req.params;
+  console.log(channelId)
+  buildSSEResponse({req, res, channelId});
 });
 
-app.get('/sse/notifications/chats/:chatId', (req, res) => {
-  const { chatId } = req.params;
-  buildSSEResponse({req, res, searchParms: { chatId }});
-});
-
-const server = app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+const server = app.listen(serverConfig.port, () => {
+  console.log(`Server running on port ${serverConfig.port}`);
 });
 
 module.exports = server;

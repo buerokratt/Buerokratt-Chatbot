@@ -1,10 +1,7 @@
 {
   "mappings": {
     "properties": {
-      "userId": {
-        "type": "keyword"
-      },
-      "chatId": {
+      "channelId": {
         "type": "keyword"
       },
       "payload": {

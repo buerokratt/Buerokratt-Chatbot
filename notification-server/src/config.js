@@ -15,9 +15,11 @@ module.exports = {
             
       return `${protocol}://${username}:${password}@${host}:${port}`
     },
+    retry_on_conflict: 6,
   },
   serverConfig: {
     port: process.env.PORT || 4040,
+    refreshInterval: process.env.REFRESH_INTERVAL || 1000,
   },
 };
 
