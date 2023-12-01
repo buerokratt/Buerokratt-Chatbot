@@ -22,7 +22,7 @@ async function searchNotification(match, connectionId, callback) {
   });
 
   for (const hit of response.body.hits.hits) {
-    await callback(hit._source);
+    await callback(hit._source.payload);
     await markAsSeen(hit, connectionId);
   }
 }

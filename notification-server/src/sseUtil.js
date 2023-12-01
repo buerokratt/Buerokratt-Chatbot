@@ -29,7 +29,7 @@ function buildSSEResponse({
 
   req.on('close', () => {
     console.log('Client disconnected from SSE');
-    clearInterval(3);
+    clearInterval(intervalHandle);
   });
 }
 
