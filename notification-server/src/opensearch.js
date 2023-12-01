@@ -6,23 +6,12 @@ const client = new Client({
   ssl: openSearchConfig.ssl,
 });
 
-async function searchNotification(match, connectionId, lastTimestamp, callback) {
+async function searchNotification(match, connectionId, callback) {
   const body = {
     query: {
       bool: {
-        must: [
-          {
-            range: {
-              timestamp: {
-                gt: lastTimestamp
-              }
-            }
-          },
-          { match }
-        ],
-        must_not: { 
-          match: { sentTo: connectionId }
-        }
+        must: [{ match }],
+        must_not: { match: { sentTo: connectionId }}
       }
     }
   }
@@ -44,6 +33,8 @@ async function markAsSeen(hit, connectionId) {
   await client.update({
     index: _index,
     id: _id,
+    refresh: 'wait_for',
+    retry_on_conflict: 6,
     body: {
       script: {
         source: `if (ctx._source.sentTo == null) {

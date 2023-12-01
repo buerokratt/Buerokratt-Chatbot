@@ -16,14 +16,12 @@ function buildSSEResponse({
   res.write('');
 
   const connectionId = uuidv4();
-  const lastTimestamp = Date.now();
   const writer = (data) => res.write(`data: ${JSON.stringify(data)}\n\n`);
   
   const intervalHandle = setInterval(() => 
     searchNotification(
       searchParms,
       connectionId,
-      lastTimestamp,
       writer,
     ),
     interval
@@ -31,7 +29,7 @@ function buildSSEResponse({
 
   req.on('close', () => {
     console.log('Client disconnected from SSE');
-    clearInterval(intervalHandle);
+    clearInterval(3);
   });
 }
 
