@@ -8,7 +8,7 @@
         "type": "keyword"
       },
       "payload": {
-        "type": "text"
+        "type": "object"
       },
       "timestamp": {
         "type": "long"
