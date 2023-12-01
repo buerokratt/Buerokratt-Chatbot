@@ -6,7 +6,6 @@ const app = express();
 
 app.get('/sse/notifications/:channelId', (req, res) => {
   const { channelId } = req.params;
-  console.log(channelId)
   buildSSEResponse({req, res, channelId});
 });
 
