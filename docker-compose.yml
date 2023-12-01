@@ -273,6 +273,42 @@ services:
     networks:
       - bykstack
 
+  notifications-node:
+    container_name: notifications-node
+    build:
+      context: ./notification-server
+      dockerfile: Dockerfile
+    ports:
+      - 4040:4040
+    depends_on:
+      - opensearch-node
+    environment:
+      OPENSEARCH_PROTOCOL: http
+      OPENSEARCH_HOST: opensearch-node
+      OPENSEARCH_PORT: 9200
+      OPENSEARCH_USERNAME: admin
+      OPENSEARCH_PASSWORD: admin
+      PORT: 4040
+      REFRESH_INTERVAL: 1000
+    volumes:
+      - ./notification-server:/app
+      - ./notification-server/node_modules:/app/node_modules
+    command: ["npm", "run", "dev"]
+    networks:
+      - bykstack
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx-node
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - notifications-node
+    networks:
+      - bykstack
+  
 volumes:
   opensearch-data:
 networks:
