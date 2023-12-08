@@ -5,7 +5,16 @@
 This repo will primarily contain:
 
 1. Architectural and other documentation;   
-2. Docker Compose file to set up and run Bürokratt's Chat Bot as a fully functional service;        
+2. Docker Compose file to set up and run Bürokratt's Chat Bot as a fully functional service;
+
+### Use external components.
+
+Currently, Header and Main Navigation used as external components, they are defined as dependency in package.json
+```  
+ "@buerokrat-ria/header": "^0.0.1"
+ "@buerokrat-ria/menu": "^0.0.1"
+ "@buerokrat-ria/styles": "^0.0.1"
+```
 
 ## Dev setup
 

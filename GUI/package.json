@@ -12,6 +12,8 @@
   },
   "dependencies": {
     "@exirain/header": "file:exirain-header-0.0.27.tgz",
+    "@buerokratt-ria/header": "^0.0.1",
+    "@buerokratt-ria/styles": "^0.0.1",
     "@fontsource/roboto": "^4.5.8",
     "@formkit/auto-animate": "^1.0.0-beta.5",
     "@fortaine/fetch-event-source": "^3.0.6",
