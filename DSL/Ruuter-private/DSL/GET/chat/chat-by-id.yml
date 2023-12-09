@@ -1,6 +1,6 @@
 extractRequestData:
   assign:
-    chatId: ${incoming.body.chatId}
+    chatId: ${incoming.params.chatId}
   next: getChatById
 
 getChatById:
