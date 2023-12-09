@@ -1,6 +1,6 @@
 extractRequestData:
   assign:
-    timeRangeBegin: ${incoming.body.timeRangeBegin}
+    timeRangeBegin: ${incoming.params.timeRangeBegin}
   next: get_chat_info
 
 get_chat_info:

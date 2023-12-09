@@ -10,15 +10,6 @@ getMessagesByChatId:
     body:
       chatId: ${chatId}
   result: getMessagesByChatIdResult
-  next: mapChatMessages
-
-mapChatMessages:
-  call: http.post
-  args:
-    url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/json/v2/format_chat_log"
-    body:
-      data: ${getMessagesByChatIdResult.response.body}
-  result: formattedChatMessages
   next: convertDataToPdf
 
 convertDataToPdf:
@@ -26,7 +17,7 @@ convertDataToPdf:
   args:
     url: "[#CHATBOT_DMAPPER_V2]:[#CHATBOT_DMAPPER_V2_PORT]/js/convert/pdf"
     body:
-      data: ${formattedChatMessages.response.body}
+      data: ${getMessagesByChatIdResult.response.body}
   result: pdfFile
   next: checkPdfExists
 

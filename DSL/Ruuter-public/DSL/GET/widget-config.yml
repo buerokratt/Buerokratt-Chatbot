@@ -2,27 +2,8 @@ getWidgetConfig:
   call: http.post
   args:
     url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-widget-config"
-  result: getWidgetConfigResult
+  result: res
 
-validateWidgetConfigExists:
-  switch:
-    - condition: '${getWidgetConfigResult.response.body.length > 0}'
-      next: mapWidgetConfigData
-  next: returnNotFound
-
-mapWidgetConfigData:
-  call: http.post
-  args:
-    url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/json/v2/return_widget_config"
-    body:
-      configurationArray: ${getWidgetConfigResult.response.body}
-  result: widgetConfigData
-  next: returnSuccess
-
-returnSuccess:
-  return: ${widgetConfigData.response.body}
-  next: end
-
-returnNotFound:
-  return: "error: not found"
+return_result:
+  return: ${res.response.body[0]}
   next: end

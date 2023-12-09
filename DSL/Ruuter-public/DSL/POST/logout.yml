@@ -1,0 +1,23 @@
+blacklist_cookie:
+  call: http.post
+  args:
+   url: "[#ANALYTICS_TIM]:[#ANALYTICS_TIM_PORT]/jwt/custom-jwt-blacklist"
+   contentType: plaintext
+   plaintext: 
+      "clientCustomJwtCookie"
+  result: res
+
+assign_cookie:
+  assign:
+    setCookie:
+      name: "clientCustomJwtCookie"
+      Domain: "[#DOMAIN]"
+      Secure: false
+      HttpOnly: true
+      value: null
+      maxAge: 0
+
+return_value:
+  headers:
+    Set-Cookie: ${setCookie}
+  return: "Logged Out Successfully"

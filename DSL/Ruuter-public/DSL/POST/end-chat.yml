@@ -1,0 +1,15 @@
+extractRequestData:
+  assign:
+    chatId: "${incoming.body.chatId}"
+    event: "${incoming.body.event}"
+    authorTimestamp: "${incoming.body.authorTimestamp}"
+
+deleteMessagePreview:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/delete-message-preview"
+    body:
+      chatId: ${chatId}
+  result: res
+
+# TO Be Continued
