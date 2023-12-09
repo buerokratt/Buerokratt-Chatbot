@@ -78,9 +78,9 @@ services:
       - CONTENT_FOLDER=/data
     volumes:
       - ./DSL:/data
-      - ./DSL/DMapper-v2/hbs:/workspace/app/views/chat-bot
-      - ./DSL/DMapper-v2/js:/workspace/app/js/chat-bot
-      - ./DSL/DMapper-v2/lib:/workspace/app/lib
+      - ./DSL/DMapper/hbs:/workspace/app/views/chat-bot
+      - ./DSL/DMapper/js:/workspace/app/js/chat-bot
+      - ./DSL/DMapper/lib:/workspace/app/lib
     ports:
       - 3000:3000
     networks:
