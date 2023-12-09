@@ -6,6 +6,7 @@ extractRequestData:
     authorRole: ${incoming.body.authorRole}
     authorTimestamp: ${incoming.body.authorTimestamp}
     content: ${incoming.body.content}
+    event: ${incoming.body.event}
     cookie: ${incoming.headers.cookie}
   next: get_user_info
 
@@ -75,7 +76,7 @@ insertMessage:
       created: ${instant}
       authorLastName: ""
       rating: ""
-      event: ""
+      event: ${event}
       forwardedByUser: ""
       forwardedFromCsa: ""
       forwardedToCsa: ""

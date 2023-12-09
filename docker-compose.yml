@@ -1,73 +1,39 @@
 version: "3.9"
 
 services:
-  ruuter-v1-public:
-    container_name: ruuter-v1-public
-    image: riaee/byk-chatbot-public-ruuter:05
+  ruuter-public:
+    container_name: ruuter-public
+    image: ruuter
     environment:
-      - csrf.enabled=false
-      - csrf.tim_userinfo_url=
-      - csrf.ruuter_services_whitelist=
-      - legacy-portal-integration.sessionCookieDomain=buerokratt.ee
-      - allowed.requested.method.types=POST,GET
-      - ruuter.cors.allowedOrigins=https://buerokratt.ee,https://admin.buerokratt.ee,https://tim.buerokratt.ee,http://localhost:3001,http://localhost:3002,http://localhost:3003,http://localhost:3004,http://localhost:8086
-      - maxRequestSizeBytes=10000000000
-      - default.requested.method.type=POST
-      - incoming.request.external.validation.enabled=false
-      - requested.method.type.error.http.response.code=200
-      - verify.requested.method.type=false
-      - incoming.request.external.validation.endpoint=
-      - headers.contentSecurityPolicy=
-      - logging.level.root=INFO
+      - application.cors.allowedOrigins=http://localhost:8086,http://localhost:3001,http://localhost:3003,http://localhost:8080
+      - application.httpCodesAllowList=200,201,202,400,401,403,500
+      - application.logging.displayRequestContent=true
+      - application.logging.displayResponseContent=true
+      - server.port=8086
     volumes:
-      - ./setup/ruuter/server.xml:/usr/local/tomcat/conf/server.xml:ro
-      - ./setup/ruuter/public.urls.docker.json:/usr/local/tomcat/urls.env.json:ro
-      - ./setup/ruuter/cert.crt:/usr/local/tomcat/conf/cert.crt:ro
-      - ./setup/ruuter/key.key:/usr/local/tomcat/conf/key.key:ro
-      - ./DSL.Ruuter-v1.public:/usr/local/tomcat/configurations
+      - ./DSL/Ruuter.public/DSL:/DSL
+      - ./constants.ini:/app/constants.ini
     ports:
-      - 8080:8080
-    restart: always
+      - 8086:8086
     networks:
       - bykstack
     cpus: "0.5" # Example CPU limit
     mem_limit: "512M" # Example memory limit
 
-  ruuter-v1-private:
-    container_name: ruuter-v1-private
-    image: riaee/byk-chatbot-private-ruuter:05
+  ruuter-private:
+    container_name: ruuter-private
+    image: ruuter
     environment:
-      - legacy-portal-integration.sessionCookieDomain=buerokratt.ee
-      - logging.level.root=INFO
-      - ruuter.cors.allowedOrigins=https://buerokratt.ee,https://admin.buerokratt.ee,https://tim.buerokratt.ee,http://localhost:3001,http://localhost:3002,http://localhost:3003,http://localhost:3004
-      - headers.contentSecurityPolicy=
-      - maxRequestSizeBytes=10000000000
-      - incoming.request.external.validation.enabled=false
-      - incoming.request.external.validation.endpoint=
-      - verify.requested.method.type=false
-      - allowed.requested.method.types=POST
-      - default.requested.method.type=POST
-      - requested.method.type.error.http.response.code=200
-      - csrf.enabled=false
-      - csrf.tim_userinfo_url=
-      - csrf.ruuter_services_whitelist=
-      - ip-whitelist.routes[0].ips[0]=127.0.0.1
-      - ip-whitelist.routes[0].patterns[0]=/functions/*
-      - ip-whitelist.routes[1].ips[0]=127.0.0.1
-      - ip-whitelist.routes[1].patterns[0]=/get-location-coordinates
-      - ip-whitelist.routes[1].patterns[1]=/get-weather-data
-      - ip-whitelist.routes[1].patterns[2]=/get-weather-station-id
-      - ip-whitelist.routes[1].patterns[3]=/get-weather
-      - ip-whitelist.routes[1].patterns[4]=/param_string_length
+      - application.cors.allowedOrigins=http://localhost:8082,http://localhost:3001,http://localhost:3003
+      - application.httpCodesAllowList=200,201,202,400,401,403,500
+      - application.logging.displayRequestContent=true
+      - application.logging.displayResponseContent=true
+      - server.port=8088
     volumes:
-      - ./setup/ruuter/server.xml:/usr/local/tomcat/conf/server.xml:ro
-      - ./setup/ruuter/private.urls.docker.json:/usr/local/tomcat/urls.env.json:ro
-      - ./setup/ruuter/cert.crt:/usr/local/tomcat/conf/cert.crt:ro
-      - ./setup/ruuter/key.key:/usr/local/tomcat/conf/key.key:ro
-      - ./DSL.Ruuter-v1.private:/usr/local/tomcat/configurations
+      - ./DSL/Ruuter.private/DSL:/DSL
+      - ./constants.ini:/app/constants.ini
     ports:
-      - 8090:8080
-    restart: always
+      - 8088:8088
     networks:
       - bykstack
     cpus: "0.5" # Example CPU limit
@@ -102,44 +68,6 @@ services:
     networks:
       - bykstack
 
-  ruuter-v2-private:
-    container_name: ruuter-v2-private
-    image: ruuter
-    environment:
-      - application.cors.allowedOrigins=http://localhost:8082,http://localhost:3001,http://localhost:3003
-      - application.httpCodesAllowList=200,201,202,400,401,403,500
-      - application.logging.displayRequestContent=true
-      - application.logging.displayResponseContent=true
-      - server.port=8088
-    volumes:
-      - ./DSL.Ruuter.private/DSL:/DSL
-      - ./constants.ini:/app/constants.ini
-    ports:
-      - 8088:8088
-    networks:
-      - bykstack
-    cpus: "0.5" # Example CPU limit
-    mem_limit: "512M" # Example memory limit
-
-  ruuter-v2-public:
-    container_name: ruuter-v2-public
-    image: ruuter
-    environment:
-      - application.cors.allowedOrigins=http://localhost:8086,http://localhost:3001,http://localhost:3003,http://localhost:8080
-      - application.httpCodesAllowList=200,201,202,400,401,403,500
-      - application.logging.displayRequestContent=true
-      - application.logging.displayResponseContent=true
-      - server.port=8086
-    volumes:
-      - ./DSL.Ruuter.public/DSL:/DSL
-      - ./constants.ini:/app/constants.ini
-    ports:
-      - 8086:8086
-    networks:
-      - bykstack
-    cpus: "0.5" # Example CPU limit
-    mem_limit: "512M" # Example memory limit
-
   dmapper:
     container_name: dmapper
     image: riaee/byk-dmapper:11
@@ -153,7 +81,7 @@ services:
       - ./setup/dmapper/server.xml:/usr/local/tomcat/conf/server.xml:ro
       - ./setup/dmapper/cert.crt:/usr/local/tomcat/conf/tls.crt:ro
       - ./setup/dmapper/key.key:/usr/local/tomcat/conf/tls.key:ro
-      - ./DSL.DMapper:/usr/local/tomcat/templates/v2/
+      - ./DSL/DMapper:/usr/local/tomcat/templates/v2/
     restart: always
     networks:
       - bykstack
@@ -166,9 +94,9 @@ services:
       - CONTENT_FOLDER=/data
     volumes:
       - ./DSL:/data
-      - ./DSL.DMapper-v2/hbs:/workspace/app/views/chat-bot
-      - ./DSL.DMapper-v2/js:/workspace/app/js/chat-bot
-      - ./DSL.DMapper-v2/lib:/workspace/app/lib
+      - ./DSL/DMapper-v2/hbs:/workspace/app/views/chat-bot
+      - ./DSL/DMapper-v2/js:/workspace/app/js/chat-bot
+      - ./DSL/DMapper-v2/lib:/workspace/app/lib
     ports:
       - 3005:3005
     networks:
@@ -188,7 +116,7 @@ services:
     ports:
       - 8082:8082
     volumes:
-      - ./DSL.Resql:/workspace/app/templates/byk
+      - ./DSL/Resql:/workspace/app/templates/byk
     networks:
       - bykstack
 
@@ -308,7 +236,7 @@ services:
       - notifications-node
     networks:
       - bykstack
-  
+
 volumes:
   opensearch-data:
 networks:
