@@ -11,14 +11,14 @@ services:
       - application.logging.displayResponseContent=true
       - server.port=8086
     volumes:
-      - ./DSL/Ruuter.public/DSL:/DSL
+      - ./DSL/Ruuter-public/DSL:/DSL
       - ./constants.ini:/app/constants.ini
     ports:
       - 8086:8086
     networks:
       - bykstack
-    cpus: "0.5" # Example CPU limit
-    mem_limit: "512M" # Example memory limit
+    cpus: "0.5"
+    mem_limit: "512M"
 
   ruuter-private:
     container_name: ruuter-private
@@ -30,14 +30,14 @@ services:
       - application.logging.displayResponseContent=true
       - server.port=8088
     volumes:
-      - ./DSL/Ruuter.private/DSL:/DSL
+      - ./DSL/Ruuter-private/DSL:/DSL
       - ./constants.ini:/app/constants.ini
     ports:
       - 8088:8088
     networks:
       - bykstack
-    cpus: "0.5" # Example CPU limit
-    mem_limit: "512M" # Example memory limit
+    cpus: "0.5"
+    mem_limit: "512M"
 
   tim:
     container_name: tim
@@ -50,8 +50,8 @@ services:
       - bykstack
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    cpus: "0.5" # Example CPU limit
-    mem_limit: "512M" # Example memory limit
+    cpus: "0.5"
+    mem_limit: "512M"
 
   tim-postgresql:
     container_name: tim-postgresql
@@ -68,29 +68,11 @@ services:
     networks:
       - bykstack
 
-  dmapper:
-    container_name: dmapper
-    image: riaee/byk-dmapper:11
+  data-mapper:
+    container_name: data-mapper
+    image: data-mapper
     environment:
-      - logging.level.root=INFO
-      - headers.contentSecurityPolicy=
-      - cors.allowedOrigins=ruuter.test.buerokratt.ee,https://ruuter.aadress.ee
-    ports:
-      - 3000:3000
-    volumes:
-      - ./setup/dmapper/server.xml:/usr/local/tomcat/conf/server.xml:ro
-      - ./setup/dmapper/cert.crt:/usr/local/tomcat/conf/tls.crt:ro
-      - ./setup/dmapper/key.key:/usr/local/tomcat/conf/tls.key:ro
-      - ./DSL/DMapper:/usr/local/tomcat/templates/v2/
-    restart: always
-    networks:
-      - bykstack
-
-  dmapper-v2:
-    container_name: dmapper-v2
-    image: datamapper-node
-    environment:
-      - PORT=3005
+      - PORT=3000
       - CONTENT_FOLDER=/data
     volumes:
       - ./DSL:/data
@@ -98,7 +80,7 @@ services:
       - ./DSL/DMapper-v2/js:/workspace/app/js/chat-bot
       - ./DSL/DMapper-v2/lib:/workspace/app/lib
     ports:
-      - 3005:3005
+      - 3000:3000
     networks:
       - bykstack
 
@@ -156,8 +138,8 @@ services:
       - ./GUI:/app
     networks:
       - bykstack
-    cpus: "0.5" # Example CPU limit
-    mem_limit: "1G" # Example memory limit
+    cpus: "0.5"
+    mem_limit: "1G"
 
   chat-widget:
     container_name: chat-widget
