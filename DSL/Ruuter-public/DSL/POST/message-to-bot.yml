@@ -83,7 +83,7 @@ check_if_bot_is_unable_to_reply:
   switch:
     - condition: ${post_message_to_client_result.response.body[0].text == 'Suunan teid klienditeenindajale. Varuge natukene kannatust.'}
       next: get_organization_working_details
-  next: getInstant
+  next: add_bot_message_to_db
 
 get_organization_working_details:
   call: http.post
@@ -99,15 +99,6 @@ get_organization_working_details:
 assign_organization_details:
   assign:
     org_details: ${org_res.response.body[0]}
-  next: getCurrentInstant
-
-getCurrentInstant:
-  call: http.post
-  args:
-    url: "[#CHATBOT_DMAPPER_V2]:[#CHATBOT_DMAPPER_V2_PORT]/hbs/chat-bot/return_instant"
-    headers:
-      type: json
-  result: current_instant_res
   next: check_if_organization_is_available
 
 check_if_organization_is_available: 
@@ -129,12 +120,12 @@ return_is_a_holiday:
          -
           chatId: ${chatId}
           content: ${org_details.holidayMessage}
-          authorTimestamp: ${current_instant_res.response.body.instant}
+          authorTimestamp: ${new Date().toISOString()}
           event: 'unavailable_holiday'
           authorId: ${get_bot_name_result.response.body[0].value}
           authorFirstName: ""
           authorLastName: ""
-          created: ${current_instant_res.response.body.instant}
+          created: ${new Date().toISOString()}
   result: is_a_holiday_result
   next: return_is_holiday
 
@@ -147,12 +138,12 @@ return_organization_is_not_available:
          -
           chatId: ${chatId}
           content: 'Bürokratt on hetkel väljaspool tööaega, palun jäta oma kontaktandmed ja võtame Sinuga esimesel võimalusel ühendust'
-          authorTimestamp: ${current_instant_res.response.body.instant}
+          authorTimestamp: ${new Date().toISOString()}
           event: 'unavailable_organization'
           authorId: ${get_bot_name_result.response.body[0].value}
           authorFirstName: ""
           authorLastName: ""
-          created: ${current_instant_res.response.body.instant}
+          created: ${new Date().toISOString()}
   result: organization_is_not_available_result
   next: return_organization_is_not_available_res
 
@@ -183,12 +174,12 @@ send_csas_not_available_message:
          -
           chatId: ${chatId}
           content: 'Hetkel nõustajad puuduvad, palun jätke oma kontaktandmed ja võtame Teiega esimesel võimalusel ühendust'
-          authorTimestamp: ${current_instant_res.response.body.instant}
+          authorTimestamp: ${new Date().toISOString()}
           event: 'unavailable_csas'
           authorId: ${get_bot_name_result.response.body[0].value}
           authorFirstName: ""
           authorLastName: ""
-          created: ${current_instant_res.response.body.instant}
+          created: ${new Date().toISOString()}
   result: csas_not_available_message_result
   next: return_csa_is_not_available
 
@@ -199,30 +190,6 @@ redirect_chat_to_back_office:
     body:
       chatId: ${chatId}
   result: redirect_chat_to_back_office_result
-  next: getInstant
-
-getInstant:
-  call: http.post
-  args:
-    url: "[#CHATBOT_DMAPPER_V2]:[#CHATBOT_DMAPPER_V2_PORT]/hbs/chat-bot/return_instant"
-    headers:
-      type: json
-  result: instant_result
-  next: convert_bot_responses_to_messages
-
-convert_bot_responses_to_messages:
-  call: http.post
-  args:
-    url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/json/v2/bot_responses_to_messages"
-    body:
-      botMessages: ${post_message_to_client_result.response.body}
-      chatId: ${chatId}
-      authorId: ${get_bot_name_result.response.body[0].value}
-      authorFirstName: ""
-      authorLastName: ""
-      authorTimestamp: ${instant_result.response.body.instant}
-      created: ${instant_result.response.body.instant}
-  result: converted_messages_return
   next: add_bot_message_to_db
 
 add_bot_message_to_db:
@@ -230,7 +197,7 @@ add_bot_message_to_db:
   args:
     url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/insert-bot-message"
     body:
-      messages: ${converted_messages_return.response.body}
+      messages: ${post_message_to_client_result.response.body}
   result: post_message_to_client_result
   next: return_message_sent
 

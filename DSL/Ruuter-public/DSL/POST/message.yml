@@ -45,27 +45,18 @@ getActiveChatById:
 checkActiveChatResult:
   switch:
     - condition: ${activeChatRes.response.body.length > 0}
-      next: getInstant
+      next: assignInstant
   next: return_chat_ended
-
-getInstant:
-  call: http.post
-  args:
-    url: "[#CHATBOT_DMAPPER_V2]:[#CHATBOT_DMAPPER_V2_PORT]/hbs/chat-bot/return_instant"
-    headers:
-      type: json
-  result: instant_result
-  next: assignInstant
 
 assignInstant:
   assign:
-    instant: ${instant_result.response.body.instant}
+    instant: ${new Date().toISOString()}
   next: getUuid
 
 getUuid:
   call: http.post
   args:
-    url: "[#CHATBOT_DMAPPER_V2]:[#CHATBOT_DMAPPER_V2_PORT]/hbs/chat-bot/return_uuid"
+    url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/hbs/chat-bot/return_uuid"
     headers:
       type: json
   result: uuid_result

@@ -31,20 +31,11 @@ check_user_info_response:
 assignIdCode:
   assign:
     idCode: ${res.response.body.idCode}
-  next: getInstant
-
-getInstant:
-  call: http.post
-  args:
-    url: "[#CHATBOT_DMAPPER_V2]:[#CHATBOT_DMAPPER_V2_PORT]/hbs/chat-bot/return_instant"
-    headers:
-      type: json
-  result: instant_result
   next: assignInstant
 
 assignInstant:
   assign:
-    instant: ${instant_result.response.body.instant}
+    instant: ${new Date().toISOString()}
   next: getUuid
 
 getUuid:

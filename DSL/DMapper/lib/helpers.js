@@ -8,10 +8,6 @@ export function stringToList(str, block) {
   return out;
 }
 
-export function getInstant() {
-  return new Date().toISOString();
-}
-
 export function getUuid() {
   return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (c) =>
     (

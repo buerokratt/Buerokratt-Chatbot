@@ -12,7 +12,7 @@ getGreetingMessage:
 getUuid:
   call: http.post
   args:
-    url: "[#CHATBOT_DMAPPER_V2]:[#CHATBOT_DMAPPER_V2_PORT]/hbs/chat-bot/return_uuid"
+    url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/hbs/chat-bot/return_uuid"
     headers:
       type: json
   result: uuid_result
