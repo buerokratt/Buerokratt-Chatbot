@@ -2,7 +2,6 @@ extractRequestData:
   assign:
     comment: ${incoming.body.comment}
     chatId: ${incoming.body.chatId}
-  next: setChatComment
 
 setChatComment:
   call: http.post
@@ -11,9 +10,8 @@ setChatComment:
     body:
       comment: ${comment}
       chatId: ${chatId}
-  result: setCommentResult
-  next: returnSuccess
+  result: res
 
-returnSuccess:
-  return: ${setCommentResult.response.body}
+return_result:
+  return: ${res.response.body}
   next: end

@@ -12,4 +12,3 @@ getCustomerSupportActivity:
 
 return_result:
   return: ${res.response.body}
-  next: end

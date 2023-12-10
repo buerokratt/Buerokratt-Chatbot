@@ -7,7 +7,6 @@ extractRequestData:
     newChatSoundNotifications: ${incoming.body.newChatSoundNotifications}
     newChatEmailNotifications: ${incoming.body.newChatEmailNotifications}
     useAutocorrect: ${incoming.body.useAutocorrect}
-  next: get_user_info  
 
 get_user_info:
   call: http.post

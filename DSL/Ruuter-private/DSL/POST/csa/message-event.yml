@@ -3,7 +3,6 @@ extractRequestData:
     messageId: ${incoming.body.messageId}
     event: ${incoming.body.event}
     authorTimestamp: ${incoming.body.authorTimestamp}
-  next: getMessageById
 
 getMessageById:
   call: http.post
@@ -12,12 +11,10 @@ getMessageById:
     body:
       id: ${messageId}
   result: res
-  next: assignMessage  
 
 assignMessage:
   assign:
     message: ${res.response.body[0]}
-  next: insertMessage  
 
 insertMessage:
   call: http.post
@@ -39,8 +36,7 @@ insertMessage:
       forwardedToCsa: ${message.forwardedToCsa}
       rating: ${message.rating}
   result: insertMessageResult
-  next: returnSuccess  
 
-returnSuccess:
+return_result:
   return: "Message Event Sent Successfully"
   next: end

@@ -22,20 +22,11 @@ setEmergencyNotice:
       emergencyNoticeEndISO: ${emergencyNoticeEndISO}
       isEmergencyNoticeVisible: ${isEmergencyNoticeVisible}
       created: ${new Date().toISOString()}
-  result: setEmergencyNoticeResult
-  next: mapEmergencyNoticeData
+  result: res
+  next: return_result
 
-mapEmergencyNoticeData:
-  call: http.post
-  args:
-    url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/json/v2/return_emergency_notice"
-    body:
-      configurationArray: ${setEmergencyNoticeResult.response.body}
-  result: emergencyNoticeData
-  next: returnSuccess
-
-returnSuccess:
-  return: ${emergencyNoticeData.response.body}
+return_result:
+  return: ${res.response.body}
   next: end
 
 returnInvalidBody:

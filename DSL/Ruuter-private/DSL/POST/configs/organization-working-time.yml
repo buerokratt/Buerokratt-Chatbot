@@ -20,7 +20,6 @@ extractRequestData:
     organizationClosedOnWeekEnds: ${incoming.body.organizationClosedOnWeekEnds}
     organizationTheSameOnAllWorkingDays: ${incoming.body.organizationTheSameOnAllWorkingDays}
     organizationWorkingTimeNationalHolidays: ${incoming.body.organizationWorkingTimeNationalHolidays}
-  next: setOrganizationWorkingTime
 
 setOrganizationWorkingTime:
   call: http.post
@@ -49,19 +48,17 @@ setOrganizationWorkingTime:
       organizationWorkingTimeNationalHolidays: ${organizationWorkingTimeNationalHolidays}
       created: ${new Date().toISOString()}
   result: setOrganizationWorkingTimeResult
-  next: mapOrganizationWorkingTimeData
 
 mapOrganizationWorkingTimeData:
   call: http.post
   args:
-    url: "[#CHATBOT_DMAPPER_V2]:[#CHATBOT_DMAPPER_V2_PORT]/hbs/chat-bot/return_organization_working_time"
+    url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/hbs/chat-bot/return_organization_working_time"
     headers:
       type: json
     body:
       configurationArray: ${setOrganizationWorkingTimeResult.response.body}
   result: organizationWorkingTimeData
-  next: returnSuccess
 
-returnSuccess:
+return_result:
   return: ${organizationWorkingTimeData.response.body}
   next: end

@@ -27,7 +27,7 @@ extend_cookie:
 assign_cookie:
   assign:
     setCookie:
-      customJwtCookie: ${cookie_result.response.body.token}
+      chatJwt: ${cookie_result.response.body.token}
       maxAge: ${sessionLength}
       Domain: "[#DOMAIN]"
       Secure: false

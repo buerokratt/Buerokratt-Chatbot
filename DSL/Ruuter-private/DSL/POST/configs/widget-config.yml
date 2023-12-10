@@ -6,7 +6,6 @@ extractRequestData:
     widgetBubbleMessageText: ${incoming.body.widgetBubbleMessageText}
     widgetColor: ${incoming.body.widgetColor}
     isWidgetActive: ${incoming.body.isWidgetActive}
-  next: setWidgetConfig 
 
 setWidgetConfig:
   call: http.post
@@ -20,18 +19,8 @@ setWidgetConfig:
       isWidgetActive: ${isWidgetActive}
       widgetAnimation: ${widgetAnimation}
       created: ${new Date().toISOString()}
-  result: setWidgetConfigResult
-  next: mapWidgetConfigData
+  result: res
 
-mapWidgetConfigData:
-  call: http.post
-  args:
-    url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/json/v2/return_widget_config"
-    body:
-      configurationArray: ${setWidgetConfigResult.response.body}
-  result: widgetConfigData
-  next: returnSuccess
-
-returnSuccess:
-  return: ${widgetConfigData.response.body}
+return_result:
+  return: ${re.response.body}
   next: end

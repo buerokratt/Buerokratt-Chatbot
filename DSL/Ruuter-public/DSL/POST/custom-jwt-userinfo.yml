@@ -11,4 +11,3 @@ get_user_info:
 
 return_result:
   return: ${res.response.body}
-  next: end  

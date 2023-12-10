@@ -1,7 +1,6 @@
 extractRequestData:
   assign:
     isVisible: ${incoming.body.isVisible}
-  next: setConfigurationValue 
 
 setConfigurationValue:
   call: http.post
@@ -12,8 +11,6 @@ setConfigurationValue:
       key: "is_csa_name_visible"
       value: ${isVisible}
   result: setConfigurationResult
-  next: returnSuccess
 
 returnSuccess:
   return: ${setConfigurationResult.response.body}
-  next: end

@@ -11,4 +11,3 @@ blacklist_jwt:
 
 return_result:
   return: ${res.response.body}
-  next: end  

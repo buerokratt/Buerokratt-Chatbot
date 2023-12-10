@@ -9,7 +9,6 @@ getUserEmailByChatId:
     body:
       chatId: ${chatId}
   result: getUserEmailByChatIdResult
-  next: getMessagesByChatId
 
 getMessagesByChatId:
   call: http.post
@@ -18,27 +17,16 @@ getMessagesByChatId:
     body:
       chatId: ${chatId}
   result: getMessagesByChatIdResult
-  next: mapChatMessages
-
-mapChatMessages:
-  call: http.post
-  args:
-    url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/json/v2/format_chat_log"
-    body:
-      data: ${getMessagesByChatIdResult.response.body}
-  result: chatMessagesData
-  next: sendDataToEmail
 
 sendDataToEmail:
   call: http.post
   args:
-    url: "[#CHATBOT_DMAPPER_V2]:[#CHATBOT_DMAPPER_V2_PORT]/js/email/sendMockEmail"
+    url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/js/email/sendMockEmail"
     body:
       to: ${getUserEmailByChatIdResult.response.body[0].csaEmail}
       subject: "Chat history"
-      text: ${chatMessagesData.response.body}
+      text: ${getMessagesByChatIdResult.response.body}
   result: emailResponseData
-  next: registerEmailSentEvent
 
 registerEmailSentEvent:
   call: http.post
@@ -59,8 +47,6 @@ registerEmailSentEvent:
       forwardedFromCsa: ""
       forwardedToCsa: ""
       created: ${new Date().toISOString()}
-  next: returnSuccess
 
 returnSuccess:
   return: "OK"
-  next: end

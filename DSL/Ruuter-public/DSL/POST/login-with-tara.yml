@@ -52,7 +52,7 @@ generate_cookie:
 assign_cookie:
   assign:
     setCookie:
-      clientCustomJwtCookie: ${cookie_result.response.body.token}
+      customJwtCookie: ${cookie_result.response.body.token}
       maxAge: 28800
       Domain: "[#DOMAIN]"
       Secure: false
