@@ -5,7 +5,7 @@ services:
     container_name: ruuter-public
     image: ruuter
     environment:
-      - application.cors.allowedOrigins=http://localhost:8086,http://localhost:3001,http://localhost:3003,http://localhost:8080
+      - application.cors.allowedOrigins=http://localhost:8086,http://localhost:3001,http://localhost:3003,http://localhost:3004,http://localhost:8080
       - application.httpCodesAllowList=200,201,202,400,401,403,500
       - application.logging.displayRequestContent=true
       - application.logging.displayResponseContent=true
@@ -45,7 +45,7 @@ services:
     depends_on:
       - tim-postgresql
     environment:
-      - SECURITY_ALLOWLIST_JWT=ruuter-private,ruuter-public,data-mapper,resql,tim,tim-postgresql,chat-widget,customer-service,127.0.0.1,::1
+      - SECURITY_ALLOWLIST_JWT=ruuter-private,ruuter-public,data-mapper,resql,tim,tim-postgresql,chat-widget,customer-service,authentication-layer,127.0.0.1,::1
     ports:
       - 8085:8085
     networks:

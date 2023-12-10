@@ -1,22 +1,3 @@
-extractRequestData:
-  assign:
-    chatId: ${incoming.body.chatId}
-  next: getChatById
-
-getChatById:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-chat-by-id"
-    body:
-      id: ${chatId}
-  result: chatResult
-  next: assignChat
-
-assignChat:
-  assign:
-    chat: ${chatResult.response.body[0]}
-  next: get_tara_user_info  
-
 get_tara_user_info:
   call: http.post
   args:
