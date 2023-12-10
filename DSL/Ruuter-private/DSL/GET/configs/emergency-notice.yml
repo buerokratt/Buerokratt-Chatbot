@@ -2,26 +2,17 @@ getEmergencyNotice:
   call: http.post
   args:
     url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-emergency-notice"
-  result: getEmergencyNoticeResult
+  result: res
   next: validateEmergencyNoticeExists
 
 validateEmergencyNoticeExists:
   switch:
     - condition: "${getEmergencyNoticeResult.response.body.length > 0}"
-      next: mapEmergencyNoticeData
+      next: returnSuccess
   next: returnNotFound
 
-mapEmergencyNoticeData:
-  call: http.post
-  args:
-    url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/json/v2/return_emergency_notice"
-    body:
-      configurationArray: ${getEmergencyNoticeResult.response.body}
-  result: emergencyNoticeData
-  next: returnSuccess
-
 returnSuccess:
-  return: ${emergencyNoticeData.response.body}
+  return: ${res.response.body}
   next: end
 
 returnNotFound:

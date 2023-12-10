@@ -40,6 +40,6 @@ returnSuccess:
   return: ${getUserSettingsResult.response.body}
   next: end
 
-returnNotFound:
-  return: "error: not found"
+return_bad_request:
+  return: "error: bad request"
   next: end

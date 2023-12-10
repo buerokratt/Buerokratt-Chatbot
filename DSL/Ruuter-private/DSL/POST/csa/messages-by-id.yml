@@ -2,13 +2,13 @@ extractRequestData:
   assign:
     chatId: ${incoming.body.chatId}
 
-getMessagePreview:
+getUnavailableEndedChats:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-message-preview"
+    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-chat-messages"
     body:
       chatId: ${chatId}
   result: res
 
-returnSuccess:
+return_result:
   return: ${res.response.body}

@@ -4,17 +4,7 @@ getConfigurationValue:
     url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-configuration"
     body:
       key: "end_user_session_length"
-  result: getConfigurationValueResult
+  result: res
 
-mapData:
-  call: http.post
-  args:
-    url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/json/v2/return_first_configuration_from_array"
-    body:
-      configurationArray: ${getConfigurationValueResult.response.body}
-  result: dataMapperData
-  next: returnSuccess
-
-returnSuccess:
-  return: ${dataMapperData.response.body}
-  next: end
+return_result:
+  return: ${res.response.body[0].value}

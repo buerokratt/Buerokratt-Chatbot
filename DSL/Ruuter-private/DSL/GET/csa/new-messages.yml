@@ -2,7 +2,6 @@ extractRequestData:
   assign:
     chatId: ${incoming.body.chatId}
     lastRead: ${incoming.body.lastRead}
-  next: getNewMessages
 
 getNewMessages:
   call: http.post
@@ -12,8 +11,6 @@ getNewMessages:
       chatId: ${chatId}
       timeRangeBegin: ${lastRead}
   result: res
-  next: returnSuccess
 
 returnSuccess:
   return: ${res.response.body}
-  next: end

@@ -3,7 +3,6 @@ getActiveChats:
   args:
     url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-cs-all-active-chats"
   result: res
-  next: returnSuccess
 
 returnSuccess:
   return: ${res.response.body}

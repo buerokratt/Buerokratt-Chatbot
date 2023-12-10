@@ -3,15 +3,14 @@ extractRequestData:
     startDate: "${incoming.body.startDate}"
     endDate: "${incoming.body.endDate}"
 
-getEndedChats:
+getUnavailableEndedChats:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-cs-all-ended-chats"
+    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-cs-all-unavailable-ended-chats"
     body:
       start: ${startDate}
       end: ${endDate}  
   result: res
 
-returnSuccess:
+return_result:
   return: ${res.response.body}
-  next: end

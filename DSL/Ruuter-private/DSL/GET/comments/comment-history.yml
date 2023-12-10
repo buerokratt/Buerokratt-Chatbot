@@ -1,7 +1,6 @@
 extractRequestData:
   assign:
-    chatId: ${incoming.params.chatId}
-  next: getChatHistoryComment    
+    chatId: ${incoming.params.chatId}    
 
 getChatHistoryComment:
   call: http.post
@@ -9,18 +8,8 @@ getChatHistoryComment:
     url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-chat-history-comment-by-id"
     body:
       chatId: ${chatId}
-  result: getChatHistoryCommentResult
-  next: mapChatHistoryCommentData
-
-mapChatHistoryCommentData:
-  call: http.post
-  args:
-    url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/json/v2/return_chat_history_comment"
-    body:
-      historyComment: ${getChatHistoryCommentResult.response.body}
-  result: chatHistoryCommentData
-  next: returnSuccess
+  result: res
 
 returnSuccess:
-  return: ${chatHistoryCommentData.response.body}
+  return: ${res.response.body}
   next: end
