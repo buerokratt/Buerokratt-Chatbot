@@ -119,7 +119,7 @@ insertChat:
       endUserLastName: ""
       status: "OPEN"
       lastMessage: ${content}
-      created: "${new Date().toISOString()}"
+      created: ${new Date().toISOString()}
       ended: ""
       feedbackRating: ""
       feedbackText: ""

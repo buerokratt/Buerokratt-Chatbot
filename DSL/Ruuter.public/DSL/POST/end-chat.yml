@@ -61,7 +61,7 @@ postMessage:
       authorFirstName: ""
       authorLastName: ""
       authorRole: "buerokratt"
-      created: "${new Date().toISOString()}"
+      created: ${new Date().toISOString()}
       rating: ""
       event: ${event}
       forwardedByUser: ""
