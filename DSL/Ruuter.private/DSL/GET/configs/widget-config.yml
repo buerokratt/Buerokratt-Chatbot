@@ -1,0 +1,20 @@
+getWidgetConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-widget-config"
+  result: res
+  next: validateWidgetConfigExists
+
+validateWidgetConfigExists:
+  switch:
+    - condition: "${getWidgetConfigResult.response.body.length > 0}"
+      next: returnSuccess
+  next: returnNotFound
+
+returnSuccess:
+  return: ${res.response.body}
+  next: end
+
+returnNotFound:
+  return: "error: not found"
+  next: end

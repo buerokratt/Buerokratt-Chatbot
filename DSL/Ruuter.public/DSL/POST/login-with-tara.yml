@@ -1,0 +1,59 @@
+get_tara_user_info:
+  call: http.post
+  args:
+   url: "[#CHATBOT_TIM]:[#CHATBOT_TIM_PORT]/jwt/userinfo"
+   contentType: plaintext
+   headers:
+    cookie: ${incoming.headers.cookie}
+   plaintext: 
+      "JWTTOKEN"
+  result: tara_info
+  next: get_session_length
+
+get_session_length:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-configuration"
+    body:
+      key: "session_length"
+  result: session_result
+  next: generate_cookie
+
+generate_cookie:
+  call: http.post
+  args:
+    url: "[#CHATBOT_TIM]:[#CHATBOT_TIM_PORT]/jwt/custom-jwt-generate"
+    body:
+      JWTName: "customJwtCookie"
+      expirationInMinutes: ${session_result.response.body[0].value}
+      content: ${tara_info.response.body[0]}
+  result: cookie_result
+  next: assign_cookie
+
+assign_cookie:
+  assign:
+    setCookie:
+      customJwtCookie: ${cookie_result.response.body.token}
+      maxAge: 28800
+      Domain: "[#DOMAIN]"
+      Secure: false
+      HttpOnly: false
+  next: setCustomerSupportAgentAway
+
+setCustomerSupportAgentAway:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/set-customer-support-status"
+    body:
+      active: false
+      userIdCode: ${login}
+      created: ${new Date().toISOString()}
+      status: "offline"
+  result: setCustomerSupportAgentAwayResult
+  next: return_value  
+
+return_value:
+  headers:
+    Set-Cookie: ${setCookie}
+  return: ${cookie_result.response.body.token}
+  next: end 

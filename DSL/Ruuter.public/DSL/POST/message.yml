@@ -1,0 +1,104 @@
+extractRequestData:
+  assign:
+    chatId: ${incoming.body.chatId}
+    authorTimestamp: ${incoming.body.authorTimestamp}
+    authorRole: ${incoming.body.authorRole}
+    content: ${incoming.body.content}
+    event: ${incoming.body.event}
+    holidays: ${incoming.body.holidays}
+    holidayNames: ${incoming.body.holidayNames}
+    cookie: ${incoming.headers.cookie}
+  next: get_chat_info
+
+get_chat_info:
+  call: http.post
+  args:
+   url: "[#CHATBOT_TIM]:[#CHATBOT_TIM_PORT]/jwt/custom-jwt-userinfo"
+   contentType: plaintext
+   headers:
+    cookie: ${cookie}
+   plaintext:
+      "chatJwt"
+  result: res
+  next: check_chat_info_response
+
+check_chat_info_response:
+  switch:
+    - condition: ${200 <= res.response.statusCodeValue && res.response.statusCodeValue < 300}
+      next: assignChatId
+  next: return_bad_request
+
+assignChatId:
+  assign:
+    chatId: ${res.response.body.chatId}
+  next: getActiveChatById
+
+getActiveChatById:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-active-chat-by-id"
+    body:
+      id: ${chatId}
+  result: activeChatRes
+  next: checkActiveChatResult    
+
+checkActiveChatResult:
+  switch:
+    - condition: ${activeChatRes.response.body.length > 0}
+      next: assignInstant
+  next: return_chat_ended
+
+assignInstant:
+  assign:
+    instant: ${new Date().toISOString()}
+  next: getUuid
+
+getUuid:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/hbs/chat-bot/return_uuid"
+    headers:
+      type: json
+  result: uuid_result
+  next: assignUuid
+
+assignUuid:
+  assign:
+    uuid: ${uuid_result.response.body.uuid}
+  next: insertMessage  
+
+insertMessage:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/insert-message"
+    body:
+      chatId: ${chatId}
+      messageId: ${uuid}
+      content: ${content}
+      authorTimestamp: ${authorTimestamp}
+      authorId: ${idCode}
+      authorFirstName: ${authorFirstName}
+      authorRole: ${authorRole}
+      created: ${instant}
+      authorLastName: ""
+      rating: ""
+      event: ""
+      forwardedByUser: ""
+      forwardedFromCsa: ""
+      forwardedToCsa: ""
+  result: insertMessageResult
+  next: returnSuccess  
+
+returnSuccess:
+  return: "Message Sent Successfully"
+  next: end
+
+return_chat_ended:
+  return: "Chat Has Ended"
+  status: 400
+  next: end  
+
+return_bad_request:
+  status: 400
+  return: false
+  next: end  

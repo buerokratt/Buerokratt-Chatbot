@@ -15,7 +15,7 @@ import { EMERGENCY_NOTICE_LENGTH } from 'constants/config';
 import { EmergencyNotice } from 'types/emergencyNotice';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useToast } from 'hooks/useToast';
-import apiDevV2 from 'services/api-dev-v2';
+import apiDev from 'services/api-dev';
 
 const SettingsEmergencyNotices: FC = () => {
   const { t } = useTranslation();
@@ -25,7 +25,7 @@ const SettingsEmergencyNotices: FC = () => {
     useState(false);
   const [emergencyNoticeText, setEmergencyNoticeText] = useState('');
   const { data: emergencyNotice } = useQuery<EmergencyNotice>({
-    queryKey: ['cs-get-emergency-notice', 'prod-2'],
+    queryKey: ['configs/emergency-notice', 'prod'],
     onSuccess: (data) => {
       if (Object.keys(control._formValues).length > 0) return;
       setIsEmergencyNoticeVisible(data.isEmergencyNoticeVisible ?? false);
@@ -41,7 +41,7 @@ const SettingsEmergencyNotices: FC = () => {
 
   const emergencyNoticeMutation = useMutation({
     mutationFn: (data: EmergencyNotice) =>
-      apiDevV2.post<EmergencyNotice>('cs-set-emergency-notice', data),
+      apiDev.post<EmergencyNotice>('configs/emergency-notice', data),
     onError: (error: AxiosError) => {
       toast.open({
         type: 'error',

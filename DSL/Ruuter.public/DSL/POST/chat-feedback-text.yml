@@ -1,0 +1,25 @@
+extractRequestData:
+  assign:
+    chatId: "${incoming.body.chatId}"
+    text: "${incoming.body.feedbackText}"
+
+check_text_limit:
+  switch:
+    - condition: ${text.length >= 1 && text.length =< 500}
+      next: addFeedbackText
+  next: return_invalid_text
+
+addFeedbackText:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/update-chat-with-feedback-text"
+    body:
+      id: ${chatId}
+      created: ${new Date().toISOString()}
+      feedbackText: ${text}
+  result: res
+  next: end
+
+return_invalid_text:
+  return: "error: invalid feedback text"
+  next: end

@@ -1,0 +1,30 @@
+getOrganizationWorkingTime:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-organization-working-time"
+  result: getOrganizationWorkingTimeValueResult
+
+validateOrganizationWorkingTimeExists:
+  switch:
+    - condition: "${getOrganizationWorkingTimeValueResult.response.body.length > 0}"
+      next: mapWorkingTimeData
+  next: returnNotFound
+
+mapWorkingTimeData:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/hbs/chat-bot/return_organization_working_time"
+    headers:
+      type: json
+    body:
+      configurationArray: ${getOrganizationWorkingTimeValueResult.response.body}
+  result: workingTimeData
+  next: returnSuccess
+
+returnSuccess:
+  return: ${workingTimeData.response.body}
+  next: end
+
+returnNotFound:
+  return: "error: not found"
+  next: end

@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, Card, FormDatepicker, Switch, Track } from 'components';
 import { OrganizationWorkingTime } from 'types/organizationWorkingTime';
 import { useToast } from 'hooks/useToast';
-import apiDevV2 from 'services/api-dev-v2';
+import apiDev from 'services/api-dev';
 import './SettingsWorkingTime.scss';
 import { getOrganizationTimeData, setOrganizationTimeData } from './data';
 
@@ -35,7 +35,7 @@ const SettingsWorkingTime: FC = () => {
     'organizationWorkingTimeWeekdays'
   );
   const { data: workingTime } = useQuery<OrganizationWorkingTime>({
-    queryKey: ['cs-get-organization-working-time', 'prod-2'],
+    queryKey: ['configs/organization-working-time', 'prod'],
     onSuccess: (data) => {
       if (Object.keys(control._formValues).length > 0) return;
       reset(getOrganizationTimeData(data));
@@ -45,8 +45,8 @@ const SettingsWorkingTime: FC = () => {
 
   const workingTimeMutation = useMutation({
     mutationFn: (data: OrganizationWorkingTime) =>
-      apiDevV2.post<OrganizationWorkingTime>(
-        'cs-set-organization-working-time',
+      apiDev.post<OrganizationWorkingTime>(
+        'configs/organization-working-time',
         setOrganizationTimeData(data)
       ),
     onSuccess: () => {

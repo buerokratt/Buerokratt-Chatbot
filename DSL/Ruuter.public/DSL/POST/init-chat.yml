@@ -1,0 +1,162 @@
+extractRequestData:
+  assign:
+    authorRole: ${incoming.body.message.authorRole}
+    authorTimestamp: ${incoming.body.message.authorTimestamp}
+    content: ${incoming.body.message.content}
+    endUserId: ""
+    endUserEmail: ""
+    endUserPhone: ""
+    endUserOs: ${incoming.body.endUserTechnicalData.endUserOs}
+    endUserUrl: ${incoming.body.endUserTechnicalData.endUserUrl}
+    forwardedByUser: ""
+    forwardedFromCsa: ""
+    forwardedToCsa: ""
+    holidays: ${incoming.body.holidays}
+    holidayNames: ${incoming.body.holidayNames}
+  next: getChatUuid
+
+getChatUuid:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/hbs/chat-bot/return_uuid"
+    headers:
+      type: json
+  result: chat_uuid_result
+  next: assignChatUuid
+
+assignChatUuid:
+  assign:
+    chatUuid: ${chat_uuid_result.response.body.uuid}
+  next: getMessageUuid  
+
+getMessageUuid:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/hbs/chat-bot/return_uuid"
+    headers:
+      type: json
+  result: message_uuid_result
+  next: assignMessageUuid
+
+assignMessageUuid:
+  assign:
+    messageUuid: ${message_uuid_result.response.body.uuid}
+  next: get_session_length  
+
+get_session_length:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-configuration"
+    body:
+      key: "session_length"
+  result: session_result
+  next: generate_cookie
+
+generate_cookie:
+  call: http.post
+  args:
+    url: "[#CHATBOT_TIM]:[#CHATBOT_TIM_PORT]/jwt/custom-jwt-generate"
+    body:
+      JWTName: "chatJwt"
+      expirationInMinutes: ${session_result.response.body[0].value}
+      content: {
+        "chatId": "${chatUuid}",
+        "forwardTo": ""   
+      }
+  result: cookie_result
+  next: assign_cookie
+
+assign_cookie:
+  assign:
+    setCookie:
+      chatJwt: ${cookie_result.response.body.token}
+      maxAge: 7200
+      Domain: "[#DOMAIN]"
+      Secure: true
+      HttpOnly: true
+  next: setCustomerSupportAgentAway
+
+postGreetingMessage:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RUUTER_PUBLIC]:[#CHATBOT_RUUTER_PUBLIC_PORT]/greeting-to-chat"
+    body:
+      chatId: ${chatUuid}
+      authorTimestamp: ${authorTimestamp}
+  result: greeting_result
+  next: postClientMessage
+
+postClientMessage:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/insert-message"
+    body:
+      chatId: ${chatUuid}
+      messageId: ${messageUuid}
+      content: ${content}
+      event: ""
+      authorTimestamp: ${authorTimestamp}
+      authorId: ${endUserId}
+      authorFirstName: ""
+      authorRole: ${authorRole}
+      created: ${instant}
+      authorLastName: ""
+      rating: ""
+      forwardedByUser: ${forwardedByUser}
+      forwardedFromCsa: ${forwardedFromCsa}
+      forwardedToCsa: ${forwardedToCsa}
+  result: insertMessageResult
+  next: insertChat 
+
+insertChat:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/init-chat"
+    body:
+      id: ${chatUuid}
+      endUserId: ${endUserId}
+      endUserFirstName: ""
+      endUserLastName: ""
+      status: "OPEN"
+      lastMessage: ${content}
+      created: ${new Date().toISOString()}
+      ended: ""
+      feedbackRating: ""
+      feedbackText: ""
+      endUserEmail: ${endUserEmail}
+      endUserPhone: ${endUserPhone}
+      endUserOs: ${endUserOs}
+      endUserUrl: ${endUserUrl}
+      externalId: ""
+      forwardedTo: ""
+      forwardedToName: ""
+      receivedFrom: ""
+      reveivedFromName: ""
+  result: insertMessageResult
+  next: postMessageToBot 
+
+postMessageToBot:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RUUTER_PUBLIC]:[#CHATBOT_RUUTER_PUBLIC_PORT]/post-message-to-bot"
+    body:
+      chatId: ${chatUuid}
+      content: ${content}
+      authorId: ${endUserId}
+      holidays: ${holidays}
+      holidayNames: ${holidayNames}
+  result: message_result
+  next: getInsertedChat
+
+getInsertedChat:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-chat-by-id"
+    body:
+      id: ${chatUuid}
+  result: chat_result
+  next: returnSuccess
+
+returnSuccess:
+  return: ${chat_result.response.body}
+  next: end

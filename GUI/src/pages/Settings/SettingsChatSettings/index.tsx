@@ -6,7 +6,6 @@ import { AxiosError } from 'axios';
 import { Card, Switch, Track } from 'components';
 import { useToast } from 'hooks/useToast';
 import apiDev from 'services/api-dev';
-import apiDevV2 from 'services/api-dev-v2';
 
 const SettingsChatSettings: FC = () => {
   const { t } = useTranslation();
@@ -15,19 +14,19 @@ const SettingsChatSettings: FC = () => {
   const [isNameVisible, setIsNameVisible] = useState<boolean>(true);
   const [isTitleVisible, setIsTitleVisible] = useState<boolean>(true);
   const { data: botConfig } = useQuery<{ is_bot_active: boolean }>({
-    queryKey: ['cs-get-is-bot-active', 'prod'],
+    queryKey: ['bot/is-bot-active', 'prod'],
     onSuccess(res: any) {
       setBotActive(res.data.get_is_bot_active.value === 'true' ? true : false);
     },
   });
   const { data: csaNameVisibility } = useQuery<{ isVisible: boolean }>({
-    queryKey: ['cs-get-csa-name-visibility', 'prod-2'],
+    queryKey: ['csa/name-visibility', 'prod'],
     onSuccess(res: any) {
       setIsNameVisible(res.isVisible)
     },
   });
   const { data: csaTitleVisibility } = useQuery<{ isVisible: boolean }>({
-    queryKey: ['cs-get-csa-title-visibility', 'prod-2'],
+    queryKey: ['csa/title-visibility', 'prod'],
     onSuccess(res: any) {
       setIsTitleVisible(res.isVisible)
     },
@@ -36,7 +35,7 @@ const SettingsChatSettings: FC = () => {
   const botConfigMutation = useMutation({
     mutationFn: (data: { is_bot_active: boolean }) => {
       setBotActive(data.is_bot_active);
-      return apiDev.post(`cs-set-is-bot-active`, { 'isActive': data.is_bot_active })
+      return apiDev.post(`bot/is-bot-active`, { 'isActive': data.is_bot_active })
     },
     onError: (error: AxiosError) => {
       toast.open({
@@ -50,7 +49,7 @@ const SettingsChatSettings: FC = () => {
   const csaNameVisibilityMutation = useMutation({
     mutationFn: (data: { isVisible: boolean }) => {
       setIsNameVisible(data.isVisible);
-      return apiDevV2.post(`cs-set-csa-name-visibility`, data)},
+      return apiDev.post(`csa/name-visibility`, data)},
     onError: (error: AxiosError) => {
       toast.open({
         type: 'error',
@@ -63,7 +62,7 @@ const SettingsChatSettings: FC = () => {
   const csaTitleVisibilityMutation = useMutation({
     mutationFn: (data: { isVisible: boolean }) => {
       setIsTitleVisible(data.isVisible);
-      return apiDevV2.post(`cs-set-csa-title-visibility`, data)},
+      return apiDev.post(`csa/title-visibility`, data)},
     onError: (error: AxiosError) => {
       toast.open({
         type: 'error',

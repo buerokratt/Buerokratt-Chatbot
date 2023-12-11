@@ -1,0 +1,52 @@
+extractRequestData:
+  assign:
+    chatId: ${incoming.body.chatId}
+
+getUserEmailByChatId:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-user-email-by-chat-id"
+    body:
+      chatId: ${chatId}
+  result: getUserEmailByChatIdResult
+
+getMessagesByChatId:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-chat-messages"
+    body:
+      chatId: ${chatId}
+  result: getMessagesByChatIdResult
+
+sendDataToEmail:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/js/email/sendMockEmail"
+    body:
+      to: ${getUserEmailByChatIdResult.response.body[0].csaEmail}
+      subject: "Chat history"
+      text: ${getMessagesByChatIdResult.response.body}
+  result: emailResponseData
+
+registerEmailSentEvent:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/insert-message"
+    body:
+      chatId: ${chatId}
+      messageId: ""
+      content: ""
+      event: "chat_sent_to_csa_email"
+      authorTimestamp: ${new Date().toISOString()}
+      authorId: ""
+      authorFirstName: ""
+      authorLastName: ""
+      authorRole: "backoffice-user"
+      rating: ""
+      forwardedByUser: ""
+      forwardedFromCsa: ""
+      forwardedToCsa: ""
+      created: ${new Date().toISOString()}
+
+returnSuccess:
+  return: "OK"

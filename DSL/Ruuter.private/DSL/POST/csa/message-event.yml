@@ -1,0 +1,42 @@
+extractRequestData:
+  assign:
+    messageId: ${incoming.body.messageId}
+    event: ${incoming.body.event}
+    authorTimestamp: ${incoming.body.authorTimestamp}
+
+getMessageById:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-message-by-id"
+    body:
+      id: ${messageId}
+  result: res
+
+assignMessage:
+  assign:
+    message: ${res.response.body[0]}
+
+insertMessage:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/insert-message"
+    body:
+      messageId: ${messageId}
+      chatId: ${message.chatId}
+      authorId: ${message.authorId}
+      authorTimestamp: ${authorTimestamp}
+      authorFirstName: ${message.authorFirstName}
+      authorLastName: ${message.authorLastName}
+      authorRole: ${message.authorRole}
+      created: ${message.created}
+      content: ${message.content}
+      event: ${event}
+      forwardedByUser: ${message.forwardedByUser}
+      forwardedFromCsa: ${message.forwardedFromCsa}
+      forwardedToCsa: ${message.forwardedToCsa}
+      rating: ${message.rating}
+  result: insertMessageResult
+
+return_result:
+  return: "Message Event Sent Successfully"
+  next: end
