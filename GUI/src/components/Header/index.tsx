@@ -102,7 +102,7 @@ const Header: FC = () => {
   }, [userInfo?.idCode]);
 
   const getMessages = async () => {
-    const { data: res } = await apiDev.post('account/user-profile-settings');
+    const { data: res } = await apiDev.get('account/user-profile-settings');
 
     if (res.response && res.response != 'error: not found')
       setUserProfileSettings(res.response[0]);

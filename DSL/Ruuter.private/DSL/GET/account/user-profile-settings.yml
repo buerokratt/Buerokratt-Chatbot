@@ -34,7 +34,7 @@ validateUserSettingsResultExists:
   switch:
     - condition: "${getUserSettingsResult.response.body.length > 0}"
       next: returnSuccess
-  next: returnNotFound
+  next: return_not_found
 
 returnSuccess:
   return: ${getUserSettingsResult.response.body}
@@ -42,4 +42,8 @@ returnSuccess:
 
 return_bad_request:
   return: "error: bad request"
+  next: end
+
+return_not_found:
+  return: "error: User not found"
   next: end
