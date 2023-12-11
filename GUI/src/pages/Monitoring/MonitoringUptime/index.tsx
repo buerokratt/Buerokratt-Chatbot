@@ -13,7 +13,7 @@ type ComponentHealth = {
 const MonitoringUptime: FC = () => {
   const { t } = useTranslation();
   const { data: uptimeData } = useQuery<ComponentHealth[]>({
-    queryKey: ['cs-get-components-healthz-status'],
+    queryKey: ['health/components-status'],
   });
 
   return (

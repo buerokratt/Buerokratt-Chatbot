@@ -55,7 +55,7 @@ const HistoricalChat: FC<ChatProps> = ({
   }, [trigger]);
 
   const getMessages = async () => {
-    const { data: res } = await apiDev.post('cs-get-messages-by-chat-id', {
+    const { data: res } = await apiDev.post('csa/messages-by-id', {
       chatId: chat.id,
     });
     setMessagesList(res.data.cs_get_messages_by_chat_id);

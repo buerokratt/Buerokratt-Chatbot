@@ -20,7 +20,6 @@ import clsx from 'clsx';
 import StartAServiceModal from '../StartAServiceModal';
 import ChatTrigger from './ChatTrigger';
 import './ChatActive.scss';
-import apiDevV2 from 'services/api-dev-v2';
 import { v4 as uuidv4 } from 'uuid';
 import { useLocation } from 'react-router-dom';
 import sse from 'services/sse-service';
@@ -35,9 +34,9 @@ const CSAchatStatuses = [
 const ChatActive: FC = () => {
   const { t } = useTranslation();
   const { state } = useLocation();
-  const userInfo = useStore(state => state.userInfo);
+  const userInfo = useStore((state) => state.userInfo);
   const toast = useToast();
-  const chatCsaActive = useStore(state => state.chatCsaActive);
+  const chatCsaActive = useStore((state) => state.chatCsaActive);
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
   const [endChatModal, setEndChatModal] = useState<ChatType | null>(null);
   const [forwardToColleaugeModal, setForwardToColleaugeModal] =
@@ -56,7 +55,7 @@ const ChatActive: FC = () => {
   >(null);
 
   const { refetch } = useQuery<ChatType[]>({
-    queryKey: ['cs-get-all-active-chats', 'prod'],
+    queryKey: ['csa/active-chats', 'prod'],
     onSuccess(res: any) {
       const isChatStillExists = res.data.get_all_active_chats?.filter(function (
         e: any
@@ -99,32 +98,32 @@ const ChatActive: FC = () => {
   }, [chatCsaActive]);
 
   const { data: csaNameVisiblity } = useQuery<{ isVisible: boolean }>({
-    queryKey: ['cs-get-csa-name-visibility', 'prod-2'],
+    queryKey: ['csa/name-visibility', 'prod'],
   });
 
   const { data: csaTitleVisibility } = useQuery<{ isVisible: boolean }>({
-    queryKey: ['cs-get-csa-title-visibility', 'prod-2'],
+    queryKey: ['csa/title-visibility', 'prod'],
   });
 
-  const sendToEmailMutation = useMutation({
-    mutationFn: (data: ChatType) =>
-      apiDevV2.post('history/cs-send-history-to-email', { chatId: data.id }),
-    onSuccess: () => {
-      toast.open({
-        type: 'success',
-        title: t('global.notification'),
-        message: t('toast.success.messageToUserEmail'),
-      });
-    },
-    onError: (error: AxiosError) => {
-      toast.open({
-        type: 'error',
-        title: t('global.notificationError'),
-        message: error.message,
-      });
-    },
-    onSettled: () => setSendToEmailModal(null),
-  });
+  // const sendToEmailMutation = useMutation({
+  //   mutationFn: (data: ChatType) =>
+  //     apiDev.post('history/cs-send-history-to-email', { chatId: data.id }),
+  //   onSuccess: () => {
+  //     toast.open({
+  //       type: 'success',
+  //       title: t('global.notification'),
+  //       message: t('toast.success.messageToUserEmail'),
+  //     });
+  //   },
+  //   onError: (error: AxiosError) => {
+  //     toast.open({
+  //       type: 'error',
+  //       title: t('global.notificationError'),
+  //       message: error.message,
+  //     });
+  //   },
+  //   onSettled: () => setSendToEmailModal(null),
+  // });
 
   const selectedChat = useMemo(
     () =>
@@ -183,7 +182,7 @@ const ChatActive: FC = () => {
 
   const handleCsaForward = async (chat: ChatType, user: User) => {
     try {
-      await apiDev.post('cs-redirect-chat', {
+      await apiDev.post('chat/redirect-chat', {
         id: chat.id ?? '',
         customerSupportId: user?.idCode ?? '',
         customerSupportDisplayName: user?.displayName ?? '',
@@ -225,7 +224,7 @@ const ChatActive: FC = () => {
     if (!selectedEndChatStatus) return;
 
     try {
-      await apiDev.post('cs-end-chat', {
+      await apiDev.post('chat/end-chat', {
         chatId: selectedChatId,
         event: selectedEndChatStatus.toUpperCase(),
         authorTimestamp: new Date().toISOString(),
@@ -369,7 +368,7 @@ const ChatActive: FC = () => {
               </Button>
               <Button
                 appearance="error"
-                onClick={() => sendToEmailMutation.mutate(sendToEmailModal)}
+                // onClick={() => sendToEmailMutation.mutate(sendToEmailModal)}
               >
                 {t('global.yes')}
               </Button>

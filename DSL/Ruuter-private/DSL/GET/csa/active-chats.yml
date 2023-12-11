@@ -4,6 +4,5 @@ getActiveChats:
     url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-cs-all-active-chats"
   result: res
 
-returnSuccess:
+return_result:
   return: ${res.response.body}
-  next: end

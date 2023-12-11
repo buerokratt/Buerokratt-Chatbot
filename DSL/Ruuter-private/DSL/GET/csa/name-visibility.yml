@@ -5,7 +5,6 @@ getConfigurationValue:
     body:
       key: "is_csa_name_visible"
   result: res
-  next: mapData
 
 return_result:
   return: ${res.response.body[0].value}
