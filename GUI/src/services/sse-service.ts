@@ -1,6 +1,6 @@
 import { RuuterResponse } from '../model/ruuter-response-model';
 
-const ruuterUrl = import.meta.env.REACT_APP_RUUTER_V1_PRIVATE_API_URL;
+const ruuterUrl = import.meta.env.REACT_APP_RUUTER_PRIVATE_API_URL;
 
 const sse = <T>(url: string, onMessage: (data: T) => void): EventSource => {
   const eventSource = new EventSource(`${ruuterUrl}/sse/${url}`, { withCredentials: true });

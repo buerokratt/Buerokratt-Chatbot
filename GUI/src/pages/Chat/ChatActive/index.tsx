@@ -86,7 +86,7 @@ const ChatActive: FC = () => {
       }
     };
 
-    const events = sse(`cs-get-all-active-chats`, onMessage);
+    const events = sse(`csa/active-chats`, onMessage);
 
     return () => {
       events.close();

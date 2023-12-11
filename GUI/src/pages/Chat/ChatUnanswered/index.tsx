@@ -23,9 +23,9 @@ import sse from 'services/sse-service';
 
 const ChatUnanswered: FC = () => {
   const { t } = useTranslation();
-  const userInfo = useStore(state => state.userInfo);
+  const userInfo = useStore((state) => state.userInfo);
   const toast = useToast();
-  const chatCsaActive = useStore(state => state.chatCsaActive);
+  const chatCsaActive = useStore((state) => state.chatCsaActive);
   const [endChatModal, setEndChatModal] = useState<ChatType | null>(null);
   const [forwardToColleaugeModal, setForwardToColleaugeModal] =
     useState<ChatType | null>(null);
@@ -44,9 +44,9 @@ const ChatUnanswered: FC = () => {
     CHAT_EVENTS.RESPONSE_SENT_TO_CLIENT_EMAIL,
   ];
 
-  const activeChats = useStore(state => state.activeChats);
-  const selectedChatId = useStore(state => state.selectedChatId);
-  const selectedChat = useStore(state => state.selectedChat());
+  const activeChats = useStore((state) => state.activeChats);
+  const selectedChatId = useStore((state) => state.selectedChatId);
+  const selectedChat = useStore((state) => state.selectedChat());
   const setActiveChats = useStore.getState().setActiveChats;
 
   const { refetch } = useQuery<ChatType[]>({
@@ -55,7 +55,7 @@ const ChatUnanswered: FC = () => {
       setActiveChats(res.data.get_all_active_chats);
     },
   });
-  
+
   useEffect(() => {
     refetch();
   }, [chatCsaActive]);
@@ -74,7 +74,7 @@ const ChatUnanswered: FC = () => {
       }
     };
 
-    const events = sse(`cs-get-all-active-chats`, onMessage);
+    const events = sse(`csa/active-chats`, onMessage);
 
     return () => {
       events.close();
