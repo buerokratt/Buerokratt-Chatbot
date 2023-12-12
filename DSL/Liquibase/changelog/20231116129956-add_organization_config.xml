@@ -3,7 +3,7 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
-    <changeSet id="20221222122800" author="Net Group">
+    <changeSet id="20231116129956" author="Net Group">
         <insert tableName="configuration">
             <column name="key" value="organizationMondayWorkingTimeStartISO"/>
             <column name="value" value="2023-10-22T09:00:00.000Z"/>
