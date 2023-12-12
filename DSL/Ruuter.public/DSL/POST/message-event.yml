@@ -11,7 +11,7 @@ extractRequestData:
 getMessageById:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-message-by-id"
+    url: "[#CHATBOT_RESQL]/get-message-by-id"
     body:
       id: ${messageId}
   result: res
@@ -25,7 +25,7 @@ assignMessage:
 insertMessage:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/insert-message"
+    url: "[#CHATBOT_RESQL]/insert-message"
     body:
       messageId: ${messageId}
       chatId: ${message.chatId}

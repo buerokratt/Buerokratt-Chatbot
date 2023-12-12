@@ -1,7 +1,7 @@
 get_user_info:
   call: http.post
   args:
-   url: "[#CHATBOT_TIM]:[#CHATBOT_TIM_PORT]/jwt/custom-jwt-userinfo"
+   url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
    contentType: plaintext
    headers:
     cookie: ${incoming.headers.cookie}
@@ -24,7 +24,7 @@ assignIdCode:
 unassignAllClaimedChats:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/update-chats-assignee-by-user-id"
+    url: "[#CHATBOT_RESQL]/update-chats-assignee-by-user-id"
     body:
       userId: ${idCode}
   result: unclaim_res
@@ -33,7 +33,7 @@ unassignAllClaimedChats:
 setCustomerSupportAgentAway:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/set-customer-support-status"
+    url: "[#CHATBOT_RESQL]/set-customer-support-status"
     body:
       userIdCode: ${idCode}
       active: false
@@ -45,7 +45,7 @@ setCustomerSupportAgentAway:
 blacklistCustomJwt:
   call: http.post
   args:
-    url: "[#CHATBOT_TIM]:[#CHATBOT_TIM_PORT]/jwt/blacklist-custom-jwt"
+    url: "[#CHATBOT_TIM]/jwt/blacklist-custom-jwt"
     contentType: plaintext
     headers:
       cookie: ${incoming.headers.cookie}

@@ -1,7 +1,7 @@
 getActiveChats:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-cs-all-active-chats"
+    url: "[#CHATBOT_RESQL]/get-cs-all-active-chats"
   result: res
 
 return_result:

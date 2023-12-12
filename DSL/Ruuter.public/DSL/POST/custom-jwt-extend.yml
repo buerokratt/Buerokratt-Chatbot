@@ -1,7 +1,7 @@
 getConfigurationValue:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-configuration"
+    url: "[#CHATBOT_RESQL]/get-configuration"
     body:
       key: "end_user_session_length"
   result: res
@@ -15,7 +15,7 @@ assignSessionLength:
 extend_cookie:
   call: http.post
   args:
-    url: "[#CHATBOT_TIM]:[#CHATBOT_TIM_PORT]/jwt/custom-jwt-extend"
+    url: "[#CHATBOT_TIM]/jwt/custom-jwt-extend"
     contentType: plaintext
     headers:
       cookie: ${incoming.headers.cookie}

@@ -5,7 +5,7 @@ extractRequestData:
 getUser:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-user"
+    url: "[#CHATBOT_RESQL]/get-user"
     body:
       userIdCode: ${userId}
   result: res

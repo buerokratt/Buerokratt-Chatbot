@@ -1,7 +1,7 @@
 get_chat_info:
   call: http.post
   args:
-   url: "[#CHATBOT_TIM]:[#CHATBOT_TIM_PORT]/jwt/custom-jwt-userinfo"
+   url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
    contentType: plaintext
    headers:
     cookie: ${cookie}
@@ -26,7 +26,7 @@ assignChatIdInfo:
 getActiveChatById:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-active-chat-by-id"
+    url: "[#CHATBOT_RESQL]/get-active-chat-by-id"
     body:
       id: ${chatId}
   result: activeChatRes
@@ -46,7 +46,7 @@ assignChat:
 getMessagesToRedirect:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-redirection-messages-by-chatId"
+    url: "[#CHATBOT_RESQL]/get-redirection-messages-by-chatId"
     body:
       chatId: ${chatId}
   result: messagesToRedirectRes
@@ -65,7 +65,7 @@ forwardChat:
       originChatId: ${chatId}
       endUserFirstName: ${activeChat.endUserFirstName}
       endUserLastName: ${activeChat.endUserLastName}
-      receivedFrom: "[#CHATBOT_RUUTER_PRIVATE]:[#CHATBOT_RUUTER_PRIVATE_PORT]"
+      receivedFrom: "[#CHATBOT_RUUTER_PRIVATE]"
       endUserId: ${activeChat.endUserId}
   result: forwardChatRes
   next: get_session_length
@@ -73,7 +73,7 @@ forwardChat:
 get_session_length:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-configuration"
+    url: "[#CHATBOT_RESQL]/get-configuration"
     body:
       key: "session_length"
   result: session_result
@@ -82,7 +82,7 @@ get_session_length:
 updateChatJwt:
   call: http.post
   args:
-    url: "[#CHATBOT_TIM]:[#CHATBOT_TIM_PORT]/jwt/custom-jwt-generate"
+    url: "[#CHATBOT_TIM]/jwt/custom-jwt-generate"
     body:
       chatId: ${chatId}
       JWTCreated: ${JWTCreated}
@@ -104,7 +104,7 @@ assign_cookie:
 redirectChat:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/insert-chat"
+    url: "[#CHATBOT_RESQL]/insert-chat"
     body:
       id: ${chatId}
       customerSupportId: ${activeChat.customerSupportId}
@@ -133,7 +133,7 @@ redirectChat:
 getChatById:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-chat-by-id"
+    url: "[#CHATBOT_RESQL]/get-chat-by-id"
     body:
       id: ${chatUuid}
   result: chat_result

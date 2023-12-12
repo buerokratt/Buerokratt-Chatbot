@@ -5,7 +5,7 @@ extractRequestData:
 getChatHistoryComment:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-chat-history-comment-by-id"
+    url: "[#CHATBOT_RESQL]/get-chat-history-comment-by-id"
     body:
       chatId: ${chatId}
   result: res

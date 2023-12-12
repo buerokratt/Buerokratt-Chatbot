@@ -12,7 +12,7 @@ check_rating_limit:
 addFeedbackRating:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/update-chat-with-feedback-rating"
+    url: "[#CHATBOT_RESQL]/update-chat-with-feedback-rating"
     body:
       id: ${chatId}
       created: ${new Date().toISOString()}

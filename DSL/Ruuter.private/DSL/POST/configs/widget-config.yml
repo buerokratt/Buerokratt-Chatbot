@@ -10,7 +10,7 @@ extractRequestData:
 setWidgetConfig:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/set-widget-config"
+    url: "[#CHATBOT_RESQL]/set-widget-config"
     body:
       widgetProactiveSeconds: ${widgetProactiveSeconds}
       widgetDisplayBubbleMessageSeconds: ${widgetDisplayBubbleMessageSeconds}

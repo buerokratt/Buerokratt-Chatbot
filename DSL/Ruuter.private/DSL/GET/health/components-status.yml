@@ -1,37 +1,37 @@
 getTimHealth:
   call: http.post
   args:
-    url: "[#CHATBOT_TIM]:[#CHATBOT_TIM_PORT]/healthz"
+    url: "[#CHATBOT_TIM]/healthz"
   result: tim_res
 
 getDataMapperHealth:
   call: http.post
   args:
-    url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/healthz"
+    url: "[#CHATBOT_DMAPPER]/healthz"
   result: data_mapper_res  
 
 getPublicRuuterHealth:
   call: http.post
   args:
-    url: "[#CHATBOT_RUUTER_PUBLIC]:[#CHATBOT_RUUTER_PUBLIC_PORT]/healthz"
+    url: "[#CHATBOT_RUUTER_PUBLIC]/healthz"
   result: public_ruuter_res
 
 getPrivateRuuterHealth:
   call: http.post
   args:
-    url: "[#CHATBOT_RUUTER_PRIVATE]:[#CHATBOT_RUUTER_PRIVATE_PORT]/healthz"
+    url: "[#CHATBOT_RUUTER_PRIVATE]/healthz"
   result: private_ruuter_res  
 
 getResqlHealth:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/healthz"
+    url: "[#CHATBOT_RESQL]/healthz"
   result: resql_res
 
 formatHealthResponse:
   call: http.post
   args:
-    url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/hbs/chat-bot/return_components_health"
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/return_components_health"
     body:
      tim: "{tim_res.response.body}"
      data_mapper: "{data_mapper_res.response.body}"

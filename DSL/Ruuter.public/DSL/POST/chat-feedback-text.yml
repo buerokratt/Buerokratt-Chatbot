@@ -12,7 +12,7 @@ check_text_limit:
 addFeedbackText:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/update-chat-with-feedback-text"
+    url: "[#CHATBOT_RESQL]/update-chat-with-feedback-text"
     body:
       id: ${chatId}
       created: ${new Date().toISOString()}

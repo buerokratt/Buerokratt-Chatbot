@@ -1,7 +1,7 @@
 getAdmins:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-users-with-roles"
+    url: "[#CHATBOT_RESQL]/get-users-with-roles"
   result: res
 
 return_result:

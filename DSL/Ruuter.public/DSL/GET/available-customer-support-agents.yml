@@ -1,7 +1,7 @@
 getAvailableCustomerSupportAgents:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-all-available-customer-support-agents"
+    url: "[#CHATBOT_RESQL]/get-all-available-customer-support-agents"
   result: res
 
 return_result:

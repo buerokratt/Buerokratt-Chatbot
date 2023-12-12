@@ -11,7 +11,7 @@ extractRequestData:
 getUser:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-user"
+    url: "[#CHATBOT_RESQL]/get-user"
     body:
       userIdCode: ${userIdCode}
   result: res
@@ -26,7 +26,7 @@ checkIfUserExists:
 addUser:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/insert-user"
+    url: "[#CHATBOT_RESQL]/insert-user"
     body:
       created: ${new Date().toISOString()}
       status: "active"
@@ -42,7 +42,7 @@ addUser:
 addRoles:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/insert-user-role"
+    url: "[#CHATBOT_RESQL]/insert-user-role"
     body:
       userIdCode: ${userIdCode}
       roles: ${roles}
@@ -53,7 +53,7 @@ addRoles:
 setDefaultActivity: 
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/set-customer-support-status"
+    url: "[#CHATBOT_RESQL]/set-customer-support-status"
     body:
       userIdCode: ${userIdCode}
       active: "false"
@@ -65,7 +65,7 @@ setDefaultActivity:
 setUserProfileSettings:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/set-user-profile-settings"
+    url: "[#CHATBOT_RESQL]/set-user-profile-settings"
     body:
       userId: ${userIdCode}
       forwardedChatPopupNotifications: false

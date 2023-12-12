@@ -8,7 +8,7 @@ extractRequestData:
 getActiveChatById:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-active-chat-by-id"
+    url: "[#CHATBOT_RESQL]/get-active-chat-by-id"
     body:
       id: ${id}
   result: activeChatRes
@@ -28,7 +28,7 @@ assignChat:
 claimChat:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/insert-chat"
+    url: "[#CHATBOT_RESQL]/insert-chat"
     body:
       id: ${id}
       customerSupportId: ${customerSupportId}
@@ -57,7 +57,7 @@ claimChat:
 getClaimedChat:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-active-chat-by-id"
+    url: "[#CHATBOT_RESQL]/get-active-chat-by-id"
     body:
       id: ${id}
   result: claimedChatRes

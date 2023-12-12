@@ -6,7 +6,7 @@ extractRequestData:
 getMessagesByChatId:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-chat-messages"
+    url: "[#CHATBOT_RESQL]/get-chat-messages"
     body:
       chatId: ${chatId}
   result: getMessagesByChatIdResult
@@ -15,7 +15,7 @@ getMessagesByChatId:
 convertDataToPdf:
   call: http.post
   args:
-    url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/js/convert/pdf"
+    url: "[#CHATBOT_DMAPPER]/js/convert/pdf"
     body:
       data: ${getMessagesByChatIdResult.response.body}
   result: pdfFile
@@ -37,7 +37,7 @@ checkIsEmailPresent:
 sendPdfToEmail:
   call: http.post
   args:
-    url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/js/email/sendMockEmail"
+    url: "[#CHATBOT_DMAPPER]/js/email/sendMockEmail"
     body:
       to: ${email}
       subject: "Chat history"

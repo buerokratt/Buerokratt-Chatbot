@@ -11,7 +11,7 @@ extractRequestData:
 getActiveChatById:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-active-chat-by-id"
+    url: "[#CHATBOT_RESQL]/get-active-chat-by-id"
     body:
       id: ${id}
   result: activeChatRes
@@ -31,7 +31,7 @@ assignChat:
 redirectChat:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/insert-chat"
+    url: "[#CHATBOT_RESQL]/insert-chat"
     body:
       id: ${id}
       customerSupportId: ${customerSupportId}
@@ -60,7 +60,7 @@ redirectChat:
 getUuid:
   call: http.post
   args:
-    url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/hbs/chat-bot/return_uuid"
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/return_uuid"
     headers:
       type: json
   result: uuid_result
@@ -74,7 +74,7 @@ assignUuid:
 insertMessage:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/insert-message"
+    url: "[#CHATBOT_RESQL]/insert-message"
     body:
       chatId: ${activeChat.id}
       messageId: ${uuid}
@@ -96,7 +96,7 @@ insertMessage:
 getRedirectedChat:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-active-chat-by-id"
+    url: "[#CHATBOT_RESQL]/get-active-chat-by-id"
     body:
       id: ${id}
   result: redirectedChatRes

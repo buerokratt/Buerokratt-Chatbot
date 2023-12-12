@@ -5,7 +5,7 @@ extractRequestData:
 getUserEmailByChatId:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-user-email-by-chat-id"
+    url: "[#CHATBOT_RESQL]/get-user-email-by-chat-id"
     body:
       chatId: ${chatId}
   result: getUserEmailByChatIdResult
@@ -13,7 +13,7 @@ getUserEmailByChatId:
 getMessagesByChatId:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-chat-messages"
+    url: "[#CHATBOT_RESQL]/get-chat-messages"
     body:
       chatId: ${chatId}
   result: getMessagesByChatIdResult
@@ -21,7 +21,7 @@ getMessagesByChatId:
 sendDataToEmail:
   call: http.post
   args:
-    url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/js/email/sendMockEmail"
+    url: "[#CHATBOT_DMAPPER]/js/email/sendMockEmail"
     body:
       to: ${getUserEmailByChatIdResult.response.body[0].csaEmail}
       subject: "Chat history"
@@ -31,7 +31,7 @@ sendDataToEmail:
 registerEmailSentEvent:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/insert-message"
+    url: "[#CHATBOT_RESQL]/insert-message"
     body:
       chatId: ${chatId}
       messageId: ""

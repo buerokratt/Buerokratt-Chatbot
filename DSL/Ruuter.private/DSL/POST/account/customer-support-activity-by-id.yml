@@ -5,7 +5,7 @@ extractRequestData:
 getCustomerSupportActivity:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-customer-support-activity-by-id-code"
+    url: "[#CHATBOT_RESQL]/get-customer-support-activity-by-id-code"
     body:
       customerSupportId: ${customerSupportId}
   result: res

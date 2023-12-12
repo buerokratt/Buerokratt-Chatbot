@@ -6,7 +6,7 @@ extractRequestData:
 get_chat_info:
   call: http.post
   args:
-   url: "[#CHATBOT_TIM]:[#CHATBOT_TIM_PORT]/jwt/custom-jwt-userinfo"
+   url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
    contentType: plaintext
    headers:
     cookie: ${cookie}
@@ -29,7 +29,7 @@ assignChatId:
 getNewMessages:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-chat-messages-updated-after-time"
+    url: "[#CHATBOT_RESQL]/get-chat-messages-updated-after-time"
     body:
       chatId: ${chatId}
       timeRangeBegin: ${timeRangeBegin}

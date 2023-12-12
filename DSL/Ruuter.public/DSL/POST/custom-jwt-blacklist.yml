@@ -1,7 +1,7 @@
 blacklist_jwt:
   call: http.post
   args:
-   url: "[#CHATBOT_TIM]:[#CHATBOT_TIM_PORT]/jwt/custom-jwt-blacklist"
+   url: "[#CHATBOT_TIM]/jwt/custom-jwt-blacklist"
    contentType: plaintext
    headers:
     cookie: ${incoming.headers.cookie}

@@ -15,7 +15,7 @@ validateBody:
 setEmergencyNotice:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/set-emergency-notice"
+    url: "[#CHATBOT_RESQL]/set-emergency-notice"
     body:
       emergencyNoticeText: ${emergencyNoticeText}
       emergencyNoticeStartISO: ${emergencyNoticeStartISO}

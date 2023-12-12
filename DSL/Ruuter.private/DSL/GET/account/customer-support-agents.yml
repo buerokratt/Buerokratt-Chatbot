@@ -1,7 +1,7 @@
 getCustomerSupportAgents:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-users-with-roles-by-role"
+    url: "[#CHATBOT_RESQL]/get-users-with-roles-by-role"
     body:
       roles: [
          "ROLE_ADMINISTRATOR",

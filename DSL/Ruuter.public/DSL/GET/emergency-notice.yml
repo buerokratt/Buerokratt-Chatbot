@@ -1,7 +1,7 @@
 getEmergencyNotice:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-emergency-notice"
+    url: "[#CHATBOT_RESQL]/get-emergency-notice"
   result: res
 
 return_result:

@@ -24,7 +24,7 @@ extractRequestData:
 setOrganizationWorkingTime:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/set-organization-working-time"
+    url: "[#CHATBOT_RESQL]/set-organization-working-time"
     body:
       organizationMondayWorkingTimeStartISO: ${organizationMondayWorkingTimeStartISO}
       organizationMondayWorkingTimeEndISO: ${organizationMondayWorkingTimeEndISO}
@@ -52,7 +52,7 @@ setOrganizationWorkingTime:
 mapOrganizationWorkingTimeData:
   call: http.post
   args:
-    url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/hbs/chat-bot/return_organization_working_time"
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/return_organization_working_time"
     headers:
       type: json
     body:

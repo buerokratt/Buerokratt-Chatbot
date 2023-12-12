@@ -1,7 +1,7 @@
 getGreetingMessage:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-greeting-message"
+    url: "[#CHATBOT_RESQL]/get-greeting-message"
   result: res
 
 return_result:

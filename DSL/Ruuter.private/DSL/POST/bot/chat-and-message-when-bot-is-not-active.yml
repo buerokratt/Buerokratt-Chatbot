@@ -1,7 +1,7 @@
 getBotName:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-configuration"
+    url: "[#CHATBOT_RESQL]/get-configuration"
     body:
       key: "bot_institution_id"
   result: bot_name_res
@@ -13,7 +13,7 @@ assignBotName:
 endOldBotChats:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/insert-chat-ended-by-last-message-datetime"
+    url: "[#CHATBOT_RESQL]/insert-chat-ended-by-last-message-datetime"
     body:
       authorId: ${botName}
       authorRole: "buerokratt"
@@ -29,7 +29,7 @@ endOldBotChats:
 insertMessageContent:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/insert-message-content-by-customer-support-id"
+    url: "[#CHATBOT_RESQL]/insert-message-content-by-customer-support-id"
     body:
       customerSupportId: ${botName}
       authorId: ${botName}
@@ -42,7 +42,7 @@ insertMessageContent:
 insertChatCustomerSupport:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/insert-chat-customer-support-by-customer-support-id"
+    url: "[#CHATBOT_RESQL]/insert-chat-customer-support-by-customer-support-id"
     body:
       customerSupportId: ${botName}
   result: insert_chat_customer_support_res

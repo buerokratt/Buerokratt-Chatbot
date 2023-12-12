@@ -1,7 +1,7 @@
 getEstablishments:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-all-establishments"
+    url: "[#CHATBOT_RESQL]/get-all-establishments"
     body:
       start: ${startDate}
       end: ${endDate}  

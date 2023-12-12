@@ -6,7 +6,7 @@ extractRequestData:
 getNewMessages:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-chat-messages-updated-after-time"
+    url: "[#CHATBOT_RESQL]/get-chat-messages-updated-after-time"
     body:
       chatId: ${chatId}
       timeRangeBegin: ${lastRead}

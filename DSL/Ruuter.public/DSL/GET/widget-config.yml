@@ -1,7 +1,7 @@
 getWidgetConfig:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-widget-config"
+    url: "[#CHATBOT_RESQL]/get-widget-config"
   result: res
 
 return_result:
