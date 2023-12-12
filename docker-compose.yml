@@ -202,9 +202,8 @@ services:
       PORT: 4040
       REFRESH_INTERVAL: 1000
     volumes:
+      - /app/node_modules
       - ./notification-server:/app
-      - ./notification-server/node_modules:/app/node_modules
-    command: ["npm", "run", "dev"]
     networks:
       - bykstack
 
