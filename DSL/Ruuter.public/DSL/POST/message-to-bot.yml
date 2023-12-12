@@ -66,7 +66,7 @@ check_chat_belongs_to_bot:
 post_message_to_client:
   call: http.post
   args:
-    url: http://171.22.247.37:5005/webhooks/rest/webhook
+    url: "[#CHATBOT_BOT]/webhooks/rest/webhook"
     body:
       sender: ${chatId}
       message: ${content}
