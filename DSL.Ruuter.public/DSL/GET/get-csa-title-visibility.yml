@@ -1,0 +1,21 @@
+getConfigurationValue:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-configuration"
+    body:
+      key: "is_csa_title_visible"
+  result: getConfigurationValueResult
+  next: mapData
+
+mapData:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/json/v2/return_first_is_csa_title_visible_from_array"
+    body:
+      configurationArray: ${getConfigurationValueResult.response.body}
+  result: dataMapperData
+  next: returnSuccess
+
+returnSuccess:
+  return: ${dataMapperData.response.body}
+  next: end
