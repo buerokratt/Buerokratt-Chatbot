@@ -185,10 +185,8 @@ const SettingsWorkingTime: FC = () => {
         {!isOrganizationTheSameOnAllWorkingDays &&
           weekdaysOptions.map((d) => {
             return isOrganizationClosedOnWeekEnds &&
-              (d === 'Saturday' || d === 'Sunday') ? (
-              <></>
-            ) : (
-              <Track>
+              (d === 'Saturday' || d === 'Sunday') ? null : (
+              <Track key={d}>
                 <label className="Label switch">
                   {t(`settings.weekdays.${d}`.toLowerCase())}
                 </label>

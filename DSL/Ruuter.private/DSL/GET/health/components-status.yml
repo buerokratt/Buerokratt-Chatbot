@@ -4,41 +4,43 @@ getTimHealth:
     url: "[#CHATBOT_TIM]/healthz"
   result: tim_res
 
-getDataMapperHealth:
-  call: http.post
-  args:
-    url: "[#CHATBOT_DMAPPER]/healthz"
-  result: data_mapper_res  
+# getDataMapperHealth:
+#   call: http.post
+#   args:
+#     url: "[#CHATBOT_DMAPPER]/healthz"
+#   result: data_mapper_res  
 
-getPublicRuuterHealth:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RUUTER_PUBLIC]/healthz"
-  result: public_ruuter_res
+# getPublicRuuterHealth:
+#   call: http.post
+#   args:
+#     url: "[#CHATBOT_RUUTER_PUBLIC]/healthz"
+#   result: public_ruuter_res
 
-getPrivateRuuterHealth:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RUUTER_PRIVATE]/healthz"
-  result: private_ruuter_res  
+# getPrivateRuuterHealth:
+#   call: http.post
+#   args:
+#     url: "[#CHATBOT_RUUTER_PRIVATE]/healthz"
+#   result: private_ruuter_res  
 
 getResqlHealth:
-  call: http.post
+  call: http.get
   args:
     url: "[#CHATBOT_RESQL]/healthz"
   result: resql_res
 
-formatHealthResponse:
-  call: http.post
-  args:
-    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/return_components_health"
-    body:
-     tim: "{tim_res.response.body}"
-     data_mapper: "{data_mapper_res.response.body}"
-     public_ruuter: "{public_ruuter_res.response.body}"
-     private_ruuter: "{private_ruuter_res.response.body}"
-     resql: "{resql.response.body}"
-  result: res
+# formatHealthResponse:
+#   call: http.post
+#   args:
+#     url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/return_components_health"
+#     headers:
+#       type: json
+#     body:
+#      tim: ${tim_res.response.body.version}
+#      data_mapper: ""
+#      public_ruuter: ""
+#      private_ruuter: ""
+#      resql: ${resql_res.response.body.version}
+#   result: res
 
 return_result:
-  return: ${res.response.body}
+  return: ${[tim_res.response.body,resql_res.response.body]}
