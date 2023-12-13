@@ -58,7 +58,7 @@ const HistoricalChat: FC<ChatProps> = ({
     const { data: res } = await apiDev.post('csa/messages-by-id', {
       chatId: chat.id,
     });
-    setMessagesList(res.data.cs_get_messages_by_chat_id);
+    setMessagesList(res.response);
   };
 
   const endUserFullName =
