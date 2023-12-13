@@ -1,0 +1,13 @@
+blacklist_jwt:
+  call: http.post
+  args:
+   url: "[#CHATBOT_TIM]/jwt/custom-jwt-blacklist"
+   contentType: plaintext
+   headers:
+    cookie: ${incoming.headers.cookie}
+   plaintext: 
+      "customJwtCookie"
+  result: res
+
+return_result:
+  return: ${res.response.body}

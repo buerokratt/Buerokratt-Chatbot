@@ -3,18 +3,18 @@ getWidgetConfig:
   args:
     url: "[#CHATBOT_RESQL]/get-widget-config"
   result: res
-  next: validateWidgetConfigExists
+  next: validate_response
 
-validateWidgetConfigExists:
+validate_response:
   switch:
-    - condition: "${getWidgetConfigResult.response.body.length > 0}"
-      next: returnSuccess
-  next: returnNotFound
+    - condition: "${res.response.body.length > 0}"
+      next: return_result
+  next: return_not_found
 
-returnSuccess:
+return_result:
   return: ${res.response.body}
   next: end
 
-returnNotFound:
+return_not_found:
   return: "error: not found"
   next: end

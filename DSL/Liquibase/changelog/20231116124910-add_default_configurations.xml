@@ -45,5 +45,21 @@ http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
             <column name="key" value="greeting_message_est"/>
             <column name="value" value="tere"/>
         </insert>
+        <insert tableName="configuration">
+            <column name="key" value="emergencyNoticeText"/>
+            <column name="value" value="We are out of service at the moment"/>
+        </insert>
+        <insert tableName="configuration">
+            <column name="key" value="emergencyNoticeStartISO"/>
+            <column name="value" value="2023-10-22T23:00:00.000Z"/>
+        </insert>
+        <insert tableName="configuration">
+            <column name="key" value="emergencyNoticeEndISO"/>
+            <column name="value" value="2023-10-22T22:00:00.000Z"/>
+        </insert>
+        <insert tableName="configuration">
+            <column name="key" value="isEmergencyNoticeVisible"/>
+            <column name="value" value="false"/>
+        </insert>
     </changeSet>
 </databaseChangeLog>

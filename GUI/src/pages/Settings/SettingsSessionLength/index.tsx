@@ -14,7 +14,7 @@ const SettingsSessionLength: FC = () => {
   const { data } = useQuery({
     queryKey: ['account/session-length', 'prod'],
     onSuccess: (res: any) =>
-      setSessionLength(res.data.cs_get_session_length[0].value ?? ''),
+      setSessionLength(res.response ?? ''),
   });
 
   const sessionLengthMutation = useMutation({

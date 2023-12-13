@@ -25,7 +25,7 @@ const SettingsUsers: FC = () => {
   const { data: users } = useQuery<User[]>({
     queryKey: ['account/customer-support-agents', 'prod'],
     onSuccess(res: any) {
-      setUsersList(res.data.get_customer_support_agents);
+      setUsersList(res.response);
     },
   });
   const columnHelper = createColumnHelper<User>();

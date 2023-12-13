@@ -3,18 +3,18 @@ getEmergencyNotice:
   args:
     url: "[#CHATBOT_RESQL]/get-emergency-notice"
   result: res
-  next: validateEmergencyNoticeExists
+  next: validate_res
 
-validateEmergencyNoticeExists:
+validate_res:
   switch:
-    - condition: "${getEmergencyNoticeResult.response.body.length > 0}"
-      next: returnSuccess
-  next: returnNotFound
+    - condition: "${res.response.body.length > 0}"
+      next: return_response
+  next: return_not_found
 
-returnSuccess:
+return_response:
   return: ${res.response.body}
   next: end
 
-returnNotFound:
+return_not_found:
   return: "error: not found"
   next: end

@@ -13,21 +13,21 @@ const Layout: FC = () => {   const CACHE_NAME = 'mainmenu-cache';
 
     const [MainMenuItems, setMainMenuItems] = useState([])
 
-    const  {data, isLoading, status}  = useQuery({
-        queryKey: [import.meta.env.REACT_APP_MENU_URL + import.meta.env.REACT_APP_MENU_PATH],
-        onSuccess: (res: any) => {
-            try {
-                setMainMenuItems(res);
-                localStorage.setItem(CACHE_NAME, JSON.stringify(res));
-            } catch (e) {
-                console.log(e);
-            }
-        },
-        onError: (error: any) => {
-            setMainMenuItems(getCache());
-        }
+    // const  {data, isLoading, status}  = useQuery({
+    //     queryKey: [import.meta.env.REACT_APP_MENU_URL + import.meta.env.REACT_APP_MENU_PATH],
+    //     onSuccess: (res: any) => {
+    //         try {
+    //             setMainMenuItems(res);
+    //             localStorage.setItem(CACHE_NAME, JSON.stringify(res));
+    //         } catch (e) {
+    //             console.log(e);
+    //         }
+    //     },
+    //     onError: (error: any) => {
+    //         setMainMenuItems(getCache());
+    //     }
 
-    });
+    // });
 
     function getCache(): any {
         const cache = localStorage.getItem(CACHE_NAME) || '{}';
