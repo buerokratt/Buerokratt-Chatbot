@@ -8,11 +8,22 @@ getWidgetConfig:
 validate_response:
   switch:
     - condition: "${res.response.body.length > 0}"
-      next: return_result
+      next: mapWidgetConfigData
   next: return_not_found
 
+mapWidgetConfigData:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/return_widget_config"
+    headers:
+      type: json
+    body:
+      configurationArray: ${res.response.body}
+  result: formattedData
+  next: return_result
+
 return_result:
-  return: ${res.response.body}
+  return: ${formattedData.response.body}
   next: end
 
 return_not_found:

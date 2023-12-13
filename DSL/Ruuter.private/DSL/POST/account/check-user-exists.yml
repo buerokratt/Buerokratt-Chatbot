@@ -18,7 +18,9 @@ checkIfUserExists:
   next: return_not_exists
 
 return_exists:
-  return: true
+  return: "true"
+  next: end
 
 return_not_exists:
-  return: false
+  return: "false"
+  next: end

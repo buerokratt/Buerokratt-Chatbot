@@ -35,7 +35,7 @@ addUser:
       userIdCode: ${userIdCode}
       displayName: ${displayName}
       csaTitle: ${csaTitle}
-      csa_email: ${csa_email}
+      csaEmail: ${csa_email}
   result: add_user_res
   next: addRoles
 

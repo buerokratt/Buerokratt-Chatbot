@@ -22,5 +22,5 @@ setWidgetConfig:
   result: res
 
 return_result:
-  return: ${re.response.body}
+  return: ${res.response.body}
   next: end

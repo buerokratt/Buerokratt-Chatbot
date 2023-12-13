@@ -26,7 +26,7 @@ const SettingsEmergencyNotices: FC = () => {
   const [emergencyNoticeText, setEmergencyNoticeText] = useState('');
   const { data: emergencyNotice } = useQuery<EmergencyNotice>({
     queryKey: ['configs/emergency-notice', 'prod'],
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       const res = data.response;
       if (Object.keys(control._formValues).length > 0) return;
       setIsEmergencyNoticeVisible(res.isEmergencyNoticeVisible ?? false);

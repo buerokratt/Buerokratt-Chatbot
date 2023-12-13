@@ -7,7 +7,7 @@ extractRequestData:
     csaTitle: ${incoming.body.csaTitle}
     csa_email: ${incoming.body.csa_email}
     roles: ${incoming.body.roles}
-
+ 
 getUser:
   call: http.post
   args:
@@ -35,7 +35,7 @@ updateUser:
       userIdCode: ${userIdCode}
       displayName: ${displayName}
       csaTitle: ${csaTitle}
-      csa_email: ${csa_email}
+      csaEmail: ${csa_email}
   result: add_user_res
   next: updateRoles
 

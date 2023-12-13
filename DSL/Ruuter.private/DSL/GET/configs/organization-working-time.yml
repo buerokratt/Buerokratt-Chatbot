@@ -19,9 +19,9 @@ mapWorkingTimeData:
     body:
       configurationArray: ${getOrganizationWorkingTimeValueResult.response.body}
   result: workingTimeData
-  next: returnSuccess
+  next: return_result
 
-returnSuccess:
+return_result:
   return: ${workingTimeData.response.body}
   next: end
 
