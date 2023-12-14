@@ -98,7 +98,7 @@ postChat:
       forwardedTo: ${chat.forwardedTo}
       forwardedToName: ${chat.forwardedToName}
       receivedFrom: ${chat.receivedFrom}
-      reveivedFromName: ${chat.receivedFromName ?? ""}
+      receivedFromName: ${chat.receivedFromName ?? ""}
   result: post_chat_res
   next: return_result    
 

@@ -94,7 +94,7 @@ endChat:
       forwardedTo: ${activeChat.forwardedTo}
       forwardedToName: ${activeChat.forwardedToName}
       receivedFrom: ${activeChat.receivedFrom}
-      reveivedFromName: ${activeChat.reveivedFromName}
+      receivedFromName: ${activeChat.receivedFromName}
   result: end_chat_res
   next: return_result    
 

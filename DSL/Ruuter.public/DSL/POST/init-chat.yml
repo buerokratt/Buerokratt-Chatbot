@@ -55,7 +55,7 @@ get_session_length:
 generate_cookie:
   call: http.post
   args:
-    url: "[#CHATBOT_TIM]:[#CHATBOT_TIM_PORT]/jwt/custom-jwt-generate"
+    url: "[#CHATBOT_TIM]/jwt/custom-jwt-generate"
     body:
       JWTName: "chatJwt"
       expirationInMinutes: ${session_result.response.body[0].value}
@@ -74,7 +74,7 @@ assign_cookie:
       Domain: "[#DOMAIN]"
       Secure: true
       HttpOnly: true
-  next: setCustomerSupportAgentAway
+  next: postGreetingMessage
 
 postGreetingMessage:
   call: http.post
@@ -131,18 +131,17 @@ insertChat:
       forwardedTo: ""
       forwardedToName: ""
       receivedFrom: ""
-      reveivedFromName: ""
+      receivedFromName: ""
   result: insertMessageResult
   next: postMessageToBot 
 
 postMessageToBot:
   call: http.post
   args:
-    url: "[#CHATBOT_RUUTER_PUBLIC]/post-message-to-bot"
+    url: "[#CHATBOT_RUUTER_PUBLIC]/message-to-bot"
     body:
       chatId: ${chatUuid}
       content: ${content}
-      authorId: ${endUserId}
       holidays: ${holidays}
       holidayNames: ${holidayNames}
   result: message_result

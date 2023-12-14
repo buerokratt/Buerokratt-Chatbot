@@ -66,7 +66,7 @@ insertChat:
       forwardedTo: ""
       forwardedToName: ""
       receivedFrom: ${activeChat.receivedFrom}
-      reveivedFromName: ""
+      receivedFromName: ""
   result: insert_chat_res
   next: return_result
 
