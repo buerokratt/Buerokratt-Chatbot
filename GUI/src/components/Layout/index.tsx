@@ -1,7 +1,7 @@
 import { FC, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import useStore from 'store';
-import { MainNavigation } from '@exirain/header/src';
+import { MainNavigation } from '@buerokratt-ria/menu/src';
 import { Header } from '@buerokratt-ria/header/src';
 import './Layout.scss';
 import {useQuery} from "@tanstack/react-query";
