@@ -215,6 +215,7 @@ services:
       - REACT_APP_RUUTER_V1_PRIVATE_API_URL=http://localhost:8090
       - REACT_APP_RUUTER_V2_PRIVATE_API_URL=http://localhost:8088
       - REACT_APP_CUSTOMER_SERVICE_LOGIN=http://localhost:3004/et/dev-auth
+      - DEBUG_ENABLED=true
       - CHOKIDAR_USEPOLLING=true
       - PORT=3001
     build:
@@ -293,7 +294,7 @@ services:
     volumes:
       - ./notification-server:/app
       - ./notification-server/node_modules:/app/node_modules
-    command: ["npm", "run", "dev"]
+    command: [ "npm", "run", "dev" ]
     networks:
       - bykstack
 
@@ -308,7 +309,7 @@ services:
       - notifications-node
     networks:
       - bykstack
-  
+
 volumes:
   opensearch-data:
 networks:
