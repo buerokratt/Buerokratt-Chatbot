@@ -70,10 +70,9 @@ assign_cookie:
   assign:
     setCookie:
       chatJwt: ${cookie_result.response.body.token}
-      maxAge: 7200
       Domain: "[#DOMAIN]"
-      Secure: true
-      HttpOnly: true
+      Secure: false
+      HttpOnly: false
   next: postGreetingMessage
 
 postGreetingMessage:
@@ -99,14 +98,14 @@ postClientMessage:
       authorId: ${endUserId}
       authorFirstName: ""
       authorRole: ${authorRole}
-      created: ${instant}
+      created: ${new Date().toISOString()}
       authorLastName: ""
       rating: ""
       forwardedByUser: ${forwardedByUser}
       forwardedFromCsa: ${forwardedFromCsa}
       forwardedToCsa: ${forwardedToCsa}
   result: insertMessageResult
-  next: insertChat 
+  next: insertChat
 
 insertChat:
   call: http.post
@@ -133,29 +132,34 @@ insertChat:
       receivedFrom: ""
       receivedFromName: ""
   result: insertMessageResult
-  next: postMessageToBot 
+  next: postMessageToBot
 
 postMessageToBot:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RUUTER_PUBLIC]/message-to-bot"
-    body:
+  template: templates/message-to-bot
+  requestType: post
+  body:
       chatId: ${chatUuid}
       content: ${content}
       holidays: ${holidays}
       holidayNames: ${holidayNames}
-  result: message_result
-  next: getInsertedChat
+  result: message_to_bot_result
+  next: return_ssss
 
-getInsertedChat:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RESQL]/get-chat-by-id"
-    body:
-      id: ${chatUuid}
-  result: chat_result
-  next: returnSuccess
+return_ssss:
+   return: ${message_to_bot_result.response.body}
+   next: end
 
-returnSuccess:
-  return: ${chat_result.response.body}
-  next: end
+# check_authority_result:
+#   call: http.post
+#   args:
+#     url: "[#CHATBOT_RESQL]/get-chat-by-id"
+#     body:
+#       id: ${chatUuid}
+#   result: chat_result
+#   next: return_result
+
+# return_result:
+#   headers:
+#     Set-Cookie: ${setCookie}
+#   return: ${chat_result.response.body}
+#   next: end

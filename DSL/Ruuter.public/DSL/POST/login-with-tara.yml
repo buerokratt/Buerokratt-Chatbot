@@ -34,7 +34,6 @@ assign_cookie:
   assign:
     setCookie:
       customJwtCookie: ${cookie_result.response.body.token}
-      maxAge: 28800
       Domain: "[#DOMAIN]"
       Secure: false
       HttpOnly: false

@@ -83,7 +83,7 @@ check_if_bot_is_unable_to_reply:
   switch:
     - condition: ${post_message_to_client_result.response.body[0].text == 'Suunan teid klienditeenindajale. Varuge natukene kannatust.'}
       next: get_organization_working_details
-  next: add_bot_message_to_db
+  next: convert_bot_responses_to_messages
 
 get_organization_working_details:
   call: http.post
@@ -199,14 +199,16 @@ convert_bot_responses_to_messages:
     headers:
       type: json
     body:
-      botMessages: ${post_message_to_client_result.response.body}
-      chatId: ${chatId}
-      authorId: ${get_bot_name_result.response.body[0].value}
-      authorFirstName: ""
-      authorLastName: ""
-      authorTimestamp: ${instant_result.response.body.instant}
-      created: ${instant_result.response.body.instant}
-  result: converted_messages_return
+      data: {
+        "botMessages": "${post_message_to_client_result.response.body}",
+        "chatId": "${chatId}",
+        "authorId": "${get_bot_name_result.response.body[0].value}",
+        "authorFirstName": "",
+        "authorLastName": "",
+        "authorTimestamp": "${new Date().toISOString()}",
+        "created": "${new Date().toISOString()}"
+      }
+  result: converted_messages_res
   next: add_bot_message_to_db
 
 add_bot_message_to_db:
@@ -214,8 +216,8 @@ add_bot_message_to_db:
   args:
     url: "[#CHATBOT_RESQL]/insert-bot-message"
     body:
-      messages: ${post_message_to_client_result.response.body}
-  result: post_message_to_client_result
+      messages: ${converted_messages_res.response.body}
+  result: add_bot_message_to_bot_result
   next: return_message_sent
 
 return_is_holiday:
