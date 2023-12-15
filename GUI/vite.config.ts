@@ -7,9 +7,6 @@ import path from 'path';
 // https://vitejs.dev/config/
 export default defineConfig({
   envPrefix: 'REACT_APP_',
-  define: {
-    process: process
-  },
   plugins: [react(), tsconfigPaths(), svgr()],
   base: 'chat',
   build: {
