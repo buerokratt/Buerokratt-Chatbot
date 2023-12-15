@@ -1,0 +1,11 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/GUI"
+    schedule:
+      time: "08:00"
+      interval: "daily"
+    allow:
+      - dependency-name: "@buerokratt-ria/header"
+      - dependency-name: "@buerokratt-ria/styles"
+    open-pull-requests-limit: 3
