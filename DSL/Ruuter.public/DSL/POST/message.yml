@@ -1,9 +1,8 @@
 extractRequestData:
   assign:
-    chatId: ${incoming.body.chatId}
-    authorTimestamp: ${incoming.body.authorTimestamp}
-    authorRole: ${incoming.body.authorRole}
-    content: ${incoming.body.content}
+    authorTimestamp: ${incoming.body.message.authorTimestamp}
+    authorRole: ${incoming.body.message.authorRole}
+    content: ${incoming.body.message.content}
     event: ${incoming.body.event}
     holidays: ${incoming.body.holidays}
     holidayNames: ${incoming.body.holidayNames}
@@ -45,13 +44,8 @@ getActiveChatById:
 checkActiveChatResult:
   switch:
     - condition: ${activeChatRes.response.body.length > 0}
-      next: assignInstant
+      next: getUuid
   next: return_chat_ended
-
-assignInstant:
-  assign:
-    instant: ${new Date().toISOString()}
-  next: getUuid
 
 getUuid:
   call: http.post
@@ -74,22 +68,83 @@ insertMessage:
     body:
       chatId: ${chatId}
       messageId: ${uuid}
-      content: ${content}
+      content: ${content ?? ""}
       authorTimestamp: ${authorTimestamp}
-      authorId: ${idCode}
-      authorFirstName: ${authorFirstName}
+      authorId: ""
+      authorFirstName: ""
       authorRole: ${authorRole}
-      created: ${instant}
+      created: ${new Date().toISOString()}
       authorLastName: ""
       rating: ""
-      event: ""
+      event: ${event ?? ""}
       forwardedByUser: ""
       forwardedFromCsa: ""
       forwardedToCsa: ""
   result: insertMessageResult
-  next: returnSuccess  
+  next: postMessageToBot
 
-returnSuccess:
+postMessageToBot:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RUUTER_PUBLIC]/message-to-bot"
+    body:
+      chatId: ${chatId}
+      content: ${content}
+      holidays: ${holidays}
+      holidayNames: ${holidayNames}
+  result: message_to_bot_result
+  next: clearChatList
+
+clearChatList:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query"
+    body:
+     query:
+      term:
+       channelId: "chat-list"
+  result: clear_chat_res
+  next: postNotificationAboutAddedChat
+
+postNotificationAboutAddedChat:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
+    body:
+     channelId: "chat-list"
+     timestamp: ${new Date().toISOString()}
+     payload: {
+        "status": "Chat Status Changed"
+     }
+  result: chat_notification_result
+  next: clearMessages
+
+clearMessages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query"
+    body:
+     query:
+      term:
+       channelId: ${chatId}
+  result: clear_messages_res
+  next: postNotificationAboutMessageResponse 
+
+postNotificationAboutMessageResponse:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
+    body:
+     channelId: ${chatId}
+     timestamp: ${new Date().toISOString()}
+     payload: {
+        "type": "message",
+        "messageId": "${uuid}"
+     }
+  result: message_notification_result
+  next: return_result 
+
+return_result:
   return: "Message Sent Successfully"
   next: end
 
@@ -100,5 +155,5 @@ return_chat_ended:
 
 return_bad_request:
   status: 400
-  return: false
+  return: "Error: Bad Request"
   next: end  

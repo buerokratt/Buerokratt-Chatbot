@@ -10,7 +10,7 @@ import Track from 'components/Track';
 import './Typing.scss';
 
 type PreviewMessageProps = {
-  message: Message;
+  preview: string;
   onSelect: (message: Message) => void;
   readStatus: {
     current: MessageStatus;
@@ -18,17 +18,17 @@ type PreviewMessageProps = {
 };
 
 const PreviewMessage: FC<PreviewMessageProps> = ({
-  message,
+  preview,
   onSelect,
   readStatus,
 }) => {
   return (
     <div className={clsx('active-chat__messageContainer')}>
-      {!!message.preview && message.preview && (
+      {!!preview && preview && (
         <div className={clsx('active-chat__message-preview')}>
-          {!!message.preview && (
+          {!!preview && (
             <Track>
-              <Linkifier message={decodeURIComponent(message.preview ?? '')} />
+              <Linkifier message={decodeURIComponent(preview ?? '')} />
               <div className="typing">
                 <span></span>
                 <span></span>

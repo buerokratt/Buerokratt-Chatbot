@@ -28,7 +28,6 @@ assign_cookie:
   assign:
     setCookie:
       chatJwt: ${cookie_result.response.body.token}
-      maxAge: ${sessionLength}
       Domain: "[#DOMAIN]"
       Secure: false
       HttpOnly: false

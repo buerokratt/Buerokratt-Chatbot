@@ -1,6 +1,6 @@
 extractRequestData:
   assign:
-    chatId: ${incoming.body.chatId}
+    chatId: ${incoming.params.chatId}
 
 getMessagePreview:
   call: http.post
@@ -10,5 +10,5 @@ getMessagePreview:
       chatId: ${chatId}
   result: res
 
-returnSuccess:
-  return: ${res.response.body}
+return_result:
+  return: ${res.response.body[0].preview}

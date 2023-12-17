@@ -9,7 +9,7 @@ get_chat_info:
    url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
    contentType: plaintext
    headers:
-    cookie: ${cookie}
+    cookie: ${incoming.headers.cookie}
    plaintext:
       "chatJwt"
   result: infoRes

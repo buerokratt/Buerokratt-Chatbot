@@ -1,7 +1,7 @@
 extractRequestData:
   assign:
-    chatId: ${incoming.body.chatId}
-    lastRead: ${incoming.body.lastRead}
+    chatId: ${incoming.params.chatId}
+    lastRead: ${incoming.params.lastRead}
 
 getNewMessages:
   call: http.post

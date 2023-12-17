@@ -57,23 +57,24 @@ const ChatActive: FC = () => {
   const { refetch } = useQuery<ChatType[]>({
     queryKey: ['csa/active-chats', 'prod'],
     onSuccess(res: any) {
-      const isChatStillExists = res.data.get_all_active_chats?.filter(function (
+      const isChatStillExists = res.response?.filter(function (
         e: any
       ) {
         return e.id === selectedChatId;
       });
       if (isChatStillExists.length === 0 && activeChatsList.length > 0) {
         setTimeout(function () {
-          setActiveChatsList(res.data.get_all_active_chats);
+          setActiveChatsList(res.response);
         }, 3000);
       } else {
-        setActiveChatsList(res.data.get_all_active_chats);
+        setActiveChatsList(res.response);
       }
     },
   });
 
   useEffect(() => {
-    const onMessage = (chats: any) => {
+    const onMessage = () => {
+      const chats = apiDev.get('csa/active-chats') ?? [];
       const isChatStillExists = chats?.filter(function (e: any) {
         return e.id === selectedChatId;
       });
@@ -86,7 +87,7 @@ const ChatActive: FC = () => {
       }
     };
 
-    const events = sse(`csa/active-chats`, onMessage);
+    const events = sse(`/chat-list`, onMessage);
 
     return () => {
       events.close();

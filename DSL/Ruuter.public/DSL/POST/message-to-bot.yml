@@ -1,15 +1,9 @@
-check_for_required_parameters:
-  switch:
-    - condition: ${incoming.body.chatId == null || incoming.body.holidays == null || incoming.body.holiday_names == null || incoming.body.content == null}
-      next: return_missing_body_parameters
-  next: extractRequestData
-
 extractRequestData:
   assign:
     chatId: ${incoming.body.chatId}
     content: ${incoming.body.content}
     holidays: ${incoming.body.holidays}
-    holiday_names: ${incoming.body.holiday_names}
+    holidayNames: ${incoming.body.holidayNames}
   next: check_bot_is_active
 
 check_bot_is_active:
@@ -91,7 +85,7 @@ get_organization_working_details:
     url: "[#CHATBOT_RESQL]/get-is-organization-available"
     body:
       holidays: ${holidays}
-      holiday_names: ${holiday_names}
+      holiday_names: ${holidayNames}
       current_timestamp: ${new Date().toISOString()}
   result: org_res
   next: assign_organization_details

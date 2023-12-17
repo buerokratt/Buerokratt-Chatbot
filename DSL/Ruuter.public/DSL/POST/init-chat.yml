@@ -135,31 +135,77 @@ insertChat:
   next: postMessageToBot
 
 postMessageToBot:
-  template: templates/message-to-bot
-  requestType: post
-  body:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RUUTER_PUBLIC]/message-to-bot"
+    body:
       chatId: ${chatUuid}
       content: ${content}
       holidays: ${holidays}
       holidayNames: ${holidayNames}
   result: message_to_bot_result
-  next: return_ssss
+  next: getChat
 
-return_ssss:
-   return: ${message_to_bot_result.response.body}
-   next: end
+getChat:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-chat-by-id"
+    body:
+      id: ${chatUuid}
+  result: chat_result
+  next: clearChatList
 
-# check_authority_result:
-#   call: http.post
-#   args:
-#     url: "[#CHATBOT_RESQL]/get-chat-by-id"
-#     body:
-#       id: ${chatUuid}
-#   result: chat_result
-#   next: return_result
+clearChatList:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query"
+    body:
+     query:
+      term:
+       channelId: "chat-list"
+  result: clear_chat_res
+  next: postNotificationAboutAddedChat 
 
-# return_result:
-#   headers:
-#     Set-Cookie: ${setCookie}
-#   return: ${chat_result.response.body}
-#   next: end
+postNotificationAboutAddedChat:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
+    body:
+     channelId: "chat-list"
+     timestamp: ${new Date().toISOString()}
+     payload: {
+        "status": "Chat Status Changed"
+     }
+  result: chat_notification_result
+  next: clearMessages
+
+clearMessages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query"
+    body:
+     query:
+      term:
+       channelId: ${chatUuid}
+  result: clear_messages_res
+  next: postNotificationAboutMessageResponse 
+
+postNotificationAboutMessageResponse:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
+    body:
+     channelId: ${chatUuid}
+     timestamp: ${new Date().toISOString()}
+     payload: {
+        "type": "message",
+        "messageId": "${messageUuid}"
+     }
+  result: message_notification_result
+  next: return_result  
+
+return_result:
+  headers:
+    Set-Cookie: ${setCookie}
+  return: ${chat_result.response.body[0]}
+  next: end
