@@ -7,22 +7,26 @@ const client = new Client({
 });
 
 async function searchNotification({ channelId, connectionId, callback }) {
-  const response = await client.search({
-    index: openSearchConfig.notificationIndex,
-    body: {
-      query: {
-        bool: {
-          must: { match: { channelId } },
-          must_not: { match: { sentTo: connectionId } },
+  try {
+    const response = await client.search({
+      index: openSearchConfig.notificationIndex,
+      body: {
+        query: {
+          bool: {
+            must: { match: { channelId } },
+            must_not: { match: { sentTo: connectionId } },
+          },
         },
+        sort: { timestamp: { order: "asc" } },
       },
-      sort: { timestamp: { order: "asc" } },
-    },
-  });
+    });
 
-  for (const hit of response.body.hits.hits) {
-    await callback(hit._source.payload);
-    await markAsSent(hit, connectionId);
+    for (const hit of response.body.hits.hits) {
+      await callback(hit._source.payload);
+      await markAsSent(hit, connectionId);
+    }
+  } catch (e) {
+    await callback({});
   }
 }
 
