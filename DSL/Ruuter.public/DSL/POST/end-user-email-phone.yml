@@ -1,8 +1,8 @@
 assignIncoming:
   assign:
-    chatId: "${incoming.body.chatId}"
-    email: "${incoming.body.endUserEmail}"
-    phone: "${incoming.body.endUserPhone}"
+    chatId: ${incoming.body.chatId}
+    email: ${incoming.body.endUserEmail}
+    phone: ${incoming.body.endUserPhone}
 
 checkChatId:
   switch:

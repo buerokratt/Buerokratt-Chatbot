@@ -1,9 +1,9 @@
 assignIncoming:
   assign:
-    chatId: "${incoming.body.chatId}"
-    id: "${incoming.body.endUserId}"
-    firstName: "${incoming.body.endUserFirstName}"
-    lastName: "${incoming.body.endUserLastName}"
+    chatId: ${incoming.body.chatId}
+    id: ${incoming.body.endUserId}
+    firstName: ${incoming.body.endUserFirstName}
+    lastName: ${incoming.body.endUserLastName}
 
 checkChatId:
   switch:

@@ -1,13 +1,13 @@
 extractRequestData:
   assign:
-    chatId: "${incoming.body.chatId}"
-    text: "${incoming.body.feedbackText}"
+    chatId: ${incoming.body.chatId}
+    text: ${incoming.body.feedbackText}
 
 check_text_limit:
   switch:
-    - condition: ${text.length >= 1 && text.length =< 500}
-      next: addFeedbackText
-  next: return_invalid_text
+    - condition: ${text === null || text === 'null'}
+      next: return_invalid_text
+  next: addFeedbackText
 
 addFeedbackText:
   call: http.post
@@ -18,6 +18,10 @@ addFeedbackText:
       created: ${new Date().toISOString()}
       feedbackText: ${text}
   result: res
+  next: return_result
+
+return_result:
+  return: "Added Chat Feedback Successfully"
   next: end
 
 return_invalid_text:

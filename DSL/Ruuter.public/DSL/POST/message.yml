@@ -3,7 +3,7 @@ extractRequestData:
     authorTimestamp: ${incoming.body.message.authorTimestamp}
     authorRole: ${incoming.body.message.authorRole}
     content: ${incoming.body.message.content}
-    event: ${incoming.body.event}
+    event: ${incoming.body.message.event}
     holidays: ${incoming.body.holidays}
     holidayNames: ${incoming.body.holidayNames}
     cookie: ${incoming.headers.cookie}
