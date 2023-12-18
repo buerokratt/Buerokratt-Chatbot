@@ -8,7 +8,7 @@
         "type": "object"
       },
       "timestamp": {
-        "type": "long"
+        "type": "keyword"
       },
       "sentTo": {
         "type": "keyword"

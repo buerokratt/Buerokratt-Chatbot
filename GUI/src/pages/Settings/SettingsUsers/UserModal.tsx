@@ -114,7 +114,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
     mutationFn: ({ userData }: { userData: UserDTO }) =>
       checkIfUserExists(userData),
     onSuccess: async (data) => {
-      if (data.data.check_user_exists !== undefined) {
+      if (data.response === 'true') {
         toast.open({
           type: 'error',
           title: t('global.notificationError'),

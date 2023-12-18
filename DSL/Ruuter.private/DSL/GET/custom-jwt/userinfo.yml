@@ -1,7 +1,7 @@
 get_user_info:
   call: http.post
   args:
-   url: "[#CHATBOT_TIM]:[#CHATBOT_TIM_PORT]/jwt/custom-jwt-userinfo"
+   url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
    contentType: plaintext
    headers:
     cookie: ${incoming.headers.cookie}

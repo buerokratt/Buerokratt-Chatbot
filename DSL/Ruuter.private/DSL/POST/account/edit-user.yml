@@ -7,11 +7,11 @@ extractRequestData:
     csaTitle: ${incoming.body.csaTitle}
     csa_email: ${incoming.body.csa_email}
     roles: ${incoming.body.roles}
-
+ 
 getUser:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-user"
+    url: "[#CHATBOT_RESQL]/get-user"
     body:
       userIdCode: ${userIdCode}
   result: res
@@ -26,7 +26,7 @@ checkIfUserExists:
 updateUser:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/update-user"
+    url: "[#CHATBOT_RESQL]/update-user"
     body:
       created: ${new Date().toISOString()}
       status: "active"
@@ -35,14 +35,14 @@ updateUser:
       userIdCode: ${userIdCode}
       displayName: ${displayName}
       csaTitle: ${csaTitle}
-      csa_email: ${csa_email}
+      csaEmail: ${csa_email}
   result: add_user_res
   next: updateRoles
 
 updateRoles:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/update-user-role"
+    url: "[#CHATBOT_RESQL]/update-user-role"
     body:
       userIdCode: ${userIdCode}
       roles: ${roles}

@@ -253,7 +253,7 @@ const Header: FC = () => {
     mutationFn: async () => {
       const {
         data: { data },
-      } = await apiDev.post('custom-jwt/extend', {});
+      } = await apiDev.post('extend', {});
       if (data.custom_jwt_extend === null) return;
       setNewCookie(data.custom_jwt_extend);
     },

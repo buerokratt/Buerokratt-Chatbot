@@ -1,0 +1,40 @@
+getConfigurationValue:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-configuration"
+    body:
+      key: "end_user_session_length"
+  result: res
+  next: assignSessionLength
+
+assignSessionLength:
+  assign:
+    sessionLength: ${res.response.body[0].value}
+  next: extend_cookie  
+
+extend_cookie:
+  call: http.post
+  args:
+    url: "[#CHATBOT_TIM]/jwt/custom-jwt-extend"
+    contentType: plaintext
+    headers:
+      cookie: ${incoming.headers.cookie}
+    plaintext: 
+      "chatJwt"
+  result: cookie_result
+  next: assign_cookie
+
+assign_cookie:
+  assign:
+    setCookie:
+      chatJwt: ${cookie_result.response.body.token}
+      Domain: "[#DOMAIN]"
+      Secure: false
+      HttpOnly: false
+  next: return_value
+
+return_value:
+  headers:
+    Set-Cookie: ${setCookie}
+  return: ${cookie_result.response.body.token}
+  next: end 

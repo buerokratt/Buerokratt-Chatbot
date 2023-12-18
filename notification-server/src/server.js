@@ -1,12 +1,15 @@
-const express = require('express');
-const { buildSSEResponse } = require('./sseUtil');
-const { serverConfig } = require('./config');
+const express = require("express");
+const cors = require("cors");
+const { buildSSEResponse } = require("./sseUtil");
+const { serverConfig } = require("./config");
 
 const app = express();
 
-app.get('/sse/notifications/:channelId', (req, res) => {
+app.use(cors());
+
+app.get("/sse/notifications/:channelId", (req, res) => {
   const { channelId } = req.params;
-  buildSSEResponse({req, res, channelId});
+  buildSSEResponse({ req, res, channelId });
 });
 
 const server = app.listen(serverConfig.port, () => {

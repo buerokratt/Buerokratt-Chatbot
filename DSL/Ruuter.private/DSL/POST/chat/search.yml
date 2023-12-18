@@ -5,7 +5,7 @@ extractRequestData:
 getChatById:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-chat-ids-matching-message-search"
+    url: "[#CHATBOT_RESQL]/get-chat-ids-matching-message-search"
     body:
       searchKey: ${searchKey}
   result: res

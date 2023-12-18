@@ -6,7 +6,7 @@ extractRequestData:
 setChatLabels:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/insert-chat-history-labels"
+    url: "[#CHATBOT_RESQL]/insert-chat-history-labels"
     body:
       labels: ${labels}
       chatId: ${chatId}

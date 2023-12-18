@@ -11,7 +11,7 @@ extractRequestData:
 getActiveChatById:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-active-chat-by-id"
+    url: "[#CHATBOT_RESQL]/get-active-chat-by-id"
     body:
       id: ${id}
   result: activeChatRes
@@ -31,36 +31,36 @@ assignChat:
 redirectChat:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/insert-chat"
+    url: "[#CHATBOT_RESQL]/insert-chat"
     body:
       id: ${id}
       customerSupportId: ${customerSupportId}
       customerSupportDisplayName: ${customerSupportDisplayName}
       csaTitle: ${csaTitle}
-      endUserId: ${activeChat.endUserId}
-      endUserFirstName: ${activeChat.endUserFirstName}
-      endUserLastName: ${activeChat.endUserLastName}
+      endUserId: ${activeChat.endUserId ?? ""}
+      endUserFirstName: ${activeChat.endUserFirstName ?? ""}
+      endUserLastName: ${activeChat.endUserLastName ?? ""}
       status: "REDIRECTED"
-      endUserEmail: ${activeChat.endUserEmail}
-      endUserPhone: ${activeChat.endUserPhone}
-      endUserOs: ${activeChat.endUserOs}
-      endUserUrl: ${activeChat.endUserUrl}
+      endUserEmail: ${activeChat.endUserEmail ?? ""}
+      endUserPhone: ${activeChat.endUserPhone ?? ""}
+      endUserOs: ${activeChat.endUserOs ?? ""}
+      endUserUrl: ${activeChat.endUserUrl ?? ""}
       feedbackText: ""
       feedbackRating: ""
-      externalId: ${activeChat.externalId}
-      created: ${activeChat.created}
-      ended: ${activeChat.ended}
-      forwardedTo: ${activeChat.forwardedTo}
-      forwardedToName: ${activeChat.forwardedToName}
-      receivedFrom: ${activeChat.receivedFrom}
-      receivedFromName: ${activeChat.receivedFromName}
+      externalId: ${activeChat.externalId ?? ""}
+      created: ${activeChat.created ?? new Date().toISOString()}
+      ended: ${activeChat.ended ?? ""}
+      forwardedTo: ${activeChat.forwardedTo ?? ""}
+      forwardedToName: ${activeChat.forwardedToName ?? ""}
+      receivedFrom: ${activeChat.receivedFrom ?? ""}
+      receivedFromName: ${activeChat.receivedFromName ?? ""}
   result: redirectChatRes
   next: getUuid
 
 getUuid:
   call: http.post
   args:
-    url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/hbs/chat-bot/return_uuid"
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/return_uuid"
     headers:
       type: json
   result: uuid_result
@@ -74,9 +74,9 @@ assignUuid:
 insertMessage:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/insert-message"
+    url: "[#CHATBOT_RESQL]/insert-message"
     body:
-      chatId: ${activeChat.id}
+      chatId: ${activeChat.id ?? uuid}
       messageId: ${uuid}
       content: ""
       authorTimestamp: ${new Date().toISOString()}
@@ -91,16 +91,65 @@ insertMessage:
       forwardedFromCsa: ${forwardedFromCsa}
       forwardedToCsa: ${forwardedToCsa}
   result: insertMessageResult
-  next: getRedirectedChat 
+  next: clearChatList
+
+clearChatList:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query"
+    body:
+     query:
+      term:
+       channelId: "chat-list"
+  result: clear_chat_res
+  next: postNotificationAboutAddedChat
+
+postNotificationAboutAddedChat:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
+    body:
+     channelId: "chat-list"
+     timestamp: ${new Date().toISOString()}
+     payload: {
+        "status": "Chat Status Changed"
+     }
+  result: chat_notification_result
+  next: getRedirectedChat
 
 getRedirectedChat:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-active-chat-by-id"
+    url: "[#CHATBOT_RESQL]/get-active-chat-by-id"
     body:
       id: ${id}
   result: redirectedChatRes
-  next: return_result
+  next: clearMessages
+
+clearMessages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query"
+    body:
+     query:
+      term:
+       channelId: ${activeChat.id ?? uuid}
+  result: clear_messages_res
+  next: postNotificationAboutMessageResponse 
+
+postNotificationAboutMessageResponse:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
+    body:
+     channelId: ${activeChat.id ?? uuid}
+     timestamp: ${new Date().toISOString()}
+     payload: {
+        "type": "message",
+        "messageId": "${uuid}"
+     }
+  result: message_notification_result
+  next: return_result  
 
 return_result:
   return: ${redirectedChatRes.response.body}

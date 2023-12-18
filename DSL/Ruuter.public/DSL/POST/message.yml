@@ -1,10 +1,9 @@
 extractRequestData:
   assign:
-    chatId: ${incoming.body.chatId}
-    authorTimestamp: ${incoming.body.authorTimestamp}
-    authorRole: ${incoming.body.authorRole}
-    content: ${incoming.body.content}
-    event: ${incoming.body.event}
+    authorTimestamp: ${incoming.body.message.authorTimestamp}
+    authorRole: ${incoming.body.message.authorRole}
+    content: ${incoming.body.message.content}
+    event: ${incoming.body.message.event}
     holidays: ${incoming.body.holidays}
     holidayNames: ${incoming.body.holidayNames}
     cookie: ${incoming.headers.cookie}
@@ -13,7 +12,7 @@ extractRequestData:
 get_chat_info:
   call: http.post
   args:
-   url: "[#CHATBOT_TIM]:[#CHATBOT_TIM_PORT]/jwt/custom-jwt-userinfo"
+   url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
    contentType: plaintext
    headers:
     cookie: ${cookie}
@@ -36,7 +35,7 @@ assignChatId:
 getActiveChatById:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-active-chat-by-id"
+    url: "[#CHATBOT_RESQL]/get-active-chat-by-id"
     body:
       id: ${chatId}
   result: activeChatRes
@@ -45,18 +44,13 @@ getActiveChatById:
 checkActiveChatResult:
   switch:
     - condition: ${activeChatRes.response.body.length > 0}
-      next: assignInstant
+      next: getUuid
   next: return_chat_ended
-
-assignInstant:
-  assign:
-    instant: ${new Date().toISOString()}
-  next: getUuid
 
 getUuid:
   call: http.post
   args:
-    url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/hbs/chat-bot/return_uuid"
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/return_uuid"
     headers:
       type: json
   result: uuid_result
@@ -70,26 +64,87 @@ assignUuid:
 insertMessage:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/insert-message"
+    url: "[#CHATBOT_RESQL]/insert-message"
     body:
       chatId: ${chatId}
       messageId: ${uuid}
-      content: ${content}
+      content: ${content ?? ""}
       authorTimestamp: ${authorTimestamp}
-      authorId: ${idCode}
-      authorFirstName: ${authorFirstName}
+      authorId: ""
+      authorFirstName: ""
       authorRole: ${authorRole}
-      created: ${instant}
+      created: ${new Date().toISOString()}
       authorLastName: ""
       rating: ""
-      event: ""
+      event: ${event ?? ""}
       forwardedByUser: ""
       forwardedFromCsa: ""
       forwardedToCsa: ""
   result: insertMessageResult
-  next: returnSuccess  
+  next: postMessageToBot
 
-returnSuccess:
+postMessageToBot:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RUUTER_PUBLIC]/message-to-bot"
+    body:
+      chatId: ${chatId}
+      content: ${content}
+      holidays: ${holidays}
+      holidayNames: ${holidayNames}
+  result: message_to_bot_result
+  next: clearChatList
+
+clearChatList:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query"
+    body:
+     query:
+      term:
+       channelId: "chat-list"
+  result: clear_chat_res
+  next: postNotificationAboutAddedChat
+
+postNotificationAboutAddedChat:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
+    body:
+     channelId: "chat-list"
+     timestamp: ${new Date().toISOString()}
+     payload: {
+        "status": "Chat Status Changed"
+     }
+  result: chat_notification_result
+  next: clearMessages
+
+clearMessages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query"
+    body:
+     query:
+      term:
+       channelId: ${chatId}
+  result: clear_messages_res
+  next: postNotificationAboutMessageResponse 
+
+postNotificationAboutMessageResponse:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
+    body:
+     channelId: ${chatId}
+     timestamp: ${new Date().toISOString()}
+     payload: {
+        "type": "message",
+        "messageId": "${uuid}"
+     }
+  result: message_notification_result
+  next: return_result 
+
+return_result:
   return: "Message Sent Successfully"
   next: end
 
@@ -100,5 +155,5 @@ return_chat_ended:
 
 return_bad_request:
   status: 400
-  return: false
+  return: "Error: Bad Request"
   next: end  

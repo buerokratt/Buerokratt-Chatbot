@@ -104,8 +104,8 @@ const ChatHistory: FC = () => {
         endDate: data.endDate,
       }),
     onSuccess: (res: any) => {
-      setEndedChatsList(res.data.data.cs_get_all_ended_chats ?? []);
-      filterChatsList(res.data.data.cs_get_all_ended_chats ?? []);
+      setEndedChatsList(res.data.response ?? []);
+      filterChatsList(res.data.response ?? []);
     },
   });
 
@@ -116,14 +116,6 @@ const ChatHistory: FC = () => {
       }),
     onSuccess: (res: any) => {
       setSelectedChat(res.data.response);
-    },
-  });
-
-  useQuery<Message[]>({
-    queryKey: ['csa/messages-by-id', selectedChat?.id, 'prod'],
-    enabled: !!selectedChat,
-    onSuccess(res: any) {
-      setchatMessagesList(res.data.cs_get_messages_by_chat_id);
     },
   });
 
@@ -170,9 +162,9 @@ const ChatHistory: FC = () => {
         searchKey: searchKey,
       }),
     onSuccess: (res: any) => {
-      const responseList = (
-        res.data.data.get_chat_ids_matching_message_search ?? []
-      ).map((item: any) => item.chatId);
+      const responseList = (res.data.response ?? []).map(
+        (item: any) => item.chatId
+      );
       const filteredChats = endedChatsList.filter((item) =>
         responseList.includes(item.id)
       );
@@ -200,7 +192,7 @@ const ChatHistory: FC = () => {
 
       if (!isChangeable) return;
 
-      await apiDev.post('chat/end-chat', {
+      await apiDev.post('chat/status', {
         chatId: selectedChat!.id,
         event: data.event.toUpperCase(),
         authorTimestamp: new Date().toISOString(),

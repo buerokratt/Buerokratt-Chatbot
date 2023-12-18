@@ -1,7 +1,7 @@
 get_user_info:
   call: http.post
   args:
-   url: "[#CHATBOT_TIM]:[#CHATBOT_TIM_PORT]/jwt/custom-jwt-userinfo"
+   url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
    contentType: plaintext
    headers:
     cookie: ${incoming.headers.cookie}
@@ -24,13 +24,13 @@ assignIdCode:
 getCustomerSupportActivity:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-customer-support-activity-by-id-code"
+    url: "[#CHATBOT_RESQL]/get-customer-support-activity-by-id-code"
     body:
       customerSupportId: ${idCode}
   result: res
 
 return_result:
-  return: ${res.response.body}
+  return: ${res.response.body[0]}
   next: end
 
 return_bad_request:

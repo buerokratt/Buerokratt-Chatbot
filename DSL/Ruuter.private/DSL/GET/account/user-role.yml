@@ -1,7 +1,7 @@
 get_user_info:
   call: http.post
   args:
-   url: "[#CHATBOT_TIM]:[#CHATBOT_TIM_PORT]/jwt/custom-jwt-userinfo"
+   url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
    contentType: plaintext
    headers:
     cookie: ${incoming.headers.cookie}
@@ -24,14 +24,14 @@ assignIdCode:
 getUserRole:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-user-role"
+    url: "[#CHATBOT_RESQL]/get-user-role"
     body:
       userIdCode: ${idCode}
   result: roles_res
   next: returnSuccess
 
 returnSuccess:
-  return: ${roles_res.response.body}
+  return: ${roles_res.response.body[0].authorities}
   next: end
 
 returnNotFound:

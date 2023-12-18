@@ -2,13 +2,14 @@ extractRequestData:
   assign:
     chatId: "${incoming.body.chatId}"
     event: "${incoming.body.event}"
+    authorRole: ${incoming.body.authorRole}
     authorTimestamp: "${incoming.body.authorTimestamp}"
   next: deleteMessagePreview  
 
 deleteMessagePreview:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/delete-message-preview"
+    url: "[#CHATBOT_RESQL]/delete-message-preview"
     body:
       chatId: ${chatId}
   result: res
@@ -17,7 +18,7 @@ deleteMessagePreview:
 getMessageUuid:
   call: http.post
   args:
-    url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/hbs/chat-bot/return_uuid"
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/return_uuid"
     headers:
       type: json
   result: message_uuid_result
@@ -31,7 +32,7 @@ assignMessageUuid:
 getActiveChatById:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-active-chat-by-id"
+    url: "[#CHATBOT_RESQL]/get-active-chat-by-id"
     body:
       id: ${chatId}
   result: activeChatRes
@@ -51,7 +52,7 @@ assignChat:
 postMessage:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/insert-message"
+    url: "[#CHATBOT_RESQL]/insert-message"
     body:
       chatId: ${chatId}
       messageId: ${messageUuid}
@@ -60,7 +61,7 @@ postMessage:
       authorId: ""
       authorFirstName: ""
       authorLastName: ""
-      authorRole: "buerokratt"
+      authorRole: ${authorRole ?? "buerokratt"}
       created: ${new Date().toISOString()}
       rating: ""
       event: ${event}
@@ -72,36 +73,36 @@ postMessage:
 endChat:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/insert-chat"
+    url: "[#CHATBOT_RESQL]/insert-chat"
     body:
       id: ${activeChat.id}
-      customerSupportId: ${activeChat.customerSupportId}
-      customerSupportDisplayName: ${activeChat.customerSupportDisplayName}
-      csaTitle: ${activeChat.csaTitle}
-      endUserId: ${endUserId}
-      endUserFirstName: ${activeChat.endUserFirstName}
-      endUserLastName: ${activeChat.endUserLastName}
+      customerSupportId: ${activeChat.customerSupportId ?? ""}
+      customerSupportDisplayName: ${activeChat.customerSupportDisplayName ?? ""}
+      csaTitle: ${activeChat.csaTitle ?? ""}
+      endUserId: ${activeChat.endUserId ?? ""}
+      endUserFirstName: ${activeChat.endUserFirstName ?? ""}
+      endUserLastName: ${activeChat.endUserLastName ?? ""}
       status: "ENDED"
-      created: ${activeChat.created}
+      created: ${activeChat.created ?? new Date().toISOString()}
       ended: ${new Date().toISOString()}
-      feedbackRating: ${activeChat.feedbackRating}
-      feedbackText: ${activeChat.feedbackText}
-      endUserEmail: ${activeChat.endUserEmail}
-      endUserPhone: ${activeChat.endUserPhone}
-      endUserOs: ${activeChat.endUserOs}
-      endUserUrl: ${activeChat.endUserUrl}
-      externalId: ${activeChat.externalId}
-      forwardedTo: ${activeChat.forwardedTo}
-      forwardedToName: ${activeChat.forwardedToName}
-      receivedFrom: ${activeChat.receivedFrom}
-      reveivedFromName: ${activeChat.reveivedFromName}
+      feedbackRating: ${activeChat.feedbackRating ?? ""}
+      feedbackText: ${activeChat.feedbackText ?? ""}
+      endUserEmail: ${activeChat.endUserEmail ?? ""}
+      endUserPhone: ${activeChat.endUserPhone ?? ""}
+      endUserOs: ${activeChat.endUserOs ?? ""}
+      endUserUrl: ${activeChat.endUserUrl ?? ""}
+      externalId: ${activeChat.externalId ?? ""}
+      forwardedTo: ${activeChat.forwardedTo ?? ""}
+      forwardedToName: ${activeChat.forwardedToName ?? ""}
+      receivedFrom: ${activeChat.receivedFrom ?? ""}
+      receivedFromName: ${activeChat.receivedFromName ?? ""}
   result: end_chat_res
   next: blacklist_chat_jwt
 
 blacklist_chat_jwt:
   call: http.post
   args:
-   url: "[#CHATBOT_TIM]:[#CHATBOT_TIM_PORT]/jwt/custom-jwt-blacklist"
+   url: "[#CHATBOT_TIM]/jwt/custom-jwt-blacklist"
    contentType: plaintext
    headers:
     cookie: ${incoming.headers.cookie}
@@ -117,13 +118,13 @@ assign_chat_cookie:
       Domain: "[#DOMAIN]"
       Secure: false
       HttpOnly: true
-      maxAge: 0
+      Max-Age: 0
   next: blacklist_client_jwt     
 
 blacklist_client_jwt:
   call: http.post
   args:
-   url: "[#CHATBOT_TIM]:[#CHATBOT_TIM_PORT]/jwt/custom-jwt-blacklist"
+   url: "[#CHATBOT_TIM]/jwt/custom-jwt-blacklist"
    contentType: plaintext
    headers:
     cookie: ${incoming.headers.cookie}
@@ -139,10 +140,34 @@ assign_client_cookie:
       Domain: "[#DOMAIN]"
       Secure: false
       HttpOnly: true
-      maxAge: 0
-  next: return_value  
+      Max-Age: 0
+  next: clearChatList
 
-return_value:
+clearChatList:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query"
+    body:
+     query:
+      term:
+       channelId: "chat-list"
+  result: clear_chat_res
+  next: postNotificationAboutAddedChat
+
+postNotificationAboutAddedChat:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
+    body:
+     channelId: "chat-list"
+     timestamp: ${new Date().toISOString()}
+     payload: {
+        "status": "Chat Status Changed"
+     }
+  result: chat_notification_result
+  next: return_result
+
+return_result:
   headers:
     Set-Cookie: ${chatCookie}
     "\0Set-Cookie": ${clientCookie}

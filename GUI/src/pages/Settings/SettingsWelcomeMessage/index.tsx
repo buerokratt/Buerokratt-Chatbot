@@ -17,9 +17,9 @@ const SettingsWelcomeMessage: FC = () => {
   const { data } = useQuery({
     queryKey: ['greeting/message', 'prod'],
     onSuccess: (res: any) => {
-      setWelcomeMessage(res.data.return_first_greeting_from_array.est ?? '');
+      setWelcomeMessage(res.response.est ?? '');
       setWelcomeMessageActivity(
-        res.data.return_first_greeting_from_array.isActive ?? false
+        res.response.isActive ?? false
       );
     },
   });
@@ -27,7 +27,7 @@ const SettingsWelcomeMessage: FC = () => {
   const welcomeMessageMutation = useMutation({
     mutationFn: () =>
       apiDev.post('greeting/message', {
-        est: welcomeMessage,
+        message: welcomeMessage,
       }),
     onSuccess: () => {
       toast.open({

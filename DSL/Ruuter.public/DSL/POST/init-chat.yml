@@ -18,7 +18,7 @@ extractRequestData:
 getChatUuid:
   call: http.post
   args:
-    url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/hbs/chat-bot/return_uuid"
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/return_uuid"
     headers:
       type: json
   result: chat_uuid_result
@@ -32,7 +32,7 @@ assignChatUuid:
 getMessageUuid:
   call: http.post
   args:
-    url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/hbs/chat-bot/return_uuid"
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/return_uuid"
     headers:
       type: json
   result: message_uuid_result
@@ -46,7 +46,7 @@ assignMessageUuid:
 get_session_length:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-configuration"
+    url: "[#CHATBOT_RESQL]/get-configuration"
     body:
       key: "session_length"
   result: session_result
@@ -55,7 +55,7 @@ get_session_length:
 generate_cookie:
   call: http.post
   args:
-    url: "[#CHATBOT_TIM]:[#CHATBOT_TIM_PORT]/jwt/custom-jwt-generate"
+    url: "[#CHATBOT_TIM]/jwt/custom-jwt-generate"
     body:
       JWTName: "chatJwt"
       expirationInMinutes: ${session_result.response.body[0].value}
@@ -70,16 +70,15 @@ assign_cookie:
   assign:
     setCookie:
       chatJwt: ${cookie_result.response.body.token}
-      maxAge: 7200
       Domain: "[#DOMAIN]"
-      Secure: true
-      HttpOnly: true
-  next: setCustomerSupportAgentAway
+      Secure: false
+      HttpOnly: false
+  next: postGreetingMessage
 
 postGreetingMessage:
   call: http.post
   args:
-    url: "[#CHATBOT_RUUTER_PUBLIC]:[#CHATBOT_RUUTER_PUBLIC_PORT]/greeting-to-chat"
+    url: "[#CHATBOT_RUUTER_PUBLIC]/greeting-to-chat"
     body:
       chatId: ${chatUuid}
       authorTimestamp: ${authorTimestamp}
@@ -89,7 +88,7 @@ postGreetingMessage:
 postClientMessage:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/insert-message"
+    url: "[#CHATBOT_RESQL]/insert-message"
     body:
       chatId: ${chatUuid}
       messageId: ${messageUuid}
@@ -99,19 +98,19 @@ postClientMessage:
       authorId: ${endUserId}
       authorFirstName: ""
       authorRole: ${authorRole}
-      created: ${instant}
+      created: ${new Date().toISOString()}
       authorLastName: ""
       rating: ""
       forwardedByUser: ${forwardedByUser}
       forwardedFromCsa: ${forwardedFromCsa}
       forwardedToCsa: ${forwardedToCsa}
   result: insertMessageResult
-  next: insertChat 
+  next: insertChat
 
 insertChat:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/init-chat"
+    url: "[#CHATBOT_RESQL]/init-chat"
     body:
       id: ${chatUuid}
       endUserId: ${endUserId}
@@ -131,32 +130,82 @@ insertChat:
       forwardedTo: ""
       forwardedToName: ""
       receivedFrom: ""
-      reveivedFromName: ""
+      receivedFromName: ""
   result: insertMessageResult
-  next: postMessageToBot 
+  next: postMessageToBot
 
 postMessageToBot:
   call: http.post
   args:
-    url: "[#CHATBOT_RUUTER_PUBLIC]:[#CHATBOT_RUUTER_PUBLIC_PORT]/post-message-to-bot"
+    url: "[#CHATBOT_RUUTER_PUBLIC]/message-to-bot"
     body:
       chatId: ${chatUuid}
       content: ${content}
-      authorId: ${endUserId}
       holidays: ${holidays}
       holidayNames: ${holidayNames}
-  result: message_result
-  next: getInsertedChat
+  result: message_to_bot_result
+  next: getChat
 
-getInsertedChat:
+getChat:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-chat-by-id"
+    url: "[#CHATBOT_RESQL]/get-chat-by-id"
     body:
       id: ${chatUuid}
   result: chat_result
-  next: returnSuccess
+  next: clearChatList
 
-returnSuccess:
-  return: ${chat_result.response.body}
+clearChatList:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query"
+    body:
+     query:
+      term:
+       channelId: "chat-list"
+  result: clear_chat_res
+  next: postNotificationAboutAddedChat 
+
+postNotificationAboutAddedChat:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
+    body:
+     channelId: "chat-list"
+     timestamp: ${new Date().toISOString()}
+     payload: {
+        "status": "Chat Status Changed"
+     }
+  result: chat_notification_result
+  next: clearMessages
+
+clearMessages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query"
+    body:
+     query:
+      term:
+       channelId: ${chatUuid}
+  result: clear_messages_res
+  next: postNotificationAboutMessageResponse 
+
+postNotificationAboutMessageResponse:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
+    body:
+     channelId: ${chatUuid}
+     timestamp: ${new Date().toISOString()}
+     payload: {
+        "type": "message",
+        "messageId": "${messageUuid}"
+     }
+  result: message_notification_result
+  next: return_result  
+
+return_result:
+  headers:
+    Set-Cookie: ${setCookie}
+  return: ${chat_result.response.body[0]}
   next: end

@@ -5,7 +5,7 @@ extractRequestData:
 getUnavailableEndedChats:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-chat-messages"
+    url: "[#CHATBOT_RESQL]/get-chat-messages"
     body:
       chatId: ${chatId}
   result: res

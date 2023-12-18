@@ -38,7 +38,7 @@ const SettingsWorkingTime: FC = () => {
     queryKey: ['configs/organization-working-time', 'prod'],
     onSuccess: (data) => {
       if (Object.keys(control._formValues).length > 0) return;
-      reset(getOrganizationTimeData(data));
+      reset(getOrganizationTimeData(data.response));
       setKey(key + 1);
     },
   });
@@ -185,10 +185,8 @@ const SettingsWorkingTime: FC = () => {
         {!isOrganizationTheSameOnAllWorkingDays &&
           weekdaysOptions.map((d) => {
             return isOrganizationClosedOnWeekEnds &&
-              (d === 'Saturday' || d === 'Sunday') ? (
-              <></>
-            ) : (
-              <Track>
+              (d === 'Saturday' || d === 'Sunday') ? null : (
+              <Track key={d}>
                 <label className="Label switch">
                   {t(`settings.weekdays.${d}`.toLowerCase())}
                 </label>

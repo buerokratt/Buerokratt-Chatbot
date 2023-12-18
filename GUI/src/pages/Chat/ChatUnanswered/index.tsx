@@ -52,7 +52,7 @@ const ChatUnanswered: FC = () => {
   const { refetch } = useQuery<ChatType[]>({
     queryKey: ['csa/active-chats', 'prod'],
     onSuccess(res: any) {
-      setActiveChats(res.data.get_all_active_chats);
+      setActiveChats(res.response);
     },
   });
 
@@ -61,7 +61,9 @@ const ChatUnanswered: FC = () => {
   }, [chatCsaActive]);
 
   useEffect(() => {
-    const onMessage = (chats: any) => {
+    const onMessage = async () => {
+      const res = await apiDev.get('csa/active-chats');
+      const chats = res.data.response ?? [];
       const isChatStillExists = chats?.filter(function (e: any) {
         return e.id === selectedChatId;
       });
@@ -74,7 +76,7 @@ const ChatUnanswered: FC = () => {
       }
     };
 
-    const events = sse(`csa/active-chats`, onMessage);
+    const events = sse(`/chat-list`, onMessage);
 
     return () => {
       events.close();

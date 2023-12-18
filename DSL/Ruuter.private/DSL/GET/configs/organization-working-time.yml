@@ -1,7 +1,7 @@
 getOrganizationWorkingTime:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-organization-working-time"
+    url: "[#CHATBOT_RESQL]/get-organization-working-time"
   result: getOrganizationWorkingTimeValueResult
 
 validateOrganizationWorkingTimeExists:
@@ -13,15 +13,15 @@ validateOrganizationWorkingTimeExists:
 mapWorkingTimeData:
   call: http.post
   args:
-    url: "[#CHATBOT_DMAPPER]:[#CHATBOT_DMAPPER_PORT]/hbs/chat-bot/return_organization_working_time"
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/return_organization_working_time"
     headers:
       type: json
     body:
       configurationArray: ${getOrganizationWorkingTimeValueResult.response.body}
   result: workingTimeData
-  next: returnSuccess
+  next: return_result
 
-returnSuccess:
+return_result:
   return: ${workingTimeData.response.body}
   next: end
 

@@ -44,13 +44,14 @@ const SettingsAppearance: FC = () => {
   const { data: widgetConfig } = useQuery<WidgetConfig>({
     queryKey: ['configs/widget-config', 'prod'],
     onSuccess: (data) => {
+      const res = data.response;
       if (!hasRendered.current) {
         reset({
-          ...data,
+          ...res,
           widgetAnimation:
-            data.widgetAnimation.length === 0
+            res.widgetAnimation.length === 0
               ? 'shockwave'
-              : data.widgetAnimation,
+              : res.widgetAnimation,
         });
         hasRendered.current = true;
       }

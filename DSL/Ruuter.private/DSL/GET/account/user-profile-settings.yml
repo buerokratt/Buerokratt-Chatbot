@@ -1,7 +1,7 @@
 get_user_info:
   call: http.post
   args:
-   url: "[#CHATBOT_TIM]:[#CHATBOT_TIM_PORT]/jwt/custom-jwt-userinfo"
+   url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
    contentType: plaintext
    headers:
     cookie: ${incoming.headers.cookie}
@@ -24,7 +24,7 @@ assignIdCode:
 getUserSettings:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-user-profile-settings"
+    url: "[#CHATBOT_RESQL]/get-user-profile-settings"
     body:
       userId: ${idCode}
   result: getUserSettingsResult

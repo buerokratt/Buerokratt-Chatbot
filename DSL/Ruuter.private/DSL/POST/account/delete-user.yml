@@ -5,7 +5,7 @@ extractRequestData:
 setConfigurationValue:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/delete-user"
+    url: "[#CHATBOT_RESQL]/delete-user"
     body:
       userIdCode: ${userId}
       created: ${new Date().toISOString()}

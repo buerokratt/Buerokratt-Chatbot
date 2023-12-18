@@ -5,7 +5,7 @@ extractRequestData:
 setConfigurationValue:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/set-configuration-value"
+    url: "[#CHATBOT_RESQL]/set-configuration-value"
     body:
       created: ${new Date().toISOString()}
       key: "is_bot_active"
@@ -15,13 +15,13 @@ setConfigurationValue:
 insertChatAndMessageWhenBotNotActive:
   call: http.post
   args:
-    url: "[#CHATBOT_RUUTER_PRIVATE]:[#CHATBOT_RUUTER_PRIVATE_PORT]/insert-chat-and-message"
+    url: "[#CHATBOT_RUUTER_PRIVATE]/bot/chat-and-message-when-bot-is-not-active"
   result: insertChatAndMessageWhenBotNotActiveResult
 
 getConfigurationValue:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-configuration"
+    url: "[#CHATBOT_RESQL]/get-configuration"
     body:
       key: "is_bot_active"
   result: res

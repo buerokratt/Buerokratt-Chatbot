@@ -6,7 +6,7 @@ extractRequestData:
 get_user_info:
   call: http.post
   args:
-   url: "[#CHATBOT_TIM]:[#CHATBOT_TIM_PORT]/jwt/custom-jwt-userinfo"
+   url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
    contentType: plaintext
    headers:
     cookie: ${incoming.headers.cookie}
@@ -29,7 +29,7 @@ assignIdCode:
 setCustomerSupportActivity:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/set-customer-support-status"
+    url: "[#CHATBOT_RESQL]/set-customer-support-status"
     body:
       active: ${active}
       userIdCode: ${idCode}

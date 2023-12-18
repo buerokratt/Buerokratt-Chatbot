@@ -1,23 +1,27 @@
 extractRequestData:
   assign:
-    chatId: "${incoming.body.chatId}"
-    rating: "${incoming.body.feedbackRating}"
+    chatId: ${incoming.body.chatId}
+    rating: ${incoming.body.feedbackRating}
 
 check_rating_limit:
   switch:
-    - condition: ${rating >= 0 && rating =< 10}
-      next: addFeedbackRating
-  next: return_invalid_rating
+    - condition: ${rating === null || rating === 'null'}
+      next: return_invalid_rating
+  next: addFeedbackRating
 
 addFeedbackRating:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/update-chat-with-feedback-rating"
+    url: "[#CHATBOT_RESQL]/update-chat-with-feedback-rating"
     body:
       id: ${chatId}
       created: ${new Date().toISOString()}
       feedbackRating: ${rating}
   result: res
+  next: return_result
+
+return_result:
+  return: "Rated Chat Successfully"
   next: end
 
 return_invalid_rating:

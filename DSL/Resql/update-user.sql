@@ -1,11 +1,9 @@
 UPDATE "user"
-SET login = :userIdCode,
-    first_name = :first_name,
-    last_name = :last_name,
+SET first_name = :firstName,
+    last_name = :lastName,
     display_name = :displayName,
-    password_hash = :displayName, 
     status = :status,    
     created = :created::timestamp with time zone, 
     csa_title = :csaTitle,
-    csa_email = :csa_email
+    csa_email = :csaEmail
 WHERE id_code = :userIdCode

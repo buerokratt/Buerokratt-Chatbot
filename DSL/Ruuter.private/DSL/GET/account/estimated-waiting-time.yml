@@ -1,7 +1,7 @@
 getEstimatedWaitingTime:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-estimated-waiting-time"
+    url: "[#CHATBOT_RESQL]/get-estimated-waiting-time"
     body:
       key: "estimated_waiting_time"
   result: res

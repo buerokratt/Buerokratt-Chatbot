@@ -6,7 +6,7 @@ extractRequestData:
 setChatComment:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/insert-chat-history-comment"
+    url: "[#CHATBOT_RESQL]/insert-chat-history-comment"
     body:
       comment: ${comment}
       chatId: ${chatId}

@@ -6,7 +6,7 @@ extractRequestData:
 getEndedChats:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/get-cs-all-ended-chats"
+    url: "[#CHATBOT_RESQL]/get-cs-all-ended-chats"
     body:
       start: ${startDate}
       end: ${endDate}  

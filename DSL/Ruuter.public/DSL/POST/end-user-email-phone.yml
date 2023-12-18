@@ -1,8 +1,8 @@
 assignIncoming:
   assign:
-    chatId: "${incoming.body.chatId}"
-    email: "${incoming.body.endUserEmail}"
-    phone: "${incoming.body.endUserPhone}"
+    chatId: ${incoming.body.chatId}
+    email: ${incoming.body.endUserEmail}
+    phone: ${incoming.body.endUserPhone}
 
 checkChatId:
   switch:
@@ -13,7 +13,7 @@ checkChatId:
 insertEmailAndPhone:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]:[#CHATBOT_RESQL_PORT]/update-chat-with-end-user-email-and-phone"
+    url: "[#CHATBOT_RESQL]/update-chat-with-end-user-email-and-phone"
     body:
       chatId: ${chatId}
       endUserEmail: "${email ? email : ''}"

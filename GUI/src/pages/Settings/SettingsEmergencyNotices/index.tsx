@@ -26,15 +26,16 @@ const SettingsEmergencyNotices: FC = () => {
   const [emergencyNoticeText, setEmergencyNoticeText] = useState('');
   const { data: emergencyNotice } = useQuery<EmergencyNotice>({
     queryKey: ['configs/emergency-notice', 'prod'],
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
+      const res = data.response;
       if (Object.keys(control._formValues).length > 0) return;
-      setIsEmergencyNoticeVisible(data.isEmergencyNoticeVisible ?? false);
-      setEmergencyNoticeText(data.emergencyNoticeText ?? '');
+      setIsEmergencyNoticeVisible(res.isEmergencyNoticeVisible ?? false);
+      setEmergencyNoticeText(res.emergencyNoticeText ?? '');
       reset({
-        emergencyNoticeStartISO: new Date(data.emergencyNoticeStartISO ?? '0'),
-        emergencyNoticeEndISO: new Date(data.emergencyNoticeEndISO ?? '0'),
-        emergencyNoticeText: data.emergencyNoticeText ?? '',
-        isEmergencyNoticeVisible: data.isEmergencyNoticeVisible ?? false,
+        emergencyNoticeStartISO: new Date(res.emergencyNoticeStartISO ?? '0'),
+        emergencyNoticeEndISO: new Date(res.emergencyNoticeEndISO ?? '0'),
+        emergencyNoticeText: res.emergencyNoticeText ?? '',
+        isEmergencyNoticeVisible: res.isEmergencyNoticeVisible ?? false,
       });
     },
   });

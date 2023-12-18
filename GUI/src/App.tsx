@@ -26,12 +26,12 @@ const App: FC = () => {
     data: { custom_jwt_userinfo: UserInfo };
   }>({
     queryKey: ['custom-jwt/userinfo', 'prod'],
-    onSuccess: (data: { data: { custom_jwt_userinfo: UserInfo } }) => {
+    onSuccess: (res: { response: UserInfo }) => {
       localStorage.setItem(
         'exp',
-        data.data.custom_jwt_userinfo.JWTExpirationTimestamp
+        res.response.JWTExpirationTimestamp
       );
-      return useStore.getState().setUserInfo(data.data.custom_jwt_userinfo);
+      return useStore.getState().setUserInfo(res.response);
     },
   });
 
