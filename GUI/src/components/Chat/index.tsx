@@ -119,59 +119,62 @@ const Chat: FC<ChatProps> = ({
         );
         setPreviewTypingMessage(previewMessage.data.response);
       } else {
-        const res =
-          (await apiDev.get(
-            `csa/new-messages?chatId=${chat.id}&lastRead=${
-              chat.lastMessageTimestamp.split('+')[0] ?? ''
-            }`
-          )) ?? [];
-        const messages = res.data.response;
-        setPreviewTypingMessage('');
-        const filteredMessages = messages?.filter((newMessage) => {
-          return !messagesList.some(
-            (existingMessage) =>
-              existingMessage.id === newMessage.id &&
-              existingMessage.event === newMessage.event
+        if (messagesList?.length > 0) {
+          const res =
+            (await apiDev.get(
+              `csa/new-messages?chatId=${chat.id}&lastRead=${
+                chat.lastMessageTimestamp.split('+')[0] ?? ''
+              }`
+            )) ?? [];
+          const messages = res.data.response;
+          setPreviewTypingMessage('');
+          const filteredMessages = messages?.filter((newMessage) => {
+            return !messagesList.some(
+              (existingMessage) =>
+                existingMessage.id === newMessage.id &&
+                existingMessage.event === newMessage.event
+            );
+          });
+
+          let newDisplayableMessages = filteredMessages?.filter(
+            (msg) => msg.authorId != userInfo?.idCode
           );
-        });
 
-        const newDisplayableMessages = filteredMessages?.filter(
-          (msg) => msg.authorId != userInfo?.idCode
-        );
+          if (newDisplayableMessages?.length > 0) {
+            setMessagesList((oldMessages) => [
+              ...oldMessages,
+              ...newDisplayableMessages,
+            ]);
+          }
 
-        if (newDisplayableMessages?.length > 0) {
-          setMessagesList((oldMessages) => [
-            ...oldMessages,
-            ...newDisplayableMessages,
-          ]);
-        }
+          const askingPermissionsMessages: Message[] = messagesList?.filter(
+            (e: Message) =>
+              e.event === 'ask-permission' ||
+              e.event === 'ask-permission-accepted' ||
+              e.event === 'ask-permission-rejected' ||
+              e.event === 'ask-permission-ignored'
+          );
+          const lastestPermissionDate = new Date(
+            askingPermissionsMessages[askingPermissionsMessages.length - 1]
+              ?.created ?? new Date()
+          );
 
-        const askingPermissionsMessages: Message[] = messagesList?.filter(
-          (e: Message) =>
-            e.event === 'ask-permission' ||
-            e.event === 'ask-permission-accepted' ||
-            e.event === 'ask-permission-rejected' ||
-            e.event === 'ask-permission-ignored'
-        );
-        const lastestPermissionDate = new Date(
-          askingPermissionsMessages[askingPermissionsMessages.length - 1]
-            ?.created ?? new Date()
-        );
+          const lastPermissionMesageSecondsDiff = Math.round(
+            (new Date().getTime() - lastestPermissionDate.getTime()) / 1000
+          );
 
-        const lastPermissionMesageSecondsDiff = Math.round(
-          (new Date().getTime() - lastestPermissionDate.getTime()) / 1000
-        );
+          setLatestPermissionMessage(lastPermissionMesageSecondsDiff ?? 0);
 
-        setLatestPermissionMessage(lastPermissionMesageSecondsDiff ?? 0);
-
-        const permissionsHandeledMessages: Message[] = filteredMessages?.filter(
-          (e: Message) =>
-            e.event === 'ask-permission-accepted' ||
-            e.event === 'ask-permission-rejected' ||
-            e.event === 'ask-permission-ignored'
-        );
-        if (permissionsHandeledMessages?.length > 0) {
-          getMessages();
+          const permissionsHandeledMessages: Message[] =
+            filteredMessages?.filter(
+              (e: Message) =>
+                e.event === 'ask-permission-accepted' ||
+                e.event === 'ask-permission-rejected' ||
+                e.event === 'ask-permission-ignored'
+            );
+          if (permissionsHandeledMessages?.length > 0) {
+            getMessages();
+          }
         }
       }
     };
@@ -181,7 +184,7 @@ const Chat: FC<ChatProps> = ({
     return () => {
       events.close();
     };
-  }, [chat.id]);
+  }, [chat.id, messagesList]);
 
   const getMessages = async () => {
     const { data: res } = await apiDev.post('csa/messages-by-id', {
