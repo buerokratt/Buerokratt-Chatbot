@@ -107,75 +107,81 @@ const Chat: FC<ChatProps> = ({
     useStore
       .getState()
       .setChatCsaActive(
-        res.response.status === 'online' ||
-          res.response.status === 'idle'
+        res.response.status === 'online' || res.response.status === 'idle'
       );
   };
 
   useEffect(() => {
     const onMessage = async (res) => {
       if (res === 'preview') {
-       const previewMessage = await apiDev.get('csa/message-preview?chatId=' + chat.id);
-       setPreviewTypingMessage(previewMessage.data.response);
-      } else {
-      const res = await apiDev.get(`csa/new-messages?chatId=${chat.id}&lastRead=${chat.lastMessageTimestamp.split('+')[0] ?? ''}`) ?? [];
-      const messages = res.data.response;
-      setPreviewTypingMessage("");
-      const filteredMessages = messages?.filter((newMessage) => {
-        return !messagesList.some(
-          (existingMessage) =>
-            existingMessage.id === newMessage.id &&
-            existingMessage.event === newMessage.event
+        const previewMessage = await apiDev.get(
+          'csa/message-preview?chatId=' + chat.id
         );
-      });
+        setPreviewTypingMessage(previewMessage.data.response);
+      } else {
+        const res =
+          (await apiDev.get(
+            `csa/new-messages?chatId=${chat.id}&lastRead=${
+              chat.lastMessageTimestamp.split('+')[0] ?? ''
+            }`
+          )) ?? [];
+        const messages = res.data.response;
+        setPreviewTypingMessage('');
+        const filteredMessages = messages?.filter((newMessage) => {
+          return !messagesList.some(
+            (existingMessage) =>
+              existingMessage.id === newMessage.id &&
+              existingMessage.event === newMessage.event
+          );
+        });
 
-      const newDisplayableMessages = filteredMessages?.filter(
-        (msg) => msg.authorId != userInfo?.idCode
-      );
+        const newDisplayableMessages = filteredMessages?.filter(
+          (msg) => msg.authorId != userInfo?.idCode
+        );
 
-      if (newDisplayableMessages?.length > 0) {
-        setMessagesList((oldMessages) => [
-          ...oldMessages,
-          ...newDisplayableMessages,
-        ]);
+        if (newDisplayableMessages?.length > 0) {
+          setMessagesList((oldMessages) => [
+            ...oldMessages,
+            ...newDisplayableMessages,
+          ]);
+        }
+
+        const askingPermissionsMessages: Message[] = messagesList?.filter(
+          (e: Message) =>
+            e.event === 'ask-permission' ||
+            e.event === 'ask-permission-accepted' ||
+            e.event === 'ask-permission-rejected' ||
+            e.event === 'ask-permission-ignored'
+        );
+        const lastestPermissionDate = new Date(
+          askingPermissionsMessages[askingPermissionsMessages.length - 1]
+            ?.created ?? new Date()
+        );
+
+        const lastPermissionMesageSecondsDiff = Math.round(
+          (new Date().getTime() - lastestPermissionDate.getTime()) / 1000
+        );
+
+        setLatestPermissionMessage(lastPermissionMesageSecondsDiff ?? 0);
+
+        const permissionsHandeledMessages: Message[] = filteredMessages?.filter(
+          (e: Message) =>
+            e.event === 'ask-permission-accepted' ||
+            e.event === 'ask-permission-rejected' ||
+            e.event === 'ask-permission-ignored'
+        );
+        if (permissionsHandeledMessages?.length > 0) {
+          getMessages();
+        }
       }
-
-      const askingPermissionsMessages: Message[] = messagesList?.filter(
-        (e: Message) =>
-          e.event === 'ask-permission' ||
-          e.event === 'ask-permission-accepted' ||
-          e.event === 'ask-permission-rejected' ||
-          e.event === 'ask-permission-ignored'
-      );
-      const lastestPermissionDate = new Date(
-        askingPermissionsMessages[askingPermissionsMessages.length - 1]
-          ?.created ?? new Date()
-      );
-
-      const lastPermissionMesageSecondsDiff = Math.round(
-        (new Date().getTime() - lastestPermissionDate.getTime()) / 1000
-      );
-
-      setLatestPermissionMessage(lastPermissionMesageSecondsDiff ?? 0);
-
-      const permissionsHandeledMessages: Message[] = filteredMessages?.filter(
-        (e: Message) =>
-          e.event === 'ask-permission-accepted' ||
-          e.event === 'ask-permission-rejected' ||
-          e.event === 'ask-permission-ignored'
-      );
-      if (permissionsHandeledMessages?.length > 0) {
-        getMessages();
-      }
-     }
     };
 
     const events = sse(`/${chat.id}`, onMessage);
 
     return () => {
-       events.close();
+      events.close();
     };
-  }, [messagesList]);
+  }, [chat.id]);
 
   const getMessages = async () => {
     const { data: res } = await apiDev.post('csa/messages-by-id', {
@@ -184,24 +190,21 @@ const Chat: FC<ChatProps> = ({
     if (
       messagesLength != 0 &&
       messagesLength < res.response.length &&
-      res.response[
-        res.response.length - 1
-      ].authorId != userInfo?.idCode
+      res.response[res.response.length - 1].authorId != userInfo?.idCode
     ) {
       newMessage?.play();
       onRefresh();
     }
     messagesLength = res.response.length;
-    const askingPermissionsMessages: Message[] =
-      res.response
-        .map((e: Message[]) => e)
-        .filter(
-          (e: Message) =>
-            e.event === 'ask-permission' ||
-            e.event === 'ask-permission-accepted' ||
-            e.event === 'ask-permission-rejected' ||
-            e.event === 'ask-permission-ignored'
-        );
+    const askingPermissionsMessages: Message[] = res.response
+      .map((e: Message[]) => e)
+      .filter(
+        (e: Message) =>
+          e.event === 'ask-permission' ||
+          e.event === 'ask-permission-accepted' ||
+          e.event === 'ask-permission-rejected' ||
+          e.event === 'ask-permission-ignored'
+      );
 
     const lastestPermissionDate = new Date(
       askingPermissionsMessages[askingPermissionsMessages.length - 1]
