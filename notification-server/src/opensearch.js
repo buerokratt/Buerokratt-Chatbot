@@ -1,27 +1,23 @@
-const { Client } = require('@opensearch-project/opensearch');
-const { openSearchConfig } = require('./config');
+const { Client } = require("@opensearch-project/opensearch");
+const { openSearchConfig } = require("./config");
 
 const client = new Client({
   node: openSearchConfig.getUrl(),
   ssl: openSearchConfig.ssl,
 });
 
-async function searchNotification({
-  channelId,
-  connectionId,
-  callback
-}) {
+async function searchNotification({ channelId, connectionId, callback }) {
   const response = await client.search({
     index: openSearchConfig.notificationIndex,
     body: {
       query: {
         bool: {
-          must: { match: { channelId }},
-          must_not: { match: { sentTo: connectionId }}
+          must: { match: { channelId } },
+          must_not: { match: { sentTo: connectionId } },
         },
       },
-      sort: { timestamp: { order: 'asc' }},
-    }
+      sort: { timestamp: { order: "asc" } },
+    },
   });
 
   for (const hit of response.body.hits.hits) {
@@ -31,7 +27,6 @@ async function searchNotification({
 }
 
 async function markAsSent({ _index, _id }, connectionId) {
-
   await client.update({
     index: _index,
     id: _id,
@@ -43,10 +38,10 @@ async function markAsSent({ _index, _id }, connectionId) {
         } else {
           ctx._source.sentTo.add(params.connectionId);
         }`,
-        lang: 'painless',
-        params: { connectionId }
-      }
-    }
+        lang: "painless",
+        params: { connectionId },
+      },
+    },
   });
 }
 

@@ -31,11 +31,6 @@ check_user_info_response:
 assignIdCode:
   assign:
     idCode: ${res.response.body.idCode}
-  next: assignInstant
-
-assignInstant:
-  assign:
-    instant: ${new Date().toISOString()}
   next: getUuid
 
 getUuid:
@@ -59,22 +54,71 @@ insertMessage:
     body:
       chatId: ${chatId}
       messageId: ${uuid}
-      content: ${content}
-      authorTimestamp: ${authorTimestamp}
+      content: ${content ?? ""}
+      authorTimestamp: ${authorTimestamp ?? new Date().toISOString()}
       authorId: ${idCode}
-      authorFirstName: ${authorFirstName}
-      authorRole: ${authorRole}
-      created: ${instant}
+      authorFirstName: ${authorFirstName ?? ""}
+      authorRole: ${authorRole ?? "backoffice-user"}
+      created: ${new Date().toISOString()}
       authorLastName: ""
       rating: ""
-      event: ${event}
+      event: ${event ?? ""}
       forwardedByUser: ""
       forwardedFromCsa: ""
       forwardedToCsa: ""
   result: insertMessageResult
-  next: returnSuccess  
+  next: clearChatList
 
-returnSuccess:
+clearChatList:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query"
+    body:
+     query:
+      term:
+       channelId: "chat-list"
+  result: clear_chat_res
+  next: postNotificationAboutAddedChat
+
+postNotificationAboutAddedChat:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
+    body:
+     channelId: "chat-list"
+     timestamp: ${new Date().toISOString()}
+     payload: {
+        "status": "Chat Status Changed"
+     }
+  result: chat_notification_result
+  next: clearMessages
+
+clearMessages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query"
+    body:
+     query:
+      term:
+       channelId: ${chatId}
+  result: clear_messages_res
+  next: postNotificationAboutMessageResponse 
+
+postNotificationAboutMessageResponse:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
+    body:
+     channelId: ${chatId}
+     timestamp: ${new Date().toISOString()}
+     payload: {
+        "type": "message",
+        "messageId": "${uuid}"
+     }
+  result: message_notification_result
+  next: return_result   
+
+return_result:
   return: "Message Sent Successfully"
   next: end
 

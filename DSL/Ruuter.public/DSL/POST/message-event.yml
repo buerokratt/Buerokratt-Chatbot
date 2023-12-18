@@ -1,6 +1,6 @@
 extractRequestData:
   assign:
-    messageId: ${incoming.body.messageId}
+    messageId: ${incoming.body.id}
     event: ${incoming.body.event}
     content: ${incoming.body.content}
     authorRole: ${incoming.body.authorRole}
@@ -20,7 +20,7 @@ getMessageById:
 assignMessage:
   assign:
     message: ${res.response.body[0]}
-  next: insertMessage  
+  next: insertMessage
 
 insertMessage:
   call: http.post
@@ -28,19 +28,19 @@ insertMessage:
     url: "[#CHATBOT_RESQL]/insert-message"
     body:
       messageId: ${messageId}
-      chatId: ${message.chatId}
-      authorId: ${message.authorId}
-      authorTimestamp: ${authorTimestamp}
-      authorFirstName: ${message.authorFirstName}
-      authorLastName: ${message.authorLastName}
-      authorRole: ${authorRole}
-      created: ${message.created}
-      content: ${content}
-      event: ${event}
-      forwardedByUser: ${message.forwardedByUser}
-      forwardedFromCsa: ${message.forwardedFromCsa}
-      forwardedToCsa: ${message.forwardedToCsa}
-      rating: ${rating}
+      chatId: ${message.chatBaseId}
+      authorId: ${message.authorId ?? "end-user"}
+      authorTimestamp: ${authorTimestamp ?? new Date().toISOString()}
+      authorFirstName: ${message.authorFirstName ?? ""}
+      authorLastName: ${message.authorLastName ?? ""}
+      authorRole: "end-user"
+      created: ${message.created ?? new Date().toISOString()}
+      content: ${content ?? ""}
+      event: ${event ?? ""}
+      forwardedByUser: ${message.forwardedByUser ?? ""}
+      forwardedFromCsa: ${message.forwardedFromCsa ?? ""}
+      forwardedToCsa: ${message.forwardedToCsa ?? ""}
+      rating: ${rating ?? ""}
   result: insertMessageResult
   next: clearChatList
 
@@ -75,7 +75,7 @@ clearMessages:
     body:
      query:
       term:
-       channelId: ${message.chatId}
+       channelId: ${message.chatBaseId}
   result: clear_messages_res
   next: postNotificationAboutMessageResponse
 
@@ -84,7 +84,7 @@ postNotificationAboutMessageResponse:
   args:
     url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
     body:
-     channelId: ${message.chatId}
+     channelId: ${message.chatBaseId}
      timestamp: ${new Date().toISOString()}
      payload: {
         "type": "message",

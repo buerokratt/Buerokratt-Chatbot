@@ -40,9 +40,7 @@ const Layout: FC = () => {
         items={MainMenuItems}
       />
       <div className="layout__wrapper">
-        {/* <Header
-                    user={useStore.getState().userInfo}
-                /> */}
+        <Header user={useStore.getState().userInfo} />
         <main className="layout__main">
           <Outlet />
         </main>

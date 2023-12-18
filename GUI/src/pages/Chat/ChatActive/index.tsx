@@ -57,9 +57,7 @@ const ChatActive: FC = () => {
   const { refetch } = useQuery<ChatType[]>({
     queryKey: ['csa/active-chats', 'prod'],
     onSuccess(res: any) {
-      const isChatStillExists = res.response?.filter(function (
-        e: any
-      ) {
+      const isChatStillExists = res.response?.filter(function (e: any) {
         return e.id === selectedChatId;
       });
       if (isChatStillExists.length === 0 && activeChatsList.length > 0) {
@@ -73,8 +71,9 @@ const ChatActive: FC = () => {
   });
 
   useEffect(() => {
-    const onMessage = () => {
-      const chats = apiDev.get('csa/active-chats') ?? [];
+    const onMessage = async () => {
+      const res = await apiDev.get('csa/active-chats');
+      const chats = res.data.response ?? [];
       const isChatStillExists = chats?.filter(function (e: any) {
         return e.id === selectedChatId;
       });

@@ -61,8 +61,9 @@ const ChatUnanswered: FC = () => {
   }, [chatCsaActive]);
 
   useEffect(() => {
-    const onMessage = () => {
-      const chats = apiDev.get('csa/active-chats') ?? [];
+    const onMessage = async () => {
+      const res = await apiDev.get('csa/active-chats');
+      const chats = res.data.response ?? [];
       const isChatStillExists = chats?.filter(function (e: any) {
         return e.id === selectedChatId;
       });
