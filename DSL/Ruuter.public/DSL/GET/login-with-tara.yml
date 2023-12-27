@@ -26,7 +26,7 @@ generate_cookie:
     body:
       JWTName: "customJwtCookie"
       expirationInMinutes: ${session_result.response.body[0].value}
-      content: ${tara_info.response.body[0]}
+      content: ${tara_info.response.body}
   result: cookie_result
   next: assign_cookie
 
