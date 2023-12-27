@@ -33,7 +33,6 @@ Currently, Header and Main Navigation used as external components, they are defi
 - Clone [Authentication Layer](https://github.com/buerokratt/Authentication-layer)
 - build chat widget image `docker build -f Dockerfile.dev -t authentication-layer .`
 - Navigate to current repo and run `docker-compose up -d`
-- For GUI make sure that Dockerfile.dev have header package include with version specified in package.json `COPY ./exirain-header-0.0.27.tgz ./`
 - Go to http://localhost:3004/et/dev-auth
 
 ### Database setup
