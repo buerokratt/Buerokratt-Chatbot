@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, Fragment, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
@@ -72,6 +72,7 @@ const SettingsWorkingTime: FC = () => {
   if (!workingTime || Object.keys(control._formValues).length === 0) {
     return <>Loading...</>;
   }
+  
   return (
     <>
       <h1>{t('settings.workingTime.title')}</h1>
@@ -183,9 +184,9 @@ const SettingsWorkingTime: FC = () => {
           </Track>
         )}
         {!isOrganizationTheSameOnAllWorkingDays &&
-          weekdaysOptions.map((d) => {
-            return isOrganizationClosedOnWeekEnds &&
-              (d === 'Saturday' || d === 'Sunday') ? null : (
+          weekdaysOptions
+            .filter((d) => !(isOrganizationClosedOnWeekEnds && (d === 'Saturday' || d === 'Sunday')))
+            .map((d) => (
               <Track key={d}>
                 <label className="Label switch">
                   {t(`settings.weekdays.${d}`.toLowerCase())}
@@ -265,8 +266,7 @@ const SettingsWorkingTime: FC = () => {
                   </Track>
                 )}
               </Track>
-            );
-          })}
+          ))}
       </Card>
     </>
   );

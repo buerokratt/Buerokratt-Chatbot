@@ -1,6 +1,5 @@
 import Layout from './Layout';
 import Button from './Button';
-import MainNavigation from './MainNavigation';
 import Icon from './Icon';
 import Track from './Track';
 import {
@@ -32,7 +31,6 @@ import Chat from './Chat';
 export {
   Layout,
   Button,
-  MainNavigation,
   Icon,
   Track,
   Tooltip,
