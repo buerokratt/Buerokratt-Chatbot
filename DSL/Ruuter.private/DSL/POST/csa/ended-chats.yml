@@ -1,0 +1,17 @@
+extractRequestData:
+  assign:
+    startDate: "${incoming.body.startDate}"
+    endDate: "${incoming.body.endDate}"
+
+getEndedChats:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-cs-all-ended-chats"
+    body:
+      start: ${startDate}
+      end: ${endDate}  
+  result: res
+
+returnSuccess:
+  return: ${res.response.body}
+  next: end

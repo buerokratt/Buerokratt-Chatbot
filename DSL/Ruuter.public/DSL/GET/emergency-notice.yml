@@ -1,0 +1,9 @@
+getEmergencyNotice:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-emergency-notice"
+  result: res
+
+return_result:
+  return: ${res.response.body[0]}
+  next: end

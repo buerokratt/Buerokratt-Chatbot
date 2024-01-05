@@ -1,0 +1,16 @@
+extractRequestData:
+  assign:
+    waitingTime: ${incoming.body.waitingTime}
+
+setConfigurationValue:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-configuration-value"
+    body:
+      created: ${new Date().toISOString()}
+      key: "estimated_waiting_time"
+      value: ${waitingTime}
+  result: res
+
+return_result:
+  return: ${res.response.body}

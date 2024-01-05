@@ -1,0 +1,17 @@
+getCustomerSupportAgents:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-users-with-roles-by-role"
+    body:
+      roles: [
+         "ROLE_ADMINISTRATOR",
+         "ROLE_CUSTOMER_SUPPORT_AGENT",
+         "ROLE_SERVICE_MANAGER",
+         "ROLE_CHATBOT_TRAINER",
+         "ROLE_ANALYST"
+        ]
+  result: res
+
+return_result:
+  return: ${res.response.body}
+  next: end

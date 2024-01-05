@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+    <changeSet id="20231116129956" author="Net Group">
+        <insert tableName="configuration">
+            <column name="key" value="organizationMondayWorkingTimeStartISO"/>
+            <column name="value" value="2023-10-22T09:00:00.000Z"/>
+        </insert>
+        <insert tableName="configuration">
+            <column name="key" value="organizationMondayWorkingTimeEndISO"/>
+            <column name="value" value="2023-10-22T17:00:00.000Z"/>
+        </insert>
+        <insert tableName="configuration">
+            <column name="key" value="organizationTuesdayWorkingTimeStartISO"/>
+            <column name="value" value="2023-10-22T09:00:00.000Z"/>
+        </insert>
+        <insert tableName="configuration">
+            <column name="key" value="organizationTuesdayWorkingTimeEndISO"/>
+            <column name="value" value="2023-10-22T17:00:00.000Z"/>
+        </insert>
+        <insert tableName="configuration">
+            <column name="key" value="organizationWednesdayWorkingTimeStartISO"/>
+            <column name="value" value="2023-10-22T09:00:00.000Z"/>
+        </insert>
+        <insert tableName="configuration">
+            <column name="key" value="organizationWednesdayWorkingTimeEndISO"/>
+            <column name="value" value="2023-10-22T17:00:00.000Z"/>
+        </insert>
+        <insert tableName="configuration">
+            <column name="key" value="organizationThursdayWorkingTimeStartISO"/>
+            <column name="value" value="2023-10-22T09:00:00.000Z"/>
+        </insert>
+        <insert tableName="configuration">
+            <column name="key" value="organizationThursdayWorkingTimeEndISO"/>
+            <column name="value" value="2023-10-22T17:00:00.000Z"/>
+        </insert>
+        <insert tableName="configuration">
+            <column name="key" value="organizationFridayWorkingTimeStartISO"/>
+            <column name="value" value="2023-10-22T09:00:00.000Z"/>
+        </insert>
+        <insert tableName="configuration">
+            <column name="key" value="organizationFridayWorkingTimeEndISO"/>
+            <column name="value" value="2023-10-22T17:00:00.000Z"/>
+        </insert>
+        <insert tableName="configuration">
+            <column name="key" value="organizationSaturdayWorkingTimeStartISO"/>
+            <column name="value" value="2023-10-22T09:00:00.000Z"/>
+        </insert>
+        <insert tableName="configuration">
+            <column name="key" value="organizationSaturdayWorkingTimeEndISO"/>
+            <column name="value" value="2023-10-22T17:00:00.000Z"/>
+        </insert>
+        <insert tableName="configuration">
+            <column name="key" value="organizationSundayWorkingTimeStartISO"/>
+            <column name="value" value="2023-10-22T09:00:00.000Z"/>
+        </insert>
+        <insert tableName="configuration">
+            <column name="key" value="organizationSundayWorkingTimeEndISO"/>
+            <column name="value" value="2023-10-22T17:00:00.000Z"/>
+        </insert>
+        <insert tableName="configuration">
+            <column name="key" value="organizationAllWeekdaysTimeStartISO"/>
+            <column name="value" value="2023-10-22T09:00:00.000Z"/>
+        </insert>
+        <insert tableName="configuration">
+            <column name="key" value="organizationAllWeekdaysTimeEndISO"/>
+            <column name="value" value="2023-10-22T17:00:00.000Z"/>
+        </insert>
+        <insert tableName="configuration">
+            <column name="key" value="organizationWorkingTimeWeekdays"/>
+            <column name="value" value="monday,tuesday,wednesday,thursday,friday,saturday,sunday"/>
+        </insert>
+        <insert tableName="configuration">
+            <column name="key" value="organizationWorkingTimeNationalHolidays"/>
+            <column name="value" value="true"/>
+        </insert>
+        <insert tableName="configuration">
+            <column name="key" value="organizationClosedOnWeekEnds"/>
+            <column name="value" value="false"/>
+        </insert>
+        <insert tableName="configuration">
+            <column name="key" value="organizationTheSameOnAllWorkingDays"/>
+            <column name="value" value="false"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>
+

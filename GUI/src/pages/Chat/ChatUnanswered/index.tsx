@@ -23,9 +23,9 @@ import sse from 'services/sse-service';
 
 const ChatUnanswered: FC = () => {
   const { t } = useTranslation();
-  const userInfo = useStore(state => state.userInfo);
+  const userInfo = useStore((state) => state.userInfo);
   const toast = useToast();
-  const chatCsaActive = useStore(state => state.chatCsaActive);
+  const chatCsaActive = useStore((state) => state.chatCsaActive);
   const [endChatModal, setEndChatModal] = useState<ChatType | null>(null);
   const [forwardToColleaugeModal, setForwardToColleaugeModal] =
     useState<ChatType | null>(null);
@@ -44,24 +44,26 @@ const ChatUnanswered: FC = () => {
     CHAT_EVENTS.RESPONSE_SENT_TO_CLIENT_EMAIL,
   ];
 
-  const activeChats = useStore(state => state.activeChats);
-  const selectedChatId = useStore(state => state.selectedChatId);
-  const selectedChat = useStore(state => state.selectedChat());
+  const activeChats = useStore((state) => state.activeChats);
+  const selectedChatId = useStore((state) => state.selectedChatId);
+  const selectedChat = useStore((state) => state.selectedChat());
   const setActiveChats = useStore.getState().setActiveChats;
 
   const { refetch } = useQuery<ChatType[]>({
-    queryKey: ['cs-get-all-active-chats', 'prod'],
+    queryKey: ['csa/active-chats', 'prod'],
     onSuccess(res: any) {
-      setActiveChats(res.data.get_all_active_chats);
+      setActiveChats(res.response);
     },
   });
-  
+
   useEffect(() => {
     refetch();
   }, [chatCsaActive]);
 
   useEffect(() => {
-    const onMessage = (chats: any) => {
+    const onMessage = async () => {
+      const res = await apiDev.get('csa/active-chats');
+      const chats = res.data.response ?? [];
       const isChatStillExists = chats?.filter(function (e: any) {
         return e.id === selectedChatId;
       });
@@ -74,7 +76,7 @@ const ChatUnanswered: FC = () => {
       }
     };
 
-    const events = sse(`cs-get-all-active-chats`, onMessage);
+    const events = sse(`/chat-list`, onMessage);
 
     return () => {
       events.close();
@@ -82,11 +84,11 @@ const ChatUnanswered: FC = () => {
   }, []);
 
   const { data: csaNameVisiblity } = useQuery<{ isVisible: boolean }>({
-    queryKey: ['cs-get-csa-name-visibility', 'prod-2'],
+    queryKey: ['csa/name-visibility', 'prod'],
   });
 
   const { data: csaTitleVisibility } = useQuery<{ isVisible: boolean }>({
-    queryKey: ['cs-get-csa-title-visibility', 'prod-2'],
+    queryKey: ['csa/title-visibility', 'prod'],
   });
 
   const groupedUnansweredChats: GroupedChat = useMemo(() => {
@@ -139,7 +141,7 @@ const ChatUnanswered: FC = () => {
 
   const handleCsaForward = async (chat: ChatType, user: User) => {
     try {
-      await apiDev.post('cs-redirect-chat', {
+      await apiDev.post('chat/redirect-chat', {
         id: chat.id ?? '',
         customerSupportId: user?.idCode ?? '',
         customerSupportDisplayName: user?.displayName ?? '',
@@ -181,7 +183,7 @@ const ChatUnanswered: FC = () => {
     if (!selectedEndChatStatus) return;
 
     try {
-      await apiDev.post('cs-end-chat', {
+      await apiDev.post('chat/end-chat', {
         chatId: selectedChatId,
         event: selectedEndChatStatus.toUpperCase(),
         authorTimestamp: new Date().toISOString(),

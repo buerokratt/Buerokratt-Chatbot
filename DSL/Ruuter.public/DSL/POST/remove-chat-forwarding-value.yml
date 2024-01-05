@@ -1,0 +1,85 @@
+get_chat_info:
+  call: http.post
+  args:
+   url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
+   contentType: plaintext
+   headers:
+    cookie: ${cookie}
+   plaintext:
+      "chatJwt"
+  result: infoRes
+  next: check_chat_info_response
+
+check_chat_info_response:
+  switch:
+    - condition: ${200 <= infoRes.response.statusCodeValue && infoRes.response.statusCodeValue < 300}
+      next: assignChatId
+  next: return_bad_request
+
+assignChatId:
+  assign:
+    chatId: ${infoRes.response.body.chatId}
+  next: getActiveChatById
+
+getActiveChatById:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-active-chat-by-id"
+    body:
+      id: ${chatId}
+  result: activeChatRes
+  next: checkActiveChatResult 
+
+checkActiveChatResult:
+  switch:
+    - condition: ${activeChatRes.response.body.length > 0}
+      next: assignChat
+  next: return_chat_ended
+
+assignChat:
+  assign:
+    activeChat: ${activeChatRes.response.body[0]}
+  next: insertChat  
+
+insertChat:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-chat"
+    body:
+      id: ${chatId}
+      customerSupportId: ${activeChat.customerSupportId}
+      customerSupportDisplayName: ${activeChat.customerSupportDisplayName}
+      csaTitle: ${activeChat.csaTitle}
+      endUserId: ${activeChat.endUserId}
+      endUserFirstName: ${activeChat.endUserFirstName}
+      endUserLastName: ${activeChat.endUserLastName}
+      status: ${activeChat.status}
+      created: ${activeChat.created}
+      ended: ${activeChat.ended}
+      feedbackRating: ""
+      feedbackText: ""
+      endUserEmail: ${activeChat.endUserEmail}
+      endUserPhone: ${activeChat.endUserPhone}
+      endUserOs: ${activeChat.endUserOs}
+      endUserUrl: ${activeChat.endUserUrl}
+      externalId: ${activeChat.externalId}
+      forwardedTo: ""
+      forwardedToName: ""
+      receivedFrom: ${activeChat.receivedFrom}
+      receivedFromName: ""
+  result: insert_chat_res
+  next: return_result
+
+return_result:
+  return: ${insert_chat_res.response.body}
+  next: end  
+
+return_bad_request:
+  status: 400
+  return: "Bad Request"
+  next: end 
+
+return_chat_ended:
+  return: "Chat Has Ended"
+  status: 400
+  next: end  

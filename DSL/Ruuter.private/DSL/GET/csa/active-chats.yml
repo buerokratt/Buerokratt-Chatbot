@@ -1,0 +1,8 @@
+getActiveChats:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-cs-all-active-chats"
+  result: res
+
+return_result:
+  return: ${res.response.body}

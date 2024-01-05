@@ -1,0 +1,17 @@
+extractRequestData:
+  assign:
+    comment: ${incoming.body.comment}
+    chatId: ${incoming.body.chatId}
+
+setChatComment:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-chat-history-comment"
+    body:
+      comment: ${comment}
+      chatId: ${chatId}
+  result: res
+
+return_result:
+  return: ${res.response.body}
+  next: end

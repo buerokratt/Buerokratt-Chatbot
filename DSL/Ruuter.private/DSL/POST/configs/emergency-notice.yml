@@ -1,0 +1,34 @@
+extractRequestData:
+  assign:
+    emergencyNoticeText: ${incoming.body.emergencyNoticeText}
+    emergencyNoticeStartISO: ${incoming.body.emergencyNoticeStartISO}
+    emergencyNoticeEndISO: ${incoming.body.emergencyNoticeEndISO}
+    isEmergencyNoticeVisible: ${incoming.body.isEmergencyNoticeVisible}
+  next: validateBody
+
+validateBody:
+  switch:
+    - condition: "${!!(new Date(emergencyNoticeStartISO) && new Date(emergencyNoticeEndISO))}"
+      next: setEmergencyNotice
+  next: returnInvalidBody
+
+setEmergencyNotice:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-emergency-notice"
+    body:
+      emergencyNoticeText: ${emergencyNoticeText}
+      emergencyNoticeStartISO: ${emergencyNoticeStartISO}
+      emergencyNoticeEndISO: ${emergencyNoticeEndISO}
+      isEmergencyNoticeVisible: ${isEmergencyNoticeVisible}
+      created: ${new Date().toISOString()}
+  result: res
+  next: return_result
+
+return_result:
+  return: ${res.response.body}
+  next: end
+
+returnInvalidBody:
+  return: "error: invalid body"
+  next: end

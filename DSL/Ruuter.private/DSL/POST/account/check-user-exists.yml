@@ -1,0 +1,26 @@
+extractRequestData:
+  assign:
+    userId: ${incoming.body.userIdCode}
+
+getUser:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-user"
+    body:
+      userIdCode: ${userId}
+  result: res
+  next: checkIfUserExists
+
+checkIfUserExists:
+  switch:
+    - condition: "${res.response.body.length > 0}"
+      next: return_exists
+  next: return_not_exists
+
+return_exists:
+  return: "true"
+  next: end
+
+return_not_exists:
+  return: "false"
+  next: end

@@ -31,7 +31,6 @@ import {
   setToLocalStorage,
 } from 'utils/local-storage-utils';
 import { CHAT_HISTORY_PREFERENCES_KEY } from 'constants/config';
-import apiDevV2 from 'services/api-dev-v2';
 import { useLocation } from 'react-router-dom';
 
 const ChatHistory: FC = () => {
@@ -100,31 +99,23 @@ const ChatHistory: FC = () => {
 
   const getAllEndedChats = useMutation({
     mutationFn: (data: { startDate: string; endDate: string }) =>
-      apiDev.post('cs-get-all-ended-chats', {
+      apiDev.post('csa/ended-chats', {
         startDate: data.startDate,
         endDate: data.endDate,
       }),
     onSuccess: (res: any) => {
-      setEndedChatsList(res.data.data.cs_get_all_ended_chats ?? []);
-      filterChatsList(res.data.data.cs_get_all_ended_chats ?? []);
+      setEndedChatsList(res.data.response ?? []);
+      filterChatsList(res.data.response ?? []);
     },
   });
 
   const getChatById = useMutation({
     mutationFn: () =>
-      apiDevV2.post('cs-get-chat-by-id', {
+      apiDev.post('chat/chat-by-id', {
         chatId: passedChatId,
       }),
     onSuccess: (res: any) => {
       setSelectedChat(res.data.response);
-    },
-  });
-
-  useQuery<Message[]>({
-    queryKey: ['cs-get-messages-by-chat-id', selectedChat?.id, 'prod'],
-    enabled: !!selectedChat,
-    onSuccess(res: any) {
-      setchatMessagesList(res.data.cs_get_messages_by_chat_id);
     },
   });
 
@@ -145,35 +136,35 @@ const ChatHistory: FC = () => {
     [t]
   );
 
-  const sendToEmailMutation = useMutation({
-    mutationFn: (data: ChatType) =>
-      apiDevV2.post('history/cs-send-history-to-email', { chatId: data.id }),
-    onSuccess: () => {
-      toast.open({
-        type: 'success',
-        title: t('global.notification'),
-        message: t('toast.success.messageToUserEmail'),
-      });
-    },
-    onError: (error: AxiosError) => {
-      toast.open({
-        type: 'error',
-        title: t('global.notificationError'),
-        message: error.message,
-      });
-    },
-    onSettled: () => setSendToEmailModal(null),
-  });
+  // const sendToEmailMutation = useMutation({
+  //   mutationFn: (data: ChatType) =>
+  //     apiDev.post('history/cs-send-history-to-email', { chatId: data.id }),
+  //   onSuccess: () => {
+  //     toast.open({
+  //       type: 'success',
+  //       title: t('global.notification'),
+  //       message: t('toast.success.messageToUserEmail'),
+  //     });
+  //   },
+  //   onError: (error: AxiosError) => {
+  //     toast.open({
+  //       type: 'error',
+  //       title: t('global.notificationError'),
+  //       message: error.message,
+  //     });
+  //   },
+  //   onSettled: () => setSendToEmailModal(null),
+  // });
 
   const searchChatsMutation = useMutation({
     mutationFn: (searchKey: string) =>
-      apiDev.post('cs-get-chat-ids-matching-message-search', {
+      apiDev.post('chat/search', {
         searchKey: searchKey,
       }),
-    onSuccess: (res) => {
-      const responseList = (
-        res.data.data.get_chat_ids_matching_message_search ?? []
-      ).map((item: any) => item.chatId);
+    onSuccess: (res: any) => {
+      const responseList = (res.data.response ?? []).map(
+        (item: any) => item.chatId
+      );
       const filteredChats = endedChatsList.filter((item) =>
         responseList.includes(item.id)
       );
@@ -201,7 +192,7 @@ const ChatHistory: FC = () => {
 
       if (!isChangeable) return;
 
-      await apiDev.post('cs-end-chat', {
+      await apiDev.post('chat/status', {
         chatId: selectedChat!.id,
         event: data.event.toUpperCase(),
         authorTimestamp: new Date().toISOString(),
@@ -235,7 +226,7 @@ const ChatHistory: FC = () => {
 
   const chatCommentChangeMutation = useMutation({
     mutationFn: (data: { chatId: string | number; comment: string }) =>
-      apiDevV2.post('comments/comment-history', data),
+      apiDev.post('comments/comment-history', data),
     onSuccess: (res, { chatId, comment }) => {
       const updatedChatList = endedChatsList.map((chat) =>
         chat.id === chatId ? { ...chat, comment } : chat
@@ -559,7 +550,7 @@ const ChatHistory: FC = () => {
               </Button>
               <Button
                 appearance="error"
-                onClick={() => sendToEmailMutation.mutate(sendToEmailModal)}
+                // onClick={() => sendToEmailMutation.mutate(sendToEmailModal)}
               >
                 {t('global.yes')}
               </Button>

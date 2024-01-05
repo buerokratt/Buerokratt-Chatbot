@@ -68,7 +68,7 @@ const Chat: FC<ChatProps> = ({
   onRefresh,
 }) => {
   const { t } = useTranslation();
-  const userInfo = useStore(state => state.userInfo);
+  const userInfo = useStore((state) => state.userInfo);
   const chatRef = useRef<HTMLDivElement>(null);
   const [messageGroups, _setMessageGroups] = useState<GroupedMessage[]>([]);
   const messageGroupsRef = useRef(messageGroups);
@@ -80,7 +80,7 @@ const Chat: FC<ChatProps> = ({
   const [isPending, startTransition] = useTransition();
   const [responseText, setResponseText] = useState('');
   const [selectedMessages, setSelectedMessages] = useState<Message[]>([]);
-  const chatCsaActive = useStore(state => state.chatCsaActive);
+  const chatCsaActive = useStore((state) => state.chatCsaActive);
   const [messagesList, setMessagesList] = useState<Message[]>([]);
   const [latestPermissionMessage, setLatestPermissionMessage] =
     useState<number>(0);
@@ -99,105 +99,115 @@ const Chat: FC<ChatProps> = ({
 
   const getCsaStatus = async () => {
     const { data: res } = await apiDev.post(
-      'cs-get-customer-support-activity-by-id',
+      'account/customer-support-activity-by-id',
       {
         customerSupportId: userInfo?.idCode ?? '',
       }
     );
-    useStore.getState().setChatCsaActive(
-      res.data.get_customer_support_activity[0]?.status === 'online' ||
-        res.data.get_customer_support_activity[0]?.status === 'idle'
-    );
+    useStore
+      .getState()
+      .setChatCsaActive(
+        res.response.status === 'online' || res.response.status === 'idle'
+      );
   };
 
   useEffect(() => {
-    const sseUrl = `cs-get-new-messages?chatId=${chat.id}&lastRead=${new Date(
-      chat.lastMessageTimestamp ?? ''
-    ).toISOString()}`;
-
-    const onMessage = (messages: Message[]) => {
-      if (messages.length > 0)
-        setPreviewTypingMessage(messages[messages.length - 1]);
-      const filteredMessages = messages?.filter((newMessage) => {
-        return !messagesList.some(
-          (existingMessage) =>
-            existingMessage.id === newMessage.id &&
-            existingMessage.event === newMessage.event
+    const onMessage = async (res) => {
+      if (res === 'preview') {
+        const previewMessage = await apiDev.get(
+          'csa/message-preview?chatId=' + chat.id
         );
-      });
+        setPreviewTypingMessage(previewMessage.data.response);
+      } else {
+        if (messagesList?.length > 0) {
+          const res =
+            (await apiDev.get(
+              `csa/new-messages?chatId=${chat.id}&lastRead=${
+                chat.lastMessageTimestamp.split('+')[0] ?? ''
+              }`
+            )) ?? [];
+          const messages = res.data.response;
+          setPreviewTypingMessage('');
+          const filteredMessages = messages?.filter((newMessage) => {
+            return !messagesList.some(
+              (existingMessage) =>
+                existingMessage.id === newMessage.id &&
+                existingMessage.event === newMessage.event
+            );
+          });
 
-      const newDisplayableMessages = filteredMessages?.filter(
-        (msg) => msg.authorId != userInfo?.idCode
-      );
+          let newDisplayableMessages = filteredMessages?.filter(
+            (msg) => msg.authorId != userInfo?.idCode
+          );
 
-      if (newDisplayableMessages?.length > 0) {
-        setMessagesList((oldMessages) => [
-          ...oldMessages,
-          ...newDisplayableMessages,
-        ]);
+          if (newDisplayableMessages?.length > 0) {
+            setMessagesList((oldMessages) => [
+              ...oldMessages,
+              ...newDisplayableMessages,
+            ]);
+          }
+
+          const askingPermissionsMessages: Message[] = messagesList?.filter(
+            (e: Message) =>
+              e.event === 'ask-permission' ||
+              e.event === 'ask-permission-accepted' ||
+              e.event === 'ask-permission-rejected' ||
+              e.event === 'ask-permission-ignored'
+          );
+          const lastestPermissionDate = new Date(
+            askingPermissionsMessages[askingPermissionsMessages.length - 1]
+              ?.created ?? new Date()
+          );
+
+          const lastPermissionMesageSecondsDiff = Math.round(
+            (new Date().getTime() - lastestPermissionDate.getTime()) / 1000
+          );
+
+          setLatestPermissionMessage(lastPermissionMesageSecondsDiff ?? 0);
+
+          const permissionsHandeledMessages: Message[] =
+            filteredMessages?.filter(
+              (e: Message) =>
+                e.event === 'ask-permission-accepted' ||
+                e.event === 'ask-permission-rejected' ||
+                e.event === 'ask-permission-ignored'
+            );
+          if (permissionsHandeledMessages?.length > 0) {
+            getMessages();
+          }
+        }
       }
+    };
 
-      const askingPermissionsMessages: Message[] = messagesList?.filter(
+    const events = sse(`/${chat.id}`, onMessage);
+
+    return () => {
+      events.close();
+    };
+  }, [chat.id, messagesList]);
+
+  const getMessages = async () => {
+    const { data: res } = await apiDev.post('csa/messages-by-id', {
+      chatId: chat.id,
+    });
+    if (
+      messagesLength != 0 &&
+      messagesLength < res.response.length &&
+      res.response[res.response.length - 1].authorId != userInfo?.idCode
+    ) {
+      newMessage?.play();
+      onRefresh();
+    }
+    messagesLength = res.response.length;
+    const askingPermissionsMessages: Message[] = res.response
+      .map((e: Message[]) => e)
+      .filter(
         (e: Message) =>
           e.event === 'ask-permission' ||
           e.event === 'ask-permission-accepted' ||
           e.event === 'ask-permission-rejected' ||
           e.event === 'ask-permission-ignored'
       );
-      const lastestPermissionDate = new Date(
-        askingPermissionsMessages[askingPermissionsMessages.length - 1]
-          ?.created ?? new Date()
-      );
-
-      const lastPermissionMesageSecondsDiff = Math.round(
-        (new Date().getTime() - lastestPermissionDate.getTime()) / 1000
-      );
-
-      setLatestPermissionMessage(lastPermissionMesageSecondsDiff ?? 0);
-
-      const permissionsHandeledMessages: Message[] = filteredMessages?.filter(
-        (e: Message) =>
-          e.event === 'ask-permission-accepted' ||
-          e.event === 'ask-permission-rejected' ||
-          e.event === 'ask-permission-ignored'
-      );
-      if (permissionsHandeledMessages?.length > 0) {
-        getMessages();
-      }
-    };
-
-    const events = sse(sseUrl, onMessage);
-
-    return () => {
-       events.close();
-    };
-  }, [messagesList]);
-
-  const getMessages = async () => {
-    const { data: res } = await apiDev.post('cs-get-messages-by-chat-id', {
-      chatId: chat.id,
-    });
-    if (
-      messagesLength != 0 &&
-      messagesLength < res.data.cs_get_messages_by_chat_id.length &&
-      res.data.cs_get_messages_by_chat_id[
-        res.data.cs_get_messages_by_chat_id.length - 1
-      ].authorId != userInfo?.idCode
-    ) {
-      newMessage?.play();
-      onRefresh();
-    }
-    messagesLength = res.data.cs_get_messages_by_chat_id.length;
-    const askingPermissionsMessages: Message[] =
-      res.data.cs_get_messages_by_chat_id
-        .map((e: Message[]) => e)
-        .filter(
-          (e: Message) =>
-            e.event === 'ask-permission' ||
-            e.event === 'ask-permission-accepted' ||
-            e.event === 'ask-permission-rejected' ||
-            e.event === 'ask-permission-ignored'
-        );
 
     const lastestPermissionDate = new Date(
       askingPermissionsMessages[askingPermissionsMessages.length - 1]
@@ -210,7 +220,7 @@ const Chat: FC<ChatProps> = ({
 
     setLatestPermissionMessage(lastPermissionMesageSecondsDiff ?? 0);
 
-    setMessagesList(res.data.cs_get_messages_by_chat_id);
+    setMessagesList(res.response);
   };
 
   const sendAttachmentMutation = useSendAttachment();
@@ -239,7 +249,7 @@ const Chat: FC<ChatProps> = ({
   };
 
   const postMessageMutation = useMutation({
-    mutationFn: (message: Message) => apiDev.post('cs-post-message', message),
+    mutationFn: (message: Message) => apiDev.post('csa/message', message),
     onSuccess: () => {},
     onError: (error: AxiosError) => {
       toast.open({
@@ -252,8 +262,9 @@ const Chat: FC<ChatProps> = ({
 
   const postEventMutation = useMutation({
     mutationFn: (message: Message) =>
-      apiDev.post('cs-post-event-message', {
+      apiDev.post('csa/message', {
         chatId: message.chatId ?? '',
+        content: '',
         event: message.event ?? '',
         authorTimestamp: message.authorTimestamp ?? '',
       }),
@@ -271,7 +282,7 @@ const Chat: FC<ChatProps> = ({
 
   const postMessageWithNewEventMutation = useMutation({
     mutationFn: (message: Message) =>
-      apiDev.post('cs-post-message-with-new-event', {
+      apiDev.post('message-event', {
         id: message.id ?? '',
         event: CHAT_EVENTS.ASK_PERMISSION_IGNORED,
         authorTimestamp: message.authorTimestamp ?? '',
@@ -291,7 +302,7 @@ const Chat: FC<ChatProps> = ({
 
   const takeOverChatMutation = useMutation({
     mutationFn: () =>
-      apiDev.post('cs-claim-chat', {
+      apiDev.post('chat/claim-chat', {
         id: chat.id ?? '',
         customerSupportId: userInfo?.idCode ?? '',
         customerSupportDisplayName: userInfo?.displayName ?? '',
@@ -659,7 +670,7 @@ const Chat: FC<ChatProps> = ({
                 )}
               </div>
             ))}
-          {previewTypingMessage?.preview && (
+          {previewTypingMessage && (
             <>
               <div className={clsx(['active-chat__group'])} key={`group`}>
                 <div className="active-chat__group-initials">
@@ -668,7 +679,7 @@ const Chat: FC<ChatProps> = ({
                 <div className="active-chat__group-name">{'User Typing'}</div>
                 <div className="active-chat__messages">
                   <PreviewMessage
-                    message={previewTypingMessage}
+                    preview={previewTypingMessage}
                     readStatus={messageReadStatusRef}
                     key={`preview-message`}
                     onSelect={(_) => {}}

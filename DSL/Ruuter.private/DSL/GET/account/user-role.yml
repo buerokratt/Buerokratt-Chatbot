@@ -1,0 +1,39 @@
+get_user_info:
+  call: http.post
+  args:
+   url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
+   contentType: plaintext
+   headers:
+    cookie: ${incoming.headers.cookie}
+   plaintext: 
+      "customJwtCookie"
+  result: res
+  next: check_user_info_response
+
+check_user_info_response:
+  switch:
+    - condition: ${200 <= res.response.statusCodeValue && res.response.statusCodeValue < 300}
+      next: assignIdCode
+  next: returnNotFound
+
+assignIdCode:
+  assign:
+    idCode: ${res.response.body.idCode}
+  next: getUserRole
+
+getUserRole:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-user-role"
+    body:
+      userIdCode: ${idCode}
+  result: roles_res
+  next: returnSuccess
+
+returnSuccess:
+  return: ${roles_res.response.body[0].authorities}
+  next: end
+
+returnNotFound:
+  return: "error: not found"
+  next: end

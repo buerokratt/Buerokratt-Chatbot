@@ -1,0 +1,93 @@
+get_tara_user_info:
+  call: http.get
+  args:
+   url: "[#CHATBOT_TIM]/jwt/userinfo"
+   contentType: plaintext
+   headers:
+    cookie: ${incoming.headers.cookie}
+   plaintext: 
+      "JWTTOKEN"
+  result: tara_info
+  next: get_session_length
+
+get_session_length:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-configuration"
+    body:
+      key: "session_length"
+  result: session_result
+  next: getUser
+
+getUser:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-user-with-roles-by-id-code"
+    body:
+      userIdCode: ${tara_info.response.body.personalCode}
+  result: user_info
+  next: checkIfUserExists
+
+checkIfUserExists:
+  switch:
+    - condition: "${user_info.response.body.length > 0}"
+      next: assignUser
+  next: return_not_exists
+
+assignUser:
+  assign:
+    user: ${user_info.response.body[0]}
+  next: generate_cookie  
+
+generate_cookie:
+  call: http.post
+  args:
+    url: "[#CHATBOT_TIM]/jwt/custom-jwt-generate"
+    body:
+      JWTName: "customJwtCookie"
+      expirationInMinutes: ${session_result.response.body[0].value}
+      content: {
+        "idCode": "${user.idCode}",
+        "login": "${user.idCode}",
+        "displayName": "${user.displayName}",
+        "firstName": "${user.firstName}",
+        "lastName": "${user.lastName}",
+        "csaEmail": "${user.csaEmail}",
+        "csaTitle": "${user.csaTitle}",
+        "authorities": "${user.authorities}",
+        "authMethod": "${tara_info.response.body.authMethod}",
+        "fullName": "${tara_info.response.body.fullName}"
+      }
+  result: cookie_result
+  next: assign_cookie
+
+assign_cookie:
+  assign:
+    setCookie:
+      customJwtCookie: ${cookie_result.response.body.token}
+      Domain: "[#DOMAIN]"
+      Secure: false
+      HttpOnly: false
+  next: setCustomerSupportAgentAway
+
+setCustomerSupportAgentAway:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-customer-support-status"
+    body:
+      active: false
+      userIdCode: ${tara_info.response.body.personalCode}
+      created: ${new Date().toISOString()}
+      status: "offline"
+  result: setCustomerSupportAgentAwayResult
+  next: return_value  
+
+return_value:
+  headers:
+    Set-Cookie: ${setCookie}
+  return: ${cookie_result.response.body.token}
+  next: end 
+
+return_not_exists:
+  return: "User does not exist"
+  next: end

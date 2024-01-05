@@ -1,0 +1,15 @@
+extractRequestData:
+  assign:
+    chatId: ${incoming.params.chatId}    
+
+getChatHistoryComment:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-chat-history-comment-by-id"
+    body:
+      chatId: ${chatId}
+  result: res
+
+returnSuccess:
+  return: ${res.response.body}
+  next: end

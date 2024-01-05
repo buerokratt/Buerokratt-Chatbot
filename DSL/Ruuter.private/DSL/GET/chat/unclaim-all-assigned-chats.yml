@@ -1,0 +1,35 @@
+get_user_info:
+  call: http.post
+  args:
+   url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
+   contentType: plaintext
+   headers:
+    cookie: ${incoming.headers.cookie}
+   plaintext: 
+      "customJwtCookie"
+  result: res
+  next: check_user_info_response
+
+check_user_info_response:
+  switch:
+    - condition: ${200 <= res.response.statusCodeValue && res.response.statusCodeValue < 300}
+      next: assignIdCode
+  next: return_bad_request
+
+assignIdCode:
+  assign:
+    idCode: ${res.response.body.idCode}
+  next: unclaimAllAssignedChats
+
+unclaimAllAssignedChats:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/update-chats-assignee-by-user-id"
+    body:
+      userId: ${idCode}
+  result: unclaim_res
+  next: return_result
+
+return_result:
+  return: ${unclaim_res.response.body}
+  next: end
