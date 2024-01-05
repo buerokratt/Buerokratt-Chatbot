@@ -25,13 +25,13 @@ const App: FC = () => {
   useQuery<{
     data: { custom_jwt_userinfo: UserInfo };
   }>({
-    queryKey: ['cs-custom-jwt-userinfo', 'prod'],
-    onSuccess: (data: { data: { custom_jwt_userinfo: UserInfo } }) => {
+    queryKey: ['custom-jwt/userinfo', 'prod'],
+    onSuccess: (res: { response: UserInfo }) => {
       localStorage.setItem(
         'exp',
-        data.data.custom_jwt_userinfo.JWTExpirationTimestamp
+        res.response.JWTExpirationTimestamp
       );
-      return useStore.getState().setUserInfo(data.data.custom_jwt_userinfo);
+      return useStore.getState().setUserInfo(res.response);
     },
   });
 
@@ -43,10 +43,7 @@ const App: FC = () => {
         <Route path="/active" element={<ChatActive />} />
         <Route path="/history" element={<ChatHistory />} />
         <Route path="/users" element={<SettingsUsers />} />
-        <Route
-          path="/chatbot/settings"
-          element={<SettingsChatSettings />}
-        />
+        <Route path="/chatbot/settings" element={<SettingsChatSettings />} />
         <Route
           path="/chatbot/welcome-message"
           element={<SettingsWelcomeMessage />}
@@ -55,18 +52,9 @@ const App: FC = () => {
           path="/chatbot/emergency-notices"
           element={<SettingsEmergencyNotices />}
         />
-        <Route
-          path="/chatbot/appearance"
-          element={<SettingsAppearance />}
-        />
-        <Route
-          path="/working-time"
-          element={<SettingsWorkingTime />}
-        />
-        <Route
-          path="/session-length"
-          element={<SettingsSessionLength />}
-        />
+        <Route path="/chatbot/appearance" element={<SettingsAppearance />} />
+        <Route path="/working-time" element={<SettingsWorkingTime />} />
+        <Route path="/session-length" element={<SettingsSessionLength />} />
         <Route path="/uptime" element={<MonitoringUptime />} />
       </Route>
     </Routes>

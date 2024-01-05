@@ -1,0 +1,8 @@
+getGreetingMessage:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-greeting-message"
+  result: res
+
+return_result:
+  return: ${res.response.body[0]}

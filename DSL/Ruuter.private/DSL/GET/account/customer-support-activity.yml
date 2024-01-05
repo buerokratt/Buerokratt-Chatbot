@@ -1,0 +1,38 @@
+get_user_info:
+  call: http.post
+  args:
+   url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
+   contentType: plaintext
+   headers:
+    cookie: ${incoming.headers.cookie}
+   plaintext: 
+      "customJwtCookie"
+  result: res
+  next: check_user_info_response
+
+check_user_info_response:
+  switch:
+    - condition: ${200 <= res.response.statusCodeValue && res.response.statusCodeValue < 300}
+      next: assignIdCode
+  next: return_bad_request
+
+assignIdCode:
+  assign:
+    idCode: ${res.response.body.idCode}
+  next: getCustomerSupportActivity
+
+getCustomerSupportActivity:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-customer-support-activity-by-id-code"
+    body:
+      customerSupportId: ${idCode}
+  result: res
+
+return_result:
+  return: ${res.response.body[0]}
+  next: end
+
+return_bad_request:
+  return: "error: bad request"
+  next: end

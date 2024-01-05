@@ -1,0 +1,29 @@
+assignIncoming:
+  assign:
+    chatId: "${incoming.body.chatId}"
+    email: "${incoming.body.endUserEmail}"
+    phone: "${incoming.body.endUserPhone}"
+
+checkChatId:
+  switch:
+    - condition: ${!!chatId && chatId !== "" && chatId !== null}
+      next: insertEmailAndPhone
+  next: returnNoChatId
+
+insertEmailAndPhone:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/update-chat-with-end-user-email-and-phone"
+    body:
+      chatId: ${chatId}
+      endUserEmail: "${email ? email : ''}"
+      endUserPhone: "${phone ? phone : ''}"
+  result: insertEmailAndPhoneResult
+
+returnSuccess:
+  return: Updated ${chatId} with ${email} and ${phone}.
+  next: end
+
+returnNoChatId:
+  return: Missing chatId in request body.
+  next: end

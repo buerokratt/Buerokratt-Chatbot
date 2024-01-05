@@ -15,19 +15,19 @@ const SettingsWelcomeMessage: FC = () => {
   const [welcomeMessageActive, setWelcomeMessageActivity] =
     useState<boolean>(true);
   const { data } = useQuery({
-    queryKey: ['cs-get-greeting-message', 'prod'],
+    queryKey: ['greeting/message', 'prod'],
     onSuccess: (res: any) => {
-      setWelcomeMessage(res.data.return_first_greeting_from_array.est ?? '');
+      setWelcomeMessage(res.response.est ?? '');
       setWelcomeMessageActivity(
-        res.data.return_first_greeting_from_array.isActive ?? false
+        res.response.isActive ?? false
       );
     },
   });
 
   const welcomeMessageMutation = useMutation({
     mutationFn: () =>
-      apiDev.post('cs-set-greeting-message', {
-        est: welcomeMessage,
+      apiDev.post('greeting/message', {
+        message: welcomeMessage,
       }),
     onSuccess: () => {
       toast.open({
@@ -47,7 +47,7 @@ const SettingsWelcomeMessage: FC = () => {
 
   const messageActivityMutation = useMutation({
     mutationFn: (value: boolean) =>
-      apiDev.post('cs-set-is-greeting-active', {
+      apiDev.post('greeting/is-active', {
         isActive: value,
       }),
     onError: (error: AxiosError) => {

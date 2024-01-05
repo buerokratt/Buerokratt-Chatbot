@@ -1,0 +1,255 @@
+extractRequestData:
+  assign:
+    chatId: ${incoming.body.chatId}
+    content: ${incoming.body.content}
+    holidays: ${incoming.body.holidays}
+    holidayNames: ${incoming.body.holidayNames}
+  next: check_bot_is_active
+
+check_bot_is_active:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-configuration"
+    body:
+      key: "is_bot_active"
+  result: is_bot_active_result
+  next: check_for_bot_active_result
+
+check_for_bot_active_result:
+  switch:
+    - condition: ${is_bot_active_result.response.body[0].value === 'true'}
+      next: get_bot_name
+  next: return_bot_is_not_active
+
+get_bot_name:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-configuration"
+    body:
+      key: "bot_institution_id"
+  result: get_bot_name_result
+  next: check_for_bot_name_result
+
+check_for_bot_name_result:
+  switch:
+    - condition: ${200 <= get_bot_name_result.response.statusCodeValue && get_bot_name_result.response.statusCodeValue < 300}
+      next: get_chat
+  next: return_bad_request
+
+get_chat:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-chat-by-id"
+    body:
+      id: ${chatId}
+  result: get_chat_result
+  next: check_for_get_chat_result  
+
+check_for_get_chat_result:
+  switch:
+    - condition: ${200 <= get_chat_result.response.statusCodeValue && get_chat_result.response.statusCodeValue < 300}
+      next: check_chat_belongs_to_bot
+  next: return_bad_request
+
+check_chat_belongs_to_bot:
+  switch:
+    - condition: ${get_chat_result.response.body[0].customerSupportId == get_bot_name_result.response.body[0].value}
+      next: post_message_to_client
+  next: return_chat_does_not_belong_to_bot
+
+post_message_to_client:
+  call: http.post
+  args:
+    url: "[#CHATBOT_BOT]/webhooks/rest/webhook"
+    body:
+      sender: ${chatId}
+      message: ${content}
+  result: post_message_to_client_result
+  next: check_for_post_message_to_client_result
+
+check_for_post_message_to_client_result:
+  switch:
+    - condition: ${200 <= post_message_to_client_result.response.statusCodeValue && post_message_to_client_result.response.statusCodeValue < 300}
+      next: check_if_bot_is_unable_to_reply
+  next: return_bad_request
+
+check_if_bot_is_unable_to_reply:
+  switch:
+    - condition: ${post_message_to_client_result.response.body[0].text == 'Suunan teid klienditeenindajale. Varuge natukene kannatust.'}
+      next: get_organization_working_details
+  next: convert_bot_responses_to_messages
+
+get_organization_working_details:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-is-organization-available"
+    body:
+      holidays: ${holidays}
+      holiday_names: ${holidayNames}
+      current_timestamp: ${new Date().toISOString()}
+  result: org_res
+  next: assign_organization_details
+
+assign_organization_details:
+  assign:
+    org_details: ${org_res.response.body[0]}
+  next: check_if_organization_is_available
+
+check_if_organization_is_available: 
+  switch:
+    - condition: ${org_details.isWithinWorkingTime === true && org_details.isWithinWorkingDays === true && org_details.isAllowedToWorkAtHolidays === true}
+      next: get_all_available_csas
+    - condition: ${org_details.isWithinWorkingTime === true && org_details.isWithinWorkingDays === true && org_details.isAllowedToWorkAtHolidays === false && org_details.isHoliday == true}
+      next: return_is_a_holiday
+    - condition: ${org_details.isWithinWorkingTime === true && org_details.isWithinWorkingDays === true && org_details.isAllowedToWorkAtHolidays === false && org_details.isHoliday == false}
+      next: get_all_available_csas   
+  next: return_organization_is_not_available
+
+return_is_a_holiday:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-bot-message"
+    body:
+      messages: 
+         -
+          chatId: ${chatId}
+          content: ${org_details.holidayMessage}
+          authorTimestamp: ${new Date().toISOString()}
+          event: 'unavailable_holiday'
+          authorId: ${get_bot_name_result.response.body[0].value}
+          authorFirstName: ""
+          authorLastName: ""
+          created: ${new Date().toISOString()}
+  result: is_a_holiday_result
+  next: return_is_holiday
+
+return_organization_is_not_available:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-bot-message"
+    body:
+      messages: 
+         -
+          chatId: ${chatId}
+          content: 'Bürokratt on hetkel väljaspool tööaega, palun jäta oma kontaktandmed ja võtame Sinuga esimesel võimalusel ühendust'
+          authorTimestamp: ${new Date().toISOString()}
+          event: 'unavailable_organization'
+          authorId: ${get_bot_name_result.response.body[0].value}
+          authorFirstName: ""
+          authorLastName: ""
+          created: ${new Date().toISOString()}
+  result: organization_is_not_available_result
+  next: return_organization_is_not_available_res
+
+get_all_available_csas:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-all-available-customer-support-agents"
+  result: csas_res
+  next: assign_available_csas
+
+assign_available_csas:
+  assign:
+    available_csas: ${csas_res.response.body.length}
+  next: check_if_csas_are_available 
+
+check_if_csas_are_available:
+  switch:
+    - condition: ${available_csas == 0}
+      next: send_csas_not_available_message
+  next: redirect_chat_to_back_office
+
+send_csas_not_available_message:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-bot-message"
+    body:
+      messages: 
+         -
+          chatId: ${chatId}
+          content: 'Hetkel nõustajad puuduvad, palun jätke oma kontaktandmed ja võtame Teiega esimesel võimalusel ühendust'
+          authorTimestamp: ${new Date().toISOString()}
+          event: 'unavailable_csas'
+          authorId: ${get_bot_name_result.response.body[0].value}
+          authorFirstName: ""
+          authorLastName: ""
+          created: ${new Date().toISOString()}
+  result: csas_not_available_message_result
+  next: return_csa_is_not_available
+
+redirect_chat_to_back_office:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/remove_cs_agent_from_chat"
+    body:
+      chatId: ${chatId}
+  result: redirect_chat_to_back_office_result
+  next: convert_bot_responses_to_messages
+
+convert_bot_responses_to_messages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/bot_responses_to_messages"
+    headers:
+      type: json
+    body:
+      data: {
+        "botMessages": "${post_message_to_client_result.response.body}",
+        "chatId": "${chatId}",
+        "authorId": "${get_bot_name_result.response.body[0].value}",
+        "authorFirstName": "",
+        "authorLastName": "",
+        "authorTimestamp": "${new Date().toISOString()}",
+        "created": "${new Date().toISOString()}"
+      }
+  result: converted_messages_res
+  next: add_bot_message_to_db
+
+add_bot_message_to_db:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-bot-message"
+    body:
+      messages: ${converted_messages_res.response.body}
+  result: add_bot_message_to_bot_result
+  next: return_message_sent
+
+return_is_holiday:
+  status: 200
+  return: "Today is a national holiday" 
+  next: end   
+
+return_organization_is_not_available_res:
+  status: 200
+  return: "Organization is not available" 
+  next: end
+  
+return_csa_is_not_available:
+  status: 200
+  return: "CSA's are not available" 
+  next: end
+
+return_message_sent:
+  status: 200
+  return: "Message Sent Successfully"
+  next: end  
+
+return_chat_does_not_belong_to_bot:
+  status: 200
+  return: "Chat does not belong to bot"
+  next: end  
+
+return_bot_is_not_active:
+  status: 200
+  return: "Bot is not active"
+  next: end  
+
+return_bad_request:
+  status: 400
+  return: "Bad Request"
+  next: end  
+
+return_incorrect_request:
+  status: 400
+  return: "Required parameter(s) missing"
+  next: end

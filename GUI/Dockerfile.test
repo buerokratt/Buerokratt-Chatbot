@@ -1,6 +1,7 @@
 FROM node:lts AS build
 WORKDIR /app
 COPY ./package.json .
+COPY ./exirain-header-0.0.29.tgz .
 RUN npm install --legacy-peer-deps --mode=development
 COPY . .
 RUN ./node_modules/.bin/vite build --mode=development

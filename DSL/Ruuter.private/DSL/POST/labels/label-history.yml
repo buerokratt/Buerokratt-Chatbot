@@ -1,0 +1,16 @@
+extractRequestData:
+  assign:
+    labels: ${incoming.body.labels}
+    chatId: ${incoming.body.chatId}
+
+setChatLabels:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-chat-history-labels"
+    body:
+      labels: ${labels}
+      chatId: ${chatId}
+  result: setLabelsResult
+
+return_result:
+  return: ${setLabelsResult.response.body}

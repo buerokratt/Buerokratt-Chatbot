@@ -1,0 +1,52 @@
+getBotName:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-configuration"
+    body:
+      key: "bot_institution_id"
+  result: bot_name_res
+
+assignBotName:
+  assign:
+    botName: ${bot_name_res.response.body[0].value}
+
+endOldBotChats:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-chat-ended-by-last-message-datetime"
+    body:
+      authorId: ${botName}
+      authorRole: "buerokratt"
+      content: "Teie vestlus antakse üle nõustajale."
+      currentDatetime: ${new Date().toISOString()}
+      currentStatus: "OPEN"
+      event: "inactive-chat-ended"
+      interval: "2 hours"
+      newStatus: "ENDED"
+      targetUser: "end-user"
+  result: end_old_bot_chats_res    
+
+insertMessageContent:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-message-content-by-customer-support-id"
+    body:
+      customerSupportId: ${botName}
+      authorId: ${botName}
+      authorRole: "buerokratt"
+      content: "Teie vestlus antakse üle nõustajale."
+      event: ""
+      created: ${new Date().toISOString()}
+  result: insert_message_content_res
+
+insertChatCustomerSupport:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-chat-customer-support-by-customer-support-id"
+    body:
+      customerSupportId: ${botName}
+  result: insert_chat_customer_support_res
+
+return_result:
+  return: "success"
+  next: end

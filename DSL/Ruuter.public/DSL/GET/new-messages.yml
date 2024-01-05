@@ -1,0 +1,46 @@
+extractRequestData:
+  assign:
+    timeRangeBegin: ${incoming.params.timeRangeBegin}
+  next: get_chat_info
+
+get_chat_info:
+  call: http.post
+  args:
+   url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
+   contentType: plaintext
+   headers:
+    cookie: ${incoming.headers.cookie}
+   plaintext:
+      "chatJwt"
+  result: infoRes
+  next: check_chat_info_response
+
+check_chat_info_response:
+  switch:
+    - condition: ${200 <= infoRes.response.statusCodeValue && infoRes.response.statusCodeValue < 300}
+      next: assignChatId
+  next: return_bad_request
+
+assignChatId:
+  assign:
+    chatId: ${infoRes.response.body.chatId}
+  next: getNewMessages
+
+getNewMessages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-chat-messages-updated-after-time"
+    body:
+      chatId: ${chatId}
+      timeRangeBegin: ${timeRangeBegin}
+  result: res
+  next: returnSuccess
+
+returnSuccess:
+  return: ${res.response.body}
+  next: end
+
+return_bad_request:
+  status: 400
+  return: false
+  next: end  

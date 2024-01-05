@@ -1,0 +1,30 @@
+extractRequestData:
+  assign:
+    isActive: ${incoming.body.isActive}
+
+setConfigurationValue:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-configuration-value"
+    body:
+      created: ${new Date().toISOString()}
+      key: "is_bot_active"
+      value: ${isActive}
+  result: setConfigurationResult
+
+insertChatAndMessageWhenBotNotActive:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RUUTER_PRIVATE]/bot/chat-and-message-when-bot-is-not-active"
+  result: insertChatAndMessageWhenBotNotActiveResult
+
+getConfigurationValue:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-configuration"
+    body:
+      key: "is_bot_active"
+  result: res
+
+return_result:
+  return: ${res.response.body[0].value}

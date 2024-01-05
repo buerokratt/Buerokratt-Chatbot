@@ -1,0 +1,15 @@
+extractRequestData:
+  assign:
+    chatId: ${incoming.body.chatId}
+
+getChatById:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-chat-by-id"
+    body:
+      id: ${chatId}
+  result: res
+
+return_result:
+   return: ${res.response.body[0]}  
+   next: end

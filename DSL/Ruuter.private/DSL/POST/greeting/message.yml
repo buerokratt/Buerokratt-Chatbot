@@ -1,0 +1,16 @@
+extractRequestData:
+  assign:
+    message: ${incoming.body.message}
+
+setConfigurationValue:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-configuration-value"
+    body:
+      created: ${new Date().toISOString()}
+      key: "greeting_message_est"
+      value: ${message}
+  result: res
+
+return_result:
+  return: ${res.response.body}

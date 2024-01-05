@@ -1,0 +1,16 @@
+extractRequestData:
+  assign:
+    startDate: "${incoming.body.startDate}"
+    endDate: "${incoming.body.endDate}"
+
+getUnavailableEndedChats:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-cs-all-unavailable-ended-chats"
+    body:
+      start: ${startDate}
+      end: ${endDate}  
+  result: res
+
+return_result:
+  return: ${res.response.body}

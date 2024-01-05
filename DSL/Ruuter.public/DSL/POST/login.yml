@@ -1,0 +1,73 @@
+extractRequestData:
+  assign:
+    login: ${incoming.body.login}
+    password: ${incoming.body.password}
+  next: getUserWithRole
+
+getUserWithRole:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-user-with-roles"
+    body:
+      login: ${login}
+      password: ${password}
+  result: user_result
+  next: check_user_result
+
+check_user_result:
+  switch:
+    - condition: "${user_result.response.body.length > 0}"
+      next: get_session_length
+  next: return_user_not_found 
+
+get_session_length:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-configuration"
+    body:
+      key: "session_length"
+  result: session_result
+  next: generate_cookie
+
+generate_cookie:
+  call: http.post
+  args:
+    url: "[#CHATBOT_TIM]/jwt/custom-jwt-generate"
+    body:
+      JWTName: "customJwtCookie"
+      expirationInMinutes: ${session_result.response.body[0].value}
+      content: ${user_result.response.body[0]}
+  result: cookie_result
+  next: assign_cookie
+
+assign_cookie:
+  assign:
+    setCookie:
+      customJwtCookie: ${cookie_result.response.body.token}
+      Domain: "[#DOMAIN]"
+      Secure: false
+      HttpOnly: false
+  next: setCustomerSupportAgentAway
+
+setCustomerSupportAgentAway:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-customer-support-status"
+    body:
+      active: false
+      userIdCode: ${login}
+      created: ${new Date().toISOString()}
+      status: "offline"
+  result: setCustomerSupportAgentAwayResult
+  next: return_value
+
+return_value:
+  headers:
+    Set-Cookie: ${setCookie}
+  return: ${cookie_result.response.body.token}
+  next: end 
+
+return_user_not_found:
+  status: 400
+  return: "User Not Found"
+  next: end
