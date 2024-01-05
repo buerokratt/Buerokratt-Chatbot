@@ -1,7 +1,6 @@
 FROM node:lts AS image
 WORKDIR /app
 COPY ./package.json .
-COPY ./exirain-header-0.0.29.tgz ./
 
 FROM image AS build
 RUN npm install --legacy-peer-deps --mode=development

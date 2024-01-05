@@ -4,7 +4,6 @@ ARG nginx_version=nginx:1.21.3-alpine
 FROM $node_version as image
 WORKDIR /usr/buerokratt-chatbot
 COPY ./package*.json ./
-COPY ./exirain-header-0.0.29.tgz .
 
 FROM image AS build
 RUN npm install --legacy-peer-deps --mode=development
