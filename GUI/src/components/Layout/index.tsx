@@ -1,10 +1,10 @@
 import { FC, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import useStore from 'store';
-// import { MainNavigation } from '@exirain/header/src';
-// import { Header } from '@buerokratt-ria/header/src';
-import { Header, MainNavigation } from '@exirain/header/src';
+import { MainNavigation } from '@buerokratt-ria/menu';
+import { Header } from "@buerokratt-ria/header"
 import './Layout.scss';
+import {useToast} from "../../hooks/useToast";
 
 const Layout: FC = () => {
   const [MainMenuItems, _] = useState([]);
@@ -16,7 +16,10 @@ const Layout: FC = () => {
         items={MainMenuItems}
       />
       <div className="layout__wrapper">
-        <Header user={useStore.getState().userInfo} />
+        <Header
+            toastContext={useToast()}
+            user={useStore.getState().userInfo}
+        />
         <main className="layout__main">
           <Outlet />
         </main>
