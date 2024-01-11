@@ -146,7 +146,7 @@ assign_client_cookie:
 clearChatList:
   call: http.post
   args:
-    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query"
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query?conflicts=proceed"
     body:
      query:
       term:
