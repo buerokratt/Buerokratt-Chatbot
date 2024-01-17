@@ -72,7 +72,7 @@ const SettingsWorkingTime: FC = () => {
   if (!workingTime || Object.keys(control._formValues).length === 0) {
     return <>Loading...</>;
   }
-  
+
   return (
     <>
       <h1>{t('settings.workingTime.title')}</h1>
@@ -137,10 +137,9 @@ const SettingsWorkingTime: FC = () => {
           <Track>
             <label className="Label">
               {t(
-                `${
-                  isOrganizationClosedOnWeekEnds
-                    ? 'settings.workingTime.allWeekdaysExceptWeekend'
-                    : 'settings.workingTime.allWeekdays'
+                `${isOrganizationClosedOnWeekEnds
+                  ? 'settings.workingTime.allWeekdaysExceptWeekend'
+                  : 'settings.workingTime.allWeekdays'
                 }`
               )}
             </label>
@@ -204,14 +203,14 @@ const SettingsWorkingTime: FC = () => {
                           field.onChange(
                             value
                               ? [...field.value.split(','), d.toLowerCase()]
-                                  .sort()
-                                  .join(',')
+                                .sort()
+                                .join(',')
                               : field.value
-                                  .split(',')
-                                  .filter(
-                                    (pd: string) => pd !== d.toLowerCase()
-                                  )
-                                  .join(',')
+                                .split(',')
+                                .filter(
+                                  (pd: string) => pd !== d.toLowerCase()
+                                )
+                                .join(',')
                           );
                         }}
                         checked={field.value?.includes(d.toLowerCase())}
@@ -266,7 +265,7 @@ const SettingsWorkingTime: FC = () => {
                   </Track>
                 )}
               </Track>
-          ))}
+            ))}
       </Card>
     </>
   );
