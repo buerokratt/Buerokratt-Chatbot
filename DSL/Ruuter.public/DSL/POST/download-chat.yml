@@ -6,7 +6,7 @@ extractRequestData:
 getMessagesByChatId:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/get-chat-messages"
+    url: "[#CHATBOT_RESQL]/get-chat-messages-to-print"
     body:
       chatId: ${chatId}
   result: getMessagesByChatIdResult
