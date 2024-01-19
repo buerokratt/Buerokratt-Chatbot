@@ -13,11 +13,13 @@ SELECT m.base_id      AS id,
        m.forwarded_to_csa,
        mp.content AS preview,
        rating,
-       created,
-       updated
+       m.created,
+       updated,
+       u.csa_title 
 FROM message m
 LEFT JOIN message_preview mp ON m.chat_base_id = mp.chat_base_id
-WHERE id IN (SELECT max(id) FROM message WHERE chat_base_id = :chatId GROUP BY base_id)
+LEFT JOIN "user" u ON m.author_id = u.id_code
+WHERE m.id IN (SELECT max(id) FROM message WHERE chat_base_id = :chatId GROUP BY base_id)
   AND :timeRangeBegin::timestamp
     with time zone < m.updated
-ORDER BY created;
+ORDER BY m.created;
