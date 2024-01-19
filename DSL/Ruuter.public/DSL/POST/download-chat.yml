@@ -32,7 +32,7 @@ convertDataToPdf:
   args:
     url: "[#CHATBOT_DMAPPER]/js/convert/pdf"
     body:
-      data: ${getMessagesByChatIdResult.response.body}
+      messages: ${getMessagesByChatIdResult.response.body}
       csaTitleVisible: ${titleVisibilityResult.response.body[0].value}
       csaNameVisible: ${nameVisibilityResult.response.body[0].value}
   result: pdfFile
