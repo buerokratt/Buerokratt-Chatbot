@@ -49,14 +49,14 @@ generate_cookie:
       content: {
         "idCode": "${user.idCode}",
         "login": "${user.idCode}",
-#        "displayName": "${user.displayName}",
+        "displayName": "${user.displayName}",
         "firstName": "${user.firstName}",
         "lastName": "${user.lastName}",
-#        "csaEmail": "${user.csaEmail}",
-#        "csaTitle": "${user.csaTitle}",
+        "csaEmail": "${user.csaEmail}",
+        "csaTitle": "${user.csaTitle}",
         "authorities": "${user.authorities}",
         "authMethod": "${tara_info.response.body.authMethod}",
-#        "fullName": "${tara_info.response.body.fullName}"
+        "fullName": "${tara_info.response.body.fullName}"
       }
   result: cookie_result
   next: assign_cookie
