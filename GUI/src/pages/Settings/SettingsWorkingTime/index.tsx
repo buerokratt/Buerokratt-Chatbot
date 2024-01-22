@@ -3,7 +3,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { useTranslation } from 'react-i18next';
-
+import { format, parse } from 'date-fns';
 import { Button, Card, FormDatepicker, Switch, Track } from 'components';
 import { OrganizationWorkingTime } from 'types/organizationWorkingTime';
 import { useToast } from 'hooks/useToast';
@@ -155,7 +155,13 @@ const SettingsWorkingTime: FC = () => {
                       hideLabel
                       direction="row"
                       label=""
-                      value={field.value ?? new Date('0')}
+                      value={
+                        parse(
+                          format(field.value as Date, 'HH:mm:ss'),
+                          'HH:mm:ss',
+                          new Date()
+                        ) ?? new Date('0')
+                      }
                     />
                   </div>
                 );
@@ -174,7 +180,13 @@ const SettingsWorkingTime: FC = () => {
                       hideLabel
                       direction="row"
                       label=""
-                      value={field.value ?? new Date('0')}
+                      value={
+                        parse(
+                          format(field.value as Date, 'HH:mm:ss'),
+                          'HH:mm:ss',
+                          new Date()
+                        ) ?? new Date('0')
+                      }
                     />
                   </div>
                 );
@@ -184,7 +196,13 @@ const SettingsWorkingTime: FC = () => {
         )}
         {!isOrganizationTheSameOnAllWorkingDays &&
           weekdaysOptions
-            .filter((d) => !(isOrganizationClosedOnWeekEnds && (d === 'Saturday' || d === 'Sunday')))
+            .filter(
+              (d) =>
+                !(
+                  isOrganizationClosedOnWeekEnds &&
+                  (d === 'Saturday' || d === 'Sunday')
+                )
+            )
             .map((d) => (
               <Track key={d}>
                 <label className="Label switch">
@@ -235,7 +253,13 @@ const SettingsWorkingTime: FC = () => {
                               hideLabel
                               direction="row"
                               label=""
-                              value={field.value ?? new Date('0')}
+                              value={
+                                parse(
+                                  format(field.value as Date, 'HH:mm:ss'),
+                                  'HH:mm:ss',
+                                  new Date()
+                                ) ?? new Date('0')
+                              }
                             />
                           </div>
                         );
@@ -256,7 +280,13 @@ const SettingsWorkingTime: FC = () => {
                               hideLabel
                               direction="row"
                               label=""
-                              value={field.value ?? new Date('0')}
+                              value={
+                                parse(
+                                  format(field.value as Date, 'HH:mm:ss'),
+                                  'HH:mm:ss',
+                                  new Date()
+                                ) ?? new Date('0')
+                              }
                             />
                           </div>
                         );
