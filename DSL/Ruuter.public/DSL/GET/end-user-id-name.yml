@@ -1,0 +1,61 @@
+get_tara_user_info:
+  call: http.get
+  args:
+   url: "[#CHATBOT_TIM]/jwt/userinfo"
+   contentType: plaintext
+   headers:
+    cookie: ${incoming.headers.cookie}
+   plaintext: 
+      "JWTTOKEN"
+  result: tara_info
+  next: assignUserInfo
+
+assignUserInfo:
+  assign:
+    id: ${tara_info.response.body.personalCode}
+    firstName: ${tara_info.response.body.firstName}
+    lastName: ${tara_info.response.body.lastName}
+  next: get_chat_info
+
+get_chat_info:
+  call: http.post
+  args:
+   url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
+   contentType: plaintext
+   headers:
+    cookie: ${incoming.headers.cookie}
+   plaintext:
+      "chatJwt"
+  result: infoRes
+  next: check_chat_info_response
+
+check_chat_info_response:
+  switch:
+    - condition: ${200 <= infoRes.response.statusCodeValue && infoRes.response.statusCodeValue < 300}
+      next: assignChatId
+  next: return_chat_not_exists
+
+assignChatId:
+  assign:
+    chatId: ${infoRes.response.body.chatId}
+  next: insertIdAndName
+
+insertIdAndName:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/update-chat-with-end-user-id-and-name"
+    body:
+      chatId: ${chatId}
+      endUserId: "${id ? id : ''}"
+      endUserFirstName: "${firstName ? firstName : ''}"
+      endUserLastName: "${lastName ? lastName : ''}"
+  result: insertIdAndNameResult
+  next: return_result
+
+return_result:
+  return: Updated ${chatId} with ${id} and ${firstName} ${lastName}.
+  next: end
+
+return_chat_not_exists:
+  return: "Chat does not exist"
+  next: end
