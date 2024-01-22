@@ -174,7 +174,8 @@ postNotificationAboutAddedChat:
      channelId: "chat-list"
      timestamp: ${new Date().toISOString()}
      payload: {
-        "status": "Chat Status Changed"
+        "status": "Chat Status Changed",
+        "chatId": "${chatUuid}"
      }
   result: chat_notification_result
   next: clearMessages
