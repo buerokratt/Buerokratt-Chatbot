@@ -4,7 +4,7 @@ get_chat_info:
    url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
    contentType: plaintext
    headers:
-    cookie: ${cookie}
+    cookie: ${incoming.headers.cookie}
    plaintext:
       "chatJwt"
   result: infoRes
@@ -19,19 +19,19 @@ check_chat_info_response:
 assignChatId:
   assign:
     chatId: ${infoRes.response.body.chatId}
-  next: getChat
+  next: getChatMessages
 
-getChat:
+getChatMessages:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/get-chat-by-id"
+    url: "[#CHATBOT_RESQL]/get-chat-messages"
     body:
-      id: ${chatId}
+      chatId: ${chatId}
   result: res
-  next: return_result
+  next: returnSuccess
 
-return_result:
-  return: ${res.response.body[0]}
+returnSuccess:
+  return: ${res.response.body}
   next: end
 
 return_bad_request:
