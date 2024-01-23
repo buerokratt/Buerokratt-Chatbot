@@ -1,5 +1,5 @@
 {"index":{"_id":"1"}}
-{"channelId": "chat-list","payload": {"status":"Chat Status Changed"},"timestamp": "1801371325497", "sentTo": []}
+{"channelId": "chat-list","payload": {"status":"Chat Status Changed", "chatId": ""},"timestamp": "1801371325497", "sentTo": []}
 {"index":{"_id":"2"}}
 {"channelId": "9f6d91f8-ee5a-4d68-9c79-f71f5cda2c57","payload": {"content":"Notification for user 2"},"timestamp": "1801371325597", "sentTo": []}
 {"index":{"_id":"3"}}
