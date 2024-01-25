@@ -39,7 +39,8 @@ postNotificationAboutMessageResponse:
      channelId: ${chatId}
      timestamp: ${new Date().toISOString()}
      payload: {
-        "type": "event-message"
+        "type": "message",
+        "messageId": ""
       }
   result: message_notification_result
   next: return_result 
