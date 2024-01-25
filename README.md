@@ -35,7 +35,17 @@ Currently, Header and Main Navigation used as external components, they are defi
 - build chat widget image `docker build -f Dockerfile.dev -t authentication-layer .`
 - Clone [RASA](https://github.com/buerokratt/Rasa-for-Buerokratt)
 - choose dev branch and run `docker build -t rasa .`
+
+### Run with local bot
+
+- Change `CHATBOT_BOT=http://bot:5005` in constants.ini
+- Navigate to current repo and run `docker-compose $(find docker-* | sed -e 's/^/-f /') up -d`
+
+### Run with remote bot
+
+- Change `CHATBOT_BOT=http://171.22.247.37:5005` in constants.ini
 - Navigate to current repo and run `docker-compose up -d`
+
 - Go to http://localhost:3004/et/dev-auth
 
 ### Database setup
