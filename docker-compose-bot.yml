@@ -62,3 +62,10 @@ services:
       options:
         max-size: "50m"
         max-file: "3"
+
+networks:
+  bykstack:
+    name: bykstack
+    driver: bridge
+    driver_opts:
+      com.docker.network.driver.mtu: 1400
