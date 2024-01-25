@@ -6,18 +6,35 @@ extractRequestData:
 getMessagesByChatId:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/get-chat-messages"
+    url: "[#CHATBOT_RESQL]/get-chat-messages-to-print"
     body:
       chatId: ${chatId}
   result: getMessagesByChatIdResult
-  next: convertDataToPdf
+
+getCsaTitleVisibility:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-configuration"
+    body:
+      key: "is_csa_title_visible"
+  result: titleVisibilityResult
+
+getCsaNameVisibility:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-configuration"
+    body:
+      key: "is_csa_name_visible"
+  result: nameVisibilityResult
 
 convertDataToPdf:
   call: http.post
   args:
     url: "[#CHATBOT_DMAPPER]/js/convert/pdf"
     body:
-      data: ${getMessagesByChatIdResult.response.body}
+      messages: ${getMessagesByChatIdResult.response.body}
+      csaTitleVisible: ${titleVisibilityResult.response.body[0].value}
+      csaNameVisible: ${nameVisibilityResult.response.body[0].value}
   result: pdfFile
   next: checkPdfExists
 

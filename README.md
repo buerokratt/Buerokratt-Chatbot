@@ -10,7 +10,8 @@ This repo will primarily contain:
 ### Use external components.
 
 Currently, Header and Main Navigation used as external components, they are defined as dependency in package.json
-```  
+
+```
  "@buerokrat-ria/header": "^0.0.1"
  "@buerokrat-ria/menu": "^0.0.1"
  "@buerokrat-ria/styles": "^0.0.1"
@@ -32,6 +33,8 @@ Currently, Header and Main Navigation used as external components, they are defi
 - build chat widget image `docker build -f Dockerfile.dev -t chat-widget .`
 - Clone [Authentication Layer](https://github.com/buerokratt/Authentication-layer)
 - build chat widget image `docker build -f Dockerfile.dev -t authentication-layer .`
+- Clone [RASA](https://github.com/buerokratt/Rasa-for-Buerokratt)
+- choose dev branch and run `docker build -t rasa .`
 - Navigate to current repo and run `docker-compose up -d`
 - Go to http://localhost:3004/et/dev-auth
 
