@@ -7,4 +7,4 @@ VALUES (:chatId,
              ELSE (gen_random_uuid()::varchar) END),
         :content, :event, :authorTimestamp::timestamp with time zone, :authorId, :authorFirstName,
         :authorLastName,
-        :authorRole, :rating, :created::timestamp with time zone, :forwardedByUser, :forwardedFromCsa, :forwardedToCsa);
+        :authorRole, (NULLIF(:rating, '')::integer), :created::timestamp with time zone, :forwardedByUser, :forwardedFromCsa, :forwardedToCsa);

@@ -29,7 +29,6 @@ const useStore = create<StoreState>((set, get, store) => ({
   setUserInfo: (data) => set({ userInfo: data, userId: data?.idCode || '' }),
   setSelectedChatId: (id) => set({ selectedChatId: id }),
   setChatCsaActive: (active) => set({ chatCsaActive: active }),
-
   selectedChat: () => {
     const selectedChatId = get().selectedChatId;
     return get().activeChats.find(c => c.id === selectedChatId);
