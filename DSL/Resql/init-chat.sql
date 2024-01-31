@@ -25,7 +25,7 @@ VALUES (:id,
              WHEN (:ended = '') THEN null
              WHEN (:ended = 'null') THEN null
              ELSE :ended END):: timestamp with time zone,
-        :endUserEmail, :endUserPhone, :endUserOs, :endUserUrl, :feedbackText, :feedbackRating, :externalId, :forwardedTo, :forwardedToName,
+        :endUserEmail, :endUserPhone, :endUserOs, :endUserUrl, :feedbackText, (NULLIF(:feedbackRating, '')::integer), :externalId, :forwardedTo, :forwardedToName,
         :receivedFrom, :receivedFromName,         (CASE
                                                        WHEN ((SELECT value
                                                               FROM configuration
