@@ -102,41 +102,41 @@ const ChatPending: FC = () => {
 
     if (!pendingChats) return grouped;
 
-    // if (chatCsaActive === true) {
-    pendingChats.forEach((c) => {
-      if (c.customerSupportId === 'chatbot') {
-        grouped.newChats.push(c);
-        return;
-      } else {
-        grouped.inProcessChats.push(c);
-        pendingChats.forEach((c) => {
-          if (c.customerSupportId === userInfo?.idCode) {
-            grouped.myChats.push(c);
-            return;
-          }
-
-          grouped.myChats.sort((a, b) => a.created.localeCompare(b.created));
-          const groupIndex = grouped.otherChats.findIndex(
-            (x) => x.groupId === c.customerSupportId
-          );
-          if (c.customerSupportId !== '') {
-            if (groupIndex === -1) {
-              grouped.otherChats.push({
-                groupId: c.customerSupportId ?? '',
-                name: c.customerSupportDisplayName ?? '',
-                chats: [c],
-              });
-            } else {
-              grouped.otherChats[groupIndex].chats.push(c);
+    if (chatCsaActive === true) {
+      pendingChats.forEach((c) => {
+        if (c.customerSupportId === 'chatbot') {
+          grouped.newChats.push(c);
+          return;
+        } else {
+          grouped.inProcessChats.push(c);
+          pendingChats.forEach((c) => {
+            if (c.customerSupportId === userInfo?.idCode) {
+              grouped.myChats.push(c);
+              return;
             }
-          }
-        });
 
-        grouped.otherChats.sort((a, b) => a.name.localeCompare(b.name));
-        return;
-      }
-    });
-    // }
+            grouped.myChats.sort((a, b) => a.created.localeCompare(b.created));
+            const groupIndex = grouped.otherChats.findIndex(
+              (x) => x.groupId === c.customerSupportId
+            );
+            if (c.customerSupportId !== '') {
+              if (groupIndex === -1) {
+                grouped.otherChats.push({
+                  groupId: c.customerSupportId ?? '',
+                  name: c.customerSupportDisplayName ?? '',
+                  chats: [c],
+                });
+              } else {
+                grouped.otherChats[groupIndex].chats.push(c);
+              }
+            }
+          });
+
+          grouped.otherChats.sort((a, b) => a.name.localeCompare(b.name));
+          return;
+        }
+      });
+    }
     return grouped;
   }, [pendingChats, chatCsaActive]);
 
