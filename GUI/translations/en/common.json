@@ -105,6 +105,8 @@
     "redirectedMessageByOwner": "{{from}} forwarded chat to {{to}} {{date}}",
     "redirectedMessageClaimed": "{{to}} took over chat from {{from}} {{date}}",
     "redirectedMessage": "{{user}} forwarded chat from {{from}} to {{to}} {{date}}",
+    "new": "New",
+    "inProcess": "In Process",
     "status": {
       "active": "Active",
       "ended": "Unspecified"
@@ -135,7 +137,10 @@
       "startService": "Start a service",
       "selectService": "Select a service",
       "start": "Start",
-      "service": "Service"
+      "service": "Service",
+      "takeIt": "Take it",
+      "ContactedUser": "Contacted User",
+      "couldNotReachUser": "Could Not Reach User"
     },
     "history": {
       "title": "History",
@@ -183,7 +188,9 @@
       "unavailable_organization": "Organization Unavailable",
       "unavailable_csas": "CSA's Unavailable",
       "unavailable_holiday": "Holiday",
-      "message-read": "Read"
+      "message-read": "Read",
+      "user-reached": "User contacted",
+      "user-not-reached": "User could not be reached"
     },
     "events": {
       "answered": "Answered {{date}}",
@@ -217,7 +224,10 @@
       "unavailable-contact-information-fulfilled": "Contact information provided",
       "unavailable_organization": "Organization Unavailable",
       "unavailable_csas": "CSA's Unavailable",
-      "unavailable_holiday": "Holiday"
+      "unavailable_holiday": "Holiday",
+      "pending-assigned": "Csa assigned to contact user",
+      "user-reached": "User contacted",
+      "user-not-reached": "User could not be reached"
     }
   },
   "roles": {

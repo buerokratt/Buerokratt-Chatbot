@@ -20,6 +20,7 @@ import MonitoringUptime from 'pages/Monitoring/MonitoringUptime';
 import SettingsWelcomeMessage from 'pages/Settings/SettingsWelcomeMessage';
 import SettingsSessionLength from 'pages/Settings/SettingsSessionLength';
 import './locale/et_EE';
+import ChatPending from 'pages/Chat/ChatPending';
 
 const App: FC = () => {
   useQuery<{
@@ -27,10 +28,7 @@ const App: FC = () => {
   }>({
     queryKey: ['custom-jwt/userinfo', 'prod'],
     onSuccess: (res: { response: UserInfo }) => {
-      localStorage.setItem(
-        'exp',
-        res.response.JWTExpirationTimestamp
-      );
+      localStorage.setItem('exp', res.response.JWTExpirationTimestamp);
       return useStore.getState().setUserInfo(res.response);
     },
   });
@@ -42,6 +40,7 @@ const App: FC = () => {
         <Route path="/unanswered" element={<ChatUnanswered />} />
         <Route path="/active" element={<ChatActive />} />
         <Route path="/history" element={<ChatHistory />} />
+        <Route path="/pending" element={<ChatPending />} />
         <Route path="/users" element={<SettingsUsers />} />
         <Route path="/chatbot/settings" element={<SettingsChatSettings />} />
         <Route

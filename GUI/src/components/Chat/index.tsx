@@ -15,7 +15,12 @@ import clsx from 'clsx';
 import { MdOutlineAttachFile, MdOutlineSend } from 'react-icons/md';
 import { Button, Icon, Label, Track } from 'components';
 import { ReactComponent as BykLogoWhite } from 'assets/logo-white.svg';
-import { Chat as ChatType, MessageStatus, CHAT_EVENTS } from 'types/chat';
+import {
+  Chat as ChatType,
+  MessageStatus,
+  CHAT_EVENTS,
+  CHAT_STATUS,
+} from 'types/chat';
 import { useMutation } from '@tanstack/react-query';
 import { Attachment, AttachmentTypes, Message } from 'types/message';
 import ChatMessage from './ChatMessage';
@@ -321,6 +326,49 @@ const Chat: FC<ChatProps> = ({
       } else {
         chat.customerSupportId = userInfo?.idCode;
       }
+      onRefresh();
+    },
+    onError: (error: AxiosError) => {
+      toast.open({
+        type: 'error',
+        title: t('global.notificationError'),
+        message: error.message,
+      });
+    },
+  });
+
+  const assignPendingChatMutation = useMutation({
+    mutationFn: () =>
+      apiDev.post('chat/assign-pending-chat', {
+        id: chat.id ?? '',
+        customerSupportId: userInfo?.idCode ?? '',
+        customerSupportDisplayName: userInfo?.displayName ?? '',
+        csaTitle: userInfo?.csaTitle ?? '',
+      }),
+    onSuccess: async () => {
+      chat.customerSupportId = userInfo?.idCode;
+      onRefresh();
+    },
+    onError: (error: AxiosError) => {
+      toast.open({
+        type: 'error',
+        title: t('global.notificationError'),
+        message: error.message,
+      });
+    },
+  });
+
+  const endPendingChat = useMutation({
+    mutationFn: (event: string) =>
+      apiDev.post('chat/end-chat', {
+        chatId: chat.id ?? '',
+        event: event,
+        authorTimestamp: new Date().toISOString(),
+        authorFirstName: userInfo!.firstName,
+        authorId: userInfo!.idCode,
+        authorRole: userInfo!.authorities,
+      }),
+    onSuccess: async () => {
       onRefresh();
     },
     onError: (error: AxiosError) => {
@@ -692,50 +740,55 @@ const Chat: FC<ChatProps> = ({
           <div id="anchor" ref={chatRef}></div>
         </div>
 
-        {chat.customerSupportId == userInfo?.idCode && (
-          <div className="active-chat__toolbar">
-            <Track>
-              <ChatTextArea
-                name="message"
-                label={t('')}
-                id="chatArea"
-                placeholder={t('chat.reply') + '...'}
-                minRows={1}
-                maxRows={8}
-                value={responseText}
-                onSubmit={(e) => handleResponseTextSend()}
-                maxLength={CHAT_INPUT_LENGTH}
-                onChange={(e) => setResponseText(e.target.value)}
-              />
-              <div className="active-chat__toolbar-actions">
-                <Button
-                  id="myButton"
-                  appearance="primary"
-                  onClick={handleResponseTextSend}
-                >
-                  <Icon icon={<MdOutlineSend fontSize={18} />} size="medium" />
-                  <input
-                    type="file"
-                    ref={hiddenFileInputRef}
-                    onChange={handleFileChange}
-                    style={{ display: 'none' }}
-                  />
-                </Button>
-                <Button appearance="secondary" onClick={handleUploadClick}>
-                  <Icon
-                    icon={<MdOutlineAttachFile fontSize={18} />}
-                    size="medium"
-                  />
-                </Button>
-              </div>
-            </Track>
-          </div>
-        )}
+        {chat.customerSupportId == userInfo?.idCode &&
+          chat.status != CHAT_STATUS.IDLE && (
+            <div className="active-chat__toolbar">
+              <Track>
+                <ChatTextArea
+                  name="message"
+                  label={t('')}
+                  id="chatArea"
+                  placeholder={t('chat.reply') + '...'}
+                  minRows={1}
+                  maxRows={8}
+                  value={responseText}
+                  onSubmit={(e) => handleResponseTextSend()}
+                  maxLength={CHAT_INPUT_LENGTH}
+                  onChange={(e) => setResponseText(e.target.value)}
+                />
+                <div className="active-chat__toolbar-actions">
+                  <Button
+                    id="myButton"
+                    appearance="primary"
+                    onClick={handleResponseTextSend}
+                  >
+                    <Icon
+                      icon={<MdOutlineSend fontSize={18} />}
+                      size="medium"
+                    />
+                    <input
+                      type="file"
+                      ref={hiddenFileInputRef}
+                      onChange={handleFileChange}
+                      style={{ display: 'none' }}
+                    />
+                  </Button>
+                  <Button appearance="secondary" onClick={handleUploadClick}>
+                    <Icon
+                      icon={<MdOutlineAttachFile fontSize={18} />}
+                      size="medium"
+                    />
+                  </Button>
+                </div>
+              </Track>
+            </div>
+          )}
 
         {(chat.customerSupportId === '' ||
           (chat.customerSupportId !== userInfo?.idCode &&
             userInfo?.authorities.includes('ROLE_ADMINISTRATOR'))) &&
-          chatCsaActive === true && (
+          chatCsaActive === true &&
+          chat.status != CHAT_STATUS.IDLE && (
             <div className="active-chat__toolbar">
               <Track justify="center">
                 <div className="active-chat__toolbar-actions">
@@ -756,106 +809,162 @@ const Chat: FC<ChatProps> = ({
               </Track>
             </div>
           )}
+
+        {chat.status === CHAT_STATUS.IDLE &&
+          chat.customerSupportId === 'chatbot' && (
+            <div className="active-chat__toolbar">
+              <Track justify="center">
+                <div className="active-chat__toolbar-actions">
+                  <Button
+                    appearance="primary"
+                    style={{
+                      backgroundColor: '#25599E',
+                      color: '#FFFFFF',
+                      borderRadius: '50px',
+                      paddingLeft: '40px',
+                      paddingRight: '40px',
+                    }}
+                    onClick={() => assignPendingChatMutation.mutate()}
+                  >
+                    {t('chat.active.takeIt')}
+                  </Button>
+                </div>
+              </Track>
+            </div>
+          )}
+
+        {chat.status === CHAT_STATUS.IDLE &&
+          chat.customerSupportId != 'chatbot' && (
+            <div className="active-chat__toolbar">
+              <Track justify="center">
+                <div className="active-chat__toolbar-actions">
+                  <Button
+                    appearance="error"
+                    style={{
+                      borderRadius: '50px',
+                      paddingLeft: '40px',
+                      paddingRight: '40px',
+                    }}
+                    onClick={() => endPendingChat.mutate('user-not-reached')}
+                  >
+                    {t('chat.active.couldNotReachUser')}
+                  </Button>
+                  <Button
+                    appearance="success"
+                    style={{
+                      borderRadius: '50px',
+                      paddingLeft: '40px',
+                      paddingRight: '40px',
+                    }}
+                    onClick={() => endPendingChat.mutate('user-reached')}
+                  >
+                    {t('chat.active.ContactedUser')}
+                  </Button>
+                </div>
+              </Track>
+            </div>
+          )}
       </div>
       <div className="active-chat__side">
         {(chat.customerSupportId === '' ||
-          chat.customerSupportId === userInfo?.idCode) && (
-          <div className="active-chat__side-actions">
-            <Button
-              appearance="success"
-              onClick={onChatEnd ? () => onChatEnd(chat) : undefined}
-            >
-              {t('chat.active.endChat')}
-            </Button>
-            <Button
-              appearance="secondary"
-              disabled={chat.customerSupportId != userInfo?.idCode}
-              onClick={() =>
-                handleChatEvent(CHAT_EVENTS.REQUESTED_AUTHENTICATION)
-              }
-            >
-              {t('chat.active.askAuthentication')}
-            </Button>
-            <Button
-              appearance="secondary"
-              disabled={chat.customerSupportId != userInfo?.idCode}
-              onClick={() => handleChatEvent(CHAT_EVENTS.CONTACT_INFORMATION)}
-            >
-              {t('chat.active.askForContact')}
-            </Button>
-            <div style={{ position: 'relative', display: 'inline-block' }}>
+          chat.customerSupportId === userInfo?.idCode) &&
+          chat.status != CHAT_STATUS.IDLE && (
+            <div className="active-chat__side-actions">
+              <Button
+                appearance="success"
+                onClick={onChatEnd ? () => onChatEnd(chat) : undefined}
+              >
+                {t('chat.active.endChat')}
+              </Button>
               <Button
                 appearance="secondary"
-                style={{ width: '100%' }}
-                disabledWithoutStyle={
-                  chat.customerSupportId != userInfo?.idCode ||
-                  (latestPermissionMessage <= 60 &&
-                    latestPermissionMessage != 0)
-                }
                 disabled={chat.customerSupportId != userInfo?.idCode}
-                onClick={() => {
-                  const message: Message | undefined = messagesList.findLast(
-                    (e) => e.event === CHAT_EVENTS.ASK_PERMISSION
-                  );
-                  if (message != undefined) {
-                    postMessageWithNewEventMutation.mutate(message);
-                  } else {
-                    handleChatEvent(CHAT_EVENTS.ASK_PERMISSION);
-                  }
-                }}
+                onClick={() =>
+                  handleChatEvent(CHAT_EVENTS.REQUESTED_AUTHENTICATION)
+                }
               >
-                {t('chat.active.askPermission')}
+                {t('chat.active.askAuthentication')}
               </Button>
-              {latestPermissionMessage <= 60 && (
-                <LoaderOverlay
-                  maxPercent={60}
-                  currentPercent={latestPermissionMessage}
-                />
-              )}
-            </div>
-            <Button
-              appearance="secondary"
-              disabled={!chatCsaActive}
-              onClick={
-                onForwardToColleauge
-                  ? () => {
-                      onForwardToColleauge(chat);
-                      setSelectedMessages([]);
+              <Button
+                appearance="secondary"
+                disabled={chat.customerSupportId != userInfo?.idCode}
+                onClick={() => handleChatEvent(CHAT_EVENTS.CONTACT_INFORMATION)}
+              >
+                {t('chat.active.askForContact')}
+              </Button>
+              <div style={{ position: 'relative', display: 'inline-block' }}>
+                <Button
+                  appearance="secondary"
+                  style={{ width: '100%' }}
+                  disabledWithoutStyle={
+                    chat.customerSupportId != userInfo?.idCode ||
+                    (latestPermissionMessage <= 60 &&
+                      latestPermissionMessage != 0)
+                  }
+                  disabled={chat.customerSupportId != userInfo?.idCode}
+                  onClick={() => {
+                    const message: Message | undefined = messagesList.findLast(
+                      (e) => e.event === CHAT_EVENTS.ASK_PERMISSION
+                    );
+                    if (message != undefined) {
+                      postMessageWithNewEventMutation.mutate(message);
+                    } else {
+                      handleChatEvent(CHAT_EVENTS.ASK_PERMISSION);
                     }
-                  : undefined
-              }
-            >
-              {t('chat.active.forwardToColleague')}
-            </Button>
-            <Button
-              appearance="secondary"
-              disabled={!chatCsaActive}
-              onClick={
-                onForwardToEstablishment
-                  ? () => onForwardToEstablishment(chat)
-                  : undefined
-              }
-            >
-              {t('chat.active.forwardToOrganization')}
-            </Button>
-            <Button
-              appearance="secondary"
-              disabled={chat.customerSupportId != userInfo?.idCode}
-              onClick={onSendToEmail ? () => onSendToEmail(chat) : undefined}
-            >
-              {t('chat.active.sendToEmail')}
-            </Button>
-            <Button
-              appearance="secondary"
-              disabled={chat.customerSupportId != userInfo?.idCode}
-              onClick={
-                onStartAService ? () => onStartAService(chat) : undefined
-              }
-            >
-              {t('chat.active.startService')}
-            </Button>
-          </div>
-        )}
+                  }}
+                >
+                  {t('chat.active.askPermission')}
+                </Button>
+                {latestPermissionMessage <= 60 && (
+                  <LoaderOverlay
+                    maxPercent={60}
+                    currentPercent={latestPermissionMessage}
+                  />
+                )}
+              </div>
+              <Button
+                appearance="secondary"
+                disabled={!chatCsaActive}
+                onClick={
+                  onForwardToColleauge
+                    ? () => {
+                        onForwardToColleauge(chat);
+                        setSelectedMessages([]);
+                      }
+                    : undefined
+                }
+              >
+                {t('chat.active.forwardToColleague')}
+              </Button>
+              <Button
+                appearance="secondary"
+                disabled={!chatCsaActive}
+                onClick={
+                  onForwardToEstablishment
+                    ? () => onForwardToEstablishment(chat)
+                    : undefined
+                }
+              >
+                {t('chat.active.forwardToOrganization')}
+              </Button>
+              <Button
+                appearance="secondary"
+                disabled={chat.customerSupportId != userInfo?.idCode}
+                onClick={onSendToEmail ? () => onSendToEmail(chat) : undefined}
+              >
+                {t('chat.active.sendToEmail')}
+              </Button>
+              <Button
+                appearance="secondary"
+                disabled={chat.customerSupportId != userInfo?.idCode}
+                onClick={
+                  onStartAService ? () => onStartAService(chat) : undefined
+                }
+              >
+                {t('chat.active.startService')}
+              </Button>
+            </div>
+          )}
         {chat.customerSupportId !== '' &&
           chat.customerSupportId !== userInfo?.idCode &&
           !chatCsaActive && (

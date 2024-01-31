@@ -105,6 +105,8 @@
     "redirectedMessageByOwner": "{{from}} suunas vestluse kasutajale {{to}} {{date}}",
     "redirectedMessageClaimed": "{{to}} võttis vestluse üle kasutajalt {{from}} {{date}}",
     "redirectedMessage": "{{user}} suunas vestluse kasutajalt {{from}} kasutajale {{to}} {{date}}",
+    "new": "uued",
+    "inProcess": "töös",
     "status": {
       "active": "Aktiivne",
       "ended": "Määramata"
@@ -135,7 +137,10 @@
       "startService": "Alusta teenust",
       "selectService": "Vali teenus",
       "start": "Alusta",
-      "service": "Teenus"
+      "service": "Teenus",
+      "takeIt": "Võta see",
+      "ContactedUser": "Kasutajaga ühendust võetud",
+      "couldNotReachUser": "Kasutajani ei õnnestunud jõuda"
     },
     "history": {
       "title": "Ajalugu",
@@ -183,7 +188,9 @@
       "unavailable-contact-information-fulfilled": "Kontaktandmed on antud",
       "unavailable_organization": "Organisatsioon pole saadaval",
       "unavailable_csas": "CSA-d pole saadaval",
-      "unavailable_holiday": "Puhkus"
+      "unavailable_holiday": "Puhkus",
+      "user-reached": "Kasutaja võttis ühendust",
+      "user-not-reached": "Kasutajaga ei õnnestunud ühendust saada"
     },
     "events": {
       "answered": "Vastatud {{date}}",
@@ -217,7 +224,10 @@
       "unavailable-contact-information-fulfilled": "Kontaktandmed on antud",
       "unavailable_organization": "Organisatsioon pole saadaval",
       "unavailable_csas": "CSA-d pole saadaval",
-      "unavailable_holiday": "Puhkus"
+      "unavailable_holiday": "Puhkus",
+      "pending-assigned": "Csa määratud kontaktkasutajale",
+      "user-reached": "Kasutaja võttis ühendust",
+      "user-not-reached": "Kasutajaga ei õnnestunud ühendust saada"
     }
   },
   "roles": {

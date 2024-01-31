@@ -52,16 +52,8 @@ FROM
        (SELECT MAX(id)
         FROM chat
         GROUP BY base_id)
-     AND ended IS NULL
-     AND customer_support_id !=
-       (SELECT value
-        FROM configuration
-        WHERE KEY = 'bot_institution_id'
-          AND id IN
-            (SELECT max(id)
-             FROM configuration
-             GROUP BY KEY)
-          AND deleted = FALSE)) AS c
+     AND status = 'IDLE'
+     ) AS c
 JOIN
   (SELECT *
    FROM message
