@@ -31,7 +31,7 @@ assignMessageUuid:
 getActiveChatById:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/get-active-chat-by-id"
+    url: "[#CHATBOT_RESQL]/get-chat-by-id"
     body:
       id: ${chatId}
   result: activeChatRes
@@ -118,7 +118,8 @@ postNotificationAboutAddedChat:
      channelId: "chat-list"
      timestamp: ${new Date().toISOString()}
      payload: {
-        "status": "Chat Status Changed"
+        "status": "Chat Status Changed",
+        "chatId": "${chatId}"
      }
   result: chat_notification_result
   next: return_result

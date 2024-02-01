@@ -1,9 +1,10 @@
 extractRequestData:
   assign:
-    chatId: "${incoming.body.chatId}"
-    event: "${incoming.body.event}"
-    authorRole: ${incoming.body.authorRole}
-    authorTimestamp: "${incoming.body.authorTimestamp}"
+    chatId: "${incoming.body.message.chatId}"
+    event: "${incoming.body.message.event}"
+    authorRole: ${incoming.body.message.authorRole}
+    authorTimestamp: "${incoming.body.message.authorTimestamp}"
+    status: "${incoming.body.status}"
   next: deleteMessagePreview  
 
 deleteMessagePreview:
@@ -82,7 +83,7 @@ endChat:
       endUserId: ${activeChat.endUserId ?? ""}
       endUserFirstName: ${activeChat.endUserFirstName ?? ""}
       endUserLastName: ${activeChat.endUserLastName ?? ""}
-      status: "ENDED"
+      status: ${status ?? "ENDED"}
       created: ${activeChat.created ?? new Date().toISOString()}
       ended: ${new Date().toISOString()}
       feedbackRating: ${activeChat.feedbackRating ?? ""}
@@ -162,7 +163,8 @@ postNotificationAboutAddedChat:
      channelId: "chat-list"
      timestamp: ${new Date().toISOString()}
      payload: {
-        "status": "Chat Status Changed"
+        "status": "Chat Status Changed",
+        "chatId": "${chatId}"
      }
   result: chat_notification_result
   next: return_result

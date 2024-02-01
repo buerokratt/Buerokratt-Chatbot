@@ -18,9 +18,34 @@ insertEmailAndPhone:
       chatId: ${chatId}
       endUserEmail: "${email ? email : ''}"
       endUserPhone: "${phone ? phone : ''}"
-  result: insertEmailAndPhoneResult
+  result: clearMessages
 
-returnSuccess:
+clearMessages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query?conflicts=proceed"
+    body:
+     query:
+      term:
+       channelId: ${chatId}
+  result: clear_messages_res
+  next: postNotificationAboutMessageResponse
+
+postNotificationAboutMessageResponse:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
+    body:
+     channelId: ${chatId}
+     timestamp: ${new Date().toISOString()}
+     payload: {
+        "type": "message",
+        "messageId": ""
+      }
+  result: message_notification_result
+  next: return_result 
+
+return_result:
   return: Updated ${chatId} with ${email} and ${phone}.
   next: end
 

@@ -1,14 +1,14 @@
 extractRequestData:
   assign:
-    id: ${incoming.body.id}
-    customerSupportId: ${incoming.body.customerSupportId}
-    customerSupportDisplayName: ${incoming.body.customerSupportDisplayName}
-    csaTitle: ${incoming.body.csaTitle}
+    id: "${incoming.body.id}"
+    customerSupportId: "${incoming.body.customerSupportId}"
+    customerSupportDisplayName: "${incoming.body.customerSupportDisplayName}"
+    csaTitle: "${incoming.body.csaTitle}"
 
 getActiveChatById:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/get-active-chat-by-id"
+    url: "[#CHATBOT_RESQL]/get-chat-by-id"
     body:
       id: ${id}
   result: activeChatRes
@@ -23,9 +23,9 @@ checkActiveChatResult:
 assignChat:
   assign:
     activeChat: ${activeChatRes.response.body[0]}
-  next: claimChat
+  next: assignPendingChat
 
-claimChat:
+assignPendingChat:
   call: http.post
   args:
     url: "[#CHATBOT_RESQL]/insert-chat"
@@ -37,7 +37,7 @@ claimChat:
       endUserId: ${activeChat.endUserId ?? ""}
       endUserFirstName: ${activeChat.endUserFirstName ?? ""}
       endUserLastName: ${activeChat.endUserLastName ?? ""}
-      status: ${activeChat.status ?? "OPEN"}
+      status: "IDLE"
       endUserEmail: ${activeChat.endUserEmail ?? ""}
       endUserPhone: ${activeChat.endUserPhone ?? ""}
       endUserOs: ${activeChat.endUserOs ?? ""}
@@ -51,7 +51,43 @@ claimChat:
       forwardedToName: ${activeChat.forwardedToName ?? ""}
       receivedFrom: ${activeChat.receivedFrom ?? ""}
       receivedFromName: ${activeChat.receivedFromName ?? ""}
-  result: claimChatRes
+  result: assignPendingChatRes
+  next: getUuid
+
+getUuid:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/return_uuid"
+    headers:
+      type: json
+  result: uuid_result
+  next: assignUuid
+
+assignUuid:
+  assign:
+    uuid: ${uuid_result.response.body.uuid}
+  next: insertMessage  
+
+insertMessage:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-message"
+    body:
+      chatId: ${activeChat.id ?? uuid}
+      messageId: ${uuid}
+      content: ""
+      authorTimestamp: ${new Date().toISOString()}
+      authorId: ""
+      authorFirstName: ""
+      authorRole: "buerokratt"
+      created: ${new Date().toISOString()}
+      authorLastName: ""
+      rating: ""
+      event: "pending-assigned"
+      forwardedByUser: ""
+      forwardedFromCsa: ""
+      forwardedToCsa: ""
+  result: insertMessageResult
   next: clearChatList
 
 clearChatList:
@@ -74,25 +110,50 @@ postNotificationAboutAddedChat:
      timestamp: ${new Date().toISOString()}
      payload: {
         "status": "Chat Status Changed",
-        "chatId": ""
+        "chatId": "${id}"
      }
   result: chat_notification_result
-  next: getClaimedChat
+  next: getRedirectedChat
 
-getClaimedChat:
+getRedirectedChat:
   call: http.post
   args:
     url: "[#CHATBOT_RESQL]/get-active-chat-by-id"
     body:
       id: ${id}
-  result: claimedChatRes
-  next: return_result
+  result: redirectedChatRes
+  next: clearMessages
+
+clearMessages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query?conflicts=proceed"
+    body:
+     query:
+      term:
+       channelId: ${activeChat.id ?? uuid}
+  result: clear_messages_res
+  next: postNotificationAboutMessageResponse 
+
+postNotificationAboutMessageResponse:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
+    body:
+     channelId: ${activeChat.id ?? uuid}
+     timestamp: ${new Date().toISOString()}
+     payload: {
+        "type": "message",
+        "messageId": "${uuid}"
+     }
+  result: message_notification_result
+  next: return_result  
 
 return_result:
-  return: ${claimedChatRes.response.body}
+  return: ${assignPendingChatRes.response.body}
   next: end
 
 return_chat_ended:
   return: "Chat Has Ended"
   status: 400
-  next: end  
+  next: end 

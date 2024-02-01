@@ -56,7 +56,7 @@ setDefaultActivity:
     url: "[#CHATBOT_RESQL]/set-customer-support-status"
     body:
       userIdCode: ${userIdCode}
-      active: "false"
+      active: false
       status: "offline"
       created: ${new Date().toISOString()}
   result: set_default_activity_res

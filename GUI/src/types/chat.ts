@@ -2,6 +2,7 @@ export enum CHAT_STATUS {
   ENDED = 'ENDED',
   OPEN = 'OPEN',
   REDIRECTED = 'REDIRECTED',
+  IDLE = 'IDLE',
 }
 
 export enum CHAT_EVENTS {
@@ -69,6 +70,17 @@ export interface Chat {
   labels: string;
 }
 export interface GroupedChat {
+  myChats: Chat[];
+  otherChats: {
+    groupId: string;
+    name: string;
+    chats: Chat[];
+  }[];
+}
+
+export interface GroupedPendingChat {
+  newChats: Chat[];
+  inProcessChats: Chat[];
   myChats: Chat[];
   otherChats: {
     groupId: string;
