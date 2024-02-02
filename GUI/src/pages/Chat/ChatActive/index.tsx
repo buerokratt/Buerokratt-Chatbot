@@ -264,11 +264,10 @@ const ChatActive: FC = () => {
           style={{ overflow: 'auto' }}
         >
           <div className="vertical-tabs__group-header">
-            <p>{`${t('chat.active.myChats')} ${
-              (activeChats?.myChats?.length ?? 0) == 0
+            <p>{`${t('chat.active.myChats')} ${(activeChats?.myChats?.length ?? 0) == 0
                 ? ''
                 : `(${activeChats?.myChats?.length ?? 0})`
-            }`}</p>
+              }`}</p>
           </div>
           {activeChats?.myChats?.map((chat) => (
             <Tabs.Trigger
@@ -368,7 +367,7 @@ const ChatActive: FC = () => {
               </Button>
               <Button
                 appearance="error"
-                // onClick={() => sendToEmailMutation.mutate(sendToEmailModal)}
+              // onClick={() => sendToEmailMutation.mutate(sendToEmailModal)}
               >
                 {t('global.yes')}
               </Button>
