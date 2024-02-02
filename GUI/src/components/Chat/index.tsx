@@ -267,7 +267,7 @@ const Chat: FC<ChatProps> = ({
 
   const postEventMutation = useMutation({
     mutationFn: (message: Message) =>
-      apiDev.post('csa/message', {
+      apiDev.post('csa/message-event', {
         chatId: message.chatId ?? '',
         content: '',
         event: message.event ?? '',
