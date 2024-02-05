@@ -10,18 +10,10 @@ import Track from 'components/Track';
 import './Typing.scss';
 
 type PreviewMessageProps = {
-  preview: string;
-  onSelect: (message: Message) => void;
-  readStatus: {
-    current: MessageStatus;
-  };
+  preview: string | undefined;
 };
 
-const PreviewMessage: FC<PreviewMessageProps> = ({
-  preview,
-  onSelect,
-  readStatus,
-}) => {
+const PreviewMessage: FC<PreviewMessageProps> = ({ preview }) => {
   return (
     <div className={clsx('active-chat__messageContainer')}>
       {!!preview && preview && (

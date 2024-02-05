@@ -115,7 +115,7 @@ const Chat: FC<ChatProps> = ({
   };
 
   useEffect(() => {
-    const onMessage = async (res) => {
+    const onMessage = async (res: any) => {
       if (res === 'preview') {
         const previewMessage = await apiDev.get(
           'csa/message-preview?chatId=' + chat.id
@@ -126,12 +126,12 @@ const Chat: FC<ChatProps> = ({
           const res =
             (await apiDev.get(
               `csa/new-messages?chatId=${chat.id}&lastRead=${
-                chat.lastMessageTimestamp.split('+')[0] ?? ''
+                chat.lastMessageTimestamp?.split('+')[0] ?? ''
               }`
             )) ?? [];
           const messages = res.data.response;
-          setPreviewTypingMessage('');
-          const filteredMessages = messages?.filter((newMessage) => {
+          setPreviewTypingMessage(undefined);
+          const filteredMessages = messages?.filter((newMessage: Message) => {
             return !messagesList.some(
               (existingMessage) =>
                 existingMessage.id === newMessage.id &&
@@ -140,7 +140,7 @@ const Chat: FC<ChatProps> = ({
           });
 
           let newDisplayableMessages = filteredMessages?.filter(
-            (msg) => msg.authorId != userInfo?.idCode
+            (msg: Message) => msg.authorId != userInfo?.idCode
           );
 
           if (newDisplayableMessages?.length > 0) {
@@ -725,10 +725,8 @@ const Chat: FC<ChatProps> = ({
                 <div className="active-chat__group-name">{'User Typing'}</div>
                 <div className="active-chat__messages">
                   <PreviewMessage
-                    preview={previewTypingMessage}
-                    readStatus={messageReadStatusRef}
                     key={`preview-message`}
-                    onSelect={(_) => {}}
+                    preview={previewTypingMessage.preview}
                   />
                 </div>
               </div>
