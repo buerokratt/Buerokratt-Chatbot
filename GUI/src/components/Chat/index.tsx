@@ -1,9 +1,7 @@
 import {
   ChangeEvent,
   FC,
-  useContext,
   useEffect,
-  useMemo,
   useRef,
   useState,
   useTransition,
@@ -92,7 +90,7 @@ const Chat: FC<ChatProps> = ({
   const [userInput, setUserInput] = useState<string>('');
   const [userInputFile, setUserInputFile] = useState<Attachment>();
   const [errorMessage, setErrorMessage] = useState('');
-  const [newMessage] = useNewMessageSound();
+  const [newMessageEffect] = useNewMessageSound();
   let messagesLength = 0;
   const navigate = useNavigate();
   const [previewTypingMessage, setPreviewTypingMessage] = useState<Message>();
@@ -200,7 +198,7 @@ const Chat: FC<ChatProps> = ({
       messagesLength < res.response.length &&
       res.response[res.response.length - 1].authorId != userInfo?.idCode
     ) {
-      newMessage?.play();
+      newMessageEffect?.play();
       onRefresh();
     }
     messagesLength = res.response.length;
