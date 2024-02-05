@@ -8,12 +8,17 @@ function buildSSEResponse({
   channelId,
   interval = serverConfig.refreshInterval,
 }) {
+
+  const corsWhitelist = process.env.CORS_WHITELIST_ORIGINS.split(',');
+  const whitelisted = corsWhitelist.indexOf(req.headers.origin) !== -1;
+  const origin = whitelisted ? req.headers.origin : '*';
+
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
     'Connection': 'keep-alive',
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Expose-Headers': 'Content-Type, Cache-Control, Connection' 
+    'Access-Control-Allow-Origin': origin,
+    'Access-Control-Expose-Headers': 'Origin, X-Requested-With, Content-Type, Cache-Control, Connection, Accept'
   });
 
   res.write('');
