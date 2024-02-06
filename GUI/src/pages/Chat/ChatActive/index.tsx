@@ -17,10 +17,10 @@ import ForwardToEstablishmentModal from '../ForwardToEstablishmentModal';
 import clsx from 'clsx';
 import StartAServiceModal from '../StartAServiceModal';
 import ChatTrigger from './ChatTrigger';
-import './ChatActive.scss';
 import { v4 as uuidv4 } from 'uuid';
 import { useLocation } from 'react-router-dom';
 import sse from 'services/sse-service';
+import './ChatActive.scss';
 
 const CSAchatStatuses = [
   CHAT_EVENTS.ACCEPTED,

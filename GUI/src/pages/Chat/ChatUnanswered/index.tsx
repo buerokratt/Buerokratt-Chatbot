@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Tabs from '@radix-ui/react-tabs';
 import { useQuery } from '@tanstack/react-query';
@@ -8,24 +8,22 @@ import {
   CHAT_EVENTS,
   CHAT_STATUS,
   Chat as ChatType,
-  GroupedChat,
 } from 'types/chat';
 import useStore from 'store';
 import { User } from 'types/user';
 import { useToast } from 'hooks/useToast';
-import './ChatUnanswered.scss';
 import apiDev from 'services/api-dev';
 import ChatTrigger from '../ChatActive/ChatTrigger';
 import clsx from 'clsx';
 import ForwardToColleaugeModal from '../ForwardToColleaugeModal';
 import ForwardToEstablishmentModal from '../ForwardToEstablishmentModal';
 import sse from 'services/sse-service';
+import './ChatUnanswered.scss';
 
 const ChatUnanswered: FC = () => {
   const { t } = useTranslation();
   const userInfo = useStore((state) => state.userInfo);
   const toast = useToast();
-  const chatCsaActive = useStore((state) => state.chatCsaActive);
   const [endChatModal, setEndChatModal] = useState<ChatType | null>(null);
   const [forwardToColleaugeModal, setForwardToColleaugeModal] =
     useState<ChatType | null>(null);
