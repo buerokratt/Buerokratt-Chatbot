@@ -9,7 +9,7 @@ function buildSSEResponse({
   interval = serverConfig.refreshInterval,
 }) {
 
-  const origxin = extractOrigin(req.headers.origin);
+  const origin = extractOrigin(req.headers.origin);
 
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
@@ -41,8 +41,8 @@ function buildSSEResponse({
 
 function extractOrigin(reqOrigin) {
   const corsWhitelist = process.env.CORS_WHITELIST_ORIGINS.split(',');
-  const whitelisted = corsWhitelist.indexOf(req.headers.origin) !== -1;
-  return whitelisted ? req.headers.origin : '*';
+  const whitelisted = corsWhitelist.indexOf(reqOrigin) !== -1;
+  return whitelisted ? reqOrigin : '*';
 }
 
 module.exports = {
