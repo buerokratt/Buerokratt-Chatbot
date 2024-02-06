@@ -20,7 +20,6 @@ import ChatTrigger from './ChatTrigger';
 import './ChatActive.scss';
 import { v4 as uuidv4 } from 'uuid';
 import { useLocation } from 'react-router-dom';
-import useChatList from 'hooks/useChatList';
 import sse from 'services/sse-service';
 
 const CSAchatStatuses = [
