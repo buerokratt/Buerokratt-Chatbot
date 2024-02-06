@@ -1,14 +1,12 @@
-import { FC, useContext, useEffect, useMemo, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Tabs from '@radix-ui/react-tabs';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
+import { useQuery } from '@tanstack/react-query';
 import { Chat, Dialog, Button, FormRadios, Track } from 'components';
 import {
   Chat as ChatType,
   CHAT_EVENTS,
   CHAT_STATUS,
-  GroupedChat,
 } from 'types/chat';
 import useStore from 'store';
 import { User } from 'types/user';
@@ -22,6 +20,7 @@ import ChatTrigger from './ChatTrigger';
 import './ChatActive.scss';
 import { v4 as uuidv4 } from 'uuid';
 import { useLocation } from 'react-router-dom';
+import useChatList from 'hooks/useChatList';
 import sse from 'services/sse-service';
 
 const CSAchatStatuses = [
@@ -36,8 +35,6 @@ const ChatActive: FC = () => {
   const { state } = useLocation();
   const userInfo = useStore((state) => state.userInfo);
   const toast = useToast();
-  const chatCsaActive = useStore((state) => state.chatCsaActive);
-  const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
   const [endChatModal, setEndChatModal] = useState<ChatType | null>(null);
   const [forwardToColleaugeModal, setForwardToColleaugeModal] =
     useState<ChatType | null>(null);
@@ -49,54 +46,25 @@ const ChatActive: FC = () => {
   const [startAServiceModal, setStartAServiceModal] = useState<ChatType | null>(
     null
   );
-  const [activeChatsList, setActiveChatsList] = useState<ChatType[]>([]);
   const [selectedEndChatStatus, setSelectedEndChatStatus] = useState<
     string | null
   >(null);
 
-  const { refetch } = useQuery<ChatType[]>({
-    queryKey: ['csa/active-chats', 'prod'],
-    onSuccess(res: any) {
-      const isChatStillExists = res.response?.filter(function (e: any) {
-        return e.id === selectedChatId;
-      });
-      if (isChatStillExists.length === 0 && activeChatsList.length > 0) {
-        setTimeout(function () {
-          setActiveChatsList(res.response);
-        }, 3000);
-      } else {
-        setActiveChatsList(res.response);
-      }
-    },
-  });
+  const loadActiveChats = useStore((state) => state.loadActiveChats);
+  const selectedChat = useStore((state) => state.selectedChat());
+  const selectedChatId = useStore((state) => state.selectedChatId);
+  const activeChats = useStore((state) => state.getGroupedActiveChats());
 
   useEffect(() => {
-    const onMessage = async () => {
-      const res = await apiDev.get('csa/active-chats');
-      const chats = res.data.response ?? [];
-      const isChatStillExists = chats?.filter(function (e: any) {
-        return e.id === selectedChatId;
-      });
-      if (isChatStillExists.length === 0 && activeChatsList.length > 0) {
-        setTimeout(function () {
-          setActiveChatsList(chats);
-        }, 3000);
-      } else {
-        setActiveChatsList(chats);
-      }
-    };
-
-    const events = sse(`/chat-list`, onMessage);
-
-    return () => {
-      events.close();
-    };
+    useStore.getState().loadActiveChats();
   }, []);
 
-  useEffect(() => {
-    refetch();
-  }, [chatCsaActive]);
 
+  useEffect(() => {
+    const events = sse(`/chat-list`, loadActiveChats);
+    return () => events.close()
+  }, []);
+  
   const { data: csaNameVisiblity } = useQuery<{ isVisible: boolean }>({
     queryKey: ['csa/name-visibility', 'prod'],
   });
@@ -125,61 +93,6 @@ const ChatActive: FC = () => {
   //   onSettled: () => setSendToEmailModal(null),
   // });
 
-  const selectedChat = useMemo(
-    () =>
-      activeChatsList && activeChatsList.find((c) => c.id === selectedChatId),
-    [activeChatsList, selectedChatId]
-  );
-
-  const activeChats: GroupedChat = useMemo(() => {
-    const grouped: GroupedChat = {
-      myChats: [],
-      otherChats: [],
-    };
-
-    if (!activeChatsList) return grouped;
-
-    if (
-      chatCsaActive === false &&
-      !userInfo?.authorities.includes('ROLE_ADMINISTRATOR')
-    ) {
-      setSelectedChatId(null);
-      return grouped;
-    }
-
-    activeChatsList.forEach((c) => {
-      if (c.customerSupportId === userInfo?.idCode) {
-        grouped.myChats.push(c);
-        return;
-      }
-
-      const groupIndex = grouped.otherChats.findIndex(
-        (x) => x.groupId === c.customerSupportId
-      );
-      if (c.customerSupportId !== '') {
-        if (groupIndex === -1) {
-          grouped.otherChats.push({
-            groupId: c.customerSupportId ?? '',
-            name: c.customerSupportDisplayName ?? '',
-            chats: [c],
-          });
-        } else {
-          grouped.otherChats[groupIndex].chats.push(c);
-        }
-      }
-    });
-
-    grouped.otherChats.sort((a, b) => a.name.localeCompare(b.name));
-    return grouped;
-  }, [activeChatsList, chatCsaActive]);
-
-  useEffect(() => {
-    if (state?.chatId && activeChatsList?.length > 0) {
-      setSelectedChatId(state?.chatId);
-      window.history.replaceState(null, '');
-    }
-  }, [activeChatsList]);
-
   const handleCsaForward = async (chat: ChatType, user: User) => {
     try {
       await apiDev.post('chat/redirect-chat', {
@@ -192,7 +105,7 @@ const ChatActive: FC = () => {
         forwardedToCsa: user?.displayName ?? '',
       }),
         setForwardToColleaugeModal(null);
-      refetch();
+      loadActiveChats();
       toast.open({
         type: 'success',
         title: t('global.notification'),
@@ -232,7 +145,7 @@ const ChatActive: FC = () => {
         authorId: userInfo!.idCode,
         authorRole: userInfo!.authorities,
       });
-      refetch();
+      loadActiveChats();
       toast.open({
         type: 'success',
         title: t('global.notification'),
@@ -254,7 +167,7 @@ const ChatActive: FC = () => {
       <Tabs.Root
         className="vertical-tabs"
         orientation="vertical"
-        onValueChange={setSelectedChatId}
+        onValueChange={useStore.getState().setSelectedChatId}
         defaultValue={state?.chatId}
         style={{ height: '100%', overflow: 'hidden' }}
       >
@@ -324,7 +237,7 @@ const ChatActive: FC = () => {
                 onForwardToEstablishment={setForwardToEstablishmentModal}
                 onSendToEmail={setSendToEmailModal}
                 onStartAService={setStartAServiceModal}
-                onRefresh={refetch}
+                onRefresh={loadActiveChats}
               />
             )}
           </Tabs.Content>

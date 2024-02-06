@@ -48,40 +48,16 @@ const ChatPending: FC = () => {
   const pendingChats = useStore((state) => state.activeChats);
   const selectedChatId = useStore((state) => state.selectedChatId);
   const selectedChat = useStore((state) => state.selectedChat());
-  const setPendingChats = useStore.getState().setActiveChats;
 
-  const { refetch } = useQuery<ChatType[]>({
-    queryKey: ['csa/pending-chats', 'prod'],
-    onSuccess(res: any) {
-      setPendingChats(res.response);
-    },
-  });
+  const loadPendingChats = useStore((state) => state.loadPendingChats);
 
   useEffect(() => {
-    refetch();
-  }, [chatCsaActive]);
+    useStore.getState().loadPendingChats();
+  }, []);
 
   useEffect(() => {
-    const onMessage = async () => {
-      const res = await apiDev.get('csa/pending-chats');
-      const chats = res.data.response ?? [];
-      const isChatStillExists = chats?.filter(function (e: any) {
-        return e.id === selectedChatId;
-      });
-      if (isChatStillExists.length === 0 && pendingChats.length > 0) {
-        setTimeout(function () {
-          setPendingChats(chats);
-        }, 3000);
-      } else {
-        setPendingChats(chats);
-      }
-    };
-
-    const events = sse(`/chat-list`, onMessage);
-
-    return () => {
-      events.close();
-    };
+    const events = sse(`/chat-list`, loadPendingChats);
+    return () => events.close()
   }, []);
 
   const { data: csaNameVisiblity } = useQuery<{ isVisible: boolean }>({
@@ -92,54 +68,8 @@ const ChatPending: FC = () => {
     queryKey: ['csa/title-visibility', 'prod'],
   });
 
-  const groupedPendingChats: GroupedPendingChat = useMemo(() => {
-    const grouped: GroupedPendingChat = {
-      newChats: [],
-      inProcessChats: [],
-      myChats: [],
-      otherChats: [],
-    };
-
-    if (!pendingChats) return grouped;
-
-    if (chatCsaActive === true) {
-      pendingChats.forEach((c) => {
-        if (c.customerSupportId === 'chatbot') {
-          grouped.newChats.push(c);
-          return;
-        } else {
-          grouped.inProcessChats.push(c);
-          pendingChats.forEach((c) => {
-            if (c.customerSupportId === userInfo?.idCode) {
-              grouped.myChats.push(c);
-              return;
-            }
-
-            grouped.myChats.sort((a, b) => a.created.localeCompare(b.created));
-            const groupIndex = grouped.otherChats.findIndex(
-              (x) => x.groupId === c.customerSupportId
-            );
-            if (c.customerSupportId !== '') {
-              if (groupIndex === -1) {
-                grouped.otherChats.push({
-                  groupId: c.customerSupportId ?? '',
-                  name: c.customerSupportDisplayName ?? '',
-                  chats: [c],
-                });
-              } else {
-                grouped.otherChats[groupIndex].chats.push(c);
-              }
-            }
-          });
-
-          grouped.otherChats.sort((a, b) => a.name.localeCompare(b.name));
-          return;
-        }
-      });
-    }
-    return grouped;
-  }, [pendingChats, chatCsaActive]);
-
+  const groupedPendingChats = useStore((state) => state.getGroupedPendingChats());
+  
   const handleCsaForward = async (chat: ChatType, user: User) => {
     try {
       await apiDev.post('chat/redirect-chat', {
@@ -152,7 +82,7 @@ const ChatPending: FC = () => {
         forwardedToCsa: user?.displayName ?? '',
       }),
         setForwardToColleaugeModal(null);
-      refetch();
+      loadPendingChats();
       toast.open({
         type: 'success',
         title: t('global.notification'),
@@ -192,7 +122,7 @@ const ChatPending: FC = () => {
         authorId: userInfo!.idCode,
         authorRole: userInfo!.authorities,
       });
-      refetch();
+      loadPendingChats();
       toast.open({
         type: 'success',
         title: t('global.notification'),
@@ -298,7 +228,7 @@ const ChatPending: FC = () => {
               onForwardToColleauge={setForwardToColleaugeModal}
               onForwardToEstablishment={setForwardToEstablishmentModal}
               onSendToEmail={setSendToEmailModal}
-              onRefresh={refetch}
+              onRefresh={loadPendingChats}
             />
           )}
         </Tabs.Content>
