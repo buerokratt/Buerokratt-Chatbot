@@ -20,7 +20,6 @@ async function searchNotification({ channelId, callback }) {
       },
     });
 
-    console.log(firstResponse.body.hits.length + ' notifications found');
     for (const hit of response.body.hits.hits) {
       await callback(hit._source.payload);
     }
