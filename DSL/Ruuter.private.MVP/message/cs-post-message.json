@@ -129,6 +129,39 @@
       }
     },
     {
+      "post_message_to_notifications_server": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{opensearch_url}/notifications/_doc",
+          "post_body_struct": {
+            "channelId": "{#.reflect_input#.chatId}",
+            "timestamp": "$_getInstant()",
+            "payload": {
+              "chatId": "{#.reflect_input#.chatId}",
+              "authorId": "{#.reflect_input#.authorId}",
+              "authorFirstName": "{#.reflect_input#.authorFirstName}",
+              "authorRole": "{#.reflect_input#.authorRole}",
+              "authorTimestamp": "{#.reflect_input#.authorTimestamp}",
+              "content": "{#.reflect_input#.content}",
+              "forwardedByUser": "",
+              "forwardedFromCsa": "",
+              "forwardedToCsa": ""
+            }
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
       "get_not_ended_chat": {
         "verify": {
           "response": {
