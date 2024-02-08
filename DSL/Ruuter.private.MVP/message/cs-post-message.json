@@ -1,0 +1,153 @@
+{
+  "action_type": "BLOGIC",
+  "destination": [
+    {
+      "reflect_input": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{dmapper_url}/json/v2/reflect_cs_post_message",
+          "post_body_struct": {
+            "chatId": "{#.chatId}",
+            "authorId": "{#.authorId}",
+            "authorFirstName": "{#.authorFirstName}",
+            "authorRole": "{#.authorRole}",
+            "authorTimestamp": "{#.authorTimestamp}",
+            "content": "{#.content}",
+            "forwardedByUser": "",
+            "forwardedFromCsa": "",
+            "forwardedToCsa": ""
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
+      "userinfo": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{tim_url}/jwt/custom-jwt-userinfo",
+          "cookies": [
+            "customJwtCookie"
+          ],
+          "post_body_struct": "customJwtCookie"
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
+      "get_message_uuid": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{ruuter_url}/functions/generateRandomUuid",
+          "post_body_struct": {}
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
+      "insert_message": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{resql_url}/insert-message",
+          "post_body_parameters": {
+            "check_roles": {
+              "method": "post",
+              "endpoint": "{ruuter_url}/match_input",
+              "post_body_struct": {
+                "input": {
+                  "authorities": "{#.userinfo#.authorities}"
+                },
+                "validate_against": {
+                  "authorities": [
+                    "ROLE_ADMINISTRATOR",
+                    "ROLE_CUSTOMER_SUPPORT_AGENT",
+                    "ROLE_SERVICE_MANAGER"
+                  ]
+                },
+                "validation_type": "MUST_MATCH_ANY"
+              },
+              "response": {
+                "ok": "proceed",
+                "nok": "stop"
+              }
+            }
+          },
+          "post_body_struct": {
+            "chatId": "{#.reflect_input#.chatId}",
+            "messageId": "{#.get_message_uuid#.output}",
+            "content": "{#.reflect_input#.content}",
+            "event": "",
+            "authorTimestamp": "{#.reflect_input#.authorTimestamp}",
+            "authorId": "{#.userinfo#.idCode}",
+            "authorFirstName": "{#.reflect_input#.authorFirstName}",
+            "authorLastName": "",
+            "authorRole": "{#.reflect_input#.authorRole}",
+            "rating": "",
+            "created": "$_getInstant()",
+            "forwardedByUser": "",
+            "forwardedFromCsa": "",
+            "forwardedToCsa": ""
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
+      "get_not_ended_chat": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{resql_url}/get-active-chat-by-id",
+          "post_body_struct": {
+            "id": "{#.reflect_input#.chatId}"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    }
+  ]
+}

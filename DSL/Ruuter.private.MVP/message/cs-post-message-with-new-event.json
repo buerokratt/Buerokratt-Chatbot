@@ -1,0 +1,83 @@
+{
+  "action_type": "BLOGIC",
+  "destination": [
+    {
+      "reflect_input": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{dmapper_url}/json/v2/reflect_message_event",
+          "post_body_struct": {
+            "id": "{#.id}",
+            "event": "{#.event}",
+            "authorTimestamp": "{#.authorTimestamp}"
+          },
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        }
+      }
+    },
+    {
+      "get_message_by_id": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{resql_url}/get-message-by-id",
+          "post_body_struct": {
+            "id": "{#.reflect_input#.id}"
+          },
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        }
+      }
+    },
+    {
+      "post_message": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{resql_url}/insert-message",
+          "post_body_struct": {
+            "messageId": "{#.get_message_by_id[0]#.baseId}",
+            "chatId": "{#.get_message_by_id[0]#.chatBaseId}",
+            "authorId": "{#.get_message_by_id[0]#.authorId}",
+            "authorTimestamp": "{#.reflect_input#.authorTimestamp}",
+            "authorFirstName": "{#.get_message_by_id[0]#.authorFirstName}",
+            "authorLastName": "{#.get_message_by_id[0]#.authorLastName}",
+            "authorRole": "{#.get_message_by_id[0]#.authorRole}",
+            "created": "{#.get_message_by_id[0]#.created}",
+            "content": "{#.get_message_by_id[0]#.content}",
+            "event": "{#.reflect_input#.event}",
+            "forwardedByUser": "{#.get_message_by_id[0]#.forwardedByUser}",
+            "forwardedFromCsa": "{#.get_message_by_id[0]#.forwardedFromCsa}",
+            "forwardedToCsa": "{#.get_message_by_id[0]#.forwardedToCsa}",
+            "rating": ""
+          },
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        }
+      }
+    }
+  ]
+}
