@@ -129,6 +129,31 @@
       }
     },
     {
+      "clear_chat_list": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{opensearch_url}/notifications/_delete_by_query?conflicts=proceed",
+          "post_body_struct": {
+            "query": {
+              "term": {
+                "channelId": "chat-list"
+              }
+            }
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
       "post_message_to_notifications_server": {
         "verify": {
           "response": {
@@ -143,15 +168,8 @@
             "channelId": "{#.reflect_input#.chatId}",
             "timestamp": "$_getInstant()",
             "payload": {
-              "chatId": "{#.reflect_input#.chatId}",
-              "authorId": "{#.reflect_input#.authorId}",
-              "authorFirstName": "{#.reflect_input#.authorFirstName}",
-              "authorRole": "{#.reflect_input#.authorRole}",
-              "authorTimestamp": "{#.reflect_input#.authorTimestamp}",
-              "content": "{#.reflect_input#.content}",
-              "forwardedByUser": "",
-              "forwardedFromCsa": "",
-              "forwardedToCsa": ""
+              "status": "Chat Status Changed",
+              "chatId": "{#.reflect_input#.chatId}"
             }
           }
         },
