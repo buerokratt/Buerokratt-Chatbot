@@ -1,0 +1,262 @@
+{
+  "action_type": "BLOGIC",
+  "destination": [
+    {
+      "reflect_input": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{dmapper_url}/json/v2/reflect_end_chat",
+          "post_body_struct": {
+            "chatId": "{#.chatId}",
+            "event": "{#.event}",
+            "authorTimestamp": "{#.authorTimestamp}"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
+      "get_message_uuid": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{ruuter_url}/functions/generateRandomUuid",
+          "post_body_struct": {}
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
+      "get_not_ended_chat": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{resql_url}/get-active-chat-by-id",
+          "post_body_parameters": {},
+          "post_body_struct": {
+            "id": "{#.reflect_input#.chatId}"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
+      "verify_chat_not_ended": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{ruuter_url}/match_input",
+          "post_body_struct": {
+            "input": {
+              "chat_id": "{#.get_not_ended_chat[0]#.id}"
+            },
+            "validate_against": {
+              "chat_id": "{#.reflect_input#.chatId}"
+            },
+            "validation_type": "MUST_MATCH_EXACT"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
+      "post_message": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{resql_url}/insert-message",
+          "post_body_parameters": {
+            "match_user_chat_id": {
+              "method": "post",
+              "endpoint": "{ruuter_url}/match_input",
+              "post_body_parameters": {
+                "chat_info": {
+                  "cookies": ["chatJwt"],
+                  "method": "post",
+                  "endpoint": "{tim_url}/jwt/custom-jwt-userinfo",
+                  "post_body_struct": "chatJwt",
+                  "response": {
+                    "ok": "proceed",
+                    "nok": "stop"
+                  }
+                }
+              },
+              "post_body_struct": {
+                "input": {
+                  "chat_id": "{$.chat_info$.chatId}"
+                },
+                "validate_against": {
+                  "chat_id": "{#.get_not_ended_chat[0]#.id}"
+                },
+                "validation_type": "MUST_MATCH_EXACT"
+              },
+              "response": {
+                "ok": "proceed",
+                "nok": "stop"
+              }
+            }
+          },
+          "post_body_struct": {
+            "chatId": "{#.get_not_ended_chat[0]#.id}",
+            "messageId": "{#.get_message_uuid#.output}",
+            "content": "",
+            "event": "{#.reflect_input#.event}",
+            "authorTimestamp": "{#.reflect_input#.authorTimestamp}",
+            "authorId": "",
+            "authorFirstName": "",
+            "authorLastName": "",
+            "authorRole": "buerokratt",
+            "rating": "",
+            "created": "$_getInstant()",
+            "forwardedByUser": "",
+            "forwardedFromCsa": "",
+            "forwardedToCsa": ""
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
+      "end_chat": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{resql_url}/insert-chat",
+          "post_body_struct": {
+            "id": "{#.get_not_ended_chat[0]#.id}",
+            "customerSupportId": "{#.get_not_ended_chat[0]#.customerSupportId}",
+            "customerSupportDisplayName": "{#.get_not_ended_chat[0]#.customerSupportDisplayName}",
+            "csaTitle": "{#.get_not_ended_chat[0]#.csaTitle}",
+            "endUserId": "{#.get_not_ended_chat[0]#.endUserId}",
+            "endUserFirstName": "{#.get_not_ended_chat[0]#.endUserFirstName}",
+            "endUserLastName": "{#.get_not_ended_chat[0]#.endUserLastName}",
+            "status": "ENDED",
+            "endUserEmail": "{#.get_not_ended_chat[0]#.endUserEmail}",
+            "endUserPhone": "{#.get_not_ended_chat[0]#.endUserPhone}",
+            "endUserOs": "{#.get_not_ended_chat[0]#.endUserOs}",
+            "endUserUrl": "{#.get_not_ended_chat[0]#.endUserUrl}",
+            "feedbackText": "{#.get_not_ended_chat[0]#.feedbackText}",
+            "feedbackRating": "{#.get_not_ended_chat[0]#.feedbackRating}",
+            "externalId": "{#.get_not_ended_chat[0]#.externalId}",
+            "created": "{#.get_not_ended_chat[0]#.created}",
+            "ended": "$_getInstant()",
+            "forwardedTo": "{#.get_not_ended_chat[0]#.forwardedTo}",
+            "forwardedToName": "{#.get_not_ended_chat[0]#.forwardedToName}",
+            "receivedFrom": "{#.get_not_ended_chat[0]#.receivedFrom}",
+            "receivedFromName": "{#.get_not_ended_chat[0]#.receivedFromName}"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "on_error"
+        }
+      }
+    },
+    {
+      "blacklist_chat_jwt": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "proceed"
+          }
+        },
+        "proceed": {
+          "cookies": ["chatJwt"],
+          "method": "post",
+          "endpoint": "{tim_url}/jwt/custom-jwt-blacklist",
+          "post_body_struct": "chatJwt",
+          "response_header": {
+            "Set-Cookie": {
+              "name": "chatJwt",
+              "maxAge": 0,
+              "httpOnly": true,
+              "domain": "{cookie_domain}",
+              "setSecure": true,
+              "value": null
+            }
+          },
+          "response": {
+            "ok": "proceed",
+            "nok": "proceed"
+          }
+        }
+      }
+    },
+    {
+      "blacklist_client_custom_jwt": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "proceed"
+          }
+        },
+        "proceed": {
+          "cookies": ["clientCustomJwtCookie"],
+          "method": "post",
+          "endpoint": "{tim_url}/jwt/custom-jwt-blacklist",
+          "post_body_struct": "clientCustomJwtCookie",
+          "response_header": {
+            "Set-Cookie": {
+              "name": "clientCustomJwtCookie",
+              "httpOnly": true,
+              "maxAge": 0,
+              "domain": "{cookie_domain}",
+              "setSecure": true,
+              "value": null
+            }
+          },
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        }
+      }
+    }
+  ]
+}
