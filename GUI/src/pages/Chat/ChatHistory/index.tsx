@@ -1,6 +1,6 @@
 import { FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { createColumnHelper, PaginationState } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { AxiosError } from 'axios';

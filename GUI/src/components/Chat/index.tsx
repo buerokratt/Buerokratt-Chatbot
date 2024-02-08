@@ -1,9 +1,7 @@
 import {
   ChangeEvent,
   FC,
-  useContext,
   useEffect,
-  useMemo,
   useRef,
   useState,
   useTransition,
@@ -92,7 +90,7 @@ const Chat: FC<ChatProps> = ({
   const [userInput, setUserInput] = useState<string>('');
   const [userInputFile, setUserInputFile] = useState<Attachment>();
   const [errorMessage, setErrorMessage] = useState('');
-  const [newMessage] = useNewMessageSound();
+  const [newMessageEffect] = useNewMessageSound();
   let messagesLength = 0;
   const navigate = useNavigate();
   const [previewTypingMessage, setPreviewTypingMessage] = useState<Message>();
@@ -117,7 +115,7 @@ const Chat: FC<ChatProps> = ({
   };
 
   useEffect(() => {
-    const onMessage = async (res) => {
+    const onMessage = async (res: any) => {
       if (res === 'preview') {
         const previewMessage = await apiDev.get(
           'csa/message-preview?chatId=' + chat.id
@@ -128,12 +126,12 @@ const Chat: FC<ChatProps> = ({
           const res =
             (await apiDev.get(
               `csa/new-messages?chatId=${chat.id}&lastRead=${
-                chat.lastMessageTimestamp.split('+')[0] ?? ''
+                chat.lastMessageTimestamp?.split('+')[0] ?? ''
               }`
             )) ?? [];
           const messages = res.data.response;
-          setPreviewTypingMessage('');
-          const filteredMessages = messages?.filter((newMessage) => {
+          setPreviewTypingMessage(undefined);
+          const filteredMessages = messages?.filter((newMessage: Message) => {
             return !messagesList.some(
               (existingMessage) =>
                 existingMessage.id === newMessage.id &&
@@ -142,7 +140,7 @@ const Chat: FC<ChatProps> = ({
           });
 
           let newDisplayableMessages = filteredMessages?.filter(
-            (msg) => msg.authorId != userInfo?.idCode
+            (msg: Message) => msg.authorId != userInfo?.idCode
           );
 
           if (newDisplayableMessages?.length > 0) {
@@ -200,7 +198,7 @@ const Chat: FC<ChatProps> = ({
       messagesLength < res.response.length &&
       res.response[res.response.length - 1].authorId != userInfo?.idCode
     ) {
-      newMessage?.play();
+      newMessageEffect?.play();
       onRefresh();
     }
     messagesLength = res.response.length;
@@ -267,7 +265,7 @@ const Chat: FC<ChatProps> = ({
 
   const postEventMutation = useMutation({
     mutationFn: (message: Message) =>
-      apiDev.post('csa/message', {
+      apiDev.post('csa/message-event', {
         chatId: message.chatId ?? '',
         content: '',
         event: message.event ?? '',
@@ -385,162 +383,11 @@ const Chat: FC<ChatProps> = ({
     readTime: null,
   });
   const messageReadStatusRef = useRef(messageReadStatus);
-  const setMessageReadStatus = (data: MessageStatus) => {
-    messageReadStatusRef.current = data;
-    _setMessageReadStatus(data);
-  };
-
-  const setPreviewMessage = (messages: Message[]) => {
-    const PREVIEW_MESSAGE: GroupedMessage = {
-      name: endUserFullName,
-      type: messages[0].authorRole ?? '',
-      messages: messages,
-    };
-    const CURRENT_MESSAGE_GROUPS = messageGroupsRef.current;
-    const index = findIndex(
-      CURRENT_MESSAGE_GROUPS,
-      (o) => o.messages[0].id === PREVIEW_MESSAGE.messages[0].id
-    );
-
-    if (index === -1) {
-      CURRENT_MESSAGE_GROUPS.push(PREVIEW_MESSAGE);
-    } else {
-      CURRENT_MESSAGE_GROUPS.splice(index, 1, PREVIEW_MESSAGE);
-    }
-    startTransition(() => setMessageGroups(CURRENT_MESSAGE_GROUPS));
-  };
 
   const endUserFullName =
     chat.endUserFirstName !== '' && chat.endUserLastName !== ''
       ? `${chat.endUserFirstName} ${chat.endUserLastName}`
       : t('global.anonymous');
-
-  const allSideButtons =
-    chat.customerSupportId === userInfo?.idCode
-      ? [
-          {
-            id: 'endChat',
-            button: (
-              <Button
-                key="endChat"
-                appearance="success"
-                onClick={onChatEnd ? () => onChatEnd(chat) : undefined}
-              >
-                {t('chat.active.endChat')}
-              </Button>
-            ),
-          },
-          {
-            id: 'askAuthentication',
-            button: (
-              <Button
-                key="askAuthentication"
-                appearance="secondary"
-                onClick={() =>
-                  handleChatEvent(CHAT_EVENTS.REQUESTED_AUTHENTICATION)
-                }
-              >
-                {t('chat.active.askAuthentication')}
-              </Button>
-            ),
-          },
-          {
-            id: 'askForContact',
-            button: (
-              <Button
-                key="askForContact"
-                appearance="secondary"
-                onClick={() => handleChatEvent(CHAT_EVENTS.CONTACT_INFORMATION)}
-              >
-                {t('chat.active.askForContact')}
-              </Button>
-            ),
-          },
-          {
-            id: 'askPermission',
-            button: (
-              <Button
-                key="askPermission"
-                appearance="secondary"
-                onClick={() => handleChatEvent(CHAT_EVENTS.ASK_PERMISSION)}
-              >
-                {t('chat.active.askPermission')}
-              </Button>
-            ),
-          },
-          {
-            id: 'forwardToColleague',
-            button: (
-              <Button
-                key="forwardToColleague"
-                appearance="secondary"
-                onClick={
-                  onForwardToColleauge
-                    ? () => {
-                        onForwardToColleauge(chat);
-                        setSelectedMessages([]);
-                      }
-                    : undefined
-                }
-              >
-                {t('chat.active.forwardToColleague')}
-              </Button>
-            ),
-          },
-          {
-            id: 'forwardToOrganization',
-            button: (
-              <Button
-                key="forwardToOrganization"
-                appearance="secondary"
-                onClick={
-                  onForwardToEstablishment
-                    ? () => onForwardToEstablishment(chat)
-                    : undefined
-                }
-              >
-                {t('chat.active.forwardToOrganization')}
-              </Button>
-            ),
-          },
-          {
-            id: 'sendToEmail',
-            button: (
-              <Button
-                key="sendToEmail"
-                appearance="secondary"
-                onClick={onSendToEmail ? () => onSendToEmail(chat) : undefined}
-              >
-                {t('chat.active.sendToEmail')}
-              </Button>
-            ),
-          },
-        ]
-      : [];
-  const [sideButtons, setSideButtons] = useState([]);
-  const [buttonsToAllow] = useState<any[]>([]);
-
-  useEffect(() => {
-    if (sideButtons.length > 0) return;
-    let buttons: any = [];
-    // userInfo?.authorities.forEach((authority) => {
-    //     // make role more uri friendly
-    //     let role = authority.substring(5).replaceAll('_', '-').toLowerCase();
-    //     // TODO: Replace '/active/admin.json' with '/<type>/<role>.json'.
-    //     axios({ url: `import.meta.env.REACT_APP_RUUTER_V1_PRIVATE_API_URL/cdn/buttons/chats/active/${role}.json` })
-    //         .then(res => {
-    //             res.data.buttons.forEach((btnId: any) => {
-    //                 if (!buttonsToAllow.includes(btnId))
-    //                     buttonsToAllow.push(btnId);
-    //             });
-    //         });
-    // });
-    // allSideButtons.forEach((button) => {
-    //     if (buttonsToAllow.includes(button.id))
-    //         buttons.push(button.button);
-    // });
-    // setSideButtons(buttons);
-  }, [buttonsToAllow, sideButtons]);
 
   useEffect(() => {
     if (!messagesList) return;
@@ -727,10 +574,8 @@ const Chat: FC<ChatProps> = ({
                 <div className="active-chat__group-name">{'User Typing'}</div>
                 <div className="active-chat__messages">
                   <PreviewMessage
-                    preview={previewTypingMessage}
-                    readStatus={messageReadStatusRef}
                     key={`preview-message`}
-                    onSelect={(_) => {}}
+                    preview={previewTypingMessage.preview}
                   />
                 </div>
               </div>
@@ -879,9 +724,7 @@ const Chat: FC<ChatProps> = ({
               <Button
                 appearance="secondary"
                 disabled={chat.customerSupportId != userInfo?.idCode}
-                onClick={() =>
-                  handleChatEvent(CHAT_EVENTS.REQUESTED_AUTHENTICATION)
-                }
+                onClick={() => handleChatEvent(CHAT_EVENTS.REQUESTED_AUTHENTICATION)}
               >
                 {t('chat.active.askAuthentication')}
               </Button>

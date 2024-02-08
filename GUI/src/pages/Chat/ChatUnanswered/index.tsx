@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Tabs from '@radix-ui/react-tabs';
 import { useQuery } from '@tanstack/react-query';
@@ -8,24 +8,22 @@ import {
   CHAT_EVENTS,
   CHAT_STATUS,
   Chat as ChatType,
-  GroupedChat,
 } from 'types/chat';
 import useStore from 'store';
 import { User } from 'types/user';
 import { useToast } from 'hooks/useToast';
-import './ChatUnanswered.scss';
 import apiDev from 'services/api-dev';
 import ChatTrigger from '../ChatActive/ChatTrigger';
 import clsx from 'clsx';
 import ForwardToColleaugeModal from '../ForwardToColleaugeModal';
 import ForwardToEstablishmentModal from '../ForwardToEstablishmentModal';
 import sse from 'services/sse-service';
+import './ChatUnanswered.scss';
 
 const ChatUnanswered: FC = () => {
   const { t } = useTranslation();
   const userInfo = useStore((state) => state.userInfo);
   const toast = useToast();
-  const chatCsaActive = useStore((state) => state.chatCsaActive);
   const [endChatModal, setEndChatModal] = useState<ChatType | null>(null);
   const [forwardToColleaugeModal, setForwardToColleaugeModal] =
     useState<ChatType | null>(null);
@@ -44,43 +42,18 @@ const ChatUnanswered: FC = () => {
     CHAT_EVENTS.RESPONSE_SENT_TO_CLIENT_EMAIL,
   ];
 
-  const activeChats = useStore((state) => state.activeChats);
+  const groupedUnansweredChats = useStore((state) => state.getGroupedUnansweredChats());
   const selectedChatId = useStore((state) => state.selectedChatId);
   const selectedChat = useStore((state) => state.selectedChat());
-  const setActiveChats = useStore.getState().setActiveChats;
-
-  const { refetch } = useQuery<ChatType[]>({
-    queryKey: ['csa/active-chats', 'prod'],
-    onSuccess(res: any) {
-      setActiveChats(res.response);
-    },
-  });
+  const loadActiveChats = useStore((state) => state.loadActiveChats);
 
   useEffect(() => {
-    refetch();
-  }, [chatCsaActive]);
+    useStore.getState().loadActiveChats();
+  }, []);
 
   useEffect(() => {
-    const onMessage = async () => {
-      const res = await apiDev.get('csa/active-chats');
-      const chats = res.data.response ?? [];
-      const isChatStillExists = chats?.filter(function (e: any) {
-        return e.id === selectedChatId;
-      });
-      if (isChatStillExists.length === 0 && activeChats.length > 0) {
-        setTimeout(function () {
-          setActiveChats(chats);
-        }, 3000);
-      } else {
-        setActiveChats(chats);
-      }
-    };
-
-    const events = sse(`/chat-list`, onMessage);
-
-    return () => {
-      events.close();
-    };
+    const events = sse(`/chat-list`, loadActiveChats);
+    return () => events.close()
   }, []);
 
   const { data: csaNameVisiblity } = useQuery<{ isVisible: boolean }>({
@@ -90,54 +63,6 @@ const ChatUnanswered: FC = () => {
   const { data: csaTitleVisibility } = useQuery<{ isVisible: boolean }>({
     queryKey: ['csa/title-visibility', 'prod'],
   });
-
-  const groupedUnansweredChats: GroupedChat = useMemo(() => {
-    const grouped: GroupedChat = {
-      myChats: [],
-      otherChats: [],
-    };
-
-    if (!activeChats) return grouped;
-
-    if (chatCsaActive === true) {
-      activeChats.forEach((c) => {
-        if (c.customerSupportId === '') {
-          grouped.myChats.push(c);
-          return;
-        }
-      });
-    } else {
-      activeChats.forEach((c) => {
-        if (
-          c.customerSupportId === userInfo?.idCode ||
-          c.customerSupportId === ''
-        ) {
-          grouped.myChats.push(c);
-          return;
-        }
-
-        grouped.myChats.sort((a, b) => a.created.localeCompare(b.created));
-        const groupIndex = grouped.otherChats.findIndex(
-          (x) => x.groupId === c.customerSupportId
-        );
-        if (c.customerSupportId !== '') {
-          if (groupIndex === -1) {
-            grouped.otherChats.push({
-              groupId: c.customerSupportId ?? '',
-              name: c.customerSupportDisplayName ?? '',
-              chats: [c],
-            });
-          } else {
-            grouped.otherChats[groupIndex].chats.push(c);
-          }
-        }
-      });
-
-      grouped.otherChats.sort((a, b) => a.name.localeCompare(b.name));
-    }
-
-    return grouped;
-  }, [activeChats, chatCsaActive]);
 
   const handleCsaForward = async (chat: ChatType, user: User) => {
     try {
@@ -151,7 +76,7 @@ const ChatUnanswered: FC = () => {
         forwardedToCsa: user?.displayName ?? '',
       }),
         setForwardToColleaugeModal(null);
-      refetch();
+      loadActiveChats();
       toast.open({
         type: 'success',
         title: t('global.notification'),
@@ -191,7 +116,7 @@ const ChatUnanswered: FC = () => {
         authorId: userInfo!.idCode,
         authorRole: userInfo!.authorities,
       });
-      refetch();
+      loadActiveChats();
       toast.open({
         type: 'success',
         title: t('global.notification'),
@@ -255,7 +180,7 @@ const ChatUnanswered: FC = () => {
               onForwardToColleauge={setForwardToColleaugeModal}
               onForwardToEstablishment={setForwardToEstablishmentModal}
               onSendToEmail={setSendToEmailModal}
-              onRefresh={refetch}
+              onRefresh={loadActiveChats}
             />
           )}
         </Tabs.Content>
