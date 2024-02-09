@@ -360,40 +360,6 @@
       }
     },
     {
-      "get_inserted_chat": {
-        "verify": {
-          "response": {
-            "ok": "proceed",
-            "nok": "stop"
-          }
-        },
-        "proceed": {
-          "method": "post",
-          "endpoint": "{dmapper_url}/json/v2/return_first_chat_from_array",
-          "post_body_parameters": {
-            "get_chat_by_id": {
-              "method": "post",
-              "endpoint": "{resql_url}/get-chat-by-id",
-              "post_body_struct": {
-                "id": "{#.get_chat_uuid#.output}"
-              },
-              "response": {
-                "ok": "proceed",
-                "nok": "stop"
-              }
-            }
-          },
-          "post_body_struct": {
-            "chatArray": "{$.get_chat_by_id}"
-          }
-        },
-        "response": {
-          "ok": "proceed",
-          "nok": "stop"
-        }
-      }
-    },
-    {
       "clearMessages": {
         "verify": {
           "response": {
@@ -436,6 +402,40 @@
               "type": "message",
               "messageId": "{#.get_message_uuid#.output}"
             }
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
+      "get_inserted_chat": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{dmapper_url}/json/v2/return_first_chat_from_array",
+          "post_body_parameters": {
+            "get_chat_by_id": {
+              "method": "post",
+              "endpoint": "{resql_url}/get-chat-by-id",
+              "post_body_struct": {
+                "id": "{#.get_chat_uuid#.output}"
+              },
+              "response": {
+                "ok": "proceed",
+                "nok": "stop"
+              }
+            }
+          },
+          "post_body_struct": {
+            "chatArray": "{$.get_chat_by_id}"
           }
         },
         "response": {
