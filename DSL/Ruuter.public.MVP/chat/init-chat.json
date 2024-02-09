@@ -392,6 +392,57 @@
           "nok": "stop"
         }
       }
+    },
+    {
+      "clearMessages": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{opensearch_url}/notifications/_delete_by_query?conflicts=proceed",
+          "post_body_struct": {
+            "query": {
+              "term": {
+                "channelId": "{#.get_chat_uuid#.output}"
+              }
+            }
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
+      "post_notification_about_chat": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{opensearch_url}/notifications/_doc",
+          "post_body_struct": {
+            "channelId": "{#.get_chat_uuid#.output}",
+            "timestamp": "$_getInstant()",
+            "payload": {
+              "type": "message",
+              "messageId": "{#.get_message_uuid#.output}"
+            }
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
     }
   ]
 }
