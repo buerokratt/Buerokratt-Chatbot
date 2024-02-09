@@ -191,6 +191,57 @@
           }
         }
       }
+    },
+    {
+      "clear_messages": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{opensearch_url}/notifications/_delete_by_query?conflicts=proceed",
+          "post_body_struct": {
+            "query": {
+              "term": {
+                "channelId": "{#.reflect_input#.chatId}"
+              }
+            }
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
+      "post_notifications_about_message": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{opensearch_url}/notifications/_doc",
+          "post_body_struct": {
+            "channelId": "{#.reflect_input#.chatId}",
+            "timestamp": "$_getInstant()",
+            "payload": {
+              "type": "message",
+              "messageId": "{#.get_message_uuid#.output}"
+            }
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
     }
   ]
 }

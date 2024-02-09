@@ -129,7 +129,7 @@
       }
     },
     {
-      "clear_chat_list": {
+      "clear_chatlist": {
         "verify": {
           "response": {
             "ok": "proceed",
@@ -154,7 +154,58 @@
       }
     },
     {
-      "post_message_to_notifications_server": {
+      "post_notifications_about_chat": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{opensearch_url}/notifications/_doc",
+          "post_body_struct": {
+            "channelId": "chat-list",
+            "timestamp": "$_getInstant()",
+            "payload": {
+              "status": "Chat Status Changed",
+              "chatId": "{#.reflect_input#.chatId}"
+            }
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
+      "clear_messages": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{opensearch_url}/notifications/_delete_by_query?conflicts=proceed",
+          "post_body_struct": {
+            "query": {
+              "term": {
+                "channelId": "{#.reflect_input#.chatId}"
+              }
+            }
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
+      "post_notifications_about_message": {
         "verify": {
           "response": {
             "ok": "proceed",
@@ -168,8 +219,8 @@
             "channelId": "{#.reflect_input#.chatId}",
             "timestamp": "$_getInstant()",
             "payload": {
-              "status": "Chat Status Changed",
-              "chatId": "{#.reflect_input#.chatId}"
+              "type": "message",
+              "messageId": "{#.get_message_uuid#.output}"
             }
           }
         },
