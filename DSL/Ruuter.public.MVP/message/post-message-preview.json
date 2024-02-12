@@ -20,7 +20,7 @@
       }
     },
     {
-      "clearMessages": {
+      "clear-messages": {
         "verify": {
           "response": {
             "ok": "proceed",
