@@ -99,7 +99,9 @@ const useStore = create<StoreState>((set, get, store) => ({
       chatCsaActive === false &&
       !userInfo?.authorities.includes('ROLE_ADMINISTRATOR')
     ) {
-      get().setSelectedChatId(null);
+      if (get().selectedChatId !== null) {
+        get().setSelectedChatId(null);
+      }
       return grouped;
     }
 
