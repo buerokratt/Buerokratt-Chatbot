@@ -265,7 +265,7 @@ const Chat: FC<ChatProps> = ({
 
   const postEventMutation = useMutation({
     mutationFn: (message: Message) =>
-      apiDev.post('csa/message-event', {
+      apiDev.post('csa/message', {
         chatId: message.chatId ?? '',
         content: '',
         event: message.event ?? '',
@@ -724,7 +724,9 @@ const Chat: FC<ChatProps> = ({
               <Button
                 appearance="secondary"
                 disabled={chat.customerSupportId != userInfo?.idCode}
-                onClick={() => handleChatEvent(CHAT_EVENTS.REQUESTED_AUTHENTICATION)}
+                onClick={() =>
+                  handleChatEvent(CHAT_EVENTS.REQUESTED_AUTHENTICATION)
+                }
               >
                 {t('chat.active.askAuthentication')}
               </Button>
