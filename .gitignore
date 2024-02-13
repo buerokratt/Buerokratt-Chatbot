@@ -4,3 +4,4 @@
 .DS_Store
 /loba
 node_modules
+**/package-lock.json
