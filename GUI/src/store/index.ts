@@ -16,6 +16,7 @@ interface StoreState {
   setSelectedChatId: (id: string | null) => void;
   setChatCsaActive: (active: boolean) => void;
   selectedChat: () => ChatType | null | undefined;
+  selectedPendingChat: () => ChatType | null | undefined;
   unansweredChats: () => ChatType[];
   forwordedChats: () => ChatType[];
   unansweredChatsLength: () => number;
@@ -48,6 +49,10 @@ const useStore = create<StoreState>((set, get, store) => ({
   selectedChat: () => {
     const selectedChatId = get().selectedChatId;
     return get().activeChats.find(c => c.id === selectedChatId);
+  },
+  selectedPendingChat: () => {
+    const selectedChatId = get().selectedChatId;
+    return get().pendingChats.find(c => c.id === selectedChatId);
   },
   unansweredChats: () => {
     return get().activeChats.filter(c => c.customerSupportId === '');
@@ -183,7 +188,6 @@ const useStore = create<StoreState>((set, get, store) => ({
 
     return grouped;
   },
-
   getGroupedPendingChats: () => {
     const pendingChats = get().pendingChats;
     const userInfo = get().userInfo;
@@ -198,7 +202,7 @@ const useStore = create<StoreState>((set, get, store) => ({
 
     if (!pendingChats) return grouped;
 
-    if (chatCsaActive === true) {
+    // if (chatCsaActive === true) {
       pendingChats.forEach((c) => {
         if (c.customerSupportId === 'chatbot') {
           grouped.newChats.push(c);
@@ -232,7 +236,7 @@ const useStore = create<StoreState>((set, get, store) => ({
           return;
         }
       });
-    }
+    // }
     return grouped;
   }
 }));
