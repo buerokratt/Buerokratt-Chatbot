@@ -22,6 +22,7 @@ function buildSSEResponse({
   res.write('');
 
   const connectionId = uuidv4();
+  console.log(`New client connected with connectionId: ${connectionId}`);
   const callback = (data) => res.write(`data: ${JSON.stringify(data)}\n\n`);
   
   const intervalHandle = setInterval(() => 

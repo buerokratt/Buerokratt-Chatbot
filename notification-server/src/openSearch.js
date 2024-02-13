@@ -14,6 +14,7 @@ async function searchNotification({ channelId, connectionId, callback }) {
         query: {
           bool: {
             must: { match: { channelId } },
+            must_not: { match: { sentTo: connectionId } },
           },
         },
         sort: { timestamp: { order: "asc" } },
