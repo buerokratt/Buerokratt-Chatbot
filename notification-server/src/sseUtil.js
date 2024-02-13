@@ -1,5 +1,6 @@
 const { searchNotification } = require('./openSearch');
 const { serverConfig } = require('./config');
+const { v4: uuidv4 } = require('uuid');
 
 function buildSSEResponse({
   res,
@@ -20,12 +21,14 @@ function buildSSEResponse({
 
   res.write('');
 
+  const connectionId = uuidv4();
   const callback = (data) => res.write(`data: ${JSON.stringify(data)}\n\n`);
   
   const intervalHandle = setInterval(() => 
     searchNotification({
       channelId,
       callback,
+      connectionId,
     }),
     interval
   );
