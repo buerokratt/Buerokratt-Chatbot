@@ -22,6 +22,7 @@ async function searchNotification({ channelId, callback }) {
 
     for (const hit of response.body.hits.hits) {
       await callback(hit._source.payload);
+      await markAsSent(hit, channelId);
     }
   } catch (e) {
     console.error(e);
