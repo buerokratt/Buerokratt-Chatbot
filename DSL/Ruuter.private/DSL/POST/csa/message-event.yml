@@ -1,6 +1,6 @@
 extractRequestData:
   assign:
-    messageId: ${incoming.body.id}
+    id: ${incoming.body.id}
     event: ${incoming.body.event}
     authorTimestamp: ${incoming.body.authorTimestamp}
 
@@ -9,7 +9,7 @@ getMessageById:
   args:
     url: "[#CHATBOT_RESQL]/get-message-by-id"
     body:
-      id: ${messageId}
+      id: ${id}
   result: res
   next: assignMessage
 
@@ -23,7 +23,7 @@ insertMessage:
   args:
     url: "[#CHATBOT_RESQL]/insert-message"
     body:
-      messageId: ${messageId}
+      messageId: ${id}
       chatId: ${message.chatBaseId}
       authorId: ${message.authorId ?? ""}
       authorTimestamp: ${authorTimestamp}
