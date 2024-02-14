@@ -4,11 +4,7 @@ import * as Tabs from '@radix-ui/react-tabs';
 import { useQuery } from '@tanstack/react-query';
 
 import { Chat, Dialog, Button, FormRadios, Track } from 'components';
-import {
-  CHAT_EVENTS,
-  CHAT_STATUS,
-  Chat as ChatType,
-} from 'types/chat';
+import { CHAT_EVENTS, CHAT_STATUS, Chat as ChatType } from 'types/chat';
 import useStore from 'store';
 import { User } from 'types/user';
 import { useToast } from 'hooks/useToast';
@@ -43,9 +39,8 @@ const ChatPending: FC = () => {
     CHAT_EVENTS.RESPONSE_SENT_TO_CLIENT_EMAIL,
   ];
 
-  const pendingChats = useStore((state) => state.activeChats);
   const selectedChatId = useStore((state) => state.selectedChatId);
-  const selectedChat = useStore((state) => state.selectedChat());
+  const selectedChat = useStore((state) => state.selectedPendingChat());
 
   const loadPendingChats = useStore((state) => state.loadPendingChats);
 
@@ -55,7 +50,7 @@ const ChatPending: FC = () => {
 
   useEffect(() => {
     const events = sse(`/chat-list`, loadPendingChats);
-    return () => events.close()
+    return () => events.close();
   }, []);
 
   const { data: csaNameVisiblity } = useQuery<{ isVisible: boolean }>({
@@ -66,8 +61,10 @@ const ChatPending: FC = () => {
     queryKey: ['csa/title-visibility', 'prod'],
   });
 
-  const groupedPendingChats = useStore((state) => state.getGroupedPendingChats());
-  
+  const groupedPendingChats = useStore((state) =>
+    state.getGroupedPendingChats()
+  );
+
   const handleCsaForward = async (chat: ChatType, user: User) => {
     try {
       await apiDev.post('chat/redirect-chat', {
