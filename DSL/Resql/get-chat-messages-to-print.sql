@@ -2,8 +2,8 @@ SELECT m.content,
        m.event,
        m.created,
        m.author_role,
-       COALESCE(u.first_name, m.author_first_name, u.display_name) AS author_first_name,
-       COALESCE(u.last_name, m.author_last_name) AS author_last_name,
+       COALESCE(m.author_first_name, u.first_name, u.display_name) AS author_first_name,
+       COALESCE(m.author_last_name, u.last_name) AS author_last_name,
        u.csa_title,
        m.buttons
 FROM message m
