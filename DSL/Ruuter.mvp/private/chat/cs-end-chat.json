@@ -83,9 +83,7 @@
         "proceed": {
           "method": "post",
           "endpoint": "{tim_url}/jwt/custom-jwt-userinfo",
-          "cookies": [
-            "customJwtCookie"
-          ],
+          "cookies": ["customJwtCookie"],
           "post_body_struct": "customJwtCookie"
         },
         "response": {
@@ -265,7 +263,7 @@
             "id": "{#.get_not_ended_chat[0]#.id}",
             "customerSupportId": "{#.get_not_ended_chat[0]#.customerSupportId}",
             "customerSupportDisplayName": "{#.get_not_ended_chat[0]#.customerSupportDisplayName}",
-            "csaTitle":"{#.get_not_ended_chat[0]#.csaTitle}",
+            "csaTitle": "{#.get_not_ended_chat[0]#.csaTitle}",
             "endUserId": "{#.get_not_ended_chat[0]#.endUserId}",
             "endUserFirstName": "{#.get_not_ended_chat[0]#.endUserFirstName}",
             "endUserLastName": "{#.get_not_ended_chat[0]#.endUserLastName}",
@@ -283,6 +281,57 @@
             "receivedFrom": "{#.get_not_ended_chat[0]#.receivedFrom}",
             "receivedFromName": "{#.get_not_ended_chat[0]#.receivedFromName}",
             "ended": "$_getInstant()"
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
+      "clear_chat_list": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{opensearch_url}/notifications/_delete_by_query?conflicts=proceed",
+          "post_body_struct": {
+            "query": {
+              "term": {
+                "channelId": "chat-list"
+              }
+            }
+          }
+        },
+        "response": {
+          "ok": "proceed",
+          "nok": "stop"
+        }
+      }
+    },
+    {
+      "post_message_to_notifications_server": {
+        "verify": {
+          "response": {
+            "ok": "proceed",
+            "nok": "stop"
+          }
+        },
+        "proceed": {
+          "method": "post",
+          "endpoint": "{opensearch_url}/notifications/_doc",
+          "post_body_struct": {
+            "channelId": "chat-list",
+            "timestamp": "$_getInstant()",
+            "payload": {
+              "status": "Chat Status Changed",
+              "chatId": "{#.reflect_input#.chatId}"
+            }
           }
         },
         "response": {

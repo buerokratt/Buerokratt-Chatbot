@@ -177,7 +177,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{ruuter_v2_url}/post-message-to-bot",
+          "endpoint": "{ruuter_url}/post-message-to-bot",
           "post_body_struct": {
             "chatId": "{#.reflect_input#.chatId}",
             "content": "{#.reflect_input#.content}",
