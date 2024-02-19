@@ -16,7 +16,7 @@ addFeedbackRating:
     body:
       id: ${chatId}
       created: ${new Date().toISOString()}
-      feedbackRating: ${rating}
+      feedback_rating: ${rating}
   result: res
   next: return_result
 
