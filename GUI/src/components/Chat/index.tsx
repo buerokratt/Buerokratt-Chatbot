@@ -34,6 +34,7 @@ import useSendAttachment from 'modules/attachment/hooks';
 import { AxiosError } from 'axios';
 import { useToast } from 'hooks/useToast';
 import useStore from 'store';
+import useHeaderStore from '@buerokratt-ria/header/src/header/store/store';
 import sse from '../../services/sse-service';
 import { useNavigate } from 'react-router-dom';
 import PreviewMessage from './PreviewMessage';
@@ -83,7 +84,7 @@ const Chat: FC<ChatProps> = ({
   const [isPending, startTransition] = useTransition();
   const [responseText, setResponseText] = useState('');
   const [selectedMessages, setSelectedMessages] = useState<Message[]>([]);
-  const chatCsaActive = useStore((state) => state.chatCsaActive);
+  const chatCsaActive = useHeaderStore((state) => state.chatCsaActive);
   const [messagesList, setMessagesList] = useState<Message[]>([]);
   const [latestPermissionMessage, setLatestPermissionMessage] =
     useState<number>(0);
@@ -107,7 +108,7 @@ const Chat: FC<ChatProps> = ({
         customerSupportId: userInfo?.idCode ?? '',
       }
     );
-    useStore
+    useHeaderStore
       .getState()
       .setChatCsaActive(
         res.response.status === 'online' || res.response.status === 'idle'
