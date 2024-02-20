@@ -138,7 +138,6 @@
       "selectService": "Select a service",
       "start": "Start",
       "service": "Service",
-      "takeIt": "Take it",
       "ContactedUser": "Contacted User",
       "couldNotReachUser": "Could Not Reach User"
     },
@@ -225,9 +224,9 @@
       "unavailable_organization": "Organization Unavailable",
       "unavailable_csas": "CSA's Unavailable",
       "unavailable_holiday": "Holiday",
-      "pending-assigned": "Csa assigned to contact user",
-      "user-reached": "User contacted",
-      "user-not-reached": "User could not be reached"
+      "pending-assigned": "{{name}} assigned to contact user",
+      "user-reached": "{{name}} contacted the user",
+      "user-not-reached": "{{name}} could not reach the user"
     }
   },
   "roles": {

@@ -30,6 +30,7 @@ const ChatPending: FC = () => {
   const [sendToEmailModal, setSendToEmailModal] = useState<ChatType | null>(
     null
   );
+
   const [selectedEndChatStatus, setSelectedEndChatStatus] = useState<
     string | null
   >(null);

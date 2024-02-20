@@ -42,6 +42,7 @@ const ChatActive: FC = () => {
   const [startAServiceModal, setStartAServiceModal] = useState<ChatType | null>(
     null
   );
+
   const [selectedEndChatStatus, setSelectedEndChatStatus] = useState<
     string | null
   >(null);

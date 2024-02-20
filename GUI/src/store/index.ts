@@ -1,6 +1,11 @@
 import { create } from 'zustand';
 import { UserInfo } from 'types/userInfo';
-import { CHAT_STATUS, Chat as ChatType, GroupedChat, GroupedPendingChat } from 'types/chat';
+import {
+  CHAT_STATUS,
+  Chat as ChatType,
+  GroupedChat,
+  GroupedPendingChat,
+} from 'types/chat';
 import apiDev from 'services/api-dev';
 
 interface StoreState {
@@ -48,20 +53,23 @@ const useStore = create<StoreState>((set, get, store) => ({
   },
   selectedChat: () => {
     const selectedChatId = get().selectedChatId;
-    return get().activeChats.find(c => c.id === selectedChatId);
+    return get().activeChats.find((c) => c.id === selectedChatId);
   },
   selectedPendingChat: () => {
     const selectedChatId = get().selectedChatId;
-    return get().pendingChats.find(c => c.id === selectedChatId);
+    return get().pendingChats.find((c) => c.id === selectedChatId);
   },
   unansweredChats: () => {
-    return get().activeChats.filter(c => c.customerSupportId === '');
+    return get().activeChats.filter((c) => c.customerSupportId === '');
   },
   forwordedChats: () => {
     const userId = get().userId;
-    return get().activeChats.filter(c =>
-      c.status === CHAT_STATUS.REDIRECTED && c.customerSupportId === userId
-    ) || [];
+    return (
+      get().activeChats.filter(
+        (c) =>
+          c.status === CHAT_STATUS.REDIRECTED && c.customerSupportId === userId
+      ) || []
+    );
   },
   unansweredChatsLength: () => get().unansweredChats().length,
   forwordedChatsLength: () => get().forwordedChats().length,
@@ -70,7 +78,9 @@ const useStore = create<StoreState>((set, get, store) => ({
     const res = await apiDev.get('csa/active-chats');
     const chats: ChatType[] = res.data.response ?? [];
     const selectedChatId = get().selectedChatId;
-    const isChatStillExists = chats?.filter((e: any) => e.id === selectedChatId);
+    const isChatStillExists = chats?.filter(
+      (e: any) => e.id === selectedChatId
+    );
     if (isChatStillExists.length === 0 && get().activeChats.length > 0) {
       setTimeout(() => get().setActiveChats(chats), 3000);
     } else {
@@ -81,7 +91,9 @@ const useStore = create<StoreState>((set, get, store) => ({
     const res = await apiDev.get('csa/pending-chats');
     const chats: ChatType[] = res.data.response ?? [];
     const selectedChatId = get().selectedChatId;
-    const isChatStillExists = chats?.filter((e: any) => e.id === selectedChatId);
+    const isChatStillExists = chats?.filter(
+      (e: any) => e.id === selectedChatId
+    );
     if (isChatStillExists.length === 0 && get().pendingChats.length > 0) {
       setTimeout(() => get().setPendingChats(chats), 3000);
     } else {
@@ -202,43 +214,43 @@ const useStore = create<StoreState>((set, get, store) => ({
 
     if (!pendingChats) return grouped;
 
-    // if (chatCsaActive === true) {
+    if (chatCsaActive === true) {
       pendingChats.forEach((c) => {
         if (c.customerSupportId === 'chatbot') {
           grouped.newChats.push(c);
           return;
         } else {
           grouped.inProcessChats.push(c);
-          pendingChats.forEach((c) => {
-            if (c.customerSupportId === userInfo?.idCode) {
-              grouped.myChats.push(c);
-              return;
-            }
-
-            grouped.myChats.sort((a, b) => a.created.localeCompare(b.created));
-            const groupIndex = grouped.otherChats.findIndex(
-              (x) => x.groupId === c.customerSupportId
-            );
-            if (c.customerSupportId !== '') {
-              if (groupIndex === -1) {
-                grouped.otherChats.push({
-                  groupId: c.customerSupportId ?? '',
-                  name: c.customerSupportDisplayName ?? '',
-                  chats: [c],
-                });
-              } else {
-                grouped.otherChats[groupIndex].chats.push(c);
-              }
-            }
-          });
-
-          grouped.otherChats.sort((a, b) => a.name.localeCompare(b.name));
           return;
         }
       });
-    // }
+
+      grouped.inProcessChats.forEach((c) => {
+        if (c.customerSupportId === userInfo?.idCode) {
+          grouped.myChats.push(c);
+          return;
+        }
+
+        grouped.myChats.sort((a, b) => a.created.localeCompare(b.created));
+        const groupIndex = grouped.otherChats.findIndex(
+          (x) => x.groupId === c.customerSupportId
+        );
+        if (c.customerSupportId !== '') {
+          if (groupIndex === -1) {
+            grouped.otherChats.push({
+              groupId: c.customerSupportId ?? '',
+              name: c.customerSupportDisplayName ?? '',
+              chats: [c],
+            });
+          } else {
+            grouped.otherChats[groupIndex].chats.push(c);
+          }
+        }
+        grouped.otherChats.sort((a, b) => a.name.localeCompare(b.name));
+      });
+    }
     return grouped;
-  }
+  },
 }));
 
 export default useStore;

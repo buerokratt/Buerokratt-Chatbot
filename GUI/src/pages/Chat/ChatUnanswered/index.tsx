@@ -42,6 +42,7 @@ const ChatUnanswered: FC = () => {
   const groupedUnansweredChats = useHeaderStore((state) =>
     state.getGroupedUnansweredChats()
   );
+
   const selectedChatId = useHeaderStore((state) => state.selectedChatId);
   const selectedChat = useHeaderStore((state) => state.selectedChat());
   const loadActiveChats = useHeaderStore((state) => state.loadActiveChats);

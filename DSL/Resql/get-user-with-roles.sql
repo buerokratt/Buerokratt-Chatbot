@@ -1,4 +1,4 @@
-SELECT u.login,
+SELECT DISTINCT u.login,
        u.first_name,
        u.last_name,
        u.id_code,

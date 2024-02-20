@@ -172,6 +172,21 @@ const ChatEvent: FC<ChatEventProps> = ({ message }) => {
         date: format(new Date(authorTimestamp), 'dd.MM.yyyy HH:mm:ss'),
       });
       break;
+    case CHAT_EVENTS.ASSIGN_PENDING_CHAT_CSA:
+      EVENT_PARAMS = t('chat.events.pending-assigned', {
+        name: message.authorFirstName ?? 'CSA',
+      });
+      break;
+    case CHAT_EVENTS.PENDING_USER_REACHED:
+      EVENT_PARAMS = t('chat.events.user-reached', {
+        name: message.authorFirstName ?? 'CSA',
+      });
+      break;
+    case CHAT_EVENTS.PENDING_USER_NOT_REACHED:
+      EVENT_PARAMS = t('chat.events.user-not-reached', {
+        name: message.authorFirstName ?? 'CSA',
+      });
+      break;
     default:
       EVENT_PARAMS = t(`chat.events.${event?.toLowerCase()}`, {
         date: format(new Date(authorTimestamp), 'dd.MM.yyyy HH:mm:ss'),

@@ -657,7 +657,8 @@ const Chat: FC<ChatProps> = ({
           )}
 
         {chat.status === CHAT_STATUS.IDLE &&
-          chat.customerSupportId === 'chatbot' && (
+          (chat.customerSupportId === 'chatbot' ||
+            chat.customerSupportId != userInfo?.idCode) && (
             <div className="active-chat__toolbar">
               <Track justify="center">
                 <div className="active-chat__toolbar-actions">
@@ -672,7 +673,7 @@ const Chat: FC<ChatProps> = ({
                     }}
                     onClick={() => assignPendingChatMutation.mutate()}
                   >
-                    {t('chat.active.takeIt')}
+                    {t('chat.active.takeOver')}
                   </Button>
                 </div>
               </Track>
@@ -680,7 +681,8 @@ const Chat: FC<ChatProps> = ({
           )}
 
         {chat.status === CHAT_STATUS.IDLE &&
-          chat.customerSupportId != 'chatbot' && (
+          chat.customerSupportId != 'chatbot' &&
+          chat.customerSupportId === userInfo?.idCode && (
             <div className="active-chat__toolbar">
               <Track justify="center">
                 <div className="active-chat__toolbar-actions">
