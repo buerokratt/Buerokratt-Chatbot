@@ -38,6 +38,9 @@ export enum CHAT_EVENTS {
   UNAVAILABLE_ORGANIZATION = 'unavailable_organization',
   UNAVAILABLE_CSAS = 'unavailable_csas',
   UNAVAILABLE_HOLIDAY = 'unavailable_holiday',
+  ASSIGN_PENDING_CHAT_CSA = 'pending-assigned',
+  PENDING_USER_REACHED = 'user-reached',
+  PENDING_USER_NOT_REACHED = 'user-not-reached',
   READ = 'message-read',
 }
 

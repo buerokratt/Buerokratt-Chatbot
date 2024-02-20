@@ -3,12 +3,9 @@ import { useTranslation } from 'react-i18next';
 import * as Tabs from '@radix-ui/react-tabs';
 import { useQuery } from '@tanstack/react-query';
 import { Chat, Dialog, Button, FormRadios, Track } from 'components';
-import {
-  Chat as ChatType,
-  CHAT_EVENTS,
-  CHAT_STATUS,
-} from 'types/chat';
+import { Chat as ChatType, CHAT_EVENTS, CHAT_STATUS } from 'types/chat';
 import useStore from 'store';
+import useHeaderStore from '@buerokratt-ria/header/src/header/store/store';
 import { User } from 'types/user';
 import { useToast } from 'hooks/useToast';
 import apiDev from 'services/api-dev';
@@ -45,25 +42,25 @@ const ChatActive: FC = () => {
   const [startAServiceModal, setStartAServiceModal] = useState<ChatType | null>(
     null
   );
+
   const [selectedEndChatStatus, setSelectedEndChatStatus] = useState<
     string | null
   >(null);
 
-  const loadActiveChats = useStore((state) => state.loadActiveChats);
-  const selectedChat = useStore((state) => state.selectedChat());
-  const selectedChatId = useStore((state) => state.selectedChatId);
-  const activeChats = useStore((state) => state.getGroupedActiveChats());
+  const loadActiveChats = useHeaderStore((state) => state.loadActiveChats);
+  const selectedChat = useHeaderStore((state) => state.selectedChat());
+  const selectedChatId = useHeaderStore((state) => state.selectedChatId);
+  const activeChats = useHeaderStore((state) => state.getGroupedActiveChats());
 
   useEffect(() => {
-    useStore.getState().loadActiveChats();
+    useHeaderStore.getState().loadActiveChats();
   }, []);
-
 
   useEffect(() => {
     const events = sse(`/chat-list`, loadActiveChats);
-    return () => events.close()
+    return () => events.close();
   }, []);
-  
+
   const { data: csaNameVisiblity } = useQuery<{ isVisible: boolean }>({
     queryKey: ['csa/name-visibility', 'prod'],
   });
@@ -166,7 +163,7 @@ const ChatActive: FC = () => {
       <Tabs.Root
         className="vertical-tabs"
         orientation="vertical"
-        onValueChange={useStore.getState().setSelectedChatId}
+        onValueChange={useHeaderStore.getState().setSelectedChatId}
         defaultValue={state?.chatId}
         style={{ height: '100%', overflow: 'hidden' }}
       >
@@ -176,10 +173,11 @@ const ChatActive: FC = () => {
           style={{ overflow: 'auto' }}
         >
           <div className="vertical-tabs__group-header">
-            <p>{`${t('chat.active.myChats')} ${(activeChats?.myChats?.length ?? 0) == 0
+            <p>{`${t('chat.active.myChats')} ${
+              (activeChats?.myChats?.length ?? 0) == 0
                 ? ''
                 : `(${activeChats?.myChats?.length ?? 0})`
-              }`}</p>
+            }`}</p>
           </div>
           {activeChats?.myChats?.map((chat) => (
             <Tabs.Trigger
@@ -279,7 +277,7 @@ const ChatActive: FC = () => {
               </Button>
               <Button
                 appearance="error"
-              // onClick={() => sendToEmailMutation.mutate(sendToEmailModal)}
+                // onClick={() => sendToEmailMutation.mutate(sendToEmailModal)}
               >
                 {t('global.yes')}
               </Button>

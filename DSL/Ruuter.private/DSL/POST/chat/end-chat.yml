@@ -57,8 +57,8 @@ postMessage:
       messageId: ${messageUuid}
       content: ""
       authorTimestamp: ${authorTimestamp}
-      authorId: ""
-      authorFirstName: ""
+      authorId: ${activeChat.customerSupportId ?? ""}
+      authorFirstName: ${activeChat.customerSupportDisplayName ?? ""}
       authorLastName: ""
       authorRole: "backoffice-user"
       created: ${new Date().toISOString()}

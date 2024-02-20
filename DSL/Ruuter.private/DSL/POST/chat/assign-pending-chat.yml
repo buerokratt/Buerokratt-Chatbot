@@ -77,8 +77,8 @@ insertMessage:
       messageId: ${uuid}
       content: ""
       authorTimestamp: ${new Date().toISOString()}
-      authorId: ""
-      authorFirstName: ""
+      authorId: ${customerSupportId}
+      authorFirstName: ${customerSupportDisplayName}
       authorRole: "buerokratt"
       created: ${new Date().toISOString()}
       authorLastName: ""

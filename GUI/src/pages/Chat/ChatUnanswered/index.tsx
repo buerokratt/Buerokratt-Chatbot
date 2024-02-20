@@ -4,11 +4,8 @@ import * as Tabs from '@radix-ui/react-tabs';
 import { useQuery } from '@tanstack/react-query';
 
 import { Chat, Dialog, Button, FormRadios } from 'components';
-import {
-  CHAT_EVENTS,
-  CHAT_STATUS,
-  Chat as ChatType,
-} from 'types/chat';
+import { CHAT_EVENTS, CHAT_STATUS, Chat as ChatType } from 'types/chat';
+import useHeaderStore from '@buerokratt-ria/header/src/header/store/store';
 import useStore from 'store';
 import { User } from 'types/user';
 import { useToast } from 'hooks/useToast';
@@ -42,18 +39,21 @@ const ChatUnanswered: FC = () => {
     CHAT_EVENTS.RESPONSE_SENT_TO_CLIENT_EMAIL,
   ];
 
-  const groupedUnansweredChats = useStore((state) => state.getGroupedUnansweredChats());
-  const selectedChatId = useStore((state) => state.selectedChatId);
-  const selectedChat = useStore((state) => state.selectedChat());
-  const loadActiveChats = useStore((state) => state.loadActiveChats);
+  const groupedUnansweredChats = useHeaderStore((state) =>
+    state.getGroupedUnansweredChats()
+  );
+
+  const selectedChatId = useHeaderStore((state) => state.selectedChatId);
+  const selectedChat = useHeaderStore((state) => state.selectedChat());
+  const loadActiveChats = useHeaderStore((state) => state.loadActiveChats);
 
   useEffect(() => {
-    useStore.getState().loadActiveChats();
+    useHeaderStore.getState().loadActiveChats();
   }, []);
 
   useEffect(() => {
     const events = sse(`/chat-list`, loadActiveChats);
-    return () => events.close()
+    return () => events.close();
   }, []);
 
   const { data: csaNameVisiblity } = useQuery<{ isVisible: boolean }>({
@@ -137,7 +137,7 @@ const ChatUnanswered: FC = () => {
     <Tabs.Root
       className="vertical-tabs"
       orientation="vertical"
-      onValueChange={useStore.getState().setSelectedChatId}
+      onValueChange={useHeaderStore.getState().setSelectedChatId}
       style={{ height: '100%', overflow: 'hidden' }}
     >
       <Tabs.List

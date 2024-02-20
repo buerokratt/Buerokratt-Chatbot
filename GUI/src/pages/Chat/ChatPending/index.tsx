@@ -5,7 +5,6 @@ import { useQuery } from '@tanstack/react-query';
 
 import { Chat, Dialog, Button, FormRadios, Track } from 'components';
 import { CHAT_EVENTS, CHAT_STATUS, Chat as ChatType } from 'types/chat';
-import useStore from 'store';
 import { User } from 'types/user';
 import { useToast } from 'hooks/useToast';
 import apiDev from 'services/api-dev';
@@ -16,6 +15,8 @@ import ForwardToEstablishmentModal from '../ForwardToEstablishmentModal';
 import sse from 'services/sse-service';
 import { v4 as uuidv4 } from 'uuid';
 import './ChatPending.scss';
+import useHeaderStore from '@buerokratt-ria/header/src/header/store/store';
+import useStore from 'store';
 
 const ChatPending: FC = () => {
   const { t } = useTranslation();
@@ -29,6 +30,7 @@ const ChatPending: FC = () => {
   const [sendToEmailModal, setSendToEmailModal] = useState<ChatType | null>(
     null
   );
+
   const [selectedEndChatStatus, setSelectedEndChatStatus] = useState<
     string | null
   >(null);
@@ -39,13 +41,13 @@ const ChatPending: FC = () => {
     CHAT_EVENTS.RESPONSE_SENT_TO_CLIENT_EMAIL,
   ];
 
-  const selectedChatId = useStore((state) => state.selectedChatId);
-  const selectedChat = useStore((state) => state.selectedPendingChat());
+  const selectedChatId = useHeaderStore((state) => state.selectedChatId);
+  const selectedChat = useHeaderStore((state) => state.selectedPendingChat());
 
-  const loadPendingChats = useStore((state) => state.loadPendingChats);
+  const loadPendingChats = useHeaderStore((state) => state.loadPendingChats);
 
   useEffect(() => {
-    useStore.getState().loadPendingChats();
+    useHeaderStore.getState().loadPendingChats();
   }, []);
 
   useEffect(() => {
@@ -61,7 +63,7 @@ const ChatPending: FC = () => {
     queryKey: ['csa/title-visibility', 'prod'],
   });
 
-  const groupedPendingChats = useStore((state) =>
+  const groupedPendingChats = useHeaderStore((state) =>
     state.getGroupedPendingChats()
   );
 
@@ -138,7 +140,7 @@ const ChatPending: FC = () => {
     <Tabs.Root
       className="vertical-tabs"
       orientation="vertical"
-      onValueChange={useStore.getState().setSelectedChatId}
+      onValueChange={useHeaderStore.getState().setSelectedChatId}
       style={{ height: '100%', overflow: 'hidden' }}
     >
       <Tabs.List

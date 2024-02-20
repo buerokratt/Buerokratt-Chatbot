@@ -34,6 +34,7 @@ import useSendAttachment from 'modules/attachment/hooks';
 import { AxiosError } from 'axios';
 import { useToast } from 'hooks/useToast';
 import useStore from 'store';
+import useHeaderStore from '@buerokratt-ria/header/src/header/store/store';
 import sse from '../../services/sse-service';
 import { useNavigate } from 'react-router-dom';
 import PreviewMessage from './PreviewMessage';
@@ -83,7 +84,7 @@ const Chat: FC<ChatProps> = ({
   const [isPending, startTransition] = useTransition();
   const [responseText, setResponseText] = useState('');
   const [selectedMessages, setSelectedMessages] = useState<Message[]>([]);
-  const chatCsaActive = useStore((state) => state.chatCsaActive);
+  const chatCsaActive = useHeaderStore((state) => state.chatCsaActive);
   const [messagesList, setMessagesList] = useState<Message[]>([]);
   const [latestPermissionMessage, setLatestPermissionMessage] =
     useState<number>(0);
@@ -107,7 +108,7 @@ const Chat: FC<ChatProps> = ({
         customerSupportId: userInfo?.idCode ?? '',
       }
     );
-    useStore
+    useHeaderStore
       .getState()
       .setChatCsaActive(
         res.response.status === 'online' || res.response.status === 'idle'
@@ -656,7 +657,8 @@ const Chat: FC<ChatProps> = ({
           )}
 
         {chat.status === CHAT_STATUS.IDLE &&
-          chat.customerSupportId === 'chatbot' && (
+          (chat.customerSupportId === 'chatbot' ||
+            chat.customerSupportId != userInfo?.idCode) && (
             <div className="active-chat__toolbar">
               <Track justify="center">
                 <div className="active-chat__toolbar-actions">
@@ -671,7 +673,7 @@ const Chat: FC<ChatProps> = ({
                     }}
                     onClick={() => assignPendingChatMutation.mutate()}
                   >
-                    {t('chat.active.takeIt')}
+                    {t('chat.active.takeOver')}
                   </Button>
                 </div>
               </Track>
@@ -679,7 +681,8 @@ const Chat: FC<ChatProps> = ({
           )}
 
         {chat.status === CHAT_STATUS.IDLE &&
-          chat.customerSupportId != 'chatbot' && (
+          chat.customerSupportId != 'chatbot' &&
+          chat.customerSupportId === userInfo?.idCode && (
             <div className="active-chat__toolbar">
               <Track justify="center">
                 <div className="active-chat__toolbar-actions">
@@ -723,7 +726,10 @@ const Chat: FC<ChatProps> = ({
               </Button>
               <Button
                 appearance="secondary"
-                disabled={chat.customerSupportId != userInfo?.idCode}
+                disabled={
+                  chat.customerSupportId != userInfo?.idCode ||
+                  chat.endUserId != ''
+                }
                 onClick={() =>
                   handleChatEvent(CHAT_EVENTS.REQUESTED_AUTHENTICATION)
                 }
