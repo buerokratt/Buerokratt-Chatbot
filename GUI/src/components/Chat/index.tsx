@@ -726,7 +726,10 @@ const Chat: FC<ChatProps> = ({
               </Button>
               <Button
                 appearance="secondary"
-                disabled={chat.customerSupportId != userInfo?.idCode}
+                disabled={
+                  chat.customerSupportId != userInfo?.idCode ||
+                  chat.endUserId != ''
+                }
                 onClick={() =>
                   handleChatEvent(CHAT_EVENTS.REQUESTED_AUTHENTICATION)
                 }
