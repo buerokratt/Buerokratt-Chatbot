@@ -214,14 +214,12 @@ const useStore = create<StoreState>((set, get, store) => ({
 
     if (!pendingChats) return grouped;
 
-    if (chatCsaActive === true) {
+    if (chatCsaActive) {
       pendingChats.forEach((c) => {
         if (c.customerSupportId === 'chatbot') {
           grouped.newChats.push(c);
-          return;
         } else {
           grouped.inProcessChats.push(c);
-          return;
         }
       });
 
