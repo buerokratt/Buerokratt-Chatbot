@@ -122,7 +122,14 @@ postNotificationAboutAddedChat:
         "chatId": "${chatId}"
      }
   result: chat_notification_result
-  next: return_result
+
+remove_chat_id_from_queue_notification_node_if_existed:
+  call: http.post
+  args:
+    url: "[#CHATBOT_NOTIFICATIONS]/dequeue"
+    body:
+      id: ${chatId}
+  result: remove_chat_id_from_queue_notification_node_if_existed_res
 
 return_result:
   return: "Ended Chat Successfully"

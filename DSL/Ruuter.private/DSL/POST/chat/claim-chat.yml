@@ -86,7 +86,14 @@ getClaimedChat:
     body:
       id: ${id}
   result: claimedChatRes
-  next: return_result
+
+remove_chat_id_from_queue_notification_node_if_existed:
+  call: http.post
+  args:
+    url: "[#CHATBOT_NOTIFICATIONS]/dequeue"
+    body:
+      id: ${id}
+  result: remove_chat_id_from_queue_notification_node_if_existed_res
 
 return_result:
   return: ${claimedChatRes.response.body}
