@@ -1,5 +1,6 @@
 const { searchNotification } = require('./openSearch');
 const { serverConfig } = require('./config');
+const DummyQueueNotForProduction = require('./dummy-queue');
 
 function buildNotificationSearchInterval({ 
   channelId,
@@ -19,8 +20,25 @@ function buildNotificationSearchInterval({
   };
 }
 
-function buildQueueCounter({ sender }) {
-  sender(5); // to-do: implement queue counter
+// to-do: implement queue counter
+function buildQueueCounter({
+  id,
+  interval = serverConfig.refreshInterval,
+}) {
+  return ({ sender }) => {
+    let lastOrder = 0;
+    const intervalHandle = setInterval(() => {
+        const order = DummyQueueNotForProduction.findOrder(id);
+        if(order == lastOrder)
+          return;
+        lastOrder = order;
+        sender(order)
+      },
+      interval
+    );
+
+    return () => clearInterval(intervalHandle);
+  }
 }
 
 module.exports = {

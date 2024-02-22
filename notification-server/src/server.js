@@ -3,6 +3,7 @@ const cors = require("cors");
 const { buildSSEResponse } = require("./sseUtil");
 const { serverConfig } = require("./config");
 const { buildNotificationSearchInterval, buildQueueCounter } = require("./addOns");
+const DummyQueueNotForProduction = require('./dummy-queue');
 
 const app = express();
 
@@ -17,7 +18,18 @@ app.get("/sse/notifications/:channelId", (req, res) => {
   });
 });
 
-app.get("/sse/queue", (req, res) => {
+
+app.post("/queue", (req, res) => {
+  DummyQueueNotForProduction.add(req.body.id);
+  res.sendStatus(200);
+});
+
+app.post("/dequeue", (req, res) => {
+  DummyQueueNotForProduction.remove(req.body.id);
+  res.sendStatus(200);
+});
+
+app.get("/sse/queue/:id", (req, res) => {
   buildSSEResponse({ 
     req,
     res,
