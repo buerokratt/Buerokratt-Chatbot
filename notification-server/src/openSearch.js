@@ -6,7 +6,7 @@ const client = new Client({
   ssl: openSearchConfig.ssl,
 });
 
-async function searchNotification({ channelId, connectionId, callback }) {
+async function searchNotification({ channelId, connectionId, sender }) {
   try {
     const response = await client.search({
       index: openSearchConfig.notificationIndex,
@@ -22,12 +22,12 @@ async function searchNotification({ channelId, connectionId, callback }) {
     });
 
     for (const hit of response.body.hits.hits) {
-      await callback(hit._source.payload);
+      await sender(hit._source.payload);
       await markAsSent(hit, connectionId);
     }
   } catch (e) {
     console.error(e);
-    await callback({});
+    await sender({});
   }
 }
 
