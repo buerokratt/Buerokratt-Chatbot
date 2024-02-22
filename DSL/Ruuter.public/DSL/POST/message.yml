@@ -7,6 +7,7 @@ extractRequestData:
     holidays: ${incoming.body.holidays}
     holidayNames: ${incoming.body.holidayNames}
     cookie: ${incoming.headers.cookie}
+    silent: ${incoming.body.silent}
   next: get_chat_info
 
 get_chat_info:
@@ -81,6 +82,12 @@ insertMessage:
       forwardedFromCsa: ""
       forwardedToCsa: ""
   result: insertMessageResult
+  next: check_skip_bot
+
+check_skip_bot:
+  switch:
+    - condition: ${silent == 'true' || silent == true}
+      next: clearChatList
   next: postMessageToBot
 
 postMessageToBot:
