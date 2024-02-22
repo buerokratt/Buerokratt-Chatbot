@@ -226,7 +226,8 @@
       "unavailable_holiday": "Puhkus",
       "pending-assigned": "{{name}} määratud kontaktkasutajale",
       "user-reached": "{{name}} võttis kasutajaga ühendust",
-      "user-not-reached": "{{name}} ei saanud kasutajat kätte"
+      "user-not-reached": "{{name}} ei saanud kasutajat kätte",
+      "user-authenticated": "{{name}} on autentitud {{date}}"
     }
   },
   "roles": {
