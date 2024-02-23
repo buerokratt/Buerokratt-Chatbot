@@ -918,16 +918,6 @@ const Chat: FC<ChatProps> = ({
     </div>
   );
 
-  function handleSendAttachment() {
-    const mutationArgs = {
-      data: userInputFile!,
-    };
-    sendAttachmentMutation.mutate(mutationArgs as any);
-    sendAttachmentMutation.isLoading && console.log('Attachment sending...');
-    sendAttachmentMutation.isSuccess && console.log('Attachment sent');
-    sendAttachmentMutation.isError && console.log('Attachment sending error');
-  }
-
   async function handleFileRead(file: File): Promise<string | null> {
     if (!Object.values(AttachmentTypes).some((v) => v === file.type)) {
       setErrorMessage(`${file.type} file type is not supported`);
