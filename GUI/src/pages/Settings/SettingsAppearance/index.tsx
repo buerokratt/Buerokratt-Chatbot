@@ -137,7 +137,7 @@ const SettingsAppearance: FC = () => {
 
   return (
     <div ref={colorComponentRef}>
-      <h1>{t('settings.appearance.title')}</h1>
+      <h1 style={{ paddingBottom: 16 }}>{t('settings.appearance.title')}</h1>
 
       <Card
         footer={

@@ -280,7 +280,7 @@
       "noticeChanged": "Emergency notice settings changed successfully"
     },
     "appearance": {
-      "title": "Appearance and bahavior",
+      "title": "Appearance and behavior",
       "widgetBubbleMessageText": "Widget bubble message text",
       "widgetProactiveSeconds": "Widget proactive seconds",
       "widgetDisplayBubbleMessageSeconds": "Widget bubble message seconds",
