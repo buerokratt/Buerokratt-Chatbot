@@ -276,7 +276,8 @@
       "title": "Erakorralised teated",
       "noticeActive": "Teade aktiivne",
       "notice": "Teade",
-      "displayPeriod": "Kuvamisperiood"
+      "displayPeriod": "Kuvamisperiood",
+      "noticeChanged": "Hädaabiteate seadeid muudeti edukalt"
     },
     "appearance": {
       "title": "Välimus ja käitumine",

@@ -276,7 +276,8 @@
       "title": "Emergency notices",
       "noticeActive": "Notice active",
       "notice": "Notice",
-      "displayPeriod": "Display period"
+      "displayPeriod": "Display period",
+      "noticeChanged": "Emergency notice settings changed successfully"
     },
     "appearance": {
       "title": "Appearance and bahavior",
