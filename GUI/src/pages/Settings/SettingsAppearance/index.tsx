@@ -133,7 +133,7 @@ const SettingsAppearance: FC = () => {
     });
   };
 
-  if (!widgetConfig) return <>Loading...</>;
+  if (hasRendered.current === undefined) return <>Loading...</>;
 
   return (
     <div ref={colorComponentRef}>
