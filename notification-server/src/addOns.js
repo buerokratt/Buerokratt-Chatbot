@@ -19,15 +19,14 @@ function buildNotificationSearchInterval({
   };
 }
 
-// to-do: implement queue counter
 function buildQueueCounter({
   id,
-  interval = serverConfig.refreshInterval,
+  interval = serverConfig.queueRefreshInterval,
 }) {
   return ({ sender }) => {
     let lastOrder = 0;
-    const intervalHandle = setInterval(() => {
-        const order = findChatIdOrder(id);
+    const intervalHandle = setInterval(async () => {
+        const order = await findChatIdOrder(id);
         if(order == lastOrder)
           return;
         lastOrder = order;

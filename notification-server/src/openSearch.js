@@ -51,7 +51,7 @@ async function markAsSent({ _index, _id }, connectionId) {
 }
 
 async function enqueueChatId(chatId) {
-  if(await findValue(chatId)) return;
+  if(await findChatId(chatId)) return;
   
   await client.index({ 
     index: openSearchConfig.chatQueueIndex,
@@ -79,7 +79,7 @@ async function dequeueChatId(chatId) {
   });
 }
 
-async function findValue(chatId) {
+async function findChatId(chatId) {
   const found = await isQueueIndexExists();
   if(!found)
     return null;
@@ -103,7 +103,7 @@ async function findValue(chatId) {
   return response.body.hits.hits[0]._source;
 };
 
-async function isQueueIndexExists(){
+async function isQueueIndexExists() {
   const res = await client.indices.exists({
     index: openSearchConfig.chatQueueIndex
   });
@@ -112,8 +112,8 @@ async function isQueueIndexExists(){
 }
 
 async function findChatIdOrder(chatId) {
-  const found = await findValue(chatId);
-  if(!found) return -1;
+  const found = await findChatId(chatId);
+  if(!found) return 0;
   
   const response = await client.search({
     index: openSearchConfig.chatQueueIndex,
@@ -129,7 +129,7 @@ async function findChatIdOrder(chatId) {
     },
   });
 
-  return response.body.hits.total.value;
+  return response.body.hits.total.value + 1;
 };
 
 module.exports = {

@@ -3,7 +3,7 @@ require('dotenv').config();
 module.exports = {
   openSearchConfig: {
     notificationIndex: 'notifications',
-    chatQueueIndex: 'chatQueue',
+    chatQueueIndex: 'chatqueue',
     ssl: {
       rejectUnauthorized: false 
     },
@@ -21,6 +21,7 @@ module.exports = {
   serverConfig: {
     port: process.env.PORT || 4040,
     refreshInterval: process.env.REFRESH_INTERVAL || 1000,
+    queueRefreshInterval: process.env.QUEUE_REFRESH_INTERVAL || 2000,
   },
 };
 
