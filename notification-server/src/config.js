@@ -3,6 +3,7 @@ require('dotenv').config();
 module.exports = {
   openSearchConfig: {
     notificationIndex: 'notifications',
+    chatQueueIndex: 'chatQueue',
     ssl: {
       rejectUnauthorized: false 
     },

@@ -1,6 +1,5 @@
-const { searchNotification } = require('./openSearch');
+const { searchNotification, findChatIdOrder } = require('./openSearch');
 const { serverConfig } = require('./config');
-const DummyQueueNotForProduction = require('./dummy-queue');
 
 function buildNotificationSearchInterval({ 
   channelId,
@@ -28,11 +27,11 @@ function buildQueueCounter({
   return ({ sender }) => {
     let lastOrder = 0;
     const intervalHandle = setInterval(() => {
-        const order = DummyQueueNotForProduction.findOrder(id);
+        const order = findChatIdOrder(id);
         if(order == lastOrder)
           return;
         lastOrder = order;
-        sender(order)
+        sender({ order });
       },
       interval
     );

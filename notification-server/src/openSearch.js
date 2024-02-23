@@ -50,6 +50,91 @@ async function markAsSent({ _index, _id }, connectionId) {
   });
 }
 
+async function enqueueChatId(chatId) {
+  if(await findValue(chatId)) return;
+  
+  await client.index({ 
+    index: openSearchConfig.chatQueueIndex,
+    body: {
+      chatId,
+      timestamp: Date.now(),
+    },
+    refresh: true,
+  });
+}
+
+async function dequeueChatId(chatId) {
+  await client.deleteByQuery({
+    index: openSearchConfig.chatQueueIndex,
+    body: {
+      query: {
+        match: {
+          chatId: {
+            query: chatId,
+          },
+        },
+      },
+    },
+    refresh: true,
+  });
+}
+
+async function findValue(chatId) {
+  const found = await isQueueIndexExists();
+  if(!found)
+    return null;
+
+  const response = await client.search({
+    index: openSearchConfig.chatQueueIndex,
+    body: {
+      query: {
+        match: {
+          chatId: {
+            query: chatId,
+          },
+        },
+      },
+    },
+  });
+
+  if(response.body.hits.hits.length == 0)
+    return null;
+
+  return response.body.hits.hits[0]._source;
+};
+
+async function isQueueIndexExists(){
+  const res = await client.indices.exists({
+    index: openSearchConfig.chatQueueIndex
+  });
+
+  return res.body;
+}
+
+async function findChatIdOrder(chatId) {
+  const found = await findValue(chatId);
+  if(!found) return -1;
+  
+  const response = await client.search({
+    index: openSearchConfig.chatQueueIndex,
+    body: {
+      query: {
+        range: {
+          timestamp: {
+            lt: found.timestamp,
+          },
+        },
+      },
+      size: 0,
+    },
+  });
+
+  return response.body.hits.total.value;
+};
+
 module.exports = {
   searchNotification,
+  enqueueChatId,
+  dequeueChatId,
+  findChatIdOrder,
 };
