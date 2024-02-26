@@ -128,14 +128,21 @@ redirectChat:
       receivedFrom: ${activeChat.receivedFrom}
       receivedFromName: ${activeChat.receivedFromName}
   result: redirectChatRes
-  next: getChatById
+
+add_chat_id_to_queue_notification_node:
+  call: http.post
+  args:
+    url: "[#CHATBOT_NOTIFICATIONS]/eequeue"
+    body:
+      id: ${chatId}
+  result: add_chat_id_to_queue_notification_node_res
 
 getChatById:
   call: http.post
   args:
     url: "[#CHATBOT_RESQL]/get-chat-by-id"
     body:
-      id: ${chatUuid}
+      id: ${chatId}
   result: chat_result
   next: return_result
 
