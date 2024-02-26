@@ -129,10 +129,22 @@ redirectChat:
       receivedFromName: ${activeChat.receivedFromName}
   result: redirectChatRes
 
+getAvailableCSACount:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-available-csa-count"
+  result: countRes
+
+check_available_csa_count:
+  switch:
+    - condition: ${countRes.response.body.count > 0}
+      next: add_chat_id_to_queue_notification_node
+  next: getChatById
+
 add_chat_id_to_queue_notification_node:
   call: http.post
   args:
-    url: "[#CHATBOT_NOTIFICATIONS]/eequeue"
+    url: "[#CHATBOT_NOTIFICATIONS]/enqueue"
     body:
       id: ${chatId}
   result: add_chat_id_to_queue_notification_node_res
