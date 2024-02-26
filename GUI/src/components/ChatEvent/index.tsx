@@ -187,6 +187,12 @@ const ChatEvent: FC<ChatEventProps> = ({ message }) => {
         name: message.authorFirstName ?? 'CSA',
       });
       break;
+    case CHAT_EVENTS.USER_AUTHENTICATED:
+      EVENT_PARAMS = t('chat.events.user-authenticated', {
+        name: `${message.authorFirstName ?? ''} ${message.authorLastName ?? ''}`,
+        date: format(new Date(message.authorTimestamp), 'dd.MM.yyyy HH:mm:ss'),
+      });
+      break;
     default:
       EVENT_PARAMS = t(`chat.events.${event?.toLowerCase()}`, {
         date: format(new Date(authorTimestamp), 'dd.MM.yyyy HH:mm:ss'),

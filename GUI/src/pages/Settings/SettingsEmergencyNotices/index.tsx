@@ -16,6 +16,7 @@ import { EmergencyNotice } from 'types/emergencyNotice';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useToast } from 'hooks/useToast';
 import apiDev from 'services/api-dev';
+import { format, parse } from 'date-fns';
 
 const SettingsEmergencyNotices: FC = () => {
   const { t } = useTranslation();
@@ -43,6 +44,13 @@ const SettingsEmergencyNotices: FC = () => {
   const emergencyNoticeMutation = useMutation({
     mutationFn: (data: EmergencyNotice) =>
       apiDev.post<EmergencyNotice>('configs/emergency-notice', data),
+    onSuccess: () => {
+      toast.open({
+        type: 'success',
+        title: t('global.notification'),
+        message: t('settings.emergencyNotices.noticeChanged'),
+      });
+    },
     onError: (error: AxiosError) => {
       toast.open({
         type: 'error',
@@ -53,11 +61,8 @@ const SettingsEmergencyNotices: FC = () => {
   });
 
   const handleFormSubmit = handleSubmit((data) => {
-    const endDate = control._formValues.emergencyNoticeEndISO as Date;
-    endDate.setDate(endDate.getDate() + 1);
     emergencyNoticeMutation.mutate({
       ...data,
-      emergencyNoticeEndISO: endDate,
       isEmergencyNoticeVisible,
       emergencyNoticeText,
     });
@@ -111,7 +116,13 @@ const SettingsEmergencyNotices: FC = () => {
                     label={t('global.startDate')}
                     hideLabel
                     {...field}
-                    value={field.value ?? new Date('0')}
+                    value={
+                      parse(
+                        format(field.value as Date, 'yyyy-MM-dd'),
+                        'yyyy-MM-dd',
+                        new Date()
+                      ) ?? new Date('0')
+                    }
                   />
                 )}
               />
@@ -124,7 +135,13 @@ const SettingsEmergencyNotices: FC = () => {
                     label={t('global.endDate')}
                     hideLabel
                     {...field}
-                    value={field.value ?? new Date('0')}
+                    value={
+                      parse(
+                        format(field.value as Date, 'yyyy-MM-dd'),
+                        'yyyy-MM-dd',
+                        new Date()
+                      ) ?? new Date('0')
+                    }
                   />
                 )}
               />

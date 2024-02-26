@@ -3,16 +3,20 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { AxiosError } from 'axios';
 
-import { Card, Switch, Track } from 'components';
+import { Button, Card, Switch, Track } from 'components';
 import { useToast } from 'hooks/useToast';
 import apiDev from 'services/api-dev';
 
 const SettingsChatSettings: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
-  const [botActive, setBotActive] = useState<boolean>(true);
-  const [isNameVisible, setIsNameVisible] = useState<boolean>(true);
-  const [isTitleVisible, setIsTitleVisible] = useState<boolean>(true);
+  const [botActive, setBotActive] = useState<boolean | undefined>(undefined);
+  const [isNameVisible, setIsNameVisible] = useState<boolean | undefined>(
+    undefined
+  );
+  const [isTitleVisible, setIsTitleVisible] = useState<boolean | undefined>(
+    undefined
+  );
   const { data: botConfig } = useQuery<{ is_bot_active: boolean }>({
     queryKey: ['bot/is-bot-active', 'prod'],
     onSuccess(res: any) {
@@ -65,6 +69,13 @@ const SettingsChatSettings: FC = () => {
       setIsTitleVisible(data.isVisible);
       return apiDev.post(`csa/title-visibility`, data);
     },
+    onSuccess: () => {
+      toast.open({
+        type: 'success',
+        title: t('global.notification'),
+        message: t('toast.success.updateSuccess'),
+      });
+    },
     onError: (error: AxiosError) => {
       toast.open({
         type: 'error',
@@ -73,6 +84,20 @@ const SettingsChatSettings: FC = () => {
       });
     },
   });
+
+  const handleFormSubmit = () => {
+    botConfigMutation.mutate({ is_bot_active: botActive ?? true });
+    csaNameVisibilityMutation.mutate({ isVisible: isNameVisible ?? true });
+    csaTitleVisibilityMutation.mutate({ isVisible: isTitleVisible ?? true });
+  };
+
+  if (
+    botActive === undefined &&
+    isNameVisible === undefined &&
+    isTitleVisible === undefined
+  ) {
+    return <>Loading...</>;
+  }
 
   return (
     <>
@@ -85,11 +110,14 @@ const SettingsChatSettings: FC = () => {
               name="is_bot_active"
               label={t('settings.chat.chatActive')}
               checked={botActive}
-              onCheckedChange={(value) =>
-                botConfigMutation.mutate({ is_bot_active: value })
-              }
+              onCheckedChange={setBotActive}
             />
           )
+        }
+        footer={
+          <Track justify="end">
+            <Button onClick={handleFormSubmit}>{t('global.save')}</Button>
+          </Track>
         }
       >
         <Track gap={8} direction="vertical" align="left">
@@ -98,9 +126,7 @@ const SettingsChatSettings: FC = () => {
               name="is_csa_name_visible"
               label={t('settings.chat.showSupportName')}
               checked={isNameVisible}
-              onCheckedChange={(value) =>
-                csaNameVisibilityMutation.mutate({ isVisible: value })
-              }
+              onCheckedChange={setIsNameVisible}
             />
           )}
           {csaTitleVisibility && (
@@ -108,9 +134,7 @@ const SettingsChatSettings: FC = () => {
               name="is_csa_title_visible"
               label={t('settings.chat.showSupportTitle')}
               checked={isTitleVisible}
-              onCheckedChange={(value) =>
-                csaTitleVisibilityMutation.mutate({ isVisible: value })
-              }
+              onCheckedChange={setIsTitleVisible}
             />
           )}
         </Track>

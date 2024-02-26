@@ -41,6 +41,7 @@ export enum CHAT_EVENTS {
   ASSIGN_PENDING_CHAT_CSA = 'pending-assigned',
   PENDING_USER_REACHED = 'user-reached',
   PENDING_USER_NOT_REACHED = 'user-not-reached',
+  USER_AUTHENTICATED = 'user-authenticated',
   READ = 'message-read',
 }
 

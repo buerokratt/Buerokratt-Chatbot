@@ -12,15 +12,14 @@ const SettingsWelcomeMessage: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
   const [welcomeMessage, setWelcomeMessage] = useState<string>('');
-  const [welcomeMessageActive, setWelcomeMessageActivity] =
-    useState<boolean>(true);
+  const [welcomeMessageActive, setWelcomeMessageActivity] = useState<
+    boolean | undefined
+  >(undefined);
   const { data } = useQuery({
     queryKey: ['greeting/message', 'prod'],
     onSuccess: (res: any) => {
       setWelcomeMessage(res.response.est ?? '');
-      setWelcomeMessageActivity(
-        res.response.isActive ?? false
-      );
+      setWelcomeMessageActivity(res.response.isActive ?? false);
     },
   });
 
@@ -67,14 +66,14 @@ const SettingsWelcomeMessage: FC = () => {
         message: t('settings.welcomeMessage.emptyMessage'),
       });
     } else {
+      messageActivityMutation.mutate(welcomeMessageActive ?? true);
       welcomeMessageMutation.mutate();
     }
   };
 
-  const handleActivityChange = (checked: boolean) => {
-    setWelcomeMessageActivity(checked);
-    messageActivityMutation.mutate(checked);
-  };
+  if (welcomeMessageActive === undefined) {
+    return <>Loading...</>;
+  }
 
   return (
     <>
@@ -92,7 +91,7 @@ const SettingsWelcomeMessage: FC = () => {
             checked={welcomeMessageActive}
             label={t('settings.welcomeMessage.greetingActive')}
             name={'label'}
-            onCheckedChange={handleActivityChange}
+            onCheckedChange={setWelcomeMessageActivity}
           />
           <FormTextarea
             label={t('settings.welcomeMessage.welcomeMessage')}

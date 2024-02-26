@@ -226,7 +226,8 @@
       "unavailable_holiday": "Holiday",
       "pending-assigned": "{{name}} assigned to contact user",
       "user-reached": "{{name}} contacted the user",
-      "user-not-reached": "{{name}} could not reach the user"
+      "user-not-reached": "{{name}} could not reach the user",
+      "user-authenticated": "{{name}} is authenticated {{date}}"
     }
   },
   "roles": {
@@ -275,10 +276,11 @@
       "title": "Emergency notices",
       "noticeActive": "Notice active",
       "notice": "Notice",
-      "displayPeriod": "Display period"
+      "displayPeriod": "Display period",
+      "noticeChanged": "Emergency notice settings changed successfully"
     },
     "appearance": {
-      "title": "Appearance and bahavior",
+      "title": "Appearance and behavior",
       "widgetBubbleMessageText": "Widget bubble message text",
       "widgetProactiveSeconds": "Widget proactive seconds",
       "widgetDisplayBubbleMessageSeconds": "Widget bubble message seconds",
