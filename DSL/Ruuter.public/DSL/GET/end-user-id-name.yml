@@ -50,6 +50,42 @@ insertIdAndName:
       endUserFirstName: "${firstName ? firstName : ''}"
       endUserLastName: "${lastName ? lastName : ''}"
   result: insertIdAndNameResult
+  next: getUuid
+
+getUuid:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/return_uuid"
+    headers:
+      type: json
+  result: uuid_result
+  next: assignUuid
+
+assignUuid:
+  assign:
+    uuid: ${uuid_result.response.body.uuid}
+  next: insertMessage  
+
+insertMessage:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-message"
+    body:
+      chatId: ${chatId}
+      messageId: ${uuid}
+      content: ""
+      authorTimestamp: ${new Date().toISOString()}
+      authorId: ${id ?? ""}
+      authorFirstName: ${firstName ?? ""}
+      authorRole: "end-user"
+      created: ${new Date().toISOString()}
+      authorLastName: ${lastName ?? ""}
+      rating: ""
+      event: "user-authenticated"
+      forwardedByUser: ""
+      forwardedFromCsa: ""
+      forwardedToCsa: ""
+  result: insertMessageResult
   next: clearChatList
 
 clearChatList:
@@ -97,7 +133,7 @@ postNotificationAboutMessageResponse:
      timestamp: ${new Date().toISOString()}
      payload: {
         "type": "message",
-        "messageId": ""
+        "messageId": "${uuid}"
       }
   result: message_notification_result
   next: return_result 
