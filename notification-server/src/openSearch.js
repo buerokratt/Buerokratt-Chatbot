@@ -6,7 +6,7 @@ const client = new Client({
   ssl: openSearchConfig.ssl,
 });
 
-async function searchNotification({ channelId, connectionId, callback }) {
+async function searchNotification({ channelId, connectionId, sender }) {
   try {
     const response = await client.search({
       index: openSearchConfig.notificationIndex,
@@ -22,12 +22,12 @@ async function searchNotification({ channelId, connectionId, callback }) {
     });
 
     for (const hit of response.body.hits.hits) {
-      await callback(hit._source.payload);
+      await sender(hit._source.payload);
       await markAsSent(hit, connectionId);
     }
   } catch (e) {
     console.error(e);
-    await callback({});
+    await sender({});
   }
 }
 
@@ -50,6 +50,91 @@ async function markAsSent({ _index, _id }, connectionId) {
   });
 }
 
+async function enqueueChatId(chatId) {
+  if(await findChatId(chatId)) return;
+  
+  await client.index({ 
+    index: openSearchConfig.chatQueueIndex,
+    body: {
+      chatId,
+      timestamp: Date.now(),
+    },
+    refresh: true,
+  });
+}
+
+async function dequeueChatId(chatId) {
+  await client.deleteByQuery({
+    index: openSearchConfig.chatQueueIndex,
+    body: {
+      query: {
+        match: {
+          chatId: {
+            query: chatId,
+          },
+        },
+      },
+    },
+    refresh: true,
+  });
+}
+
+async function findChatId(chatId) {
+  const found = await isQueueIndexExists();
+  if(!found)
+    return null;
+
+  const response = await client.search({
+    index: openSearchConfig.chatQueueIndex,
+    body: {
+      query: {
+        match: {
+          chatId: {
+            query: chatId,
+          },
+        },
+      },
+    },
+  });
+
+  if(response.body.hits.hits.length == 0)
+    return null;
+
+  return response.body.hits.hits[0]._source;
+};
+
+async function isQueueIndexExists() {
+  const res = await client.indices.exists({
+    index: openSearchConfig.chatQueueIndex
+  });
+
+  return res.body;
+}
+
+async function findChatIdOrder(chatId) {
+  const found = await findChatId(chatId);
+  if(!found) return 0;
+  
+  const response = await client.search({
+    index: openSearchConfig.chatQueueIndex,
+    body: {
+      query: {
+        range: {
+          timestamp: {
+            lt: found.timestamp,
+          },
+        },
+      },
+      size: 0,
+    },
+  });
+
+  return response.body.hits.total.value + 1;
+};
+
 module.exports = {
   searchNotification,
+  enqueueChatId,
+  dequeueChatId,
+  findChatIdOrder,
 };
