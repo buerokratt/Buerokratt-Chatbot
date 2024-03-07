@@ -1,0 +1,77 @@
+extractRequestData:
+  assign:
+    chatId: ${incoming.body.chatId}
+    email: ${incoming.body.email}
+
+getMessagesByChatId:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-chat-messages-to-print"
+    body:
+      chatId: ${chatId}
+  result: getMessagesByChatIdResult
+
+getCsaTitleVisibility:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-configuration"
+    body:
+      key: "is_csa_title_visible"
+  result: titleVisibilityResult
+
+getCsaNameVisibility:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-configuration"
+    body:
+      key: "is_csa_name_visible"
+  result: nameVisibilityResult
+
+convertDataToPdf:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/js/convert/pdf"
+    body:
+      messages: ${getMessagesByChatIdResult.response.body}
+      csaTitleVisible: ${titleVisibilityResult.response.body[0].value}
+      csaNameVisible: ${nameVisibilityResult.response.body[0].value}
+  result: pdfFile
+  next: checkPdfExists
+
+checkPdfExists:
+  switch:
+    - condition: ${!!pdfFile.response.body && pdfFile.response.body !== null}
+      next: checkIsEmailPresent
+  next: returnFailure
+
+checkIsEmailPresent:
+  switch:
+    - condition: ${email !== null}
+      next: sendPdfToEmail
+  next: returnFile
+
+# TODO: Datamapper's email service needs to be updated to support attachments
+sendPdfToEmail:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/js/email/sendMockEmail"
+    body:
+      to: ${email}
+      subject: "Chat history"
+      text: "Datamapper's email service needs to be updated to support attachments"
+  result: emailResponseData
+  next: returnSuccess
+
+returnSuccess:
+  return: "OK"
+  next: end
+
+returnFile:
+  wrapper: false
+  headers:
+    Content-disposition: "attachment;filename=chat-history.pdf"
+  return: "data:application/pdf;base64,${pdfFile.response.body.response}"
+  next: end
+
+returnFailure:
+  return: "error: unable to generate PDF"

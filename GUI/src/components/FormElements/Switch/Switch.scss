@@ -8,9 +8,10 @@
   display: flex;
   align-items: center;
   gap: get-spacing(paldiski);
+  width: 100%;
 
   &__label {
-    flex: 0 0 170px;
+    flex: 0 0 185px;
     font-size: $veera-font-size-100;
     line-height: 24px;
   }

@@ -1,0 +1,43 @@
+extractRequestData:
+  assign:
+    chatId: ${incoming.body.chatId}
+    content: ${incoming.body.content}
+  next: insertMessagePreview
+
+insertMessagePreview:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-message-preview"
+    body:
+      chatId: ${chatId}
+      content: ${content}
+  result: res
+  next: clearMessages
+
+clearMessages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query?conflicts=proceed"
+    body:
+     query:
+      term:
+       channelId: ${chatId}
+  result: clear_messages_res
+  next: postNotificationAboutPreview
+
+postNotificationAboutPreview:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
+    body:
+     channelId: ${chatId}
+     timestamp: ${new Date().toISOString()}
+     payload: {
+        "type": "preview"
+     }
+  result: message_notification_result
+  next: return_result  
+
+return_result:
+  return: "Message Event Sent Successfully"
+  next: end

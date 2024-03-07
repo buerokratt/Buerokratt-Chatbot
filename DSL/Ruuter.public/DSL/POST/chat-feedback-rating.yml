@@ -1,0 +1,29 @@
+extractRequestData:
+  assign:
+    chatId: ${incoming.body.chatId}
+    rating: ${incoming.body.feedbackRating}
+
+check_rating_limit:
+  switch:
+    - condition: ${rating === null || rating === 'null'}
+      next: return_invalid_rating
+  next: addFeedbackRating
+
+addFeedbackRating:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/update-chat-with-feedback-rating"
+    body:
+      id: ${chatId}
+      created: ${new Date().toISOString()}
+      feedback_rating: ${rating}
+  result: res
+  next: return_result
+
+return_result:
+  return: "Rated Chat Successfully"
+  next: end
+
+return_invalid_rating:
+  return: "error: invalid rating"
+  next: end

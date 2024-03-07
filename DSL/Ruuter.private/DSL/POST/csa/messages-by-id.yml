@@ -1,0 +1,14 @@
+extractRequestData:
+  assign:
+    chatId: ${incoming.body.chatId}
+
+getUnavailableEndedChats:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-chat-messages"
+    body:
+      chatId: ${chatId}
+  result: res
+
+return_result:
+  return: ${res.response.body}

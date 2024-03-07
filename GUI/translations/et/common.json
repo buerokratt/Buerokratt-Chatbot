@@ -105,9 +105,11 @@
     "redirectedMessageByOwner": "{{from}} suunas vestluse kasutajale {{to}} {{date}}",
     "redirectedMessageClaimed": "{{to}} võttis vestluse üle kasutajalt {{from}} {{date}}",
     "redirectedMessage": "{{user}} suunas vestluse kasutajalt {{from}} kasutajale {{to}} {{date}}",
+    "new": "uued",
+    "inProcess": "töös",
     "status": {
       "active": "Aktiivne",
-      "ended": "Lõpetatud"
+      "ended": "Määramata"
     },
     "chatStatus": "Vestluse staatus",
     "changeStatus": "Muuda staatust",
@@ -135,7 +137,9 @@
       "startService": "Alusta teenust",
       "selectService": "Vali teenus",
       "start": "Alusta",
-      "service": "Teenus"
+      "service": "Teenus",
+      "ContactedUser": "Kasutajaga ühendust võetud",
+      "couldNotReachUser": "Kasutajani ei õnnestunud jõuda"
     },
     "history": {
       "title": "Ajalugu",
@@ -147,11 +151,12 @@
       "comment": "Kommentaar",
       "label": "Märksõna",
       "nps": "NPS",
-      "forwarded": "Suunatud"
+      "forwarded": "Suunatud",
+      "addACommentToTheConversation": "Lisa vestlusele kommentaar"
     },
     "plainEvents": {
       "answered": "Vastatud",
-      "terminated": "Lõpetatud",
+      "terminated": "Määramata",
       "sent_to_csa_email": "Vestlus saadetud klienditeenindaja e-mailile",
       "client-left": "Klient lahkus",
       "client_left_with_accepted": "Klient lahkus aktsepteeritud vastusega",
@@ -177,11 +182,18 @@
       "requested-chat-forward-accepted": "Vestluse suunamine aktsepteeritud",
       "requested-chat-forward-rejected": "Vestluse suunamine tagasi lükatud",
       "inactive-chat-ended": "Lõpetatud tegevusetuse tõttu",
-      "message-read": "Loetud"
+      "message-read": "Loetud",
+      "contact-information-skipped": "Kontaktandmeid pole esitatud",
+      "unavailable-contact-information-fulfilled": "Kontaktandmed on antud",
+      "unavailable_organization": "Organisatsioon pole saadaval",
+      "unavailable_csas": "CSA-d pole saadaval",
+      "unavailable_holiday": "Puhkus",
+      "user-reached": "Kasutaja võttis ühendust",
+      "user-not-reached": "Kasutajaga ei õnnestunud ühendust saada"
     },
     "events": {
       "answered": "Vastatud {{date}}",
-      "terminated": "Lõpetatud {{date}}",
+      "terminated": "Määramata {{date}}",
       "sent_to_csa_email": "Vestlus saadetud klienditeenindaja e-mailile {{date}}",
       "client-left": "Klient lahkus {{date}}",
       "client_left_with_accepted": "Klient lahkus aktsepteeritud vastusega {{date}}",
@@ -206,7 +218,16 @@
       "requested-chat-forward": "Küsiti vestluse suunamist",
       "requested-chat-forward-accepted": "Vestluse suunamine aktsepteeritud {{date}}",
       "requested-chat-forward-rejected": "Vestluse suunamine tagasi lükatud {{date}}",
-      "message-read": "Loetud"
+      "message-read": "Loetud",
+      "contact-information-skipped": "Kontaktandmeid pole esitatud",
+      "unavailable-contact-information-fulfilled": "Kontaktandmed on antud",
+      "unavailable_organization": "Organisatsioon pole saadaval",
+      "unavailable_csas": "CSA-d pole saadaval",
+      "unavailable_holiday": "Puhkus",
+      "pending-assigned": "{{name}} määratud kontaktkasutajale",
+      "user-reached": "{{name}} võttis kasutajaga ühendust",
+      "user-not-reached": "{{name}} ei saanud kasutajat kätte",
+      "user-authenticated": "{{name}} on autentitud {{date}}"
     }
   },
   "roles": {
@@ -255,7 +276,8 @@
       "title": "Erakorralised teated",
       "noticeActive": "Teade aktiivne",
       "notice": "Teade",
-      "displayPeriod": "Kuvamisperiood"
+      "displayPeriod": "Kuvamisperiood",
+      "noticeChanged": "Hädaabiteate seadeid muudeti edukalt"
     },
     "appearance": {
       "title": "Välimus ja käitumine",
@@ -267,8 +289,19 @@
     },
     "workingTime": {
       "title": "Asutuse tööaeg",
+      "description": "Peale tööaja lõppemist, juhul kui juturobot ise kliendi küsimustele vastata ei oska, küsib ta tema kontaktandmeid.",
       "openFrom": "Avatud alates",
-      "openUntil": "Avatud kuni"
+      "openUntil": "Avatud kuni",
+      "publicHolidays": "Arvesta riigipühadega",
+      "consider": "Arvesta",
+      "dontConsider": "Ära arvesta",
+      "closedOnWeekends": "Nädalavahetustel suletud",
+      "theSameOnAllWorkingDays": "Kõigil tööpäevadel sama",
+      "open": "Avatud",
+      "closed": "Suletud",
+      "until": "kuni",
+      "allWeekdaysExceptWeekend": "E-R",
+      "allWeekdays": "E-P"
     },
     "userSession": {
       "title": "Kasutaja sessioon",
@@ -319,9 +352,6 @@
       "userDeleted": "Kasutaja kustutatud",
       "newUserAdded": "Uus kasutaja lisatud",
       "userUpdated": "Kasutaja uuendatud"
-    },
-    "alert": {
-      "sessionExpired": "Seanss aegunud"
     }
   }
 }

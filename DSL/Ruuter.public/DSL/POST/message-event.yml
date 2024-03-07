@@ -1,0 +1,99 @@
+extractRequestData:
+  assign:
+    messageId: ${incoming.body.id}
+    event: ${incoming.body.event}
+    content: ${incoming.body.content}
+    authorRole: ${incoming.body.authorRole}
+    authorTimestamp: ${incoming.body.authorTimestamp}
+    rating: ${incoming.body.rating}
+  next: getMessageById
+
+getMessageById:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-message-by-id"
+    body:
+      id: ${messageId}
+  result: res
+  next: assignMessage  
+
+assignMessage:
+  assign:
+    message: ${res.response.body[0]}
+  next: insertMessage
+
+insertMessage:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-message"
+    body:
+      messageId: ${messageId}
+      chatId: ${message.chatBaseId}
+      authorId: ${message.authorId ?? "end-user"}
+      authorTimestamp: ${authorTimestamp ?? new Date().toISOString()}
+      authorFirstName: ${message.authorFirstName ?? ""}
+      authorLastName: ${message.authorLastName ?? ""}
+      authorRole: "end-user"
+      created: ${message.created ?? new Date().toISOString()}
+      content: ${content ?? ""}
+      event: ${event ?? ""}
+      forwardedByUser: ${message.forwardedByUser ?? ""}
+      forwardedFromCsa: ${message.forwardedFromCsa ?? ""}
+      forwardedToCsa: ${message.forwardedToCsa ?? ""}
+      rating: ${rating ?? ""}
+  result: insertMessageResult
+  next: clearChatList
+
+clearChatList:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query?conflicts=proceed"
+    body:
+     query:
+      term:
+       channelId: "chat-list"
+  result: clear_chat_res
+  next: postNotificationAboutAddedChat
+
+postNotificationAboutAddedChat:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
+    body:
+     channelId: "chat-list"
+     timestamp: ${new Date().toISOString()}
+     payload: {
+        "status": "Chat Status Changed",
+        "chatId": "${message.chatBaseId}"
+     }
+  result: chat_notification_result
+  next: clearMessages
+
+clearMessages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query?conflicts=proceed"
+    body:
+     query:
+      term:
+       channelId: ${message.chatBaseId}
+  result: clear_messages_res
+  next: postNotificationAboutMessageResponse
+
+postNotificationAboutMessageResponse:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
+    body:
+     channelId: ${message.chatBaseId}
+     timestamp: ${new Date().toISOString()}
+     payload: {
+        "type": "message",
+        "messageId": "${messageId}"
+     }
+  result: message_notification_result
+  next: return_result 
+
+return_result:
+  return: "Message Event Sent Successfully"
+  next: end

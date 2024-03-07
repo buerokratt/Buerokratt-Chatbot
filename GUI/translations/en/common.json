@@ -105,9 +105,11 @@
     "redirectedMessageByOwner": "{{from}} forwarded chat to {{to}} {{date}}",
     "redirectedMessageClaimed": "{{to}} took over chat from {{from}} {{date}}",
     "redirectedMessage": "{{user}} forwarded chat from {{from}} to {{to}} {{date}}",
+    "new": "New",
+    "inProcess": "In Process",
     "status": {
       "active": "Active",
-      "ended": "Ended"
+      "ended": "Unspecified"
     },
     "chatStatus": "Chat status",
     "changeStatus": "Change status",
@@ -135,7 +137,9 @@
       "startService": "Start a service",
       "selectService": "Select a service",
       "start": "Start",
-      "service": "Service"
+      "service": "Service",
+      "ContactedUser": "Contacted User",
+      "couldNotReachUser": "Could Not Reach User"
     },
     "history": {
       "title": "History",
@@ -147,11 +151,12 @@
       "comment": "Comment",
       "label": "Label",
       "nps": "NPS",
-      "forwarded": "Forwarded"
+      "forwarded": "Forwarded",
+      "addACommentToTheConversation": "Add a comment to the conversation"
     },
     "plainEvents": {
       "answered": "Answered",
-      "terminated": "Terminated",
+      "terminated": "Unspecified",
       "sent_to_csa_email": "Chat sent to CSA email",
       "client-left": "Client left",
       "client_left_with_accepted": "Client left with accepted response",
@@ -177,11 +182,18 @@
       "requested-chat-forward-accepted": "Requested chat forward accepted",
       "requested-chat-forward-rejected": "Requested chat forward rejected",
       "inactive-chat-ended": "Ended cue to inactivity",
-      "message-read": "Read"
+      "contact-information-skipped": "Contact Information Skipped",
+      "unavailable-contact-information-fulfilled": "Contact information provided",
+      "unavailable_organization": "Organization Unavailable",
+      "unavailable_csas": "CSA's Unavailable",
+      "unavailable_holiday": "Holiday",
+      "message-read": "Read",
+      "user-reached": "User contacted",
+      "user-not-reached": "User could not be reached"
     },
     "events": {
       "answered": "Answered {{date}}",
-      "terminated": "Terminated {{date}}",
+      "terminated": "Unspecified {{date}}",
       "sent_to_csa_email": "Chat sent to CSA email {{date}}",
       "client-left": "Client left {{date}}",
       "client_left_with_accepted": "Client left with accepted response {{date}}",
@@ -206,7 +218,16 @@
       "requested-chat-forward": "Requested chat forward {{date}}",
       "requested-chat-forward-accepted": "Requested chat forward accepted {{date}}",
       "requested-chat-forward-rejected": "Requested chat forward rejected {{date}}",
-      "message-read": "Read"
+      "message-read": "Read",
+      "contact-information-skipped": "Contact Information Skipped",
+      "unavailable-contact-information-fulfilled": "Contact information provided",
+      "unavailable_organization": "Organization Unavailable",
+      "unavailable_csas": "CSA's Unavailable",
+      "unavailable_holiday": "Holiday",
+      "pending-assigned": "{{name}} assigned to contact user",
+      "user-reached": "{{name}} contacted the user",
+      "user-not-reached": "{{name}} could not reach the user",
+      "user-authenticated": "{{name}} is authenticated {{date}}"
     }
   },
   "roles": {
@@ -255,10 +276,11 @@
       "title": "Emergency notices",
       "noticeActive": "Notice active",
       "notice": "Notice",
-      "displayPeriod": "Display period"
+      "displayPeriod": "Display period",
+      "noticeChanged": "Emergency notice settings changed successfully"
     },
     "appearance": {
-      "title": "Appearance and bahavior",
+      "title": "Appearance and behavior",
       "widgetBubbleMessageText": "Widget bubble message text",
       "widgetProactiveSeconds": "Widget proactive seconds",
       "widgetDisplayBubbleMessageSeconds": "Widget bubble message seconds",
@@ -267,8 +289,19 @@
     },
     "workingTime": {
       "title": "Organization working time",
+      "description": "After the end of the working hours, if the chatbot cannot answer the customer's questions by itself, it will ask for the customer's contact details.",
       "openFrom": "Open from",
-      "openUntil": "Open until"
+      "openUntil": "Open until",
+      "publicHolidays": "Consider public holidays",
+      "consider": "Consider",
+      "dontConsider": "Don't Consider",
+      "closedOnWeekends": "Closed on weekends",
+      "theSameOnAllWorkingDays": "The same on all working days",
+      "open": "Open",
+      "closed": "Closed",
+      "until": "Until",
+      "allWeekdaysExceptWeekend": "M-F",
+      "allWeekdays": "M-S"
     },
     "userSession": {
       "title": "User session",
@@ -319,9 +352,6 @@
       "userDeleted": "User deleted",
       "newUserAdded": "New user added",
       "userUpdated": "User updated"
-    },
-    "alert": {
-      "sessionExpired": "Session Expired"
     }
   }
 }

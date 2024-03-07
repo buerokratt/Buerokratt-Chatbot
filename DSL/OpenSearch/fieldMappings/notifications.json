@@ -1,0 +1,18 @@
+{
+  "mappings": {
+    "properties": {
+      "channelId": {
+        "type": "keyword"
+      },
+      "payload": {
+        "type": "object"
+      },
+      "timestamp": {
+        "type": "keyword"
+      },
+      "sentTo": {
+        "type": "keyword"
+      }
+    }
+  }
+}

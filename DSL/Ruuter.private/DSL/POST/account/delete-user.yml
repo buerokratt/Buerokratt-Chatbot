@@ -1,0 +1,15 @@
+extractRequestData:
+  assign:
+    userId: ${incoming.body.userIdCode}
+
+setConfigurationValue:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/delete-user"
+    body:
+      userIdCode: ${userId}
+      created: ${new Date().toISOString()}
+  result: res
+
+return_result:
+  return: ${res.response.body}

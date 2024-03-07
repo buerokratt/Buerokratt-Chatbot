@@ -1,0 +1,54 @@
+assignIncoming:
+  assign:
+    chatId: ${incoming.body.chatId}
+    email: ${incoming.body.endUserEmail}
+    phone: ${incoming.body.endUserPhone}
+
+checkChatId:
+  switch:
+    - condition: ${!!chatId && chatId !== "" && chatId !== null}
+      next: insertEmailAndPhone
+  next: returnNoChatId
+
+insertEmailAndPhone:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/update-chat-with-end-user-email-and-phone"
+    body:
+      chatId: ${chatId}
+      endUserEmail: "${email ? email : ''}"
+      endUserPhone: "${phone ? phone : ''}"
+  result: clearMessages
+
+clearMessages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query?conflicts=proceed"
+    body:
+     query:
+      term:
+       channelId: ${chatId}
+  result: clear_messages_res
+  next: postNotificationAboutMessageResponse
+
+postNotificationAboutMessageResponse:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
+    body:
+     channelId: ${chatId}
+     timestamp: ${new Date().toISOString()}
+     payload: {
+        "type": "message",
+        "messageId": ""
+      }
+  result: message_notification_result
+  next: return_result 
+
+return_result:
+  return: Updated ${chatId} with ${email} and ${phone}.
+  next: end
+
+returnNoChatId:
+  return: Missing chatId in request body.
+  next: end

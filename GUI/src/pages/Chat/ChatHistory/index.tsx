@@ -1,6 +1,6 @@
 import { FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { createColumnHelper, PaginationState } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { AxiosError } from 'axios';
@@ -23,21 +23,22 @@ import {
 import { CHAT_EVENTS, CHAT_STATUS, Chat as ChatType } from 'types/chat';
 import { Message } from 'types/message';
 import { useToast } from 'hooks/useToast';
-import api from 'services/api';
 import apiDev from 'services/api-dev';
-import useUserInfoStore from '../../../store/store';
+import useStore from 'store';
 import { Controller, useForm } from 'react-hook-form';
 import {
   getFromLocalStorage,
   setToLocalStorage,
 } from 'utils/local-storage-utils';
-import { CHAT_HISTORY_PREFERENCES_KEY } from '../../../constants/config';
-import apiDevV2 from 'services/api-dev-v2';
+import { CHAT_HISTORY_PREFERENCES_KEY } from 'constants/config';
+import { useLocation } from 'react-router-dom';
 
 const ChatHistory: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
-  const { userInfo } = useUserInfoStore();
+  const userInfo = useStore((state) => state.userInfo);
+  const routerLocation = useLocation();
+  let passedChatId = new URLSearchParams(routerLocation.search).get('chat');
   const preferences = getFromLocalStorage(
     CHAT_HISTORY_PREFERENCES_KEY
   ) as string[];
@@ -48,6 +49,7 @@ const ChatHistory: FC = () => {
   const [statusChangeModal, setStatusChangeModal] = useState<string | null>(
     null
   );
+
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
@@ -83,6 +85,13 @@ const ChatHistory: FC = () => {
   const endDate = watch('endDate');
 
   useEffect(() => {
+    if (passedChatId != null) {
+      getChatById.mutate();
+      passedChatId = null;
+    }
+  }, [passedChatId]);
+
+  useEffect(() => {
     getAllEndedChats.mutate({
       startDate: format(new Date(startDate), 'yyyy-MM-dd'),
       endDate: format(new Date(endDate), 'yyyy-MM-dd'),
@@ -91,21 +100,23 @@ const ChatHistory: FC = () => {
 
   const getAllEndedChats = useMutation({
     mutationFn: (data: { startDate: string; endDate: string }) =>
-      apiDev.post('cs-get-all-ended-chats', {
+      apiDev.post('csa/ended-chats', {
         startDate: data.startDate,
         endDate: data.endDate,
       }),
     onSuccess: (res: any) => {
-      setEndedChatsList(res.data.data.cs_get_all_ended_chats ?? []);
-      filterChatsList(res.data.data.cs_get_all_ended_chats ?? []);
+      setEndedChatsList(res.data.response ?? []);
+      filterChatsList(res.data.response ?? []);
     },
   });
 
-  useQuery<Message[]>({
-    queryKey: ['cs-get-messages-by-chat-id', selectedChat?.id, 'prod'],
-    enabled: !!selectedChat,
-    onSuccess(res: any) {
-      setchatMessagesList(res.data.cs_get_messages_by_chat_id);
+  const getChatById = useMutation({
+    mutationFn: () =>
+      apiDev.post('chat/chat-by-id', {
+        chatId: passedChatId,
+      }),
+    onSuccess: (res: any) => {
+      setSelectedChat(res.data.response);
     },
   });
 
@@ -126,35 +137,35 @@ const ChatHistory: FC = () => {
     [t]
   );
 
-  const sendToEmailMutation = useMutation({
-    mutationFn: (data: ChatType) =>
-      apiDevV2.post('history/cs-send-history-to-email', { chatId: data.id }),
-    onSuccess: () => {
-      toast.open({
-        type: 'success',
-        title: t('global.notification'),
-        message: t('toast.success.messageToUserEmail'),
-      });
-    },
-    onError: (error: AxiosError) => {
-      toast.open({
-        type: 'error',
-        title: t('global.notificationError'),
-        message: error.message,
-      });
-    },
-    onSettled: () => setSendToEmailModal(null),
-  });
+  // const sendToEmailMutation = useMutation({
+  //   mutationFn: (data: ChatType) =>
+  //     apiDev.post('history/cs-send-history-to-email', { chatId: data.id }),
+  //   onSuccess: () => {
+  //     toast.open({
+  //       type: 'success',
+  //       title: t('global.notification'),
+  //       message: t('toast.success.messageToUserEmail'),
+  //     });
+  //   },
+  //   onError: (error: AxiosError) => {
+  //     toast.open({
+  //       type: 'error',
+  //       title: t('global.notificationError'),
+  //       message: error.message,
+  //     });
+  //   },
+  //   onSettled: () => setSendToEmailModal(null),
+  // });
 
   const searchChatsMutation = useMutation({
     mutationFn: (searchKey: string) =>
-      apiDev.post('cs-get-chat-ids-matching-message-search', {
+      apiDev.post('chat/search', {
         searchKey: searchKey,
       }),
-    onSuccess: (res) => {
-      const responseList = (
-        res.data.data.get_chat_ids_matching_message_search ?? []
-      ).map((item: any) => item.chatId);
+    onSuccess: (res: any) => {
+      const responseList = (res.data.response ?? []).map(
+        (item: any) => item.chatId
+      );
       const filteredChats = endedChatsList.filter((item) =>
         responseList.includes(item.id)
       );
@@ -182,7 +193,7 @@ const ChatHistory: FC = () => {
 
       if (!isChangeable) return;
 
-      await apiDev.post('cs-end-chat', {
+      await apiDev.post('chat/status', {
         chatId: selectedChat!.id,
         event: data.event.toUpperCase(),
         authorTimestamp: new Date().toISOString(),
@@ -216,7 +227,7 @@ const ChatHistory: FC = () => {
 
   const chatCommentChangeMutation = useMutation({
     mutationFn: (data: { chatId: string | number; comment: string }) =>
-      apiDevV2.post('comments/comment-history', data),
+      apiDev.post('comments/comment-history', data),
     onSuccess: (res, { chatId, comment }) => {
       const updatedChatList = endedChatsList.map((chat) =>
         chat.id === chatId ? { ...chat, comment } : chat
@@ -304,9 +315,6 @@ const ChatHistory: FC = () => {
         id: 'labels',
         header: t('chat.history.label') || '',
       }),
-      // columnHelper.accessor('nps', {
-      //   header: 'NPS',
-      // }),
       columnHelper.accessor('status', {
         id: 'status',
         header: t('global.status') || '',
@@ -320,6 +328,22 @@ const ChatHistory: FC = () => {
                 )
               : t('chat.status.ended')
             : '',
+        sortingFn: (a, b, isAsc) => {
+          const statusA =
+            a.getValue('status') === CHAT_STATUS.ENDED
+              ? t('chat.plainEvents.' + (a.original.lastMessageEvent ?? ''))
+              : '';
+          const statusB =
+            b.getValue('status') === CHAT_STATUS.ENDED
+              ? t('chat.plainEvents.' + (b.original.lastMessageEvent ?? ''))
+              : '';
+          return (
+            statusA.localeCompare(statusB, undefined, {
+              numeric: true,
+              sensitivity: 'base',
+            }) * (isAsc ? 1 : -1)
+          );
+        },
       }),
       columnHelper.accessor('id', {
         id: 'id',
@@ -527,7 +551,7 @@ const ChatHistory: FC = () => {
               </Button>
               <Button
                 appearance="error"
-                onClick={() => sendToEmailMutation.mutate(sendToEmailModal)}
+                // onClick={() => sendToEmailMutation.mutate(sendToEmailModal)}
               >
                 {t('global.yes')}
               </Button>

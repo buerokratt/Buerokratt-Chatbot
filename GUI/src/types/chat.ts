@@ -2,6 +2,7 @@ export enum CHAT_STATUS {
   ENDED = 'ENDED',
   OPEN = 'OPEN',
   REDIRECTED = 'REDIRECTED',
+  IDLE = 'IDLE',
 }
 
 export enum CHAT_EVENTS {
@@ -29,9 +30,18 @@ export enum CHAT_EVENTS {
   CONTACT_INFORMATION = 'contact-information',
   CONTACT_INFORMATION_REJECTED = 'contact-information-rejected',
   CONTACT_INFORMATION_FULFILLED = 'contact-information-fulfilled',
+  UNAVAILABLE_CONTACT_INFORMATION_FULFILLED = 'unavailable-contact-information-fulfilled',
+  CONTACT_INFORMATION_SKIPPED = 'contact-information-skipped',
   REQUESTED_CHAT_FORWARD = 'requested-chat-forward',
   REQUESTED_CHAT_FORWARD_ACCEPTED = 'requested-chat-forward-accepted',
   REQUESTED_CHAT_FORWARD_REJECTED = 'requested-chat-forward-rejected',
+  UNAVAILABLE_ORGANIZATION = 'unavailable_organization',
+  UNAVAILABLE_CSAS = 'unavailable_csas',
+  UNAVAILABLE_HOLIDAY = 'unavailable_holiday',
+  ASSIGN_PENDING_CHAT_CSA = 'pending-assigned',
+  PENDING_USER_REACHED = 'user-reached',
+  PENDING_USER_NOT_REACHED = 'user-not-reached',
+  USER_AUTHENTICATED = 'user-authenticated',
   READ = 'message-read',
 }
 
@@ -64,6 +74,17 @@ export interface Chat {
   labels: string;
 }
 export interface GroupedChat {
+  myChats: Chat[];
+  otherChats: {
+    groupId: string;
+    name: string;
+    chats: Chat[];
+  }[];
+}
+
+export interface GroupedPendingChat {
+  newChats: Chat[];
+  inProcessChats: Chat[];
   myChats: Chat[];
   otherChats: {
     groupId: string;

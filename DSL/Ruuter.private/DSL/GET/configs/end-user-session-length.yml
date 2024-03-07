@@ -1,0 +1,10 @@
+getConfigurationValue:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-configuration"
+    body:
+      key: "end_user_session_length"
+  result: res
+
+return_result:
+  return: ${res.response.body[0].value}

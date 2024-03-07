@@ -10,15 +10,29 @@ const instance = axios.create({
 });
 
 instance.interceptors.response.use(
-  (response) => {
-    return response;
+  (axiosResponse) => {
+    return axiosResponse;
   },
   (error: AxiosError) => {
+    console.log(error);
+    return Promise.reject(error);
+  }
+);
+
+instance.interceptors.request.use(
+  (axiosRequest) => {
+    return axiosRequest;
+  },
+  (error: AxiosError) => {
+    console.log(error);
     if (error.response?.status === 401) {
       //TODO: handle unauthorized requests
     }
+    if (error.response?.status === 403) {
+      //TODO: handle unauthorized requests
+    }
     return Promise.reject(error);
-  },
+  }
 );
 
 export default instance;

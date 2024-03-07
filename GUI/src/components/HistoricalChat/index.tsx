@@ -47,16 +47,18 @@ const HistoricalChat: FC<ChatProps> = ({
   const [messageGroups, setMessageGroups] = useState<GroupedMessage[]>([]);
   const [editingComment, setEditingComment] = useState<string | null>(null);
   const [messagesList, setMessagesList] = useState<Message[]>([]);
+  const [lastMessage, setLastMessage] = useState<Message>();
+  const [statuses, setStatuses] = useState(chatStatuses);
 
   useEffect(() => {
     getMessages();
   }, [trigger]);
 
   const getMessages = async () => {
-    const { data: res } = await apiDev.post('cs-get-messages-by-chat-id', {
+    const { data: res } = await apiDev.post('csa/messages-by-id', {
       chatId: chat.id,
     });
-    setMessagesList(res.data.cs_get_messages_by_chat_id);
+    setMessagesList(res.response);
   };
 
   const endUserFullName =
@@ -103,6 +105,31 @@ const HistoricalChat: FC<ChatProps> = ({
     });
 
     setMessageGroups(groupedMessages);
+    const lastMessage = messagesList[messagesList.length - 1];
+    if (
+      lastMessage?.event?.toLowerCase() ===
+        CHAT_EVENTS.CLIENT_LEFT_FOR_UNKNOWN_REASONS ||
+      lastMessage?.event?.toLowerCase() === CHAT_EVENTS.HATE_SPEECH ||
+      lastMessage?.event?.toLowerCase() === CHAT_EVENTS.OTHER ||
+      lastMessage?.event?.toLowerCase() ===
+        CHAT_EVENTS.RESPONSE_SENT_TO_CLIENT_EMAIL
+    ) {
+      setStatuses([
+        CHAT_EVENTS.HATE_SPEECH,
+        CHAT_EVENTS.OTHER,
+        CHAT_EVENTS.RESPONSE_SENT_TO_CLIENT_EMAIL,
+      ]);
+    } else if (
+      lastMessage?.event?.toLowerCase() ===
+        CHAT_EVENTS.CLIENT_LEFT_WITH_ACCEPTED ||
+      lastMessage?.event?.toLowerCase() ===
+        CHAT_EVENTS.CLIENT_LEFT_WITH_NO_RESOLUTION
+    ) {
+      setStatuses([]);
+    } else {
+      setStatuses(chatStatuses);
+    }
+    setLastMessage(lastMessage);
   }, [messagesList, endUserFullName]);
 
   useEffect(() => {
@@ -163,57 +190,68 @@ const HistoricalChat: FC<ChatProps> = ({
             ))}
           <div id="anchor" ref={chatRef}></div>
         </div>
-        <div className="historical-chat__toolbar">
-          <div className="historical-chat__toolbar-row">
-            <Track gap={16} justify="between">
-              {editingComment || editingComment === '' ? (
-                <FormTextarea
-                  name="comment"
-                  label={t('global.comment')}
-                  value={editingComment}
-                  hideLabel
-                  onChange={(e) => setEditingComment(e.target.value)}
+        {lastMessage && (
+          <div className="historical-chat__toolbar">
+            <div className="historical-chat__toolbar-row">
+              <Track gap={16} justify="between">
+                {editingComment || editingComment === '' ? (
+                  <FormTextarea
+                    name="comment"
+                    label={t('global.comment')}
+                    value={editingComment}
+                    hideLabel
+                    onChange={(e) => setEditingComment(e.target.value)}
+                  />
+                ) : (
+                  <p
+                    className={`historical-chat__comment-text ${
+                      chat.comment ? '' : 'placeholder'
+                    }`}
+                  >
+                    {chat.comment ??
+                      t('chat.history.addACommentToTheConversation')}
+                  </p>
+                )}
+                {editingComment || editingComment === '' ? (
+                  <Button
+                    appearance="text"
+                    onClick={() => {
+                      onCommentChange(editingComment);
+                      setEditingComment(null);
+                    }}
+                  >
+                    <Icon icon={<MdOutlineSave />} />
+                    {t('global.save')}
+                  </Button>
+                ) : (
+                  <Button
+                    appearance="text"
+                    onClick={() => setEditingComment(chat.comment ?? '')}
+                  >
+                    <Icon icon={<MdOutlineModeEditOutline />} />
+                    {t('global.edit')}
+                  </Button>
+                )}
+              </Track>
+            </div>
+            {statuses.length > 0 && (
+              <div className="historical-chat__toolbar-row">
+                <FormSelect
+                  name="chatStatus"
+                  label={t('chat.chatStatus')}
+                  direction="up"
+                  onSelectionChange={(selection) =>
+                    selection ? onChatStatusChange(selection.value) : null
+                  }
+                  options={statuses.map((status) => ({
+                    label: t(`chat.events.${status}`, { date: '' }),
+                    value: status,
+                  }))}
                 />
-              ) : (
-                <p>{chat.comment}</p>
-              )}
-              {editingComment || editingComment === '' ? (
-                <Button
-                  appearance="text"
-                  onClick={() => {
-                    onCommentChange(editingComment);
-                    setEditingComment(null);
-                  }}
-                >
-                  <Icon icon={<MdOutlineSave />} />
-                  {t('global.save')}
-                </Button>
-              ) : (
-                <Button
-                  appearance="text"
-                  onClick={() => setEditingComment(chat.comment ?? '')}
-                >
-                  <Icon icon={<MdOutlineModeEditOutline />} />
-                  {t('global.edit')}
-                </Button>
-              )}
-            </Track>
+              </div>
+            )}
           </div>
-          <div className="historical-chat__toolbar-row">
-            <FormSelect
-              name="chatStatus"
-              label={t('chat.chatStatus')}
-              direction="up"
-              onSelectionChange={(selection) =>
-                selection ? onChatStatusChange(selection.value) : null
-              }
-              options={chatStatuses.map((status) => ({
-                label: t(`chat.events.${status}`, { date: '' }),
-                value: status,
-              }))}
-            />
-          </div>
-        </div>
+        )}
       </div>
       <div id="anchor" ref={chatRef}></div>
     </div>

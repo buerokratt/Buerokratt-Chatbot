@@ -11,7 +11,9 @@
     "prettier": "prettier --write \"{,!(node_modules)/**/}*.{ts,tsx,js,json,css,less,scss}\""
   },
   "dependencies": {
-    "@exirain/header": "file:exirain-header-0.0.21.tgz",
+    "@buerokratt-ria/header": "^0.1.4",
+    "@buerokratt-ria/menu": "^0.1.5",
+    "@buerokratt-ria/styles": "^0.0.1",
     "@fontsource/roboto": "^4.5.8",
     "@formkit/auto-animate": "^1.0.0-beta.5",
     "@fortaine/fetch-event-source": "^3.0.6",
@@ -31,7 +33,9 @@
     "clsx": "^1.2.1",
     "date-fns": "^2.29.3",
     "downshift": "^7.0.5",
+    "esbuild": "^0.19.5",
     "framer-motion": "^8.5.5",
+    "howler": "^2.2.4",
     "i18next": "^22.4.5",
     "i18next-browser-languagedetector": "^7.0.1",
     "linkify-react": "^4.1.1",
@@ -58,9 +62,10 @@
     "timeago.js": "^4.0.2",
     "usehooks-ts": "^2.9.1",
     "uuid": "^9.0.0",
-    "zustand": "^4.3.2"
+    "zustand": "^4.4.4"
   },
   "devDependencies": {
+    "@types/howler": "^2.2.11",
     "@types/lodash": "^4.14.191",
     "@types/lodash.debounce": "^4.0.7",
     "@types/node": "^18.11.17",

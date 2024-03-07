@@ -17,9 +17,9 @@ import {
 import { WidgetConfig } from 'types/widgetConfig';
 import { useToast } from 'hooks/useToast';
 import bykLogo from 'assets/logo-white.svg';
-import apiDevV2 from 'services/api-dev-v2';
 import './SettingsAppearance.scss';
 import clsx from 'clsx';
+import apiDev from 'services/api-dev';
 import { ChromePicker } from 'react-color';
 import { MdOutlinePalette } from 'react-icons/md';
 
@@ -42,15 +42,16 @@ const SettingsAppearance: FC = () => {
   const [showColorPalette, setShowColorPalette] = useState(false);
   const [delayFinished, setDelayFinished] = useState(false);
   const { data: widgetConfig } = useQuery<WidgetConfig>({
-    queryKey: ['cs-get-widget-config', 'prod-2'],
+    queryKey: ['configs/widget-config', 'prod'],
     onSuccess: (data) => {
+      const res = data.response;
       if (!hasRendered.current) {
         reset({
-          ...data,
+          ...res,
           widgetAnimation:
-            data.widgetAnimation.length === 0
+            res.widgetAnimation.length === 0
               ? 'shockwave'
-              : data.widgetAnimation,
+              : res.widgetAnimation,
         });
         hasRendered.current = true;
       }
@@ -74,7 +75,7 @@ const SettingsAppearance: FC = () => {
 
   const widgetConfigMutation = useMutation({
     mutationFn: (data: WidgetConfig) =>
-      apiDevV2.post<WidgetConfig>('cs-set-widget-config', data),
+      apiDev.post<WidgetConfig>('configs/widget-config', data),
     onSuccess: () => {
       toast.open({
         type: 'success',
@@ -132,11 +133,11 @@ const SettingsAppearance: FC = () => {
     });
   };
 
-  if (!widgetConfig) return <>Loading...</>;
+  if (hasRendered.current === undefined) return <>Loading...</>;
 
   return (
     <div ref={colorComponentRef}>
-      <h1>{t('settings.appearance.title')}</h1>
+      <h1 style={{ paddingBottom: 16 }}>{t('settings.appearance.title')}</h1>
 
       <Card
         footer={

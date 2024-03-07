@@ -1,0 +1,26 @@
+extractRequestData:
+  assign:
+    widgetAnimation: ${incoming.body.widgetAnimation}
+    widgetProactiveSeconds: ${incoming.body.widgetProactiveSeconds}
+    widgetDisplayBubbleMessageSeconds: ${incoming.body.widgetDisplayBubbleMessageSeconds}
+    widgetBubbleMessageText: ${incoming.body.widgetBubbleMessageText}
+    widgetColor: ${incoming.body.widgetColor}
+    isWidgetActive: ${incoming.body.isWidgetActive}
+
+setWidgetConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-widget-config"
+    body:
+      widgetProactiveSeconds: ${widgetProactiveSeconds}
+      widgetDisplayBubbleMessageSeconds: ${widgetDisplayBubbleMessageSeconds}
+      widgetBubbleMessageText: ${widgetBubbleMessageText}
+      widgetColor: ${widgetColor}
+      isWidgetActive: ${isWidgetActive}
+      widgetAnimation: ${widgetAnimation}
+      created: ${new Date().toISOString()}
+  result: res
+
+return_result:
+  return: ${res.response.body}
+  next: end

@@ -3,22 +3,20 @@
 @import 'src/styles/settings/variables/other';
 @import 'src/styles/settings/variables/typography';
 
-.weekdays {
-  width: 100%;
-  display: flex;
-  align-items: flex-start;
-  gap: get-spacing(paldiski);
+.startTime {
+  padding-left: 20px;
+  padding-right: 10px;
+}
 
-  &__label {
-    display: block;
-    flex: 0 0 170px;
-    font-size: $veera-font-size-100;
-    line-height: 24px;
-  }
+.endTime {
+  padding-left: 15px;
+  padding-right: 15px;
+}
 
-  &__wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+.Label {
+  flex: 0 0 175px;
+
+  &.switch {
+    flex: 0 0 190px;
   }
 }

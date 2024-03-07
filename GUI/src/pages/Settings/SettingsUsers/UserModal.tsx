@@ -62,7 +62,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
     mutationFn: (data: UserDTO) => createUser(data),
     onSuccess: async () => {
       await queryClient.invalidateQueries([
-        'cs-get-customer-support-agents',
+        'account/customer-support-agents',
         'prod',
       ]);
       toast.open({
@@ -91,7 +91,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
     }) => editUser(id, userData),
     onSuccess: async () => {
       await queryClient.invalidateQueries([
-        'cs-get-customer-support-agents',
+        'account/customer-support-agents',
         'prod',
       ]);
       toast.open({
@@ -114,7 +114,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
     mutationFn: ({ userData }: { userData: UserDTO }) =>
       checkIfUserExists(userData),
     onSuccess: async (data) => {
-      if (data.data.check_user_exists !== undefined) {
+      if (data.response === 'true') {
         toast.open({
           type: 'error',
           title: t('global.notificationError'),

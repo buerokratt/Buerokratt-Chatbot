@@ -1,4 +1,4 @@
-import { FC, useContext, useEffect, useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
@@ -15,22 +15,18 @@ import {
   Switch,
   Dialog,
 } from 'components';
-import useUserInfoStore from 'store/store';
+import useStore from 'store';
 import { ReactComponent as BykLogo } from 'assets/logo.svg';
 import { UserProfileSettings } from 'types/userProfileSettings';
-import { CHAT_STATUS, Chat as ChatType } from 'types/chat';
+import { Chat as ChatType } from 'types/chat';
 import { useToast } from 'hooks/useToast';
 import { USER_IDLE_STATUS_TIMEOUT } from 'constants/config';
 import apiDev from 'services/api-dev';
-import apiDevV2 from 'services/api-dev-v2';
-import './Header.scss';
-import chatSound from '../../assets/chatSound.mp3';
-import { Subscription, interval } from 'rxjs';
+import { interval } from 'rxjs';
 import { AUTHORITY } from 'types/authorities';
-import { Cookies, useCookies } from 'react-cookie';
-import CsaActivityContext from 'providers/CsaActivityContext';
-import Alert from '../Alert';
-import { format } from 'date-fns';
+import { useCookies } from 'react-cookie';
+import { useDing } from 'hooks/useAudio';
+import './Header.scss';
 
 type CustomerSupportActivity = {
   idCode: string;
@@ -52,7 +48,7 @@ const statusColors: Record<string, string> = {
 
 const Header: FC = () => {
   const { t } = useTranslation();
-  const { userInfo } = useUserInfoStore();
+  const userInfo = useStore((state) => state.userInfo);
   const toast = useToast();
   const [__, setSecondsUntilStatusPopup] = useState(300); // 5 minutes in seconds
   const [statusPopupTimerHasStarted, setStatusPopupTimerHasStarted] =
@@ -65,9 +61,8 @@ const Header: FC = () => {
   const [csaStatus, setCsaStatus] = useState<'idle' | 'offline' | 'online'>(
     'online'
   );
-  const [showSessionExpireAlert, setShowSessionExpireAlert] = useState(false);
-  const audio = useMemo(() => new Audio(chatSound), []);
-  const { chatCsaActive, setChatCsaActive } = useContext(CsaActivityContext);
+  const [ding] = useDing();
+  const chatCsaActive = useStore((state) => state.chatCsaActive);
   const [userProfileSettings, setUserProfileSettings] =
     useState<UserProfileSettings>({
       userId: 1,
@@ -92,9 +87,9 @@ const Header: FC = () => {
         const expirationDate = new Date(parseInt(expirationTimeStamp) ?? '');
         const currentDate = new Date(Date.now());
         if (expirationDate < currentDate) {
-          if (showSessionExpireAlert === false) {
-            setShowSessionExpireAlert(true);
-          }
+          localStorage.removeItem('exp');
+          window.location.href =
+            import.meta.env.REACT_APP_CUSTOMER_SERVICE_LOGIN;
         } else {
         }
       }
@@ -107,114 +102,100 @@ const Header: FC = () => {
   }, [userInfo?.idCode]);
 
   const getMessages = async () => {
-    const { data: res } = await apiDevV2.post('cs-get-user-profile-settings', {
-      userId: userInfo?.idCode ?? '',
-    });
+    const { data: res } = await apiDev.get('account/user-profile-settings');
 
     if (res.response && res.response != 'error: not found')
       setUserProfileSettings(res.response[0]);
   };
   const { data: customerSupportActivity } = useQuery<CustomerSupportActivity>({
-    queryKey: ['cs-get-customer-support-activity', 'prod'],
+    queryKey: ['account/customer-support-activity', 'prod'],
     onSuccess(res: any) {
       const activity = res.data.get_customer_support_activity[0];
       setCsaStatus(activity.status);
-      setChatCsaActive(activity.active === 'true');
+      useStore.getState().setChatCsaActive(activity.active === 'true');
     },
   });
-  const [activeChatsList, setActiveChatsList] = useState<ChatType[]>([]);
 
   useQuery<ChatType[]>({
-    queryKey: ['cs-get-all-active-chats', 'prod'],
+    queryKey: ['csa/active-chats', 'prod'],
     onSuccess(res: any) {
-      setActiveChatsList(res.data.get_all_active_chats);
+      useStore.getState().setActiveChats(res.data.get_all_active_chats);
     },
   });
+
   const [_, setCookie] = useCookies([customJwtCookieKey]);
-
-  const unansweredChats = useMemo(
-    () =>
-      activeChatsList
-        ? activeChatsList.filter((c) => c.customerSupportId === '').length
-        : 0,
-    [activeChatsList]
+  const unansweredChatsLength = useStore((state) =>
+    state.unansweredChatsLength()
   );
-  const forwardedChats = useMemo(
-    () =>
-      activeChatsList
-        ? activeChatsList.filter(
-            (c) =>
-              c.status === CHAT_STATUS.REDIRECTED &&
-              c.customerSupportId === userInfo?.idCode
-          ).length
-        : 0,
-    [activeChatsList]
+  const forwardedChatsLength = useStore((state) =>
+    state.forwordedChatsLength()
   );
 
-  useEffect(() => {
-    let subscription: Subscription;
-    if (unansweredChats > 0) {
-      if (userProfileSettings.newChatSoundNotifications) audio.play();
-      if (userProfileSettings.newChatEmailNotifications)
-        if (userProfileSettings.newChatPopupNotifications) {
-          // TODO send email notification
-          toast.open({
-            type: 'info',
-            title: t('global.notification'),
-            message: t('settings.users.newUnansweredChat'),
-          });
-        }
-      subscription = interval(2 * 60 * 1000).subscribe(() => {
-        if (userProfileSettings.newChatSoundNotifications) audio.play();
-        if (userProfileSettings.newChatPopupNotifications) {
-          toast.open({
-            type: 'info',
-            title: t('global.notification'),
-            message: t('settings.users.newUnansweredChat'),
-          });
-        }
+  const handleNewMessage = () => {
+    if (unansweredChatsLength <= 0) {
+      return;
+    }
+
+    if (userProfileSettings.newChatSoundNotifications) {
+      ding?.play();
+    }
+    if (userProfileSettings.newChatEmailNotifications) {
+      // TODO send email notification
+    }
+    if (userProfileSettings.newChatPopupNotifications) {
+      toast.open({
+        type: 'info',
+        title: t('global.notification'),
+        message: t('settings.users.newUnansweredChat'),
       });
     }
-    return () => {
-      if (subscription) subscription.unsubscribe();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [unansweredChats]);
+  };
 
   useEffect(() => {
-    let subscription: Subscription;
-    if (forwardedChats > 0) {
-      if (userProfileSettings.forwardedChatSoundNotifications) audio.play();
-      if (userProfileSettings.forwardedChatEmailNotifications)
-        if (userProfileSettings.forwardedChatPopupNotifications) {
-          // TODO send email notification
-          toast.open({
-            type: 'info',
-            title: t('global.notification'),
-            message: t('settings.users.newForwardedChat'),
-          });
-        }
-      subscription = interval(2 * 60 * 1000).subscribe(() => {
-        if (userProfileSettings.forwardedChatSoundNotifications) audio.play();
-        if (userProfileSettings.forwardedChatPopupNotifications) {
-          toast.open({
-            type: 'info',
-            title: t('global.notification'),
-            message: t('settings.users.newForwardedChat'),
-          });
-        }
+    handleNewMessage();
+
+    const subscription = interval(2 * 60 * 1000).subscribe(() =>
+      handleNewMessage()
+    );
+    return () => {
+      subscription?.unsubscribe();
+    };
+  }, [unansweredChatsLength, userProfileSettings]);
+
+  const handleForwordMessage = () => {
+    if (forwardedChatsLength <= 0) {
+      return;
+    }
+
+    if (userProfileSettings.forwardedChatSoundNotifications) {
+      ding?.play();
+    }
+    if (userProfileSettings.forwardedChatEmailNotifications) {
+      // TODO send email notification
+    }
+    if (userProfileSettings.forwardedChatPopupNotifications) {
+      toast.open({
+        type: 'info',
+        title: t('global.notification'),
+        message: t('settings.users.newForwardedChat'),
       });
     }
+  };
+
+  useEffect(() => {
+    handleForwordMessage();
+
+    const subscription = interval(2 * 60 * 1000).subscribe(
+      () => handleForwordMessage
+    );
     return () => {
-      if (subscription) subscription.unsubscribe();
+      subscription?.unsubscribe();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [forwardedChats]);
+  }, [forwardedChatsLength, userProfileSettings]);
 
   const userProfileSettingsMutation = useMutation({
     mutationFn: async (data: UserProfileSettings) => {
-      await apiDevV2.post('cs-set-user-profile-settings', {
-        userId: userInfo?.idCode ?? '',
+      await apiDev.post('account/user-profile-settings', {
         forwardedChatPopupNotifications: data.forwardedChatPopupNotifications,
         forwardedChatSoundNotifications: data.forwardedChatSoundNotifications,
         forwardedChatEmailNotifications: data.newChatEmailNotifications,
@@ -226,7 +207,7 @@ const Header: FC = () => {
       setUserProfileSettings(data);
     },
     onError: async (error: AxiosError) => {
-      await queryClient.invalidateQueries(['cs-get-user-profile-settings']);
+      await queryClient.invalidateQueries(['account/user-profile-settings']);
       toast.open({
         type: 'error',
         title: t('global.notificationError'),
@@ -237,16 +218,13 @@ const Header: FC = () => {
 
   const unClaimAllAssignedChats = useMutation({
     mutationFn: async () => {
-      await apiDev.post('cs-unclaim-all-assigned-chats', {
-        userId: userInfo?.idCode ?? '',
-      });
+      await apiDev.post('chat/unclaim-all-assigned-chats');
     },
   });
 
   const customerSupportActivityMutation = useMutation({
     mutationFn: (data: CustomerSupportActivityDTO) =>
-      apiDev.post('cs-set-customer-support-activity', {
-        customerSupportId: data.customerSupportId,
+      apiDev.post('account/customer-support-activity', {
         customerSupportActive: data.customerSupportActive,
         customerSupportStatus: data.customerSupportStatus,
       }),
@@ -255,7 +233,7 @@ const Header: FC = () => {
     },
     onError: async (error: AxiosError) => {
       await queryClient.invalidateQueries([
-        'cs-get-customer-support-activity',
+        'account/customer-support-activity',
         'prod',
       ]);
       toast.open({
@@ -275,7 +253,7 @@ const Header: FC = () => {
     mutationFn: async () => {
       const {
         data: { data },
-      } = await apiDev.post('cs-custom-jwt-extend', {});
+      } = await apiDev.post('extend', {});
       if (data.custom_jwt_extend === null) return;
       setNewCookie(data.custom_jwt_extend);
     },
@@ -283,8 +261,8 @@ const Header: FC = () => {
   });
 
   const logoutMutation = useMutation({
-    mutationFn: () => apiDev.post('cs-logout'),
-    onSuccess(_) {
+    mutationFn: () => apiDev.post('account/logout'),
+    onSuccess(_: any) {
       window.location.href = import.meta.env.REACT_APP_CUSTOMER_SERVICE_LOGIN;
     },
     onError: async (error: AxiosError) => {
@@ -342,7 +320,7 @@ const Header: FC = () => {
   const handleCsaStatusChange = (checked: boolean) => {
     if (checked === false) unClaimAllAssignedChats.mutate();
 
-    setChatCsaActive(checked);
+    useStore.getState().setChatCsaActive(checked);
     setCsaStatus(checked === true ? 'online' : 'offline');
     customerSupportActivityMutation.mutate({
       customerSupportActive: checked,
@@ -371,23 +349,11 @@ const Header: FC = () => {
     }, 1000);
   };
 
-  function handleCloseAlert(): void {
-    setShowSessionExpireAlert(false);
-    localStorage.removeItem('exp');
-    window.location.href = import.meta.env.REACT_APP_CUSTOMER_SERVICE_LOGIN;
-  }
-
   return (
     <>
       <header className="header">
         <Track justify="between">
           <BykLogo height={50} />
-          {showSessionExpireAlert && (
-            <Alert
-              message={t('toast.alert.sessionExpired')}
-              onClose={handleCloseAlert}
-            />
-          )}
           {userInfo && (
             <Track gap={32}>
               <Track gap={16}>
@@ -398,8 +364,9 @@ const Header: FC = () => {
                     textTransform: 'lowercase',
                   }}
                 >
-                  <strong>{unansweredChats}</strong> {t('chat.unanswered')}{' '}
-                  <strong>{forwardedChats}</strong> {t('chat.forwarded')}
+                  <strong>{unansweredChatsLength}</strong>{' '}
+                  {t('chat.unanswered')} <strong>{forwardedChatsLength}</strong>{' '}
+                  {t('chat.forwarded')}
                 </p>
                 <Switch
                   onCheckedChange={handleCsaStatusChange}
@@ -513,7 +480,7 @@ const Header: FC = () => {
                 },
                 {
                   label: t('settings.users.userTitle'),
-                  value: userInfo.csaTitle.replaceAll(' ', '\xa0'),
+                  value: userInfo.csaTitle?.replaceAll(' ', '\xa0'),
                 },
                 { label: t('settings.users.email'), value: userInfo.csaEmail },
               ].map((meta, index) => (

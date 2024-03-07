@@ -1,0 +1,55 @@
+extractRequestData:
+  assign:
+    forwardedChatPopupNotifications: ${incoming.body.forwardedChatPopupNotifications}
+    forwardedChatSoundNotifications: ${incoming.body.forwardedChatSoundNotifications}
+    forwardedChatEmailNotifications: ${incoming.body.forwardedChatEmailNotifications}
+    newChatPopupNotifications: ${incoming.body.newChatPopupNotifications}
+    newChatSoundNotifications: ${incoming.body.newChatSoundNotifications}
+    newChatEmailNotifications: ${incoming.body.newChatEmailNotifications}
+    useAutocorrect: ${incoming.body.useAutocorrect}
+
+get_user_info:
+  call: http.post
+  args:
+   url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
+   contentType: plaintext
+   headers:
+    cookie: ${incoming.headers.cookie}
+   plaintext: 
+      "customJwtCookie"
+  result: res
+  next: check_user_info_response
+
+check_user_info_response:
+  switch:
+    - condition: ${200 <= res.response.statusCodeValue && res.response.statusCodeValue < 300}
+      next: assignIdCode
+  next: return_bad_request
+
+assignIdCode:
+  assign:
+    idCode: ${res.response.body.idCode}
+  next: setUserSettingValue  
+
+setUserSettingValue:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-user-profile-settings"
+    body:
+      userId: ${idCode}
+      forwardedChatPopupNotifications: ${forwardedChatPopupNotifications}
+      forwardedChatSoundNotifications: ${forwardedChatSoundNotifications}
+      forwardedChatEmailNotifications: ${forwardedChatEmailNotifications}
+      newChatPopupNotifications: ${newChatPopupNotifications}
+      newChatSoundNotifications: ${newChatSoundNotifications}
+      newChatEmailNotifications: ${newChatEmailNotifications}
+      useAutocorrect: ${useAutocorrect}
+  result: returnSuccess
+
+returnSuccess:
+  return: ${returnSuccess.response.body}
+  next: end
+
+return_bad_request:
+  return: "error: bad request"
+  next: end
