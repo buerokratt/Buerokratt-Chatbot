@@ -1,6 +1,6 @@
 assignIncoming:
   assign:
-    chatId: ${incoming.params.chatId}
+    chatId: ${incoming.body.chatId}
 
 getDurationTotalInSeconds:
   call: http.post
