@@ -1,17 +1,17 @@
 assignIncoming:
   assign:
-    chatId: '${incoming.params.chatId}'
+    chatId: ${incoming.body.chatId}
 
 getDurationTotalInSeconds:
   call: http.post
   args:
-    url: "[#CHATBOT_BYK_RESQL]:[#CHATBOT_BYK_RESQL_PORT]/get-ended-chats-total-duration-in-seconds"
+    url: "[#CHATBOT_RESQL]/get-ended-chats-total-duration-in-seconds"
   result: durationTotalInSeconds
 
 getUnassignedChats:
   call: http.post
   args:
-    url: "[#CHATBOT_BYK_RESQL]:[#CHATBOT_BYK_RESQL_PORT]/get-unassigned-chat-total-with-position-by-chat-id"
+    url: "[#CHATBOT_RESQL]/get-unassigned-chat-total-with-position-by-chat-id"
     body:
       chatId: "${chatId ? chatId : ''}"
   result: unassignedChats
@@ -33,10 +33,10 @@ calculateDuration:
 getEstimatedWaitingTime:
   call: http.post
   args:
-    url: "[#CHATBOT_BYK_DMAPPER]:[#CHATBOT_BYK_DMAPPER_PORT]/json/v2/reflect_waiting_time"
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/reflect_waiting_time"
     body:
-      durationInSeconds: '${calculatedDuration}'
-      positionInUnassignedChats: '${position}'
+      durationInSeconds: "${calculatedDuration}"
+      positionInUnassignedChats: "${position}"
   result: estimatedWaitingTime
   next: returnSuccess
 
