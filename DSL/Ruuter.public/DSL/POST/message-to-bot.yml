@@ -184,8 +184,15 @@ redirect_chat_to_back_office:
     body:
       chatId: ${chatId}
   result: redirect_chat_to_back_office_result
-  next: convert_bot_responses_to_messages
 
+add_chat_id_to_queue_notification_node:
+  call: http.post
+  args:
+    url: "[#CHATBOT_NOTIFICATIONS]/enqueue"
+    body:
+      id: ${chatId}
+  result: add_chat_id_to_queue_notification_node_res
+  
 convert_bot_responses_to_messages:
   call: http.post
   args:
