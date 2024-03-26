@@ -68,6 +68,7 @@ postMessage:
       event: ${event}
       forwardedByUser: ""
       forwardedFromCsa: ""
+      forwardedToCsa: ""
   result: message_res
   next: endChat  
 
