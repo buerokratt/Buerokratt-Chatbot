@@ -2,8 +2,11 @@ const express = require("express");
 const cors = require("cors");
 const { buildSSEResponse } = require("./sseUtil");
 const { serverConfig } = require("./config");
-const { buildNotificationSearchInterval, buildQueueCounter } = require("./addOns");
-const { enqueueChatId, dequeueChatId } = require('./openSearch');
+const {
+  buildNotificationSearchInterval,
+  buildQueueCounter,
+} = require("./addOns");
+const { enqueueChatId, dequeueChatId } = require("./openSearch");
 
 const app = express();
 
@@ -21,21 +24,21 @@ app.get("/sse/notifications/:channelId", (req, res) => {
 
 app.get("/sse/queue/:id", (req, res) => {
   const { id } = req.params;
-  buildSSEResponse({ 
+  buildSSEResponse({
     req,
     res,
     buildCallbackFunction: buildQueueCounter({ id }),
-   });
+  });
 });
 
-app.post("/enqueue", (req, res) => {
-  enqueueChatId(req.body.id);
-  res.sendStatus(200);
+app.post("/enqueue", async (req, res) => {
+  await enqueueChatId(req.body.id);
+  res.status(200).json({ response: `enqueued successfully` });
 });
 
-app.post("/dequeue", (req, res) => {
-  dequeueChatId(req.body.id);
-  res.sendStatus(200);
+app.post("/dequeue", async (req, res) => {
+  await dequeueChatId(req.body.id);
+  res.status(200).json({ response: `dequeued successfully` });
 });
 
 const server = app.listen(serverConfig.port, () => {

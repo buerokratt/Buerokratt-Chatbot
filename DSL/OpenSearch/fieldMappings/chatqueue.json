@@ -1,0 +1,12 @@
+{
+  "mappings": {
+    "properties": {
+      "chatId": {
+        "type": "keyword"
+      },
+      "timestamp": {
+        "type": "keyword"
+      }
+    }
+  }
+}
