@@ -1,10 +1,15 @@
+#!/bin/bash
+
+URL="http://localhost:9200"
+AUTH="admin:admin"
+
 #clear
-curl -XDELETE 'http://localhost:9200/*' -u admin:admin --insecure
+curl -XDELETE "$URL/*" -u "$AUTH" --insecure
 
-#notifications
-curl -H "Content-Type: application/x-ndjson" -X PUT "http://localhost:9200/notifications" -ku admin:admin --data-binary "@fieldMappings/notifications.json"
-curl -H "Content-Type: application/x-ndjson" -X PUT "http://localhost:9200/notifications/_bulk" -ku admin:admin --data-binary "@mock/notifications.json"
+# Notifications
+curl -H "Content-Type: application/x-ndjson" -X PUT "$URL/notifications" -ku "$AUTH" --data-binary "@fieldMappings/notifications.json"
+curl -H "Content-Type: application/x-ndjson" -X PUT "$URL/notifications/_bulk" -ku "$AUTH" --data-binary "@mock/notifications.json"
 
-#chatqueue
-curl -H "Content-Type: application/x-ndjson" -X PUT "http://localhost:9200/chatqueue" -ku admin:admin --data-binary "@fieldMappings/chatqueue.json"
-curl -H "Content-Type: application/x-ndjson" -X PUT "http://localhost:9200/chatqueue/_bulk" -ku admin:admin --data-binary "@mock/chatqueue.json"
+# Chat Queue
+curl -H "Content-Type: application/x-ndjson" -X PUT "$URL/chatqueue" -ku "$AUTH" --data-binary "@fieldMappings/chatqueue.json"
+curl -H "Content-Type: application/x-ndjson" -X PUT "$URL/chatqueue/_bulk" -ku "$AUTH" --data-binary "@mock/chatqueue.json"
