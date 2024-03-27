@@ -50,8 +50,8 @@ This repo will primarily contain:
 
 ### Open Search
 
-- To Use Opensearch locally run `./init.sh`
-- To Use Opensearch on k8 run `./deploy-opensearch.sh`
+- To Initialize Open Search run `./deploy-opensearch.sh <URL> <AUTH> <Is Mock Allowed - Default false>`
+- To Use Opensearch locally run `./deploy-opensearch.sh http://localhost:9200 admin:admin true`
 
 ### Use external components.
 
