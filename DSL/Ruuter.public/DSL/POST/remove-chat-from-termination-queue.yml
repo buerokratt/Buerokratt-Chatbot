@@ -1,0 +1,18 @@
+extractRequestData:
+  assign:
+    chatId: "${incoming.body.message.chatId}"
+  next: removeChatFromTerminationQueue
+
+removeChatFromTerminationQueue:
+  call: http.post
+  args:
+    url: "[#CHATBOT_NOTIFICATIONS]/remove-chat-from-termination-queue"
+    body:
+      chatId: ${chatId}
+  result: res
+  next: return_chat_removed_from_termination_queue
+
+return_chat_removed_from_termination_queue:
+  return: "Chat has removed from termination queue"
+  status: 200
+  next: end  
