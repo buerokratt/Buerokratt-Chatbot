@@ -33,12 +33,20 @@ app.get("/sse/queue/:id", (req, res) => {
 
 app.post("/enqueue", async (req, res) => {
   await enqueueChatId(req.body.id);
-  res.status(200).json({ response: `enqueued successfully` });
+  res.status(200).json({ response: 'enqueued successfully' });
 });
 
 app.post("/dequeue", async (req, res) => {
   await dequeueChatId(req.body.id);
-  res.status(200).json({ response: `dequeued successfully` });
+  res.status(200).json({ response: 'dequeued successfully' });
+});
+
+app.post("/add-chat-to-termination-queue", async (req, res) => {
+  res.status(200).json({ response: 'enqueued successfully' });
+});
+
+app.post("/remove-chat-from-termination-queue", async (req, res) => {
+  res.status(200).json({ response: 'dequeued successfully' });
 });
 
 const server = app.listen(serverConfig.port, () => {

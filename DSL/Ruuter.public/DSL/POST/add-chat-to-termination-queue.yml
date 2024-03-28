@@ -1,0 +1,26 @@
+extractRequestData:
+  assign:
+    chatId: "${incoming.body.message.chatId}"
+    event: "${incoming.body.message.event}"
+    authorRole: ${incoming.body.message.authorRole}
+    authorTimestamp: "${incoming.body.message.authorTimestamp}"
+    status: "${incoming.body.status}"
+  next: addChatToTerminationQueue
+
+addChatToTerminationQueue:
+  call: http.post
+  args:
+    url: "[#CHATBOT_NOTIFICATIONS]/add-chat-to-termination-queue"
+    body:
+      chatId: ${chatId}
+      event: ${event}
+      authorRole: ${authorRole}
+      authorTimestamp: ${authorTimestamp}
+      status: ${status}
+  result: res
+  next: return_chat_added_to_termination_queue
+
+return_chat_added_to_termination_queue:
+  return: "Chat has added to termination queue"
+  status: 200
+  next: end  
