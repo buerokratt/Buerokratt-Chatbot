@@ -5,6 +5,16 @@ extractRequestData:
     authorRole: ${incoming.body.message.authorRole}
     authorTimestamp: "${incoming.body.message.authorTimestamp}"
     status: "${incoming.body.status}"
+  next: updateChatStatus
+
+updateChatStatus:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-termination-status"
+    body:
+      chatId: ${chatId}
+      scheduledForTerminated: ${new Date().toISOString()}
+  result: statusUpdateRes
   next: addChatToTerminationQueue
 
 addChatToTerminationQueue:
