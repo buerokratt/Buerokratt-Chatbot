@@ -41,20 +41,23 @@ app.post("/dequeue", async (req, res) => {
   res.status(200).json({ response: 'dequeued successfully' });
 });
 
-const terminationQueue = new Set();
+const terminationQueue = new Map();
 
 app.post("/add-chat-to-termination-queue", async (req, res) => {
-  terminationQueue[req.body.chatId] = req.body;
+  terminationQueue.set(req.body.chatId, req.body);
   res.status(200).json({ response: 'enqueued successfully' });
 });
 
 app.post("/remove-chat-from-termination-queue", async (req, res) => {
-  const body = terminationQueue[req.body.chatId];
-  fetch(`${process.env.RUUTER_URL}/end-chat`, {
+  const body = terminationQueue.get(req.body.chatId);
+
+  await fetch(`${process.env.RUUTER_URL}/end-chat`, {
     method: 'POST',
     body: JSON.stringify(body),
     headers: { 'Content-Type': 'application/json' },
   });
+  
+  terminationQueue.delete(req.body.chatId);
   res.status(200).json({ response: 'dequeued successfully' });
 });
 
