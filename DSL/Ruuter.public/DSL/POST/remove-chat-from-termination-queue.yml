@@ -1,6 +1,6 @@
 extractRequestData:
   assign:
-    chatId: "${incoming.body.message.chatId}"
+    chatId: "${incoming.body.chatId}"
   next: updateChatStatus
 
 updateChatStatus:
