@@ -206,6 +206,7 @@ services:
       QUEUE_REFRESH_INTERVAL: 4000
       CORS_WHITELIST_ORIGINS: http://localhost:3001,http://localhost:3003,http://localhost:3004,http://localhost:8080
       RUUTER_URL: http://ruuter-private:8088
+      CHAT_TERMINATION_DELAY: 5000
     volumes:
       - /app/node_modules
       - ./notification-server:/app
