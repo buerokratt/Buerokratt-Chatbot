@@ -7,6 +7,7 @@ const {
   buildQueueCounter,
 } = require("./addOns");
 const { enqueueChatId, dequeueChatId } = require("./openSearch");
+const { addToTerminationQueue, removeFromTerminationQueue } = require("./terminationQueue");
 
 const app = express();
 
@@ -41,31 +42,14 @@ app.post("/dequeue", async (req, res) => {
   res.status(200).json({ response: 'dequeued successfully' });
 });
 
-const terminationQueue = new Map();
-
 app.post("/add-chat-to-termination-queue", (req, res) => {
-  const timeout = setTimeout(async () => {
-    await fetch(`${process.env.RUUTER_URL}/end-chat`, {
-      method: 'POST',
-      body: JSON.stringify(req.body),
-      headers: { 'Content-Type': 'application/json' },
-    });
-    
-    terminationQueue.delete(req.body.chatId);
-  }, process.env.CHAT_TERMINATION_DELAY || 5000);
-
-  terminationQueue.set(req.body.chatId, timeout);
-
-  res.status(200).json({ response: 'enqueued successfully' });
+  addToTerminationQueue(req.body.chatId, req.body);
+  res.status(200).json({ response: 'Chat will be terminated soon' });
 });
 
 app.post("/remove-chat-from-termination-queue", (req, res) => {
-  const timeout = terminationQueue.get(req.body.chatId);
-  
-  if(timeout)
-    clearTimeout(timeout);
-  
-  res.status(200).json({ response: 'dequeued successfully' });
+  removeFromTerminationQueue(req.body.chatId);
+  res.status(200).json({ response: 'Chat termination canceled' });
 });
 
 const server = app.listen(serverConfig.port, () => {
