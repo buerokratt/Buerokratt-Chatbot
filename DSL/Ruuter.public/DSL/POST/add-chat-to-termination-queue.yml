@@ -4,7 +4,6 @@ extractRequestData:
     event: "${incoming.body.message.event}"
     authorRole: ${incoming.body.message.authorRole}
     authorTimestamp: "${incoming.body.message.authorTimestamp}"
-    status: "${incoming.body.status}"
   next: updateChatStatus
 
 updateChatStatus:
@@ -26,7 +25,6 @@ addChatToTerminationQueue:
       event: ${event}
       authorRole: ${authorRole}
       authorTimestamp: ${authorTimestamp}
-      status: ${status}
   result: res
   next: return_chat_added_to_termination_queue
 
