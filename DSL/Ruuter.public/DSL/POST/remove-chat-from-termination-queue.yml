@@ -1,16 +1,6 @@
 extractRequestData:
   assign:
     chatId: "${incoming.body.chatId}"
-  next: updateChatStatus
-
-updateChatStatus:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RESQL]/unset-termination-status"
-    body:
-      chatId: ${chatId}
-  result: statusUpdateRes
-  next: removeChatFromTerminationQueue
 
 removeChatFromTerminationQueue:
   call: http.post
@@ -19,7 +9,6 @@ removeChatFromTerminationQueue:
     body:
       chatId: ${chatId}
   result: res
-  next: return_chat_removed_from_termination_queue
 
 return_chat_removed_from_termination_queue:
   return: "Chat has removed from termination queue"
