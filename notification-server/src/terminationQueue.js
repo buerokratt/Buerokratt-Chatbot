@@ -1,13 +1,18 @@
 const terminationQueue = new Map();
 
-function addToTerminationQueue(id, body, cookies) {
+function addToTerminationQueue(id, cookies) {
   removeFromTerminationQueue(id);
 
   const timeout = setTimeout(async () => {
     await fetch(`${process.env.RUUTER_URL}/end-chat`, {
       method: 'POST',
       body: JSON.stringify({
-        message: body
+        message: {
+          chatId: id,
+          authorRole: 'end-user',
+          event: 'CLIENT_LEFT_FOR_UNKNOWN_REASONS',
+          authorTimestamp: new Date().toISOString(),
+        }
       }),
       headers: {
         'Content-Type': 'application/json',

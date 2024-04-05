@@ -1,19 +1,10 @@
-extractRequestData:
-  assign:
-    chatId: "${incoming.body.chatId}"
-    event: "${incoming.body.event}"
-    authorRole: "${incoming.body.authorRole}"
-    authorTimestamp: "${incoming.body.authorTimestamp}"
-
 addChatToTerminationQueue:
   call: http.post
   args:
     url: "[#CHATBOT_NOTIFICATIONS]/add-chat-to-termination-queue"
     body:
-      chatId: ${chatId}
-      event: ${event}
-      authorRole: ${authorRole}
-      authorTimestamp: ${authorTimestamp}
+      chatId: ${incoming.body.chatId}
+      cookies: ${incoming.headers.cookie}
   result: res
 
 return_chat_added_to_termination_queue:

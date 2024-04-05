@@ -43,7 +43,7 @@ app.post("/dequeue", async (req, res) => {
 });
 
 app.post("/add-chat-to-termination-queue", (req, res) => {
-  addToTerminationQueue(req.body.chatId, req.body, req.cookies);
+  addToTerminationQueue(req.body.chatId, req.body.cookies);
   res.status(200).json({ response: 'Chat will be terminated soon' });
 });
 
