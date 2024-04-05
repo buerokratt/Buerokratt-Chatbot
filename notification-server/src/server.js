@@ -43,7 +43,25 @@ app.post("/dequeue", async (req, res) => {
 });
 
 app.post("/add-chat-to-termination-queue", (req, res) => {
-  addToTerminationQueue(req.body.chatId, req.body.cookies);
+  addToTerminationQueue(
+    req.body.chatId,
+    () => fetch(`${process.env.RUUTER_URL}/end-chat`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'cookie': req.body.cookie || req.headers.cookie,
+      },
+      body: JSON.stringify({
+        message: {
+          chatId: req.body.chatId,
+          authorRole: 'end-user',
+          event: 'CLIENT_LEFT_FOR_UNKNOWN_REASONS',
+          authorTimestamp: new Date().toISOString(),
+        }
+      }),
+    })
+  );
+
   res.status(200).json({ response: 'Chat will be terminated soon' });
 });
 

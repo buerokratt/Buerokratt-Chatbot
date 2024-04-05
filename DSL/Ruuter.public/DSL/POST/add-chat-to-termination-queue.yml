@@ -4,7 +4,7 @@ addChatToTerminationQueue:
     url: "[#CHATBOT_NOTIFICATIONS]/add-chat-to-termination-queue"
     body:
       chatId: ${incoming.body.chatId}
-      cookies: ${incoming.headers.cookie}
+      cookie: ${incoming.headers.cookie}
   result: res
 
 return_chat_added_to_termination_queue:

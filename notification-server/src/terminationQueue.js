@@ -1,37 +1,21 @@
 const terminationQueue = new Map();
 
-function addToTerminationQueue(id, cookies) {
-  removeFromTerminationQueue(id);
-
+function addToTerminationQueue(id, callback) {
   const timeout = setTimeout(async () => {
-    await fetch(`${process.env.RUUTER_URL}/end-chat`, {
-      method: 'POST',
-      body: JSON.stringify({
-        message: {
-          chatId: id,
-          authorRole: 'end-user',
-          event: 'CLIENT_LEFT_FOR_UNKNOWN_REASONS',
-          authorTimestamp: new Date().toISOString(),
-        }
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-        Cookie: cookies,
-      },
-    });
+    const abort = terminationQueue.get(`${id}-abort`);
+    if(!abort) {
+      await callback();
+    }
     
-    terminationQueue.delete(id);
+    terminationQueue.delete(`${id}-timeout`);
+    terminationQueue.delete(`${id}-abort`);
   }, process.env.CHAT_TERMINATION_DELAY || 5000);
 
-  terminationQueue.set(id, timeout);
+  terminationQueue.set(`${id}-timeout`, timeout);
 }
 
 function removeFromTerminationQueue(id) {
-  const timeout = terminationQueue.get(id);
-  
-  if(timeout) {
-    clearTimeout(timeout);
-  }  
+  terminationQueue.set(`${id}-abort`, true);
 }
 
 module.exports = {
