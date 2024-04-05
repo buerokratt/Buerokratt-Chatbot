@@ -67,7 +67,7 @@ app.post("/add-chat-to-termination-queue", (req, res) => {
 
 app.post("/remove-chat-from-termination-queue", (req, res) => {
   removeFromTerminationQueue(req.body.chatId);
-  res.status(200).json({ response: 'Chat termination canceled' });
+  res.status(200).json({ response: 'Chat termination will be canceled' });
 });
 
 const server = app.listen(serverConfig.port, () => {
