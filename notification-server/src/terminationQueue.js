@@ -14,14 +14,12 @@ function removeFromTerminationQueue(id) {
 }
 
 function spliceAborts(id) {
-  const abortIndex = abortQueue.findIndex(findAbortPredicate(Date.now()));
+  const abortIndex = abortQueue.findIndex((x) => x.id === id && 5000 > (Date.now() - x.at));
   if(abortIndex === -1) {
     return [];
   }
   return abortQueue.splice(abortIndex, 1);
 }
-
-const findAbortPredicate = (now) => (x) => x.id === id && 5000 > (now - x.at);
 
 module.exports = {
   addToTerminationQueue,
