@@ -1,28 +1,27 @@
-const terminationQueue = new Map();
+const abortQueue = [];
+const TIMEOUT = process.env.CHAT_TERMINATION_DELAY || 5000;
 
 function addToTerminationQueue(id, callback) {
-  const timeout = setTimeout(async () => {
-    if(!isAborted(id))
+  setTimeout(async () => {
+    const aborts = spliceAborts(id);
+    if(aborts.length === 0)
       await callback();
-    
-    cleanUp(id);
-  }, process.env.CHAT_TERMINATION_DELAY || 5000);
-
-  terminationQueue.set(`${id}-timeout`, timeout);
+  }, TIMEOUT);
 }
 
 function removeFromTerminationQueue(id) {
-  terminationQueue.set(`${id}-abort`, true);
+  abortQueue.push({ id, at: Date.now() });
 }
 
-function isAborted(id) {
-  return terminationQueue.get(`${id}-abort`)
+function spliceAborts(id) {
+  const abortIndex = abortQueue.findIndex(findAbortPredicate(Date.now()));
+  if(abortIndex === -1) {
+    return [];
+  }
+  return abortQueue.splice(abortIndex, 1);
 }
 
-function cleanUp(id) {
-  terminationQueue.delete(`${id}-timeout`);
-  terminationQueue.delete(`${id}-abort`);
-}
+const findAbortPredicate = (now) => (x) => x.id === id && 5000 > (now - x.at);
 
 module.exports = {
   addToTerminationQueue,
