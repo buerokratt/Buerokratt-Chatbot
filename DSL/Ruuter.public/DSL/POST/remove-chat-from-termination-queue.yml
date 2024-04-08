@@ -1,0 +1,12 @@
+removeChatFromTerminationQueue:
+  call: http.post
+  args:
+    url: "[#CHATBOT_NOTIFICATIONS]/remove-chat-from-termination-queue"
+    body:
+      chatId: ${incoming.body.chatId}
+  result: res
+
+return_chat_removed_from_termination_queue:
+  return: "Chat has removed from termination queue"
+  status: 200
+  next: end  
