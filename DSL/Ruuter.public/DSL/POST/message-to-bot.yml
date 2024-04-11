@@ -193,6 +193,50 @@ add_chat_id_to_queue_notification_node:
       id: ${chatId}
   result: add_chat_id_to_queue_notification_node_res
   
+extract_bot_responses:
+  assign:
+    botMsg: ${post_message_to_client_result.response.body}
+
+check_if_bot_message_start_with_hash:
+  switch:
+    - condition: ${botMsg.startsWith('#')}
+      next: extrat_trigger_service_info
+  next: convert_bot_responses_to_messages
+
+extrat_trigger_service_info:
+  assign:
+    trigger_service_name: ${botMsg.split(';')[0].replace("#", "").trim()}
+    trigger_service_params: ${botMsg.split(';')}
+
+check_if_trigger_service_is_exist:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/check-if-trigger-service-is-exist"
+    body:
+      name: ${trigger_service_name}
+  result: trigger_service_is_exist_res
+
+check_for_trigger_service_is_exist_res:
+  switch:
+    - condition: ${trigger_service_is_exist_res.response.body[0].isExist === true}
+      next: call_trigger_service
+  next: return_trigger_service_is_not_exist
+
+call_trigger_service:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RUUTER]/call-trigger-service"
+    body:
+      chatId: ${chatId}
+      name: ${trigger_service_name}
+      params: ${trigger_service_params}
+  result: trigger_service_result
+  next: return_message_sent
+
+return_trigger_service_is_not_exist:
+  assign:
+    botMsg: "service_currently_unavailable"
+
 convert_bot_responses_to_messages:
   call: http.post
   args:
@@ -201,7 +245,7 @@ convert_bot_responses_to_messages:
       type: json
     body:
       data: {
-        "botMessages": "${post_message_to_client_result.response.body}",
+        "botMessages": "${botMsg}",
         "chatId": "${chatId}",
         "authorId": "${get_bot_name_result.response.body[0].value}",
         "authorFirstName": "",
