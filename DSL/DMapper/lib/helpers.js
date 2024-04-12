@@ -25,3 +25,11 @@ export function lookup(configurationArray, key) {
   }
   return "";
 }
+
+export function extractServiceTriggerName(msg) {
+  return msg.split(';')[0].replace('#', '').trim();
+}
+
+export function extractServiceTriggerParams(msg) {
+  return msg.split(';').splice(1).map(p => p.trim());
+}
