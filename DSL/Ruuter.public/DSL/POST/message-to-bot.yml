@@ -211,19 +211,26 @@ extrat_trigger_service_info:
       msg: ${botMsg}
   result: trigger_service_info_res
 
+check_for_trigger_service_info_res:
+  switch:
+    - condition: ${200 <= trigger_service_info_res.response.statusCodeValue && trigger_service_info_res.response.statusCodeValue < 300}
+      next: check_if_trigger_service_is_exist
+  next: return_bad_request
+
 check_if_trigger_service_is_exist:
   call: http.post
   args:
     url: "[#TRAINING_RESQL]/check-if-trigger-service-is-exist"
     body:
-      name: ${trigger_service_info_res.response.body.name}
+      intent: ${trigger_service_info_res.response.body.name}
   result: trigger_service_is_exist_res
 
 check_trigger_service_is_exist_res:
   switch:
-    - condition: ${trigger_service_is_exist_res.response.body.isExist === true}
-      next: call_trigger_service
-  next: return_trigger_service_is_not_exist
+    - condition: ${trigger_service_is_exist_res.response.statusCodeValue >= 300}
+      next: return_trigger_service_is_not_exist
+    - condition: ${trigger_service_is_exist_res.response.body.length === 0}
+      next: return_trigger_service_is_not_exist
 
 call_trigger_service:
   call: http.post
