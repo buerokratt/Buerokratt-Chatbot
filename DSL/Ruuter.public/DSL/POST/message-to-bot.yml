@@ -211,12 +211,6 @@ extrat_trigger_service_info:
       msg: ${botMsg}
   result: trigger_service_info_res
 
-check_for_trigger_service_info_res:
-  switch:
-    - condition: ${200 <= trigger_service_info_res.response.statusCodeValue && trigger_service_info_res.response.statusCodeValue < 300}
-      next: check_if_trigger_service_is_exist
-  next: return_bad_request
-
 check_if_trigger_service_is_exist:
   call: http.post
   args:
