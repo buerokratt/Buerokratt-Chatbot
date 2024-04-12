@@ -1,0 +1,15 @@
+extractRequestData:
+  assign:
+    chatId: ${incoming.body.chatId}
+    name: ${incoming.body.name}
+    params: ${incoming.body.params}
+
+call_the_service:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RUUTER_PUBLIC]/services/active/${name}"
+    body:
+      chatId: ${chatId}
+      params: ${params}
+  result: trigger_service_result
+  next: return_message_sent

@@ -229,7 +229,7 @@ check_trigger_service_is_exist_res:
 call_trigger_service:
   call: http.post
   args:
-    url: "[#CHATBOT_RUUTER]/call-trigger-service"
+    url: "[#CHATBOT_RUUTER]/trigger-a-service"
     body:
       chatId: ${chatId}
       name: ${trigger_service_info_res.response.body.name}
