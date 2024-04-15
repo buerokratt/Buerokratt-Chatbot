@@ -2,6 +2,7 @@ extract_body:
   assign:
     msg: ${incoming.body.msg}
     chatId: ${incoming.body.chatId}
+    autherId: ${incoming.body.autherId}
 
 extrat_trigger_service_info:
   call: http.post
@@ -31,9 +32,10 @@ check_trigger_service_is_exist_res:
 extract_dynamic_body:
   assign:
     dynamicBody:
-      chatId: ${incoming.body.chatId}
+      chatId: ${chatId}
       name: ${trigger_service_info_res.response.body.name}
       params: ${trigger_service_info_res.response.body.params}
+      autherId: ${autherId}
 
 call_the_service:
   call: http.post

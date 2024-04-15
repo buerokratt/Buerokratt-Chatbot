@@ -206,10 +206,11 @@ check_if_bot_message_start_with_hash:
 call_service:
   call: http.post
   args:
-    url: "[#CHATBOT_RUUTER]/call-service"
+    url: "[#CHATBOT_RUUTER_PUBLIC]/call-service"
     body:
       chatId: ${chatId}
       msg: ${botMsg}
+      autherId: ${get_bot_name_result.response.body[0].value}
   result: call_service_result
 
 check_if_call_service_result_is_ok:
