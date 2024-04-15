@@ -31,5 +31,7 @@ export function extractServiceTriggerName(msg) {
 }
 
 export function extractServiceTriggerParams(msg) {
+  if(msg.endsWith(';'))
+    msg = msg.substr(0, msg.length - 1);
   return msg.split(';').splice(1).map(p => p.trim());
 }

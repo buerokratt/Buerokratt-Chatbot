@@ -207,6 +207,8 @@ extrat_trigger_service_info:
   call: http.post
   args:
     url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/extract_trigger_service_info"
+    headers:
+      type: json
     body:
       msg: ${botMsg}
   result: trigger_service_info_res

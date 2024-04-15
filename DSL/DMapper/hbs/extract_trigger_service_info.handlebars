@@ -1,9 +1,9 @@
 {
-  "name": "{{extractServiceTriggerName @root}}",
+  "name": "{{extractServiceTriggerName msg}}",
   "params": [
-  {{#each extractServiceTriggerParams @root}}
+  {{#each (extractServiceTriggerParams msg)}}
     "{{this}}"
-    {{unless @last}},{{/unless}}
+    {{#unless @last}},{{/unless}}
   {{/each}}
   ]
 }
