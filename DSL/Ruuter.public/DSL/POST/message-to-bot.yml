@@ -200,48 +200,32 @@ extract_bot_responses:
 check_if_bot_message_start_with_hash:
   switch:
     - condition: ${botMsg.startsWith('#')}
-      next: extrat_trigger_service_info
+      next: call_service
   next: convert_bot_responses_to_messages
 
-extrat_trigger_service_info:
+call_service:
   call: http.post
   args:
-    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/extract_trigger_service_info"
-    headers:
-      type: json
-    body:
-      msg: ${botMsg}
-  result: trigger_service_info_res
-
-check_if_trigger_service_is_exist:
-  call: http.post
-  args:
-    url: "[#TRAINING_RESQL]/check-if-trigger-service-is-exist"
-    body:
-      intent: ${trigger_service_info_res.response.body.name}
-  result: trigger_service_is_exist_res
-
-check_trigger_service_is_exist_res:
-  switch:
-    - condition: ${trigger_service_is_exist_res.response.statusCodeValue >= 300}
-      next: return_trigger_service_is_not_exist
-    - condition: ${trigger_service_is_exist_res.response.body.length === 0}
-      next: return_trigger_service_is_not_exist
-
-call_trigger_service:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RUUTER]/trigger-a-service"
+    url: "[#CHATBOT_RUUTER]/call-service"
     body:
       chatId: ${chatId}
-      name: ${trigger_service_info_res.response.body.name}
-      params: ${trigger_service_info_res.response.body.params}
-  result: trigger_service_result
-  next: return_message_sent
+      msg: ${botMsg}
+  result: call_service_result
+
+check_if_call_service_result_is_ok:
+  switch:
+    - condition: ${404 === call_service_result.response.statusCodeValue}
+      next: return_trigger_service_is_not_exist
+  next: return_ok
+
+return_ok:
+  status: 200
+  return: "Service called successfully" 
+  next: end   
 
 return_trigger_service_is_not_exist:
   assign:
-    botMsg: "service_currently_unavailable"
+    botMsg: "service_currently_unavailable" 
 
 convert_bot_responses_to_messages:
   call: http.post
