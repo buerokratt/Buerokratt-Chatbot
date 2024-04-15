@@ -2,7 +2,7 @@ extract_body:
   assign:
     msg: ${incoming.body.msg}
     chatId: ${incoming.body.chatId}
-    autherId: ${incoming.body.autherId}
+    authorId: ${incoming.body.authorId}
 
 extrat_trigger_service_info:
   call: http.post
@@ -35,7 +35,7 @@ extract_dynamic_body:
       chatId: ${chatId}
       name: ${trigger_service_info_res.response.body.name}
       params: ${trigger_service_info_res.response.body.params}
-      autherId: ${autherId}
+      authorId: ${authorId}
 
 call_the_service:
   call: http.post
