@@ -31,11 +31,8 @@ check_trigger_service_is_exist_res:
 
 extract_dynamic_body:
   assign:
-    dynamicBody:
-      chatId: ${chatId}
-      name: ${trigger_service_info_res.response.body.name}
-      params: ${trigger_service_info_res.response.body.params}
-      authorId: ${authorId}
+    name: ${trigger_service_is_exist_res.response.body[0].name}
+    params: ${trigger_service_info_res.response.body.params}
 
 call_the_service:
   call: http.post
@@ -43,16 +40,17 @@ call_the_service:
     url: "[#SERVICE_RUUTER_PUBLIC]/services/active/${name}"
     dynamicParameters: true
     body:
-      dynamicBody: ${dynamicBody}
+      chatId: ${chatId}
+      authorId: ${authorId}
+      params: ${params}
   result: service_call_result
-  next: return_ok
-
-return_trigger_service_is_not_exist:
-  status: 404
-  return: "service_currently_unavailable" 
-  next: end
 
 return_ok:
   status: 200
   return: "Service called successfully" 
   next: end   
+
+return_trigger_service_is_not_exist:
+  status: 404
+  return: "service_currently_unavailable" 
+  next: end
