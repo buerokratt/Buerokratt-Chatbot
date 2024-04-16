@@ -61,25 +61,24 @@ decode_content_to_be_sent_to_bot:
   assign:
     decodedContent: ${decodeURIComponent(content)}
 
-post_message_to_client:
+post_message_to_bot:
   call: http.post
   args:
     url: "[#CHATBOT_BOT]/webhooks/rest/webhook"
     body:
       sender: ${chatId}
       message: ${decodedContent}
-  result: post_message_to_client_result
-  next: check_for_post_message_to_client_result
+  result: post_message_to_bot_result
 
-check_for_post_message_to_client_result:
+check_for_post_message_to_bot_result:
   switch:
-    - condition: ${200 <= post_message_to_client_result.response.statusCodeValue && post_message_to_client_result.response.statusCodeValue < 300}
+    - condition: ${200 <= post_message_to_bot_result.response.statusCodeValue && post_message_to_bot_result.response.statusCodeValue < 300}
       next: check_if_bot_is_unable_to_reply
   next: return_bad_request
 
 check_if_bot_is_unable_to_reply:
   switch:
-    - condition: ${post_message_to_client_result.response.body[0].text == 'Suunan teid klienditeenindajale. Varuge natukene kannatust.'}
+    - condition: ${post_message_to_bot_result.response.body[0].text == 'Suunan teid klienditeenindajale. Varuge natukene kannatust.'}
       next: get_organization_working_details
   next: convert_bot_responses_to_messages
 
@@ -205,7 +204,7 @@ convert_bot_responses_to_messages:
       type: json
     body:
       data: {
-        "botMessages": "${post_message_to_client_result.response.body}",
+        "botMessages": "${post_message_to_bot_result.response.body}",
         "chatId": "${chatId}",
         "authorId": "${get_bot_name_result.response.body[0].value}",
         "authorFirstName": "",
