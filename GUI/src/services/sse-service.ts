@@ -1,27 +1,29 @@
 const notificationNodeUrl = import.meta.env.REACT_APP_NOTIFICATION_NODE_URL;
 
 const sse = <T>(url: string, onMessage: (data: T) => void): EventSource => {
-  if(!notificationNodeUrl) {
-    console.error('Notification node url is not defined')
+  if (!notificationNodeUrl) {
+    console.error('Notification node url is not defined');
     throw new Error('Notification node url is not defined');
   }
-  const eventSource = new EventSource(`${notificationNodeUrl}/sse/notifications${url}`);
+  const eventSource = new EventSource(
+    `${notificationNodeUrl}/sse/notifications${url}`
+  );
 
   eventSource.onmessage = (event: MessageEvent) => {
-    if (event.data != undefined && event.data != "undefined") {
-    const response = JSON.parse(event.data);
-    if (response != undefined) {
-      onMessage(Object.values(response)[0] as T);
-    }
+    if (event.data != undefined && event.data != 'undefined') {
+      const response = JSON.parse(event.data);
+      if (response != undefined) {
+        onMessage(Object.values(response)[0] as T);
+      }
     }
   };
 
   eventSource.onopen = () => {
-    console.log("SSE connection Opened");
+    console.log('SSE connection Opened');
   };
-  
+
   eventSource.onerror = () => {
-    console.error('SSE error');
+    // console.error('SSE error, url:', url); // Uncomment this line to see the error in the console
   };
 
   return eventSource;
