@@ -118,6 +118,23 @@ services:
     networks:
       - bykstack
 
+  resql_training:
+    container_name: resql-training
+    image: resql
+    environment:
+      - sqlms.datasources.[0].name=training
+      - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://171.22.247.13:5434/train_db
+      - sqlms.datasources.[0].username=byk
+      - sqlms.datasources.[0].password=01234
+      - logging.level.org.springframework.boot=INFO
+      - server.port=8083
+    ports:
+      - 8083:8083
+    volumes:
+      - ./DSL/Resql.training:/workspace/app/templates/training
+    networks:
+      - bykstack
+
   gui:
     container_name: gui
     environment:
