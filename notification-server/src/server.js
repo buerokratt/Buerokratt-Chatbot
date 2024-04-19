@@ -45,7 +45,7 @@ app.post("/dequeue", async (req, res) => {
 app.post("/add-chat-to-termination-queue", (req, res) => {
   addToTerminationQueue(
     req.body.chatId,
-    () => fetch(`${process.env.RUUTER_URL}/chat/end`, {
+    () => fetch(`${process.env.RUUTER_URL}/chats/end`, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
