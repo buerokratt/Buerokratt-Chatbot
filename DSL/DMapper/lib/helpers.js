@@ -25,3 +25,13 @@ export function lookup(configurationArray, key) {
   }
   return "";
 }
+
+export function extractServiceTriggerName(msg) {
+  return msg.split(';')[0].replace('#', '').trim();
+}
+
+export function extractServiceTriggerParams(msg) {
+  if(msg.endsWith(';'))
+    msg = msg.substr(0, msg.length - 1);
+  return msg.split(';').splice(1).map(p => p.trim());
+}
