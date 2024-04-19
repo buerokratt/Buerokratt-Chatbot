@@ -1,0 +1,43 @@
+post_answer:
+  call: http.post
+  args:
+    url: "PLACEHOLDER-URL"
+    headers:
+      "Content-Type": "application/json"
+      "api-key": "PLACEHOLDER-API-KEY"
+    body:
+      dataSources:
+      - type: AzureCognitiveSearch
+        parameters:
+          "endpoint": "https://gptproov.search.windows.net"
+          "indexName": "proov"
+          "semanticConfiguration": "default"
+          "queryType": "simple"
+          "fieldsMapping": {}
+          "inScope": true
+          "roleInformation": "You are an AI assistant that helps people find information."
+          "filter":
+          "strictness": 3
+          "topNDocuments": 5
+          "key": "PLACEHOLDER-KEY"
+      messages:
+      - "role": "system"
+        "content": "You are an AI assistant that helps people find information."
+      - "role": "user"
+        "content": ${incoming.body.message}
+      deployment: "finetune"
+      temperature: 0
+      top_p: 1
+      max_tokens: 800
+      stream: false
+  result: test
+
+assign_value:
+  assign:
+    correct_value:
+    - recipient_id: ${incoming.body.sender}
+      text: ${test.response.body.choices[0].message.content}
+  next: return_value
+
+return_value:
+  return: ${correct_value}
