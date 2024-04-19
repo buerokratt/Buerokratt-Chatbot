@@ -26,7 +26,7 @@ const App: FC = () => {
   useQuery<{
     data: { custom_jwt_userinfo: UserInfo };
   }>({
-    queryKey: ['custom-jwt/userinfo', 'prod'],
+    queryKey: ['auth/jwt/userinfo', 'prod'],
     onSuccess: (res: { response: UserInfo }) => {
       localStorage.setItem('exp', res.response.JWTExpirationTimestamp);
       return useStore.getState().setUserInfo(res.response);

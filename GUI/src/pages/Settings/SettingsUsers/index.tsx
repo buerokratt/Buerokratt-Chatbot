@@ -23,7 +23,7 @@ const SettingsUsers: FC = () => {
   );
   const [usersList, setUsersList] = useState<User[]>([]);
   const { data: users } = useQuery<User[]>({
-    queryKey: ['account/customer-support-agents', 'prod'],
+    queryKey: ['accounts/customer-support-agents', 'prod'],
     onSuccess(res: any) {
       setUsersList(res.response);
     },
@@ -34,7 +34,7 @@ const SettingsUsers: FC = () => {
     mutationFn: ({ id }: { id: string | number }) => deleteUser(id),
     onSuccess: async () => {
       await queryClient.invalidateQueries([
-        'account/customer-support-agents',
+        'accounts/customer-support-agents',
         'prod',
       ]);
       toast.open({

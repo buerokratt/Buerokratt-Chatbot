@@ -103,7 +103,7 @@ const Chat: FC<ChatProps> = ({
 
   const getCsaStatus = async () => {
     const { data: res } = await apiDev.post(
-      'account/customer-support-activity-by-id',
+      'accounts/customer-support-activity-by-id',
       {
         customerSupportId: userInfo?.idCode ?? '',
       }
@@ -119,14 +119,14 @@ const Chat: FC<ChatProps> = ({
     const onMessage = async (res: any) => {
       if (res === 'preview') {
         const previewMessage = await apiDev.get(
-          'csa/message-preview?chatId=' + chat.id
+          'agents/chats/messages/preview?chatId=' + chat.id
         );
         setPreviewTypingMessage(previewMessage.data.response);
       } else {
         if (messagesList?.length > 0) {
           const res =
             (await apiDev.get(
-              `csa/new-messages?chatId=${chat.id}&lastRead=${
+              `agents/chats/messages/new?chatId=${chat.id}&lastRead=${
                 chat.lastMessageTimestamp?.split('+')[0] ?? ''
               }`
             )) ?? [];
@@ -191,7 +191,7 @@ const Chat: FC<ChatProps> = ({
   }, [chat.id, messagesList]);
 
   const getMessages = async () => {
-    const { data: res } = await apiDev.post('csa/messages-by-id', {
+    const { data: res } = await apiDev.post('agents/messages-by-id', {
       chatId: chat.id,
     });
     if (
@@ -253,7 +253,7 @@ const Chat: FC<ChatProps> = ({
   };
 
   const postMessageMutation = useMutation({
-    mutationFn: (message: Message) => apiDev.post('csa/message', message),
+    mutationFn: (message: Message) => apiDev.post('agents/chats/messages/insert', message),
     onSuccess: () => {},
     onError: (error: AxiosError) => {
       toast.open({
@@ -266,7 +266,7 @@ const Chat: FC<ChatProps> = ({
 
   const postEventMutation = useMutation({
     mutationFn: (message: Message) =>
-      apiDev.post('csa/message', {
+      apiDev.post('agents/chats/messages/insert', {
         chatId: message.chatId ?? '',
         content: '',
         event: message.event ?? '',
@@ -306,7 +306,7 @@ const Chat: FC<ChatProps> = ({
 
   const takeOverChatMutation = useMutation({
     mutationFn: () =>
-      apiDev.post('chat/claim-chat', {
+      apiDev.post('chats/claim', {
         id: chat.id ?? '',
         customerSupportId: userInfo?.idCode ?? '',
         customerSupportDisplayName: userInfo?.displayName ?? '',
@@ -338,7 +338,7 @@ const Chat: FC<ChatProps> = ({
 
   const assignPendingChatMutation = useMutation({
     mutationFn: () =>
-      apiDev.post('chat/assign-pending-chat', {
+      apiDev.post('chats/pending/assign', {
         id: chat.id ?? '',
         customerSupportId: userInfo?.idCode ?? '',
         customerSupportDisplayName: userInfo?.displayName ?? '',
@@ -359,7 +359,7 @@ const Chat: FC<ChatProps> = ({
 
   const endPendingChat = useMutation({
     mutationFn: (event: string) =>
-      apiDev.post('chat/end-chat', {
+      apiDev.post('chats/end', {
         chatId: chat.id ?? '',
         event: event,
         authorTimestamp: new Date().toISOString(),

@@ -56,11 +56,11 @@ const ChatPending: FC = () => {
   }, []);
 
   const { data: csaNameVisiblity } = useQuery<{ isVisible: boolean }>({
-    queryKey: ['csa/name-visibility', 'prod'],
+    queryKey: ['agents/name-visibility', 'prod'],
   });
 
   const { data: csaTitleVisibility } = useQuery<{ isVisible: boolean }>({
-    queryKey: ['csa/title-visibility', 'prod'],
+    queryKey: ['agents/title-visibility', 'prod'],
   });
 
   const groupedPendingChats = useHeaderStore((state) =>
@@ -69,7 +69,7 @@ const ChatPending: FC = () => {
 
   const handleCsaForward = async (chat: ChatType, user: User) => {
     try {
-      await apiDev.post('chat/redirect-chat', {
+      await apiDev.post('chats/redirect', {
         id: chat.id ?? '',
         customerSupportId: user?.idCode ?? '',
         customerSupportDisplayName: user?.displayName ?? '',
@@ -111,7 +111,7 @@ const ChatPending: FC = () => {
     if (!selectedEndChatStatus) return;
 
     try {
-      await apiDev.post('chat/end-chat', {
+      await apiDev.post('chats/end', {
         chatId: selectedChatId,
         event: selectedEndChatStatus.toUpperCase(),
         authorTimestamp: new Date().toISOString(),

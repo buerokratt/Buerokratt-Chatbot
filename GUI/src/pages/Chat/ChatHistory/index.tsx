@@ -100,7 +100,7 @@ const ChatHistory: FC = () => {
 
   const getAllEndedChats = useMutation({
     mutationFn: (data: { startDate: string; endDate: string }) =>
-      apiDev.post('csa/ended-chats', {
+      apiDev.post('agents/chats/ended', {
         startDate: data.startDate,
         endDate: data.endDate,
       }),
@@ -112,7 +112,7 @@ const ChatHistory: FC = () => {
 
   const getChatById = useMutation({
     mutationFn: () =>
-      apiDev.post('chat/chat-by-id', {
+      apiDev.post('chats/get', {
         chatId: passedChatId,
       }),
     onSuccess: (res: any) => {
@@ -159,7 +159,7 @@ const ChatHistory: FC = () => {
 
   const searchChatsMutation = useMutation({
     mutationFn: (searchKey: string) =>
-      apiDev.post('chat/search', {
+      apiDev.post('chats/search', {
         searchKey: searchKey,
       }),
     onSuccess: (res: any) => {
@@ -193,7 +193,7 @@ const ChatHistory: FC = () => {
 
       if (!isChangeable) return;
 
-      await apiDev.post('chat/status', {
+      await apiDev.post('chats/status', {
         chatId: selectedChat!.id,
         event: data.event.toUpperCase(),
         authorTimestamp: new Date().toISOString(),
