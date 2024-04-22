@@ -85,7 +85,7 @@ check_for_fallback_bot:
     url: "[#CHATBOT_RUUTER_PUBLIC]/external-bot"
     body:
       sender: ${chatId}
-      message: ${decodedContent}
+      message: ${content}
   result: fallback_bot_result
   next: check_if_fallback_bot_is_unable_to_reply
 
