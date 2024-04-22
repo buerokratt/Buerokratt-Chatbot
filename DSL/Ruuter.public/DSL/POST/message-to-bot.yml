@@ -78,9 +78,25 @@ check_for_post_message_to_bot_result:
 
 check_if_bot_is_unable_to_reply:
   switch:
-    - condition: ${post_message_to_bot_result.response.body[0].text == 'Suunan teid klienditeenindajale. Varuge natukene kannatust.'}
-      next: get_organization_working_details
+    - condition: ${post_message_to_bot_result.response.body[0].text == 'UNKNOWN'}
+      next: check_for_fallback_bot
   next: extract_bot_responses
+
+check_for_fallback_bot:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RUUTER_PUBLIC]/external-bot"
+    body:
+      sender: ${chatId}
+      message: ${decodedContent}
+  result: fallback_bot_result
+  next: check_if_fallback_bot_is_unable_to_reply
+
+check_if_fallback_bot_is_unable_to_reply:
+  switch:
+    - condition: ${fallback_bot_result.response.body.response[0].text == 'Vabandust, kuid ma ei saa teie küsimusest aru. Kas saaksite palun selgitada, mida soovite teada saada või kuidas saaksin teid aidata?'}
+      next: get_organization_working_details
+  next: convert_fallback_bot_responses_to_messages
 
 get_organization_working_details:
   call: http.post
@@ -202,7 +218,7 @@ extract_bot_responses:
 
 check_if_bot_message_start_with_hash:
   switch:
-    - condition: ${botMsg.startsWith('#')}
+    - condition: ${botMsg[0].text.startsWith('#')}
       next: call_service
   next: convert_bot_responses_to_messages
 
@@ -240,6 +256,25 @@ convert_bot_responses_to_messages:
     body:
       data: {
         "botMessages": "${botMsg}",
+        "chatId": "${chatId}",
+        "authorId": "${get_bot_name_result.response.body[0].value}",
+        "authorFirstName": "",
+        "authorLastName": "",
+        "authorTimestamp": "${new Date().toISOString()}",
+        "created": "${new Date().toISOString()}"
+      }
+  result: converted_messages_res
+  next: add_bot_message_to_db
+
+convert_fallback_bot_responses_to_messages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/bot_responses_to_messages"
+    headers:
+      type: json
+    body:
+      data: {
+        "botMessages": "${fallback_bot_result.response.body.response}",
         "chatId": "${chatId}",
         "authorId": "${get_bot_name_result.response.body[0].value}",
         "authorFirstName": "",
