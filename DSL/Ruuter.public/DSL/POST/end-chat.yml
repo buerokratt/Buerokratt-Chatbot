@@ -118,8 +118,9 @@ assign_chat_cookie:
     chatCookie:
       chatJwt: null
       Domain: "[#DOMAIN]"
-      Secure: false
+      Secure: true
       HttpOnly: true
+      SameSite: "Lax"
       Max-Age: 0
   next: blacklist_client_jwt     
 
@@ -140,8 +141,9 @@ assign_client_cookie:
     clientCookie:
       clientCustomJwtCookie: null
       Domain: "[#DOMAIN]"
-      Secure: false
+      Secure: true
       HttpOnly: true
+      SameSite: "Lax"
       Max-Age: 0
   next: clearChatList
 

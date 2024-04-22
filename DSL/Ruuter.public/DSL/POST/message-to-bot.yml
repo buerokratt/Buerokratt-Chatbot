@@ -75,9 +75,25 @@ check_for_post_message_to_client_result:
 
 check_if_bot_is_unable_to_reply:
   switch:
-    - condition: ${post_message_to_client_result.response.body[0].text == 'Suunan teid klienditeenindajale. Varuge natukene kannatust.'}
+    - condition: ${post_message_to_client_result.response.body[0].text == 'UNKNOWN'}
+      next: check_for_fallback_bot
+  next: extract_bot_responses
+
+check_for_fallback_bot:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RUUTER_PUBLIC]/external-bot"
+    body:
+      sender: ${chatId}
+      message: ${content}
+  result: fallback_bot_result
+  next: check_if_fallback_bot_is_unable_to_reply
+
+check_if_fallback_bot_is_unable_to_reply:
+  switch:
+    - condition: ${fallback_bot_result.response.body.response[0].text == 'Vabandust, kuid ma ei saa teie küsimusest aru. Kas saaksite palun selgitada, mida soovite teada saada või kuidas saaksin teid aidata?'}
       next: get_organization_working_details
-  next: convert_bot_responses_to_messages
+  next: convert_fallback_bot_responses_to_messages
 
 get_organization_working_details:
   call: http.post
@@ -193,6 +209,41 @@ add_chat_id_to_queue_notification_node:
       id: ${chatId}
   result: add_chat_id_to_queue_notification_node_res
   
+extract_bot_responses:
+  assign:
+    botMsg: ${post_message_to_client_result.response.body}
+
+check_if_bot_message_start_with_hash:
+  switch:
+    - condition: ${botMsg[0].text.startsWith('#')}
+      next: call_service
+  next: convert_bot_responses_to_messages
+
+call_service:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RUUTER_PUBLIC]/call-service"
+    body:
+      chatId: ${chatId}
+      msg: ${botMsg}
+      authorId: ${get_bot_name_result.response.body[0].value}
+  result: call_service_result
+
+check_if_call_service_result_is_ok:
+  switch:
+    - condition: ${call_service_result.response.statusCodeValue >= 400}
+      next: return_trigger_service_is_not_exist
+  next: return_ok
+
+return_ok:
+  status: 200
+  return: "Service called successfully" 
+  next: end   
+
+return_trigger_service_is_not_exist:
+  assign:
+    botMsg: "service_currently_unavailable" 
+
 convert_bot_responses_to_messages:
   call: http.post
   args:
@@ -201,7 +252,26 @@ convert_bot_responses_to_messages:
       type: json
     body:
       data: {
-        "botMessages": "${post_message_to_client_result.response.body}",
+        "botMessages": "${botMsg}",
+        "chatId": "${chatId}",
+        "authorId": "${get_bot_name_result.response.body[0].value}",
+        "authorFirstName": "",
+        "authorLastName": "",
+        "authorTimestamp": "${new Date().toISOString()}",
+        "created": "${new Date().toISOString()}"
+      }
+  result: converted_messages_res
+  next: add_bot_message_to_db
+
+convert_fallback_bot_responses_to_messages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/bot_responses_to_messages"
+    headers:
+      type: json
+    body:
+      data: {
+        "botMessages": "${fallback_bot_result.response.body.response}",
         "chatId": "${chatId}",
         "authorId": "${get_bot_name_result.response.body[0].value}",
         "authorFirstName": "",

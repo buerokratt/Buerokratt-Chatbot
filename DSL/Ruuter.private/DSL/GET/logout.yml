@@ -60,8 +60,9 @@ assign_cookie:
       customJwtCookie: null
       Domain: "[#DOMAIN]"
       Max-Age: 0
-      Secure: false
-      HttpOnly: false
+      Secure: true
+      HttpOnly: true
+      SameSite: "Lax"
   next: return_result
 
 return_result:
