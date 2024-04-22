@@ -97,8 +97,9 @@ assign_cookie:
       redirectJwt: ${forwardChatRes.response.body.data.format_forward_destination_response.redirectJwt}
       maxAge: 7200
       Domain: "[#DOMAIN]"
-      Secure: false
-      HttpOnly: false
+      Secure: true
+      HttpOnly: true
+      SameSite: "Lax"
   next: redirectChat
 
 redirectChat:
