@@ -102,13 +102,13 @@ const Header: FC = () => {
   }, [userInfo?.idCode]);
 
   const getMessages = async () => {
-    const { data: res } = await apiDev.get('account/user-profile-settings');
+    const { data: res } = await apiDev.get('accounts/settings');
 
     if (res.response && res.response != 'error: not found')
       setUserProfileSettings(res.response[0]);
   };
   const { data: customerSupportActivity } = useQuery<CustomerSupportActivity>({
-    queryKey: ['account/customer-support-activity', 'prod'],
+    queryKey: ['accounts/customer-support-activity', 'prod'],
     onSuccess(res: any) {
       const activity = res.data.get_customer_support_activity[0];
       setCsaStatus(activity.status);
@@ -117,7 +117,7 @@ const Header: FC = () => {
   });
 
   useQuery<ChatType[]>({
-    queryKey: ['csa/active-chats', 'prod'],
+    queryKey: ['agents/chats/active', 'prod'],
     onSuccess(res: any) {
       useStore.getState().setActiveChats(res.data.get_all_active_chats);
     },
@@ -195,7 +195,7 @@ const Header: FC = () => {
 
   const userProfileSettingsMutation = useMutation({
     mutationFn: async (data: UserProfileSettings) => {
-      await apiDev.post('account/user-profile-settings', {
+      await apiDev.post('accounts/settings', {
         forwardedChatPopupNotifications: data.forwardedChatPopupNotifications,
         forwardedChatSoundNotifications: data.forwardedChatSoundNotifications,
         forwardedChatEmailNotifications: data.newChatEmailNotifications,
@@ -207,7 +207,7 @@ const Header: FC = () => {
       setUserProfileSettings(data);
     },
     onError: async (error: AxiosError) => {
-      await queryClient.invalidateQueries(['account/user-profile-settings']);
+      await queryClient.invalidateQueries(['accounts/settings']);
       toast.open({
         type: 'error',
         title: t('global.notificationError'),
@@ -218,13 +218,13 @@ const Header: FC = () => {
 
   const unClaimAllAssignedChats = useMutation({
     mutationFn: async () => {
-      await apiDev.post('chat/unclaim-all-assigned-chats');
+      await apiDev.post('chats/assigned/unclaim');
     },
   });
 
   const customerSupportActivityMutation = useMutation({
     mutationFn: (data: CustomerSupportActivityDTO) =>
-      apiDev.post('account/customer-support-activity', {
+      apiDev.post('accounts/customer-support-activity', {
         customerSupportActive: data.customerSupportActive,
         customerSupportStatus: data.customerSupportStatus,
       }),
@@ -233,7 +233,7 @@ const Header: FC = () => {
     },
     onError: async (error: AxiosError) => {
       await queryClient.invalidateQueries([
-        'account/customer-support-activity',
+        'accounts/customer-support-activity',
         'prod',
       ]);
       toast.open({
@@ -261,7 +261,7 @@ const Header: FC = () => {
   });
 
   const logoutMutation = useMutation({
-    mutationFn: () => apiDev.post('account/logout'),
+    mutationFn: () => apiDev.post('accounts/logout'),
     onSuccess(_: any) {
       window.location.href = import.meta.env.REACT_APP_CUSTOMER_SERVICE_LOGIN;
     },
