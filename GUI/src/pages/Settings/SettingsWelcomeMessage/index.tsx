@@ -16,7 +16,7 @@ const SettingsWelcomeMessage: FC = () => {
     boolean | undefined
   >(undefined);
   const { data } = useQuery({
-    queryKey: ['greeting/message', 'prod'],
+    queryKey: ['chats/messages/greeting', 'prod'],
     onSuccess: (res: any) => {
       setWelcomeMessage(res.response.est ?? '');
       setWelcomeMessageActivity(res.response.isActive ?? false);

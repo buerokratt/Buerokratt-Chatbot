@@ -78,7 +78,7 @@ assign_cookie:
 postGreetingMessage:
   call: http.post
   args:
-    url: "[#CHATBOT_RUUTER_PUBLIC]/greeting-to-chat"
+    url: "[#CHATBOT_RUUTER_PUBLIC]/chats/greeting"
     body:
       chatId: ${chatUuid}
       authorTimestamp: ${authorTimestamp}
@@ -137,7 +137,7 @@ insertChat:
 postMessageToBot:
   call: http.post
   args:
-    url: "[#CHATBOT_RUUTER_PUBLIC]/message-to-bot"
+    url: "[#CHATBOT_RUUTER_PUBLIC]/internal/message-to-bot"
     body:
       chatId: ${chatUuid}
       content: ${content}

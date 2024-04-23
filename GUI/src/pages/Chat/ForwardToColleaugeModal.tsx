@@ -24,7 +24,7 @@ const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({ chat, onMod
   });
   const [usersList, setUsersList] = useState<User[]>([]);
   const { data: users } = useQuery<User[]>({
-    queryKey: ['account/customer-support-agents', 'prod'],
+    queryKey: ['accounts/customer-support-agents', 'prod'],
     onSuccess(res: any) {
       setUsersList(res.response);
     },

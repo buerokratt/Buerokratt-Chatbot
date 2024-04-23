@@ -62,7 +62,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
     mutationFn: (data: UserDTO) => createUser(data),
     onSuccess: async () => {
       await queryClient.invalidateQueries([
-        'account/customer-support-agents',
+        'accounts/customer-support-agents',
         'prod',
       ]);
       toast.open({
@@ -91,7 +91,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
     }) => editUser(id, userData),
     onSuccess: async () => {
       await queryClient.invalidateQueries([
-        'account/customer-support-agents',
+        'accounts/customer-support-agents',
         'prod',
       ]);
       toast.open({

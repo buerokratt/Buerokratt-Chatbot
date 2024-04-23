@@ -4,7 +4,7 @@ import { User, UserDTO } from 'types/user';
 export async function createUser(userData: UserDTO) {
   const authorities = userData.authorities.map((e) => (e as any).value).filter(item => item);
   const fullName = userData.fullName?.trim();
-  const { data } = await apiDev.post<User>('account/add-user', {
+  const { data } = await apiDev.post<User>('accounts/add', {
     "firstName": fullName?.split(' ').slice(0, 1).join(' ') ?? '',
     "lastName": fullName?.split(' ').slice(1, 2).join(' ') ?? '',
     "userIdCode": userData.idCode,
@@ -17,7 +17,7 @@ export async function createUser(userData: UserDTO) {
 }
 
 export async function checkIfUserExists(userData: UserDTO) {
-  const { data } = await apiDev.post('account/check-user-exists', {
+  const { data } = await apiDev.post('accounts/exists', {
     "userIdCode": userData.idCode
   });
   return data;
@@ -26,7 +26,7 @@ export async function checkIfUserExists(userData: UserDTO) {
 export async function editUser(id: string | number, userData: UserDTO) {
   const authorities = userData.authorities.map((e) => (e as any).value).filter(item => item);
   const fullName = userData.fullName?.trim();
-  const { data } = await apiDev.post<User>('account/edit-user', {
+  const { data } = await apiDev.post<User>('accounts/edit', {
     "firstName": fullName?.split(' ').slice(0, 1).join(' ') ?? '',
     "lastName": fullName?.split(' ').slice(1, 2).join(' ') ?? '',
     "userIdCode": id,
@@ -39,7 +39,7 @@ export async function editUser(id: string | number, userData: UserDTO) {
 }
 
 export async function deleteUser(id: string | number) {
-  const { data } = await apiDev.post<User>('account/delete-user', {
+  const { data } = await apiDev.post<User>('accounts/delete', {
     "userIdCode": id,
   });
   return data;

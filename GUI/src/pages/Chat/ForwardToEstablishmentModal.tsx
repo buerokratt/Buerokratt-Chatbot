@@ -29,7 +29,7 @@ const ForwardToEstablishmentModal: FC<ForwardToEstablishmentModalProps> = ({
     []
   );
   const { data: establishments } = useQuery<Establishment[]>({
-    queryKey: ['chat/establishments', 'prod'],
+    queryKey: ['chats/establishments', 'prod'],
     onSuccess(res: any) {
       setEstablishmentsList(
         (res.data.format_data.establishments as string[]).map(
