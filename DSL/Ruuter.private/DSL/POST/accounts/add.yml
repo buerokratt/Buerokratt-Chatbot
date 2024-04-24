@@ -1,3 +1,22 @@
+declaration:
+  call: declare
+  allowlist:
+    body:
+      - field: firstName
+        type: string
+      - field: lastName
+        type: string
+      - field: userIdCode
+        type: string
+      - field: displayName
+        type: string
+      - field: csaTitle
+        type: string
+      - field: csa_email
+        type: string
+      - field: roles
+        type: array
+
 extractRequestData:
   assign:
     firstName: ${incoming.body.firstName}
