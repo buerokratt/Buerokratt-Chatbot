@@ -227,7 +227,7 @@ const ChatHistory: FC = () => {
 
   const chatCommentChangeMutation = useMutation({
     mutationFn: (data: { chatId: string | number; comment: string }) =>
-      apiDev.post('comments/comment-history', data),
+      apiDev.post('comments/history', data),
     onSuccess: (res, { chatId, comment }) => {
       const updatedChatList = endedChatsList.map((chat) =>
         chat.id === chatId ? { ...chat, comment } : chat

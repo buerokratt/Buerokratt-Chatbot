@@ -15,7 +15,7 @@ setConfigurationValue:
 insertChatAndMessageWhenBotNotActive:
   call: http.post
   args:
-    url: "[#CHATBOT_RUUTER_PRIVATE]/bot/chat-and-message-when-bot-is-not-active"
+    url: "[#CHATBOT_RUUTER_PRIVATE]/internal/chat-and-message-when-bot-is-not-active"
   result: insertChatAndMessageWhenBotNotActiveResult
 
 getConfigurationValue:
