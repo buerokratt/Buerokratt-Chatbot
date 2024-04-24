@@ -42,7 +42,7 @@ const SettingsAppearance: FC = () => {
   const [showColorPalette, setShowColorPalette] = useState(false);
   const [delayFinished, setDelayFinished] = useState(false);
   const { data: widgetConfig } = useQuery<WidgetConfig>({
-    queryKey: ['configs/widget-config', 'prod'],
+    queryKey: ['configs/widget', 'prod'],
     onSuccess: (data) => {
       const res = data.response;
       if (!hasRendered.current) {
@@ -75,7 +75,7 @@ const SettingsAppearance: FC = () => {
 
   const widgetConfigMutation = useMutation({
     mutationFn: (data: WidgetConfig) =>
-      apiDev.post<WidgetConfig>('configs/widget-config', data),
+      apiDev.post<WidgetConfig>('configs/widget', data),
     onSuccess: () => {
       toast.open({
         type: 'success',
