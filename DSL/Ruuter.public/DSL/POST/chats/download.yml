@@ -4,7 +4,7 @@ declaration:
   description: "Decription placeholder for 'DOWNLOAD'"
   method: post
   accepts: json
-  returns: json
+  returns: data:application/pdf
   namespace: backoffice
   allowlist:
     body:

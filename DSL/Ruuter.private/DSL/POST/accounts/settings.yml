@@ -9,26 +9,30 @@ declaration:
   allowlist:
     body:
       - field: forwardedChatEmailNotifications
-        type: string
+        type: boolean
         description: "Body field 'forwardedChatEmailNotifications'"
       - field: forwardedChatPopupNotifications
-        type: string
+        type: boolean
         description: "Body field 'forwardedChatPopupNotifications'"
       - field: forwardedChatSoundNotifications
-        type: string
+        type: boolean
         description: "Body field 'forwardedChatSoundNotifications'"
       - field: newChatEmailNotifications
-        type: string
+        type: boolean
         description: "Body field 'newChatEmailNotifications'"
       - field: newChatPopupNotifications
-        type: string
+        type: boolean
         description: "Body field 'newChatPopupNotifications'"
       - field: newChatSoundNotifications
-        type: string
+        type: boolean
         description: "Body field 'newChatSoundNotifications'"
       - field: useAutocorrect
-        type: string
+        type: boolean
         description: "Body field 'useAutocorrect'"
+    headers:
+      - field: cookie
+        type: string
+        description: "Cookie field"
 
 extractRequestData:
   assign:

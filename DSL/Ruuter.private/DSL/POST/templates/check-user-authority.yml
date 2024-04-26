@@ -6,6 +6,11 @@ declaration:
   accepts: json
   returns: json
   namespace: backoffice
+  allowlist:
+    headers:
+      - field: cookie
+        type: string
+        description: "Cookie field"
 
 get_cookie_info:
   call: http.post

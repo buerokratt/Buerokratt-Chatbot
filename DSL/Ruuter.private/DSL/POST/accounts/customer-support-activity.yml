@@ -14,6 +14,10 @@ declaration:
       - field: customerSupportStatus
         type: string
         description: "Body field 'customerSupportStatus'"
+    headers:
+      - field: cookie
+        type: string
+        description: "Cookie field"
 
 extractRequestData:
   assign:

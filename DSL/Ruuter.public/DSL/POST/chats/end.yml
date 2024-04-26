@@ -11,6 +11,10 @@ declaration:
       - field: status
         type: string
         description: "Body field 'status'"
+    headers:
+      - field: cookie
+        type: string
+        description: "Cookie field"
 
 extractRequestData:
   assign:

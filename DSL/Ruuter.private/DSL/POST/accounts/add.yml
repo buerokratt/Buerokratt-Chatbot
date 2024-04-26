@@ -24,7 +24,7 @@ declaration:
         type: string
         description: "Body field 'lastName'"
       - field: roles
-        type: string
+        type: array
         description: "Body field 'roles'"
       - field: userIdCode
         type: string
