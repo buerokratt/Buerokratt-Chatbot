@@ -1,3 +1,20 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'LABEL-HISTORY'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: chatId
+        type: string
+        description: "Body field 'chatId'"
+      - field: labels
+        type: string
+        description: "Body field 'labels'"
+
 extractRequestData:
   assign:
     labels: ${incoming.body.labels}

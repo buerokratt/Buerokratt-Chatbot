@@ -1,3 +1,12 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'AVAILABLE'"
+  method: get
+  accepts: json
+  returns: json
+  namespace: backoffice
+
 getAvailableCustomerSupportAgents:
   call: http.post
   args:

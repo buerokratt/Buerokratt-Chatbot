@@ -1,3 +1,35 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'SETTINGS'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: forwardedChatEmailNotifications
+        type: string
+        description: "Body field 'forwardedChatEmailNotifications'"
+      - field: forwardedChatPopupNotifications
+        type: string
+        description: "Body field 'forwardedChatPopupNotifications'"
+      - field: forwardedChatSoundNotifications
+        type: string
+        description: "Body field 'forwardedChatSoundNotifications'"
+      - field: newChatEmailNotifications
+        type: string
+        description: "Body field 'newChatEmailNotifications'"
+      - field: newChatPopupNotifications
+        type: string
+        description: "Body field 'newChatPopupNotifications'"
+      - field: newChatSoundNotifications
+        type: string
+        description: "Body field 'newChatSoundNotifications'"
+      - field: useAutocorrect
+        type: string
+        description: "Body field 'useAutocorrect'"
+
 extractRequestData:
   assign:
     forwardedChatPopupNotifications: ${incoming.body.forwardedChatPopupNotifications}

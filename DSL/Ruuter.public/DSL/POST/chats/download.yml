@@ -1,3 +1,20 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'DOWNLOAD'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: chatId
+        type: string
+        description: "Body field 'chatId'"
+      - field: email
+        type: string
+        description: "Body field 'email'"
+
 extractRequestData:
   assign:
     chatId: ${incoming.body.chatId}

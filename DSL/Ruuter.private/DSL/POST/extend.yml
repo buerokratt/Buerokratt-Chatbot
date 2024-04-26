@@ -1,3 +1,12 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'EXTEND'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+
 getConfigurationValue:
   call: http.post
   args:

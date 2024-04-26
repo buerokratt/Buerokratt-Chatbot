@@ -1,21 +1,34 @@
 declaration:
   call: declare
+  version: 0.1
+  description: "Decription placeholder for 'ADD'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
   allowlist:
     body:
-      - field: firstName
-        type: string
-      - field: lastName
-        type: string
-      - field: userIdCode
-        type: string
-      - field: displayName
-        type: string
       - field: csaTitle
         type: string
+        description: "Body field 'csaTitle'"
       - field: csa_email
         type: string
+        description: "Body field 'csa_email'"
+      - field: displayName
+        type: string
+        description: "Body field 'displayName'"
+      - field: firstName
+        type: string
+        description: "Body field 'firstName'"
+      - field: lastName
+        type: string
+        description: "Body field 'lastName'"
       - field: roles
-        type: array
+        type: string
+        description: "Body field 'roles'"
+      - field: userIdCode
+        type: string
+        description: "Body field 'userIdCode'"
 
 extractRequestData:
   assign:

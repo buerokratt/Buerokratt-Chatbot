@@ -1,3 +1,17 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'TITLE-VISIBILITY'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: isVisible
+        type: string
+        description: "Body field 'isVisible'"
+
 extractRequestData:
   assign:
     isVisible: ${incoming.body.isVisible}

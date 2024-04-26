@@ -1,3 +1,12 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'USER-ROLE'"
+  method: get
+  accepts: json
+  returns: json
+  namespace: backoffice
+
 get_user_info:
   call: http.post
   args:

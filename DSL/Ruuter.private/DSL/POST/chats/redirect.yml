@@ -1,3 +1,35 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'REDIRECT'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: csaTitle
+        type: string
+        description: "Body field 'csaTitle'"
+      - field: customerSupportDisplayName
+        type: string
+        description: "Body field 'customerSupportDisplayName'"
+      - field: customerSupportId
+        type: string
+        description: "Body field 'customerSupportId'"
+      - field: forwardedByUser
+        type: string
+        description: "Body field 'forwardedByUser'"
+      - field: forwardedFromCsa
+        type: string
+        description: "Body field 'forwardedFromCsa'"
+      - field: forwardedToCsa
+        type: string
+        description: "Body field 'forwardedToCsa'"
+      - field: id
+        type: string
+        description: "Body field 'id'"
+
 extractRequestData:
   assign:
     id: "${incoming.body.id}"

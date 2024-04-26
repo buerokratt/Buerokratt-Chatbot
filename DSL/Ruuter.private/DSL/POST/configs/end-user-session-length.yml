@@ -1,3 +1,17 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'END-USER-SESSION-LENGTH'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: sessionLength
+        type: string
+        description: "Body field 'sessionLength'"
+
 extractRequestData:
   assign:
     sessionLength: ${incoming.body.sessionLength}

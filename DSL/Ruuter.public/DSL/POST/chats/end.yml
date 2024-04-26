@@ -1,3 +1,17 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'END'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: status
+        type: string
+        description: "Body field 'status'"
+
 extractRequestData:
   assign:
     chatId: "${incoming.body.message.chatId}"

@@ -1,3 +1,20 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'EXTERNAL-BOT'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: message
+        type: string
+        description: "Body field 'message'"
+      - field: sender
+        type: string
+        description: "Body field 'sender'"
+
 post_answer:
   call: http.post
   args:

@@ -1,3 +1,32 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'EVENT'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: authorRole
+        type: string
+        description: "Body field 'authorRole'"
+      - field: authorTimestamp
+        type: string
+        description: "Body field 'authorTimestamp'"
+      - field: content
+        type: string
+        description: "Body field 'content'"
+      - field: event
+        type: string
+        description: "Body field 'event'"
+      - field: id
+        type: string
+        description: "Body field 'id'"
+      - field: rating
+        type: string
+        description: "Body field 'rating'"
+
 extractRequestData:
   assign:
     messageId: ${incoming.body.id}
