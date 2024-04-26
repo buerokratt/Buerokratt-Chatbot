@@ -1,3 +1,12 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'CHAT-AND-MESSAGE-WHEN-BOT-IS-NOT-ACTIVE'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+
 getBotName:
   call: http.post
   args:

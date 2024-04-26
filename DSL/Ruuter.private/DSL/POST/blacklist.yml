@@ -1,3 +1,17 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'BLACKLIST'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    headers:
+      - field: cookie
+        type: string
+        description: "Cookie field"
+
 blacklist_jwt:
   call: http.post
   args:

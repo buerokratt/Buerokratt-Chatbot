@@ -1,3 +1,26 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'ID-NAME'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: chatId
+        type: string
+        description: "Body field 'chatId'"
+      - field: endUserFirstName
+        type: string
+        description: "Body field 'endUserFirstName'"
+      - field: endUserId
+        type: string
+        description: "Body field 'endUserId'"
+      - field: endUserLastName
+        type: string
+        description: "Body field 'endUserLastName'"
+
 assignIncoming:
   assign:
     chatId: "${incoming.body.chatId}"

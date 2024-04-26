@@ -1,3 +1,12 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'GREETING'"
+  method: get
+  accepts: json
+  returns: json
+  namespace: backoffice
+
 getGreetingMessage:
   call: http.post
   args:

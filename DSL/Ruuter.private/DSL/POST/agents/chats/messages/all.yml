@@ -1,3 +1,17 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'ALL'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: chatId
+        type: string
+        description: "Body field 'chatId'"
+
 extractRequestData:
   assign:
     chatId: ${incoming.body.chatId}

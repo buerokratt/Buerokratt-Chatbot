@@ -1,3 +1,24 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'CUSTOMER-SUPPORT-ACTIVITY'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: customerSupportActive
+        type: string
+        description: "Body field 'customerSupportActive'"
+      - field: customerSupportStatus
+        type: string
+        description: "Body field 'customerSupportStatus'"
+    headers:
+      - field: cookie
+        type: string
+        description: "Cookie field"
+
 extractRequestData:
   assign:
     active: ${incoming.body.customerSupportActive}

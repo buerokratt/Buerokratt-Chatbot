@@ -1,3 +1,21 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'NEW'"
+  method: get
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    params:
+      - field: timeRangeBegin
+        type: string
+        description: "Parameter 'timeRangeBegin'"
+    headers:
+      - field: cookie
+        type: string
+        description: "Cookie field"
+
 extractRequestData:
   assign:
     timeRangeBegin: ${incoming.params.timeRangeBegin}

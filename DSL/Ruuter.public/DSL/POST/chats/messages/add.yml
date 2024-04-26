@@ -1,3 +1,30 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'ADD'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: holidayNames
+        type: string
+        description: "Body field 'holidayNames'"
+      - field: holidays
+        type: string
+        description: "Body field 'holidays'"
+      - field: silent
+        type: string
+        description: "Body field 'silent'"
+      - field: message
+        type: json
+        description: "Body field 'message'"
+    headers:
+      - field: cookie
+        type: string
+        description: "Cookie field"
+
 extractRequestData:
   assign:
     authorTimestamp: ${incoming.body.message.authorTimestamp}

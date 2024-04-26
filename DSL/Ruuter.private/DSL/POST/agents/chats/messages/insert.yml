@@ -1,3 +1,39 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'INSERT'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: authorFirstName
+        type: string
+        description: "Body field 'authorFirstName'"
+      - field: authorId
+        type: string
+        description: "Body field 'authorId'"
+      - field: authorRole
+        type: string
+        description: "Body field 'authorRole'"
+      - field: authorTimestamp
+        type: string
+        description: "Body field 'authorTimestamp'"
+      - field: chatId
+        type: string
+        description: "Body field 'chatId'"
+      - field: content
+        type: string
+        description: "Body field 'content'"
+      - field: event
+        type: string
+        description: "Body field 'event'"
+    headers:
+      - field: cookie
+        type: string
+        description: "Cookie field"
+
 extractRequestData:
   assign:
     chatId: ${incoming.body.chatId}

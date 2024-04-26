@@ -1,3 +1,23 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'END'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: authorTimestamp
+        type: string
+        description: "Body field 'authorTimestamp'"
+      - field: chatId
+        type: string
+        description: "Body field 'chatId'"
+      - field: event
+        type: string
+        description: "Body field 'event'"
+
 extractRequestData:
   assign:
     chatId: "${incoming.body.chatId}"

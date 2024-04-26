@@ -1,3 +1,20 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'LOGIN'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: login
+        type: string
+        description: "Body field 'login'"
+      - field: password
+        type: string
+        description: "Body field 'password'"
+
 extractRequestData:
   assign:
     login: ${incoming.body.login}

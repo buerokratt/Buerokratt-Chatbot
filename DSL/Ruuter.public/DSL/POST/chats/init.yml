@@ -1,3 +1,26 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'INIT'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: holidayNames
+        type: string
+        description: "Body field 'holidayNames'"
+      - field: holidays
+        type: string
+        description: "Body field 'holidays'"
+      - field: message
+        type: json
+        description: "Body field 'message'"
+      - field: endUserTechnicalData
+        type: json
+        description: "Body field 'endUserTechnicalData'"
+
 extractRequestData:
   assign:
     authorRole: ${incoming.body.message.authorRole}

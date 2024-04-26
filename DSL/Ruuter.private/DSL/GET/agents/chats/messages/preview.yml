@@ -1,3 +1,17 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'PREVIEW'"
+  method: get
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    params:
+      - field: chatId
+        type: string
+        description: "Parameter 'chatId'"
+
 extractRequestData:
   assign:
     chatId: ${incoming.params.chatId}
