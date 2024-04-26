@@ -11,6 +11,9 @@ declaration:
       - field: status
         type: string
         description: "Body field 'status'"
+      - field: message
+        type: json
+        description: "Body field 'message'"
     headers:
       - field: cookie
         type: string
