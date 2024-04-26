@@ -1,5 +1,5 @@
 authenticate:
-  template: check-user-authority
+  template: templates/check-user-authority
   requestType: post
   headers:
     cookie: ${incoming.headers.cookie}
