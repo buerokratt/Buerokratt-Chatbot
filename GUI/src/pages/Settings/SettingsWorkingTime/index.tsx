@@ -1,4 +1,4 @@
-import { FC, Fragment, useState } from 'react';
+import { FC, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
@@ -137,9 +137,10 @@ const SettingsWorkingTime: FC = () => {
           <Track>
             <label className="Label">
               {t(
-                `${isOrganizationClosedOnWeekEnds
-                  ? 'settings.workingTime.allWeekdaysExceptWeekend'
-                  : 'settings.workingTime.allWeekdays'
+                `${
+                  isOrganizationClosedOnWeekEnds
+                    ? 'settings.workingTime.allWeekdaysExceptWeekend'
+                    : 'settings.workingTime.allWeekdays'
                 }`
               )}
             </label>
@@ -221,14 +222,14 @@ const SettingsWorkingTime: FC = () => {
                           field.onChange(
                             value
                               ? [...field.value.split(','), d.toLowerCase()]
-                                .sort()
-                                .join(',')
+                                  .sort((a, b) => a.localeCompare(b))
+                                  .join(',')
                               : field.value
-                                .split(',')
-                                .filter(
-                                  (pd: string) => pd !== d.toLowerCase()
-                                )
-                                .join(',')
+                                  .split(',')
+                                  .filter(
+                                    (pd: string) => pd !== d.toLowerCase()
+                                  )
+                                  .join(',')
                           );
                         }}
                         checked={field.value?.includes(d.toLowerCase())}

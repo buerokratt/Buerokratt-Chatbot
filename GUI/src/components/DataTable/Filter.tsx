@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState, MouseEvent } from 'react';
+import React, { FC, useState, MouseEvent } from 'react';
 import { Column, Table } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 import { MdOutlineSearch } from 'react-icons/md';
@@ -22,14 +22,6 @@ const Filter: FC<FilterProps> = ({ column, table }) => {
   const columnFilterValue = column.getFilterValue();
 
   useDocumentEscapeListener(() => setFilterOpen(false));
-
-  const sortedUniqueValues = useMemo(
-    () =>
-      typeof firstValue === 'number'
-        ? []
-        : Array.from(column.getFacetedUniqueValues().keys()).sort(),
-    [column.getFacetedUniqueValues()]
-  );
 
   const handleFilterToggle = (e: MouseEvent) => {
     e.stopPropagation();

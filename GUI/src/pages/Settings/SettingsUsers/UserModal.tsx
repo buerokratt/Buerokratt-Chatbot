@@ -219,7 +219,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
                   required={true}
                   options={roles}
                   defaultValue={user?.authorities.map((v) => {
-                    return { label: t(`roles.${v}` ?? ''), value: v };
+                    return { label: t(`roles.${v ?? ''}`), value: v };
                   })}
                   isMulti={true}
                   placeholder={t('global.choose')}
