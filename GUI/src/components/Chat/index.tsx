@@ -1,11 +1,4 @@
-import {
-  ChangeEvent,
-  FC,
-  useEffect,
-  useRef,
-  useState,
-  useTransition,
-} from 'react';
+import { ChangeEvent, FC, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { et } from 'date-fns/locale';
@@ -23,12 +16,10 @@ import { useMutation } from '@tanstack/react-query';
 import { Attachment, AttachmentTypes, Message } from 'types/message';
 import ChatMessage from './ChatMessage';
 import ChatEvent from '../ChatEvent';
-import { findIndex } from 'lodash';
 import { CHAT_INPUT_LENGTH } from 'constants/config';
 import apiDev from 'services/api-dev';
 import ChatTextArea from './ChatTextArea';
-import { ROLES } from 'utils/constants';
-import { AUTHOR_ROLES, MESSAGE_FILE_SIZE_LIMIT } from 'utils/constants';
+import { AUTHOR_ROLES, MESSAGE_FILE_SIZE_LIMIT, ROLES } from 'utils/constants';
 import formatBytes from 'utils/format-bytes';
 import useSendAttachment from 'modules/attachment/hooks';
 import { AxiosError } from 'axios';
@@ -74,14 +65,13 @@ const Chat: FC<ChatProps> = ({
   const { t } = useTranslation();
   const userInfo = useStore((state) => state.userInfo);
   const chatRef = useRef<HTMLDivElement>(null);
-  const [messageGroups, _setMessageGroups] = useState<GroupedMessage[]>([]);
+  const [messageGroups, setMessageGroups] = useState<GroupedMessage[]>([]);
   const messageGroupsRef = useRef(messageGroups);
-  const setMessageGroups = (data: GroupedMessage[]) => {
+  const setMessageGroupsState = (data: GroupedMessage[]) => {
     messageGroupsRef.current = data;
-    _setMessageGroups(data);
+    setMessageGroups(data);
   };
   const toast = useToast();
-  const [isPending, startTransition] = useTransition();
   const [responseText, setResponseText] = useState('');
   const [selectedMessages, setSelectedMessages] = useState<Message[]>([]);
   const chatCsaActive = useHeaderStore((state) => state.chatCsaActive);
@@ -253,7 +243,8 @@ const Chat: FC<ChatProps> = ({
   };
 
   const postMessageMutation = useMutation({
-    mutationFn: (message: Message) => apiDev.post('agents/chats/messages/insert', message),
+    mutationFn: (message: Message) =>
+      apiDev.post('agents/chats/messages/insert', message),
     onSuccess: () => {},
     onError: (error: AxiosError) => {
       toast.open({
@@ -443,7 +434,7 @@ const Chat: FC<ChatProps> = ({
         }
       }
     });
-    setMessageGroups(groupedMessages);
+    setMessageGroupsState(groupedMessages);
   }, [messagesList, endUserFullName]);
 
   useEffect(() => {
@@ -519,68 +510,64 @@ const Chat: FC<ChatProps> = ({
         </div>
 
         <div className="active-chat__group-wrapper">
-          {messageGroups &&
-            messageGroups.map((group, index) => (
-              <div
-                className={clsx([
-                  'active-chat__group',
-                  `active-chat__group--${group.type}`,
-                ])}
-                key={`group-${index}`}
-              >
-                {group.type === 'event' ? (
-                  <ChatEvent message={group.messages[0]} />
-                ) : (
-                  <>
-                    <div className="active-chat__group-initials">
-                      {group.type === 'buerokratt' ||
-                      group.type === 'chatbot' ? (
-                        <BykLogoWhite height={24} />
-                      ) : (
-                        <>
-                          {group.name
-                            .split(' ')
-                            .map((n) => n[0])
-                            .join('')
-                            .toUpperCase()}
-                        </>
-                      )}
-                    </div>
-                    <div className="active-chat__group-name">{group.name}</div>
-                    <div className="active-chat__messages">
-                      {group.messages.map((message, i) => (
-                        <ChatMessage
-                          message={message}
-                          readStatus={messageReadStatusRef}
-                          key={`message-${i}`}
-                          onSelect={(message) =>
-                            setSelectedMessages((prevState) => [
-                              ...prevState,
-                              message,
-                            ])
-                          }
-                        />
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
-            ))}
+          {messageGroups?.map((group, index) => (
+            <div
+              className={clsx([
+                'active-chat__group',
+                `active-chat__group--${group.type}`,
+              ])}
+              key={`${group.type}-${index}`}
+            >
+              {group.type === 'event' ? (
+                <ChatEvent message={group.messages[0]} />
+              ) : (
+                <>
+                  <div className="active-chat__group-initials">
+                    {group.type === 'buerokratt' || group.type === 'chatbot' ? (
+                      <BykLogoWhite height={24} />
+                    ) : (
+                      <>
+                        {group.name
+                          .split(' ')
+                          .map((n) => n[0])
+                          .join('')
+                          .toUpperCase()}
+                      </>
+                    )}
+                  </div>
+                  <div className="active-chat__group-name">{group.name}</div>
+                  <div className="active-chat__messages">
+                    {group.messages.map((message, i) => (
+                      <ChatMessage
+                        message={message}
+                        readStatus={messageReadStatusRef}
+                        key={`${message.id ?? ''}-${i}`}
+                        onSelect={(message) =>
+                          setSelectedMessages((prevState) => [
+                            ...prevState,
+                            message,
+                          ])
+                        }
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          ))}
           {previewTypingMessage && (
-            <>
-              <div className={clsx(['active-chat__group'])} key={`group`}>
-                <div className="active-chat__group-initials">
-                  {<BykLogoWhite height={24} />}
-                </div>
-                <div className="active-chat__group-name">{'User Typing'}</div>
-                <div className="active-chat__messages">
-                  <PreviewMessage
-                    key={`preview-message`}
-                    preview={previewTypingMessage.preview}
-                  />
-                </div>
+            <div className={clsx(['active-chat__group'])} key={`group`}>
+              <div className="active-chat__group-initials">
+                {<BykLogoWhite height={24} />}
               </div>
-            </>
+              <div className="active-chat__group-name">{'User Typing'}</div>
+              <div className="active-chat__messages">
+                <PreviewMessage
+                  key={`preview-message`}
+                  preview={previewTypingMessage.preview}
+                />
+              </div>
+            </div>
           )}
 
           <div id="anchor" ref={chatRef}></div>
@@ -942,7 +929,7 @@ const Chat: FC<ChatProps> = ({
         resolve(fileReader.result);
       };
       fileReader.onerror = (error) => {
-        reject(error);
+        reject(new Error('Error reading file'));
       };
     });
   }

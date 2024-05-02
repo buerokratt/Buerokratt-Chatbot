@@ -90,7 +90,6 @@ const Header: FC = () => {
           localStorage.removeItem('exp');
           window.location.href =
             import.meta.env.REACT_APP_CUSTOMER_SERVICE_LOGIN;
-        } else {
         }
       }
     }, 2000);
@@ -301,7 +300,7 @@ const Header: FC = () => {
     });
   };
 
-  const { getRemainingTime } = useIdleTimer({
+  useIdleTimer({
     onIdle,
     onActive,
     timeout: USER_IDLE_STATUS_TIMEOUT,

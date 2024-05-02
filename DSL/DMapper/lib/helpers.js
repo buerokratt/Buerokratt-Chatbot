@@ -1,5 +1,5 @@
 export function stringToList(str, block) {
-  var out = "";
+  let out = "";
   if (!str) return "";
   const parts = str.split(",");
   parts.map(function (prop, i) {
@@ -18,9 +18,9 @@ export function getUuid() {
 }
 
 export function lookup(configurationArray, key) {
-  for (let i = 0; i < configurationArray.length; i++) {
-    if (configurationArray[i].key === key) {
-      return configurationArray[i].value;
+  for (const element of configurationArray) {
+    if (element.key === key) {
+      return element.value;
     }
   }
   return "";

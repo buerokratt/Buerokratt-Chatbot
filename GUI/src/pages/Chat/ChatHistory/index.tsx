@@ -58,7 +58,7 @@ const ChatHistory: FC = () => {
   const [filteredEndedChatsList, setFilteredEndedChatsList] = useState<
     ChatType[]
   >([]);
-  const [chatMessagesList, setchatMessagesList] = useState<Message[]>([]);
+  const [chatMessagesList, setChatMessagesList] = useState<Message[]>([]);
   const [messagesTrigger, setMessagesTrigger] = useState(false);
   const [selectedColumns, setSelectedColumns] = useState<string[]>(
     preferences ?? []
