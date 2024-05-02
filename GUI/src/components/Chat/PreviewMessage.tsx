@@ -1,11 +1,6 @@
-import { FC, useState } from 'react';
-import { format } from 'date-fns';
+import { FC } from 'react';
 import clsx from 'clsx';
-import { MdOutlineCheck } from 'react-icons/md';
-import { Message } from '../../types/message';
-import { CHAT_EVENTS, MessageStatus } from '../../types/chat';
 import Linkifier from './linkifier';
-import { useTranslation } from 'react-i18next';
 import Track from 'components/Track';
 import './Typing.scss';
 

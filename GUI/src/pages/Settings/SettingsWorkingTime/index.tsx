@@ -36,7 +36,7 @@ const SettingsWorkingTime: FC = () => {
   );
   const { data: workingTime } = useQuery<OrganizationWorkingTime>({
     queryKey: ['configs/organization-working-time', 'prod'],
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       if (Object.keys(control._formValues).length > 0) return;
       reset(getOrganizationTimeData(data.response));
       setKey(key + 1);

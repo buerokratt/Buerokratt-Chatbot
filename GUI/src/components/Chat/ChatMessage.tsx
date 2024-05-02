@@ -6,7 +6,6 @@ import { Message } from '../../types/message';
 import { CHAT_EVENTS, MessageStatus } from '../../types/chat';
 import Linkifier from './linkifier';
 import { useTranslation } from 'react-i18next';
-import Track from 'components/Track';
 import './Typing.scss';
 
 type ChatMessageProps = {

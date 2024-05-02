@@ -74,8 +74,8 @@ const ChatUnanswered: FC = () => {
         forwardedByUser: userInfo?.displayName ?? '',
         forwardedFromCsa: userInfo?.displayName ?? '',
         forwardedToCsa: user?.displayName ?? '',
-      }),
-        setForwardToColleaugeModal(null);
+      });
+      setForwardToColleaugeModal(null);
       loadActiveChats();
       toast.open({
         type: 'success',
@@ -95,7 +95,7 @@ const ChatUnanswered: FC = () => {
     chat: ChatType,
     establishment: string
   ) => {
-    // TODO: Add endpoint for chat forwarding
+    // To be added: Add endpoint for chat forwarding
     setForwardToEstablishmentModal(null);
     toast.open({
       type: 'success',
@@ -142,7 +142,7 @@ const ChatUnanswered: FC = () => {
     >
       <Tabs.List
         className="vertical-tabs__list"
-        aria-label={t('chat.active.list') || ''}
+        aria-label={t('chat.active.list') ?? ''}
         style={{ overflow: 'auto' }}
       >
         <div className="vertical-tabs__group-header">

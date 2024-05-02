@@ -52,7 +52,7 @@ const StartAServiceModal: FC<StartAServiceModalProps> = ({ chat, onModalClose })
 
   const usersColumns = useMemo(() => [
     columnHelper.accessor('name', {
-      header: t('chat.active.service') || '',
+      header: t('chat.active.service') ?? '',
     }),
     columnHelper.display({
       id: 'start',

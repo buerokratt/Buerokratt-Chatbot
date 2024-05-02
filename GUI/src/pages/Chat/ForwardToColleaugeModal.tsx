@@ -36,13 +36,13 @@ const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({ chat, onMod
 
   const usersColumns = useMemo(() => [
     columnHelper.accessor('displayName', {
-      header: t('settings.users.name') || '',
+      header: t('settings.users.name') ?? '',
     }),
     columnHelper.accessor('csaTitle', {
-      header: t('settings.users.displayName') || '',
+      header: t('settings.users.displayName') ?? '',
     }),
     columnHelper.accessor('customerSupportStatus', {
-      header: t('global.status') || '',
+      header: t('global.status') ?? '',
       cell: (props) => (
         <span style={{
           display: 'block',

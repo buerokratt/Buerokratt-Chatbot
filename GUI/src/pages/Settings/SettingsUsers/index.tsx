@@ -59,11 +59,11 @@ const SettingsUsers: FC = () => {
         (row) => `${row.firstName ?? ''} ${row.lastName ?? ''}`,
         {
           id: `name`,
-          header: t('settings.users.name') || '',
+          header: t('settings.users.name') ?? '',
         }
       ),
       columnHelper.accessor('idCode', {
-        header: t('settings.users.idCode') || '',
+        header: t('settings.users.idCode') ?? '',
       }),
       columnHelper.accessor(
         (data: { authorities: ROLES[] }) => {
@@ -74,7 +74,7 @@ const SettingsUsers: FC = () => {
           return output;
         },
         {
-          header: t('settings.users.role') || '',
+          header: t('settings.users.role') ?? '',
           cell: (props) => props.getValue().join(', '),
           filterFn: (row: Row<User>, _, filterValue) => {
             const rowAuthorities: string[] = [];
@@ -89,13 +89,13 @@ const SettingsUsers: FC = () => {
         }
       ),
       columnHelper.accessor('displayName', {
-        header: t('settings.users.displayName') || '',
+        header: t('settings.users.displayName') ?? '',
       }),
       columnHelper.accessor('csaTitle', {
-        header: t('settings.users.userTitle') || '',
+        header: t('settings.users.userTitle') ?? '',
       }),
       columnHelper.accessor('csaEmail', {
-        header: t('settings.users.email') || '',
+        header: t('settings.users.email') ?? '',
       }),
       columnHelper.display({
         id: 'edit',

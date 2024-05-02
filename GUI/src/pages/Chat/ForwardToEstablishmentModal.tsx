@@ -46,7 +46,7 @@ const ForwardToEstablishmentModal: FC<ForwardToEstablishmentModalProps> = ({
   const establishmentsColumns = useMemo(
     () => [
       columnHelper.accessor('name', {
-        header: t('chat.active.establishment') || '',
+        header: t('chat.active.establishment') ?? '',
         cell: (props) => props.getValue(),
       }),
       columnHelper.display({

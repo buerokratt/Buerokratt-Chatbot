@@ -139,7 +139,6 @@ const DataTable: FC<DataTableProps> = (
               {headerGroup.headers.map((header) => (
                 <th key={header.id} style={{ width: (header.column.columnDef as CustomColumnDef).meta?.size }}>
                   {header.isPlaceholder ? null : (
-                    <>
                       <Track gap={8}>
                         {sortable && header.column.getCanSort() && (
                           <button onClick={header.column.getToggleSortingHandler()}>
@@ -156,7 +155,6 @@ const DataTable: FC<DataTableProps> = (
                           <Filter column={header.column} table={table} />
                         )}
                       </Track>
-                    </>
                   )}
                 </th>
               ))}
@@ -186,7 +184,7 @@ const DataTable: FC<DataTableProps> = (
               >
                 <MdOutlineWest />
               </button>
-              <nav role='navigation' aria-label={t('global.paginationNavigation') || ''}>
+              <nav role='navigation' aria-label={t('global.paginationNavigation') ?? ''}>
                 <ul className='links'>
                   {[...Array(table.getPageCount())].map((_, index) => (
                     <li

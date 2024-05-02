@@ -1,7 +1,7 @@
 import { FC, useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { useForm, Controller, useWatch, useFormContext } from 'react-hook-form';
+import { useForm, Controller, useWatch } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { AxiosError } from 'axios';
 
@@ -41,9 +41,9 @@ const SettingsAppearance: FC = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [showColorPalette, setShowColorPalette] = useState(false);
   const [delayFinished, setDelayFinished] = useState(false);
-  const { data: widgetConfig } = useQuery<WidgetConfig>({
+  useQuery<WidgetConfig>({
     queryKey: ['configs/widget', 'prod'],
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       const res = data.response;
       if (!hasRendered.current) {
         reset({
