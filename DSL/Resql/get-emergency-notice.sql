@@ -1,4 +1,4 @@
-SELECT *
+SELECT id, key, value
 FROM configuration
 WHERE key IN (
    'emergencyNoticeText',
@@ -6,4 +6,4 @@ WHERE key IN (
    'emergencyNoticeEndISO',
    'isEmergencyNoticeVisible')
   AND id IN (SELECT max(id) from configuration GROUP BY key)
-  AND deleted = FALSE;
+  AND NOT deleted;

@@ -10,4 +10,4 @@ FROM message m
 LEFT JOIN "user" u ON m.author_id = u.id_code
 WHERE m.chat_base_id = :chatId
   AND m.content != 'message-read'
-ORDER BY m.id;
+ORDER BY m.id ASC;

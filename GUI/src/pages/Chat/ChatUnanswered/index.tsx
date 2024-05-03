@@ -26,9 +26,7 @@ const ChatUnanswered: FC = () => {
     useState<ChatType | null>(null);
   const [forwardToEstablishmentModal, setForwardToEstablishmentModal] =
     useState<ChatType | null>(null);
-  const [sendToEmailModal, setSendToEmailModal] = useState<ChatType | null>(
-    null
-  );
+
   const [selectedEndChatStatus, setSelectedEndChatStatus] = useState<
     string | null
   >(null);
@@ -179,7 +177,7 @@ const ChatUnanswered: FC = () => {
               onChatEnd={setEndChatModal}
               onForwardToColleauge={setForwardToColleaugeModal}
               onForwardToEstablishment={setForwardToEstablishmentModal}
-              onSendToEmail={setSendToEmailModal}
+              onSendToEmail={() => {}} // To be added when endpoint is ready
               onRefresh={loadActiveChats}
             />
           )}
