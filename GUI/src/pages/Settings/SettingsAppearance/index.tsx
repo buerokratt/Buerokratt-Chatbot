@@ -192,9 +192,6 @@ const SettingsAppearance: FC = () => {
                 />
                 {showColorPalette && (
                   <div style={{ position: 'absolute', zIndex: '2' }}>
-                    <div
-                      onClick={() => setShowColorPalette(!showColorPalette)}
-                    />
                     <ChromePicker
                       {...register('widgetColor')}
                       color={widgetColor}
