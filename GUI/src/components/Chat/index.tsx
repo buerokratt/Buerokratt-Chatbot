@@ -358,7 +358,7 @@ const Chat: FC<ChatProps> = ({
   });
 
   const endUserFullName =
-    chat.endUserFirstName !== '' && chat.endUserLastName !== ''
+    chat.endUserFirstName && chat.endUserLastName
       ? `${chat.endUserFirstName} ${chat.endUserLastName}`
       : t('global.anonymous');
 
