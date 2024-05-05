@@ -43,6 +43,16 @@ const ForwardToEstablishmentModal: FC<ForwardToEstablishmentModalProps> = ({
 
   const columnHelper = createColumnHelper<Establishment>();
 
+  const forwardView = (props: any) => (
+    <Button
+      appearance="text"
+      onClick={() => onForward(chat, props.row.original.name)}
+    >
+      <Icon icon={<MdOutlineArrowForward color="rgba(0, 0, 0, 0.54)" />} />
+      {t('global.forward')}
+    </Button>
+  );
+
   const establishmentsColumns = useMemo(
     () => [
       columnHelper.accessor('name', {
@@ -51,17 +61,7 @@ const ForwardToEstablishmentModal: FC<ForwardToEstablishmentModalProps> = ({
       }),
       columnHelper.display({
         id: 'forward',
-        cell: (props) => (
-          <Button
-            appearance="text"
-            onClick={() => onForward(chat, props.row.original.name)}
-          >
-            <Icon
-              icon={<MdOutlineArrowForward color="rgba(0, 0, 0, 0.54)" />}
-            />
-            {t('global.forward')}
-          </Button>
-        ),
+        cell: forwardView,
         meta: {
           size: '1%',
         },

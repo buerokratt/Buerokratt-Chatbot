@@ -53,6 +53,26 @@ const SettingsUsers: FC = () => {
     },
   });
 
+  const editView = (props: any) => (
+    <Button
+      appearance="text"
+      onClick={() => setEditableRow(props.row.original)}
+    >
+      <Icon icon={<MdOutlineEdit />} />
+      {t('global.edit')}
+    </Button>
+  );
+
+  const deleteView = (props: any) => (
+    <Button
+      appearance="text"
+      onClick={() => setDeletableRow(props.row.original.idCode)}
+    >
+      <Icon icon={<MdOutlineDeleteOutline />} />
+      {t('global.delete')}
+    </Button>
+  );
+
   const usersColumns = useMemo(
     () => [
       columnHelper.accessor(
@@ -99,30 +119,14 @@ const SettingsUsers: FC = () => {
       }),
       columnHelper.display({
         id: 'edit',
-        cell: (props) => (
-          <Button
-            appearance="text"
-            onClick={() => setEditableRow(props.row.original)}
-          >
-            <Icon icon={<MdOutlineEdit />} />
-            {t('global.edit')}
-          </Button>
-        ),
+        cell: editView,
         meta: {
           size: '1%',
         },
       }),
       columnHelper.display({
         id: 'delete',
-        cell: (props) => (
-          <Button
-            appearance="text"
-            onClick={() => setDeletableRow(props.row.original.idCode)}
-          >
-            <Icon icon={<MdOutlineDeleteOutline />} />
-            {t('global.delete')}
-          </Button>
-        ),
+        cell: deleteView,
         meta: {
           size: '1%',
         },
