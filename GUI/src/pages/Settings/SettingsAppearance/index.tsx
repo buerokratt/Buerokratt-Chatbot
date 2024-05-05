@@ -183,13 +183,25 @@ const SettingsAppearance: FC = () => {
             onClick={() => setShowColorPalette(!showColorPalette)}
           >
             {
-              <div>
-                <Icon
-                  icon={
-                    <MdOutlinePalette fontSize={20} color="rgba(0,0,0,0.54)" />
-                  }
-                  onIconClicked={() => setShowColorPalette(!showColorPalette)}
-                />
+              <div style={{ flexDirection: 'row' }}>
+                <button
+                  style={{
+                    position: 'absolute',
+                    zIndex: '2',
+                    right: '10px',
+                    bottom: '95%',
+                  }}
+                  onClick={() => setShowColorPalette(!showColorPalette)}
+                >
+                  <Icon
+                    icon={
+                      <MdOutlinePalette
+                        fontSize={20}
+                        color="rgba(0,0,0,0.54)"
+                      />
+                    }
+                  />
+                </button>
                 {showColorPalette && (
                   <div style={{ position: 'absolute', zIndex: '2' }}>
                     <ChromePicker

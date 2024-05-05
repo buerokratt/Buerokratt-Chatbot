@@ -31,7 +31,7 @@ const ChatMessage: FC<ChatMessageProps> = ({
           'active-chat__message--selected': selected,
         })}
       >
-        <div
+        <button
           className={clsx('active-chat__message-text')}
           onClick={() => {
             setSelected(!selected);
@@ -39,7 +39,7 @@ const ChatMessage: FC<ChatMessageProps> = ({
           }}
         >
           <Linkifier message={decodeURIComponent(message.content ?? '')} />
-        </div>
+        </button>
         <time
           dateTime={message.authorTimestamp}
           className="active-chat__message-date"

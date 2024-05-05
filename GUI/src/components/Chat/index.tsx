@@ -6,22 +6,15 @@ import clsx from 'clsx';
 import { MdOutlineAttachFile, MdOutlineSend } from 'react-icons/md';
 import { Button, Icon, Label, Track } from 'components';
 import { ReactComponent as BykLogoWhite } from 'assets/logo-white.svg';
-import {
-  Chat as ChatType,
-  MessageStatus,
-  CHAT_EVENTS,
-  CHAT_STATUS,
-} from 'types/chat';
+import { Chat as ChatType, CHAT_EVENTS, CHAT_STATUS } from 'types/chat';
 import { useMutation } from '@tanstack/react-query';
-import { Attachment, AttachmentTypes, Message } from 'types/message';
+import { AttachmentTypes, Message } from 'types/message';
 import ChatMessage from './ChatMessage';
 import ChatEvent from '../ChatEvent';
 import { CHAT_INPUT_LENGTH } from 'constants/config';
 import apiDev from 'services/api-dev';
 import ChatTextArea from './ChatTextArea';
 import { AUTHOR_ROLES, MESSAGE_FILE_SIZE_LIMIT, ROLES } from 'utils/constants';
-import formatBytes from 'utils/format-bytes';
-import useSendAttachment from 'modules/attachment/hooks';
 import { AxiosError } from 'axios';
 import { useToast } from 'hooks/useToast';
 import useStore from 'store';
@@ -73,14 +66,10 @@ const Chat: FC<ChatProps> = ({
   };
   const toast = useToast();
   const [responseText, setResponseText] = useState('');
-  const [selectedMessages, setSelectedMessages] = useState<Message[]>([]);
   const chatCsaActive = useHeaderStore((state) => state.chatCsaActive);
   const [messagesList, setMessagesList] = useState<Message[]>([]);
   const [latestPermissionMessage, setLatestPermissionMessage] =
     useState<number>(0);
-  const [userInput, setUserInput] = useState<string>('');
-  const [userInputFile, setUserInputFile] = useState<Attachment>();
-  const [errorMessage, setErrorMessage] = useState('');
   const [newMessageEffect] = useNewMessageSound();
   let messagesLength = 0;
   const navigate = useNavigate();
@@ -112,63 +101,56 @@ const Chat: FC<ChatProps> = ({
           'agents/chats/messages/preview?chatId=' + chat.id
         );
         setPreviewTypingMessage(previewMessage.data.response);
-      } else {
-        if (messagesList?.length > 0) {
-          const res =
-            (await apiDev.get(
-              `agents/chats/messages/new?chatId=${chat.id}&lastRead=${
-                chat.lastMessageTimestamp?.split('+')[0] ?? ''
-              }`
-            )) ?? [];
-          const messages = res.data.response;
-          setPreviewTypingMessage(undefined);
-          const filteredMessages = messages?.filter((newMessage: Message) => {
-            return !messagesList.some(
-              (existingMessage) =>
-                existingMessage.id === newMessage.id &&
-                existingMessage.event === newMessage.event
-            );
-          });
+      } else if (messagesList?.length > 0) {
+        const res =
+          (await apiDev.get(
+            `agents/chats/messages/new?chatId=${chat.id}&lastRead=${
+              chat.lastMessageTimestamp?.split('+')[0] ?? ''
+            }`
+          )) ?? [];
+        const messages = res.data.response;
+        setPreviewTypingMessage(undefined);
+        const filteredMessages = messages?.filter((newMessage: Message) => {
+          return filterMessages(messagesList, newMessage);
+        });
 
-          let newDisplayableMessages = filteredMessages?.filter(
-            (msg: Message) => msg.authorId != userInfo?.idCode
-          );
+        let newDisplayableMessages = filteredMessages?.filter(
+          (msg: Message) => msg.authorId != userInfo?.idCode
+        );
 
-          if (newDisplayableMessages?.length > 0) {
-            setMessagesList((oldMessages) => [
-              ...oldMessages,
-              ...newDisplayableMessages,
-            ]);
-          }
+        if (newDisplayableMessages?.length > 0) {
+          setMessagesList((oldMessages) => [
+            ...oldMessages,
+            ...newDisplayableMessages,
+          ]);
+        }
 
-          const askingPermissionsMessages: Message[] = messagesList?.filter(
-            (e: Message) =>
-              e.event === 'ask-permission' ||
-              e.event === 'ask-permission-accepted' ||
-              e.event === 'ask-permission-rejected' ||
-              e.event === 'ask-permission-ignored'
-          );
-          const lastestPermissionDate = new Date(
-            askingPermissionsMessages[askingPermissionsMessages.length - 1]
-              ?.created ?? new Date()
-          );
+        const askingPermissionsMessages: Message[] = messagesList?.filter(
+          (e: Message) =>
+            e.event === 'ask-permission' ||
+            e.event === 'ask-permission-accepted' ||
+            e.event === 'ask-permission-rejected' ||
+            e.event === 'ask-permission-ignored'
+        );
+        const lastestPermissionDate = new Date(
+          askingPermissionsMessages[askingPermissionsMessages.length - 1]
+            ?.created ?? new Date()
+        );
 
-          const lastPermissionMesageSecondsDiff = Math.round(
-            (new Date().getTime() - lastestPermissionDate.getTime()) / 1000
-          );
+        const lastPermissionMesageSecondsDiff = Math.round(
+          (new Date().getTime() - lastestPermissionDate.getTime()) / 1000
+        );
 
-          setLatestPermissionMessage(lastPermissionMesageSecondsDiff ?? 0);
+        setLatestPermissionMessage(lastPermissionMesageSecondsDiff ?? 0);
 
-          const permissionsHandeledMessages: Message[] =
-            filteredMessages?.filter(
-              (e: Message) =>
-                e.event === 'ask-permission-accepted' ||
-                e.event === 'ask-permission-rejected' ||
-                e.event === 'ask-permission-ignored'
-            );
-          if (permissionsHandeledMessages?.length > 0) {
-            getMessages();
-          }
+        const permissionsHandeledMessages: Message[] = filteredMessages?.filter(
+          (e: Message) =>
+            e.event === 'ask-permission-accepted' ||
+            e.event === 'ask-permission-rejected' ||
+            e.event === 'ask-permission-ignored'
+        );
+        if (permissionsHandeledMessages?.length > 0) {
+          getMessages();
         }
       }
     };
@@ -217,7 +199,6 @@ const Chat: FC<ChatProps> = ({
     setMessagesList(res.response);
   };
 
-  const sendAttachmentMutation = useSendAttachment();
   const hiddenFileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleUploadClick = () => {
@@ -232,14 +213,15 @@ const Chat: FC<ChatProps> = ({
 
     if (!base64) return;
 
-    setUserInput(e.target.files[0].name);
-    setUserInputFile({
-      chatId: chat.id,
-      name: e.target.files[0].name,
-      type: e.target.files[0].type as AttachmentTypes,
-      size: e.target.files[0].size,
-      base64: base64,
-    });
+    // To be added: file upload logic
+    // setUserInput(e.target.files[0].name);
+    // setUserInputFile({
+    //   chatId: chat.id,
+    //   name: e.target.files[0].name,
+    //   type: e.target.files[0].type as AttachmentTypes,
+    //   size: e.target.files[0].size,
+    //   base64: base64,
+    // });
   };
 
   const postMessageMutation = useMutation({
@@ -370,11 +352,10 @@ const Chat: FC<ChatProps> = ({
     },
   });
 
-  const [messageReadStatus, _setMessageReadStatus] = useState<MessageStatus>({
+  const messageReadStatusRef = useRef({
     messageId: null,
     readTime: null,
   });
-  const messageReadStatusRef = useRef(messageReadStatus);
 
   const endUserFullName =
     chat.endUserFirstName !== '' && chat.endUserLastName !== ''
@@ -409,29 +390,29 @@ const Chat: FC<ChatProps> = ({
             messages: [{ ...message }],
           });
         }
+      } else if (
+        !message.event ||
+        message.event === '' ||
+        message.event === 'greeting'
+      ) {
+        const isBackOfficeUser =
+          message.authorRole === 'backoffice-user'
+            ? `${message.authorFirstName} ${message.authorLastName}`
+            : message.authorRole;
+        groupedMessages.push({
+          name:
+            message.authorRole === 'end-user'
+              ? endUserFullName
+              : isBackOfficeUser,
+          type: message.authorRole,
+          messages: [{ ...message }],
+        });
       } else {
-        if (
-          !message.event ||
-          message.event === '' ||
-          message.event === 'greeting'
-        ) {
-          groupedMessages.push({
-            name:
-              message.authorRole === 'end-user'
-                ? endUserFullName
-                : message.authorRole === 'backoffice-user'
-                ? `${message.authorFirstName} ${message.authorLastName}`
-                : message.authorRole,
-            type: message.authorRole,
-            messages: [{ ...message }],
-          });
-        } else {
-          groupedMessages.push({
-            name: '',
-            type: 'event',
-            messages: [{ ...message }],
-          });
-        }
+        groupedMessages.push({
+          name: '',
+          type: 'event',
+          messages: [{ ...message }],
+        });
       }
     });
     setMessageGroupsState(groupedMessages);
@@ -483,16 +464,6 @@ const Chat: FC<ChatProps> = ({
     setMessagesList((oldMessages) => [...oldMessages, newMessage]);
   };
 
-  const getCsaName = (message: Message) => {
-    return `${
-      isCsaNameVisible
-        ? `${message.authorFirstName} ${message.authorLastName}`
-        : ''
-    } ${
-      isCsaTitleVisible && chat.csaTitle !== null ? chat.csaTitle : ''
-    }`.trim();
-  };
-
   return (
     <div className="active-chat">
       <div className="active-chat__body">
@@ -542,12 +513,10 @@ const Chat: FC<ChatProps> = ({
                         message={message}
                         readStatus={messageReadStatusRef}
                         key={`${message.id ?? ''}-${i}`}
-                        onSelect={(message) =>
-                          setSelectedMessages((prevState) => [
-                            ...prevState,
-                            message,
-                          ])
-                        }
+                        onSelect={(message) => {
+                          // To be added: message selection logic
+                          console.log(message);
+                        }}
                       />
                     ))}
                   </div>
@@ -767,7 +736,6 @@ const Chat: FC<ChatProps> = ({
                   onForwardToColleauge
                     ? () => {
                         onForwardToColleauge(chat);
-                        setSelectedMessages([]);
                       }
                     : undefined
                 }
@@ -823,7 +791,6 @@ const Chat: FC<ChatProps> = ({
                     onForwardToColleauge
                       ? () => {
                           onForwardToColleauge(chat);
-                          setSelectedMessages([]);
                         }
                       : undefined
                   }
@@ -907,14 +874,10 @@ const Chat: FC<ChatProps> = ({
 
   async function handleFileRead(file: File): Promise<string | null> {
     if (!Object.values(AttachmentTypes).some((v) => v === file.type)) {
-      setErrorMessage(`${file.type} file type is not supported`);
       return null;
     }
 
     if (file.size > MESSAGE_FILE_SIZE_LIMIT) {
-      setErrorMessage(
-        `Max allowed file size is ${formatBytes(MESSAGE_FILE_SIZE_LIMIT)}`
-      );
       return null;
     } else {
       return await convertBase64(file);
@@ -934,4 +897,12 @@ const Chat: FC<ChatProps> = ({
     });
   }
 };
+
+function filterMessages(messagesList: Message[], newMessage: Message) {
+  return !messagesList.some(
+    (existingMessage) =>
+      existingMessage.id === newMessage.id &&
+      existingMessage.event === newMessage.event
+  );
+}
 export default Chat;
