@@ -91,13 +91,14 @@ const HistoricalChat: FC<ChatProps> = ({
           });
         }
       } else {
+        const isBackOfficeUser = message.authorRole === 'backoffice-user'
+              ? `${message.authorFirstName} ${message.authorLastName}`
+              : message.authorRole;
         groupedMessages.push({
           name:
             message.authorRole === 'end-user'
               ? endUserFullName
-              : message.authorRole === 'backoffice-user'
-              ? `${message.authorFirstName} ${message.authorLastName}`
-              : message.authorRole,
+              : isBackOfficeUser,
           type: message.authorRole,
           messages: [{ ...message }],
         });
@@ -155,7 +156,7 @@ const HistoricalChat: FC<ChatProps> = ({
                 'historical-chat__group',
                 `historical-chat__group--${group.type}`,
               ])}
-              key={`group-${index}`}
+              key={`${group.name}-${index}`}
             >
               {isEvent(group) ? (
                 <ChatEvent message={group.messages[0]} />
@@ -179,7 +180,7 @@ const HistoricalChat: FC<ChatProps> = ({
                   </div>
                   <div className="historical-chat__messages">
                     {group.messages.map((message, i) => (
-                      <ChatMessage message={message} key={`message-${i}`} />
+                      <ChatMessage message={message} key={`${message.id ?? ''}-${i}`} />
                     ))}
                   </div>
                 </>

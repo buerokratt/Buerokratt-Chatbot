@@ -69,6 +69,14 @@ const SettingsWorkingTime: FC = () => {
     workingTimeMutation.mutate(data)
   );
 
+  function sortAndJoin(array: string[]): string {
+    return array.toSorted((a, b) => a.localeCompare(b)).join(',');
+  }
+
+  function filterAndJoin(array: string[], day: string): string {
+    return array.filter((pd: string) => pd !== day.toLowerCase()).join(',');
+  }
+
   if (!workingTime || Object.keys(control._formValues).length === 0) {
     return <>Loading...</>;
   }
@@ -221,15 +229,14 @@ const SettingsWorkingTime: FC = () => {
                         onCheckedChange={(value) => {
                           field.onChange(
                             value
-                              ? [...field.value.split(','), d.toLowerCase()]
-                                  .sort((a, b) => a.localeCompare(b))
-                                  .join(',')
-                              : field.value
-                                  .split(',')
-                                  .filter(
-                                    (pd: string) => pd !== d.toLowerCase()
-                                  )
-                                  .join(',')
+                              ? sortAndJoin([
+                                  ...field.value.toString().split(','),
+                                  d.toLowerCase(),
+                                ])
+                              : filterAndJoin(
+                                  field.value.toString().split(','),
+                                  d
+                                )
                           );
                         }}
                         checked={field.value?.includes(d.toLowerCase())}

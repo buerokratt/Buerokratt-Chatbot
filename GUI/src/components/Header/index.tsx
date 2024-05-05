@@ -50,7 +50,7 @@ const Header: FC = () => {
   const { t } = useTranslation();
   const userInfo = useStore((state) => state.userInfo);
   const toast = useToast();
-  const [__, setSecondsUntilStatusPopup] = useState(300); // 5 minutes in seconds
+  let secondsUntilStatusPopup = 300;
   const [statusPopupTimerHasStarted, setStatusPopupTimerHasStarted] =
     useState(false);
   const [showStatusConfirmationModal, setShowStatusConfirmationModal] =
@@ -335,16 +335,13 @@ const Header: FC = () => {
 
     setStatusPopupTimerHasStarted((value) => !value);
     const timer = setInterval(() => {
-      setSecondsUntilStatusPopup((prevSeconds) => {
-        if (prevSeconds > 0) {
-          return prevSeconds - 1;
-        } else {
-          clearInterval(timer);
-          setShowStatusConfirmationModal((value) => !value);
-          setStatusPopupTimerHasStarted((value) => !value);
-          return 0;
-        }
-      });
+      let time = secondsUntilStatusPopup;
+      while (time > 0) {
+        time -= 1;
+      }
+      clearInterval(timer);
+      setShowStatusConfirmationModal((value) => !value);
+      setStatusPopupTimerHasStarted((value) => !value);
     }, 1000);
   };
 
