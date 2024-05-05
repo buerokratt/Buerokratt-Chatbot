@@ -357,10 +357,7 @@ const Chat: FC<ChatProps> = ({
     readTime: null,
   });
 
-  const endUserFullName =
-    chat.endUserFirstName && chat.endUserLastName
-      ? `${chat.endUserFirstName} ${chat.endUserLastName}`
-      : t('global.anonymous');
+  const endUserFullName = getUserName();
 
   useEffect(() => {
     if (!messagesList) return;
@@ -871,6 +868,12 @@ const Chat: FC<ChatProps> = ({
       </div>
     </div>
   );
+
+  function getUserName() {
+    return chat.endUserFirstName !== '' && chat.endUserLastName !== ''
+      ? `${chat.endUserFirstName} ${chat.endUserLastName}`
+      : t('global.anonymous');
+  }
 
   async function handleFileRead(file: File): Promise<string | null> {
     if (!Object.values(AttachmentTypes).some((v) => v === file.type)) {
