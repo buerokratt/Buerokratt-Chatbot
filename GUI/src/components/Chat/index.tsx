@@ -760,9 +760,7 @@ const Chat: FC<ChatProps> = ({
               <Button
                 appearance="secondary"
                 disabled={chat.customerSupportId != userInfo?.idCode}
-                onClick={
-                  onStartAService ? () => onStartAService(chat) : undefined
-                }
+                onClick={() => StartAService()}
               >
                 {t('chat.active.startService')}
               </Button>
@@ -784,13 +782,7 @@ const Chat: FC<ChatProps> = ({
               ) && (
                 <Button
                   appearance="secondary"
-                  onClick={
-                    onForwardToColleauge
-                      ? () => {
-                          onForwardToColleauge(chat);
-                        }
-                      : undefined
-                  }
+                  onClick={() => forwardToColleague()}
                 >
                   {t('chat.active.forwardToColleague')}
                 </Button>
@@ -868,6 +860,18 @@ const Chat: FC<ChatProps> = ({
       </div>
     </div>
   );
+
+  function forwardToColleague() {
+    return onForwardToColleauge
+      ? () => {
+          onForwardToColleauge(chat);
+        }
+      : undefined;
+  }
+
+  function StartAService() {
+    return onStartAService ? () => onStartAService(chat) : undefined;
+  }
 
   function getUserName() {
     return chat.endUserFirstName !== '' && chat.endUserLastName !== ''
