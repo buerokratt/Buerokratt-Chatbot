@@ -1,4 +1,4 @@
-SELECT *
+SELECT id, key, value, created
 FROM configuration
 WHERE key IN (
    'organizationMondayWorkingTimeStartISO',
@@ -22,4 +22,4 @@ WHERE key IN (
    'organizationTheSameOnAllWorkingDays',
    'organizationWorkingTimeNationalHolidays')
   AND id IN (SELECT max(id) from configuration GROUP BY key)
-  AND deleted = FALSE;
+  AND NOT deleted;

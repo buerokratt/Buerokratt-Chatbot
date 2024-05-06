@@ -1,7 +1,6 @@
-ARG node_version=node:lts
-ARG nginx_version=nginx:1.21.3-alpine
+ARG nginx_version=nginx:1.25.4-alpine
 
-FROM $node_version as image
+FROM node:22.0.0-alpine AS image
 WORKDIR /usr/buerokratt-chatbot
 COPY ./package*.json ./
 

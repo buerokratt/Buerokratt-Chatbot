@@ -20,7 +20,7 @@ const SettingsChatSettings: FC = () => {
   const { data: botConfig } = useQuery<{ is_bot_active: boolean }>({
     queryKey: ['bots/config/active', 'prod'],
     onSuccess(res: any) {
-      setBotActive(res.response === 'true' ? true : false);
+      setBotActive(res.response === 'true');
     },
   });
   const { data: csaNameVisibility } = useQuery<{ isVisible: boolean }>({

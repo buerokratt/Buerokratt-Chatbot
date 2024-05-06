@@ -10,7 +10,7 @@ This repo will primarily contain:
 ## Dev setup
 
 - Clone [Ruuter](https://github.com/buerokratt/Ruuter)
-- Navigate to Ruuter and build the image `docker build -t ruuter .
+- Navigate to Ruuter and build the image `docker build -t ruuter .`
 - Clone [Resql](https://github.com/buerokratt/Resql)
 - Navigate to Resql and build the image `docker build -t resql .`
 - Clone [Data Mapper](https://github.com/buerokratt/DataMapper)

@@ -8,11 +8,17 @@ const {
 } = require("./addOns");
 const { enqueueChatId, dequeueChatId } = require("./openSearch");
 const { addToTerminationQueue, removeFromTerminationQueue } = require("./terminationQueue");
+const helmet = require("helmet");
+const cookieParser = require("cookie-parser");
+const csurf = require("csurf");
 
 const app = express();
 
 app.use(cors());
+app.use(helmet.hidePoweredBy());
 app.use(express.json({ extended: false }));
+app.use(cookieParser());
+app.use(csurf({ cookie: true }));
 
 app.get("/sse/notifications/:channelId", (req, res) => {
   const { channelId } = req.params;

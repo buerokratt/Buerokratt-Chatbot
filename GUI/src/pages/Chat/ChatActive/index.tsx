@@ -69,25 +69,6 @@ const ChatActive: FC = () => {
     queryKey: ['agents/title-visibility', 'prod'],
   });
 
-  // const sendToEmailMutation = useMutation({
-  //   mutationFn: (data: ChatType) =>
-  //     apiDev.post('history/cs-send-history-to-email', { chatId: data.id }),
-  //   onSuccess: () => {
-  //     toast.open({
-  //       type: 'success',
-  //       title: t('global.notification'),
-  //       message: t('toast.success.messageToUserEmail'),
-  //     });
-  //   },
-  //   onError: (error: AxiosError) => {
-  //     toast.open({
-  //       type: 'error',
-  //       title: t('global.notificationError'),
-  //       message: error.message,
-  //     });
-  //   },
-  //   onSettled: () => setSendToEmailModal(null),
-  // });
 
   const handleCsaForward = async (chat: ChatType, user: User) => {
     try {
@@ -98,9 +79,9 @@ const ChatActive: FC = () => {
         csaTitle: user?.csaTitle ?? '',
         forwardedByUser: userInfo?.displayName ?? '',
         forwardedFromCsa: userInfo?.displayName ?? '',
-        forwardedToCsa: user?.displayName ?? '',
-      }),
-        setForwardToColleaugeModal(null);
+        forwardedToCsa: user?.displayName ?? ''
+      });
+      setForwardToColleaugeModal(null);
       loadActiveChats();
       toast.open({
         type: 'success',
@@ -120,7 +101,7 @@ const ChatActive: FC = () => {
     chat: ChatType,
     establishment: string
   ) => {
-    // TODO: Add endpoint for chat forwarding
+    // To be added: Add endpoint for chat forwarding
     setForwardToEstablishmentModal(null);
     toast.open({
       type: 'success',
@@ -169,7 +150,7 @@ const ChatActive: FC = () => {
       >
         <Tabs.List
           className="vertical-tabs__list"
-          aria-label={t('chat.active.list') || ''}
+          aria-label={t('chat.active.list') ?? ''}
           style={{ overflow: 'auto' }}
         >
           <div className="vertical-tabs__group-header">

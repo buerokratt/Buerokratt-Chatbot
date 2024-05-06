@@ -8,7 +8,7 @@ import './ChatActive.scss';
 const ChatTrigger: FC<{ chat: ChatType }> = ({ chat }) => {
   const { t } = useTranslation();
   const [timeStamp, setTimeStamp] = useState<string>(
-    format(chat.lastMessageTimestamp ?? '' ?? new Date().toISOString, 'et_EE')
+    format(chat.lastMessageTimestamp ?? new Date().toISOString(), 'et_EE')
   );
 
   const timeStampRef = useRef<string>(timeStamp);
@@ -16,7 +16,7 @@ const ChatTrigger: FC<{ chat: ChatType }> = ({ chat }) => {
   useEffect(() => {
     const intervalId = setInterval(() => {
       const currentTimestamp = format(
-        chat.lastMessageTimestamp ?? '' ?? new Date().toISOString(),
+        chat.lastMessageTimestamp ?? new Date().toISOString(),
         'et_EE'
       );
 
@@ -46,7 +46,7 @@ const ChatTrigger: FC<{ chat: ChatType }> = ({ chat }) => {
       </Track>
       <div className="wrapper">
         <p className="last_message">
-          {decodeURIComponent(`${chat.lastMessage}.` ?? '')}
+          {decodeURIComponent(`${chat.lastMessage ?? ''}.`)}
         </p>
       </div>
     </div>

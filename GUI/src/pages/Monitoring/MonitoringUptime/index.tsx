@@ -34,7 +34,7 @@ const MonitoringUptime: FC = () => {
     },
   ]);
 
-  // TODO: Connect API
+  // To be added: Connect API
   // const { data: uptimeData } = useQuery<ComponentHealth[]>({
   //   queryKey: ['health/components-status', 'prod'],
   // });
@@ -42,51 +42,49 @@ const MonitoringUptime: FC = () => {
   return (
     <>
       <h1>{t('monitoring.uptime.title')}</h1>
-
-      {uptimeData &&
-        uptimeData.map((component) => (
-          <Card
-            key={component.name}
-            header={<h2 className="h5">{component.name}</h2>}
-          >
-            <Track direction="vertical" align="left" gap={8}>
-              <Track gap={5} justify="between" style={{ width: '100%' }}>
-                {Array.from({ length: 90 }, (v, i) => i).map((bar) => (
-                  <Tooltip
-                    key={bar}
-                    content={format(
-                      sub(new Date(), { days: 90 - bar - 1 }),
-                      'dd.MM.yyyy'
-                    )}
-                  >
-                    <div
-                      style={{
-                        flex: 1,
-                        height: 60,
-                        backgroundColor: '#308653',
-                      }}
-                    ></div>
-                  </Tooltip>
-                ))}
-              </Track>
-
-              <Track
-                justify="between"
-                gap={16}
-                style={{
-                  color: '#4D4F5D',
-                  fontSize: 14,
-                  lineHeight: '1.5',
-                  width: '100%',
-                }}
-              >
-                <p>{t('monitoring.uptime.daysAgo', { days: 90 })}</p>
-                <p>{t('monitoring.uptime.uptimePercent', { percent: 99 })}</p>
-                <p>{t('global.today')}</p>
-              </Track>
+      {uptimeData?.map((component) => (
+        <Card
+          key={component.name}
+          header={<h2 className="h5">{component.name}</h2>}
+        >
+          <Track direction="vertical" align="left" gap={8}>
+            <Track gap={5} justify="between" style={{ width: '100%' }}>
+              {Array.from({ length: 90 }, (v, i) => i).map((bar) => (
+                <Tooltip
+                  key={bar}
+                  content={format(
+                    sub(new Date(), { days: 90 - bar - 1 }),
+                    'dd.MM.yyyy'
+                  )}
+                >
+                  <div
+                    style={{
+                      flex: 1,
+                      height: 60,
+                      backgroundColor: '#308653',
+                    }}
+                  ></div>
+                </Tooltip>
+              ))}
             </Track>
-          </Card>
-        ))}
+
+            <Track
+              justify="between"
+              gap={16}
+              style={{
+                color: '#4D4F5D',
+                fontSize: 14,
+                lineHeight: '1.5',
+                width: '100%',
+              }}
+            >
+              <p>{t('monitoring.uptime.daysAgo', { days: 90 })}</p>
+              <p>{t('monitoring.uptime.uptimePercent', { percent: 99 })}</p>
+              <p>{t('global.today')}</p>
+            </Track>
+          </Track>
+        </Card>
+      ))}
     </>
   );
 };

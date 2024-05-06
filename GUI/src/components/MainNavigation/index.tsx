@@ -191,7 +191,7 @@ const MainNavigation: FC = () => {
     },
   ];
 
-  const { data } = useQuery({
+  useQuery({
     queryKey: ['/accounts/user-role', 'prod'],
     onSuccess: (res: any) => {
       const filteredItems =
@@ -209,8 +209,6 @@ const MainNavigation: FC = () => {
             case 'ROLE_ANALYST':
               return item.id == 'analytics' || item.id == 'monitoring';
             case 'ROLE_UNAUTHENTICATED':
-              return;
-            default:
               return;
           }
         }) ?? [];
@@ -233,7 +231,7 @@ const MainNavigation: FC = () => {
   const renderMenuTree = (menuItems: MenuItem[]) => {
     return menuItems.map((menuItem) => (
       <li key={menuItem.label}>
-        {!!menuItem.children ? (
+        {menuItem.children ? (
           <>
             <button
               className={clsx('nav__toggle', {
@@ -259,7 +257,7 @@ const MainNavigation: FC = () => {
             </ul>
           </>
         ) : (
-          <NavLink to={menuItem.path || '#'}>{menuItem.label}</NavLink>
+          <NavLink to={menuItem.path ?? '#'}>{menuItem.label}</NavLink>
         )}
       </li>
     ));

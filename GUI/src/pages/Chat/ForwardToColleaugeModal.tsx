@@ -4,7 +4,15 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { MdOutlineArrowForward } from 'react-icons/md';
 
-import { Button, DataTable, Dialog, FormCheckbox, FormInput, Icon, Track } from 'components';
+import {
+  Button,
+  DataTable,
+  Dialog,
+  FormCheckbox,
+  FormInput,
+  Icon,
+  Track,
+} from 'components';
 import { User } from 'types/user';
 import { Chat } from 'types/chat';
 
@@ -12,9 +20,13 @@ type ForwardToColleaugeModalProps = {
   chat: Chat;
   onModalClose: () => void;
   onForward: (chat: Chat, user: User) => void;
-}
+};
 
-const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({ chat, onModalClose, onForward }) => {
+const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({
+  chat,
+  onModalClose,
+  onForward,
+}) => {
   const { t } = useTranslation();
   const [filter, setFilter] = useState('');
   const [showActiveAgents, setShowActiveAgents] = useState(false);
@@ -30,65 +42,90 @@ const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({ chat, onMod
     },
   });
 
-  const filteredUsers = useMemo(() => usersList && showActiveAgents ? usersList?.filter((u) => u.customerSupportStatus === 'online') : usersList, [usersList, showActiveAgents]);
+  const filteredUsers = useMemo(
+    () =>
+      usersList && showActiveAgents
+        ? usersList?.filter((u) => u.customerSupportStatus === 'online')
+        : usersList,
+    [usersList, showActiveAgents]
+  );
 
   const columnHelper = createColumnHelper<User>();
 
-  const usersColumns = useMemo(() => [
-    columnHelper.accessor('displayName', {
-      header: t('settings.users.name') || '',
-    }),
-    columnHelper.accessor('csaTitle', {
-      header: t('settings.users.displayName') || '',
-    }),
-    columnHelper.accessor('customerSupportStatus', {
-      header: t('global.status') || '',
-      cell: (props) => (
-        <span style={{
+  const customerSupportStatusView = (props: any) => {
+    const isIdle = props.getValue() === 'idle' ? '#FFB511' : '#D73E3E';
+    return (
+      <span
+        style={{
           display: 'block',
           width: 16,
           height: 16,
           borderRadius: '50%',
-          backgroundColor: props.getValue() === 'online'
-            ? '#308653'
-            : props.getValue() === 'idle' ? '#FFB511' : '#D73E3E',
-        }}></span>
-      ),
-    }),
-    columnHelper.display({
-      id: 'forward',
-      cell: (props) => (
-        <Button appearance='text' onClick={() => onForward(chat, props.row.original)}>
-          <Icon icon={<MdOutlineArrowForward color='rgba(0, 0, 0, 0.54)' />} />
-          {t('global.forward')}
-        </Button>
-      ),
-      meta: {
-        size: '1%',
-      },
-    }),
-  ], []);
+          backgroundColor: props.getValue() === 'online' ? '#308653' : isIdle,
+        }}
+      ></span>
+    );
+  };
+
+  const forwardView = (props: any) => (
+    <Button
+      appearance="text"
+      onClick={() => onForward(chat, props.row.original)}
+    >
+      <Icon icon={<MdOutlineArrowForward color="rgba(0, 0, 0, 0.54)" />} />
+      {t('global.forward')}
+    </Button>
+  );
+
+  const usersColumns = useMemo(
+    () => [
+      columnHelper.accessor('displayName', {
+        header: t('settings.users.name') ?? '',
+      }),
+      columnHelper.accessor('csaTitle', {
+        header: t('settings.users.displayName') ?? '',
+      }),
+      columnHelper.accessor('customerSupportStatus', {
+        header: t('global.status') ?? '',
+        cell: customerSupportStatusView,
+      }),
+      columnHelper.display({
+        id: 'forward',
+        cell: forwardView,
+        meta: {
+          size: '1%',
+        },
+      }),
+    ],
+    []
+  );
 
   return (
-    <Dialog title={t('chat.active.forwardChat')} onClose={onModalClose} size='large'>
+    <Dialog
+      title={t('chat.active.forwardChat')}
+      onClose={onModalClose}
+      size="large"
+    >
       <Track
-        direction='vertical'
+        direction="vertical"
         gap={8}
         style={{
           margin: '-16px -16px 0',
           padding: '16px',
           borderBottom: '1px solid #D2D3D8',
-        }}>
+        }}
+      >
         <FormInput
           label={t('chat.active.searchByName')}
-          name='search'
+          name="search"
           placeholder={t('chat.active.searchByName') + '...'}
           hideLabel
           onChange={(e) => setFilter(e.target.value)}
         />
         <FormCheckbox
           label={t('chat.active.onlyActiveAgents')}
-          hideLabel name='active'
+          hideLabel
+          name="active"
           item={{
             label: t('chat.active.onlyActiveAgents'),
             value: 'active',

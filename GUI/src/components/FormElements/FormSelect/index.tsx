@@ -1,4 +1,4 @@
-import { FC, forwardRef, ReactNode, SelectHTMLAttributes, useId, useState } from 'react';
+import { forwardRef, ReactNode, SelectHTMLAttributes, useId, useState } from 'react';
 import { useSelect } from 'downshift';
 import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';

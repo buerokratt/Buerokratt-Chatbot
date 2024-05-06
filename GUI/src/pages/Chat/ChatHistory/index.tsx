@@ -21,7 +21,6 @@ import {
   Track,
 } from 'components';
 import { CHAT_EVENTS, CHAT_STATUS, Chat as ChatType } from 'types/chat';
-import { Message } from 'types/message';
 import { useToast } from 'hooks/useToast';
 import apiDev from 'services/api-dev';
 import useStore from 'store';
@@ -58,7 +57,6 @@ const ChatHistory: FC = () => {
   const [filteredEndedChatsList, setFilteredEndedChatsList] = useState<
     ChatType[]
   >([]);
-  const [chatMessagesList, setchatMessagesList] = useState<Message[]>([]);
   const [messagesTrigger, setMessagesTrigger] = useState(false);
   const [selectedColumns, setSelectedColumns] = useState<string[]>(
     preferences ?? []
@@ -136,26 +134,6 @@ const ChatHistory: FC = () => {
     ],
     [t]
   );
-
-  // const sendToEmailMutation = useMutation({
-  //   mutationFn: (data: ChatType) =>
-  //     apiDev.post('history/cs-send-history-to-email', { chatId: data.id }),
-  //   onSuccess: () => {
-  //     toast.open({
-  //       type: 'success',
-  //       title: t('global.notification'),
-  //       message: t('toast.success.messageToUserEmail'),
-  //     });
-  //   },
-  //   onError: (error: AxiosError) => {
-  //     toast.open({
-  //       type: 'error',
-  //       title: t('global.notificationError'),
-  //       message: error.message,
-  //     });
-  //   },
-  //   onSettled: () => setSendToEmailModal(null),
-  // });
 
   const searchChatsMutation = useMutation({
     mutationFn: (searchKey: string) =>
@@ -261,73 +239,101 @@ const ChatHistory: FC = () => {
     });
   };
 
+  const commentView = (props: any) =>
+    !props.getValue() ? (
+      <></>
+    ) : (
+      <Tooltip content={props.getValue()}>
+        <span>
+          {props.getValue() === undefined
+            ? ''
+            : props.getValue()?.slice(0, 30) + '...'}
+        </span>
+      </Tooltip>
+    );
+
+  const statusView = (props: any) => {
+    const isLastMessageEvent =
+      props.row.original.lastMessageEvent != null &&
+      props.row.original.lastMessageEvent !== 'message-read'
+        ? t('chat.plainEvents.' + props.row.original.lastMessageEvent)
+        : t('chat.status.ended');
+    return props.getValue() === CHAT_STATUS.ENDED ? isLastMessageEvent : '';
+  };
+
+  const idView = (props: any) => (
+    <button onClick={() => copyValueToClipboard(props.getValue())}>
+      {props.getValue()}
+    </button>
+  );
+
+  const detailsView = (props: any) => (
+    <Button
+      appearance="text"
+      onClick={() => setSelectedChat(props.row.original)}
+    >
+      <Icon icon={<MdOutlineRemoveRedEye color={'rgba(0,0,0,0.54)'} />} />
+      {t('global.view')}
+    </Button>
+  );
+
+  const forwardView = (props: any) => (
+    <Button
+      appearance="text"
+      onClick={() => setSendToEmailModal(props.row.original)}
+    >
+      <Icon icon={<MdMailOutline color={'rgba(0,0,0,0.54)'} />} />
+      {t('chat.active.sendToEmail')}
+    </Button>
+  );
+
   const endedChatsColumns = useMemo(
     () => [
       columnHelper.accessor('created', {
         id: 'created',
-        header: t('chat.history.startTime') || '',
+        header: t('chat.history.startTime') ?? '',
         cell: (props) =>
           format(new Date(props.getValue()), 'd. MMM yyyy HH:mm:ss'),
       }),
       columnHelper.accessor('ended', {
         id: 'ended',
-        header: t('chat.history.endTime') || '',
+        header: t('chat.history.endTime') ?? '',
         cell: (props) =>
           format(new Date(props.getValue()), 'd. MMM yyyy HH:mm:ss'),
       }),
       columnHelper.accessor('customerSupportDisplayName', {
         id: 'customerSupportDisplayName',
-        header: t('chat.history.csaName') || '',
+        header: t('chat.history.csaName') ?? '',
       }),
       columnHelper.accessor(
         (row) => `${row.endUserFirstName} ${row.endUserLastName}`,
         {
           id: `endUserName`,
-          header: t('global.name') || '',
+          header: t('global.name') ?? '',
         }
       ),
       columnHelper.accessor('endUserId', {
         id: 'endUserId',
-        header: t('global.idCode') || '',
+        header: t('global.idCode') ?? '',
       }),
       columnHelper.accessor('contactsMessage', {
         id: 'contactsMessage',
-        header: t('chat.history.contact') || '',
+        header: t('chat.history.contact') ?? '',
         cell: (props) => (props.getValue() ? t('global.yes') : t('global.no')),
       }),
       columnHelper.accessor('comment', {
         id: 'comment',
-        header: t('chat.history.comment') || '',
-        cell: (props) =>
-          !props.getValue() ? (
-            <></>
-          ) : (
-            <Tooltip content={props.getValue()}>
-              <span>
-                {props.getValue() === undefined
-                  ? ''
-                  : props.getValue()?.slice(0, 30) + '...'}
-              </span>
-            </Tooltip>
-          ),
+        header: t('chat.history.comment') ?? '',
+        cell: commentView,
       }),
       columnHelper.accessor('labels', {
         id: 'labels',
-        header: t('chat.history.label') || '',
+        header: t('chat.history.label') ?? '',
       }),
       columnHelper.accessor('status', {
         id: 'status',
-        header: t('global.status') || '',
-        cell: (props) =>
-          props.getValue() === CHAT_STATUS.ENDED
-            ? props.row.original.lastMessageEvent != null &&
-              props.row.original.lastMessageEvent !== 'message-read'
-              ? t(
-                  'chat.plainEvents.' + props.row.original.lastMessageEvent ??
-                    ''
-                )
-              : t('chat.status.ended')
-            : '',
+        header: t('global.status') ?? '',
+        cell: statusView,
         sortingFn: (a, b, isAsc) => {
           const statusA =
             a.getValue('status') === CHAT_STATUS.ENDED
@@ -348,38 +354,18 @@ const ChatHistory: FC = () => {
       columnHelper.accessor('id', {
         id: 'id',
         header: 'ID',
-        cell: (props) => (
-          <button onClick={() => copyValueToClipboard(props.getValue())}>
-            {props.getValue()}
-          </button>
-        ),
+        cell: idView,
       }),
       columnHelper.display({
         id: 'detail',
-        cell: (props) => (
-          <Button
-            appearance="text"
-            onClick={() => setSelectedChat(props.row.original)}
-          >
-            <Icon icon={<MdOutlineRemoveRedEye color={'rgba(0,0,0,0.54)'} />} />
-            {t('global.view')}
-          </Button>
-        ),
+        cell: detailsView,
         meta: {
           size: '1%',
         },
       }),
       columnHelper.display({
         id: 'forward',
-        cell: (props) => (
-          <Button
-            appearance="text"
-            onClick={() => setSendToEmailModal(props.row.original)}
-          >
-            <Icon icon={<MdMailOutline color={'rgba(0,0,0,0.54)'} />} />
-            {t('chat.active.sendToEmail')}
-          </Button>
-        ),
+        cell: forwardView,
         meta: {
           size: '1%',
         },
@@ -518,7 +504,7 @@ const ChatHistory: FC = () => {
         />
       </Card>
 
-      {selectedChat && chatMessagesList && (
+      {selectedChat && (
         <Drawer
           title={
             selectedChat.endUserFirstName !== '' &&

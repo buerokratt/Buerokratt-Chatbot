@@ -15,7 +15,7 @@ instance.interceptors.response.use(
   },
   (error: AxiosError) => {
     console.log(error);
-    return Promise.reject(error);
+    return Promise.reject(new Error(error.message));
   }
 );
 
@@ -26,12 +26,12 @@ instance.interceptors.request.use(
   (error: AxiosError) => {
     console.log(error);
     if (error.response?.status === 401) {
-      //TODO: handle unauthorized requests
+      // To be added: handle unauthorized requests
     }
     if (error.response?.status === 403) {
-      //TODO: handle unauthorized requests
+      // To be added: handle unauthorized requests
     }
-    return Promise.reject(error);
+    return Promise.reject(new Error(error.message));
   }
 );
 

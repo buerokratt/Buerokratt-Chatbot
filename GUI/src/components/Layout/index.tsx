@@ -1,25 +1,20 @@
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import { Outlet } from 'react-router-dom';
 import useStore from 'store';
 import { MainNavigation } from '@buerokratt-ria/menu';
-import { Header } from "@buerokratt-ria/header"
+import { Header } from '@buerokratt-ria/header';
 import './Layout.scss';
-import {useToast} from "../../hooks/useToast";
+import { useToast } from '../../hooks/useToast';
 
 const Layout: FC = () => {
-  const [MainMenuItems, _] = useState([]);
-
   return (
     <div className="layout">
       <MainNavigation
         serviceId={import.meta.env.REACT_APP_SERVICE_ID.split(',')}
-        items={MainMenuItems}
+        items={[]}
       />
       <div className="layout__wrapper">
-        <Header
-            toastContext={useToast()}
-            user={useStore.getState().userInfo}
-        />
+        <Header toastContext={useToast()} user={useStore.getState().userInfo} />
         <main className="layout__main">
           <Outlet />
         </main>

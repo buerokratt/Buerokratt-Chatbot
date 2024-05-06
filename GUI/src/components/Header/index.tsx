@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
@@ -50,7 +50,7 @@ const Header: FC = () => {
   const { t } = useTranslation();
   const userInfo = useStore((state) => state.userInfo);
   const toast = useToast();
-  const [__, setSecondsUntilStatusPopup] = useState(300); // 5 minutes in seconds
+  let secondsUntilStatusPopup = 300;
   const [statusPopupTimerHasStarted, setStatusPopupTimerHasStarted] =
     useState(false);
   const [showStatusConfirmationModal, setShowStatusConfirmationModal] =
@@ -90,7 +90,6 @@ const Header: FC = () => {
           localStorage.removeItem('exp');
           window.location.href =
             import.meta.env.REACT_APP_CUSTOMER_SERVICE_LOGIN;
-        } else {
         }
       }
     }, 2000);
@@ -140,7 +139,7 @@ const Header: FC = () => {
       ding?.play();
     }
     if (userProfileSettings.newChatEmailNotifications) {
-      // TODO send email notification
+      // To be done: send email notification
     }
     if (userProfileSettings.newChatPopupNotifications) {
       toast.open({
@@ -171,7 +170,7 @@ const Header: FC = () => {
       ding?.play();
     }
     if (userProfileSettings.forwardedChatEmailNotifications) {
-      // TODO send email notification
+      // To be done: send email notification
     }
     if (userProfileSettings.forwardedChatPopupNotifications) {
       toast.open({
@@ -301,7 +300,7 @@ const Header: FC = () => {
     });
   };
 
-  const { getRemainingTime } = useIdleTimer({
+  useIdleTimer({
     onIdle,
     onActive,
     timeout: USER_IDLE_STATUS_TIMEOUT,
@@ -336,16 +335,13 @@ const Header: FC = () => {
 
     setStatusPopupTimerHasStarted((value) => !value);
     const timer = setInterval(() => {
-      setSecondsUntilStatusPopup((prevSeconds) => {
-        if (prevSeconds > 0) {
-          return prevSeconds - 1;
-        } else {
-          clearInterval(timer);
-          setShowStatusConfirmationModal((value) => !value);
-          setStatusPopupTimerHasStarted((value) => !value);
-          return 0;
-        }
-      });
+      let time = secondsUntilStatusPopup;
+      while (time > 0) {
+        time -= 1;
+      }
+      clearInterval(timer);
+      setShowStatusConfirmationModal((value) => !value);
+      setStatusPopupTimerHasStarted((value) => !value);
     }, 1000);
   };
 
@@ -375,8 +371,8 @@ const Header: FC = () => {
                   hideLabel
                   name="csaStatus"
                   onColor="#308653"
-                  onLabel={t('global.present') || ''}
-                  offLabel={t('global.away') || ''}
+                  onLabel={t('global.present') ?? ''}
+                  offLabel={t('global.away') ?? ''}
                 />
               </Track>
               <span

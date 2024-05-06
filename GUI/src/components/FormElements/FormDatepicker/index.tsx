@@ -1,4 +1,4 @@
-import { FC, forwardRef, useId, useState } from 'react';
+import { forwardRef, useId } from 'react';
 import ReactDatePicker, { registerLocale } from 'react-datepicker';
 import clsx from 'clsx';
 import { et } from 'date-fns/locale';

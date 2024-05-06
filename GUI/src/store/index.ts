@@ -165,7 +165,6 @@ const useStore = create<StoreState>((set, get, store) => ({
       activeChats.forEach((c) => {
         if (c.customerSupportId === '') {
           grouped.myChats.push(c);
-          return;
         }
       });
     } else {

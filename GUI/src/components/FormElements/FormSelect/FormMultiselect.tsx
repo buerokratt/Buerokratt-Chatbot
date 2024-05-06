@@ -12,11 +12,12 @@ type SelectOption = { label: string, value: string };
 type FormMultiselectProps = SelectHTMLAttributes<HTMLSelectElement> & {
   label: ReactNode;
   name: string;
+  placeholder?: string;
   hideLabel?: boolean;
   options: SelectOption[];
   selectedOptions?: SelectOption[];
   onSelectionChange?: (selection: SelectOption[] | null) => void;
-}
+};
 
 const FormMultiselect: FC<FormMultiselectProps> = (
   {
@@ -45,15 +46,14 @@ const FormMultiselect: FC<FormMultiselectProps> = (
     items: options,
     stateReducer: (state, actionAndChanges) => {
       const { changes, type } = actionAndChanges;
-      switch (type) {
-        case useSelect.stateChangeTypes.ItemClick:
-          return {
-            ...changes,
-            isOpen: true,
-            highlightedIndex: state.highlightedIndex,
-          };
-        default:
-          return changes;
+      if (type === useSelect.stateChangeTypes.ItemClick) {
+        return {
+          ...changes,
+          isOpen: true,
+          highlightedIndex: state.highlightedIndex,
+        };
+      } else {
+         return changes;
       }
     },
     selectedItem: null,
@@ -98,7 +98,7 @@ const FormMultiselect: FC<FormMultiselectProps> = (
           {isOpen &&
             options.map((item, index) => (
               <li
-                key={`${item}${index}`}
+                key={`${item.label}-${index}`}
                 className={clsx('select__option', { 'select__option--selected': highlightedIndex === index })}
                 {...getItemProps({
                   item,

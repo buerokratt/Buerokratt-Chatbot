@@ -1,4 +1,10 @@
-WITH organization_time AS
+WITH consts AS (
+  SELECT 'HH24:MI:SS' AS timeFormat,
+         '00:00' AS minTime,
+         '23:59:59.999' AS maxTime,
+         'YYYY-MM-DD' AS dateFormat
+),
+organization_time AS
   (SELECT *
    FROM configuration
    WHERE KEY IN ('organizationMondayWorkingTimeStartISO',
@@ -110,128 +116,128 @@ WITH organization_time AS
    WHERE KEY = 'organizationWorkingTimeNationalHolidays'),
      is_within_working_time AS
   (SELECT CASE
-              WHEN is_the_same_on_all_working_days THEN TO_CHAR(:current_timestamp::timestamp, 'HH24:MI:SS')::TIME BETWEEN
-                     (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
+              WHEN is_the_same_on_all_working_days THEN TO_CHAR(:current_timestamp::timestamp, (SELECT timeFormat FROM consts))::TIME BETWEEN
+                     (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
                       FROM all_weekdays_start_time) AND
-                     (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
+                     (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
                       FROM all_weekdays_end_time)
               WHEN current_day.current_day = 'monday' THEN CASE
                                                                WHEN
-                                                                      (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
+                                                                      (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
                                                                        FROM monday_start_time) >
-                                                                      (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
-                                                                       FROM monday_end_time) THEN TO_CHAR(:current_timestamp::timestamp, 'HH24:MI:SS')::TIME BETWEEN
-                                                                      (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
-                                                                       FROM monday_start_time) AND '23:59:59.999'
-                                                                    OR TO_CHAR(:current_timestamp::timestamp, 'HH24:MI:SS')::TIME BETWEEN '00:00' AND
-                                                                      (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
+                                                                      (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
+                                                                       FROM monday_end_time) THEN TO_CHAR(:current_timestamp::timestamp, (SELECT timeFormat FROM consts))::TIME BETWEEN
+                                                                      (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
+                                                                       FROM monday_start_time) AND (SELECT maxTime FROM consts)::TIME
+                                                                    OR TO_CHAR(:current_timestamp::timestamp, (SELECT timeFormat FROM consts))::TIME BETWEEN (SELECT minTime FROM consts)::TIME AND
+                                                                      (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
                                                                        FROM monday_end_time)
-                                                               ELSE TO_CHAR(:current_timestamp::timestamp, 'HH24:MI:SS')::TIME BETWEEN
-                                                                      (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
+                                                               ELSE TO_CHAR(:current_timestamp::timestamp, (SELECT timeFormat FROM consts))::TIME BETWEEN
+                                                                      (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
                                                                        FROM monday_start_time) AND
-                                                                      (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
+                                                                      (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
                                                                        FROM monday_end_time)
                                                            END
               WHEN current_day.current_day = 'tuesday' THEN CASE
                                                                 WHEN
-                                                                       (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
+                                                                       (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
                                                                         FROM tuesday_start_time) >
-                                                                       (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
-                                                                        FROM tuesday_end_time) THEN TO_CHAR(:current_timestamp::timestamp, 'HH24:MI:SS')::TIME BETWEEN
-                                                                       (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
-                                                                        FROM tuesday_start_time) AND '23:59:59.999'
-                                                                     OR TO_CHAR(:current_timestamp::timestamp, 'HH24:MI:SS')::TIME BETWEEN '00:00' AND
-                                                                       (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
+                                                                       (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
+                                                                        FROM tuesday_end_time) THEN TO_CHAR(:current_timestamp::timestamp, (SELECT timeFormat FROM consts))::TIME BETWEEN
+                                                                       (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
+                                                                        FROM tuesday_start_time) AND (SELECT maxTime FROM consts)::TIME
+                                                                     OR TO_CHAR(:current_timestamp::timestamp, (SELECT timeFormat FROM consts))::TIME BETWEEN (SELECT minTime FROM consts)::TIME AND
+                                                                       (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
                                                                         FROM tuesday_end_time)
-                                                                ELSE TO_CHAR(:current_timestamp::timestamp, 'HH24:MI:SS')::TIME BETWEEN
-                                                                       (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
+                                                                ELSE TO_CHAR(:current_timestamp::timestamp, (SELECT timeFormat FROM consts))::TIME BETWEEN
+                                                                       (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
                                                                         FROM tuesday_start_time) AND
-                                                                       (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
+                                                                       (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
                                                                         FROM tuesday_end_time)
                                                             END
               WHEN current_day.current_day = 'wednesday' THEN CASE
                                                                   WHEN
-                                                                         (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
+                                                                         (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
                                                                           FROM wednesday_start_time) >
-                                                                         (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
-                                                                          FROM wednesday_end_time) THEN TO_CHAR(:current_timestamp::timestamp, 'HH24:MI:SS')::TIME BETWEEN
-                                                                         (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
-                                                                          FROM wednesday_start_time) AND '23:59:59.999'
-                                                                       OR TO_CHAR(:current_timestamp::timestamp, 'HH24:MI:SS')::TIME BETWEEN '00:00' AND
-                                                                         (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
+                                                                         (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
+                                                                          FROM wednesday_end_time) THEN TO_CHAR(:current_timestamp::timestamp, (SELECT timeFormat FROM consts))::TIME BETWEEN
+                                                                         (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
+                                                                          FROM wednesday_start_time) AND (SELECT maxTime FROM consts)::TIME
+                                                                       OR TO_CHAR(:current_timestamp::timestamp, (SELECT timeFormat FROM consts))::TIME BETWEEN (SELECT minTime FROM consts)::TIME AND
+                                                                         (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
                                                                           FROM wednesday_end_time)
-                                                                  ELSE TO_CHAR(:current_timestamp::timestamp, 'HH24:MI:SS')::TIME BETWEEN
-                                                                         (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
+                                                                  ELSE TO_CHAR(:current_timestamp::timestamp, (SELECT timeFormat FROM consts))::TIME BETWEEN
+                                                                         (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
                                                                           FROM wednesday_start_time) AND
-                                                                         (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
+                                                                         (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
                                                                           FROM wednesday_end_time)
                                                               END
               WHEN current_day.current_day = 'thursday' THEN CASE
                                                                  WHEN
-                                                                        (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
+                                                                        (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
                                                                          FROM thursday_start_time) >
-                                                                        (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
-                                                                         FROM thursday_end_time) THEN TO_CHAR(:current_timestamp::timestamp, 'HH24:MI:SS')::TIME BETWEEN
-                                                                        (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
-                                                                         FROM thursday_start_time) AND '23:59:59.999'
-                                                                      OR TO_CHAR(:current_timestamp::timestamp, 'HH24:MI:SS')::TIME BETWEEN '00:00' AND
-                                                                        (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
+                                                                        (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
+                                                                         FROM thursday_end_time) THEN TO_CHAR(:current_timestamp::timestamp, (SELECT timeFormat FROM consts))::TIME BETWEEN
+                                                                        (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
+                                                                         FROM thursday_start_time) AND (SELECT maxTime FROM consts)::TIME
+                                                                      OR TO_CHAR(:current_timestamp::timestamp, (SELECT timeFormat FROM consts))::TIME BETWEEN (SELECT minTime FROM consts)::TIME AND
+                                                                        (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
                                                                          FROM thursday_end_time)
-                                                                 ELSE TO_CHAR(:current_timestamp::timestamp, 'HH24:MI:SS')::TIME BETWEEN
-                                                                        (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
+                                                                 ELSE TO_CHAR(:current_timestamp::timestamp, (SELECT timeFormat FROM consts))::TIME BETWEEN
+                                                                        (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
                                                                          FROM thursday_start_time) AND
-                                                                        (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
+                                                                        (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
                                                                          FROM thursday_end_time)
                                                              END
               WHEN current_day.current_day = 'friday' THEN CASE
                                                                WHEN
-                                                                      (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
+                                                                      (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
                                                                        FROM friday_start_time) >
-                                                                      (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
-                                                                       FROM friday_end_time) THEN TO_CHAR(:current_timestamp::timestamp, 'HH24:MI:SS')::TIME BETWEEN
-                                                                      (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
-                                                                       FROM friday_start_time) AND '23:59:59.999'
-                                                                    OR TO_CHAR(:current_timestamp::timestamp, 'HH24:MI:SS')::TIME BETWEEN '00:00' AND
-                                                                      (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
+                                                                      (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
+                                                                       FROM friday_end_time) THEN TO_CHAR(:current_timestamp::timestamp, (SELECT timeFormat FROM consts))::TIME BETWEEN
+                                                                      (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
+                                                                       FROM friday_start_time) AND (SELECT maxTime FROM consts)::TIME
+                                                                    OR TO_CHAR(:current_timestamp::timestamp, (SELECT timeFormat FROM consts))::TIME BETWEEN (SELECT minTime FROM consts)::TIME AND
+                                                                      (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
                                                                        FROM friday_end_time)
-                                                               ELSE TO_CHAR(:current_timestamp::timestamp, 'HH24:MI:SS')::TIME BETWEEN
-                                                                      (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
+                                                               ELSE TO_CHAR(:current_timestamp::timestamp, (SELECT timeFormat FROM consts))::TIME BETWEEN
+                                                                      (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
                                                                        FROM friday_start_time) AND
-                                                                      (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
+                                                                      (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
                                                                        FROM friday_end_time)
                                                            END
               WHEN current_day.current_day = 'saturday' THEN CASE
                                                                  WHEN
-                                                                        (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
+                                                                        (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
                                                                          FROM saturday_start_time) >
-                                                                        (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
-                                                                         FROM saturday_end_time) THEN TO_CHAR(:current_timestamp::timestamp, 'HH24:MI:SS')::TIME BETWEEN
-                                                                        (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
-                                                                         FROM saturday_start_time) AND '23:59:59.999'
-                                                                      OR TO_CHAR(:current_timestamp::timestamp, 'HH24:MI:SS')::TIME BETWEEN '00:00' AND
-                                                                        (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
+                                                                        (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
+                                                                         FROM saturday_end_time) THEN TO_CHAR(:current_timestamp::timestamp, (SELECT timeFormat FROM consts))::TIME BETWEEN
+                                                                        (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
+                                                                         FROM saturday_start_time) AND (SELECT maxTime FROM consts)::TIME
+                                                                      OR TO_CHAR(:current_timestamp::timestamp, (SELECT timeFormat FROM consts))::TIME BETWEEN (SELECT minTime FROM consts)::TIME AND
+                                                                        (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
                                                                          FROM saturday_end_time)
-                                                                 ELSE TO_CHAR(:current_timestamp::timestamp, 'HH24:MI:SS')::TIME BETWEEN
-                                                                        (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
+                                                                 ELSE TO_CHAR(:current_timestamp::timestamp, (SELECT timeFormat FROM consts))::TIME BETWEEN
+                                                                        (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
                                                                          FROM saturday_start_time) AND
-                                                                        (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
+                                                                        (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
                                                                          FROM saturday_end_time)
                                                              END
               WHEN current_day.current_day = 'sunday' THEN CASE
                                                                WHEN
-                                                                      (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
+                                                                      (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
                                                                        FROM sunday_start_time) >
-                                                                      (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
-                                                                       FROM sunday_end_time) THEN TO_CHAR(:current_timestamp::timestamp, 'HH24:MI:SS')::TIME BETWEEN
-                                                                      (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
-                                                                       FROM sunday_start_time) AND '23:59:59.999'
-                                                                    OR TO_CHAR(:current_timestamp::timestamp, 'HH24:MI:SS')::TIME BETWEEN '00:00' AND
-                                                                      (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
+                                                                      (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
+                                                                       FROM sunday_end_time) THEN TO_CHAR(:current_timestamp::timestamp, (SELECT timeFormat FROM consts))::TIME BETWEEN
+                                                                      (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
+                                                                       FROM sunday_start_time) AND (SELECT maxTime FROM consts)::TIME
+                                                                    OR TO_CHAR(:current_timestamp::timestamp, (SELECT timeFormat FROM consts))::TIME BETWEEN (SELECT minTime FROM consts)::TIME AND
+                                                                      (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
                                                                        FROM sunday_end_time)
-                                                               ELSE TO_CHAR(:current_timestamp::timestamp, 'HH24:MI:SS')::TIME BETWEEN
-                                                                      (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
+                                                               ELSE TO_CHAR(:current_timestamp::timestamp, (SELECT timeFormat FROM consts))::TIME BETWEEN
+                                                                      (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
                                                                        FROM sunday_start_time) AND
-                                                                      (SELECT TO_CHAR(value, 'HH24:MI:SS')::TIME
+                                                                      (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
                                                                        FROM sunday_end_time)
                                                            END
           END AS is_within_working_time
@@ -262,11 +268,11 @@ WITH organization_time AS
    CROSS JOIN is_closed_on_weekends),
      is_today_holiday AS
   (SELECT CASE
-              WHEN TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD') IN (:holidays) THEN format('Bürokratt pole saadaval, kuna täna on %s rahvuspüha "%s", palun jätke oma kontaktandmed ja me võtame teiega esimesel võimalusel ühendust', TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD'), holiday_names)
+              WHEN TO_CHAR(CURRENT_DATE, (SELECT dateFormat FROM consts)) IN (:holidays) THEN format('Bürokratt pole saadaval, kuna täna on %s rahvuspüha "%s", palun jätke oma kontaktandmed ja me võtame teiega esimesel võimalusel ühendust', TO_CHAR(CURRENT_DATE, (SELECT dateFormat FROM consts)), holiday_names)
               ELSE 'Täna pole riigipüha'
           END AS holiday_message,
           CASE
-              WHEN TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD') IN (:holidays) THEN TRUE
+              WHEN TO_CHAR(CURRENT_DATE, (SELECT dateFormat FROM consts)) IN (:holidays) THEN TRUE
               ELSE FALSE
           END AS is_holiday
    FROM
@@ -274,7 +280,7 @@ WITH organization_time AS
    LEFT JOIN LATERAL
      (SELECT string_agg(SUBSTRING(holiday_name, 12), ' ') AS holiday_names
       FROM unnest(string_to_array(:holiday_names, ',')) AS holiday_name
-      WHERE holiday_name LIKE TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD') || '-%' ) AS holiday_names ON TRUE)
+      WHERE holiday_name LIKE TO_CHAR(CURRENT_DATE, (SELECT dateFormat FROM consts)) || '-%' ) AS holiday_names ON TRUE)
 SELECT
   (SELECT is_within_working_time
    FROM is_within_working_time),

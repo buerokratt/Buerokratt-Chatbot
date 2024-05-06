@@ -5,7 +5,7 @@ import { ControllerRenderProps } from 'react-hook-form';
 import './SwitchBox.scss';
 
 type SwitchBoxProps = Partial<ControllerRenderProps> & {
-  name: string;
+  name?: string;
   label: string;
   checked?: boolean;
   hideLabel?: boolean;
@@ -14,6 +14,7 @@ type SwitchBoxProps = Partial<ControllerRenderProps> & {
 
 const SwitchBox = forwardRef<HTMLButtonElement, SwitchBoxProps>((
   {
+    name,
     label,
     checked,
     hideLabel,
@@ -29,6 +30,7 @@ const SwitchBox = forwardRef<HTMLButtonElement, SwitchBoxProps>((
       <RadixSwitch.Root
         ref={ref}
         id={id}
+        name={name}
         className='switchbox__button'
         onCheckedChange={onCheckedChange}
         defaultChecked={checked}
