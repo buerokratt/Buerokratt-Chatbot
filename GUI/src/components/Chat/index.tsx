@@ -461,6 +461,14 @@ const Chat: FC<ChatProps> = ({
     setMessagesList((oldMessages) => [...oldMessages, newMessage]);
   };
 
+  const disableAskForPermission =
+    chat.customerSupportId != userInfo?.idCode ||
+    (latestPermissionMessage <= 60 && latestPermissionMessage != 0);
+
+  const takeOverCondition =
+    chat.customerSupportId === '' ||
+    (chat.customerSupportId !== userInfo?.idCode &&
+      userInfo?.authorities.includes('ROLE_ADMINISTRATOR'));
   return (
     <div className="active-chat">
       <div className="active-chat__body">
@@ -583,9 +591,7 @@ const Chat: FC<ChatProps> = ({
             </div>
           )}
 
-        {(chat.customerSupportId === '' ||
-          (chat.customerSupportId !== userInfo?.idCode &&
-            userInfo?.authorities.includes('ROLE_ADMINISTRATOR'))) &&
+        {takeOverCondition &&
           chatCsaActive === true &&
           chat.status != CHAT_STATUS.IDLE && (
             <div className="active-chat__toolbar">
@@ -671,10 +677,7 @@ const Chat: FC<ChatProps> = ({
           chat.customerSupportId === userInfo?.idCode) &&
           chat.status != CHAT_STATUS.IDLE && (
             <div className="active-chat__side-actions">
-              <Button
-                appearance="success"
-                onClick={onChatEnd ? () => onChatEnd(chat) : undefined}
-              >
+              <Button appearance="success" onClick={() => chatEnd()}>
                 {t('chat.active.endChat')}
               </Button>
               <Button
@@ -700,11 +703,7 @@ const Chat: FC<ChatProps> = ({
                 <Button
                   appearance="secondary"
                   style={{ width: '100%' }}
-                  disabledWithoutStyle={
-                    chat.customerSupportId != userInfo?.idCode ||
-                    (latestPermissionMessage <= 60 &&
-                      latestPermissionMessage != 0)
-                  }
+                  disabledWithoutStyle={disableAskForPermission}
                   disabled={chat.customerSupportId != userInfo?.idCode}
                   onClick={() => {
                     const message: Message | undefined = messagesList.findLast(
@@ -729,31 +728,21 @@ const Chat: FC<ChatProps> = ({
               <Button
                 appearance="secondary"
                 disabled={!chatCsaActive}
-                onClick={
-                  onForwardToColleauge
-                    ? () => {
-                        onForwardToColleauge(chat);
-                      }
-                    : undefined
-                }
+                onClick={() => forwardToColleague()}
               >
                 {t('chat.active.forwardToColleague')}
               </Button>
               <Button
                 appearance="secondary"
                 disabled={!chatCsaActive}
-                onClick={
-                  onForwardToEstablishment
-                    ? () => onForwardToEstablishment(chat)
-                    : undefined
-                }
+                onClick={() => forwardToEstablishment()}
               >
                 {t('chat.active.forwardToOrganization')}
               </Button>
               <Button
                 appearance="secondary"
                 disabled={chat.customerSupportId != userInfo?.idCode}
-                onClick={onSendToEmail ? () => onSendToEmail(chat) : undefined}
+                onClick={() => sendToEmail()}
               >
                 {t('chat.active.sendToEmail')}
               </Button>
@@ -860,6 +849,20 @@ const Chat: FC<ChatProps> = ({
       </div>
     </div>
   );
+
+  function chatEnd() {
+    return onChatEnd ? () => onChatEnd(chat) : undefined;
+  }
+
+  function forwardToEstablishment() {
+    return onForwardToEstablishment
+      ? () => onForwardToEstablishment(chat)
+      : undefined;
+  }
+
+  function sendToEmail() {
+    return onSendToEmail ? () => onSendToEmail(chat) : undefined;
+  }
 
   function forwardToColleague() {
     return onForwardToColleauge
