@@ -62,3 +62,13 @@ Currently, Header and Main Navigation used as external components, they are defi
  "@buerokrat-ria/menu": "^0.0.1"
  "@buerokrat-ria/styles": "^0.0.1"
 ```
+
+### Notes
+
+##### Content Security Policy (CSP)
+
+- In Case you change ruuter or tim URL's, then please change it in csp configs in `/GUI/index.html` & `/GUI/vite.config.ts`
+
+##### Ruuter Internal Requests
+
+- When running ruuter either on local or in an environment make sure to adjust `- application.internalRequests.allowedIPs=127.0.0.1,{YOUR_IPS}` under ruuter environments

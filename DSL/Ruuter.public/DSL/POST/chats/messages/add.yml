@@ -120,7 +120,7 @@ check_skip_bot:
 postMessageToBot:
   call: http.post
   args:
-    url: "[#CHATBOT_RUUTER_PUBLIC]/internal/message-to-bot"
+    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL]/internal/message-to-bot"
     body:
       chatId: ${chatId}
       content: ${content}

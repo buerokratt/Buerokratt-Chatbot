@@ -260,7 +260,7 @@ const Header: FC = () => {
   });
 
   const logoutMutation = useMutation({
-    mutationFn: () => apiDev.post('accounts/logout'),
+    mutationFn: () => apiDev.get('accounts/logout'),
     onSuccess(_: any) {
       window.location.href = import.meta.env.REACT_APP_CUSTOMER_SERVICE_LOGIN;
     },

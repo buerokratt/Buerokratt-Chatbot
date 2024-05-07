@@ -105,7 +105,7 @@ check_if_bot_is_unable_to_reply:
 check_for_fallback_bot:
   call: http.post
   args:
-    url: "[#CHATBOT_RUUTER_PUBLIC]/internal/external-bot"
+    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL]/internal/external-bot"
     body:
       sender: ${chatId}
       message: ${content}
@@ -245,7 +245,7 @@ check_if_bot_message_start_with_hash:
 call_service:
   call: http.post
   args:
-    url: "[#CHATBOT_RUUTER_PUBLIC]/internal/call-service"
+    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL]/internal/call-service"
     body:
       chatId: ${chatId}
       msg: ${botMsg}

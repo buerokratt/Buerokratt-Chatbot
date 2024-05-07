@@ -15,12 +15,11 @@ declaration:
 get_user_info:
   call: http.post
   args:
-   url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
-   contentType: plaintext
-   headers:
-    cookie: ${incoming.headers.cookie}
-   plaintext: 
-      "customJwtCookie"
+    url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
+    contentType: plaintext
+    headers:
+      cookie: ${incoming.headers.cookie}
+    plaintext: "customJwtCookie"
   result: res
   next: check_user_info_response
 
@@ -63,8 +62,7 @@ blacklistCustomJwt:
     contentType: plaintext
     headers:
       cookie: ${incoming.headers.cookie}
-    plaintext: 
-      "customJwtCookie"
+    plaintext: "customJwtCookie"
   result: blacklist_res
   next: assign_cookie
 
