@@ -1,6 +1,6 @@
 authenticate:
   template: check-user-authority
-  requestType: post
+  requestType: templates
   headers:
     cookie: ${incoming.headers.cookie}
   result: authority_result
