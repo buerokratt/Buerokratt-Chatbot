@@ -7,7 +7,7 @@ services:
     environment:
       - application.cors.allowedOrigins=http://localhost:8086,http://localhost:3001,http://localhost:3003,http://localhost:3004,http://localhost:8080
       - application.httpCodesAllowList=200,201,202,400,401,403,500
-      - application.internalRequests.allowedIPs=127.0.0.1,172.25.0.8,172.25.0.2
+      - application.internalRequests.allowedIPs=127.0.0.1
       - application.logging.displayRequestContent=true
       - application.logging.displayResponseContent=true
       - server.port=8086
@@ -27,7 +27,7 @@ services:
     environment:
       - application.cors.allowedOrigins=http://localhost:8082,http://localhost:3001,http://localhost:3003
       - application.httpCodesAllowList=200,201,202,400,401,403,500
-      - application.internalRequests.allowedIPs=127.0.0.1,172.25.0.8,172.25.0.2
+      - application.internalRequests.allowedIPs=127.0.0.1
       - application.logging.displayRequestContent=true
       - application.logging.displayResponseContent=true
       - server.port=8088
