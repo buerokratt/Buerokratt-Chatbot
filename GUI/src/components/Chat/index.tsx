@@ -163,7 +163,7 @@ const Chat: FC<ChatProps> = ({
   }, [chat.id, messagesList]);
 
   const getMessages = async () => {
-    const { data: res } = await apiDev.post('agents/messages-by-id', {
+    const { data: res } = await apiDev.post('agents/chats/messages/all', {
       chatId: chat.id,
     });
     if (
@@ -677,7 +677,7 @@ const Chat: FC<ChatProps> = ({
           chat.customerSupportId === userInfo?.idCode) &&
           chat.status != CHAT_STATUS.IDLE && (
             <div className="active-chat__side-actions">
-              <Button appearance="success" onClick={() => chatEnd()}>
+              <Button appearance="success" onClick={chatEnd()}>
                 {t('chat.active.endChat')}
               </Button>
               <Button
@@ -728,28 +728,28 @@ const Chat: FC<ChatProps> = ({
               <Button
                 appearance="secondary"
                 disabled={!chatCsaActive}
-                onClick={() => forwardToColleague()}
+                onClick={forwardToColleague()}
               >
                 {t('chat.active.forwardToColleague')}
               </Button>
               <Button
                 appearance="secondary"
                 disabled={!chatCsaActive}
-                onClick={() => forwardToEstablishment()}
+                onClick={forwardToEstablishment()}
               >
                 {t('chat.active.forwardToOrganization')}
               </Button>
               <Button
                 appearance="secondary"
                 disabled={chat.customerSupportId != userInfo?.idCode}
-                onClick={() => sendToEmail()}
+                onClick={sendToEmail()}
               >
                 {t('chat.active.sendToEmail')}
               </Button>
               <Button
                 appearance="secondary"
                 disabled={chat.customerSupportId != userInfo?.idCode}
-                onClick={() => StartAService()}
+                onClick={StartAService()}
               >
                 {t('chat.active.startService')}
               </Button>
@@ -771,7 +771,7 @@ const Chat: FC<ChatProps> = ({
               ) && (
                 <Button
                   appearance="secondary"
-                  onClick={() => forwardToColleague()}
+                  onClick={forwardToColleague()}
                 >
                   {t('chat.active.forwardToColleague')}
                 </Button>

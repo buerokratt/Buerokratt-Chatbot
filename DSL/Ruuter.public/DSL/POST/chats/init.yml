@@ -50,7 +50,7 @@ getChatUuid:
 assignChatUuid:
   assign:
     chatUuid: ${chat_uuid_result.response.body.uuid}
-  next: getMessageUuid  
+  next: getMessageUuid
 
 getMessageUuid:
   call: http.post
@@ -64,7 +64,7 @@ getMessageUuid:
 assignMessageUuid:
   assign:
     messageUuid: ${message_uuid_result.response.body.uuid}
-  next: get_session_length  
+  next: get_session_length
 
 get_session_length:
   call: http.post
@@ -82,10 +82,7 @@ generate_cookie:
     body:
       JWTName: "chatJwt"
       expirationInMinutes: ${session_result.response.body[0].value}
-      content: {
-        "chatId": "${chatUuid}",
-        "forwardTo": ""   
-      }
+      content: { "chatId": "${chatUuid}", "forwardTo": "" }
   result: cookie_result
   next: assign_cookie
 
@@ -102,7 +99,7 @@ assign_cookie:
 postGreetingMessage:
   call: http.post
   args:
-    url: "[#CHATBOT_RUUTER_PUBLIC]/greeting/message"
+    url: "[#CHATBOT_RUUTER_PUBLIC]/chats/messages/greeting"
     body:
       chatId: ${chatUuid}
       authorTimestamp: ${authorTimestamp}
@@ -184,23 +181,20 @@ clearChatList:
   args:
     url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query?conflicts=proceed"
     body:
-     query:
-      term:
-       channelId: "chat-list"
+      query:
+        term:
+          channelId: "chat-list"
   result: clear_chat_res
-  next: postNotificationAboutAddedChat 
+  next: postNotificationAboutAddedChat
 
 postNotificationAboutAddedChat:
   call: http.post
   args:
     url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
     body:
-     channelId: "chat-list"
-     timestamp: ${new Date().toISOString()}
-     payload: {
-        "status": "Chat Status Changed",
-        "chatId": "${chatUuid}"
-     }
+      channelId: "chat-list"
+      timestamp: ${new Date().toISOString()}
+      payload: { "status": "Chat Status Changed", "chatId": "${chatUuid}" }
   result: chat_notification_result
   next: clearMessages
 
@@ -209,25 +203,22 @@ clearMessages:
   args:
     url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query?conflicts=proceed"
     body:
-     query:
-      term:
-       channelId: ${chatUuid}
+      query:
+        term:
+          channelId: ${chatUuid}
   result: clear_messages_res
-  next: postNotificationAboutMessageResponse 
+  next: postNotificationAboutMessageResponse
 
 postNotificationAboutMessageResponse:
   call: http.post
   args:
     url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
     body:
-     channelId: ${chatUuid}
-     timestamp: ${new Date().toISOString()}
-     payload: {
-        "type": "message",
-        "messageId": "${messageUuid}"
-     }
+      channelId: ${chatUuid}
+      timestamp: ${new Date().toISOString()}
+      payload: { "type": "message", "messageId": "${messageUuid}" }
   result: message_notification_result
-  next: return_result  
+  next: return_result
 
 return_result:
   headers:

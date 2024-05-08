@@ -18,7 +18,7 @@ const SettingsChatSettings: FC = () => {
     undefined
   );
   const { data: botConfig } = useQuery<{ is_bot_active: boolean }>({
-    queryKey: ['bots/config/active', 'prod'],
+    queryKey: ['bots/active', 'prod'],
     onSuccess(res: any) {
       setBotActive(res.response === 'true');
     },
@@ -39,7 +39,7 @@ const SettingsChatSettings: FC = () => {
   const botConfigMutation = useMutation({
     mutationFn: (data: { is_bot_active: boolean }) => {
       setBotActive(data.is_bot_active);
-      return apiDev.post(`bots/config/active`, { isActive: data.is_bot_active });
+      return apiDev.post(`bots/active`, { isActive: data.is_bot_active });
     },
     onError: (error: AxiosError) => {
       toast.open({
