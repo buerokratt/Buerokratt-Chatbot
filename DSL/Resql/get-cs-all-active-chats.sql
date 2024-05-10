@@ -68,7 +68,7 @@ ActiveChats AS (
       received_from_name
   FROM chat
   CROSS JOIN BotName
-  JOIN MaxChats on id = MaxChats.maxId
+  JOIN MaxChats ON id = maxId
   AND ended IS NULL
   AND customer_support_id != BotName.value
 ),
@@ -80,7 +80,7 @@ ContactsMessage AS (
 LastEventMessage AS (
   SELECT event, chat_base_id
   FROM message
-  JOIN MessageWithContent ON message.id = MessageWithContent.maxId
+  JOIN MessageWithContent ON id = maxId
 ),
 LastContentMessage AS (
   SELECT content, chat_base_id
