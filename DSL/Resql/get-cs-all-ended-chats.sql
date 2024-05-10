@@ -25,24 +25,26 @@ TitleVisibility AS (
   ORDER BY id
   LIMIT 1
 ),
+FulfilledMessages AS (
+  SELECT MAX(id) maxId
+  FROM message
+  WHERE event = 'contact-information-fulfilled'
+  GROUP BY chat_base_id
+),
 ContactsMessage AS (
   SELECT chat_base_id, content
   FROM message
-  WHERE id IN (
-    SELECT MAX(id)
-    FROM message
-    WHERE event = 'contact-information-fulfilled'
-    GROUP BY chat_base_id
-  )
+  JOIN FulfilledMessages ON id = maxId
+),
+MaxMessages AS (
+  SELECT MAX(id) maxId
+  FROM message
+  GROUP BY chat_base_id
 ),
 Messages AS (
   SELECT event, updated, chat_base_id
   FROM message
-  WHERE id IN (
-    SELECT MAX(id)
-    FROM message
-    GROUP BY chat_base_id
-  )
+  JOIN MaxMessages ON id = maxID
 ),
 EndedChatMessages AS (
   SELECT 
