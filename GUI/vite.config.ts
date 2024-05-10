@@ -16,7 +16,9 @@ export default defineConfig({
   },
   server: {
     headers: {
-      'Content-Security-Policy': process.env.REACT_APP_CSP,
+      ...(process.env.REACT_APP_CSP && {
+        'Content-Security-Policy': process.env.REACT_APP_CSP,
+      }),
     },
   },
   resolve: {
