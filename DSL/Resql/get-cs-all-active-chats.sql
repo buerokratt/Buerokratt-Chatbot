@@ -68,5 +68,6 @@ LEFT JOIN message m_contacts ON lc.contacts_message_id = m_contacts.id
 LEFT JOIN message m_last_event ON lc.last_content_message_id = m_last_event.id
 CROSS JOIN TitleVisibility AS titlevisibility
 CROSS JOIN BotName AS botname
-ORDER BY created;
+ORDER BY created ASC
+LIMIT 100;
 

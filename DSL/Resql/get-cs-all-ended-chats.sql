@@ -73,4 +73,5 @@ LEFT JOIN (
 ) AS contacts_message ON c.base_id = contacts_message.chat_base_id
 CROSS JOIN TitleVisibility AS conf
 WHERE c.created::date BETWEEN :start::date AND :end::date
-ORDER BY c.created;
+ORDER BY c.created ASC
+LIMIT 100;
