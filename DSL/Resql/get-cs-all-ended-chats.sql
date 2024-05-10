@@ -41,11 +41,8 @@ FROM (
            end_user_first_name, end_user_last_name, end_user_email, end_user_phone, end_user_os,
            end_user_url, status, created, updated, ended, forwarded_to_name, received_from, labels
     FROM chat
-    WHERE id IN (SELECT MAX(id) FROM chat GROUP BY base_id) AND ended IS NOT NULL AND status <> 'IDLE'
-
-    -- -- For pagination
-    -- ORDER BY created
-    -- LIMIT :limit OFFSET :offset 
+    WHERE id IN (SELECT MAX(id) FROM chat GROUP BY base_id)
+    AND ended IS NOT NULL AND status <> 'IDLE'
 ) AS c
 JOIN (
     SELECT chat_base_id, event, updated
@@ -60,7 +57,7 @@ JOIN (
     SELECT chat_base_id, content
     FROM message
     WHERE id IN (SELECT last_content_message_id FROM LatestMessages)
-) AS last_content_message ON c.base_id = w.chat_base_id
+) AS last_content_message ON c.base_id = m.chat_base_id
 JOIN (
     SELECT chat_base_id, content, created
     FROM message
