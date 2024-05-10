@@ -66,7 +66,7 @@ get_chat:
     body:
       id: ${chatId}
   result: get_chat_result
-  next: check_for_get_chat_result  
+  next: check_for_get_chat_result
 
 check_for_get_chat_result:
   switch:
@@ -100,6 +100,8 @@ check_if_bot_is_unable_to_reply:
   switch:
     - condition: ${post_message_to_client_result.response.body[0].text == 'UNKNOWN'}
       next: check_for_fallback_bot
+    - condition: ${post_message_to_client_result.response.body[0].text == 'Suunan teid klienditeenindajale. Varuge natukene kannatust.'}
+      next: get_organization_working_details
   next: extract_bot_responses
 
 check_for_fallback_bot:
@@ -134,14 +136,14 @@ assign_organization_details:
     org_details: ${org_res.response.body[0]}
   next: check_if_organization_is_available
 
-check_if_organization_is_available: 
+check_if_organization_is_available:
   switch:
     - condition: ${org_details.isWithinWorkingTime === true && org_details.isWithinWorkingDays === true && org_details.isAllowedToWorkAtHolidays === true}
       next: get_all_available_csas
     - condition: ${org_details.isWithinWorkingTime === true && org_details.isWithinWorkingDays === true && org_details.isAllowedToWorkAtHolidays === false && org_details.isHoliday == true}
       next: return_is_a_holiday
     - condition: ${org_details.isWithinWorkingTime === true && org_details.isWithinWorkingDays === true && org_details.isAllowedToWorkAtHolidays === false && org_details.isHoliday == false}
-      next: get_all_available_csas   
+      next: get_all_available_csas
   next: return_organization_is_not_available
 
 return_is_a_holiday:
@@ -149,12 +151,12 @@ return_is_a_holiday:
   args:
     url: "[#CHATBOT_RESQL]/insert-bot-message"
     body:
-      messages: 
-         -
+      messages:
+        - 
           chatId: ${chatId}
           content: ${org_details.holidayMessage}
           authorTimestamp: ${new Date().toISOString()}
-          event: 'unavailable_holiday'
+          event: "unavailable_holiday"
           authorId: ${get_bot_name_result.response.body[0].value}
           authorFirstName: ""
           authorLastName: ""
@@ -167,12 +169,12 @@ return_organization_is_not_available:
   args:
     url: "[#CHATBOT_RESQL]/insert-bot-message"
     body:
-      messages: 
-         -
+      messages:
+        - 
           chatId: ${chatId}
-          content: 'Bürokratt on hetkel väljaspool tööaega, palun jäta oma kontaktandmed ja võtame Sinuga esimesel võimalusel ühendust'
+          content: "Bürokratt on hetkel väljaspool tööaega, palun jäta oma kontaktandmed ja võtame Sinuga esimesel võimalusel ühendust"
           authorTimestamp: ${new Date().toISOString()}
-          event: 'unavailable_organization'
+          event: "unavailable_organization"
           authorId: ${get_bot_name_result.response.body[0].value}
           authorFirstName: ""
           authorLastName: ""
@@ -190,7 +192,7 @@ get_all_available_csas:
 assign_available_csas:
   assign:
     available_csas: ${csas_res.response.body.length}
-  next: check_if_csas_are_available 
+  next: check_if_csas_are_available
 
 check_if_csas_are_available:
   switch:
@@ -203,12 +205,12 @@ send_csas_not_available_message:
   args:
     url: "[#CHATBOT_RESQL]/insert-bot-message"
     body:
-      messages: 
-         -
+      messages:
+        - 
           chatId: ${chatId}
-          content: 'Hetkel nõustajad puuduvad, palun jätke oma kontaktandmed ja võtame Teiega esimesel võimalusel ühendust'
+          content: "Hetkel nõustajad puuduvad, palun jätke oma kontaktandmed ja võtame Teiega esimesel võimalusel ühendust"
           authorTimestamp: ${new Date().toISOString()}
-          event: 'unavailable_csas'
+          event: "unavailable_csas"
           authorId: ${get_bot_name_result.response.body[0].value}
           authorFirstName: ""
           authorLastName: ""
@@ -231,7 +233,7 @@ add_chat_id_to_queue_notification_node:
     body:
       id: ${chatId}
   result: add_chat_id_to_queue_notification_node_res
-  
+
 extract_bot_responses:
   assign:
     botMsg: ${post_message_to_client_result.response.body}
@@ -260,12 +262,12 @@ check_if_call_service_result_is_ok:
 
 return_ok:
   status: 200
-  return: "Service called successfully" 
-  next: end   
+  return: "Service called successfully"
+  next: end
 
 return_trigger_service_is_not_exist:
   assign:
-    botMsg: "service_currently_unavailable" 
+    botMsg: "service_currently_unavailable"
 
 convert_bot_responses_to_messages:
   call: http.post
@@ -274,15 +276,16 @@ convert_bot_responses_to_messages:
     headers:
       type: json
     body:
-      data: {
-        "botMessages": "${botMsg}",
-        "chatId": "${chatId}",
-        "authorId": "${get_bot_name_result.response.body[0].value}",
-        "authorFirstName": "",
-        "authorLastName": "",
-        "authorTimestamp": "${new Date().toISOString()}",
-        "created": "${new Date().toISOString()}"
-      }
+      data:
+        {
+          "botMessages": "${botMsg}",
+          "chatId": "${chatId}",
+          "authorId": "${get_bot_name_result.response.body[0].value}",
+          "authorFirstName": "",
+          "authorLastName": "",
+          "authorTimestamp": "${new Date().toISOString()}",
+          "created": "${new Date().toISOString()}",
+        }
   result: converted_messages_res
   next: add_bot_message_to_db
 
@@ -293,15 +296,16 @@ convert_fallback_bot_responses_to_messages:
     headers:
       type: json
     body:
-      data: {
-        "botMessages": "${fallback_bot_result.response.body.response}",
-        "chatId": "${chatId}",
-        "authorId": "${get_bot_name_result.response.body[0].value}",
-        "authorFirstName": "",
-        "authorLastName": "",
-        "authorTimestamp": "${new Date().toISOString()}",
-        "created": "${new Date().toISOString()}"
-      }
+      data:
+        {
+          "botMessages": "${fallback_bot_result.response.body.response}",
+          "chatId": "${chatId}",
+          "authorId": "${get_bot_name_result.response.body[0].value}",
+          "authorFirstName": "",
+          "authorLastName": "",
+          "authorTimestamp": "${new Date().toISOString()}",
+          "created": "${new Date().toISOString()}",
+        }
   result: converted_messages_res
   next: add_bot_message_to_db
 
@@ -316,38 +320,38 @@ add_bot_message_to_db:
 
 return_is_holiday:
   status: 200
-  return: "Today is a national holiday" 
-  next: end   
+  return: "Today is a national holiday"
+  next: end
 
 return_organization_is_not_available_res:
   status: 200
-  return: "Organization is not available" 
+  return: "Organization is not available"
   next: end
-  
+
 return_csa_is_not_available:
   status: 200
-  return: "CSA's are not available" 
+  return: "CSA's are not available"
   next: end
 
 return_message_sent:
   status: 200
   return: "Message Sent Successfully"
-  next: end  
+  next: end
 
 return_chat_does_not_belong_to_bot:
   status: 200
   return: "Chat does not belong to bot"
-  next: end  
+  next: end
 
 return_bot_is_not_active:
   status: 200
   return: "Bot is not active"
-  next: end  
+  next: end
 
 return_bad_request:
   status: 400
   return: "Bad Request"
-  next: end  
+  next: end
 
 return_incorrect_request:
   status: 400
