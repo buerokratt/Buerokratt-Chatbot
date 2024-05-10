@@ -54,10 +54,10 @@ FROM
     end_user_phone, end_user_os, end_user_url, external_id, forwarded_to, forwarded_to_name,
     received_from, received_from_name
     FROM chat
+    CROSS JOIN BotName as botname
     WHERE id IN (SELECT MAX(id) FROM chat GROUP BY base_id)
       AND ended IS NULL
       AND customer_support_id != botname.value
-    
     -- -- For pagination
     -- ORDER BY created
     -- LIMIT :limit OFFSET :offset
@@ -67,7 +67,6 @@ LEFT JOIN message m_last ON lc.last_message_id = m_last.id
 LEFT JOIN message m_contacts ON lc.contacts_message_id = m_contacts.id
 LEFT JOIN message m_last_event ON lc.last_content_message_id = m_last_event.id
 CROSS JOIN TitleVisibility AS titlevisibility
-CROSS JOIN BotName AS botname
 ORDER BY created ASC
 LIMIT 100;
 
