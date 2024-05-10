@@ -21,6 +21,7 @@ FulfilledMessages AS (
   SELECT MAX(id) maxId
   FROM message
   WHERE event = 'contact-information-fulfilled'
+  GROUP BY chat_base_id
 ),
 MessageWithContent AS (
   SELECT MAX(id) AS maxId
