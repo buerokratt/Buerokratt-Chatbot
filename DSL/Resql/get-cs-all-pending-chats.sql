@@ -1,16 +1,31 @@
+WITH max_message AS (
+  SELECT MAX(id) AS id, chat_base_id
+  FROM message
+  WHERE event <> 'rating'
+    AND event <> 'requested-chat-forward'
+  GROUP BY chat_base_id
+),
+max_content_message AS (
+  SELECT MAX(id) AS id, chat_base_id
+  FROM message
+  WHERE event <> 'rating'
+    AND event <> 'requested-chat-forward'
+    AND content <> ''
+    AND content <> 'message-read'
+  GROUP BY chat_base_id
+),
+TitleVisibility AS (
+  SELECT value
+  FROM configuration
+  WHERE KEY = 'is_csa_title_visible' AND NOT deleted
+  ORDER BY id DESC
+  LIMIT 1
+)
 SELECT c.base_id AS id,
        c.customer_support_id,
        c.customer_support_display_name,
        (CASE
-            WHEN
-                   (SELECT value
-                    FROM configuration
-                    WHERE KEY = 'is_csa_title_visible'
-                      AND configuration.id IN
-                        (SELECT max(id)
-                         FROM configuration
-                         GROUP BY KEY)
-                      AND deleted = FALSE) = 'true' THEN c.csa_title
+            WHEN TitleVisibility.value = 'true' THEN c.csa_title
             ELSE ''
         END) AS csa_title,
        c.end_user_id,
@@ -30,48 +45,17 @@ SELECT c.base_id AS id,
        c.received_from,
        c.received_from_name,
        last_content_message.content AS last_message,
-  (SELECT content
-   FROM message
-   WHERE id IN (
-                  (SELECT MAX(id)
-                   FROM message
-                   WHERE event = 'contact-information-fulfilled'
-                     AND chat_base_id = c.base_id))) AS contacts_message,
+       contacts_message.content AS contacts_message,
        m.updated AS last_message_timestamp,
-  (SELECT event
-   FROM message
-   WHERE id IN (
-                  (SELECT MAX(id)
-                   FROM message
-                   WHERE event <> ''
-                     AND chat_base_id = c.base_id))) AS last_message_event
-FROM
-  (SELECT *
-   FROM chat
-   WHERE id IN
-       (SELECT MAX(id)
-        FROM chat
-        GROUP BY base_id)
-     AND status = 'IDLE'
-     ) AS c
-JOIN
-  (SELECT *
-   FROM message
-   WHERE id IN
-       (SELECT MAX(id)
-        FROM message
-        WHERE event <> 'rating'
-          AND event <> 'requested-chat-forward'
-        GROUP BY chat_base_id)) AS m ON c.base_id = m.chat_base_id
-JOIN
-  (SELECT *
-   FROM message
-   WHERE id IN
-       (SELECT MAX(id)
-        FROM message
-        WHERE event <> 'rating'
-          AND event <> 'requested-chat-forward'
-          AND content <> ''
-          AND content <> 'message-read'
-        GROUP BY chat_base_id)) AS last_content_message ON c.base_id = last_content_message.chat_base_id
-ORDER BY created;
+       last_message_event.event AS last_message_event
+FROM chat AS c
+JOIN message AS m ON c.base_id = m.chat_base_id
+JOIN max_message ON m.id = max_message.id
+JOIN message AS last_content_message ON c.base_id = last_content_message.chat_base_id
+JOIN max_content_message ON last_content_message.id = max_content_message.id
+LEFT JOIN message AS contacts_message ON c.base_id = contacts_message.chat_base_id AND contacts_message.event = 'contact-information-fulfilled'
+LEFT JOIN message AS last_message_event ON c.base_id = last_message_event.chat_base_id AND last_message_event.event <> ''
+CROSS JOIN TitleVisibility
+WHERE c.status = 'IDLE'
+ORDER BY c.created ASC
+LIMIT 100;
