@@ -22,7 +22,7 @@ TitleVisibility AS (
   FROM configuration
   WHERE key = 'is_csa_title_visible' 
   AND NOT deleted
-  ORDER BY id
+  ORDER BY id DESC
   LIMIT 1
 ),
 FulfilledMessages AS (
