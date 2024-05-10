@@ -1,92 +1,90 @@
 version: "3.9"
 
 services:
-  ruuter-public:
-    container_name: ruuter-public
-    image: ruuter
-    environment:
-      - application.cors.allowedOrigins=http://localhost:8086,http://localhost:3001,http://localhost:3003,http://localhost:3004,http://localhost:8080
-      - application.httpCodesAllowList=200,201,202,400,401,403,500
-      - application.internalRequests.allowedIPs=127.0.0.1
-      - application.logging.displayRequestContent=true
-      - application.logging.displayResponseContent=true
-      - server.port=8086
-    volumes:
-      - ./DSL/Ruuter.public/DSL:/DSL
-      - ./constants.ini:/app/constants.ini
-    ports:
-      - 8086:8086
-    networks:
-      - bykstack
-    cpus: "0.5"
-    mem_limit: "512M"
+  # ruuter-public:
+  #   container_name: ruuter-public
+  #   image: ruuter
+  #   environment:
+  #     - application.cors.allowedOrigins=http://localhost:8086,http://localhost:3001,http://localhost:3003,http://localhost:3004,http://localhost:8080
+  #     - application.httpCodesAllowList=200,201,202,400,401,403,500
+  #     - application.logging.displayRequestContent=true
+  #     - application.logging.displayResponseContent=true
+  #     - server.port=8086
+  #   volumes:
+  #     - ./DSL/Ruuter.public/DSL:/DSL
+  #     - ./constants.ini:/app/constants.ini
+  #   ports:
+  #     - 8086:8086
+  #   networks:
+  #     - bykstack
+  #   cpus: "0.5"
+  #   mem_limit: "512M"
 
-  ruuter-private:
-    container_name: ruuter-private
-    image: ruuter
-    environment:
-      - application.cors.allowedOrigins=http://localhost:8082,http://localhost:3001,http://localhost:3003
-      - application.httpCodesAllowList=200,201,202,400,401,403,500
-      - application.internalRequests.allowedIPs=127.0.0.1
-      - application.logging.displayRequestContent=true
-      - application.logging.displayResponseContent=true
-      - server.port=8088
-    volumes:
-      - ./DSL/Ruuter.private/DSL:/DSL
-      - ./constants.ini:/app/constants.ini
-    ports:
-      - 8088:8088
-    networks:
-      - bykstack
-    cpus: "0.5"
-    mem_limit: "512M"
+  # ruuter-private:
+  #   container_name: ruuter-private
+  #   image: ruuter
+  #   environment:
+  #     - application.cors.allowedOrigins=http://localhost:8082,http://localhost:3001,http://localhost:3003
+  #     - application.httpCodesAllowList=200,201,202,400,401,403,500
+  #     - application.logging.displayRequestContent=true
+  #     - application.logging.displayResponseContent=true
+  #     - server.port=8088
+  #   volumes:
+  #     - ./DSL/Ruuter.private/DSL:/DSL
+  #     - ./constants.ini:/app/constants.ini
+  #   ports:
+  #     - 8088:8088
+  #   networks:
+  #     - bykstack
+  #   cpus: "0.5"
+  #   mem_limit: "512M"
 
-  tim:
-    container_name: tim
-    image: tim
-    depends_on:
-      - tim-postgresql
-    environment:
-      - SECURITY_ALLOWLIST_JWT=ruuter-private,ruuter-public,data-mapper,resql,tim,tim-postgresql,chat-widget,authentication-layer,127.0.0.1,::1
-    ports:
-      - 8085:8085
-    networks:
-      - bykstack
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    cpus: "0.5"
-    mem_limit: "512M"
+#   tim:
+#     container_name: tim
+#     image: tim
+#     depends_on:
+#       - tim-postgresql
+#     environment:
+#       - SECURITY_ALLOWLIST_JWT=ruuter-private,ruuter-public,data-mapper,resql,tim,tim-postgresql,chat-widget,authentication-layer,127.0.0.1,::1
+#     ports:
+#       - 8085:8085
+#     networks:
+#       - bykstack
+#     extra_hosts:
+#       - "host.docker.internal:host-gateway"
+#     cpus: "0.5"
+#     mem_limit: "512M"
 
-  tim-postgresql:
-    container_name: tim-postgresql
-    image: postgres:14.1
-    environment:
-      - POSTGRES_USER=tim
-      - POSTGRES_PASSWORD=123
-      - POSTGRES_DB=tim
-      - POSTGRES_HOST_AUTH_METHOD=trust
-    volumes:
-      - ./tim-db:/var/lib/postgresql/data
-    ports:
-      - 9876:5432
-    networks:
-      - bykstack
+#   tim-postgresql:
+#     container_name: tim-postgresql
+#     image: postgres:14.1
+#     environment:
+#       - POSTGRES_USER=tim
+#       - POSTGRES_PASSWORD=123
+#       - POSTGRES_DB=tim
+#       - POSTGRES_HOST_AUTH_METHOD=trust
+#     volumes:
+#       - ./tim-db:/var/lib/postgresql/data
+#     ports:
+#       - 9876:5432
+#     networks:
+#       - bykstack
 
-  data-mapper:
-    container_name: data-mapper
-    image: data-mapper
-    environment:
-      - PORT=3000
-      - CONTENT_FOLDER=/data
-    volumes:
-      - ./DSL:/data
-      - ./DSL/DMapper/hbs:/workspace/app/views/chat-bot
-      - ./DSL/DMapper/js:/workspace/app/js/chat-bot
-      - ./DSL/DMapper/lib:/workspace/app/lib
-    ports:
-      - 3000:3000
-    networks:
-      - bykstack
+#   data-mapper:
+#     container_name: data-mapper
+#     image: data-mapper
+#     environment:
+#       - PORT=3000
+#       - CONTENT_FOLDER=/data
+#     volumes:
+#       - ./DSL:/data
+#       - ./DSL/DMapper/hbs:/workspace/app/views/chat-bot
+#       - ./DSL/DMapper/js:/workspace/app/js/chat-bot
+#       - ./DSL/DMapper/lib:/workspace/app/lib
+#     ports:
+#       - 3000:3000
+#     networks:
+#       - bykstack
 
   resql:
     container_name: resql
@@ -95,9 +93,9 @@ services:
       - users_db
     environment:
       - sqlms.datasources.[0].name=byk
-      - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://171.22.247.13:5433/byk?sslmode=require
+      - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://resql:5433/byk?sslmode=require
       - sqlms.datasources.[0].username=byk
-      - sqlms.datasources.[0].password=2nH09n6Gly
+      - sqlms.datasources.[0].password=01234
       - logging.level.org.springframework.boot=INFO
     ports:
       - 8082:8082
@@ -120,120 +118,120 @@ services:
     networks:
       - bykstack
 
-  resql_training:
-    container_name: resql-training
-    image: resql
-    environment:
-      - sqlms.datasources.[0].name=training
-      - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://171.22.247.13:5434/train_db
-      - sqlms.datasources.[0].username=byk
-      - sqlms.datasources.[0].password=01234
-      - logging.level.org.springframework.boot=INFO
-      - server.port=8083
-    ports:
-      - 8083:8083
-    volumes:
-      - ./DSL/Resql.training:/workspace/app/templates/training
-    networks:
-      - bykstack
+#   resql_training:
+#     container_name: resql-training
+#     image: resql
+#     environment:
+#       - sqlms.datasources.[0].name=training
+#       - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://171.22.247.13:5434/train_db
+#       - sqlms.datasources.[0].username=byk
+#       - sqlms.datasources.[0].password=01234
+#       - logging.level.org.springframework.boot=INFO
+#       - server.port=8083
+#     ports:
+#       - 8083:8083
+#     volumes:
+#       - ./DSL/Resql.training:/workspace/app/templates/training
+#     networks:
+#       - bykstack
 
-  gui:
-    container_name: gui
-    environment:
-      - NODE_ENV=development
-      - BASE_URL=http://localhost:8080
-      - REACT_APP_RUUTER_API_URL=http://localhost:8086
-      - REACT_APP_RUUTER_PRIVATE_API_URL=http://localhost:8088
-      - REACT_APP_CUSTOMER_SERVICE_LOGIN=http://localhost:3004/et/dev-auth
-      - REACT_APP_NOTIFICATION_NODE_URL=http://localhost:4040
-      - REACT_APP_CSP=upgrade-insecure-requests; default-src 'self'; font-src 'self' data:; img-src 'self' data:; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; object-src 'none'; connect-src 'self' http://localhost:8086 http://localhost:8088 http://localhost:8085 http://localhost:4040 https://admin.dev.buerokratt.ee/chat/menu.json;
-      - DEBUG_ENABLED=true
-      - CHOKIDAR_USEPOLLING=true
-      - PORT=3001
-    build:
-      context: ./GUI
-      # target: web // To be used in production (Dockerfile)
-      dockerfile: Dockerfile.dev
-    ports:
-      - 3001:3001
-    volumes:
-      - /app/node_modules
-      - ./GUI:/app
-    networks:
-      - bykstack
-    cpus: "0.5"
-    mem_limit: "1G"
+#   # gui:
+#   #   container_name: gui
+#   #   environment:
+#   #     - NODE_ENV=development
+#   #     - BASE_URL=http://localhost:8080
+#   #     - REACT_APP_RUUTER_API_URL=http://localhost:8086
+#   #     - REACT_APP_RUUTER_PRIVATE_API_URL=http://localhost:8088
+#   #     - REACT_APP_CUSTOMER_SERVICE_LOGIN=http://localhost:3004/et/dev-auth
+#   #     - REACT_APP_NOTIFICATION_NODE_URL=http://localhost:4040
+#   #     - DEBUG_ENABLED=true
+#   #     - CHOKIDAR_USEPOLLING=true
+#   #     - PORT=3001
+#   #   build:
+#   #     context: ./GUI
+#   #     # target: web // To be used in production (Dockerfile)
+#   #     dockerfile: Dockerfile.dev
+#   #   ports:
+#   #     - 3001:3001
+#   #   volumes:
+#   #     - /app/node_modules
+#   #     - ./GUI:/app
+#   #   networks:
+#   #     - bykstack
+#   #   cpus: "0.5"
+#   #   mem_limit: "1G"
 
-  chat-widget:
-    container_name: chat-widget
-    image: chat-widget
-    ports:
-      - 3003:3003
-    networks:
-      - bykstack
+#   # chat-widget:
+#   #   container_name: chat-widget
+#   #   image: chat-widget
+#   #   ports:
+#   #     - 3003:3003
+#   #   networks:
+#   #     - bykstack
 
-  authentication-layer:
-    container_name: authentication-layer
-    image: authentication-layer
-    ports:
-      - 3004:3004
-    networks:
-      - bykstack
+#   authentication-layer:
+#     container_name: authentication-layer
+#     image: authentication-layer
+#     ports:
+#       - 3004:3004
+#     networks:
+#       - bykstack
 
-  opensearch-node:
-    image: opensearchproject/opensearch:2.11.1
-    container_name: opensearch-node
-    environment:
-      - node.name=opensearch-node
-      - discovery.seed_hosts=opensearch
-      - discovery.type=single-node
-      - bootstrap.memory_lock=true
-      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
-      - plugins.security.disabled=true
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-      nofile:
-        soft: 65536
-        hard: 65536
-    volumes:
-      - opensearch-data:/usr/share/opensearch/data
-    ports:
-      - 9200:9200
-      - 9600:9600
-    networks:
-      - bykstack
+#   opensearch-node:
+#     image: opensearchproject/opensearch:latest
+#     container_name: opensearch-node
+#     environment:
+#       - cluster.name=opensearch-cluster
+#       - node.name=opensearch-node
+#       - discovery.type=single-node
+#       - bootstrap.memory_lock=true
+#       - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+#       - "DISABLE_INSTALL_DEMO_CONFIG=true"
+#       - "DISABLE_SECURITY_PLUGIN=true"
+#     ulimits:
+#       memlock:
+#         soft: -1
+#         hard: -1
+#       nofile:
+#         soft: 65536
+#         hard: 65536
+#     volumes:
+#       - opensearch-data:/usr/share/opensearch/data
+#     ports:
+#       - 9200:9200
+#       - 9600:9600
+#     networks:
+#       - bykstack
 
-  notifications-node:
-    container_name: notifications-node
-    build:
-      context: ./notification-server
-      dockerfile: Dockerfile
-    ports:
-      - 4040:4040
-    depends_on:
-      - opensearch-node
-    environment:
-      OPENSEARCH_PROTOCOL: http
-      OPENSEARCH_HOST: opensearch-node
-      OPENSEARCH_PORT: 9200
-      OPENSEARCH_USERNAME: admin
-      OPENSEARCH_PASSWORD: admin
-      PORT: 4040
-      REFRESH_INTERVAL: 1000
-      QUEUE_REFRESH_INTERVAL: 4000
-      CORS_WHITELIST_ORIGINS: http://localhost:3001,http://localhost:3003,http://localhost:3004,http://localhost:8080
-      RUUTER_URL: http://ruuter-public:8086
-      CHAT_TERMINATION_DELAY: 5000
-    volumes:
-      - /app/node_modules
-      - ./notification-server:/app
-    networks:
-      - bykstack
+#   notifications-node:
+#     container_name: notifications-node
+#     build:
+#       context: ./notification-server
+#       dockerfile: Dockerfile
+#     ports:
+#       - 4040:4040
+#     depends_on:
+#       - opensearch-node
+#     environment:
+#       OPENSEARCH_PROTOCOL: http
+#       OPENSEARCH_HOST: opensearch-node
+#       OPENSEARCH_PORT: 9200
+#       OPENSEARCH_USERNAME: admin
+#       OPENSEARCH_PASSWORD: admin
+#       PORT: 4040
+#       REFRESH_INTERVAL: 1000
+#       QUEUE_REFRESH_INTERVAL: 4000
+#       CORS_WHITELIST_ORIGINS: http://localhost:3001,http://localhost:3003,http://localhost:3004,http://localhost:8080
+#       RUUTER_URL: http://ruuter-public:8086
+#       CHAT_TERMINATION_DELAY: 5000
+#     volumes:
+#       - /app/node_modules
+#       - ./notification-server:/app
+#     networks:
+#       - bykstack
 
-volumes:
-  opensearch-data:
+# volumes:
+#   opensearch-data:
 networks:
   bykstack:
     name: bykstack

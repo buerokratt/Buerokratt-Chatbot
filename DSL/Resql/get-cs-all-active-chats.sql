@@ -117,7 +117,7 @@ SELECT c.base_id AS id,
       MessagesUpdateTime.updated AS last_message_timestamp,
       LastEventMessage.event AS last_message_event
 FROM ActiveChats AS c
-JOIN MessagesUpdateTime ON c.base_id = MessagesUpdateTime.chat_base_id
+LEFT JOIN MessagesUpdateTime ON c.base_id = MessagesUpdateTime.chat_base_id
 LEFT JOIN LastContentMessage ON c.base_id = LastContentMessage.chat_base_id
 LEFT JOIN LastEventMessage ON c.base_id = LastEventMessage.chat_base_id
 LEFT JOIN ContactsMessage ON ContactsMessage.chat_base_id = c.base_id
