@@ -27,6 +27,7 @@ getUnavailableEndedChats:
     body:
       start: ${startDate}
       end: ${endDate}  
+      limit: 100
   result: res
 
 return_result:

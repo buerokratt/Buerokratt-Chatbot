@@ -45,4 +45,5 @@ AND LOWER(m.event) IN (
         'contact-information-skipped',
         'unavailable_organization',
         'unavailable_csas')
-ORDER BY created;
+ORDER BY created ASC
+LIMIT :limit;
