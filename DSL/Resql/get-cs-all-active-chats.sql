@@ -58,9 +58,6 @@ FROM
     WHERE id IN (SELECT MAX(id) FROM chat GROUP BY base_id)
       AND ended IS NULL
       AND customer_support_id != botname.value
-    -- -- For pagination
-    -- ORDER BY created
-    -- LIMIT :limit OFFSET :offset
 ) AS c
 LEFT JOIN LatestMessages lc ON c.base_id = lc.chat_base_id
 LEFT JOIN message m_last ON lc.last_message_id = m_last.id
