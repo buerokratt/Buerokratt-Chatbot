@@ -33,7 +33,16 @@ MaxMessages AS (
   GROUP BY chat_base_id
 ),
 MessagesUpdateTime AS (
-  SELECT updated, chat_base_id, event
+  SELECT 
+    updated,
+    chat_base_id,
+    LOWER(event) AS event_lowercase,
+    (
+      CASE
+        WHEN event = '' THEN NULL
+        ELSE LOWER(event)
+      END
+    ) AS last_message_event
   FROM message
   JOIN MaxMessages ON id = maxId
 ),
@@ -76,7 +85,7 @@ SELECT c.base_id AS id,
        c.labels,
        s.comment,
        LastContentMessage.content AS last_message,
-       (CASE WHEN MessagesUpdateTime.event = '' THEN NULL ELSE LOWER(MessagesUpdateTime.event) END) as last_message_event,
+       MessagesUpdateTime.last_message_event AS last_message_event,
        ContactsMessage.content AS contacts_message,
        MessagesUpdateTime.updated AS last_message_timestamp
 FROM UnavailableEndedChats AS c
@@ -87,7 +96,7 @@ LEFT JOIN FirstContentMessage ON c.base_id = FirstContentMessage.chat_base_id
 LEFT JOIN ContactsMessage ON ContactsMessage.chat_base_id = c.base_id
 CROSS JOIN TitleVisibility
 WHERE c.created::date BETWEEN :start::date AND :end::date
-AND LOWER(MessagesUpdateTime.event) IN (
+AND MessagesUpdateTime.event_lowercase IN (
         'unavailable_holiday',
         'unavailable-contact-information-fulfilled',
         'contact-information-skipped',
