@@ -27,6 +27,7 @@ getEndedChats:
     body:
       start: ${startDate}
       end: ${endDate}  
+      limit: 100
   result: res
 
 returnSuccess:
