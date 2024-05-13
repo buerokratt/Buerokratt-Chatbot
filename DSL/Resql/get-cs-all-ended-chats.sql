@@ -46,6 +46,14 @@ Messages AS (
   FROM message
   JOIN MaxMessages ON id = maxID
 ),
+MaxChats AS (
+  SELECT MAX(id) maxId
+  FROM chat
+  WHERE ended IS NOT NULL
+  AND status <> 'IDLE'
+  AND created::date BETWEEN :start::date AND :end::date
+  GROUP BY base_id
+),
 EndedChatMessages AS (
   SELECT 
     base_id,
@@ -67,13 +75,7 @@ EndedChatMessages AS (
     labels,
     created
   FROM chat
-  WHERE id IN (
-    SELECT MAX(id)
-    FROM chat
-    GROUP BY base_id
-  )
-  AND ended IS NOT NULL
-  AND status <> 'IDLE'
+  RIGHT JOIN MaxChats ON id = maxId
 )
 SELECT c.base_id AS id,
        c.customer_support_id,
@@ -100,11 +102,10 @@ SELECT c.base_id AS id,
        m.updated AS last_message_timestamp
 FROM EndedChatMessages AS c
 JOIN Messages AS m ON c.base_id = m.chat_base_id
-LEFT JOIN chat_history_comments AS s ON s.chat_id =  m.chat_base_id
+LEFT JOIN chat_history_comments AS s ON m.chat_base_id = s.chat_id
 JOIN LastContentMessage ON c.base_id = LastContentMessage.chat_base_id
 JOIN FirstContentMessage ON c.base_id = FirstContentMessage.chat_base_id
 LEFT JOIN ContactsMessage ON ContactsMessage.chat_base_id = c.base_id
 CROSS JOIN TitleVisibility
-WHERE c.created::date BETWEEN :start::date AND :end::date
 ORDER BY created ASC
 LIMIT :limit;
