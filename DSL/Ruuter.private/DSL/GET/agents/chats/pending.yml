@@ -11,6 +11,8 @@ getPendingChats:
   call: http.post
   args:
     url: "[#CHATBOT_RESQL]/get-cs-all-pending-chats"
+    body:
+      limit: 100
   result: res
 
 return_result:
