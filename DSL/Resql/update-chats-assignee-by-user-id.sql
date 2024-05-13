@@ -52,7 +52,29 @@ SELECT c.base_id AS id,
                    WHERE event <> ''
                      AND chat_base_id = c.base_id))) AS last_message_event
 FROM
-  (SELECT *
+  (SELECT 
+      base_id,
+      feedback_text,
+      feedback_rating,
+      customer_support_id,
+      customer_support_display_name,
+      csa_title,
+      end_user_id,
+      end_user_first_name,
+      end_user_last_name,
+      status,
+      created,
+      updated,
+      ended,
+      end_user_email,
+      end_user_phone,
+      end_user_os,
+      end_user_url,
+      external_id,
+      forwarded_to,
+      forwarded_to_name,
+      received_from,
+      received_from_name
    FROM chat
    WHERE id IN
        (SELECT MAX(id)
@@ -69,7 +91,7 @@ FROM
              GROUP BY KEY)
           AND deleted = FALSE)) AS c
 JOIN
-  (SELECT *
+  (SELECT chat_base_id, updated
    FROM message
    WHERE id IN
        (SELECT MAX(id)
@@ -78,7 +100,7 @@ JOIN
           AND event <> 'requested-chat-forward'
         GROUP BY chat_base_id)) AS m ON c.base_id = m.chat_base_id
 JOIN
-  (SELECT *
+  (SELECT chat_base_id, content
    FROM message
    WHERE id IN
        (SELECT MAX(id)
