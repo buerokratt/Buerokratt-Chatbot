@@ -1,5 +1,5 @@
 WITH MaxPreviews AS (
-  SELECT MAX(chat_base_id) maxId
+  SELECT MAX(id) maxId
   FROM message_preview
   GROUP BY chat_base_id
 ),
