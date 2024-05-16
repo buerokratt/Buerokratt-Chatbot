@@ -24,5 +24,5 @@ SELECT base_id,
        csa_title
 FROM chat
 WHERE base_id = :id
-ORDER BY updated DESC
+ORDER BY id DESC
 LIMIT 1;

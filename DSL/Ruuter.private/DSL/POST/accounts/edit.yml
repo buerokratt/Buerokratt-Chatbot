@@ -74,7 +74,7 @@ updateUser:
 updateRoles:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/update-user-role"
+    url: "[#CHATBOT_RESQL]/insert-user-role"
     body:
       userIdCode: ${userIdCode}
       roles: ${roles}
