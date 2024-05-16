@@ -38,7 +38,7 @@ FROM (
         SELECT *
         FROM chat
         WHERE base_id = :id
-        ORDER BY id DESC
+        ORDER BY updated DESC
         LIMIT 1
     ) AS c
     JOIN message AS m ON c.base_id = m.chat_base_id
