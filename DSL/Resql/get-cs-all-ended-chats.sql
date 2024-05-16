@@ -1,3 +1,13 @@
+WITH MaxChatHistoryComments AS (
+  SELECT MAX(id) AS maxId
+  FROM chat_history_comments
+  GROUP BY chat_id
+),
+ChatHistoryComments AS (
+  SELECT comment, chat_id
+  FROM chat_history_comments
+  JOIN MaxChatHistoryComments ON id = maxId
+)
 SELECT c.base_id AS id,
        c.customer_support_id,
        c.customer_support_display_name,
@@ -28,8 +38,7 @@ SELECT c.base_id AS id,
 FROM (SELECT * FROM chat WHERE id IN (SELECT MAX(id) FROM chat GROUP BY base_id) AND ended IS NOT null AND status <> 'IDLE') AS c
   JOIN (SELECT * FROM message WHERE id IN (SELECT MAX(id) FROM message GROUP BY chat_base_id)) AS m
   ON c.base_id = m.chat_base_id
-  LEFT JOIN (SELECT chat_id, comment FROM chat_history_comments) AS s
-  ON s.chat_id =  m.chat_base_id
+  LEFT JOIN ChatHistoryComments AS s ON s.chat_id =  m.chat_base_id
   JOIN (SELECT * FROM message WHERE id IN (SELECT MAX(id) FROM message 
           WHERE content <> ''
           AND content <> 'message-read' GROUP BY chat_base_id)) AS last_content_message

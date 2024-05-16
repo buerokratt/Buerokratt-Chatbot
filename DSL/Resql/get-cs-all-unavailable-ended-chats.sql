@@ -64,6 +64,16 @@ LastContentMessage AS (
   SELECT content, chat_base_id
   FROM message
   JOIN MessageWithContent ON message.id = MessageWithContent.maxId
+),
+MaxChatHistoryComments AS (
+  SELECT MAX(id) AS maxId
+  FROM chat_history_comments
+  GROUP BY chat_id
+),
+ChatHistoryComments AS (
+  SELECT comment, chat_id
+  FROM chat_history_comments
+  JOIN MaxChatHistoryComments ON id = maxId
 )
 SELECT c.base_id AS id,
        c.customer_support_id,
@@ -90,7 +100,7 @@ SELECT c.base_id AS id,
        MessagesUpdateTime.updated AS last_message_timestamp
 FROM UnavailableEndedChats AS c
 LEFT JOIN MessagesUpdateTime ON c.base_id = MessagesUpdateTime.chat_base_id
-LEFT JOIN chat_history_comments AS s ON s.chat_id = MessagesUpdateTime.chat_base_id
+LEFT JOIN ChatHistoryComments AS s ON s.chat_id = MessagesUpdateTime.chat_base_id
 LEFT JOIN LastContentMessage ON c.base_id = LastContentMessage.chat_base_id
 LEFT JOIN FirstContentMessage ON c.base_id = FirstContentMessage.chat_base_id
 LEFT JOIN ContactsMessage ON ContactsMessage.chat_base_id = c.base_id
