@@ -98,7 +98,7 @@ SELECT c.base_id AS id,
        s.comment,
        LastContentMessage.content AS last_message,
        (CASE WHEN m.event = '' THEN NULL ELSE LOWER(m.event) END) as last_message_event,
-       ContactsMessage.content AS ContactsMessage,
+       ContactsMessage.content AS contacts_message,
        m.updated AS last_message_timestamp
 FROM EndedChatMessages AS c
 JOIN Messages AS m ON c.base_id = m.chat_base_id
