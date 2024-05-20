@@ -5,7 +5,7 @@ WITH consts AS (
          'YYYY-MM-DD' AS dateFormat
 ),
 organization_time AS
-  (SELECT *
+  (SELECT key, value
    FROM configuration
    WHERE KEY IN ('organizationMondayWorkingTimeStartISO',
                  'organizationMondayWorkingTimeEndISO',

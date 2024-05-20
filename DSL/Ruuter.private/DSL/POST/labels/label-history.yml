@@ -30,4 +30,5 @@ setChatLabels:
   result: setLabelsResult
 
 return_result:
-  return: ${setLabelsResult.response.body}
+  return: "success"
+  next: end
