@@ -1,9 +1,16 @@
-UPDATE "user"
-SET first_name = :firstName,
-    last_name = :lastName,
-    display_name = :displayName,
-    status = :status,    
-    created = :created::timestamp with time zone, 
-    csa_title = :csaTitle,
-    csa_email = :csaEmail
-WHERE id_code = :userIdCode
+INSERT INTO "user" (id_code, login, password_hash, first_name, last_name, display_name, status, created, csa_title, csa_email)
+SELECT
+  :userIdCode,
+  login,
+  password_hash,
+  :firstName,
+  :lastName,
+  :displayName,
+  :status,
+  :created::timestamp with time zone,
+  :csaTitle,
+  :csaEmail
+FROM "user"
+WHERE id = (
+  SELECT MAX(id) FROM "user" WHERE id_code = :userIdCode
+);

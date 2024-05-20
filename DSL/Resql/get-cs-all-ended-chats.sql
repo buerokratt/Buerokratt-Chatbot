@@ -1,4 +1,14 @@
-WITH MessageWithContent AS (
+WITH MaxChatHistoryComments AS (
+  SELECT MAX(id) AS maxId
+  FROM chat_history_comments
+  GROUP BY chat_id
+),
+ChatHistoryComments AS (
+  SELECT comment, chat_id
+  FROM chat_history_comments
+  JOIN MaxChatHistoryComments ON id = maxId
+),
+MessageWithContent AS (
   SELECT 
     MAX(id) AS maxId,
     MIN(id) AS minId
@@ -102,7 +112,7 @@ SELECT c.base_id AS id,
        m.updated AS last_message_timestamp
 FROM EndedChatMessages AS c
 JOIN Messages AS m ON c.base_id = m.chat_base_id
-LEFT JOIN chat_history_comments AS s ON m.chat_base_id = s.chat_id
+LEFT JOIN ChatHistoryComments AS s ON s.chat_id =  m.chat_base_id
 JOIN LastContentMessage ON c.base_id = LastContentMessage.chat_base_id
 JOIN FirstContentMessage ON c.base_id = FirstContentMessage.chat_base_id
 LEFT JOIN ContactsMessage ON ContactsMessage.chat_base_id = c.base_id
