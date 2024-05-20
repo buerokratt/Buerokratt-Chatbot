@@ -22,6 +22,8 @@ import clsx from 'clsx';
 import apiDev from 'services/api-dev';
 import { ChromePicker } from 'react-color';
 import { MdOutlinePalette } from 'react-icons/md';
+import withAuthorization from 'hoc/with-authorization';
+import { ROLES } from 'utils/constants';
 
 const variants = {
   initial: {
@@ -272,4 +274,4 @@ const SettingsAppearance: FC = () => {
   );
 };
 
-export default SettingsAppearance;
+export default withAuthorization(SettingsAppearance, [ROLES.ROLE_ADMINISTRATOR]);

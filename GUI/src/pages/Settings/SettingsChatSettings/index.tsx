@@ -6,6 +6,8 @@ import { AxiosError } from 'axios';
 import { Button, Card, Switch, Track } from 'components';
 import { useToast } from 'hooks/useToast';
 import apiDev from 'services/api-dev';
+import withAuthorization from 'hoc/with-authorization';
+import { ROLES } from 'utils/constants';
 
 const SettingsChatSettings: FC = () => {
   const { t } = useTranslation();
@@ -143,4 +145,4 @@ const SettingsChatSettings: FC = () => {
   );
 };
 
-export default SettingsChatSettings;
+export default withAuthorization(SettingsChatSettings, [ROLES.ROLE_ADMINISTRATOR]);

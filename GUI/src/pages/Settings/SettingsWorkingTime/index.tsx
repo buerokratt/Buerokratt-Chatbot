@@ -10,6 +10,8 @@ import { useToast } from 'hooks/useToast';
 import apiDev from 'services/api-dev';
 import './SettingsWorkingTime.scss';
 import { getOrganizationTimeData, setOrganizationTimeData } from './data';
+import withAuthorization from 'hoc/with-authorization';
+import { ROLES } from 'utils/constants';
 
 const weekdaysOptions = [
   'Monday',
@@ -309,4 +311,4 @@ const SettingsWorkingTime: FC = () => {
   );
 };
 
-export default SettingsWorkingTime;
+export default withAuthorization(SettingsWorkingTime, [ROLES.ROLE_ADMINISTRATOR]);

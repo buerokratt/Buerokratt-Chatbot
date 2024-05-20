@@ -31,6 +31,8 @@ import {
 } from 'utils/local-storage-utils';
 import { CHAT_HISTORY_PREFERENCES_KEY } from 'constants/config';
 import { useLocation } from 'react-router-dom';
+import withAuthorization from 'hoc/with-authorization';
+import { ROLES } from 'utils/constants';
 
 const ChatHistory: FC = () => {
   const { t } = useTranslation();
@@ -576,4 +578,7 @@ const ChatHistory: FC = () => {
   );
 };
 
-export default ChatHistory;
+export default withAuthorization(ChatHistory, [
+  ROLES.ROLE_ADMINISTRATOR,
+  ROLES.ROLE_CUSTOMER_SUPPORT_AGENT,
+]);
