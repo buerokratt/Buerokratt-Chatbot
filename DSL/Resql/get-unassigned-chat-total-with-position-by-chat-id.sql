@@ -7,6 +7,6 @@ SELECT (CASE
             WHEN :chatId IS NULL OR :chatId = ''
                 THEN (SELECT 0)
             ELSE (SELECT position FROM unassigned_chats WHERE base_id = :chatId) END) as position_in_unassigned_chats,
-       (SELECT COUNT(*) FROM unassigned_chats)                                        as unassigned_chat_total
+       (SELECT COUNT(base_id) FROM unassigned_chats)                                        as unassigned_chat_total
 FROM unassigned_chats
 LIMIT 1;

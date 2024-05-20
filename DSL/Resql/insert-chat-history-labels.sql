@@ -50,6 +50,5 @@ SELECT
 FROM chat
 WHERE base_id = :chatId
 ORDER BY id DESC
-LIMIT 1
-RETURNING *;
+LIMIT 1;
 
