@@ -133,7 +133,7 @@ const DataTable: FC<DataTableProps> = (
   });
 
   return (
-    <div className='data-table__wrapper'>
+    <div className='data-table__scrollWrapper'>
       <table className='data-table'>
         {!disableHead && (
           <thead>

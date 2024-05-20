@@ -1,1 +1,3 @@
-DELETE FROM message_preview WHERE chat_base_id = :chatId;
+INSERT INTO message_preview(chat_base_id, content)
+VALUES (:chatId, NULL)
+ON CONFLICT(chat_base_id) DO UPDATE SET content = :content;
