@@ -1,7 +1,6 @@
-ARG node_version=node:lts
-ARG nginx_version=nginx:1.21.3-alpine
+ARG nginx_version=nginx:1.25.4-alpine
 
-FROM $node_version as image
+FROM node:22.0.0-alpine AS image
 WORKDIR /usr/buerokratt-chatbot
 COPY ./package*.json ./
 
@@ -13,8 +12,9 @@ VOLUME /usr/buerokratt-chatbot
 
 FROM $nginx_version AS web
 COPY ./nginx/http-nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=build ./usr/buerokratt-chatbot/ /opt/buerokratt-chatbot/
-COPY --from=build ./usr/buerokratt-chatbot/build /usr/share/nginx/html/buerokratt-chatbot
+COPY --from=build ./usr/buerokratt-chatbot/build/assets /usr/share/nginx/html/buerokratt-chatbot/chat/assets
+COPY --from=build ./usr/buerokratt-chatbot/build/index.html /usr/share/nginx/html/buerokratt-chatbot
+COPY --from=build ./usr/buerokratt-chatbot/build/favicon.ico /usr/share/nginx/html/buerokratt-chatbot
 EXPOSE 3001
 
 CMD ["nginx", "-g", "daemon off;"]
