@@ -45,7 +45,7 @@ getUserRole:
   next: returnSuccess
 
 returnSuccess:
-  return: ${roles_res.response.body[0].authorities}
+  return: ${roles_res.response.body?.[0]?.authorities ?? []}
   next: end
 
 returnNotFound:

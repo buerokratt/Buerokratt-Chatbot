@@ -7,7 +7,7 @@ SELECT DISTINCT u.login,
        u.csa_email,
        ua.authority_name AS authorities
 FROM "user" u
-         INNER JOIN (SELECT authority_name, user_id
+         LEFT JOIN (SELECT authority_name, user_id
                      FROM user_authority AS ua
                      WHERE ua.id IN (SELECT max(id)
                                      FROM user_authority

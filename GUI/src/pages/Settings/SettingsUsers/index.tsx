@@ -88,7 +88,7 @@ const SettingsUsers: FC = () => {
       columnHelper.accessor(
         (data: { authorities: ROLES[] }) => {
           const output: string[] = [];
-          data.authorities.map((role) => {
+          data.authorities?.map?.((role) => {
             return output.push(t(`roles.${role}`));
           });
           return output;
