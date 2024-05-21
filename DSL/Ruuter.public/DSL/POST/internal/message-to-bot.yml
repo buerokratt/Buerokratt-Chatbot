@@ -40,7 +40,7 @@ check_bot_is_active:
 
 check_for_bot_active_result:
   switch:
-    - condition: ${is_bot_active_result.response.body[0].value === 'true'}
+    - condition: ${is_bot_active_result.response.body[0]?.value === 'true'}
       next: get_bot_name
   next: return_bot_is_not_active
 
@@ -55,7 +55,7 @@ get_bot_name:
 
 check_for_bot_name_result:
   switch:
-    - condition: ${200 <= get_bot_name_result.response.statusCodeValue && get_bot_name_result.response.statusCodeValue < 300}
+    - condition: ${200 <= get_bot_name_result.response.statusCodeValue && get_bot_name_result.response.statusCodeValue < 300 && get_bot_name_result.response.body[0]?.value != null}
       next: get_chat
   next: return_bad_request
 

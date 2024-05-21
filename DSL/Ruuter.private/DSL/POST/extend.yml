@@ -12,18 +12,6 @@ declaration:
         type: string
         description: "Cookie field"
 
-getConfigurationValue:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RESQL]/get-configuration"
-    body:
-      key: "session_length"
-  result: res
-
-assignSessionLength:
-  assign:
-    sessionLength: ${res.response.body[0].value}
-
 extend_cookie:
   call: http.post
   args:
