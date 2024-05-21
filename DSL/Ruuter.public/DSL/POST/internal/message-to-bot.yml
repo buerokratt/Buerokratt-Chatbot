@@ -77,30 +77,33 @@ check_for_get_chat_result:
 check_chat_belongs_to_bot:
   switch:
     - condition: ${get_chat_result.response.body[0].customerSupportId == get_bot_name_result.response.body[0].value}
-      next: post_message_to_client
+      next: decode_content_to_be_sent_to_bot
   next: return_chat_does_not_belong_to_bot
 
-post_message_to_client:
+decode_content_to_be_sent_to_bot:
+  assign:
+    decodedContent: ${decodeURIComponent(content)}
+
+post_message_to_bot:
   call: http.post
   args:
     url: "[#CHATBOT_BOT]/webhooks/rest/webhook"
     body:
       sender: ${chatId}
-      message: ${content}
-  result: post_message_to_client_result
-  next: check_for_post_message_to_client_result
-
-check_for_post_message_to_client_result:
+      message: ${decodedContent}
+  result: post_message_to_bot_result
+  
+check_for_post_message_to_bot_result:
   switch:
-    - condition: ${200 <= post_message_to_client_result.response.statusCodeValue && post_message_to_client_result.response.statusCodeValue < 300}
+    - condition: ${200 <= post_message_to_bot_result.response.statusCodeValue && post_message_to_bot_result.response.statusCodeValue < 300}
       next: check_if_bot_is_unable_to_reply
   next: return_bad_request
 
 check_if_bot_is_unable_to_reply:
   switch:
-    - condition: ${post_message_to_client_result.response.body[0].text == 'UNKNOWN'}
+    - condition: ${post_message_to_bot_result.response.body[0].text == 'UNKNOWN'}
       next: check_for_fallback_bot
-    - condition: ${post_message_to_client_result.response.body[0].text == 'Suunan teid klienditeenindajale. Varuge natukene kannatust.'}
+    - condition: ${post_message_to_bot_result.response.body[0].text == 'Suunan teid klienditeenindajale. Varuge natukene kannatust.'}
       next: get_organization_working_details
   next: extract_bot_responses
 
@@ -236,7 +239,7 @@ add_chat_id_to_queue_notification_node:
 
 extract_bot_responses:
   assign:
-    botMsg: ${post_message_to_client_result.response.body}
+    botMsg: ${post_message_to_bot_result.response.body}
 
 check_if_bot_message_start_with_hash:
   switch:
