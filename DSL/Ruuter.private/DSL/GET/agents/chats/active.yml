@@ -1,0 +1,19 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'ACTIVE'"
+  method: get
+  accepts: json
+  returns: json
+  namespace: backoffice
+
+getActiveChats:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-cs-all-active-chats"
+    body:
+      limit: 100
+  result: res
+
+return_result:
+  return: ${res.response.body}

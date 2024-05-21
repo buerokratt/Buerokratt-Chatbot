@@ -1,0 +1,28 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'SEARCH'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: searchKey
+        type: string
+        description: "Body field 'searchKey'"
+
+extractRequestData:
+  assign:
+    searchKey: ${incoming.body.searchKey}
+
+getChatById:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-chat-ids-matching-message-search"
+    body:
+      searchKey: ${searchKey}
+  result: res
+
+return_result:
+   return: ${res.response.body}  

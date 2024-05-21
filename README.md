@@ -10,7 +10,7 @@ This repo will primarily contain:
 ## Dev setup
 
 - Clone [Ruuter](https://github.com/buerokratt/Ruuter)
-- Navigate to Ruuter and build the image `docker build -t ruuter .
+- Navigate to Ruuter and build the image `docker build -t ruuter .`
 - Clone [Resql](https://github.com/buerokratt/Resql)
 - Navigate to Resql and build the image `docker build -t resql .`
 - Clone [Data Mapper](https://github.com/buerokratt/DataMapper)
@@ -62,3 +62,9 @@ Currently, Header and Main Navigation used as external components, they are defi
  "@buerokrat-ria/menu": "^0.0.1"
  "@buerokrat-ria/styles": "^0.0.1"
 ```
+
+### Notes
+
+##### Ruuter Internal Requests
+
+- When running ruuter either on local or in an environment make sure to adjust `- application.internalRequests.allowedIPs=127.0.0.1,{YOUR_IPS}` under ruuter environments

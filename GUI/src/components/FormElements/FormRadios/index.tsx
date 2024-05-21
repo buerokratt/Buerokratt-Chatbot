@@ -17,7 +17,7 @@ const FormRadios: FC<FormRadiosType> = ({ label, name, hideLabel, items, onChang
   const id = useId();
 
   return (
-    <div className='radios' role='group'>
+    <fieldset className='radios' role='group'>
       {label && !hideLabel && <label className='radios__label'>{label}</label>}
       <div className='radios__wrapper'>
         {items.map((item, index) => (
@@ -29,7 +29,7 @@ const FormRadios: FC<FormRadiosType> = ({ label, name, hideLabel, items, onChang
           </div>
         ))}
       </div>
-    </div>
+    </fieldset>
   );
 };
 

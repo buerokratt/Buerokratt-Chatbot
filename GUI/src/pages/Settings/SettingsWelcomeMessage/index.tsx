@@ -12,14 +12,14 @@ const SettingsWelcomeMessage: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
   const [welcomeMessage, setWelcomeMessage] = useState<string>('');
-  const [welcomeMessageActive, setWelcomeMessageActivity] = useState<
+  const [welcomeMessageActive, setWelcomeMessageActive] = useState<
     boolean | undefined
   >(undefined);
-  const { data } = useQuery({
+  useQuery({
     queryKey: ['greeting/message', 'prod'],
     onSuccess: (res: any) => {
       setWelcomeMessage(res.response.est ?? '');
-      setWelcomeMessageActivity(res.response.isActive ?? false);
+      setWelcomeMessageActive(res.response.isActive ?? false);
     },
   });
 
@@ -91,7 +91,7 @@ const SettingsWelcomeMessage: FC = () => {
             checked={welcomeMessageActive}
             label={t('settings.welcomeMessage.greetingActive')}
             name={'label'}
-            onCheckedChange={setWelcomeMessageActivity}
+            onCheckedChange={setWelcomeMessageActive}
           />
           <FormTextarea
             label={t('settings.welcomeMessage.welcomeMessage')}

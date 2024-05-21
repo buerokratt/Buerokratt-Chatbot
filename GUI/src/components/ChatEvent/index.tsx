@@ -24,28 +24,27 @@ const ChatEvent: FC<ChatEventProps> = ({ message }) => {
 
   switch (event) {
     case CHAT_EVENTS.REDIRECTED:
-      {
-        if (forwardedByUser === forwardedFromCsa) {
-          EVENT_PARAMS = t('chat.redirectedMessageByOwner', {
-            from: forwardedFromCsa,
-            to: forwardedToCsa,
-            date: format(new Date(authorTimestamp), 'dd.MM.yyyy HH:mm:ss'),
-          });
-        } else if (forwardedByUser === forwardedToCsa) {
-          EVENT_PARAMS = t('chat.redirectedMessageClaimed', {
-            from: forwardedFromCsa,
-            to: forwardedToCsa,
-            date: format(new Date(authorTimestamp), 'dd.MM.yyyy HH:mm:ss'),
-          });
-        } else {
-          EVENT_PARAMS = t('chat.redirectedMessage', {
-            user: forwardedByUser,
-            from: forwardedFromCsa,
-            to: forwardedToCsa,
-            date: format(new Date(authorTimestamp), 'dd.MM.yyyy HH:mm:ss'),
-          });
-        }
+      if (forwardedByUser === forwardedFromCsa) {
+        EVENT_PARAMS = t('chat.redirectedMessageByOwner', {
+          from: forwardedFromCsa,
+          to: forwardedToCsa,
+          date: format(new Date(authorTimestamp), 'dd.MM.yyyy HH:mm:ss'),
+        });
+      } else if (forwardedByUser === forwardedToCsa) {
+        EVENT_PARAMS = t('chat.redirectedMessageClaimed', {
+          from: forwardedFromCsa,
+          to: forwardedToCsa,
+          date: format(new Date(authorTimestamp), 'dd.MM.yyyy HH:mm:ss'),
+        });
+      } else {
+        EVENT_PARAMS = t('chat.redirectedMessage', {
+          user: forwardedByUser,
+          from: forwardedFromCsa,
+          to: forwardedToCsa,
+          date: format(new Date(authorTimestamp), 'dd.MM.yyyy HH:mm:ss'),
+        });
       }
+
       break;
     case CHAT_EVENTS.ANSWERED:
       EVENT_PARAMS = t('chat.events.answered', {
@@ -189,7 +188,9 @@ const ChatEvent: FC<ChatEventProps> = ({ message }) => {
       break;
     case CHAT_EVENTS.USER_AUTHENTICATED:
       EVENT_PARAMS = t('chat.events.user-authenticated', {
-        name: `${message.authorFirstName ?? ''} ${message.authorLastName ?? ''}`,
+        name: `${message.authorFirstName ?? ''} ${
+          message.authorLastName ?? ''
+        }`,
         date: format(new Date(message.authorTimestamp), 'dd.MM.yyyy HH:mm:ss'),
       });
       break;

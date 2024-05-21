@@ -1,0 +1,33 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'NEW'"
+  method: get
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    params:
+      - field: chatId
+        type: string
+        description: "Parameter 'chatId'"
+      - field: lastRead
+        type: string
+        description: "Parameter 'lastRead'"
+
+extractRequestData:
+  assign:
+    chatId: ${incoming.params.chatId}
+    lastRead: ${incoming.params.lastRead}
+
+getNewMessages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-chat-messages-updated-after-time"
+    body:
+      chatId: ${chatId}
+      timeRangeBegin: ${lastRead}
+  result: res
+
+returnSuccess:
+  return: ${res.response.body}

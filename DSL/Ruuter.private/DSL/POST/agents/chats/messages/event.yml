@@ -1,0 +1,115 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'EVENT'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: authorTimestamp
+        type: string
+        description: "Body field 'authorTimestamp'"
+      - field: event
+        type: string
+        description: "Body field 'event'"
+      - field: id
+        type: string
+        description: "Body field 'id'"
+
+extractRequestData:
+  assign:
+    id: ${incoming.body.id}
+    event: ${incoming.body.event}
+    authorTimestamp: ${incoming.body.authorTimestamp}
+
+getMessageById:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-message-by-id"
+    body:
+      id: ${id}
+  result: res
+  next: assignMessage
+
+assignMessage:
+  assign:
+    message: ${res.response.body[0]}
+  next: insertMessage
+
+insertMessage:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-message"
+    body:
+      messageId: ${id}
+      chatId: ${message.chatBaseId}
+      authorId: ${message.authorId ?? ""}
+      authorTimestamp: ${authorTimestamp}
+      authorFirstName: ${message.authorFirstName ?? ""}
+      authorLastName: ${message.authorLastName ?? ""}
+      authorRole: "backoffice-user"
+      created: ${message.created ?? ""}
+      content: ${message.content ?? ""}
+      event: ${event}
+      forwardedByUser: ${message.forwardedByUser ?? ""}
+      forwardedFromCsa: ${message.forwardedFromCsa ?? ""}
+      forwardedToCsa: ${message.forwardedToCsa ?? ""}
+      rating: ${message.rating ?? ""}
+  result: insertMessageResult
+  next: clearChatList
+
+clearChatList:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query?conflicts=proceed"
+    body:
+     query:
+      term:
+       channelId: "chat-list"
+  result: clear_chat_res
+  next: postNotificationAboutAddedChat
+
+postNotificationAboutAddedChat:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
+    body:
+     channelId: "chat-list"
+     timestamp: ${new Date().toISOString()}
+     payload: {
+        "status": "Chat Status Changed",
+        "chatId": "${message.chatBaseId}"
+     }
+  result: chat_notification_result
+  next: clearMessages
+
+clearMessages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query?conflicts=proceed"
+    body:
+     query:
+      term:
+       channelId: ${message.chatBaseId}
+  result: clear_messages_res
+  next: postNotificationAboutMessageResponse
+
+postNotificationAboutMessageResponse:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
+    body:
+     channelId: ${message.chatBaseId}
+     timestamp: ${new Date().toISOString()}
+     payload: {
+        "type": "message",
+        "messageId": "${messageId}"
+     }
+  result: message_notification_result
+  next: return_result
+
+return_result:
+  return: "Message Event Sent Successfully"
+  next: end

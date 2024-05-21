@@ -1,0 +1,76 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'CALL-SERVICE'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: authorId
+        type: string
+        description: "Body field 'authorId'"
+      - field: chatId
+        type: string
+        description: "Body field 'chatId'"
+      - field: msg
+        type: string
+        description: "Body field 'msg'"
+
+extract_body:
+  assign:
+    msg: ${incoming.body.msg}
+    chatId: ${incoming.body.chatId}
+    authorId: ${incoming.body.authorId}
+
+extrat_trigger_service_info:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/extract_trigger_service_info"
+    headers:
+      type: json
+    body:
+      msg: ${msg}
+  result: trigger_service_info_res
+
+check_if_trigger_service_is_exist:
+  call: http.post
+  args:
+    url: "[#TRAINING_RESQL]/check-if-trigger-service-is-exist"
+    body:
+      intent: ${trigger_service_info_res.response.body.name}
+  result: trigger_service_is_exist_res
+
+check_trigger_service_is_exist_res:
+  switch:
+    - condition: ${trigger_service_is_exist_res.response.statusCodeValue >= 300}
+      next: return_trigger_service_is_not_exist
+    - condition: ${trigger_service_is_exist_res.response.body.length === 0}
+      next: return_trigger_service_is_not_exist
+
+extract_dynamic_body:
+  assign:
+    name: ${trigger_service_is_exist_res.response.body[0].name}
+    params: ${trigger_service_info_res.response.body.params}
+
+call_the_service:
+  call: http.post
+  args:
+    url: "[#SERVICE_RUUTER_PUBLIC]/services/active/${name}"
+    dynamicParameters: true
+    body:
+      chatId: ${chatId}
+      authorId: ${authorId}
+      params: ${params}
+  result: service_call_result
+
+return_ok:
+  status: 200
+  return: "Service called successfully" 
+  next: end   
+
+return_trigger_service_is_not_exist:
+  status: 404
+  return: "service_currently_unavailable" 
+  next: end

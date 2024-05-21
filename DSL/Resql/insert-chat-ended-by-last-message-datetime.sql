@@ -45,7 +45,7 @@ WHERE chat_base_id NOT IN (SELECT chat_base_ids.chat_base_id FROM chat_base_ids)
   AND id IN (SELECT max(id) FROM message GROUP BY chat_base_id);
 
 WITH active_chats AS (SELECT c.id
-                      FROM (SELECT *
+                      FROM (SELECT id
                             FROM chat
                             WHERE id IN (SELECT MAX(id) FROM chat GROUP BY base_id)
                               AND status = :currentStatus

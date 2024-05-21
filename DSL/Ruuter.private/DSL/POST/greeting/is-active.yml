@@ -1,3 +1,17 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'IS-ACTIVE'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: isActive
+        type: string
+        description: "Body field 'isActive'"
+
 extractRequestData:
   assign:
     isActive: ${incoming.body.isActive}

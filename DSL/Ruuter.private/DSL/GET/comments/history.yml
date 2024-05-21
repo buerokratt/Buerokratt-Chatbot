@@ -1,0 +1,29 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'HISTORY'"
+  method: get
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    params:
+      - field: chatId
+        type: string
+        description: "Parameter 'chatId'"
+
+extractRequestData:
+  assign:
+    chatId: ${incoming.params.chatId}    
+
+getChatHistoryComment:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-chat-history-comment-by-id"
+    body:
+      chatId: ${chatId}
+  result: res
+
+returnSuccess:
+  return: ${res.response.body}
+  next: end

@@ -23,7 +23,7 @@ const SettingsUsers: FC = () => {
   );
   const [usersList, setUsersList] = useState<User[]>([]);
   const { data: users } = useQuery<User[]>({
-    queryKey: ['account/customer-support-agents', 'prod'],
+    queryKey: ['accounts/customer-support-agents', 'prod'],
     onSuccess(res: any) {
       setUsersList(res.response);
     },
@@ -34,7 +34,7 @@ const SettingsUsers: FC = () => {
     mutationFn: ({ id }: { id: string | number }) => deleteUser(id),
     onSuccess: async () => {
       await queryClient.invalidateQueries([
-        'account/customer-support-agents',
+        'accounts/customer-support-agents',
         'prod',
       ]);
       toast.open({
@@ -53,17 +53,37 @@ const SettingsUsers: FC = () => {
     },
   });
 
+  const editView = (props: any) => (
+    <Button
+      appearance="text"
+      onClick={() => setEditableRow(props.row.original)}
+    >
+      <Icon icon={<MdOutlineEdit />} />
+      {t('global.edit')}
+    </Button>
+  );
+
+  const deleteView = (props: any) => (
+    <Button
+      appearance="text"
+      onClick={() => setDeletableRow(props.row.original.idCode)}
+    >
+      <Icon icon={<MdOutlineDeleteOutline />} />
+      {t('global.delete')}
+    </Button>
+  );
+
   const usersColumns = useMemo(
     () => [
       columnHelper.accessor(
         (row) => `${row.firstName ?? ''} ${row.lastName ?? ''}`,
         {
           id: `name`,
-          header: t('settings.users.name') || '',
+          header: t('settings.users.name') ?? '',
         }
       ),
       columnHelper.accessor('idCode', {
-        header: t('settings.users.idCode') || '',
+        header: t('settings.users.idCode') ?? '',
       }),
       columnHelper.accessor(
         (data: { authorities: ROLES[] }) => {
@@ -74,7 +94,7 @@ const SettingsUsers: FC = () => {
           return output;
         },
         {
-          header: t('settings.users.role') || '',
+          header: t('settings.users.role') ?? '',
           cell: (props) => props.getValue().join(', '),
           filterFn: (row: Row<User>, _, filterValue) => {
             const rowAuthorities: string[] = [];
@@ -89,40 +109,24 @@ const SettingsUsers: FC = () => {
         }
       ),
       columnHelper.accessor('displayName', {
-        header: t('settings.users.displayName') || '',
+        header: t('settings.users.displayName') ?? '',
       }),
       columnHelper.accessor('csaTitle', {
-        header: t('settings.users.userTitle') || '',
+        header: t('settings.users.userTitle') ?? '',
       }),
       columnHelper.accessor('csaEmail', {
-        header: t('settings.users.email') || '',
+        header: t('settings.users.email') ?? '',
       }),
       columnHelper.display({
         id: 'edit',
-        cell: (props) => (
-          <Button
-            appearance="text"
-            onClick={() => setEditableRow(props.row.original)}
-          >
-            <Icon icon={<MdOutlineEdit />} />
-            {t('global.edit')}
-          </Button>
-        ),
+        cell: editView,
         meta: {
           size: '1%',
         },
       }),
       columnHelper.display({
         id: 'delete',
-        cell: (props) => (
-          <Button
-            appearance="text"
-            onClick={() => setDeletableRow(props.row.original.idCode)}
-          >
-            <Icon icon={<MdOutlineDeleteOutline />} />
-            {t('global.delete')}
-          </Button>
-        ),
+        cell: deleteView,
         meta: {
           size: '1%',
         },

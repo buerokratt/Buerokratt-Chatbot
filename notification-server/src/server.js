@@ -8,11 +8,17 @@ const {
 } = require("./addOns");
 const { enqueueChatId, dequeueChatId } = require("./openSearch");
 const { addToTerminationQueue, removeFromTerminationQueue } = require("./terminationQueue");
+const helmet = require("helmet");
+const cookieParser = require("cookie-parser");
+const csurf = require("csurf");
 
 const app = express();
 
 app.use(cors());
+app.use(helmet.hidePoweredBy());
 app.use(express.json({ extended: false }));
+app.use(cookieParser());
+app.use(csurf({ cookie: true }));
 
 app.get("/sse/notifications/:channelId", (req, res) => {
   const { channelId } = req.params;
@@ -45,7 +51,7 @@ app.post("/dequeue", async (req, res) => {
 app.post("/add-chat-to-termination-queue", (req, res) => {
   addToTerminationQueue(
     req.body.chatId,
-    () => fetch(`${process.env.RUUTER_URL}/end-chat`, {
+    () => fetch(`${process.env.RUUTER_URL}/chats/end`, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',

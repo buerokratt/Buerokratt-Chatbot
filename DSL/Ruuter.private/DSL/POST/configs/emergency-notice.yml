@@ -1,3 +1,26 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'EMERGENCY-NOTICE'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: emergencyNoticeEndISO
+        type: string
+        description: "Body field 'emergencyNoticeEndISO'"
+      - field: emergencyNoticeStartISO
+        type: string
+        description: "Body field 'emergencyNoticeStartISO'"
+      - field: emergencyNoticeText
+        type: string
+        description: "Body field 'emergencyNoticeText'"
+      - field: isEmergencyNoticeVisible
+        type: string
+        description: "Body field 'isEmergencyNoticeVisible'"
+
 extractRequestData:
   assign:
     emergencyNoticeText: ${incoming.body.emergencyNoticeText}

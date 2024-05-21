@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { AxiosError } from 'axios';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { Button, Dialog, FormInput, FormSelect, Track } from 'components';
+import { Button, Dialog, FormInput, Track } from 'components';
 import { User, UserDTO } from 'types/user';
 import { checkIfUserExists, createUser, editUser } from 'services/users';
 import { useToast } from 'hooks/useToast';
@@ -62,7 +62,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
     mutationFn: (data: UserDTO) => createUser(data),
     onSuccess: async () => {
       await queryClient.invalidateQueries([
-        'account/customer-support-agents',
+        'accounts/customer-support-agents',
         'prod',
       ]);
       toast.open({
@@ -91,7 +91,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
     }) => editUser(id, userData),
     onSuccess: async () => {
       await queryClient.invalidateQueries([
-        'account/customer-support-agents',
+        'accounts/customer-support-agents',
         'prod',
       ]);
       toast.open({
@@ -219,7 +219,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
                   required={true}
                   options={roles}
                   defaultValue={user?.authorities.map((v) => {
-                    return { label: t(`roles.${v}` ?? ''), value: v };
+                    return { label: t(`roles.${v ?? ''}`), value: v };
                   })}
                   isMulti={true}
                   placeholder={t('global.choose')}

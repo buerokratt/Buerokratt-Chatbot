@@ -1,4 +1,4 @@
-import { FC, Fragment, useState } from 'react';
+import { FC, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
@@ -36,7 +36,7 @@ const SettingsWorkingTime: FC = () => {
   );
   const { data: workingTime } = useQuery<OrganizationWorkingTime>({
     queryKey: ['configs/organization-working-time', 'prod'],
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       if (Object.keys(control._formValues).length > 0) return;
       reset(getOrganizationTimeData(data.response));
       setKey(key + 1);
@@ -68,6 +68,14 @@ const SettingsWorkingTime: FC = () => {
   const handleFormSubmit = handleSubmit((data) =>
     workingTimeMutation.mutate(data)
   );
+
+  function sortAndJoin(array: string[]): string {
+    return array.toSorted((a, b) => a.localeCompare(b)).join(',');
+  }
+
+  function filterAndJoin(array: string[], day: string): string {
+    return array.filter((pd: string) => pd !== day.toLowerCase()).join(',');
+  }
 
   if (!workingTime || Object.keys(control._formValues).length === 0) {
     return <>Loading...</>;
@@ -137,9 +145,10 @@ const SettingsWorkingTime: FC = () => {
           <Track>
             <label className="Label">
               {t(
-                `${isOrganizationClosedOnWeekEnds
-                  ? 'settings.workingTime.allWeekdaysExceptWeekend'
-                  : 'settings.workingTime.allWeekdays'
+                `${
+                  isOrganizationClosedOnWeekEnds
+                    ? 'settings.workingTime.allWeekdaysExceptWeekend'
+                    : 'settings.workingTime.allWeekdays'
                 }`
               )}
             </label>
@@ -220,15 +229,14 @@ const SettingsWorkingTime: FC = () => {
                         onCheckedChange={(value) => {
                           field.onChange(
                             value
-                              ? [...field.value.split(','), d.toLowerCase()]
-                                .sort()
-                                .join(',')
-                              : field.value
-                                .split(',')
-                                .filter(
-                                  (pd: string) => pd !== d.toLowerCase()
+                              ? sortAndJoin([
+                                  ...field.value.toString().split(','),
+                                  d.toLowerCase(),
+                                ])
+                              : filterAndJoin(
+                                  field.value.toString().split(','),
+                                  d
                                 )
-                                .join(',')
                           );
                         }}
                         checked={field.value?.includes(d.toLowerCase())}

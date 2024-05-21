@@ -1,0 +1,40 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'EXISTS'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: userIdCode
+        type: string
+        description: "Body field 'userIdCode'"
+
+extractRequestData:
+  assign:
+    userId: ${incoming.body.userIdCode}
+
+getUser:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-user"
+    body:
+      userIdCode: ${userId}
+  result: res
+  next: checkIfUserExists
+
+checkIfUserExists:
+  switch:
+    - condition: "${res.response.body.length > 0}"
+      next: return_exists
+  next: return_not_exists
+
+return_exists:
+  return: "true"
+  next: end
+
+return_not_exists:
+  return: "false"
+  next: end

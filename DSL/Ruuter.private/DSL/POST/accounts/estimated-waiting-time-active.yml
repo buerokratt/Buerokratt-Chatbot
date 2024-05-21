@@ -1,0 +1,30 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'ESTIMATED-WAITING-TIME-ACTIVE'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: isActive
+        type: string
+        description: "Body field 'isActive'"
+
+extractRequestData:
+  assign:
+    isActive: ${incoming.body.isActive}
+
+setConfigurationValue:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-configuration-value"
+    body:
+      created: ${new Date().toISOString()}
+      key: "is_estimated_waiting_time_active"
+      value: ${isActive}
+  result: res
+
+return_result:
+  return: ${res.response.body}

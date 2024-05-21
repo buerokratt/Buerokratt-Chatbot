@@ -1,0 +1,35 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'ENDED'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: endDate
+        type: string
+        description: "Body field 'endDate'"
+      - field: startDate
+        type: string
+        description: "Body field 'startDate'"
+
+extractRequestData:
+  assign:
+    startDate: "${incoming.body.startDate}"
+    endDate: "${incoming.body.endDate}"
+
+getEndedChats:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-cs-all-ended-chats"
+    body:
+      start: ${startDate}
+      end: ${endDate}  
+      limit: 100
+  result: res
+
+returnSuccess:
+  return: ${res.response.body}
+  next: end

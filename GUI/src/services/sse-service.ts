@@ -22,9 +22,7 @@ const sse = <T>(url: string, onMessage: (data: T) => void): EventSource => {
     console.log('SSE connection Opened');
   };
 
-  eventSource.onerror = () => {
-    // console.error('SSE error, url:', url); // Uncomment this line to see the error in the console
-  };
+  eventSource.onerror = () => {};
 
   return eventSource;
 };

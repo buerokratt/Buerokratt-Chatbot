@@ -1,0 +1,46 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'RATING'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: chatId
+        type: string
+        description: "Body field 'chatId'"
+      - field: feedbackRating
+        type: string
+        description: "Body field 'feedbackRating'"
+
+extractRequestData:
+  assign:
+    chatId: ${incoming.body.chatId}
+    rating: ${incoming.body.feedbackRating}
+
+check_rating_limit:
+  switch:
+    - condition: ${rating === null || rating === 'null'}
+      next: return_invalid_rating
+  next: addFeedbackRating
+
+addFeedbackRating:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/update-chat-with-feedback-rating"
+    body:
+      id: ${chatId}
+      created: ${new Date().toISOString()}
+      feedback_rating: ${rating}
+  result: res
+  next: return_result
+
+return_result:
+  return: "Rated Chat Successfully"
+  next: end
+
+return_invalid_rating:
+  return: "error: invalid rating"
+  next: end

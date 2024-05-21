@@ -1,0 +1,17 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'ADMINS'"
+  method: get
+  accepts: json
+  returns: json
+  namespace: backoffice
+
+getAdmins:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-users-with-roles"
+  result: res
+
+return_result:
+  return: ${res.response.body}

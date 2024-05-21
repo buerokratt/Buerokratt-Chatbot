@@ -18,19 +18,19 @@ const SettingsChatSettings: FC = () => {
     undefined
   );
   const { data: botConfig } = useQuery<{ is_bot_active: boolean }>({
-    queryKey: ['bot/is-bot-active', 'prod'],
+    queryKey: ['bots/active', 'prod'],
     onSuccess(res: any) {
-      setBotActive(res.response === 'true' ? true : false);
+      setBotActive(res.response === 'true');
     },
   });
   const { data: csaNameVisibility } = useQuery<{ isVisible: boolean }>({
-    queryKey: ['csa/name-visibility', 'prod'],
+    queryKey: ['agents/name-visibility', 'prod'],
     onSuccess(res: any) {
       setIsNameVisible(res.response);
     },
   });
   const { data: csaTitleVisibility } = useQuery<{ isVisible: boolean }>({
-    queryKey: ['csa/title-visibility', 'prod'],
+    queryKey: ['agents/title-visibility', 'prod'],
     onSuccess(res: any) {
       setIsTitleVisible(res.response);
     },
@@ -39,7 +39,7 @@ const SettingsChatSettings: FC = () => {
   const botConfigMutation = useMutation({
     mutationFn: (data: { is_bot_active: boolean }) => {
       setBotActive(data.is_bot_active);
-      return apiDev.post(`bot/is-bot-active`, { isActive: data.is_bot_active });
+      return apiDev.post(`bots/active`, { isActive: data.is_bot_active });
     },
     onError: (error: AxiosError) => {
       toast.open({
@@ -53,7 +53,7 @@ const SettingsChatSettings: FC = () => {
   const csaNameVisibilityMutation = useMutation({
     mutationFn: (data: { isVisible: boolean }) => {
       setIsNameVisible(data.isVisible);
-      return apiDev.post(`csa/name-visibility`, data);
+      return apiDev.post(`agents/name-visibility`, data);
     },
     onError: (error: AxiosError) => {
       toast.open({
@@ -67,7 +67,7 @@ const SettingsChatSettings: FC = () => {
   const csaTitleVisibilityMutation = useMutation({
     mutationFn: (data: { isVisible: boolean }) => {
       setIsTitleVisible(data.isVisible);
-      return apiDev.post(`csa/title-visibility`, data);
+      return apiDev.post(`agents/title-visibility`, data);
     },
     onSuccess: () => {
       toast.open({

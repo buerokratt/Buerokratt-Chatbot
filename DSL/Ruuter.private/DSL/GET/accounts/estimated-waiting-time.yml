@@ -1,0 +1,20 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'ESTIMATED-WAITING-TIME'"
+  method: get
+  accepts: json
+  returns: json
+  namespace: backoffice
+
+getEstimatedWaitingTime:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-estimated-waiting-time"
+    body:
+      key: "estimated_waiting_time"
+  result: res
+
+return_result:
+  return: ${res.response.body[0]}
+  next: end

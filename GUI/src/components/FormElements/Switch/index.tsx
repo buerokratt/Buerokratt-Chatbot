@@ -9,7 +9,7 @@ type SwitchProps = Partial<ControllerRenderProps> & {
   onLabel?: string;
   offLabel?: string;
   onColor?: string;
-  name: string;
+  name?: string;
   label: string;
   checked?: boolean;
   defaultChecked?: boolean;
@@ -23,6 +23,7 @@ const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
       onLabel,
       offLabel,
       onColor,
+      name,
       label,
       checked,
       hideLabel,
@@ -37,7 +38,7 @@ const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
     const offValueLabel = offLabel || t('global.off');
 
     return (
-      <div className="switch" style={{ [`${'--active-color'}`]: onColor }}>
+      <div className="switch" style={{  [`${'--active-color'}`]: onColor }}>
         {label && !hideLabel && (
           <label htmlFor={id} className="switch__label">
             {label}
@@ -47,6 +48,7 @@ const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
           ref={ref}
           id={id}
           className="switch__button"
+          name={name}
           onCheckedChange={onCheckedChange}
           checked={checked}
           defaultChecked={defaultChecked}

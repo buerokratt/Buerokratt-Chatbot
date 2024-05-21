@@ -1,0 +1,55 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'WIDGET-CONFIG'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: isWidgetActive
+        type: string
+        description: "Body field 'isWidgetActive'"
+      - field: widgetAnimation
+        type: string
+        description: "Body field 'widgetAnimation'"
+      - field: widgetBubbleMessageText
+        type: string
+        description: "Body field 'widgetBubbleMessageText'"
+      - field: widgetColor
+        type: string
+        description: "Body field 'widgetColor'"
+      - field: widgetDisplayBubbleMessageSeconds
+        type: string
+        description: "Body field 'widgetDisplayBubbleMessageSeconds'"
+      - field: widgetProactiveSeconds
+        type: string
+        description: "Body field 'widgetProactiveSeconds'"
+
+extractRequestData:
+  assign:
+    widgetAnimation: ${incoming.body.widgetAnimation}
+    widgetProactiveSeconds: ${incoming.body.widgetProactiveSeconds}
+    widgetDisplayBubbleMessageSeconds: ${incoming.body.widgetDisplayBubbleMessageSeconds}
+    widgetBubbleMessageText: ${incoming.body.widgetBubbleMessageText}
+    widgetColor: ${incoming.body.widgetColor}
+    isWidgetActive: ${incoming.body.isWidgetActive}
+
+setWidgetConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-widget-config"
+    body:
+      widgetProactiveSeconds: ${widgetProactiveSeconds}
+      widgetDisplayBubbleMessageSeconds: ${widgetDisplayBubbleMessageSeconds}
+      widgetBubbleMessageText: ${widgetBubbleMessageText}
+      widgetColor: ${widgetColor}
+      isWidgetActive: ${isWidgetActive}
+      widgetAnimation: ${widgetAnimation}
+      created: ${new Date().toISOString()}
+  result: res
+
+return_result:
+  return: ${res.response.body}
+  next: end

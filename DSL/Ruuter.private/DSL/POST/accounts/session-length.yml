@@ -1,0 +1,30 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'SESSION-LENGTH'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: sessionLength
+        type: string
+        description: "Body field 'sessionLength'"
+
+extractRequestData:
+  assign:
+    sessionLength: ${incoming.body.sessionLength}
+
+setConfigurationValue:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-configuration-value"
+    body:
+      created: ${new Date().toISOString()}
+      key: "session_length"
+      value: ${sessionLength}
+  result: res
+
+return_result:
+  return: ${res.response.body}

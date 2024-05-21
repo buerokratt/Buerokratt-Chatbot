@@ -1,0 +1,46 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'TEXT'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: chatId
+        type: string
+        description: "Body field 'chatId'"
+      - field: feedbackText
+        type: string
+        description: "Body field 'feedbackText'"
+
+extractRequestData:
+  assign:
+    chatId: ${incoming.body.chatId}
+    text: ${incoming.body.feedbackText}
+
+check_text_limit:
+  switch:
+    - condition: ${text === null || text === 'null'}
+      next: return_invalid_text
+  next: addFeedbackText
+
+addFeedbackText:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/update-chat-with-feedback-text"
+    body:
+      id: ${chatId}
+      created: ${new Date().toISOString()}
+      feedbackText: ${text}
+  result: res
+  next: return_result
+
+return_result:
+  return: "Added Chat Feedback Successfully"
+  next: end
+
+return_invalid_text:
+  return: "error: invalid feedback text"
+  next: end

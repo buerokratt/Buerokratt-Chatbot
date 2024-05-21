@@ -14,6 +14,13 @@ export default defineConfig({
     target: 'es2015',
     emptyOutDir: true,
   },
+  server: {
+    headers: {
+      ...(process.env.REACT_APP_CSP && {
+        'Content-Security-Policy': process.env.REACT_APP_CSP,
+      }),
+    },
+  },
   resolve: {
     alias: {
       '~@fontsource': path.resolve(__dirname, 'node_modules/@fontsource'),

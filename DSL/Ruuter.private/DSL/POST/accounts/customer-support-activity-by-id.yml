@@ -1,0 +1,28 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'CUSTOMER-SUPPORT-ACTIVITY-BY-ID'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: customerSupportId
+        type: string
+        description: "Body field 'customerSupportId'"
+
+extractRequestData:
+  assign:
+    customerSupportId: "${incoming.body.customerSupportId}"
+
+getCustomerSupportActivity:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-customer-support-activity-by-id-code"
+    body:
+      customerSupportId: ${customerSupportId}
+  result: res
+
+return_result:
+  return: ${res.response.body[0]}

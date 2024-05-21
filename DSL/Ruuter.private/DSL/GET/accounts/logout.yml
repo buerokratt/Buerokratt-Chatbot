@@ -1,0 +1,89 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'LOGOUT'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    headers:
+      - field: cookie
+        type: string
+        description: "Cookie field"
+
+get_user_info:
+  call: http.post
+  args:
+    url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
+    contentType: plaintext
+    headers:
+      cookie: ${incoming.headers.cookie}
+    plaintext: "customJwtCookie"
+  result: res
+  next: check_user_info_response
+
+check_user_info_response:
+  switch:
+    - condition: ${200 <= res.response.statusCodeValue && res.response.statusCodeValue < 300}
+      next: assignIdCode
+  next: return_bad_request
+
+assignIdCode:
+  assign:
+    idCode: ${res.response.body.idCode}
+  next: unassignAllClaimedChats
+
+unassignAllClaimedChats:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/update-chats-assignee-by-user-id"
+    body:
+      userId: ${idCode}
+  result: unclaim_res
+  next: setCustomerSupportAgentAway
+
+setCustomerSupportAgentAway:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-customer-support-status"
+    body:
+      userIdCode: ${idCode}
+      active: false
+      status: "offline"
+      created: ${new Date().toISOString()}
+  result: set_status_res
+  next: blacklistCustomJwt
+
+blacklistCustomJwt:
+  call: http.post
+  args:
+    url: "[#CHATBOT_TIM]/jwt/blacklist-custom-jwt"
+    contentType: plaintext
+    headers:
+      cookie: ${incoming.headers.cookie}
+    plaintext: "customJwtCookie"
+  result: blacklist_res
+  next: assign_cookie
+
+assign_cookie:
+  assign:
+    setCookie:
+      customJwtCookie: null
+      Domain: "[#DOMAIN]"
+      Max-Age: 0
+      Secure: true
+      HttpOnly: true
+      SameSite: "Lax"
+  next: return_result
+
+return_result:
+  headers:
+    Set-Cookie: ${setCookie}
+  return: "Logged Out Successfully"
+  next: end
+
+return_bad_request:
+  return: "error: bad request"
+  status: 400
+  next: end

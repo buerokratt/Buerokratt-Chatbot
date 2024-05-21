@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
@@ -50,7 +50,7 @@ const Header: FC = () => {
   const { t } = useTranslation();
   const userInfo = useStore((state) => state.userInfo);
   const toast = useToast();
-  const [__, setSecondsUntilStatusPopup] = useState(300); // 5 minutes in seconds
+  let secondsUntilStatusPopup = 300;
   const [statusPopupTimerHasStarted, setStatusPopupTimerHasStarted] =
     useState(false);
   const [showStatusConfirmationModal, setShowStatusConfirmationModal] =
@@ -90,7 +90,6 @@ const Header: FC = () => {
           localStorage.removeItem('exp');
           window.location.href =
             import.meta.env.REACT_APP_CUSTOMER_SERVICE_LOGIN;
-        } else {
         }
       }
     }, 2000);
@@ -102,13 +101,13 @@ const Header: FC = () => {
   }, [userInfo?.idCode]);
 
   const getMessages = async () => {
-    const { data: res } = await apiDev.get('account/user-profile-settings');
+    const { data: res } = await apiDev.get('accounts/settings');
 
     if (res.response && res.response != 'error: not found')
       setUserProfileSettings(res.response[0]);
   };
   const { data: customerSupportActivity } = useQuery<CustomerSupportActivity>({
-    queryKey: ['account/customer-support-activity', 'prod'],
+    queryKey: ['accounts/customer-support-activity', 'prod'],
     onSuccess(res: any) {
       const activity = res.data.get_customer_support_activity[0];
       setCsaStatus(activity.status);
@@ -117,7 +116,7 @@ const Header: FC = () => {
   });
 
   useQuery<ChatType[]>({
-    queryKey: ['csa/active-chats', 'prod'],
+    queryKey: ['agents/chats/active', 'prod'],
     onSuccess(res: any) {
       useStore.getState().setActiveChats(res.data.get_all_active_chats);
     },
@@ -140,7 +139,7 @@ const Header: FC = () => {
       ding?.play();
     }
     if (userProfileSettings.newChatEmailNotifications) {
-      // TODO send email notification
+      // To be done: send email notification
     }
     if (userProfileSettings.newChatPopupNotifications) {
       toast.open({
@@ -171,7 +170,7 @@ const Header: FC = () => {
       ding?.play();
     }
     if (userProfileSettings.forwardedChatEmailNotifications) {
-      // TODO send email notification
+      // To be done: send email notification
     }
     if (userProfileSettings.forwardedChatPopupNotifications) {
       toast.open({
@@ -195,7 +194,7 @@ const Header: FC = () => {
 
   const userProfileSettingsMutation = useMutation({
     mutationFn: async (data: UserProfileSettings) => {
-      await apiDev.post('account/user-profile-settings', {
+      await apiDev.post('accounts/settings', {
         forwardedChatPopupNotifications: data.forwardedChatPopupNotifications,
         forwardedChatSoundNotifications: data.forwardedChatSoundNotifications,
         forwardedChatEmailNotifications: data.newChatEmailNotifications,
@@ -207,7 +206,7 @@ const Header: FC = () => {
       setUserProfileSettings(data);
     },
     onError: async (error: AxiosError) => {
-      await queryClient.invalidateQueries(['account/user-profile-settings']);
+      await queryClient.invalidateQueries(['accounts/settings']);
       toast.open({
         type: 'error',
         title: t('global.notificationError'),
@@ -218,13 +217,13 @@ const Header: FC = () => {
 
   const unClaimAllAssignedChats = useMutation({
     mutationFn: async () => {
-      await apiDev.post('chat/unclaim-all-assigned-chats');
+      await apiDev.post('chats/assigned/unclaim');
     },
   });
 
   const customerSupportActivityMutation = useMutation({
     mutationFn: (data: CustomerSupportActivityDTO) =>
-      apiDev.post('account/customer-support-activity', {
+      apiDev.post('accounts/customer-support-activity', {
         customerSupportActive: data.customerSupportActive,
         customerSupportStatus: data.customerSupportStatus,
       }),
@@ -233,7 +232,7 @@ const Header: FC = () => {
     },
     onError: async (error: AxiosError) => {
       await queryClient.invalidateQueries([
-        'account/customer-support-activity',
+        'accounts/customer-support-activity',
         'prod',
       ]);
       toast.open({
@@ -261,7 +260,7 @@ const Header: FC = () => {
   });
 
   const logoutMutation = useMutation({
-    mutationFn: () => apiDev.post('account/logout'),
+    mutationFn: () => apiDev.get('accounts/logout'),
     onSuccess(_: any) {
       window.location.href = import.meta.env.REACT_APP_CUSTOMER_SERVICE_LOGIN;
     },
@@ -301,7 +300,7 @@ const Header: FC = () => {
     });
   };
 
-  const { getRemainingTime } = useIdleTimer({
+  useIdleTimer({
     onIdle,
     onActive,
     timeout: USER_IDLE_STATUS_TIMEOUT,
@@ -336,16 +335,13 @@ const Header: FC = () => {
 
     setStatusPopupTimerHasStarted((value) => !value);
     const timer = setInterval(() => {
-      setSecondsUntilStatusPopup((prevSeconds) => {
-        if (prevSeconds > 0) {
-          return prevSeconds - 1;
-        } else {
-          clearInterval(timer);
-          setShowStatusConfirmationModal((value) => !value);
-          setStatusPopupTimerHasStarted((value) => !value);
-          return 0;
-        }
-      });
+      let time = secondsUntilStatusPopup;
+      while (time > 0) {
+        time -= 1;
+      }
+      clearInterval(timer);
+      setShowStatusConfirmationModal((value) => !value);
+      setStatusPopupTimerHasStarted((value) => !value);
     }, 1000);
   };
 
@@ -375,8 +371,8 @@ const Header: FC = () => {
                   hideLabel
                   name="csaStatus"
                   onColor="#308653"
-                  onLabel={t('global.present') || ''}
-                  offLabel={t('global.away') || ''}
+                  onLabel={t('global.present') ?? ''}
+                  offLabel={t('global.away') ?? ''}
                 />
               </Track>
               <span

@@ -29,7 +29,7 @@ const ForwardToEstablishmentModal: FC<ForwardToEstablishmentModalProps> = ({
     []
   );
   const { data: establishments } = useQuery<Establishment[]>({
-    queryKey: ['chat/establishments', 'prod'],
+    queryKey: ['chats/establishments', 'prod'],
     onSuccess(res: any) {
       setEstablishmentsList(
         (res.data.format_data.establishments as string[]).map(
@@ -43,25 +43,25 @@ const ForwardToEstablishmentModal: FC<ForwardToEstablishmentModalProps> = ({
 
   const columnHelper = createColumnHelper<Establishment>();
 
+  const forwardView = (props: any) => (
+    <Button
+      appearance="text"
+      onClick={() => onForward(chat, props.row.original.name)}
+    >
+      <Icon icon={<MdOutlineArrowForward color="rgba(0, 0, 0, 0.54)" />} />
+      {t('global.forward')}
+    </Button>
+  );
+
   const establishmentsColumns = useMemo(
     () => [
       columnHelper.accessor('name', {
-        header: t('chat.active.establishment') || '',
+        header: t('chat.active.establishment') ?? '',
         cell: (props) => props.getValue(),
       }),
       columnHelper.display({
         id: 'forward',
-        cell: (props) => (
-          <Button
-            appearance="text"
-            onClick={() => onForward(chat, props.row.original.name)}
-          >
-            <Icon
-              icon={<MdOutlineArrowForward color="rgba(0, 0, 0, 0.54)" />}
-            />
-            {t('global.forward')}
-          </Button>
-        ),
+        cell: forwardView,
         meta: {
           size: '1%',
         },

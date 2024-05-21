@@ -1,8 +1,5 @@
 import { forwardRef, InputHTMLAttributes, PropsWithChildren, useId } from 'react';
 import clsx from 'clsx';
-import { MdOutlinePalette } from 'react-icons/md';
-
-import { Icon } from 'components';
 import './FormInput.scss';
 import { CHAT_INPUT_LENGTH } from 'constants/config';
 

@@ -56,6 +56,8 @@ type ColumnMeta = {
   }
 }
 
+type CustomColumnDef = ColumnDef<any> & ColumnMeta;
+
 declare module '@tanstack/table-core' {
   interface FilterFns {
     fuzzy: FilterFn<unknown>;
@@ -70,9 +72,10 @@ declare module '@tanstack/react-table' {
   interface TableMeta<TData extends RowData> {
     getRowStyles: (row: Row<TData>) => CSSProperties;
   }
+  class Column<TData extends RowData> {
+    columnDef: CustomColumnDef;
+  }
 }
-
-type CustomColumnDef = ColumnDef<any> & ColumnMeta;
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   const itemRank = rankItem(row.getValue(columnId), value);
@@ -130,16 +133,15 @@ const DataTable: FC<DataTableProps> = (
   });
 
   return (
-    <div className='data-table__wrapper'>
+    <div className='data-table__scrollWrapper'>
       <table className='data-table'>
         {!disableHead && (
           <thead>
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
-                <th key={header.id} style={{ width: (header.column.columnDef as CustomColumnDef).meta?.size }}>
+                <th key={header.id} style={{ width: header.column.columnDef.meta?.size }}>
                   {header.isPlaceholder ? null : (
-                    <>
                       <Track gap={8}>
                         {sortable && header.column.getCanSort() && (
                           <button onClick={header.column.getToggleSortingHandler()}>
@@ -156,7 +158,6 @@ const DataTable: FC<DataTableProps> = (
                           <Filter column={header.column} table={table} />
                         )}
                       </Track>
-                    </>
                   )}
                 </th>
               ))}
@@ -186,7 +187,7 @@ const DataTable: FC<DataTableProps> = (
               >
                 <MdOutlineWest />
               </button>
-              <nav role='navigation' aria-label={t('global.paginationNavigation') || ''}>
+              <nav role='navigation' aria-label={t('global.paginationNavigation') ?? ''}>
                 <ul className='links'>
                   {[...Array(table.getPageCount())].map((_, index) => (
                     <li

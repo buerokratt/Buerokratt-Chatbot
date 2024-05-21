@@ -1,3 +1,17 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'MESSAGE'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: message
+        type: string
+        description: "Body field 'message'"
+
 extractRequestData:
   assign:
     message: ${incoming.body.message}

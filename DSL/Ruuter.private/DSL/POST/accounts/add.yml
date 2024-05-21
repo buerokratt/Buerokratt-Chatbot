@@ -1,0 +1,120 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'ADD'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: csaTitle
+        type: string
+        description: "Body field 'csaTitle'"
+      - field: csa_email
+        type: string
+        description: "Body field 'csa_email'"
+      - field: displayName
+        type: string
+        description: "Body field 'displayName'"
+      - field: firstName
+        type: string
+        description: "Body field 'firstName'"
+      - field: lastName
+        type: string
+        description: "Body field 'lastName'"
+      - field: roles
+        type: array
+        description: "Body field 'roles'"
+      - field: userIdCode
+        type: string
+        description: "Body field 'userIdCode'"
+
+extractRequestData:
+  assign:
+    firstName: ${incoming.body.firstName}
+    lastName: ${incoming.body.lastName}
+    userIdCode: ${incoming.body.userIdCode}
+    displayName: ${incoming.body.displayName}
+    csaTitle: ${incoming.body.csaTitle}
+    csa_email: ${incoming.body.csa_email}
+    roles: ${incoming.body.roles}
+
+getUser:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-user"
+    body:
+      userIdCode: ${userIdCode}
+  result: res
+  next: checkIfUserExists
+
+checkIfUserExists:
+  switch:
+    - condition: "${res.response.body.length > 0}"
+      next: return_exists
+  next: addUser
+
+addUser:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-user"
+    body:
+      created: ${new Date().toISOString()}
+      status: "active"
+      firstName: ${firstName}
+      lastName: ${lastName}
+      userIdCode: ${userIdCode}
+      displayName: ${displayName}
+      csaTitle: ${csaTitle}
+      csaEmail: ${csa_email}
+  result: add_user_res
+  next: addRoles
+
+addRoles:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-user-role"
+    body:
+      userIdCode: ${userIdCode}
+      roles: ${roles}
+      created: ${new Date().toISOString()}
+  result: add_roles_res
+  next: setDefaultActivity
+
+setDefaultActivity: 
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-customer-support-status"
+    body:
+      userIdCode: ${userIdCode}
+      active: false
+      status: "offline"
+      created: ${new Date().toISOString()}
+  result: set_default_activity_res
+  next: setUserProfileSettings
+
+setUserProfileSettings:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-user-profile-settings"
+    body:
+      userId: ${userIdCode}
+      forwardedChatPopupNotifications: false
+      forwardedChatSoundNotifications: true
+      forwardedChatEmailNotifications: false
+      newChatPopupNotifications: false
+      newChatSoundNotifications: true
+      newChatEmailNotifications: false
+      useAutocorrect: true
+  result: set_user_profile_settings_res
+  next: return_result
+
+return_result:
+  return: "User added successfully"
+  next: end
+
+return_exists:
+  return: "error: user already exists"
+  status: 400
+  next: end

@@ -1,7 +1,7 @@
 import { FC, useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { useForm, Controller, useWatch, useFormContext } from 'react-hook-form';
+import { useForm, Controller, useWatch } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { AxiosError } from 'axios';
 
@@ -41,9 +41,9 @@ const SettingsAppearance: FC = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [showColorPalette, setShowColorPalette] = useState(false);
   const [delayFinished, setDelayFinished] = useState(false);
-  const { data: widgetConfig } = useQuery<WidgetConfig>({
-    queryKey: ['configs/widget-config', 'prod'],
-    onSuccess: (data) => {
+  useQuery<WidgetConfig>({
+    queryKey: ['configs/widget', 'prod'],
+    onSuccess: (data: any) => {
       const res = data.response;
       if (!hasRendered.current) {
         reset({
@@ -75,7 +75,7 @@ const SettingsAppearance: FC = () => {
 
   const widgetConfigMutation = useMutation({
     mutationFn: (data: WidgetConfig) =>
-      apiDev.post<WidgetConfig>('configs/widget-config', data),
+      apiDev.post<WidgetConfig>('configs/widget', data),
     onSuccess: () => {
       toast.open({
         type: 'success',
@@ -183,18 +183,27 @@ const SettingsAppearance: FC = () => {
             onClick={() => setShowColorPalette(!showColorPalette)}
           >
             {
-              <div>
-                <Icon
-                  icon={
-                    <MdOutlinePalette fontSize={20} color="rgba(0,0,0,0.54)" />
-                  }
-                  onIconClicked={() => setShowColorPalette(!showColorPalette)}
-                />
+              <div style={{ flexDirection: 'row' }}>
+                <button
+                  style={{
+                    position: 'absolute',
+                    zIndex: '2',
+                    right: '10px',
+                    bottom: '95%',
+                  }}
+                  onClick={() => setShowColorPalette(!showColorPalette)}
+                >
+                  <Icon
+                    icon={
+                      <MdOutlinePalette
+                        fontSize={20}
+                        color="rgba(0,0,0,0.54)"
+                      />
+                    }
+                  />
+                </button>
                 {showColorPalette && (
                   <div style={{ position: 'absolute', zIndex: '2' }}>
-                    <div
-                      onClick={() => setShowColorPalette(!showColorPalette)}
-                    />
                     <ChromePicker
                       {...register('widgetColor')}
                       color={widgetColor}

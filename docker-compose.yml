@@ -7,6 +7,7 @@ services:
     environment:
       - application.cors.allowedOrigins=http://localhost:8086,http://localhost:3001,http://localhost:3003,http://localhost:3004,http://localhost:8080
       - application.httpCodesAllowList=200,201,202,400,401,403,500
+      - application.internalRequests.allowedIPs=127.0.0.1
       - application.logging.displayRequestContent=true
       - application.logging.displayResponseContent=true
       - server.port=8086
@@ -25,7 +26,8 @@ services:
     image: ruuter
     environment:
       - application.cors.allowedOrigins=http://localhost:8082,http://localhost:3001,http://localhost:3003
-      - application.httpCodesAllowList=200,201,202,400,401,403,500
+      - application.httpCodesAllowList=200,201,202,204,400,401,403,500
+      - application.internalRequests.allowedIPs=127.0.0.1
       - application.logging.displayRequestContent=true
       - application.logging.displayResponseContent=true
       - server.port=8088
@@ -144,6 +146,7 @@ services:
       - REACT_APP_RUUTER_PRIVATE_API_URL=http://localhost:8088
       - REACT_APP_CUSTOMER_SERVICE_LOGIN=http://localhost:3004/et/dev-auth
       - REACT_APP_NOTIFICATION_NODE_URL=http://localhost:4040
+      - REACT_APP_CSP=upgrade-insecure-requests; default-src 'self'; font-src 'self' data:; img-src 'self' data:; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; object-src 'none'; connect-src 'self' http://localhost:8086 http://localhost:8088 http://localhost:8085 http://localhost:4040 https://admin.dev.buerokratt.ee/chat/menu.json;
       - DEBUG_ENABLED=true
       - CHOKIDAR_USEPOLLING=true
       - PORT=3001
@@ -178,16 +181,15 @@ services:
       - bykstack
 
   opensearch-node:
-    image: opensearchproject/opensearch:latest
+    image: opensearchproject/opensearch:2.11.1
     container_name: opensearch-node
     environment:
-      - cluster.name=opensearch-cluster
       - node.name=opensearch-node
+      - discovery.seed_hosts=opensearch
       - discovery.type=single-node
       - bootstrap.memory_lock=true
       - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
-      - "DISABLE_INSTALL_DEMO_CONFIG=true"
-      - "DISABLE_SECURITY_PLUGIN=true"
+      - plugins.security.disabled=true
     ulimits:
       memlock:
         soft: -1
@@ -230,8 +232,65 @@ services:
     networks:
       - bykstack
 
+  s3-ferry:
+    container_name: s3-ferry
+    image: s3-ferry
+    user: root
+    volumes:
+      - rasa-training-data:/api/data
+    environment:
+      - API_CORS_ORIGIN=*
+      - API_DOCUMENTATION_ENABLED=true
+
+      - S3_REGION=us-east-1
+      - S3_ENDPOINT_URL=http://localstack-2:4566
+      - S3_ACCESS_KEY_ID=accessKey
+      - S3_SECRET_ACCESS_KEY=secretKey
+      - S3_DATA_BUCKET_NAME=buerokratt
+      - S3_DATA_BUCKET_PATH=
+
+      - FS_DATA_DIRECTORY_PATH=./data
+    ports:
+      - 3005:3000
+    networks:
+      - bykstack
+
+  localstack:
+    container_name: localstack
+    image: localstack/localstack:3.3.0
+    ports:
+      - 4566:4566
+    environment:
+      - SERVICES=s3:4566
+    volumes:
+      - ./localstack-init.sh:/etc/localstack/init/ready.d/init.sh
+    networks:
+      - bykstack
+
+  bot:
+    container_name: bot
+    image: rasa
+    ports:
+      - 5005:5005
+    volumes:
+      - ./loba/:/app
+      - ./cc.et.300.bin:/app/fasttext_et_model/cc.et.300.bin
+      - rasa-training-data:/app/models
+    environment:
+      - SQLALCHEMY_WARN_20=1
+    command: ["run", "--enable-api"]
+    restart: always
+    networks:
+      - bykstack
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+
 volumes:
   opensearch-data:
+  rasa-training-data:
 networks:
   bykstack:
     name: bykstack

@@ -40,9 +40,12 @@ const DebouncedInput: FC<DebouncedInputProps> = ({
         onChange={(e) => setValue(e.target.value)}
       />
       {value && (
-        <i onClick={() => setValue('')}>
+        <button
+          style={{ position: 'absolute', right: '0px', bottom: '15px' }}
+          onClick={() => setValue('')}
+        >
           <CloseIcon />
-        </i>
+        </button>
       )}
     </div>
   );

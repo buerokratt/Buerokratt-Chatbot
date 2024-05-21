@@ -1,0 +1,68 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'CUSTOMER-SUPPORT-ACTIVITY'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: customerSupportActive
+        type: string
+        description: "Body field 'customerSupportActive'"
+      - field: customerSupportStatus
+        type: string
+        description: "Body field 'customerSupportStatus'"
+    headers:
+      - field: cookie
+        type: string
+        description: "Cookie field"
+
+extractRequestData:
+  assign:
+    active: ${incoming.body.customerSupportActive}
+    status: ${incoming.body.customerSupportStatus}  
+
+get_user_info:
+  call: http.post
+  args:
+   url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
+   contentType: plaintext
+   headers:
+    cookie: ${incoming.headers.cookie}
+   plaintext: 
+      "customJwtCookie"
+  result: res
+  next: check_user_info_response
+
+check_user_info_response:
+  switch:
+    - condition: ${200 <= res.response.statusCodeValue && res.response.statusCodeValue < 300}
+      next: assignIdCode
+  next: return_bad_request
+
+assignIdCode:
+  assign:
+    idCode: ${res.response.body.idCode}
+  next: setCustomerSupportActivity
+
+setCustomerSupportActivity:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-customer-support-status"
+    body:
+      active: ${active}
+      userIdCode: ${idCode}
+      status: ${status}
+      created: ${new Date().toISOString()}
+  result: res
+  next: return_result
+
+return_result:
+  return: ${res.response.body}
+  next: end
+
+return_bad_request:
+  return: "error: bad request"
+  next: end
