@@ -24,7 +24,6 @@ export async function checkIfUserExists(userData: UserDTO) {
 }
 
 export async function editUser(id: string | number, userData: UserDTO) {
-  const authorities = userData.authorities.map((e) => (e as any).value).filter(item => item);
   const fullName = userData.fullName?.trim();
   const { data } = await apiDev.post<User>('accounts/edit', {
     "firstName": fullName?.split(' ').slice(0, 1).join(' ') ?? '',
@@ -33,7 +32,7 @@ export async function editUser(id: string | number, userData: UserDTO) {
     "displayName": userData.displayName,
     "csaTitle": userData.csaTitle,
     "csa_email": userData.csaEmail,
-    "roles": authorities.length === 0 ? Object.values(userData.authorities) : authorities
+    "roles": Object.values(userData.authorities)
   });
   return data;
 }
