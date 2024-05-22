@@ -29,7 +29,7 @@ extractRequestData:
   assign:
     authorTimestamp: ${incoming.body.message.authorTimestamp}
     authorRole: ${incoming.body.message.authorRole}
-    content: ${incoming.body.message.content}
+    content: ${incoming.body.message.content ?? ""}
     event: ${incoming.body.message.event}
     holidays: ${incoming.body.holidays}
     holidayNames: ${incoming.body.holidayNames}
@@ -96,7 +96,7 @@ insertMessage:
     body:
       chatId: ${chatId}
       messageId: ${uuid}
-      content: ${content ?? ""}
+      content: ${content}
       authorTimestamp: ${authorTimestamp}
       authorId: ""
       authorFirstName: ""
