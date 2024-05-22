@@ -271,7 +271,7 @@ return_ok:
 
 return_trigger_service_is_not_exist:
   assign:
-    botMsgPlaceholder: { "temp": [{"text":"service_currently_unavailable"}]}
+    botMsgPlaceholder: { "temp": [{"text":"service_currently_unavailable", "recipient_id": "${chatId}"}]}
     botMsg: ${botMsgPlaceholder.temp}
 
 convert_bot_responses_to_messages:
