@@ -24,7 +24,7 @@ declaration:
 extractRequestData:
   assign:
     chatId: ${incoming.body.chatId}
-    content: ${incoming.body.content}
+    content: ${incoming.body.content ?? ""}
     holidays: ${incoming.body.holidays}
     holidayNames: ${incoming.body.holidayNames}
   next: check_bot_is_active
@@ -101,9 +101,9 @@ check_for_post_message_to_bot_result:
 
 check_if_bot_is_unable_to_reply:
   switch:
-    - condition: ${post_message_to_bot_result.response.body[0].text == 'UNKNOWN'}
+    - condition: ${post_message_to_bot_result.response.body?.[0]?.text == 'UNKNOWN'}
       next: check_for_fallback_bot
-    - condition: ${post_message_to_bot_result.response.body[0].text == 'Suunan teid klienditeenindajale. Varuge natukene kannatust.'}
+    - condition: ${post_message_to_bot_result.response.body?.[0]?.text == 'Suunan teid klienditeenindajale. Varuge natukene kannatust.'}
       next: get_organization_working_details
   next: extract_bot_responses
 
@@ -240,10 +240,11 @@ add_chat_id_to_queue_notification_node:
 extract_bot_responses:
   assign:
     botMsg: ${post_message_to_bot_result.response.body}
+    botMsgTxt: ${post_message_to_bot_result.response.body?.[0]?.text}
 
 check_if_bot_message_start_with_hash:
   switch:
-    - condition: ${botMsg[0].text.startsWith('#')}
+    - condition: ${botMsgTxt.startsWith('#')}
       next: call_service
   next: convert_bot_responses_to_messages
 
@@ -253,7 +254,7 @@ call_service:
     url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL]/internal/call-service"
     body:
       chatId: ${chatId}
-      msg: ${botMsg}
+      msg: ${botMsgTxt}
       authorId: ${get_bot_name_result.response.body[0].value}
   result: call_service_result
 
@@ -270,7 +271,8 @@ return_ok:
 
 return_trigger_service_is_not_exist:
   assign:
-    botMsg: "service_currently_unavailable"
+    botMsgPlaceholder: { "temp": [{"text":"service_currently_unavailable"}]}
+    botMsg: ${botMsgPlaceholder.temp}
 
 convert_bot_responses_to_messages:
   call: http.post
