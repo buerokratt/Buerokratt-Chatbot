@@ -255,23 +255,18 @@ call_service:
     body:
       chatId: ${chatId}
       msg: ${botMsgTxt}
-      authorId: ${get_bot_name_result.response.body[0].value}
+      authorId: ${get_bot_name_result.response.body?.[0]?.value}
   result: call_service_result
 
 check_if_call_service_result_is_ok:
   switch:
-    - condition: ${call_service_result.response.statusCodeValue >= 400}
-      next: return_trigger_service_is_not_exist
-  next: return_ok
+    - condition: ${call_service_result.response.body.response != "service_currently_unavailable"}
+      next: return_ok
+  next: trigger_service_is_not_exist
 
-return_ok:
-  status: 200
-  return: "Service called successfully"
-  next: end
-
-return_trigger_service_is_not_exist:
+trigger_service_is_not_exist:
   assign:
-    botMsgPlaceholder: { "temp": [{"text":"service_currently_unavailable", "recipient_id": "${chatId}"}]}
+    botMsgPlaceholder: { "temp": [{"text":"service_currently_unavailable", "recipient_id": "${chatId}"}] }
     botMsg: ${botMsgPlaceholder.temp}
 
 convert_bot_responses_to_messages:
@@ -322,6 +317,11 @@ add_bot_message_to_db:
       messages: ${converted_messages_res.response.body}
   result: add_bot_message_to_bot_result
   next: return_message_sent
+
+return_ok:
+  status: 200
+  return: "Service called successfully"
+  next: end
 
 return_is_holiday:
   status: 200
