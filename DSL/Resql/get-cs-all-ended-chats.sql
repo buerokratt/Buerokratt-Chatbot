@@ -117,5 +117,5 @@ JOIN LastContentMessage ON c.base_id = LastContentMessage.chat_base_id
 JOIN FirstContentMessage ON c.base_id = FirstContentMessage.chat_base_id
 LEFT JOIN ContactsMessage ON ContactsMessage.chat_base_id = c.base_id
 CROSS JOIN TitleVisibility
-ORDER BY created ASC
+ORDER BY created DESC
 LIMIT :limit;
