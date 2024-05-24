@@ -1,0 +1,92 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'TRAINED-MODEL'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: model
+  allowlist:
+    body:
+      - field: versionNumber
+        type: string
+        description: "Body field 'versionNumber'"
+
+checkIncomingBody:
+  switch:
+    - condition: ${incoming.body.versionNumber.length > 0}
+      next: getModelFileNameByVersionNumber
+  next: getLatestReadyModelFileName
+
+getModelFileNameByVersionNumber:
+  call: http.post
+  args:
+    url: "[#TRAINING_RESQL]/get-ready-model-file-name-by-version-number"
+    body:
+      versionNumber: ${incoming.body.versionNumber}
+  result: resqlResponse
+  next: checkResqlResponse
+
+getLatestReadyModelFileName:
+  call: http.post
+  args:
+    url: "[#TRAINING_RESQL]/get-latest-ready-model-file-name"
+  result: resqlResponse
+
+checkResqlResponse:
+  switch:
+    - condition: ${resqlResponse.response.body.length == 0}
+      next: returnModelNotFoundInDatabase
+  next: assignModelFileName
+
+assignModelFileName:
+  assign:
+    modelFileName: ${resqlResponse.response.body[0].fileName}
+
+copyFileFromRemoteToLocal:
+  call: http.post
+  args:
+    url: "[#S3_FERRY]/v1/files/copy"
+    body:
+      destinationFilePath: ${modelFileName}
+      destinationStorageType: "FS"
+      sourceFilePath: ${modelFileName}
+      sourceStorageType: "S3"
+  result: copyResponse
+
+checkCopyResponse:
+  switch:
+    - condition: ${copyResponse.response.statusCodeValue == 201 }
+      next: loadTrainedModel
+  next: returnModelCopyingFailed
+
+loadTrainedModel:
+  call: http.put
+  args:
+    url: "[#CHATBOT_BOT]/model"
+    body:
+      model_file: "/app/models/${modelFileName}"
+  result: loadResponse   
+
+checkLoadedModelResponse:
+  switch:
+    - condition: ${loadResponse.response.statusCodeValue == 204 }
+      next: returnSuccess
+  next: returnModelLoadingFailed
+
+returnSuccess:
+  return: "Model copied and loaded successfully"
+  wrapper: false
+  next: end
+
+returnModelNotFoundInDatabase:
+  return: "error: specified model not found in the database"
+  next: end
+
+returnModelCopyingFailed:
+  return: "error: model copying from remote to local storage failed"
+  next: end
+
+returnModelLoadingFailed:
+  return: "error: failed to load trained model from RASA"
+  next: end
