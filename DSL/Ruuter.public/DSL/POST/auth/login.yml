@@ -52,7 +52,7 @@ generate_cookie:
     url: "[#CHATBOT_TIM]/jwt/custom-jwt-generate"
     body:
       JWTName: "customJwtCookie"
-      expirationInMinutes: ${session_result.response.body[0].value}
+      expirationInMinutes: ${session_result.response.body[0]?.value ?? '120'}
       content: ${user_result.response.body[0]}
   result: cookie_result
   next: assign_cookie

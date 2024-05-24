@@ -60,12 +60,12 @@ const useStore = create<StoreState>((set, get, store) => ({
     return get().pendingChats.find((c) => c.id === selectedChatId);
   },
   unansweredChats: () => {
-    return get().activeChats.filter((c) => c.customerSupportId === '');
+    return get().activeChats?.filter?.((c) => c.customerSupportId === '') ?? [];
   },
   forwordedChats: () => {
     const userId = get().userId;
     return (
-      get().activeChats.filter(
+      get().activeChats?.filter(
         (c) =>
           c.status === CHAT_STATUS.REDIRECTED && c.customerSupportId === userId
       ) || []

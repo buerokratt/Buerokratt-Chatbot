@@ -77,16 +77,6 @@ forwardChat:
       receivedFrom: "[#CHATBOT_RUUTER_PRIVATE]"
       endUserId: ${activeChat.endUserId}
   result: forwardChatRes
-  next: get_session_length
-
-get_session_length:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RESQL]/get-configuration"
-    body:
-      key: "session_length"
-  result: session_result
-  next: updateChatJwt
 
 updateChatJwt:
   call: http.post

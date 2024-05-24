@@ -11,6 +11,7 @@ import { deleteUser } from 'services/users';
 import { useToast } from 'hooks/useToast';
 import UserModal from './UserModal';
 import { ROLES } from 'utils/constants';
+import withAuthorization from 'hoc/with-authorization';
 
 const SettingsUsers: FC = () => {
   const { t } = useTranslation();
@@ -88,7 +89,7 @@ const SettingsUsers: FC = () => {
       columnHelper.accessor(
         (data: { authorities: ROLES[] }) => {
           const output: string[] = [];
-          data.authorities.map((role) => {
+          data.authorities?.map?.((role) => {
             return output.push(t(`roles.${role}`));
           });
           return output;
@@ -189,4 +190,4 @@ const SettingsUsers: FC = () => {
   );
 };
 
-export default SettingsUsers;
+export default withAuthorization(SettingsUsers, [ROLES.ROLE_ADMINISTRATOR]);
