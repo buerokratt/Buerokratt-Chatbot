@@ -31,13 +31,17 @@ import {
 } from 'utils/local-storage-utils';
 import { CHAT_HISTORY_PREFERENCES_KEY } from 'constants/config';
 import { useLocation } from 'react-router-dom';
+import { unifyDateFromat } from './unfiyDate';
 
 const ChatHistory: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
   const userInfo = useStore((state) => state.userInfo);
   const routerLocation = useLocation();
-  let passedChatId = new URLSearchParams(routerLocation.search).get('chat');
+  const params = new URLSearchParams(routerLocation.search);
+  let passedChatId = params.get('chat');
+  const paasedStartDate = params.get('start');
+  const paasedEndDate = params.get('end');
   const preferences = getFromLocalStorage(
     CHAT_HISTORY_PREFERENCES_KEY
   ) as string[];
@@ -61,17 +65,18 @@ const ChatHistory: FC = () => {
   const [selectedColumns, setSelectedColumns] = useState<string[]>(
     preferences ?? []
   );
+  
   const { control, watch } = useForm<{
     startDate: Date | string;
     endDate: Date | string;
   }>({
     defaultValues: {
-      startDate: new Date(
+      startDate: paasedStartDate ? unifyDateFromat(paasedStartDate) : new Date(
         new Date().getUTCFullYear(),
         new Date().getUTCMonth(),
         new Date().getUTCDate()
       ),
-      endDate: new Date(
+      endDate: paasedEndDate ? unifyDateFromat(paasedEndDate) : new Date(
         new Date().getUTCFullYear(),
         new Date().getUTCMonth(),
         new Date().getUTCDate() + 1
