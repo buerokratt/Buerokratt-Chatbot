@@ -84,6 +84,7 @@ updateRoles:
 
 return_result:
   return: "User updated successfully"
+  status: 200
   next: end
 
 return_not_exists:

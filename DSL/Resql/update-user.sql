@@ -6,7 +6,7 @@ SELECT
   :firstName,
   :lastName,
   :displayName,
-  :status,
+  :status::user_status,
   :created::timestamp with time zone,
   :csaTitle,
   :csaEmail
