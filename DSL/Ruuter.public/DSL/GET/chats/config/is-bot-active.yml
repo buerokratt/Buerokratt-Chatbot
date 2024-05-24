@@ -16,4 +16,5 @@ getConfigurationValue:
   result: res
 
 return_result:
-  return: ${res.response.body[0].value}
+  return: ${res.response.body[0]?.value}
+  status: 200

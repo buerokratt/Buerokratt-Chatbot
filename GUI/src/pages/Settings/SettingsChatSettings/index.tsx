@@ -22,19 +22,22 @@ const SettingsChatSettings: FC = () => {
   const { data: botConfig } = useQuery<{ is_bot_active: boolean }>({
     queryKey: ['bots/active', 'prod'],
     onSuccess(res: any) {
-      setBotActive(res.response === 'true');
+      if(botActive === undefined)
+        setBotActive(res.response === 'true');
     },
   });
   const { data: csaNameVisibility } = useQuery<{ isVisible: boolean }>({
     queryKey: ['agents/name-visibility', 'prod'],
     onSuccess(res: any) {
-      setIsNameVisible(res.response);
+      if(isNameVisible === undefined)
+        setIsNameVisible(res.response);
     },
   });
   const { data: csaTitleVisibility } = useQuery<{ isVisible: boolean }>({
     queryKey: ['agents/title-visibility', 'prod'],
     onSuccess(res: any) {
-      setIsTitleVisible(res.response);
+      if(isTitleVisible === undefined)
+        setIsTitleVisible(res.response);
     },
   });
 
