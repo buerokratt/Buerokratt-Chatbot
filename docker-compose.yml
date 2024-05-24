@@ -162,12 +162,12 @@ services:
       - REACT_APP_SERVICE_ID=conversations,settings,monitoring
     build:
       context: ./GUI
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     ports:
       - 3001:3001
-    # volumes:
-    #   - /app/node_modules
-    #   - ./GUI:/app
+    volumes:
+      - /app/node_modules
+      - ./GUI:/app
     networks:
       - bykstack
     cpus: "0.5"
