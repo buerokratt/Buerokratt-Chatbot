@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 
 import { Card, Tooltip, Track } from 'components';
 import { format, sub } from 'date-fns';
+import withAuthorization from 'hoc/with-authorization';
+import { ROLES } from 'utils/constants';
 
 type ComponentHealth = {
   name: string;
@@ -89,4 +91,10 @@ const MonitoringUptime: FC = () => {
   );
 };
 
-export default MonitoringUptime;
+export default withAuthorization(MonitoringUptime, [
+  ROLES.ROLE_ADMINISTRATOR,
+  ROLES.ROLE_ANALYST,
+  ROLES.ROLE_CHATBOT_TRAINER,
+  ROLES.ROLE_CUSTOMER_SUPPORT_AGENT,
+  ROLES.ROLE_SERVICE_MANAGER,
+]);

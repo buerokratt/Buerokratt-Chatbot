@@ -17,6 +17,8 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useToast } from 'hooks/useToast';
 import apiDev from 'services/api-dev';
 import { format, parse } from 'date-fns';
+import withAuthorization from 'hoc/with-authorization';
+import { ROLES } from 'utils/constants';
 
 const SettingsEmergencyNotices: FC = () => {
   const { t } = useTranslation();
@@ -153,4 +155,4 @@ const SettingsEmergencyNotices: FC = () => {
   );
 };
 
-export default SettingsEmergencyNotices;
+export default withAuthorization(SettingsEmergencyNotices, [ROLES.ROLE_ADMINISTRATOR]);

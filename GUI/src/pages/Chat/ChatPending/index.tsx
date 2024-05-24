@@ -17,6 +17,8 @@ import { v4 as uuidv4 } from 'uuid';
 import './ChatPending.scss';
 import useHeaderStore from '@buerokratt-ria/header/src/header/store/store';
 import useStore from 'store';
+import withAuthorization from 'hoc/with-authorization';
+import { ROLES } from 'utils/constants';
 
 const ChatPending: FC = () => {
   const { t } = useTranslation();
@@ -283,4 +285,7 @@ const ChatPending: FC = () => {
   );
 };
 
-export default ChatPending;
+export default withAuthorization(ChatPending, [
+  ROLES.ROLE_ADMINISTRATOR,
+  ROLES.ROLE_CUSTOMER_SUPPORT_AGENT,
+]);

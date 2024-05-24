@@ -7,6 +7,8 @@ import { WELCOME_MESSAGE_LENGTH } from 'constants/config';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useToast } from 'hooks/useToast';
 import apiDev from 'services/api-dev';
+import withAuthorization from 'hoc/with-authorization';
+import { ROLES } from 'utils/constants';
 
 const SettingsWelcomeMessage: FC = () => {
   const { t } = useTranslation();
@@ -109,4 +111,4 @@ const SettingsWelcomeMessage: FC = () => {
   );
 };
 
-export default SettingsWelcomeMessage;
+export default withAuthorization(SettingsWelcomeMessage, [ROLES.ROLE_ADMINISTRATOR]);

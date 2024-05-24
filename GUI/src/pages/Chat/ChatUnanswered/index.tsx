@@ -16,6 +16,8 @@ import ForwardToColleaugeModal from '../ForwardToColleaugeModal';
 import ForwardToEstablishmentModal from '../ForwardToEstablishmentModal';
 import sse from 'services/sse-service';
 import './ChatUnanswered.scss';
+import withAuthorization from 'hoc/with-authorization';
+import { ROLES } from 'utils/constants';
 
 const ChatUnanswered: FC = () => {
   const { t } = useTranslation();
@@ -239,4 +241,7 @@ const ChatUnanswered: FC = () => {
   );
 };
 
-export default ChatUnanswered;
+export default withAuthorization(ChatUnanswered, [
+  ROLES.ROLE_ADMINISTRATOR,
+  ROLES.ROLE_CUSTOMER_SUPPORT_AGENT,
+]);

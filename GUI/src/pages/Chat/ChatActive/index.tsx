@@ -18,6 +18,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { useLocation } from 'react-router-dom';
 import sse from 'services/sse-service';
 import './ChatActive.scss';
+import withAuthorization from 'hoc/with-authorization';
+import { ROLES } from 'utils/constants';
 
 const CSAchatStatuses = [
   CHAT_EVENTS.ACCEPTED,
@@ -309,4 +311,7 @@ const ChatActive: FC = () => {
   );
 };
 
-export default ChatActive;
+export default withAuthorization(ChatActive, [
+  ROLES.ROLE_ADMINISTRATOR,
+  ROLES.ROLE_CUSTOMER_SUPPORT_AGENT,
+]);

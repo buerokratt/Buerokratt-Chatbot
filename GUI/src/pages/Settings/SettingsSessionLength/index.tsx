@@ -6,6 +6,8 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useToast } from 'hooks/useToast';
 import apiDev from 'services/api-dev';
 import './SettingsSessionLength.scss';
+import withAuthorization from 'hoc/with-authorization';
+import { ROLES } from 'utils/constants';
 
 const SettingsSessionLength: FC = () => {
   const { t } = useTranslation();
@@ -86,4 +88,4 @@ const SettingsSessionLength: FC = () => {
   );
 };
 
-export default SettingsSessionLength;
+export default withAuthorization(SettingsSessionLength, [ROLES.ROLE_ADMINISTRATOR]);

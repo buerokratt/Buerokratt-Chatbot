@@ -11,6 +11,7 @@ import { deleteUser } from 'services/users';
 import { useToast } from 'hooks/useToast';
 import UserModal from './UserModal';
 import { ROLES } from 'utils/constants';
+import withAuthorization from 'hoc/with-authorization';
 
 const SettingsUsers: FC = () => {
   const { t } = useTranslation();
@@ -189,4 +190,4 @@ const SettingsUsers: FC = () => {
   );
 };
 
-export default SettingsUsers;
+export default withAuthorization(SettingsUsers, [ROLES.ROLE_ADMINISTRATOR]);
