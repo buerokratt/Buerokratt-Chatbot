@@ -19,8 +19,8 @@ jobs:
 
       - name: Load environment variables and set them
         run: |
-          if [ -f .env.test ]; then
-            export $(cat .env.test | grep -v '^#' | xargs)
+          if [ -f .env.dev ]; then
+            export $(cat .env.dev | grep -v '^#' | xargs)
           fi
           echo "RELEASE=$RELEASE" >> $GITHUB_ENV
           echo "VERSION=$VERSION" >> $GITHUB_ENV
