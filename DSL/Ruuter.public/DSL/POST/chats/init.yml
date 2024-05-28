@@ -25,7 +25,7 @@ extractRequestData:
   assign:
     authorRole: ${incoming.body.message.authorRole}
     authorTimestamp: ${incoming.body.message.authorTimestamp}
-    content: ${incoming.body.message.content}
+    content: ${incoming.body.message.content ?? ""}
     endUserId: ""
     endUserEmail: ""
     endUserPhone: ""

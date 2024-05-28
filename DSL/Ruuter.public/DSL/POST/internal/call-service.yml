@@ -71,6 +71,6 @@ return_ok:
   next: end   
 
 return_trigger_service_is_not_exist:
-  status: 404
+  status: 200
   return: "service_currently_unavailable" 
   next: end

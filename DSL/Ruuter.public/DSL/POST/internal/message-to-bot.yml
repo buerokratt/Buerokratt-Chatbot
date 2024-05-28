@@ -24,7 +24,7 @@ declaration:
 extractRequestData:
   assign:
     chatId: ${incoming.body.chatId}
-    content: ${incoming.body.content}
+    content: ${incoming.body.content ?? ""}
     holidays: ${incoming.body.holidays}
     holidayNames: ${incoming.body.holidayNames}
   next: check_bot_is_active
@@ -77,30 +77,33 @@ check_for_get_chat_result:
 check_chat_belongs_to_bot:
   switch:
     - condition: ${get_chat_result.response.body[0].customerSupportId == get_bot_name_result.response.body[0].value}
-      next: post_message_to_client
+      next: decode_content_to_be_sent_to_bot
   next: return_chat_does_not_belong_to_bot
 
-post_message_to_client:
+decode_content_to_be_sent_to_bot:
+  assign:
+    decodedContent: ${decodeURIComponent(content)}
+
+post_message_to_bot:
   call: http.post
   args:
     url: "[#CHATBOT_BOT]/webhooks/rest/webhook"
     body:
       sender: ${chatId}
-      message: ${content}
-  result: post_message_to_client_result
-  next: check_for_post_message_to_client_result
-
-check_for_post_message_to_client_result:
+      message: ${decodedContent}
+  result: post_message_to_bot_result
+  
+check_for_post_message_to_bot_result:
   switch:
-    - condition: ${200 <= post_message_to_client_result.response.statusCodeValue && post_message_to_client_result.response.statusCodeValue < 300}
+    - condition: ${200 <= post_message_to_bot_result.response.statusCodeValue && post_message_to_bot_result.response.statusCodeValue < 300}
       next: check_if_bot_is_unable_to_reply
   next: return_bad_request
 
 check_if_bot_is_unable_to_reply:
   switch:
-    - condition: ${post_message_to_client_result.response.body[0].text == 'UNKNOWN'}
+    - condition: ${post_message_to_bot_result.response.body?.[0]?.text == 'UNKNOWN'}
       next: check_for_fallback_bot
-    - condition: ${post_message_to_client_result.response.body[0].text == 'Suunan teid klienditeenindajale. Varuge natukene kannatust.'}
+    - condition: ${post_message_to_bot_result.response.body?.[0]?.text == 'Suunan teid klienditeenindajale. Varuge natukene kannatust.'}
       next: get_organization_working_details
   next: extract_bot_responses
 
@@ -236,11 +239,12 @@ add_chat_id_to_queue_notification_node:
 
 extract_bot_responses:
   assign:
-    botMsg: ${post_message_to_client_result.response.body}
+    botMsg: ${post_message_to_bot_result.response.body}
+    botMsgTxt: ${post_message_to_bot_result.response.body?.[0]?.text}
 
 check_if_bot_message_start_with_hash:
   switch:
-    - condition: ${botMsg[0].text.startsWith('#')}
+    - condition: ${botMsgTxt.startsWith('#')}
       next: call_service
   next: convert_bot_responses_to_messages
 
@@ -250,24 +254,20 @@ call_service:
     url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL]/internal/call-service"
     body:
       chatId: ${chatId}
-      msg: ${botMsg}
-      authorId: ${get_bot_name_result.response.body[0].value}
+      msg: ${botMsgTxt}
+      authorId: ${get_bot_name_result.response.body?.[0]?.value}
   result: call_service_result
 
 check_if_call_service_result_is_ok:
   switch:
-    - condition: ${call_service_result.response.statusCodeValue >= 400}
-      next: return_trigger_service_is_not_exist
-  next: return_ok
+    - condition: ${call_service_result.response.body.response != "service_currently_unavailable"}
+      next: return_ok
+  next: trigger_service_is_not_exist
 
-return_ok:
-  status: 200
-  return: "Service called successfully"
-  next: end
-
-return_trigger_service_is_not_exist:
+trigger_service_is_not_exist:
   assign:
-    botMsg: "service_currently_unavailable"
+    botMsgPlaceholder: { "temp": [{"text":"service_currently_unavailable", "recipient_id": "${chatId}"}] }
+    botMsg: ${botMsgPlaceholder.temp}
 
 convert_bot_responses_to_messages:
   call: http.post
@@ -317,6 +317,11 @@ add_bot_message_to_db:
       messages: ${converted_messages_res.response.body}
   result: add_bot_message_to_bot_result
   next: return_message_sent
+
+return_ok:
+  status: 200
+  return: "Service called successfully"
+  next: end
 
 return_is_holiday:
   status: 200
