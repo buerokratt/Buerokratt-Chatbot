@@ -4,7 +4,7 @@ import { useMutation } from '@tanstack/react-query';
 import { createColumnHelper, PaginationState } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { AxiosError } from 'axios';
-import { MdMailOutline, MdOutlineRemoveRedEye } from 'react-icons/md';
+import { MdOutlineRemoveRedEye } from 'react-icons/md';
 
 import {
   Button,
@@ -34,9 +34,10 @@ import { useLocation } from 'react-router-dom';
 import { unifyDateFromat } from './unfiyDate';
 import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';
+import { et } from 'date-fns/locale';
 
 const ChatHistory: FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const toast = useToast();
   const userInfo = useStore((state) => state.userInfo);
   const routerLocation = useLocation();
@@ -48,9 +49,6 @@ const ChatHistory: FC = () => {
     CHAT_HISTORY_PREFERENCES_KEY
   ) as string[];
   const [selectedChat, setSelectedChat] = useState<ChatType | null>(null);
-  const [sendToEmailModal, setSendToEmailModal] = useState<ChatType | null>(
-    null
-  );
   const [statusChangeModal, setStatusChangeModal] = useState<string | null>(
     null
   );
@@ -134,8 +132,9 @@ const ChatHistory: FC = () => {
       { label: t('global.idCode'), value: 'endUserId' },
       { label: t('chat.history.contact'), value: 'contactsMessage' },
       { label: t('chat.history.comment'), value: 'comment' },
-      { label: t('chat.history.label'), value: 'labels' },
-      // { label: t('chat.history.nps'), value: 'nps' },
+      { label: t('chat.history.rating'), value: 'feedbackRating' },
+      { label: t('chat.history.feedback'), value: 'feedbackText' },
+      { label: t('chat.history.nps'), value: 'nps' },
       { label: t('global.status'), value: 'status' },
       { label: 'ID', value: 'id' },
     ],
@@ -242,22 +241,28 @@ const ChatHistory: FC = () => {
     toast.open({
       type: 'success',
       title: t('global.notification'),
-      message: t('toast.succes.copied'),
+      message: t('toast.success.copied'),
     });
   };
 
   const commentView = (props: any) =>
-    !props.getValue() ? (
-      <></>
-    ) : (
-      <Tooltip content={props.getValue()}>
-        <span>
-          {props.getValue() === undefined
-            ? ''
-            : props.getValue()?.slice(0, 30) + '...'}
+    props.getValue() && <Tooltip content={props.getValue()}>
+      <span onClick={() => copyValueToClipboard(props.getValue())} style={{ cursor: 'pointer' }}>
+        {props.getValue().length <= 30 ? props.getValue() : `${props.getValue()?.slice(0, 30)}...`}
+      </span>
+    </Tooltip>;
+
+  const feedbackTextView = (props: any) =>  {
+    const value = props.getValue() ?? '';
+    
+    return (
+      <Tooltip content={value}>
+        <span style={{ minWidth: '250px' }}>
+        {value.length < 30 ? value : `${value?.slice?.(0, 30)}...`}
         </span>
       </Tooltip>
-    );
+    )
+  }
 
   const statusView = (props: any) => {
     const isLastMessageEvent =
@@ -269,9 +274,11 @@ const ChatHistory: FC = () => {
   };
 
   const idView = (props: any) => (
-    <button onClick={() => copyValueToClipboard(props.getValue())}>
-      {props.getValue()}
-    </button>
+    <Tooltip content={props.getValue()}>
+      <span onClick={() => copyValueToClipboard(props.getValue())} style={{ cursor: 'pointer' }}>
+        {props.getValue().split('-')[0]}
+      </span>
+    </Tooltip>
   );
 
   const detailsView = (props: any) => (
@@ -284,29 +291,27 @@ const ChatHistory: FC = () => {
     </Button>
   );
 
-  const forwardView = (props: any) => (
-    <Button
-      appearance="text"
-      onClick={() => setSendToEmailModal(props.row.original)}
-    >
-      <Icon icon={<MdMailOutline color={'rgba(0,0,0,0.54)'} />} />
-      {t('chat.active.sendToEmail')}
-    </Button>
-  );
-
   const endedChatsColumns = useMemo(
     () => [
       columnHelper.accessor('created', {
         id: 'created',
         header: t('chat.history.startTime') ?? '',
         cell: (props) =>
-          format(new Date(props.getValue()), 'd. MMM yyyy HH:mm:ss'),
+          format(
+            new Date(props.getValue()),
+            'd. MMM yyyy HH:mm:ss',
+            i18n.language === 'et' ? { locale: et } : undefined,
+          ),
       }),
       columnHelper.accessor('ended', {
         id: 'ended',
         header: t('chat.history.endTime') ?? '',
         cell: (props) =>
-          format(new Date(props.getValue()), 'd. MMM yyyy HH:mm:ss'),
+          format(
+            new Date(props.getValue()),
+            'd. MMM yyyy HH:mm:ss',
+            i18n.language === 'et' ? { locale: et } : undefined,
+          ),
       }),
       columnHelper.accessor('customerSupportDisplayName', {
         id: 'customerSupportDisplayName',
@@ -333,9 +338,19 @@ const ChatHistory: FC = () => {
         header: t('chat.history.comment') ?? '',
         cell: commentView,
       }),
-      columnHelper.accessor('labels', {
-        id: 'labels',
-        header: t('chat.history.label') ?? '',
+      columnHelper.accessor('feedbackRating', {
+        id: 'feedbackRating',
+        header: t('chat.history.rating') ?? '',
+        cell: (props) => props.getValue() && <span>{`${props.getValue()}/10`}</span>,
+      }),
+      columnHelper.accessor('feedbackText', {
+        id: 'feedbackText',
+        header: t('chat.history.feedback') ?? '',
+        cell: feedbackTextView
+      }),
+      columnHelper.accessor('nps', {
+        id: 'nps',
+        header: 'nps',
       }),
       columnHelper.accessor('status', {
         id: 'status',
@@ -366,13 +381,6 @@ const ChatHistory: FC = () => {
       columnHelper.display({
         id: 'detail',
         cell: detailsView,
-        meta: {
-          size: '1%',
-        },
-      }),
-      columnHelper.display({
-        id: 'forward',
-        cell: forwardView,
         meta: {
           size: '1%',
         },
@@ -530,35 +538,10 @@ const ChatHistory: FC = () => {
         </Drawer>
       )}
 
-      {sendToEmailModal !== null && (
-        <Dialog
-          title={t('chat.active.sendToEmail')}
-          onClose={() => setSendToEmailModal(null)}
-          footer={
-            <>
-              <Button
-                appearance="secondary"
-                onClick={() => setSendToEmailModal(null)}
-              >
-                {t('global.no')}
-              </Button>
-              <Button
-                appearance="error"
-                // onClick={() => sendToEmailMutation.mutate(sendToEmailModal)}
-              >
-                {t('global.yes')}
-              </Button>
-            </>
-          }
-        >
-          <p>{t('global.removeValidation')}</p>
-        </Dialog>
-      )}
-
       {statusChangeModal && (
         <Dialog
           title={t('chat.changeStatus')}
-          onClose={() => setSendToEmailModal(null)}
+          onClose={() => setStatusChangeModal(null)}
           footer={
             <>
               <Button
