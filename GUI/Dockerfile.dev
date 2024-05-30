@@ -9,4 +9,6 @@ RUN ./node_modules/.bin/vite build --mode=development
 
 EXPOSE 3001
 
+ENV REACT_APP_ENABLE_HIDDEN_FEATURES TRUE
+
 CMD ["npm", "run", "dev"]

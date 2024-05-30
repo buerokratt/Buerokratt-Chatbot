@@ -3,12 +3,25 @@ import react from '@vitejs/plugin-react';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import svgr from 'vite-plugin-svgr';
 import path from 'path';
+import { removeHiddenMenuItems } from './vitePlugin';
 
 // https://vitejs.dev/config/
 export default defineConfig({
   envPrefix: 'REACT_APP_',
-  plugins: [react(), tsconfigPaths(), svgr()],
-  base: 'chat',
+  plugins: [
+    react(),
+    tsconfigPaths(),
+    svgr(),
+    {
+      name: 'removeHiddenMenuItemsPlugin',
+      transform: (str, id) => {
+        if(!id.endsWith('/menu-structure.json'))
+          return str;
+        return removeHiddenMenuItems(str);
+      },
+    },
+  ],
+base: 'chat',
   build: {
     outDir: './build',
     target: 'es2015',

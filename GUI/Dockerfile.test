@@ -12,4 +12,6 @@ COPY --from=build /app /usr/share/nginx/html
 EXPOSE 3001
 EXPOSE 80
 
+ENV REACT_APP_ENABLE_HIDDEN_FEATURES TRUE
+
 CMD ["nginx", "-g", "daemon off;"]
