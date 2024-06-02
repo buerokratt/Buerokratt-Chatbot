@@ -35,7 +35,7 @@ const SettingsUsers: FC = () => {
       sorting.length === 0
         ? 'name asc'
         : sorting[0].id + ' ' + (sorting[0].desc ? 'desc' : 'asc');
-    const result: any = apiDev
+    apiDev
       .post(`accounts/customer-support-agents`, {
         page: pagination.pageIndex + 1,
         page_size: pagination.pageSize,
@@ -62,10 +62,7 @@ const SettingsUsers: FC = () => {
   const deleteUserMutation = useMutation({
     mutationFn: ({ id }: { id: string | number }) => deleteUser(id),
     onSuccess: async () => {
-      await queryClient.invalidateQueries([
-        'accounts/customer-support-agents',
-        'prod',
-      ]);
+      getUsers(pagination, sorting);
       toast.open({
         type: 'success',
         title: t('global.notification'),
@@ -182,16 +179,20 @@ const SettingsUsers: FC = () => {
           sortable
           filterable
           pagination={pagination}
-         setPagination={(state: PaginationState) => {
-              if (state.pageIndex === pagination.pageIndex && state.pageSize === pagination.pageSize) return;
-              setPagination(state);
-              getUsers(state, sorting);
-            }}
+          setPagination={(state: PaginationState) => {
+            if (
+              state.pageIndex === pagination.pageIndex &&
+              state.pageSize === pagination.pageSize
+            )
+              return;
+            setPagination(state);
+            getUsers(state, sorting);
+          }}
           sorting={sorting}
           setSorting={(state: SortingState) => {
-              setSorting(state);
-              getUsers(pagination, state);
-            }}
+            setSorting(state);
+            getUsers(pagination, state);
+          }}
           pagesCount={totalPages}
           isClientSide={false}
         />
