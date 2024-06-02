@@ -12,12 +12,16 @@ getCustomerSupportAgents:
   args:
     url: "[#CHATBOT_RESQL]/get-users-with-roles-by-role"
     body:
-      roles: [
-         "ROLE_ADMINISTRATOR",
-         "ROLE_CUSTOMER_SUPPORT_AGENT",
-         "ROLE_SERVICE_MANAGER",
-         "ROLE_CHATBOT_TRAINER",
-         "ROLE_ANALYST"
+      page: ${incoming.body.page}
+      page_size: ${incoming.body.page_size}
+      sorting: ${incoming.body.sorting}
+      roles:
+        [
+          "ROLE_ADMINISTRATOR",
+          "ROLE_CUSTOMER_SUPPORT_AGENT",
+          "ROLE_SERVICE_MANAGER",
+          "ROLE_CHATBOT_TRAINER",
+          "ROLE_ANALYST",
         ]
   result: res
 

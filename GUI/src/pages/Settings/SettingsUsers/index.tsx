@@ -1,10 +1,15 @@
-import { FC, useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { PaginationState, Row, SortingState, createColumnHelper } from '@tanstack/react-table';
+import {
+  PaginationState,
+  Row,
+  SortingState,
+  createColumnHelper,
+} from '@tanstack/react-table';
 import { AxiosError } from 'axios';
 import { MdOutlineEdit, MdOutlineDeleteOutline } from 'react-icons/md';
-
+import apiDev from 'services/api-dev';
 import { Button, Card, DataTable, Dialog, Icon, Track } from 'components';
 import { User } from 'types/user';
 import { deleteUser } from 'services/users';
@@ -22,13 +27,31 @@ const SettingsUsers: FC = () => {
   const [deletableRow, setDeletableRow] = useState<string | number | null>(
     null
   );
-  const [usersList, setUsersList] = useState<User[]>([]);
-  const { data: users } = useQuery<User[]>({
-    queryKey: ['accounts/customer-support-agents', 'prod'],
-    onSuccess(res: any) {
-      setUsersList(res.response);
-    },
-  });
+  const [usersList, setUsersList] = useState<User[] | null>(null);
+  const [totalPages, setTotalPages] = useState<number>(1);
+
+  const getUsers = (pagination: PaginationState, sorting: SortingState) => {
+    const sort =
+      sorting.length === 0
+        ? 'name asc'
+        : sorting[0].id + ' ' + (sorting[0].desc ? 'desc' : 'asc');
+    const result: any = apiDev
+      .post(`accounts/customer-support-agents`, {
+        page: pagination.pageIndex + 1,
+        page_size: pagination.pageSize,
+        sorting: sort,
+      })
+      .then((res: any) => {
+        setUsersList(res?.data?.response ?? []);
+        setTotalPages(res?.data?.response[0]?.totalPages ?? 1);
+      })
+      .catch((error: any) => console.log(error));
+  };
+
+  useEffect(() => {
+    getUsers(pagination, sorting);
+  }, []);
+
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
@@ -141,7 +164,7 @@ const SettingsUsers: FC = () => {
     []
   );
 
-  if (!users) return <>Loading...</>;
+  if (!usersList) return <>Loading...</>;
 
   return (
     <>
@@ -159,9 +182,18 @@ const SettingsUsers: FC = () => {
           sortable
           filterable
           pagination={pagination}
-          setPagination={setPagination}
+         setPagination={(state: PaginationState) => {
+              if (state.pageIndex === pagination.pageIndex && state.pageSize === pagination.pageSize) return;
+              setPagination(state);
+              getUsers(state, sorting);
+            }}
           sorting={sorting}
-          setSorting={setSorting}
+          setSorting={(state: SortingState) => {
+              setSorting(state);
+              getUsers(pagination, state);
+            }}
+          pagesCount={totalPages}
+          isClientSide={false}
         />
       </Card>
 
