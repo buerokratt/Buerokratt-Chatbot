@@ -1,7 +1,7 @@
 import { FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation } from '@tanstack/react-query';
-import { createColumnHelper, PaginationState } from '@tanstack/react-table';
+import { createColumnHelper, PaginationState, SortingState } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { AxiosError } from 'axios';
 import { MdMailOutline, MdOutlineRemoveRedEye } from 'react-icons/md';
@@ -59,6 +59,7 @@ const ChatHistory: FC = () => {
     pageIndex: 0,
     pageSize: 10,
   });
+  const [sorting, setSorting] = useState<SortingState>([]);
   const [endedChatsList, setEndedChatsList] = useState<ChatType[]>([]);
   const [filteredEndedChatsList, setFilteredEndedChatsList] = useState<
     ChatType[]
@@ -508,6 +509,8 @@ const ChatHistory: FC = () => {
           columns={getFilteredColumns()}
           pagination={pagination}
           setPagination={setPagination}
+          sorting={sorting}
+          setSorting={setSorting}
         />
       </Card>
 

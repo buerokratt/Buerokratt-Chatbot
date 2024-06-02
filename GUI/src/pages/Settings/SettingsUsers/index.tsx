@@ -1,7 +1,7 @@
 import { FC, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Row, createColumnHelper } from '@tanstack/react-table';
+import { PaginationState, Row, SortingState, createColumnHelper } from '@tanstack/react-table';
 import { AxiosError } from 'axios';
 import { MdOutlineEdit, MdOutlineDeleteOutline } from 'react-icons/md';
 
@@ -29,6 +29,11 @@ const SettingsUsers: FC = () => {
       setUsersList(res.response);
     },
   });
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+  const [sorting, setSorting] = useState<SortingState>([]);
   const columnHelper = createColumnHelper<User>();
 
   const deleteUserMutation = useMutation({
@@ -153,6 +158,10 @@ const SettingsUsers: FC = () => {
           columns={usersColumns}
           sortable
           filterable
+          pagination={pagination}
+          setPagination={setPagination}
+          sorting={sorting}
+          setSorting={setSorting}
         />
       </Card>
 

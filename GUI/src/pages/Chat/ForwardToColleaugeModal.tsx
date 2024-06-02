@@ -1,5 +1,5 @@
 import { FC, useMemo, useState } from 'react';
-import { createColumnHelper, PaginationState } from '@tanstack/react-table';
+import { createColumnHelper, PaginationState, SortingState } from '@tanstack/react-table';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { MdOutlineArrowForward } from 'react-icons/md';
@@ -34,6 +34,7 @@ const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({
     pageIndex: 0,
     pageSize: 10,
   });
+  const [sorting, setSorting] = useState<SortingState>([]);
   const [usersList, setUsersList] = useState<User[]>([]);
   const { data: users } = useQuery<User[]>({
     queryKey: ['accounts/customer-support-agents', 'prod'],
@@ -142,6 +143,8 @@ const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({
           sortable
           pagination={pagination}
           setPagination={setPagination}
+          sorting={sorting}
+          setSorting={setSorting}
         />
       )}
     </Dialog>

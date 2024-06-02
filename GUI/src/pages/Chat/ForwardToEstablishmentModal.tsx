@@ -1,5 +1,9 @@
 import { FC, useMemo, useState } from 'react';
-import { createColumnHelper, PaginationState } from '@tanstack/react-table';
+import {
+  createColumnHelper,
+  PaginationState,
+  SortingState,
+} from '@tanstack/react-table';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { MdOutlineArrowForward } from 'react-icons/md';
@@ -25,6 +29,7 @@ const ForwardToEstablishmentModal: FC<ForwardToEstablishmentModalProps> = ({
     pageIndex: 0,
     pageSize: 10,
   });
+  const [sorting, setSorting] = useState<SortingState>([]);
   const [establishmentsList, setEstablishmentsList] = useState<Establishment[]>(
     []
   );
@@ -102,6 +107,8 @@ const ForwardToEstablishmentModal: FC<ForwardToEstablishmentModalProps> = ({
           sortable
           pagination={pagination}
           setPagination={setPagination}
+          sorting={sorting}
+          setSorting={setSorting}
         />
       )}
     </Dialog>
