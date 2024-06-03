@@ -15,6 +15,7 @@ getCustomerSupportAgents:
       page: ${incoming.body.page}
       page_size: ${incoming.body.page_size}
       sorting: ${incoming.body.sorting}
+      show_active_only: ${incoming.body.show_active_only ?? false}
       roles:
         [
           "ROLE_ADMINISTRATOR",

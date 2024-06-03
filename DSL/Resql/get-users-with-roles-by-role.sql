@@ -30,6 +30,7 @@ WHERE u.status <> 'deleted'
       FROM "user"
       GROUP BY id_code
   )
+  AND (:show_active_only <> true OR csa.status <> 'offline')
 ORDER BY 
    CASE WHEN :sorting = 'name asc' THEN u.first_name END ASC,
    CASE WHEN :sorting = 'name desc' THEN u.first_name END DESC,
@@ -42,5 +43,7 @@ ORDER BY
    CASE WHEN :sorting = 'csaTitle asc' THEN u.csa_title END ASC,
    CASE WHEN :sorting = 'csaTitle desc' THEN u.csa_title END DESC,
    CASE WHEN :sorting = 'csaEmail asc' THEN u.csa_email END ASC,
-   CASE WHEN :sorting = 'csaEmail desc' THEN u.csa_email END DESC
+   CASE WHEN :sorting = 'csaEmail desc' THEN u.csa_email END DESC,
+   CASE WHEN :sorting = 'customerSupportStatus asc' THEN csa.status END ASC,
+   CASE WHEN :sorting = 'customerSupportStatus desc' THEN csa.status END DESC
 OFFSET ((GREATEST(:page, 1) - 1) * :page_size) LIMIT :page_size;

@@ -1,8 +1,9 @@
-import { FC, useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { createColumnHelper, PaginationState, SortingState } from '@tanstack/react-table';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { MdOutlineArrowForward } from 'react-icons/md';
+import apiDev from 'services/api-dev';
 
 import {
   Button,
@@ -35,21 +36,30 @@ const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({
     pageSize: 10,
   });
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [usersList, setUsersList] = useState<User[]>([]);
-  const { data: users } = useQuery<User[]>({
-    queryKey: ['accounts/customer-support-agents', 'prod'],
-    onSuccess(res: any) {
-      setUsersList(res.response);
-    },
-  });
+  const [usersList, setUsersList] = useState<User[] | null>(null);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const getUsers = (pagination: PaginationState, sorting: SortingState, showActiveOnly: boolean = false) => {
+    const sort =
+      sorting.length === 0
+        ? 'name asc'
+        : sorting[0].id + ' ' + (sorting[0].desc ? 'desc' : 'asc');
+    apiDev
+      .post(`accounts/customer-support-agents`, {
+        page: pagination.pageIndex + 1,
+        page_size: pagination.pageSize,
+        sorting: sort,
+        show_active_only: showActiveOnly,
+      })
+      .then((res: any) => {
+        setUsersList(res?.data?.response ?? []);
+        setTotalPages(res?.data?.response[0]?.totalPages ?? 1);
+      })
+      .catch((error: any) => console.log(error));
+  };
 
-  const filteredUsers = useMemo(
-    () =>
-      usersList && showActiveAgents
-        ? usersList?.filter((u) => u.customerSupportStatus === 'online')
-        : usersList,
-    [usersList, showActiveAgents]
-  );
+  useEffect(() => {
+    getUsers(pagination, sorting, showActiveAgents);
+  }, [showActiveAgents]);
 
   const columnHelper = createColumnHelper<User>();
 
@@ -134,17 +144,30 @@ const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({
           onChange={(e) => setShowActiveAgents(e.target.checked)}
         />
       </Track>
-      {users && (
+      {usersList && (
         <DataTable
-          data={filteredUsers}
+          data={usersList}
           columns={usersColumns}
           globalFilter={filter}
           setGlobalFilter={setFilter}
           sortable
           pagination={pagination}
-          setPagination={setPagination}
+          setPagination={(state: PaginationState) => {
+            if (
+              state.pageIndex === pagination.pageIndex &&
+              state.pageSize === pagination.pageSize
+            )
+              return;
+            setPagination(state);
+            getUsers(state, sorting, showActiveAgents);
+          }}
           sorting={sorting}
-          setSorting={setSorting}
+          setSorting={(state: SortingState) => {
+            setSorting(state);
+            getUsers(pagination, state, showActiveAgents);
+          }}
+          pagesCount={totalPages}
+          isClientSide={false}
         />
       )}
     </Dialog>
