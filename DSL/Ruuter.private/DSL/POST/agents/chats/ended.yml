@@ -26,8 +26,10 @@ getEndedChats:
     url: "[#CHATBOT_RESQL]/get-cs-all-ended-chats"
     body:
       start: ${startDate}
-      end: ${endDate}  
-      limit: 100
+      end: ${endDate}
+      page: ${incoming.body.page}
+      page_size: ${incoming.body.page_size}
+      sorting: ${incoming.body.sorting}
   result: res
 
 returnSuccess:

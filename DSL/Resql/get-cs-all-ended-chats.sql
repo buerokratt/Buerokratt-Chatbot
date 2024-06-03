@@ -109,7 +109,8 @@ SELECT c.base_id AS id,
        LastContentMessage.content AS last_message,
        (CASE WHEN m.event = '' THEN NULL ELSE LOWER(m.event) END) as last_message_event,
        ContactsMessage.content AS contacts_message,
-       m.updated AS last_message_timestamp
+       m.updated AS last_message_timestamp,
+       CEIL(COUNT(*) OVER() / :page_size::DECIMAL) AS total_pages
 FROM EndedChatMessages AS c
 JOIN Messages AS m ON c.base_id = m.chat_base_id
 LEFT JOIN ChatHistoryComments AS s ON s.chat_id =  m.chat_base_id
@@ -117,5 +118,25 @@ JOIN LastContentMessage ON c.base_id = LastContentMessage.chat_base_id
 JOIN FirstContentMessage ON c.base_id = FirstContentMessage.chat_base_id
 LEFT JOIN ContactsMessage ON ContactsMessage.chat_base_id = c.base_id
 CROSS JOIN TitleVisibility
-ORDER BY created DESC
-LIMIT :limit;
+ORDER BY 
+   CASE WHEN :sorting = 'created asc' THEN FirstContentMessage.created END ASC,
+   CASE WHEN :sorting = 'created desc' THEN FirstContentMessage.created END DESC,
+   CASE WHEN :sorting = 'ended asc' THEN c.ended END ASC,
+   CASE WHEN :sorting = 'ended desc' THEN c.ended END DESC,
+   CASE WHEN :sorting = 'customerSupportDisplayName asc' THEN c.customer_support_display_name END ASC,
+   CASE WHEN :sorting = 'customerSupportDisplayName desc' THEN c.customer_support_display_name END DESC,
+   CASE WHEN :sorting = 'endUserName asc' THEN c.end_user_first_name END ASC,
+   CASE WHEN :sorting = 'endUserName desc' THEN c.end_user_first_name END DESC,
+   CASE WHEN :sorting = 'endUserId asc' THEN c.end_user_id END ASC,
+   CASE WHEN :sorting = 'endUserId desc' THEN c.end_user_id END desc,
+   CASE WHEN :sorting = 'contactsMessage asc' THEN ContactsMessage.content END ASC,
+   CASE WHEN :sorting = 'contactsMessage desc' THEN ContactsMessage.content END DESC,
+   CASE WHEN :sorting = 'comment asc' THEN s.comment END ASC,
+   CASE WHEN :sorting = 'comment desc' THEN s.comment END DESC,
+   CASE WHEN :sorting = 'labels asc' THEN c.labels END ASC,
+   CASE WHEN :sorting = 'labels desc' THEN c.labels END DESC,
+   CASE WHEN :sorting = 'status asc' THEN c.status END ASC,
+   CASE WHEN :sorting = 'status desc' THEN c.status END DESC,
+   CASE WHEN :sorting = 'id asc' THEN c.base_id END ASC,
+   CASE WHEN :sorting = 'id desc' THEN c.base_id END DESC
+OFFSET ((GREATEST(:page, 1) - 1) * :page_size) LIMIT :page_size;
