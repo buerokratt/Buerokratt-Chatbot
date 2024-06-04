@@ -1,5 +1,5 @@
 -- liquibase formatted sql
--- changeset baha-a:1715840743
+-- changeset baha-a:20240516062543
 
 ALTER TABLE chat_history_comments
 DROP CONSTRAINT IF EXISTS chat_history_comments_pkey,
