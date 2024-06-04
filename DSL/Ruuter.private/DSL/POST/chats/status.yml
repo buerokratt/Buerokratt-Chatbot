@@ -43,6 +43,7 @@ deleteMessagePreview:
     url: "[#CHATBOT_RESQL]/delete-message-preview"
     body:
       chatId: ${chatId}
+      content: ""
   result: res
   next: getMessageUuid 
 
