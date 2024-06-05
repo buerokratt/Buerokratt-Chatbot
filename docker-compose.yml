@@ -26,7 +26,7 @@ services:
     image: ruuter
     environment:
       - application.cors.allowedOrigins=http://localhost:8082,http://localhost:3001,http://localhost:3003
-      - application.httpCodesAllowList=200,201,202,204,400,401,403,500
+      - application.httpCodesAllowList=200,201,202,400,401,403,500
       - application.internalRequests.allowedIPs=127.0.0.1
       - application.logging.displayRequestContent=true
       - application.logging.displayResponseContent=true
@@ -242,65 +242,8 @@ services:
     networks:
       - bykstack
 
-  s3-ferry:
-    container_name: s3-ferry
-    image: s3-ferry
-    user: root
-    volumes:
-      - rasa-training-data:/api/data
-    environment:
-      - API_CORS_ORIGIN=*
-      - API_DOCUMENTATION_ENABLED=true
-
-      - S3_REGION=us-east-1
-      - S3_ENDPOINT_URL=http://localstack-2:4566
-      - S3_ACCESS_KEY_ID=accessKey
-      - S3_SECRET_ACCESS_KEY=secretKey
-      - S3_DATA_BUCKET_NAME=buerokratt
-      - S3_DATA_BUCKET_PATH=
-
-      - FS_DATA_DIRECTORY_PATH=./data
-    ports:
-      - 3005:3000
-    networks:
-      - bykstack
-
-  localstack:
-    container_name: localstack
-    image: localstack/localstack:3.3.0
-    ports:
-      - 4566:4566
-    environment:
-      - SERVICES=s3:4566
-    volumes:
-      - ./localstack-init.sh:/etc/localstack/init/ready.d/init.sh
-    networks:
-      - bykstack
-
-  bot:
-    container_name: bot
-    image: rasa
-    ports:
-      - 5005:5005
-    volumes:
-      - ./loba/:/app
-      - ./cc.et.300.bin:/app/fasttext_et_model/cc.et.300.bin
-      - rasa-training-data:/app/models
-    environment:
-      - SQLALCHEMY_WARN_20=1
-    command: ["run", "--enable-api"]
-    restart: always
-    networks:
-      - bykstack
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "50m"
-        max-file: "3"
-
 volumes:
   opensearch-data:
-  rasa-training-data:
 networks:
   bykstack:
     name: bykstack

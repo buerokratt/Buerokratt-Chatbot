@@ -1,6 +1,26 @@
 version: "3.9"
 
 services:
+  train-bot:
+    container_name: train-bot
+    image: rasa
+    ports:
+      - 5005:5005
+    volumes:
+      - ./loba/:/app
+    command:
+      - train
+      - --fixed-model-name
+      - loba-model
+    networks:
+      - bykstack
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+    restart: "no"
+
   run-action-server:
     container_name: bot-action-server
     image: rasa
@@ -12,6 +32,28 @@ services:
     command:
       - run
       - actions
+    restart: always
+    networks:
+      - bykstack
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+  bot:
+    container_name: bot
+    image: rasa
+    ports:
+      - 5005:5005
+    volumes:
+      - ./loba/:/app
+      - ./cc.et.300.bin:/app/fasttext_et_model/cc.et.300.bin
+    command:
+      - run
+    depends_on:
+      train-bot:
+        condition: service_completed_successfully
     restart: always
     networks:
       - bykstack
