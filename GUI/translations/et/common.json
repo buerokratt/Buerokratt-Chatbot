@@ -152,7 +152,9 @@
       "label": "Märksõna",
       "nps": "Soovitusindeks",
       "forwarded": "Suunatud",
-      "addACommentToTheConversation": "Lisa vestlusele kommentaar"
+      "addACommentToTheConversation": "Lisa vestlusele kommentaar",
+      "rating": "Hinnang",
+      "feedback": "Tagasiside"
     },
     "plainEvents": {
       "answered": "Vastatud",
