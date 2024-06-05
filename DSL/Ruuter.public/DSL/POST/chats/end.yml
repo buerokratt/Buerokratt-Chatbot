@@ -26,7 +26,7 @@ extractRequestData:
     authorRole: ${incoming.body.message.authorRole}
     authorTimestamp: "${incoming.body.message.authorTimestamp}"
     status: "${incoming.body.status}"
-  next: deleteMessagePreview  
+  next: deleteMessagePreview
 
 deleteMessagePreview:
   call: http.post
@@ -34,8 +34,9 @@ deleteMessagePreview:
     url: "[#CHATBOT_RESQL]/delete-message-preview"
     body:
       chatId: ${chatId}
+      content: ""
   result: res
-  next: getMessageUuid 
+  next: getMessageUuid
 
 getMessageUuid:
   call: http.post
@@ -49,7 +50,7 @@ getMessageUuid:
 assignMessageUuid:
   assign:
     messageUuid: ${message_uuid_result.response.body.uuid}
-  next: getActiveChatById  
+  next: getActiveChatById
 
 getActiveChatById:
   call: http.post
@@ -58,7 +59,7 @@ getActiveChatById:
     body:
       id: ${chatId}
   result: activeChatRes
-  next: checkActiveChatResult 
+  next: checkActiveChatResult
 
 checkActiveChatResult:
   switch:
@@ -69,7 +70,7 @@ checkActiveChatResult:
 assignChat:
   assign:
     activeChat: ${activeChatRes.response.body[0]}
-  next: postMessage  
+  next: postMessage
 
 postMessage:
   call: http.post
@@ -91,7 +92,7 @@ postMessage:
       forwardedFromCsa: ""
       forwardedToCsa: ""
   result: message_res
-  next: endChat  
+  next: endChat
 
 endChat:
   call: http.post
@@ -125,12 +126,11 @@ endChat:
 blacklist_chat_jwt:
   call: http.post
   args:
-   url: "[#CHATBOT_TIM]/jwt/custom-jwt-blacklist"
-   contentType: plaintext
-   headers:
-    cookie: ${incoming.headers.cookie}
-   plaintext: 
-      "chatJwt"
+    url: "[#CHATBOT_TIM]/jwt/custom-jwt-blacklist"
+    contentType: plaintext
+    headers:
+      cookie: ${incoming.headers.cookie}
+    plaintext: "chatJwt"
   result: chat_blacklist_res
   next: assign_chat_cookie
 
@@ -143,17 +143,16 @@ assign_chat_cookie:
       HttpOnly: true
       SameSite: "Lax"
       Max-Age: 0
-  next: blacklist_client_jwt     
+  next: blacklist_client_jwt
 
 blacklist_client_jwt:
   call: http.post
   args:
-   url: "[#CHATBOT_TIM]/jwt/custom-jwt-blacklist"
-   contentType: plaintext
-   headers:
-    cookie: ${incoming.headers.cookie}
-   plaintext: 
-      "clientCustomJwtCookie"
+    url: "[#CHATBOT_TIM]/jwt/custom-jwt-blacklist"
+    contentType: plaintext
+    headers:
+      cookie: ${incoming.headers.cookie}
+    plaintext: "clientCustomJwtCookie"
   result: client_blacklist_res
   next: assign_client_cookie
 
@@ -173,9 +172,9 @@ clearChatList:
   args:
     url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query?conflicts=proceed"
     body:
-     query:
-      term:
-       channelId: "chat-list"
+      query:
+        term:
+          channelId: "chat-list"
   result: clear_chat_res
   next: postNotificationAboutAddedChat
 
@@ -184,12 +183,9 @@ postNotificationAboutAddedChat:
   args:
     url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
     body:
-     channelId: "chat-list"
-     timestamp: ${new Date().toISOString()}
-     payload: {
-        "status": "Chat Status Changed",
-        "chatId": "${chatId}"
-     }
+      channelId: "chat-list"
+      timestamp: ${new Date().toISOString()}
+      payload: { "status": "Chat Status Changed", "chatId": "${chatId}" }
   result: chat_notification_result
 
 remove_chat_id_from_queue_notification_node_if_existed:
@@ -203,11 +199,10 @@ remove_chat_id_from_queue_notification_node_if_existed:
 return_result:
   headers:
     Set-Cookie: ${chatCookie}
-    "\0Set-Cookie": ${clientCookie}
   return: "Ended Chat Successfully"
   next: end
 
 return_chat_ended:
   return: "Chat Has Ended"
   status: 400
-  next: end  
+  next: end
