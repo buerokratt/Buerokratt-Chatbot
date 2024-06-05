@@ -1,10 +1,15 @@
-import { FC, useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Row, createColumnHelper } from '@tanstack/react-table';
+import {
+  PaginationState,
+  Row,
+  SortingState,
+  createColumnHelper,
+} from '@tanstack/react-table';
 import { AxiosError } from 'axios';
 import { MdOutlineEdit, MdOutlineDeleteOutline } from 'react-icons/md';
-
+import apiDev from 'services/api-dev';
 import { Button, Card, DataTable, Dialog, Icon, Track } from 'components';
 import { User } from 'types/user';
 import { deleteUser } from 'services/users';
@@ -22,22 +27,42 @@ const SettingsUsers: FC = () => {
   const [deletableRow, setDeletableRow] = useState<string | number | null>(
     null
   );
-  const [usersList, setUsersList] = useState<User[]>([]);
-  const { data: users } = useQuery<User[]>({
-    queryKey: ['accounts/customer-support-agents', 'prod'],
-    onSuccess(res: any) {
-      setUsersList(res.response);
-    },
+  const [usersList, setUsersList] = useState<User[] | null>(null);
+  const [totalPages, setTotalPages] = useState<number>(1);
+
+  const getUsers = (pagination: PaginationState, sorting: SortingState) => {
+    const sort =
+      sorting.length === 0
+        ? 'name asc'
+        : sorting[0].id + ' ' + (sorting[0].desc ? 'desc' : 'asc');
+    apiDev
+      .post(`accounts/customer-support-agents`, {
+        page: pagination.pageIndex + 1,
+        page_size: pagination.pageSize,
+        sorting: sort,
+      })
+      .then((res: any) => {
+        setUsersList(res?.data?.response ?? []);
+        setTotalPages(res?.data?.response[0]?.totalPages ?? 1);
+      })
+      .catch((error: any) => console.log(error));
+  };
+
+  useEffect(() => {
+    getUsers(pagination, sorting);
+  }, []);
+
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
   });
+  const [sorting, setSorting] = useState<SortingState>([]);
   const columnHelper = createColumnHelper<User>();
 
   const deleteUserMutation = useMutation({
     mutationFn: ({ id }: { id: string | number }) => deleteUser(id),
     onSuccess: async () => {
-      await queryClient.invalidateQueries([
-        'accounts/customer-support-agents',
-        'prod',
-      ]);
+      getUsers(pagination, sorting);
       toast.open({
         type: 'success',
         title: t('global.notification'),
@@ -136,7 +161,7 @@ const SettingsUsers: FC = () => {
     []
   );
 
-  if (!users) return <>Loading...</>;
+  if (!usersList) return <>Loading...</>;
 
   return (
     <>
@@ -153,6 +178,23 @@ const SettingsUsers: FC = () => {
           columns={usersColumns}
           sortable
           filterable
+          pagination={pagination}
+          setPagination={(state: PaginationState) => {
+            if (
+              state.pageIndex === pagination.pageIndex &&
+              state.pageSize === pagination.pageSize
+            )
+              return;
+            setPagination(state);
+            getUsers(state, sorting);
+          }}
+          sorting={sorting}
+          setSorting={(state: SortingState) => {
+            setSorting(state);
+            getUsers(pagination, state);
+          }}
+          pagesCount={totalPages}
+          isClientSide={false}
         />
       </Card>
 

@@ -1,7 +1,11 @@
 import { FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation } from '@tanstack/react-query';
-import { createColumnHelper, PaginationState } from '@tanstack/react-table';
+import {
+  createColumnHelper,
+  PaginationState,
+  SortingState,
+} from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { AxiosError } from 'axios';
 import { MdOutlineRemoveRedEye } from 'react-icons/md';
@@ -43,8 +47,8 @@ const ChatHistory: FC = () => {
   const routerLocation = useLocation();
   const params = new URLSearchParams(routerLocation.search);
   let passedChatId = params.get('chat');
-  const paasedStartDate = params.get('start');
-  const paasedEndDate = params.get('end');
+  const passedStartDate = params.get('start');
+  const passedEndDate = params.get('end');
   const preferences = getFromLocalStorage(
     CHAT_HISTORY_PREFERENCES_KEY
   ) as string[];
@@ -57,6 +61,8 @@ const ChatHistory: FC = () => {
     pageIndex: 0,
     pageSize: 10,
   });
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [totalPages, setTotalPages] = useState<number>(1);
   const [endedChatsList, setEndedChatsList] = useState<ChatType[]>([]);
   const [filteredEndedChatsList, setFilteredEndedChatsList] = useState<
     ChatType[]
@@ -65,22 +71,26 @@ const ChatHistory: FC = () => {
   const [selectedColumns, setSelectedColumns] = useState<string[]>(
     preferences ?? []
   );
-  
+
   const { control, watch } = useForm<{
     startDate: Date | string;
     endDate: Date | string;
   }>({
     defaultValues: {
-      startDate: paasedStartDate ? unifyDateFromat(paasedStartDate) : new Date(
-        new Date().getUTCFullYear(),
-        new Date().getUTCMonth(),
-        new Date().getUTCDate()
-      ),
-      endDate: paasedEndDate ? unifyDateFromat(paasedEndDate) : new Date(
-        new Date().getUTCFullYear(),
-        new Date().getUTCMonth(),
-        new Date().getUTCDate() + 1
-      ),
+      startDate: passedStartDate
+        ? unifyDateFromat(passedStartDate)
+        : new Date(
+            new Date().getUTCFullYear(),
+            new Date().getUTCMonth(),
+            new Date().getUTCDate()
+          ),
+      endDate: passedEndDate
+        ? unifyDateFromat(passedEndDate)
+        : new Date(
+            new Date().getUTCFullYear(),
+            new Date().getUTCMonth(),
+            new Date().getUTCDate() + 1
+          ),
     },
   });
 
@@ -98,18 +108,32 @@ const ChatHistory: FC = () => {
     getAllEndedChats.mutate({
       startDate: format(new Date(startDate), 'yyyy-MM-dd'),
       endDate: format(new Date(endDate), 'yyyy-MM-dd'),
+      pagination,
+      sorting,
     });
   }, []);
 
   const getAllEndedChats = useMutation({
-    mutationFn: (data: { startDate: string; endDate: string }) =>
+    mutationFn: (data: {
+      startDate: string;
+      endDate: string;
+      pagination: PaginationState;
+      sorting: SortingState;
+    }) =>
       apiDev.post('agents/chats/ended', {
         startDate: data.startDate,
         endDate: data.endDate,
+        page: pagination.pageIndex + 1,
+        page_size: pagination.pageSize,
+        sorting:
+          sorting.length === 0
+            ? 'created desc'
+            : sorting[0].id + ' ' + (sorting[0].desc ? 'desc' : 'asc'),
       }),
     onSuccess: (res: any) => {
       setEndedChatsList(res.data.response ?? []);
       filterChatsList(res.data.response ?? []);
+      setTotalPages(res?.data?.response[0]?.totalPages ?? 1);
     },
   });
 
@@ -191,6 +215,8 @@ const ChatHistory: FC = () => {
       getAllEndedChats.mutate({
         startDate: format(new Date(startDate), 'yyyy-MM-dd'),
         endDate: format(new Date(endDate), 'yyyy-MM-dd'),
+        pagination,
+        sorting,
       });
       toast.open({
         type: 'success',
@@ -462,6 +488,8 @@ const ChatHistory: FC = () => {
                         getAllEndedChats.mutate({
                           startDate: format(new Date(v), 'yyyy-MM-dd'),
                           endDate: format(new Date(endDate), 'yyyy-MM-dd'),
+                          pagination,
+                          sorting,
                         });
                       }}
                     />
@@ -485,6 +513,8 @@ const ChatHistory: FC = () => {
                         getAllEndedChats.mutate({
                           startDate: format(new Date(startDate), 'yyyy-MM-dd'),
                           endDate: format(new Date(v), 'yyyy-MM-dd'),
+                          pagination,
+                          sorting,
                         });
                       }}
                     />
@@ -515,7 +545,32 @@ const ChatHistory: FC = () => {
           sortable
           columns={getFilteredColumns()}
           pagination={pagination}
-          setPagination={setPagination}
+          sorting={sorting}
+          setPagination={(state: PaginationState) => {
+            if (
+              state.pageIndex === pagination.pageIndex &&
+              state.pageSize === pagination.pageSize
+            )
+              return;
+            setPagination(state);
+            getAllEndedChats.mutate({
+              startDate: format(new Date(startDate), 'yyyy-MM-dd'),
+              endDate: format(new Date(endDate), 'yyyy-MM-dd'),
+              pagination: state,
+              sorting,
+            });
+          }}
+          setSorting={(state: SortingState) => {
+            setSorting(state);
+            getAllEndedChats.mutate({
+              startDate: format(new Date(startDate), 'yyyy-MM-dd'),
+              endDate: format(new Date(endDate), 'yyyy-MM-dd'),
+              pagination,
+              sorting: state,
+            });
+          }}
+          isClientSide={false}
+          pagesCount={totalPages}
         />
       </Card>
 

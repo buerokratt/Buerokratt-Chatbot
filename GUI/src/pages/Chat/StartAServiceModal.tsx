@@ -1,5 +1,5 @@
 import { FC, useEffect, useMemo, useState } from 'react';
-import { createColumnHelper, PaginationState } from '@tanstack/react-table';
+import { createColumnHelper, PaginationState, SortingState } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 
 import { Button, DataTable, Dialog, FormInput, Icon, Track } from 'components';
@@ -24,6 +24,7 @@ const StartAServiceModal: FC<StartAServiceModalProps> = ({
     pageIndex: 0,
     pageSize: 10,
   });
+  const [sorting, setSorting] = useState<SortingState>([]);
   const [services, setServices] = useState<Service[]>([]);
   const toast = useToast();
 
@@ -106,6 +107,8 @@ const StartAServiceModal: FC<StartAServiceModalProps> = ({
         sortable
         pagination={pagination}
         setPagination={setPagination}
+        sorting={sorting}
+        setSorting={setSorting}
       />
     </Dialog>
   );
