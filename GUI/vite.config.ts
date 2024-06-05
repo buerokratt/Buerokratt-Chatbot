@@ -21,7 +21,7 @@ export default defineConfig({
       },
     },
   ],
-base: 'chat',
+  base: 'chat',
   build: {
     outDir: './build',
     target: 'es2015',

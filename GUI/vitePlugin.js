@@ -7,6 +7,7 @@ export function removeHiddenMenuItems(str) {
     process.env.REACT_APP_ENABLE_HIDDEN_FEATURES?.toLowerCase().trim() == '1';
 
   const json = removeHidden(JSON.parse(correctJson), isHiddenFeaturesEnabled);
+  
   const updatedJson = JSON.stringify(json);
 
   return 'export default ' + updatedJson + ';'

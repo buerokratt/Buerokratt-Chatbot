@@ -87,6 +87,7 @@
     "vite": "^4.0.0",
     "vite-plugin-env-compatible": "^1.1.1",
     "vite-plugin-svgr": "^2.4.0",
+    "vite-plugin-transform": "^2.0.1",
     "vite-tsconfig-paths": "^4.0.3"
   },
   "browserslist": {
