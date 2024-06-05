@@ -2,10 +2,24 @@ declaration:
   call: declare
   version: 0.1
   description: "Decription placeholder for 'CUSTOMER-SUPPORT-AGENTS'"
-  method: get
+  method: post
   accepts: json
   returns: json
   namespace: backoffice
+  allowlist:
+    body:
+      - field: page
+        type: number
+        description: "Body field 'page'"
+      - field: page_size
+        type: number
+        description: "Body field 'page_size'"
+      - field: sorting
+        type: string
+        description: "Body field 'sorting'"
+      - field: show_active_only
+        type: boolean
+        description: "Body field 'show_active_only'"
 
 getCustomerSupportAgents:
   call: http.post

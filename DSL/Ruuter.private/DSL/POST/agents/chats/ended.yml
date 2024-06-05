@@ -14,6 +14,15 @@ declaration:
       - field: startDate
         type: string
         description: "Body field 'startDate'"
+      - field: page
+        type: number
+        description: "Body field 'page'"
+      - field: page_size
+        type: number
+        description: "Body field 'page_size'"
+      - field: sorting
+        type: string
+        description: "Body field 'sorting'"
 
 extractRequestData:
   assign:

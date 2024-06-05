@@ -46,8 +46,8 @@ const ChatHistory: FC = () => {
   const routerLocation = useLocation();
   const params = new URLSearchParams(routerLocation.search);
   let passedChatId = params.get('chat');
-  const paasedStartDate = params.get('start');
-  const paasedEndDate = params.get('end');
+  const passedStartDate = params.get('start');
+  const passedEndDate = params.get('end');
   const preferences = getFromLocalStorage(
     CHAT_HISTORY_PREFERENCES_KEY
   ) as string[];
@@ -79,15 +79,15 @@ const ChatHistory: FC = () => {
     endDate: Date | string;
   }>({
     defaultValues: {
-      startDate: paasedStartDate
-        ? unifyDateFromat(paasedStartDate)
+      startDate: passedStartDate
+        ? unifyDateFromat(passedStartDate)
         : new Date(
             new Date().getUTCFullYear(),
             new Date().getUTCMonth(),
             new Date().getUTCDate()
           ),
-      endDate: paasedEndDate
-        ? unifyDateFromat(paasedEndDate)
+      endDate: passedEndDate
+        ? unifyDateFromat(passedEndDate)
         : new Date(
             new Date().getUTCFullYear(),
             new Date().getUTCMonth(),
