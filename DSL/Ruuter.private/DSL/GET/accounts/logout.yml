@@ -58,7 +58,7 @@ setCustomerSupportAgentAway:
 blacklistCustomJwt:
   call: http.post
   args:
-    url: "[#CHATBOT_TIM]/jwt/blacklist-custom-jwt"
+    url: "[#CHATBOT_TIM]/jwt/custom-jwt-blacklist"
     contentType: plaintext
     headers:
       cookie: ${incoming.headers.cookie}
