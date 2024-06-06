@@ -24,4 +24,5 @@ guard_success:
 
 guard_fail:
   return: "unauthorized"
+  status: 200
   next: end
