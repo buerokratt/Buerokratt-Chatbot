@@ -40,7 +40,6 @@ return_authorized:
   next: end
 
 return_unauthorized:
-  status: 403
   return: false
   next: end
 
