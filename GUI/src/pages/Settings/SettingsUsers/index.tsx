@@ -1,6 +1,6 @@
 import { FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import {
   PaginationState,
   Row,
@@ -20,7 +20,6 @@ import withAuthorization from 'hoc/with-authorization';
 
 const SettingsUsers: FC = () => {
   const { t } = useTranslation();
-  const queryClient = useQueryClient();
   const toast = useToast();
   const [newUserModal, setNewUserModal] = useState(false);
   const [editableRow, setEditableRow] = useState<User | null>(null);
@@ -198,11 +197,19 @@ const SettingsUsers: FC = () => {
         />
       </Card>
 
-      {newUserModal && <UserModal onClose={() => setNewUserModal(false)} />}
+      {
+        newUserModal && <UserModal onClose={() => {
+          setNewUserModal(false);
+          getUsers(pagination, sorting);
+        }} />
+      }
 
-      {editableRow && (
-        <UserModal user={editableRow} onClose={() => setEditableRow(null)} />
-      )}
+      {
+        editableRow && <UserModal user={editableRow} onClose={() => {
+          setEditableRow(null);
+          getUsers(pagination, sorting);
+        }} />
+      }
 
       {deletableRow !== null && (
         <Dialog
