@@ -160,7 +160,7 @@ services:
       - REACT_APP_SETTINGS_BASE_URL=http://localhost:8080/settings
       - REACT_APP_MONITORING_BASE_URL=http://localhost:8080/monitoring
       - REACT_APP_SERVICE_ID=conversations,settings,monitoring
-      - REACT_APP_ENABLE_HIDDEN_FEATURES=TRUE
+      - REACT_APP_MENU_JSON= # optional json string, overrides REACT_APP_MENU_URL and REACT_APP_MENU_PATH
     build:
       context: ./GUI
       dockerfile: Dockerfile.dev
