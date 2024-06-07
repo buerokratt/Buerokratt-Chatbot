@@ -131,7 +131,7 @@ check_if_user_wants_csa:
       sender: ${chatId}
       message: "csa"
   result: post_message_to_client_result
-  next: check_for_post_message_to_client_result
+  next: check_for_post_message_to_bot_result
 
 get_organization_working_details:
   call: http.post
