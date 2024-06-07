@@ -119,9 +119,19 @@ check_for_fallback_bot:
 
 check_if_fallback_bot_is_unable_to_reply:
   switch:
-    - condition: ${fallback_bot_result.response.body.response[0].text == 'Vabandust, kuid ma ei saa teie küsimusest aru. Kas saaksite palun selgitada, mida soovite teada saada või kuidas saaksin teid aidata?'}
-      next: get_organization_working_details
+    - condition: ${fallback_bot_result.response.body.response[0].text == 'ERROR'}
+      next: check_if_user_wants_csa
   next: convert_fallback_bot_responses_to_messages
+
+check_if_user_wants_csa:
+  call: http.post
+  args:
+    url: "[#CHATBOT_BOT]/webhooks/rest/webhook"
+    body:
+      sender: ${chatId}
+      message: "csa"
+  result: post_message_to_client_result
+  next: check_for_post_message_to_bot_result
 
 get_organization_working_details:
   call: http.post

@@ -27,14 +27,14 @@ post_answer:
         - type: AzureCognitiveSearch
           parameters:
             "endpoint": "https://gptproov.search.windows.net"
-            "indexName": "proov"
+            "indexName": "arva-rt"
             "semanticConfiguration": "default"
             "queryType": "simple"
             "fieldsMapping": {}
             "inScope": false
-            "roleInformation": "You are a government AI assistant who helps out questions with taxes and social services. If the question is not in English, answer in the language used in the question. In any other case ALWAYS answer in Estonian. When you cannot find the answer in the sources that you are given, then say that you don't know and if there is anything else you can help them with."
+            "roleInformation": "You are a government AI assistant who helps out questions with taxes and social services. All the answers MUST be in Estonian. If the question is in any other language than in Estonian, then translate the question into estonian and the answer MUST also be in Estonian. When you cannot find the answer in the sources that you are given, then your output MUST ONLY be 'ERROR'."
             "filter":
-            "strictness": 3
+            "strictness": 2
             "topNDocuments": 5
             "key": "[#CHATBOT_EXTERNAL_KEY]"
       messages:
@@ -53,7 +53,7 @@ assign_value:
   assign:
     correct_value:
       - recipient_id: ${incoming.body.sender}
-        text: ${test.response.body.choices[0].message.content.replace(/\n/g," ")}
+        text: ${test.response.body.choices[0].message.content.replace(/\n/g," ").replace(/%/g,"protsenti")}
   next: return_value
 
 return_value:
