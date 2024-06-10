@@ -48,6 +48,7 @@
   "mainMenu": {
     "menuLabel": "Põhinavigatsioon",
     "closeMenu": "Kitsendan menüü",
+    "openMenu": "Ava menüü",
     "openMenuIcon": "Ava menüü ikoon",
     "closeMenuIcon": "Sulge menüü ikoon"
   },
