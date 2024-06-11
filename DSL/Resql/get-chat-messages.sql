@@ -12,8 +12,10 @@ SELECT m.base_id      AS id,
        m.forwarded_from_csa,
        m.forwarded_to_csa,
        rating,
-       created,
-       updated
+       m.created,
+       updated,
+       u.csa_title
 FROM message m
-WHERE id IN (SELECT max(id) FROM message WHERE chat_base_id = :chatId GROUP BY base_id)
+LEFT JOIN "user" u ON m.author_id = u.id_code
+WHERE m.id IN (SELECT max(id) FROM message WHERE chat_base_id = :chatId GROUP BY base_id)
 ORDER BY created ASC;
