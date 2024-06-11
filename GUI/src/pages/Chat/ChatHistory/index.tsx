@@ -158,7 +158,6 @@ const ChatHistory: FC = () => {
       { label: t('chat.history.comment'), value: 'comment' },
       { label: t('chat.history.rating'), value: 'feedbackRating' },
       { label: t('chat.history.feedback'), value: 'feedbackText' },
-      { label: t('chat.history.nps'), value: 'nps' },
       { label: t('global.status'), value: 'status' },
       { label: 'ID', value: 'id' },
     ],
@@ -373,10 +372,6 @@ const ChatHistory: FC = () => {
         id: 'feedbackText',
         header: t('chat.history.feedback') ?? '',
         cell: feedbackTextView
-      }),
-      columnHelper.accessor('nps', {
-        id: 'nps',
-        header: 'nps',
       }),
       columnHelper.accessor('status', {
         id: 'status',
