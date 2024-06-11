@@ -88,6 +88,27 @@ EndedChatMessages AS (
     feedback_rating
   FROM chat
   RIGHT JOIN MaxChats ON id = maxId
+),
+RatedChats AS (
+	SELECT MAX(feedback_rating) AS rating
+  FROM chat
+  WHERE feedback_rating IS NOT NULL
+  GROUP BY base_id
+),
+RatedChatsCount AS (
+	SELECT COUNT(rating) AS total FROM RatedChats
+),
+Promoters AS (
+	SELECT COUNT(rating) AS p FROM RatedChats WHERE rating >= 9
+),
+Detractors AS (
+	SELECT COUNT(rating) AS d FROM RatedChats WHERE rating <= 6
+), 
+NPS AS (
+  SELECT ROUND(((p / (total * 1.0)) - (d / (total * 1.0))) * 100.0, 2) AS nps
+  FROM RatedChatsCount
+  CROSS JOIN Promoters
+  CROSS JOIN Detractors
 )
 SELECT c.base_id AS id,
        c.customer_support_id,
@@ -114,6 +135,7 @@ SELECT c.base_id AS id,
        m.updated AS last_message_timestamp,
        c.feedback_text,
        c.feedback_rating,
+       nps,
        CEIL(COUNT(*) OVER() / :page_size::DECIMAL) AS total_pages
 FROM EndedChatMessages AS c
 JOIN Messages AS m ON c.base_id = m.chat_base_id
@@ -122,6 +144,7 @@ JOIN LastContentMessage ON c.base_id = LastContentMessage.chat_base_id
 JOIN FirstContentMessage ON c.base_id = FirstContentMessage.chat_base_id
 LEFT JOIN ContactsMessage ON ContactsMessage.chat_base_id = c.base_id
 CROSS JOIN TitleVisibility
+CROSS JOIN NPS
 ORDER BY 
    CASE WHEN :sorting = 'created asc' THEN FirstContentMessage.created END ASC,
    CASE WHEN :sorting = 'created desc' THEN FirstContentMessage.created END DESC,
