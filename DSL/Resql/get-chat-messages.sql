@@ -1,3 +1,9 @@
+WITH MaxMessages AS (
+  SELECT max(id) AS maxId 
+  FROM message
+  WHERE chat_base_id = :chatId
+  GROUP BY base_id
+)
 SELECT m.base_id      AS id,
        m.chat_base_id AS chat_id,
        m.content,
@@ -17,5 +23,5 @@ SELECT m.base_id      AS id,
        u.csa_title
 FROM message m
 LEFT JOIN "user" u ON m.author_id = u.id_code
-WHERE m.id IN (SELECT max(id) FROM message WHERE chat_base_id = :chatId GROUP BY base_id)
+JOIN MaxMessages ON m.id = maxId
 ORDER BY created ASC;
