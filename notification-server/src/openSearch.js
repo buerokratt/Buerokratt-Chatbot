@@ -1,10 +1,7 @@
 const { Client } = require("@opensearch-project/opensearch");
 const { openSearchConfig } = require("./config");
 
-const client = new Client({
-  node: openSearchConfig.getUrl(),
-  ssl: openSearchConfig.ssl,
-});
+let client = buildClient();
 
 async function searchNotification({ channelId, connectionId, sender }) {
   try {
@@ -19,7 +16,7 @@ async function searchNotification({ channelId, connectionId, sender }) {
         },
         sort: { timestamp: { order: "asc" } },
       },
-    });
+    }).catch(handleError);;
 
     for (const hit of response.body.hits.hits) {
       await sender(hit._source.payload);
@@ -60,7 +57,7 @@ async function enqueueChatId(chatId) {
       timestamp: Date.now(),
     },
     refresh: true,
-  });
+  }).catch(handleError);
 }
 
 async function dequeueChatId(chatId) {
@@ -77,7 +74,7 @@ async function dequeueChatId(chatId) {
     },
     refresh: true,
     conflicts: "proceed",
-  });
+  }).catch(handleError);
 }
 
 async function findChatId(chatId) {
@@ -95,7 +92,7 @@ async function findChatId(chatId) {
         },
       },
     },
-  });
+  }).catch(handleError);
 
   if (response.body.hits.hits.length == 0) return null;
 
@@ -105,8 +102,7 @@ async function findChatId(chatId) {
 async function isQueueIndexExists() {
   const res = await client.indices.exists({
     index: openSearchConfig.chatQueueIndex,
-  });
-
+  }).catch(handleError);
   return res.body;
 }
 
@@ -126,9 +122,22 @@ async function findChatIdOrder(chatId) {
       },
       size: 0,
     },
-  });
+  }).catch(handleError);
 
   return response.body.hits.total.value + 1;
+}
+
+function buildClient() {
+  return new Client({
+    node: openSearchConfig.getUrl(),
+    ssl: openSearchConfig.ssl,
+  });
+}
+
+function handleError(e) {
+  if(e.name === 'ConnectionError')
+    client = buildClient();
+  throw e;
 }
 
 module.exports = {

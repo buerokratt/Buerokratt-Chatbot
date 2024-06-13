@@ -10,4 +10,4 @@ COPY . /app/
 
 EXPOSE 4040
 
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "start"]
