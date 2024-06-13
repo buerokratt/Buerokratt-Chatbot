@@ -7,6 +7,12 @@ MessagePreviews AS (
   SELECT content, chat_base_id
   FROM message_preview
   JOIN MaxPreviews ON id = maxId
+),
+MaxMessages AS (
+	SELECT max(id) AS maxId 
+	FROM message
+	WHERE chat_base_id = :chatId
+	GROUP BY base_id
 )
 SELECT m.base_id AS id,
        m.chat_base_id AS chatId,
@@ -29,6 +35,7 @@ SELECT m.base_id AS id,
 FROM message m
 LEFT JOIN MessagePreviews mp ON m.chat_base_id = mp.chat_base_id
 LEFT JOIN "user" u ON m.author_id = u.id_code
-WHERE m.id IN (SELECT max(id) FROM message WHERE chat_base_id = :chatId GROUP BY base_id)
-AND :timeRangeBegin::timestamp with time zone < m.updated
+JOIN MaxMessages ON m.id = maxId
+WHERE :timeRangeBegin::timestamp with time zone < m.updated
 ORDER BY m.created;
+
