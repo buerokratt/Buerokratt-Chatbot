@@ -26,11 +26,16 @@ function buildQueueCounter({
   return ({ sender }) => {
     let lastOrder = 0;
     const intervalHandle = setInterval(async () => {
-        const order = await findChatIdOrder(id);
-        if(order == lastOrder)
-          return;
-        lastOrder = order;
-        sender({ order });
+        try {
+          const order = await findChatIdOrder(id);
+        
+          if(order == lastOrder)
+            return;
+          lastOrder = order;
+          sender({ order });
+        } catch (error) {
+          console.log(error);
+        }
       },
       interval
     );
