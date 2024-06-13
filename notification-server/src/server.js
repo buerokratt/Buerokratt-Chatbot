@@ -18,7 +18,7 @@ app.use(cors());
 app.use(helmet.hidePoweredBy());
 app.use(express.json({ extended: false }));
 app.use(cookieParser());
-// app.use(csurf({ cookie: true }));
+app.use(csurf({ cookie: true, ignoreMethods: ['POST']}));
 
 app.get("/sse/notifications/:channelId", (req, res) => {
   const { channelId } = req.params;
