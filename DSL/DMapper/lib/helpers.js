@@ -17,7 +17,7 @@ export function getUuid() {
   );
 }
 
-export function lookup(configurationArray, key) {
+export function lookupConfigs(configurationArray, key) {
   for (const element of configurationArray) {
     if (element.key === key) {
       return element.value;

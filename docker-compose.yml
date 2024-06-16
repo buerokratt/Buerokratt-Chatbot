@@ -10,6 +10,8 @@ services:
       - application.internalRequests.allowedIPs=127.0.0.1
       - application.logging.displayRequestContent=true
       - application.logging.displayResponseContent=true
+      - application.logging.printStackTrace=true
+      - application.internalRequests.disabled=true
       - server.port=8086
     volumes:
       - ./DSL/Ruuter.public/DSL:/DSL
@@ -30,6 +32,8 @@ services:
       - application.internalRequests.allowedIPs=127.0.0.1
       - application.logging.displayRequestContent=true
       - application.logging.displayResponseContent=true
+      - application.logging.printStackTrace=true
+      - application.internalRequests.disabled=true
       - server.port=8088
     volumes:
       - ./DSL/Ruuter.private/DSL:/DSL
@@ -82,7 +86,7 @@ services:
       - ./DSL:/data
       - ./DSL/DMapper/hbs:/workspace/app/views/chat-bot
       - ./DSL/DMapper/js:/workspace/app/js/chat-bot
-      - ./DSL/DMapper/lib:/workspace/app/lib
+      - ./DSL/DMapper/lib/helpers.js:/workspace/app/lib/helpers.js
     ports:
       - 3000:3000
     networks:
