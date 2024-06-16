@@ -1,4 +1,4 @@
-## v2.0.0-alpha.1
+## v2.0.0
 
 ### Breaking Changes
 
