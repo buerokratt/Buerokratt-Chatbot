@@ -14,6 +14,7 @@ import {
   TableMeta,
   Row,
   RowData, ColumnFiltersState,
+  ColumnPinningState,
 } from '@tanstack/react-table';
 import {
   RankingInfo,
@@ -43,6 +44,7 @@ type DataTableProps = {
   filterable?: boolean;
   pagination?: PaginationState;
   sorting?: SortingState;
+  columnPinning?: ColumnPinningState;
   setPagination?: (state: PaginationState) => void;
   setSorting?: (state: SortingState) => void;
   globalFilter?: string;
@@ -99,6 +101,7 @@ const DataTable: FC<DataTableProps> = (
     filterable,
     pagination,
     sorting,
+    columnPinning,
     setPagination,
     setSorting,
     globalFilter,
@@ -123,9 +126,14 @@ const DataTable: FC<DataTableProps> = (
       sorting,
       columnFilters,
       globalFilter,
+      columnPinning: columnPinning ?? {
+        left: [],
+        right: [],
+      },
       columnVisibility,
       ...{ pagination },
     },
+    enableColumnPinning: columnPinning != undefined ? true : false,
     meta,
     onColumnFiltersChange: setColumnFilters,
     onGlobalFilterChange: setGlobalFilter,
