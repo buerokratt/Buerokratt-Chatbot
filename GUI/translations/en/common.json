@@ -91,6 +91,8 @@
     "workingHours": "Working hours"
   },
   "chat": {
+    "chatForwardedTo": "Chat forwarded to",
+    "chatEnded": "Chat ended",
     "reply": "Reply",
     "unansweredChats": "Unanswered chats",
     "unanswered": "Unanswered",
