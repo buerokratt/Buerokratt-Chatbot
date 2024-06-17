@@ -324,7 +324,7 @@ const ChatHistory: FC = () => {
         cell: (props) =>
           format(
             new Date(props.getValue()),
-            'd. MMM yyyy HH:mm:ss',
+            'dd.MM.yyyy HH:mm:ss',
             i18n.language === 'et' ? { locale: et } : undefined,
           ),
       }),
@@ -334,7 +334,7 @@ const ChatHistory: FC = () => {
         cell: (props) =>
           format(
             new Date(props.getValue()),
-            'd. MMM yyyy HH:mm:ss',
+            'dd.MM.yyyy HH:mm:ss',
             i18n.language === 'et' ? { locale: et } : undefined,
           ),
       }),
