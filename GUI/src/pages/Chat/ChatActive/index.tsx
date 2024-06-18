@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Chat, Dialog, Button, FormRadios, Track } from 'components';
 import { Chat as ChatType, CHAT_EVENTS, CHAT_STATUS } from 'types/chat';
 import useStore from 'store';
-import useHeaderStore from '@buerokratt-ria/header/src/header/store/store';
+import { userStore as useHeaderStore } from '@buerokratt-ria/header';
 import { User } from 'types/user';
 import { useToast } from 'hooks/useToast';
 import apiDev from 'services/api-dev';
