@@ -82,13 +82,13 @@ const ChatPending: FC = () => {
       toast.open({
         type: 'success',
         title: t('global.notification'),
-        message: `Chat forwarded to ${user.displayName}`,
+        message: `${t('chat.chatForwardedTo')} ${user.displayName}`,
       });
     } catch (error) {
       toast.open({
         type: 'warning',
         title: t('global.notificationError'),
-        message: `Chat ended`,
+        message: t('chat.chatEnded'),
       });
     }
   };
@@ -102,7 +102,7 @@ const ChatPending: FC = () => {
     toast.open({
       type: 'success',
       title: t('global.notification'),
-      message: `Chat forwarded to ${establishment}`,
+      message: `${t('chat.chatForwardedTo')} ${establishment}`,
     });
   };
 
@@ -122,13 +122,13 @@ const ChatPending: FC = () => {
       toast.open({
         type: 'success',
         title: t('global.notification'),
-        message: `Chat ended`,
+        message: t('chat.chatEnded'),
       });
     } catch (error) {
       toast.open({
         type: 'warning',
         title: t('global.notificationError'),
-        message: `Chat ended`,
+        message: t('chat.chatEnded'),
       });
     }
     setEndChatModal(null);
