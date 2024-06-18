@@ -15,6 +15,16 @@ declaration:
         type: string
         description: "Body field 'password'"
 
+getIsPasswordAuthEnabled:
+  assign:
+    isPasswordAuthEnabled: "[#PASSWORD_AUTH_ENABLED]"
+
+checkPasswordLoginEnabled:
+  switch:
+    - condition: ${isPasswordAuthEnabled === true || isPasswordAuthEnabled.toLowerCase() === "true"}
+      next: extractRequestData
+  next: return_password_login_disabled
+
 extractRequestData:
   assign:
     login: ${incoming.body.login}
@@ -88,4 +98,9 @@ return_value:
 return_user_not_found:
   status: 400
   return: "User Not Found"
+  next: end
+
+return_password_login_disabled:
+  status: 400
+  return: "Password login is disabled"
   next: end

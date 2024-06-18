@@ -58,9 +58,9 @@ This repo will primarily contain:
 Currently, Header and Main Navigation used as external components, they are defined as dependency in package.json
 
 ```
- "@buerokrat-ria/header": "^0.0.1"
- "@buerokrat-ria/menu": "^0.0.1"
- "@buerokrat-ria/styles": "^0.0.1"
+ "@buerokratt-ria/header": "^0.0.1"
+ "@buerokratt-ria/menu": "^0.0.1"
+ "@buerokratt-ria/styles": "^0.0.1"
 ```
 
 ### Notes
