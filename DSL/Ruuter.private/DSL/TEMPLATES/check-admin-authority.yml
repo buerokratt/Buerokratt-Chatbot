@@ -1,0 +1,50 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'CHECK-USER-AUTHORITY'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    headers:
+      - field: cookie
+        type: string
+        description: "Cookie field"
+
+get_cookie_info:
+  call: http.post
+  args:
+    url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
+    contentType: plaintext
+    headers:
+      cookie: ${incoming.headers.cookie}
+    plaintext: "customJwtCookie"
+  result: res
+  next: check_cookie_info_response
+
+check_cookie_info_response:
+  switch:
+    - condition: ${200 <= res.response.statusCodeValue && res.response.statusCodeValue < 300}
+      next: check_user_authority
+  next: return_bad_request
+
+check_user_authority:
+  switch:
+    - condition: ${res.response.body.authorities.includes("ROLE_ADMINISTRATOR")}
+      next: return_authorized
+  next: return_unauthorized
+
+return_authorized:
+  return: ${res.response.body}
+  next: end
+
+return_unauthorized:
+  status: 200
+  return: false
+  next: end
+
+return_bad_request:
+  status: 400
+  return: false
+  next: end
