@@ -91,6 +91,8 @@
     "workingHours": "Tööaeg"
   },
   "chat": {
+    "chatForwardedTo": "Vestlus edastati aadressile",
+    "chatEnded": "Vestlus lõppes",
     "reply": "Vasta",
     "unansweredChats": "Vastamata vestlused",
     "unanswered": "Vastamata",

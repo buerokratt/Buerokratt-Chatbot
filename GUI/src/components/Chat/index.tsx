@@ -11,7 +11,7 @@ import { useMutation } from '@tanstack/react-query';
 import { AttachmentTypes, Message } from 'types/message';
 import ChatMessage from './ChatMessage';
 import ChatEvent from '../ChatEvent';
-import { CHAT_INPUT_LENGTH } from 'constants/config';
+import { isHiddenFeaturesEnabled, CHAT_INPUT_LENGTH } from 'constants/config';
 import apiDev from 'services/api-dev';
 import ChatTextArea from './ChatTextArea';
 import { AUTHOR_ROLES, MESSAGE_FILE_SIZE_LIMIT, ROLES } from 'utils/constants';
@@ -580,12 +580,14 @@ const Chat: FC<ChatProps> = ({
                       style={{ display: 'none' }}
                     />
                   </Button>
-                  <Button appearance="secondary" onClick={handleUploadClick}>
-                    <Icon
-                      icon={<MdOutlineAttachFile fontSize={18} />}
-                      size="medium"
-                    />
-                  </Button>
+                  {isHiddenFeaturesEnabled && (
+                    <Button appearance="secondary" onClick={handleUploadClick}>
+                      <Icon
+                        icon={<MdOutlineAttachFile fontSize={18} />}
+                        size="medium"
+                      />
+                    </Button>
+                  )}
                 </div>
               </Track>
             </div>
@@ -732,27 +734,33 @@ const Chat: FC<ChatProps> = ({
               >
                 {t('chat.active.forwardToColleague')}
               </Button>
-              <Button
-                appearance="secondary"
-                disabled={!chatCsaActive}
-                onClick={forwardToEstablishment()}
-              >
-                {t('chat.active.forwardToOrganization')}
-              </Button>
-              <Button
-                appearance="secondary"
-                disabled={chat.customerSupportId != userInfo?.idCode}
-                onClick={sendToEmail()}
-              >
-                {t('chat.active.sendToEmail')}
-              </Button>
-              <Button
-                appearance="secondary"
-                disabled={chat.customerSupportId != userInfo?.idCode}
-                onClick={StartAService()}
-              >
-                {t('chat.active.startService')}
-              </Button>
+              {isHiddenFeaturesEnabled && (
+                <Button
+                  appearance="secondary"
+                  disabled={!chatCsaActive}
+                  onClick={forwardToEstablishment()}
+                >
+                  {t('chat.active.forwardToOrganization')}
+                </Button>
+              )}
+              {isHiddenFeaturesEnabled && (
+                <Button
+                  appearance="secondary"
+                  disabled={chat.customerSupportId != userInfo?.idCode}
+                  onClick={sendToEmail()}
+                >
+                  {t('chat.active.sendToEmail')}
+                </Button>
+              )}
+              {isHiddenFeaturesEnabled && (
+                <Button
+                  appearance="secondary"
+                  disabled={chat.customerSupportId != userInfo?.idCode}
+                  onClick={StartAService()}
+                >
+                  {t('chat.active.startService')}
+                </Button>
+              )}
             </div>
           )}
         {chat.customerSupportId !== '' &&
@@ -769,10 +777,7 @@ const Chat: FC<ChatProps> = ({
                   ROLES.ROLE_CUSTOMER_SUPPORT_AGENT,
                 ].includes(authority as ROLES)
               ) && (
-                <Button
-                  appearance="secondary"
-                  onClick={forwardToColleague()}
-                >
+                <Button appearance="secondary" onClick={forwardToColleague()}>
                   {t('chat.active.forwardToColleague')}
                 </Button>
               )}
