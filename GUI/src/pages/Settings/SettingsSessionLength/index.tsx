@@ -14,13 +14,13 @@ const SettingsSessionLength: FC = () => {
   const toast = useToast();
   const [sessionLength, setSessionLength] = useState<string>('');
   useQuery({
-    queryKey: ['accounts/session-length', 'prod'],
+    queryKey: ['accounts/admin/session-length', 'prod'],
     onSuccess: (res: any) => setSessionLength(res.response ?? ''),
   });
 
   const sessionLengthMutation = useMutation({
     mutationFn: () =>
-      apiDev.post('accounts/session-length', {
+      apiDev.post('accounts/admin/session-length', {
         sessionLength: sessionLength,
       }),
     onSuccess: () => {
