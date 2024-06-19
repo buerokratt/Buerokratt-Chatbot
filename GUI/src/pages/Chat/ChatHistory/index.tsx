@@ -420,6 +420,7 @@ const ChatHistory: FC = () => {
         cell: detailsView,
         meta: {
           size: '1%',
+          sticky: 'right',
         },
       }),
     ],
