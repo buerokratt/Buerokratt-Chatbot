@@ -57,11 +57,11 @@ const ChatUnanswered: FC = () => {
   }, []);
 
   const { data: csaNameVisiblity } = useQuery<{ isVisible: boolean }>({
-    queryKey: ['agents/name-visibility', 'prod'],
+    queryKey: ['agents/admin/name-visibility', 'prod'],
   });
 
   const { data: csaTitleVisibility } = useQuery<{ isVisible: boolean }>({
-    queryKey: ['agents/title-visibility', 'prod'],
+    queryKey: ['agents/admin/title-visibility', 'prod'],
   });
 
   const handleCsaForward = async (chat: ChatType, user: User) => {

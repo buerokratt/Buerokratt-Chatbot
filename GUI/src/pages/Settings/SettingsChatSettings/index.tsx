@@ -27,17 +27,15 @@ const SettingsChatSettings: FC = () => {
     },
   });
   const { data: csaNameVisibility } = useQuery<{ isVisible: boolean }>({
-    queryKey: ['agents/name-visibility', 'prod'],
+    queryKey: ['agents/admin/name-visibility', 'prod'],
     onSuccess(res: any) {
-      if(isNameVisible === undefined)
-        setIsNameVisible(res.response);
+      if (isNameVisible === undefined) setIsNameVisible(res.response);
     },
   });
   const { data: csaTitleVisibility } = useQuery<{ isVisible: boolean }>({
-    queryKey: ['agents/title-visibility', 'prod'],
+    queryKey: ['agents/admin/title-visibility', 'prod'],
     onSuccess(res: any) {
-      if(isTitleVisible === undefined)
-        setIsTitleVisible(res.response);
+      if (isTitleVisible === undefined) setIsTitleVisible(res.response);
     },
   });
 
@@ -58,7 +56,7 @@ const SettingsChatSettings: FC = () => {
   const csaNameVisibilityMutation = useMutation({
     mutationFn: (data: { isVisible: boolean }) => {
       setIsNameVisible(data.isVisible);
-      return apiDev.post(`agents/name-visibility`, data);
+      return apiDev.post(`agents/admin/name-visibility`, data);
     },
     onError: (error: AxiosError) => {
       toast.open({
@@ -72,7 +70,7 @@ const SettingsChatSettings: FC = () => {
   const csaTitleVisibilityMutation = useMutation({
     mutationFn: (data: { isVisible: boolean }) => {
       setIsTitleVisible(data.isVisible);
-      return apiDev.post(`agents/title-visibility`, data);
+      return apiDev.post(`agents/admin/title-visibility`, data);
     },
     onSuccess: () => {
       toast.open({
