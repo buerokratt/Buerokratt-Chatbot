@@ -15,7 +15,7 @@ import ForwardToEstablishmentModal from '../ForwardToEstablishmentModal';
 import sse from 'services/sse-service';
 import { v4 as uuidv4 } from 'uuid';
 import './ChatPending.scss';
-import useHeaderStore from '@buerokratt-ria/header/src/header/store/store';
+import { userStore as useHeaderStore } from '@buerokratt-ria/header';
 import useStore from 'store';
 import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';

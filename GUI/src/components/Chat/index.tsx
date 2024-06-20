@@ -18,7 +18,7 @@ import { AUTHOR_ROLES, MESSAGE_FILE_SIZE_LIMIT, ROLES } from 'utils/constants';
 import { AxiosError } from 'axios';
 import { useToast } from 'hooks/useToast';
 import useStore from 'store';
-import useHeaderStore from '@buerokratt-ria/header/src/header/store/store';
+import { userStore as useHeaderStore } from '@buerokratt-ria/header';
 import sse from '../../services/sse-service';
 import { useNavigate } from 'react-router-dom';
 import PreviewMessage from './PreviewMessage';
@@ -76,23 +76,8 @@ const Chat: FC<ChatProps> = ({
   const [previewTypingMessage, setPreviewTypingMessage] = useState<Message>();
 
   useEffect(() => {
-    getCsaStatus();
     getMessages();
   }, []);
-
-  const getCsaStatus = async () => {
-    const { data: res } = await apiDev.post(
-      'accounts/customer-support-activity-by-id',
-      {
-        customerSupportId: userInfo?.idCode ?? '',
-      }
-    );
-    useHeaderStore
-      .getState()
-      .setChatCsaActive(
-        res.response.status === 'online' || res.response.status === 'idle'
-      );
-  };
 
   useEffect(() => {
     const onMessage = async (res: any) => {
