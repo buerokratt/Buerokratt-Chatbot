@@ -13,6 +13,7 @@
     "search": "Otsi",
     "notification": "Teade",
     "notificationError": "Veateade",
+    "notificationErrorMsg": "Midagi läks valesti",
     "active": "Aktiivne",
     "activate": "Aktiveeri",
     "deactivate": "Deaktiveeri",
