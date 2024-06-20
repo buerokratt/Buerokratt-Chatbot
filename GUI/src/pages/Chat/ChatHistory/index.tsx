@@ -2,6 +2,7 @@ import { FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation } from '@tanstack/react-query';
 import {
+  ColumnPinningState,
   createColumnHelper,
   PaginationState,
   SortingState,
@@ -62,6 +63,10 @@ const ChatHistory: FC = () => {
     pageSize: 10,
   });
   const [sorting, setSorting] = useState<SortingState>([]);
+  const columnPinning: ColumnPinningState = {
+    left: [],
+    right: ['detail'],
+  };
   const [totalPages, setTotalPages] = useState<number>(1);
   const [endedChatsList, setEndedChatsList] = useState<ChatType[]>([]);
   const [filteredEndedChatsList, setFilteredEndedChatsList] = useState<
@@ -271,23 +276,30 @@ const ChatHistory: FC = () => {
   };
 
   const commentView = (props: any) =>
-    props.getValue() && <Tooltip content={props.getValue()}>
-      <span onClick={() => copyValueToClipboard(props.getValue())} style={{ cursor: 'pointer' }}>
-        {props.getValue().length <= 30 ? props.getValue() : `${props.getValue()?.slice(0, 30)}...`}
-      </span>
-    </Tooltip>;
+    props.getValue() && (
+      <Tooltip content={props.getValue()}>
+        <span
+          onClick={() => copyValueToClipboard(props.getValue())}
+          style={{ cursor: 'pointer' }}
+        >
+          {props.getValue().length <= 30
+            ? props.getValue()
+            : `${props.getValue()?.slice(0, 30)}...`}
+        </span>
+      </Tooltip>
+    );
 
-  const feedbackTextView = (props: any) =>  {
+  const feedbackTextView = (props: any) => {
     const value = props.getValue() ?? '';
-    
+
     return (
       <Tooltip content={value}>
         <span style={{ minWidth: '250px' }}>
-        {value.length < 30 ? value : `${value?.slice?.(0, 30)}...`}
+          {value.length < 30 ? value : `${value?.slice?.(0, 30)}...`}
         </span>
       </Tooltip>
-    )
-  }
+    );
+  };
 
   const statusView = (props: any) => {
     const isLastMessageEvent =
@@ -300,7 +312,10 @@ const ChatHistory: FC = () => {
 
   const idView = (props: any) => (
     <Tooltip content={props.getValue()}>
-      <span onClick={() => copyValueToClipboard(props.getValue())} style={{ cursor: 'pointer' }}>
+      <span
+        onClick={() => copyValueToClipboard(props.getValue())}
+        style={{ cursor: 'pointer' }}
+      >
         {props.getValue().split('-')[0]}
       </span>
     </Tooltip>
@@ -324,8 +339,8 @@ const ChatHistory: FC = () => {
         cell: (props) =>
           format(
             new Date(props.getValue()),
-            'd. MMM yyyy HH:mm:ss',
-            i18n.language === 'et' ? { locale: et } : undefined,
+            'dd.MM.yyyy HH:mm:ss',
+            i18n.language === 'et' ? { locale: et } : undefined
           ),
       }),
       columnHelper.accessor('ended', {
@@ -334,8 +349,8 @@ const ChatHistory: FC = () => {
         cell: (props) =>
           format(
             new Date(props.getValue()),
-            'd. MMM yyyy HH:mm:ss',
-            i18n.language === 'et' ? { locale: et } : undefined,
+            'dd.MM.yyyy HH:mm:ss',
+            i18n.language === 'et' ? { locale: et } : undefined
           ),
       }),
       columnHelper.accessor('customerSupportDisplayName', {
@@ -366,12 +381,13 @@ const ChatHistory: FC = () => {
       columnHelper.accessor('feedbackRating', {
         id: 'feedbackRating',
         header: t('chat.history.rating') ?? '',
-        cell: (props) => props.getValue() && <span>{`${props.getValue()}/10`}</span>,
+        cell: (props) =>
+          props.getValue() && <span>{`${props.getValue()}/10`}</span>,
       }),
       columnHelper.accessor('feedbackText', {
         id: 'feedbackText',
         header: t('chat.history.feedback') ?? '',
-        cell: feedbackTextView
+        cell: feedbackTextView,
       }),
       columnHelper.accessor('status', {
         id: 'status',
@@ -404,6 +420,7 @@ const ChatHistory: FC = () => {
         cell: detailsView,
         meta: {
           size: '1%',
+          sticky: 'right',
         },
       }),
     ],
@@ -540,6 +557,7 @@ const ChatHistory: FC = () => {
           sortable
           columns={getFilteredColumns()}
           pagination={pagination}
+          columnPinning={columnPinning}
           sorting={sorting}
           setPagination={(state: PaginationState) => {
             if (

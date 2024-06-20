@@ -14,6 +14,7 @@ import {
   TableMeta,
   Row,
   RowData, ColumnFiltersState,
+  ColumnPinningState,
 } from '@tanstack/react-table';
 import {
   RankingInfo,
@@ -43,6 +44,7 @@ type DataTableProps = {
   filterable?: boolean;
   pagination?: PaginationState;
   sorting?: SortingState;
+  columnPinning?: ColumnPinningState;
   setPagination?: (state: PaginationState) => void;
   setSorting?: (state: SortingState) => void;
   globalFilter?: string;
@@ -57,8 +59,9 @@ type DataTableProps = {
 type ColumnMeta = {
   meta: {
     size: number | string;
-  }
-}
+    sticky: 'left' | 'right';
+  };
+};
 
 type CustomColumnDef = ColumnDef<any> & ColumnMeta;
 
@@ -99,6 +102,7 @@ const DataTable: FC<DataTableProps> = (
     filterable,
     pagination,
     sorting,
+    columnPinning,
     setPagination,
     setSorting,
     globalFilter,
@@ -123,9 +127,14 @@ const DataTable: FC<DataTableProps> = (
       sorting,
       columnFilters,
       globalFilter,
+      columnPinning: columnPinning ?? {
+        left: [],
+        right: [],
+      },
       columnVisibility,
       ...{ pagination },
     },
+    enableColumnPinning: columnPinning != undefined ? true : false,
     meta,
     onColumnFiltersChange: setColumnFilters,
     onGlobalFilterChange: setGlobalFilter,
@@ -156,7 +165,10 @@ const DataTable: FC<DataTableProps> = (
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
-                <th key={header.id} style={{ width: header.column.columnDef.meta?.size }}>
+                <th key={header.id} style={{ width: header.column.columnDef.meta?.size, position: header.column.columnDef.meta?.sticky ? 'sticky' : undefined , 
+                  left: header.column.columnDef.meta?.sticky === 'left' ? `${header.column.getAfter('left') * 0.675}px` : undefined, 
+                  right: header.column.columnDef.meta?.sticky === 'right' ? `${header.column.getAfter('right') * 0.675}px` : undefined,
+                  backgroundColor: 'white', zIndex: header.column.columnDef.meta?.sticky ? 1 : 0 }}>
                   {header.isPlaceholder ? null : (
                       <Track gap={8}>
                         {sortable && header.column.getCanSort() && (
@@ -186,7 +198,10 @@ const DataTable: FC<DataTableProps> = (
         {table.getRowModel().rows.map((row) => (
           <tr key={row.id} style={table.options.meta?.getRowStyles(row)}>
             {row.getVisibleCells().map((cell) => (
-              <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
+              <td key={cell.id} style={{position: cell.column.columnDef.meta?.sticky ? 'sticky' : undefined , 
+                  left: cell.column.columnDef.meta?.sticky === 'left' ? `${cell.column.getAfter('left') * 0.675}px` : undefined, 
+                  right: cell.column.columnDef.meta?.sticky === 'right' ? `${cell.column.getAfter('right') * 0.675}px` : undefined,
+                  backgroundColor: 'white', zIndex: cell.column.columnDef.meta?.sticky ? 1 : 0}} >{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
             ))}
           </tr>
         ))}

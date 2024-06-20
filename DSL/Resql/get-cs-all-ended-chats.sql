@@ -105,7 +105,7 @@ Detractors AS (
 	SELECT COUNT(rating) AS d FROM RatedChats WHERE rating <= 6
 ), 
 NPS AS (
-  SELECT ROUND(((p / (total * 1.0)) - (d / (total * 1.0))) * 100.0, 2) AS nps
+  SELECT ROUND(((p / (GREATEST(total, 1) * 1.0)) - (d / (GREATEST(total, 1) * 1.0))) * 100.0, 2) AS nps
   FROM RatedChatsCount
   CROSS JOIN Promoters
   CROSS JOIN Detractors
