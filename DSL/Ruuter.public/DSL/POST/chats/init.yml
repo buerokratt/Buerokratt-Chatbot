@@ -169,7 +169,7 @@ postMessageToBot:
 
 check_for_post_message_to_bot_result:
   switch:
-    - condition: ${message_to_bot_result.response.body === 'Bot error'}
+    - condition: ${message_to_bot_result.response.body.response === 'Bot error'}
       next: return_bot_error
   next: getChat
 
@@ -233,5 +233,6 @@ return_result:
   next: end
 
 return_bot_error:
+  status: 420
   return: "Bot error"
-  next: end  
+  next: end
