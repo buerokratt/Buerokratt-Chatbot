@@ -3,6 +3,7 @@ SELECT
     base_id,
     content,
     buttons,
+    options,
     event,
     author_id,
     author_timestamp,
