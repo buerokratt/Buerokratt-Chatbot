@@ -16,6 +16,8 @@ checkservice:
       next: nordpool3Service
     - condition: ${incoming.body.list[0] === "#rahvaAlgatus"}
       next: initiativeEvents
+    - condition: ${incoming.body.list[0] === "#rahvaAlgatusPopulaarne"}
+      next: initiativeEventsPopular
     - condition: ${incoming.body.list[0] === "#riigikoguIsikuKohalolu"}
       next: riigikoguAttendance
     - condition: ${incoming.body.list[0] === "#recentVoting"}
@@ -186,6 +188,26 @@ initiativeEventsAnswer:
       created: ${incoming.body.created}
   next: end
 
+initiativeEventsPopular:
+  call: http.get
+  args:
+    url: "[#CHATBOT_RUUTER_PUBLIC]/initiative-events-popular"
+  result: initiativeEventsPopular
+  next: initiativeEventsPopularAnswer
+initiativeEventsPopularAnswer:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/resql/service-post"
+    body:
+      serviceContent: ${initiativeEventsPopular.response.body.response}
+      chatId: ${incoming.body.chatId}
+      authorId: ${incoming.body.authorId}
+      authorFirstName: ${incoming.body.authorFirstName}
+      authorLastName: ""
+      authorTimestamp: ${incoming.body.authorTimestamp}
+      created: ${incoming.body.created}
+  next: end
+
 riigikoguAttendance:
   call: http.post
   args:
@@ -209,11 +231,9 @@ riigikoguAttendanceAnswer:
   next: end
 
 riigikoguRecentVoting:
-  call: http.post
+  call: http.get
   args:
     url: "[#CHATBOT_RUUTER_PUBLIC]/riigikogu-recent-voting"
-    body:
-      memberName: ${incoming.body.list[1]}
   result: riigikoguRecentVotingRequest
   next: riigikoguRecentVotingAnswer
 riigikoguRecentVotingAnswer:

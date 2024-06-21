@@ -6,7 +6,9 @@ prepareRequest:
 makeAPIRequest:
   call: http.get
   args:
-    url: "https://api.riigikogu.ee/api/votings/last?lang=${lang}"
+    url: "https://api.riigikogu.ee/api/votings/last"
+    query:
+      lang: ${lang}
     headers:
       accept: "application/json"
   result: votingData

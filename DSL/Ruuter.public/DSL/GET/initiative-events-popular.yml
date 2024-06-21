@@ -1,0 +1,45 @@
+makeAPIRequest:
+  call: http.get
+  args:
+    url: "https://rahvaalgatus.ee/initiatives/"
+    query:
+      signedSince: ${new Date().getFullYear() - 1 + "-01-01"}
+      order: "-signatureCount"
+      limit: "5"
+    headers:
+      accept: "application/vnd.rahvaalgatus.initiative+json; v=1"
+  result: eventsData
+  error: returnError
+  next: formatResponse
+
+formatResponse:
+  assign:
+    details: |
+      Pealkiri - ${eventsData.response.body[0].title}
+      Allkirjade arv - ${eventsData.response.body[0].signatureCount}
+
+      Pealkiri - ${eventsData.response.body[1].title}
+      Allkirjade arv - ${eventsData.response.body[1].signatureCount}
+
+      Pealkiri - ${eventsData.response.body[2].title}
+      Allkirjade arv - ${eventsData.response.body[2].signatureCount}
+
+      Pealkiri - ${eventsData.response.body[3].title}
+      Allkirjade arv - ${eventsData.response.body[3].signatureCount}
+
+      Pealkiri - ${eventsData.response.body[4].title}
+      Allkirjade arv - ${eventsData.response.body[4].signatureCount}
+  next: returnResult
+
+returnResult:
+  return: ${details}
+  next: end
+
+returnError:
+  return: "Error: failed to get initiative details."
+  next: end
+
+noService:
+  return: "${incoming.body.list[0]} - POLE TEENUST"
+  status: 400
+  next: end

@@ -9,7 +9,11 @@ prepareRequest:
 makeAPIRequest:
   call: http.get
   args:
-    url: "https://rahvaalgatus.ee/initiative-events?order=${order}&distinct=${distinct}&limit=${limit}"
+    url: "https://rahvaalgatus.ee/initiative-events"
+    query:
+      order: ${order}
+      distinct: ${distinct}
+      limit: ${limit}
     headers:
       accept: ${acceptHeader}
   result: eventsData
