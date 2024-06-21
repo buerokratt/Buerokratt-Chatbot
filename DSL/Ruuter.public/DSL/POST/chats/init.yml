@@ -165,6 +165,12 @@ postMessageToBot:
       holidays: ${holidays}
       holidayNames: ${holidayNames}
   result: message_to_bot_result
+  next: check_for_post_message_to_bot_result
+
+check_for_post_message_to_bot_result:
+  switch:
+    - condition: ${message_to_bot_result.response.body === 'Bot error'}
+      next: return_bot_error
   next: getChat
 
 getChat:
@@ -225,3 +231,7 @@ return_result:
     Set-Cookie: ${setCookie}
   return: ${chat_result.response.body[0]}
   next: end
+
+return_bot_error:
+  return: "Bot error"
+  next: end  
