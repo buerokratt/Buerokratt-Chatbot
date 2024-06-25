@@ -127,6 +127,12 @@ postMessageToBot:
       holidays: ${holidays}
       holidayNames: ${holidayNames}
   result: message_to_bot_result
+  next: check_for_post_message_to_bot_result
+
+check_for_post_message_to_bot_result:
+  switch:
+    - condition: ${message_to_bot_result.response.body.response === 'Bot error'}
+      next: return_bot_error
   next: clearChatList
 
 clearChatList:
@@ -191,4 +197,9 @@ return_chat_ended:
 return_bad_request:
   status: 400
   return: "Error: Bad Request"
+  next: end  
+
+return_bot_error:
+  status: 420
+  return: "Bot error"
   next: end  
