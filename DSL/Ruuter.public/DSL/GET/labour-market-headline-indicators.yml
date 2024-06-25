@@ -1,10 +1,8 @@
 variables_step:
   assign:
-    #    year: ${new Date().getFullYear().toString()}
     year: 2023
     month: ${new Date().getMonth()}
     divided: ${(month + 3) / 3}
-    #    quarter: ${String(divided)[0]}
     quarter: 1
     year_quarter: ${year + "Q" + quarter}
 
