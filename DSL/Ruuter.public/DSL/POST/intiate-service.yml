@@ -6,8 +6,6 @@ checkservice:
       next: estimatedSubsidence
     - condition: ${incoming.body.list[0] === "#priceIndex"}
       next: priceIndex
-    - condition: ${incoming.body.list[0] === "#weather"}
-      next: weatherService
     - condition: ${incoming.body.list[0] === "#nordpool"}
       next: nordpoolService
     - condition: ${incoming.body.list[0] === "#nordpool2"}
@@ -25,28 +23,6 @@ checkservice:
     - condition: ${incoming.body.list[0] == null}
       next: noService
   next: noService
-
-weatherService:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RUUTER_PUBLIC]/weather-service"
-    body:
-      locationName: ${incoming.body.list[1]}
-  result: weatherServiceRequest
-  next: weatherServiceAnswer
-weatherServiceAnswer:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RESQL]/service-post"
-    body:
-      serviceContent: "${weatherServiceRequest.response.body.response}"
-      chatId: ${incoming.body.chatId}
-      authorId: ${incoming.body.authorId}
-      authorFirstName: ${incoming.body.authorFirstName}
-      authorLastName: ""
-      authorTimestamp: ${incoming.body.authorTimestamp}
-      created: ${incoming.body.created}
-  next: end
 
 laborMarket:
   call: http.get
