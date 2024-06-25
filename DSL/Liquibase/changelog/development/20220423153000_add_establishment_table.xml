@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+
+    <changeSet id="20220423153000" author="Fred Oja">
+        <createTable tableName="establishment">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar"/>
+            <column name="url" type="varchar"/>
+            <column name="base_id" type="varchar(36)"/>
+            <column name="deleted"
+                    type="boolean"
+                    defaultValue="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created" defaultValueComputed="current_timestamp" type="timestamp with time zone"/>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

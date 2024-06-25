@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+
+    <changeSet id="20220217090000" author="Joonas Roosalu">
+        <createTable tableName="customer_support_agent_activity">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="id_code" type="varchar"/>
+            <column name="active" type="varchar" defaultValue="false"/>
+            <column name="created" type="timestamp with time zone"/>
+        </createTable>
+
+        <sql>
+            INSERT INTO customer_support_agent_activity (id_code, active)
+            SELECT id_code, CASE WHEN active = true THEN 'true' ELSE 'false' END as active
+            FROM user_status;
+        </sql>
+
+        <dropTable tableName="user_status"/>
+    </changeSet>
+</databaseChangeLog>

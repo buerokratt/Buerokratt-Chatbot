@@ -1,4 +1,10 @@
+## Use this in developement
+# databaseChangeLog:
+#   - includeAll:
+#       path: changelog/changelog/development/
+#       errorIfMissingOrEmpty: true
+
+## Use this in production
 databaseChangeLog:
-  - includeAll:
-      path: changelog/changelog/
-      errorIfMissingOrEmpty: true
+  - include:
+      file: changelog/changelog/production/initialize.sql

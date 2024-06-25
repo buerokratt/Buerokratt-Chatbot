@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd
+http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd">
+
+    <changeSet id="20220202140000" author="Henrik Prangel">
+        <createTable tableName="chat">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="base_id" type="varchar(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="customer_support_id" type="varchar(555)">
+            </column>
+            <column name="customer_support_display_name" type="varchar(60)">
+            </column>
+            <column name="end_user_id" type="varchar(555)">
+            </column>
+            <column name="end_user_first_name" type="varchar(555)">
+            </column>
+            <column name="end_user_last_name" type="varchar(555)">
+            </column>
+            <column name="status" type="varchar(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated" defaultValueComputed="current_timestamp" type="timestamp with time zone">
+            </column>
+            <column name="ended" type="timestamp with time zone">
+            </column>
+        </createTable>
+
+        <createTable tableName="message">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="chat_base_id" type="varchar(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="base_id" type="varchar(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="content" type="varchar(3000)">
+            </column>
+            <column name="event" type="varchar(128)">
+            </column>
+            <column name="author_id" type="varchar(555)">
+            </column>
+            <column name="author_timestamp" type="timestamp with time zone">
+            </column>
+            <column name="author_first_name" type="varchar(555)">
+            </column>
+            <column name="author_last_name" type="varchar(555)">
+            </column>
+            <column name="author_role" type="varchar(128)">
+            </column>
+            <column name="rating" type="varchar(128)">
+            </column>
+            <column name="created" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated" defaultValueComputed="current_timestamp" type="timestamp with time zone">
+            </column>
+        </createTable>
+
+    </changeSet>
+</databaseChangeLog>
