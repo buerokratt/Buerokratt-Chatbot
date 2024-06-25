@@ -16,22 +16,24 @@ const ChatMessage: FC<ChatMessageProps> = ({ message, onMessageClick }) => {
   const options = useMemo(() => parseOptions(message), [message.options]);
 
   return (
-    <div className="historical-chat__message">
-      <button
-        className="historical-chat__message-text"
-        onClick={onMessageClick ? () => onMessageClick(message) : undefined}
-      >
-        <Linkifier message={decodeURIComponent(message.content ?? '')} />
-      </button>
+    <>
+      <div className="historical-chat__message">
+        <button
+          className="historical-chat__message-text"
+          onClick={onMessageClick ? () => onMessageClick(message) : undefined}
+        >
+          <Linkifier message={decodeURIComponent(message.content ?? '')} />
+        </button>
+        <time
+          dateTime={message.authorTimestamp}
+          className="historical-chat__message-date"
+        >
+          {format(new Date(message.authorTimestamp), 'HH:mm:ss')}
+        </time>
+      </div>
       {buttons.length > 0 && <ButtonMessage buttons={buttons} />}
       {options.length > 0 && <OptionMessage options={options} />}
-      <time
-        dateTime={message.authorTimestamp}
-        className="historical-chat__message-date"
-      >
-        {format(new Date(message.authorTimestamp), 'HH:mm:ss')}
-      </time>
-    </div>
+    </>
   );
 };
 

@@ -45,9 +45,8 @@ const ChatMessage: FC<ChatMessageProps> = ({
           }}
         >
           <Linkifier message={decodeURIComponent(message.content ?? '')} />
+          {!message.content && options.length > 0 && 'ok'}
         </button>
-        {buttons.length > 0 && <ButtonMessage buttons={buttons} />}
-        {options.length > 0 && <OptionMessage options={options} />}
         <time
           dateTime={message.authorTimestamp}
           className="active-chat__message-date"
@@ -60,6 +59,8 @@ const ChatMessage: FC<ChatMessageProps> = ({
           </div>
         )}
       </div>
+      {buttons.length > 0 && <ButtonMessage buttons={buttons} />}
+      {options.length > 0 && <OptionMessage options={options} />}
       {message.event === CHAT_EVENTS.READ ? (
         <span className="active-chat__message-status">
           {t('global.read')}
