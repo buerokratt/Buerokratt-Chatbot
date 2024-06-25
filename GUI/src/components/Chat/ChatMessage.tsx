@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useMemo, useState } from 'react';
 import { format } from 'date-fns';
 import clsx from 'clsx';
 import { MdOutlineCheck } from 'react-icons/md';
@@ -7,6 +7,9 @@ import { CHAT_EVENTS, MessageStatus } from '../../types/chat';
 import Linkifier from './linkifier';
 import { useTranslation } from 'react-i18next';
 import './Typing.scss';
+import { parseButtons, parseOptions } from 'utils/parse-utils';
+import ButtonMessage from 'components/ButtonMessage';
+import OptionMessage from 'components/OptionMessage';
 
 type ChatMessageProps = {
   message: Message;
@@ -23,6 +26,9 @@ const ChatMessage: FC<ChatMessageProps> = ({
 }) => {
   const { t } = useTranslation();
   const [selected, setSelected] = useState(false);
+  
+  const buttons = useMemo(() => parseButtons(message), [message.buttons]);
+  const options = useMemo(() => parseOptions(message), [message.options]);
 
   return (
     <div className={clsx('active-chat__messageContainer')}>
@@ -40,6 +46,8 @@ const ChatMessage: FC<ChatMessageProps> = ({
         >
           <Linkifier message={decodeURIComponent(message.content ?? '')} />
         </button>
+        {buttons.length > 0 && <ButtonMessage buttons={buttons} />}
+        {options.length > 0 && <OptionMessage options={options} />}
         <time
           dateTime={message.authorTimestamp}
           className="active-chat__message-date"
