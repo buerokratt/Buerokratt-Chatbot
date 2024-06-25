@@ -1,4 +1,4 @@
 databaseChangeLog:
   - includeAll:
-      path: changelog/
+      path: changelog/changelog/
       errorIfMissingOrEmpty: true
