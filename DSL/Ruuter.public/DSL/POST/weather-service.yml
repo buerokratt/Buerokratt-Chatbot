@@ -1,5 +1,0 @@
-returnFinalResult:
-  return: "Ilm on hetkel ilus ja päike paistab."
-  next: end
-
-# Old weather service needs to be converted to yml from json in this file
