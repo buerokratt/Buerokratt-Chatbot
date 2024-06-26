@@ -49,7 +49,7 @@ assignMessageUuid:
 add_message_to_db:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/insert-message"
+    url: "[#CHATBOT_RESQL]/insert-message-with-options"
     body:
       chatId: ${chatId}
       messageId: ${messageUuid}
@@ -58,12 +58,14 @@ add_message_to_db:
       authorTimestamp: ${new Date().toISOString()}
       authorRole: "buerokratt"
       created: ${new Date().toISOString()}
-      authorLastName: ""
       rating: ""
       event: ""
       forwardedByUser: ""
       forwardedFromCsa: ""
       forwardedToCsa: ""
+      authorId: ""
+      authorFirstName: ""
+      authorLastName: ""
   result: insertMessageResult
 
 clearChatList:
