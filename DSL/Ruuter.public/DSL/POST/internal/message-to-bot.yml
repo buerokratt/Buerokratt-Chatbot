@@ -97,7 +97,7 @@ check_for_post_message_to_bot_result:
   switch:
     - condition: ${200 <= post_message_to_bot_result.response.statusCodeValue && post_message_to_bot_result.response.statusCodeValue < 300}
       next: check_if_bot_is_unable_to_reply
-  next: return_bad_request
+  next: return_bot_error
 
 check_if_bot_is_unable_to_reply:
   switch:
@@ -115,7 +115,13 @@ check_for_fallback_bot:
       sender: ${chatId}
       message: ${content}
   result: fallback_bot_result
-  next: check_if_fallback_bot_is_unable_to_reply
+  next: check_for_fallback_bot_result
+
+check_for_fallback_bot_result:
+  switch:
+    - condition: ${200 <= fallback_bot_result.response.statusCodeValue && fallback_bot_result.response.statusCodeValue < 300}
+      next: check_if_fallback_bot_is_unable_to_reply
+  next: return_bot_error
 
 check_if_fallback_bot_is_unable_to_reply:
   switch:
@@ -347,6 +353,11 @@ return_csa_is_not_available:
   status: 200
   return: "CSA's are not available"
   next: end
+
+return_bot_error:
+  status: 200
+  return: "Bot error"
+  next: end  
 
 return_message_sent:
   status: 200
