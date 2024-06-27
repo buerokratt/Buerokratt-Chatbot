@@ -1,0 +1,125 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'OPTIONS-INSERT'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: chatId
+        type: string
+        description: "Body field 'chatId'"
+      - field: options
+        type: string
+        description: "Body field 'options'"
+
+extractRequestData:
+  assign:
+    chatId: ${incoming.body.chatId}
+    options: ${incoming.body.options}
+
+getActiveChatById:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-active-chat-by-id"
+    body:
+      id: ${chatId}
+  result: activeChatRes
+
+checkActiveChatResult:
+  switch:
+    - condition: ${activeChatRes.response.body.length > 0}
+      next: get_message_uuid
+  next: return_chat_ended
+
+get_message_uuid:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/return_uuid"
+    headers:
+      type: json
+  result: message_uuid_result
+
+assignMessageUuid:
+  assign:
+    messageUuid: ${message_uuid_result.response.body.uuid}
+
+add_message_to_db:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-message-with-options"
+    body:
+      chatId: ${chatId}
+      messageId: ${messageUuid}
+      content: ""
+      options: ${options ?? "[]"}
+      authorTimestamp: ${new Date().toISOString()}
+      authorRole: "buerokratt"
+      created: ${new Date().toISOString()}
+      rating: ""
+      event: ""
+      forwardedByUser: ""
+      forwardedFromCsa: ""
+      forwardedToCsa: ""
+      authorId: ""
+      authorFirstName: ""
+      authorLastName: ""
+  result: insertMessageResult
+
+clearChatList:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query?conflicts=proceed"
+    body:
+     query:
+      term:
+       channelId: "chat-list"
+  result: clear_chat_res
+
+postNotificationAboutAddedChat:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
+    body:
+     channelId: "chat-list"
+     timestamp: ${new Date().toISOString()}
+     payload: {
+        "status": "Chat Status Changed",
+        "chatId": "${chatId}"
+     }
+  result: chat_notification_result
+
+clearMessages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query?conflicts=proceed"
+    body:
+     query:
+      term:
+       channelId: ${chatId}
+  result: clear_messages_res
+
+postNotificationAboutMessageResponse:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
+    body:
+     channelId: ${chatId}
+     timestamp: ${new Date().toISOString()}
+     payload: {
+        "type": "message",
+        "messageId": "${messageUuid}"
+     }
+  result: message_notification_result
+
+return_message_sent:
+  status: 200
+  return: "Message Sent Successfully"
+  next: end
+
+return_chat_ended:
+  return: "Chat Has Ended"
+  status: 400
+  next: end  
