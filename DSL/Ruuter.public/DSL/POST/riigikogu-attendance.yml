@@ -12,7 +12,7 @@ makeAPIRequest:
   args:
     url: "https://api.riigikogu.ee/api/statistics/participations/plenary?endDate=${endDate}&startDate=${startDate}&lang=${lang}"
     query:
-      startDate: ${startDate
+      startDate: ${startDate}
       endDate: ${endDate}
       lang: ${lang}
     headers:

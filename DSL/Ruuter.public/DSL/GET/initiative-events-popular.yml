@@ -3,43 +3,42 @@ makeAPIRequest:
   args:
     url: "https://rahvaalgatus.ee/initiatives/"
     query:
-      signedSince: ${new Date().getFullYear() - 1 + "-01-01"}
+      signedSince: ${new Date().getFullYear() + "-01-01"}
       order: "-signatureCount"
-      limit: "5"
     headers:
       accept: "application/vnd.rahvaalgatus.initiative+json; v=1"
   result: eventsData
   error: returnError
+  next: filterActiveInitiatives
+
+filterActiveInitiatives:
+  assign:
+    activeInitiatives: ${eventsData.response.body.filter(event => new Date(event.signingEndsAt) > new Date())}
   next: formatResponse
 
 formatResponse:
   assign:
     details: |
-      Pealkiri - ${eventsData.response.body[0].title}
-      Allkirjade arv - ${eventsData.response.body[0].signatureCount}
+      Algatus - ${activeInitiatives[0].title}
+      Allkirjade arv - ${activeInitiatives[0].signatureCount}
 
-      Pealkiri - ${eventsData.response.body[1].title}
-      Allkirjade arv - ${eventsData.response.body[1].signatureCount}
+      Algatus - ${activeInitiatives[1].title}
+      Allkirjade arv - ${activeInitiatives[1].signatureCount}
 
-      Pealkiri - ${eventsData.response.body[2].title}
-      Allkirjade arv - ${eventsData.response.body[2].signatureCount}
+      Algatus- ${activeInitiatives[2].title}
+      Allkirjade arv - ${activeInitiatives[2].signatureCount}
 
-      Pealkiri - ${eventsData.response.body[3].title}
-      Allkirjade arv - ${eventsData.response.body[3].signatureCount}
+      Algatus - ${activeInitiatives[3].title}
+      Allkirjade arv - ${activeInitiatives[3].signatureCount}
 
-      Pealkiri - ${eventsData.response.body[4].title}
-      Allkirjade arv - ${eventsData.response.body[4].signatureCount}
+      Algatus - ${activeInitiatives[4].title}
+      Allkirjade arv - ${activeInitiatives[4].signatureCount}
   next: returnResult
 
 returnResult:
-  return: ${details}
+  return: ${"Hetkel populaarsemad rahvaalgatused. " + details}
   next: end
 
 returnError:
   return: "Error: failed to get initiative details."
-  next: end
-
-noService:
-  return: "${incoming.body.list[0]} - POLE TEENUST"
-  status: 400
   next: end
