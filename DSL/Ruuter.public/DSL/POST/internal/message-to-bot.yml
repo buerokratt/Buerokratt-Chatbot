@@ -105,8 +105,19 @@ check_if_bot_is_unable_to_reply:
       next: check_for_fallback_bot
     - condition: ${post_message_to_bot_result.response.body?.[0]?.text == 'Suunan teid klienditeenindajale. Varuge natukene kannatust.'}
       next: get_organization_working_details
+    - condition: ${post_message_to_bot_result.response.body?.[0]?.text.match(/^OPENSEARCH/)}
+      next: common_service1
   next: extract_bot_responses
 
+common_service1:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/search.yml"
+    body:
+      message: ${post_message_to_bot_result.response.body?.[0]?.text.match(/^OPENSEARCH(.*)/)}
+  result: common_service1_result
+  next: extract_bot_responses
+  
 check_for_fallback_bot:
   call: http.post
   args:
