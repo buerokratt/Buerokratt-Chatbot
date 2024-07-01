@@ -49,6 +49,12 @@ post_answer:
       stream: false
   result: test
 
+check_status:
+  switch:
+    - condition: ${test.response.statusCodeValue == 400}
+      next: failed_request
+  next: assign_value
+
 assign_value:
   assign:
     correct_value:
@@ -58,3 +64,6 @@ assign_value:
 
 return_value:
   return: ${correct_value}
+
+failed_request:
+  return: "ERROR"
