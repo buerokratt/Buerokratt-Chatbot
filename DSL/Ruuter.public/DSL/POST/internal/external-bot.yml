@@ -59,7 +59,7 @@ assign_value:
   assign:
     correct_value:
       - recipient_id: ${incoming.body.sender}
-        text: ${test.response.body.choices[0].message.content.replace(/\n/g," ").replace(/%/g," protsenti")}
+        text: ${test.response.body.choices[0].message.content.replace(/\n/g," ").replace(/%/g," protsenti").replace(/\[doc\d+\]\w+/g, "").replace(" \. ", ". ")}
   next: return_value
 
 return_value:
