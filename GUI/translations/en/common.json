@@ -234,7 +234,7 @@
       "user-reached": "{{name}} contacted the user",
       "user-not-reached": "{{name}} could not reach the user",
       "user-authenticated": "{{name}} is authenticated {{date}}",
-      "taken-over": "Human took the conversation over"
+      "taken-over": "A human took the conversation over"
     }
   },
   "roles": {
