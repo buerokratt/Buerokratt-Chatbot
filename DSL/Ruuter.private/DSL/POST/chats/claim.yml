@@ -75,6 +75,20 @@ claimChat:
       receivedFrom: ${activeChat.receivedFrom ?? ""}
       receivedFromName: ${activeChat.receivedFromName ?? ""}
   result: claimChatRes
+  next: getMessageUuid
+
+getMessageUuid:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/return_uuid"
+    headers:
+      type: json
+  result: message_uuid_result
+  next: assignMessageUuid
+
+assignMessageUuid:
+  assign:
+    messageUuid: ${message_uuid_result.response.body.uuid}
   next: insertMessage
 
 insertMessage:
@@ -83,7 +97,7 @@ insertMessage:
     url: "[#CHATBOT_RESQL]/insert-message"
     body:
       chatId: ${activeChat.id}
-      messageId: ""
+      messageId: ${messageUuid}
       content: ""
       authorTimestamp: ${new Date().toISOString()}
       authorId: ""
@@ -141,7 +155,7 @@ postNotificationAboutMessageResponse:
      timestamp: ${new Date().toISOString()}
      payload: {
         "type": "message",
-        "messageId": ""
+        "messageId": "${messageUuid}"
      }
   result: message_notification_result
 
