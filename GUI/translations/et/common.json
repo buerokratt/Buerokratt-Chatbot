@@ -233,7 +233,8 @@
       "pending-assigned": "{{name}} määratud kontaktkasutajale",
       "user-reached": "{{name}} võttis kasutajaga ühendust",
       "user-not-reached": "{{name}} ei saanud kasutajaga ühendust",
-      "user-authenticated": "{{name}} on autenditud {{date}}"
+      "user-authenticated": "{{name}} on autenditud {{date}}",
+      "taken-over": "Inimene võttis vestluse üle"
     }
   },
   "roles": {
@@ -288,8 +289,8 @@
     "appearance": {
       "title": "Välimus ja käitumine",
       "widgetBubbleMessageText": "Märguandesõnum",
-      "widgetProactiveSeconds": "Animatsiooni algus sekundites",
-      "widgetDisplayBubbleMessageSeconds": "Märguandesõnumi aeg sekundites",
+      "widgetProactiveSeconds": "Animatsiooni kestus sekundites",
+      "widgetDisplayBubbleMessageSeconds": "Aeg animatsiooni alguseni sekundites",
       "widgetColor": "Põhivärv",
       "widgetAnimation": "Animatsioon"
     },
