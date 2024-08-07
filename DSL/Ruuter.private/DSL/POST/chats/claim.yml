@@ -75,6 +75,42 @@ claimChat:
       receivedFrom: ${activeChat.receivedFrom ?? ""}
       receivedFromName: ${activeChat.receivedFromName ?? ""}
   result: claimChatRes
+  next: getMessageUuid
+
+getMessageUuid:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/return_uuid"
+    headers:
+      type: json
+  result: message_uuid_result
+  next: assignMessageUuid
+
+assignMessageUuid:
+  assign:
+    messageUuid: ${message_uuid_result.response.body.uuid}
+  next: insertMessage
+
+insertMessage:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-message"
+    body:
+      chatId: ${activeChat.id}
+      messageId: ${messageUuid}
+      content: ""
+      authorTimestamp: ${new Date().toISOString()}
+      authorId: ""
+      authorFirstName: ""
+      authorRole: "buerokratt"
+      created: ${new Date().toISOString()}
+      authorLastName: ""
+      rating: ""
+      event: "taken-over"
+      forwardedByUser: ""
+      forwardedFromCsa: ""
+      forwardedToCsa: ""
+  result: insertMessageResult
   next: clearChatList
 
 clearChatList:
@@ -97,7 +133,7 @@ postNotificationAboutAddedChat:
      timestamp: ${new Date().toISOString()}
      payload: {
         "status": "Chat Status Changed",
-        "chatId": ""
+        "chatId": "${activeChat.id}"
      }
   result: chat_notification_result
   next: getClaimedChat
@@ -109,6 +145,19 @@ getClaimedChat:
     body:
       id: ${id}
   result: claimedChatRes
+
+postNotificationAboutMessageResponse:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
+    body:
+     channelId: ${activeChat.id}
+     timestamp: ${new Date().toISOString()}
+     payload: {
+        "type": "message",
+        "messageId": "${messageUuid}"
+     }
+  result: message_notification_result
 
 remove_chat_id_from_queue_notification_node_if_existed:
   call: http.post
