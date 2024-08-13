@@ -27,7 +27,7 @@ extract_body:
 extrat_trigger_service_info:
   call: http.post
   args:
-    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/extract_trigger_service_info"
+    url: "[#CHATBOT_DMAPPER]/backoffice/hbs/extract_trigger_service_info"
     headers:
       type: json
     body:
@@ -67,10 +67,10 @@ call_the_service:
 
 return_ok:
   status: 200
-  return: "Service called successfully" 
-  next: end   
+  return: "Service called successfully"
+  next: end
 
 return_trigger_service_is_not_exist:
   status: 200
-  return: "service_currently_unavailable" 
+  return: "service_currently_unavailable"
   next: end
