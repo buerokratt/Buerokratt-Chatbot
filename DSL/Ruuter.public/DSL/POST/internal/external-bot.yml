@@ -39,7 +39,7 @@ post_answer:
           "content": "You are a government AI assistant with general questions. All the answers MUST be in Estonian. If the question is in any other language than in Estonian, then translate the question into estonian and the answer MUST also be in Estonian."
         - "role": "user"
           "content": ${incoming.body.message}
-      temperature: 0.5
+      temperature: 0.1
       top_p: 1
       max_tokens: 1000
       stream: false
@@ -52,7 +52,7 @@ assign_value:
   assign:
     correct_value:
       - recipient_id: ${incoming.body.sender}
-        text: ${test.response.body.choices[0].message.content.replace(/\n/g," ").replace(/%/g," protsenti").replace(/\[doc\d+\]/g, "").replace(" \. ", ". ")}
+        text: ${test.response.body.choices[0].message.content.replace(/\n/g," ").replace(/%/g," protsenti").replace(/\s*\[doc\s*\d+\]\s*,?\s*/g,"").replace(" \. ", ". ")}
   next: return_value
 
 return_value:
