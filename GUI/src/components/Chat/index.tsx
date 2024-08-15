@@ -25,6 +25,7 @@ import PreviewMessage from './PreviewMessage';
 import LoaderOverlay from './LoaderOverlay';
 import { useNewMessageSound } from 'hooks/useAudio';
 import './Chat.scss';
+import { useInterval } from 'usehooks-ts';
 
 type ChatProps = {
   chat: ChatType;
@@ -58,6 +59,7 @@ const Chat: FC<ChatProps> = ({
   const { t } = useTranslation();
   const userInfo = useStore((state) => state.userInfo);
   const chatRef = useRef<HTMLDivElement>(null);
+
   const [messageGroups, setMessageGroups] = useState<GroupedMessage[]>([]);
   const messageGroupsRef = useRef(messageGroups);
   const setMessageGroupsState = (data: GroupedMessage[]) => {
@@ -65,15 +67,46 @@ const Chat: FC<ChatProps> = ({
     setMessageGroups(data);
   };
   const toast = useToast();
+
   const [responseText, setResponseText] = useState('');
   const chatCsaActive = useHeaderStore((state) => state.chatCsaActive);
   const [messagesList, setMessagesList] = useState<Message[]>([]);
-  const [latestPermissionMessage, setLatestPermissionMessage] =
-    useState<number>(0);
-  const [newMessageEffect] = useNewMessageSound();
-  let messagesLength = 0;
-  const navigate = useNavigate();
+  const [latestPermissionMessageCreated, setLatestPermissionMessageCreated] = useState<string>();
+  const [latestPermissionMessageSeconds, setLatestPermissionMessageSeconds] = useState<number>(0);
   const [previewTypingMessage, setPreviewTypingMessage] = useState<Message>();
+
+  const [newMessageEffect] = useNewMessageSound();
+  const navigate = useNavigate();
+
+  const askPermissionsTimeoutInSeconds = 60;
+  let messagesLength = 0;
+
+  const calculatePermissionMessageSeconds = () => {
+    if (latestPermissionMessageCreated) {
+      const countdown = Math.round(
+        (new Date().getTime() - new Date(latestPermissionMessageCreated).getTime()) / 1000
+      ) ?? 0;
+
+      setLatestPermissionMessageSeconds(countdown);
+    }
+  }
+
+  const handlePermissionMessages = () => {
+    const permissionsMessages = messagesList.filter(
+      (e: Message) =>
+        e.event === 'ask-permission' ||
+        e.event === 'ask-permission-accepted' ||
+        e.event === 'ask-permission-rejected' ||
+        e.event === 'ask-permission-ignored'
+    );
+
+    setLatestPermissionMessageCreated(permissionsMessages[permissionsMessages.length - 1]?.created || '');
+    calculatePermissionMessageSeconds();
+  }
+
+  useInterval(() => {
+    calculatePermissionMessageSeconds();
+  }, (latestPermissionMessageCreated && latestPermissionMessageSeconds <= askPermissionsTimeoutInSeconds) ? 1000 : null);
 
   useEffect(() => {
     getMessages();
@@ -110,23 +143,7 @@ const Chat: FC<ChatProps> = ({
           ]);
         }
 
-        const askingPermissionsMessages: Message[] = messagesList?.filter(
-          (e: Message) =>
-            e.event === 'ask-permission' ||
-            e.event === 'ask-permission-accepted' ||
-            e.event === 'ask-permission-rejected' ||
-            e.event === 'ask-permission-ignored'
-        );
-        const lastestPermissionDate = new Date(
-          askingPermissionsMessages[askingPermissionsMessages.length - 1]
-            ?.created ?? new Date()
-        );
-
-        const lastPermissionMesageSecondsDiff = Math.round(
-          (new Date().getTime() - lastestPermissionDate.getTime()) / 1000
-        );
-
-        setLatestPermissionMessage(lastPermissionMesageSecondsDiff ?? 0);
+        handlePermissionMessages();
 
         const permissionsHandeledMessages: Message[] = filteredMessages?.filter(
           (e: Message) =>
@@ -135,7 +152,7 @@ const Chat: FC<ChatProps> = ({
             e.event === 'ask-permission-ignored'
         );
         if (permissionsHandeledMessages?.length > 0) {
-          getMessages();
+          await getMessages();
         }
       }
     };
@@ -151,6 +168,7 @@ const Chat: FC<ChatProps> = ({
     const { data: res } = await apiDev.post('agents/chats/messages/all', {
       chatId: chat.id,
     });
+
     if (
       messagesLength != 0 &&
       messagesLength < res.response.length &&
@@ -160,26 +178,8 @@ const Chat: FC<ChatProps> = ({
       onRefresh();
     }
     messagesLength = res.response.length;
-    const askingPermissionsMessages: Message[] = res.response
-      .map((e: Message[]) => e)
-      .filter(
-        (e: Message) =>
-          e.event === 'ask-permission' ||
-          e.event === 'ask-permission-accepted' ||
-          e.event === 'ask-permission-rejected' ||
-          e.event === 'ask-permission-ignored'
-      );
 
-    const lastestPermissionDate = new Date(
-      askingPermissionsMessages[askingPermissionsMessages.length - 1]
-        ?.created ?? new Date()
-    );
-
-    const lastPermissionMesageSecondsDiff = Math.round(
-      (new Date().getTime() - lastestPermissionDate.getTime()) / 1000
-    );
-
-    setLatestPermissionMessage(lastPermissionMesageSecondsDiff ?? 0);
+    handlePermissionMessages();
 
     setMessagesList(res.response);
   };
@@ -230,8 +230,8 @@ const Chat: FC<ChatProps> = ({
         event: message.event ?? '',
         authorTimestamp: message.authorTimestamp ?? '',
       }),
-    onSuccess: () => {
-      getMessages();
+    onSuccess: async () => {
+      await getMessages();
     },
     onError: (error: AxiosError) => {
       toast.open({
@@ -244,13 +244,13 @@ const Chat: FC<ChatProps> = ({
 
   const postMessageWithNewEventMutation = useMutation({
     mutationFn: (message: Message) =>
-      apiDev.post('message-event', {
-        id: message.id ?? '',
-        event: CHAT_EVENTS.ASK_PERMISSION_IGNORED,
-        authorTimestamp: message.authorTimestamp ?? '',
+      apiDev.post('agents/chats/messages/event', {
+        id: message.id,
+        event: CHAT_EVENTS.ASK_PERMISSION,
+        authorTimestamp: message.authorTimestamp,
       }),
-    onSuccess: () => {
-      getMessages();
+    onSuccess: async () => {
+      await getMessages();
       handleChatEvent(CHAT_EVENTS.ASK_PERMISSION);
     },
     onError: (error: AxiosError) => {
@@ -448,12 +448,13 @@ const Chat: FC<ChatProps> = ({
 
   const disableAskForPermission =
     chat.customerSupportId != userInfo?.idCode ||
-    (latestPermissionMessage <= 60 && latestPermissionMessage != 0);
+    (latestPermissionMessageSeconds <= askPermissionsTimeoutInSeconds && latestPermissionMessageSeconds != 0);
 
   const takeOverCondition =
     chat.customerSupportId === '' ||
     (chat.customerSupportId !== userInfo?.idCode &&
       userInfo?.authorities.includes('ROLE_ADMINISTRATOR'));
+
   return (
     <div className="active-chat">
       <div className="active-chat__body">
@@ -705,10 +706,10 @@ const Chat: FC<ChatProps> = ({
                 >
                   {t('chat.active.askPermission')}
                 </Button>
-                {latestPermissionMessage <= 60 && (
+                {latestPermissionMessageSeconds <= askPermissionsTimeoutInSeconds && (
                   <LoaderOverlay
-                    maxPercent={60}
-                    currentPercent={latestPermissionMessage}
+                    maxPercent={askPermissionsTimeoutInSeconds}
+                    currentPercent={latestPermissionMessageSeconds}
                   />
                 )}
               </div>
