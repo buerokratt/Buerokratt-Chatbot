@@ -5,7 +5,7 @@ import { Outlet } from 'react-router-dom';
 import { MainNavigation } from '@buerokratt-ria/menu';
 import { useToast } from '../../hooks/useToast';
 import './Layout.scss';
-import { useMenuCountConf } from '../../hooks/useMenuCountConf';
+import { useMenuCountConf } from "@buerokratt-ria/header";
 
 const Layout: FC = () => {
   const menuCountConf = useMenuCountConf();
