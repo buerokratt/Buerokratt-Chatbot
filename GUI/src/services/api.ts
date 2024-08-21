@@ -1,4 +1,6 @@
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
+import {useTranslation} from "react-i18next";
+import {useEffect} from "react";
 
 const instance = axios.create({
   baseURL: import.meta.env.BASE_URL,
@@ -9,15 +11,34 @@ const instance = axios.create({
   withCredentials: true,
 });
 
-instance.interceptors.response.use(
-  (axiosResponse) => {
-    return axiosResponse;
-  },
-  (error: AxiosError) => {
-    console.log(error);
-    return Promise.reject(new Error(error.message));
-  }
-);
+// @ts-ignore
+const AxiosInterceptor = ({ children }) => {
+  const { t } = useTranslation();
+
+  useEffect(() => {
+
+    const resInterceptor = (response: any) => {
+      import.meta.env.DEBUG_ENABLED && console.log(response);
+
+      return response;
+    }
+
+    const errInterceptor = (error: any) => {
+      import.meta.env.DEBUG_ENABLED && console.log(error);
+
+      if (error.response?.status === 409) {
+        let message = t('axios.error.conflict');
+        return Promise.reject(new Error(message));
+      }
+      return Promise.reject(new Error(error.message));
+    }
+
+    const interceptor = instance.interceptors.response.use(resInterceptor, errInterceptor);
+
+    return () => instance.interceptors.response.eject(interceptor);
+  }, [t])
+  return children;
+}
 
 instance.interceptors.request.use(
   (axiosRequest) => {
@@ -36,3 +57,4 @@ instance.interceptors.request.use(
 );
 
 export default instance;
+export { AxiosInterceptor };
