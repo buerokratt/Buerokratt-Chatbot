@@ -158,55 +158,63 @@ const DataTable: FC<DataTableProps> = (
   });
 
   return (
-    <div className='data-table__scrollWrapper'>
-      <table className='data-table'>
-        {!disableHead && (
-          <thead>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <th key={header.id} style={{ width: header.column.columnDef.meta?.size, position: header.column.columnDef.meta?.sticky ? 'sticky' : undefined , 
-                  left: header.column.columnDef.meta?.sticky === 'left' ? `${header.column.getAfter('left') * 0.675}px` : undefined, 
-                  right: header.column.columnDef.meta?.sticky === 'right' ? `${header.column.getAfter('right') * 0.675}px` : undefined,
-                  backgroundColor: 'white', zIndex: header.column.columnDef.meta?.sticky ? 1 : 0 }}>
-                  {header.isPlaceholder ? null : (
+    <>
+      <div className='data-table__scrollWrapper'>
+        <table className='data-table'>
+          {!disableHead && (
+            <thead>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <th key={header.id} style={{
+                    width: header.column.columnDef.meta?.size,
+                    position: header.column.columnDef.meta?.sticky ? 'sticky' : undefined,
+                    left: header.column.columnDef.meta?.sticky === 'left' ? `${header.column.getAfter('left') * 0.675}px` : undefined,
+                    right: header.column.columnDef.meta?.sticky === 'right' ? `${header.column.getAfter('right') * 0.675}px` : undefined,
+                    backgroundColor: 'white',
+                    zIndex: header.column.columnDef.meta?.sticky ? 1 : 0
+                  }}>
+                    {header.isPlaceholder ? null : (
                       <Track gap={8}>
                         {sortable && header.column.getCanSort() && (
                           <button onClick={header.column.getToggleSortingHandler()}>
                             {{
-                              asc: <Icon icon={<MdExpandMore fontSize={20} />} size='medium' />,
-                              desc: <Icon icon={<MdExpandLess fontSize={20} />} size='medium' />,
+                              asc: <Icon icon={<MdExpandMore fontSize={20}/>} size='medium'/>,
+                              desc: <Icon icon={<MdExpandLess fontSize={20}/>} size='medium'/>,
                             }[header.column.getIsSorted() as string] ?? (
-                              <Icon icon={<MdUnfoldMore fontSize={22} />} size='medium' />
+                              <Icon icon={<MdUnfoldMore fontSize={22}/>} size='medium'/>
                             )}
                           </button>
                         )}
                         {flexRender(header.column.columnDef.header, header.getContext())}
                         {filterable && header.column.getCanFilter() && (
-                          <Filter column={header.column} table={table} />
+                          <Filter column={header.column} table={table}/>
                         )}
                       </Track>
-                  )}
-                </th>
+                    )}
+                  </th>
+                ))}
+              </tr>
+            ))}
+            </thead>
+          )}
+          <tbody>
+          {tableBodyPrefix}
+          {table.getRowModel().rows.map((row) => (
+            <tr key={row.id} style={table.options.meta?.getRowStyles(row)}>
+              {row.getVisibleCells().map((cell) => (
+                <td key={cell.id} style={{
+                  position: cell.column.columnDef.meta?.sticky ? 'sticky' : undefined,
+                  left: cell.column.columnDef.meta?.sticky === 'left' ? `${cell.column.getAfter('left') * 0.675}px` : undefined,
+                  right: cell.column.columnDef.meta?.sticky === 'right' ? `${cell.column.getAfter('right') * 0.675}px` : undefined,
+                  backgroundColor: 'white', zIndex: cell.column.columnDef.meta?.sticky ? 1 : 0
+                }}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
               ))}
             </tr>
           ))}
-          </thead>
-        )}
-        <tbody>
-        {tableBodyPrefix}
-        {table.getRowModel().rows.map((row) => (
-          <tr key={row.id} style={table.options.meta?.getRowStyles(row)}>
-            {row.getVisibleCells().map((cell) => (
-              <td key={cell.id} style={{position: cell.column.columnDef.meta?.sticky ? 'sticky' : undefined , 
-                  left: cell.column.columnDef.meta?.sticky === 'left' ? `${cell.column.getAfter('left') * 0.675}px` : undefined, 
-                  right: cell.column.columnDef.meta?.sticky === 'right' ? `${cell.column.getAfter('right') * 0.675}px` : undefined,
-                  backgroundColor: 'white', zIndex: cell.column.columnDef.meta?.sticky ? 1 : 0}} >{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
-            ))}
-          </tr>
-        ))}
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      </div>
       {pagination && (
         <div className='data-table__pagination-wrapper'>
           {(table.getPageCount() * table.getState().pagination.pageSize) > table.getState().pagination.pageSize && (
@@ -216,14 +224,14 @@ const DataTable: FC<DataTableProps> = (
                 onClick={() => table.previousPage()}
                 disabled={!table.getCanPreviousPage()}
               >
-                <MdOutlineWest />
+                <MdOutlineWest/>
               </button>
               <nav role='navigation' aria-label={t('global.paginationNavigation') ?? ''}>
                 <ul className='links'>
                   {[...Array(table.getPageCount())].map((_, index) => (
                     <li
                       key={`${id}-${index}`}
-                      className={clsx({ 'active': table.getState().pagination.pageIndex === index })}
+                      className={clsx({'active': table.getState().pagination.pageIndex === index})}
                     >
                       <Link
                         to={`?page=${index + 1}`}
@@ -244,7 +252,7 @@ const DataTable: FC<DataTableProps> = (
                 }}
                 disabled={!table.getCanNextPage()}
               >
-                <MdOutlineEast />
+                <MdOutlineEast/>
               </button>
             </div>
           )}
@@ -266,7 +274,7 @@ const DataTable: FC<DataTableProps> = (
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 
