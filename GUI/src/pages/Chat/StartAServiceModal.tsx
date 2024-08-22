@@ -6,7 +6,7 @@ import { Button, DataTable, Dialog, FormInput, Icon, Track } from 'components';
 import { Chat } from 'types/chat';
 import { MdOutlineArrowForward } from 'react-icons/md';
 import { Service } from 'types/service';
-import api from 'services/api';
+import { api } from 'services/api';
 import { useToast } from 'hooks/useToast';
 
 type StartAServiceModalProps = {

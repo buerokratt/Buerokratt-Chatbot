@@ -9,7 +9,7 @@ import { CHAT_EVENTS, Chat as ChatType } from 'types/chat';
 import { Message } from 'types/message';
 import ChatMessage from './ChatMessage';
 import './HistoricalChat.scss';
-import apiDev from 'services/api-dev';
+import { apiDev } from 'services/api';
 import ChatEvent from 'components/ChatEvent';
 import { AUTHOR_ROLES } from 'utils/constants';
 

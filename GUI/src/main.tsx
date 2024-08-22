@@ -8,8 +8,7 @@ import {
 } from '@tanstack/react-query';
 
 import App from './App';
-import api, { AxiosInterceptor } from 'services/api';
-import apiDev from 'services/api-dev';
+import { api, apiDev, AxiosInterceptor } from 'services/api';
 import { ToastProvider } from 'context/ToastContext';
 import 'styles/main.scss';
 import '../i18n';

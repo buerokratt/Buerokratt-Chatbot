@@ -349,11 +349,6 @@
       "uptimePercent": "{{percent}}% uptime"
     }
   },
-  "axios": {
-    "error": {
-      "conflict": "This change cannot be made."
-    }
-  },
   "toast": {
     "success": {
       "updateSuccess": "Updated Successfully",

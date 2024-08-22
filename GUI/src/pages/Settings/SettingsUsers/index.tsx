@@ -9,7 +9,7 @@ import {
 } from '@tanstack/react-table';
 import { AxiosError } from 'axios';
 import { MdOutlineEdit, MdOutlineDeleteOutline } from 'react-icons/md';
-import apiDev from 'services/api-dev';
+import { apiDev } from 'services/api';
 import { Button, Card, DataTable, Dialog, Icon, Track } from 'components';
 import { User } from 'types/user';
 import { deleteUser } from 'services/users';

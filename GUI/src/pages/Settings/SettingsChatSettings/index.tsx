@@ -5,7 +5,7 @@ import { AxiosError } from 'axios';
 
 import { Button, Card, Switch, Track } from 'components';
 import { useToast } from 'hooks/useToast';
-import apiDev from 'services/api-dev';
+import { apiDev } from 'services/api';
 import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';
 

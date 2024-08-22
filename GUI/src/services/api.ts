@@ -1,8 +1,8 @@
-import axios from 'axios';
-import {useTranslation} from "react-i18next";
-import {useEffect} from "react";
+import axios, { AxiosError } from 'axios';
+import { useTranslation } from "react-i18next";
+import { useEffect } from "react";
 
-const instance = axios.create({
+const api = axios.create({
   baseURL: import.meta.env.BASE_URL,
   headers: {
     Accept: 'application/json',
@@ -11,7 +11,15 @@ const instance = axios.create({
   withCredentials: true,
 });
 
-// @ts-ignore
+const apiDev = axios.create({
+  baseURL: import.meta.env.REACT_APP_RUUTER_PRIVATE_API_URL,
+  headers: {
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  },
+  withCredentials: true,
+});
+
 const AxiosInterceptor = ({ children }) => {
   const { t } = useTranslation();
 
@@ -26,35 +34,41 @@ const AxiosInterceptor = ({ children }) => {
     const errInterceptor = (error: any) => {
       import.meta.env.DEBUG_ENABLED && console.log(error);
 
-      if (error.response?.status === 409) {
-        let message = t('axios.error.conflict');
-        return Promise.reject(new Error(message));
-      }
-      return Promise.reject(new Error(error.message));
+      let message = t('global.notificationErrorMsg');
+
+      return Promise.reject(new Error(message));
     }
 
-    const interceptor = instance.interceptors.response.use(resInterceptor, errInterceptor);
+    const apiInterceptor = api.interceptors.response.use(resInterceptor, errInterceptor);
+    const apiDevInterceptor = apiDev.interceptors.response.use(resInterceptor, errInterceptor);
 
-    return () => instance.interceptors.response.eject(interceptor);
+    return () => {
+      api.interceptors.response.eject(apiInterceptor);
+      apiDev.interceptors.response.eject(apiDevInterceptor);
+    };
   }, [t])
   return children;
 }
 
-instance.interceptors.request.use(
-  (axiosRequest) => {
-    return axiosRequest;
-  },
-  (error: AxiosError) => {
-    console.log(error);
-    if (error.response?.status === 401) {
-      // To be added: handle unauthorized requests
-    }
-    if (error.response?.status === 403) {
-      //  To be added: handle unauthorized requests
-    }
-    return Promise.reject(new Error(error.message));
+const handleRequestError = (error: AxiosError) => {
+  console.log(error);
+  if (error.response?.status === 401) {
+    // To be added: handle unauthorized requests
   }
+  if (error.response?.status === 403) {
+    // To be added: handle unauthorized requests
+  }
+  return Promise.reject(new Error(error.message));
+}
+
+api.interceptors.request.use(
+  (axiosRequest) => axiosRequest,
+  handleRequestError
 );
 
-export default instance;
-export { AxiosInterceptor };
+apiDev.interceptors.request.use(
+  (axiosRequest) => axiosRequest,
+  handleRequestError
+);
+
+export { api, apiDev, AxiosInterceptor };

@@ -349,11 +349,6 @@
       "uptimePercent": "{{percent}}% tööaeg"
     }
   },
-  "axios": {
-    "error": {
-      "conflict": "Seda muudatust ei ole võimalik teha."
-    }
-  },
   "toast": {
     "success": {
       "updateSuccess": "Värskendamine õnnestus",
