@@ -56,7 +56,7 @@ const handleRequestError = (error: AxiosError) => {
     // To be added: handle unauthorized requests
   }
   if (error.response?.status === 403) {
-    // To be added: handle unauthorized requests
+    // To be added: handle forbidden requests
   }
   return Promise.reject(new Error(error.message));
 }
