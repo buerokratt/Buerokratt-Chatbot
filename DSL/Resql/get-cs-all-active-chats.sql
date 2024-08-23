@@ -25,7 +25,7 @@ FulfilledMessages AS (
 ),
 MessageWithContent AS (
   SELECT MAX(id) AS maxId
-  FROM message 
+  FROM message
   WHERE content <> ''
   GROUP BY chat_base_id
 ),
@@ -46,7 +46,7 @@ MessagaeNotRatingOrForwardEvents AS (
   GROUP BY chat_base_id
 ),
 ActiveChats AS (
-  SELECT 
+  SELECT
       base_id,
       customer_support_id,
       customer_support_display_name,
@@ -97,6 +97,7 @@ CustomerMessages AS (
     SELECT chat_base_id, COUNT(id) AS messages_count
     FROM message
     WHERE message.author_role = 'end-user'
+    AND (message.event = '' OR message.event IS NULL)
     GROUP BY chat_base_id
 )
 SELECT c.base_id AS id,
