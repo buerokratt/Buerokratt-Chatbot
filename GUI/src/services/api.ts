@@ -24,15 +24,14 @@ const AxiosInterceptor = ({ children }) => {
   const { t } = useTranslation();
 
   useEffect(() => {
-
     const resInterceptor = (response: any) => {
-      import.meta.env.DEBUG_ENABLED && console.log(response);
+      import.meta.env.DEBUG_ENABLED && console.debug(response);
 
       return response;
     }
 
     const errInterceptor = (error: any) => {
-      import.meta.env.DEBUG_ENABLED && console.log(error);
+      import.meta.env.DEBUG_ENABLED && console.debug(error);
 
       let message = t('global.notificationErrorMsg');
 
@@ -46,12 +45,13 @@ const AxiosInterceptor = ({ children }) => {
       api.interceptors.response.eject(apiInterceptor);
       apiDev.interceptors.response.eject(apiDevInterceptor);
     };
-  }, [t])
+  }, [t]);
+
   return children;
 }
 
 const handleRequestError = (error: AxiosError) => {
-  console.log(error);
+  import.meta.env.DEBUG_ENABLED && console.debug(error);
   if (error.response?.status === 401) {
     // To be added: handle unauthorized requests
   }
