@@ -361,5 +361,9 @@
       "newUserAdded": "New user added",
       "userUpdated": "User updated"
     }
+  },
+  "notification": {
+    "title": "Bürokratt",
+    "newMessage": "New message."
   }
 }

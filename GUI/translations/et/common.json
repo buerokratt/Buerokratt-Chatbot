@@ -361,5 +361,9 @@
       "newUserAdded": "Uus kasutaja lisatud",
       "userUpdated": "Kasutaja uuendatud"
     }
+  },
+  "notification": {
+    "title": "Bürokratt",
+    "newMessage": "Uus sõnum."
   }
 }
