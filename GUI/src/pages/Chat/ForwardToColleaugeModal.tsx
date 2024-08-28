@@ -3,7 +3,7 @@ import { createColumnHelper, PaginationState, SortingState } from '@tanstack/rea
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { MdOutlineArrowForward } from 'react-icons/md';
-import apiDev from 'services/api-dev';
+import { apiDev } from 'services/api';
 
 import {
   Button,

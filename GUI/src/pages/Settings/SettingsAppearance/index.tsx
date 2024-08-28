@@ -19,7 +19,7 @@ import { useToast } from 'hooks/useToast';
 import bykLogo from 'assets/logo-white.svg';
 import './SettingsAppearance.scss';
 import clsx from 'clsx';
-import apiDev from 'services/api-dev';
+import { apiDev } from 'services/api';
 import { ChromePicker } from 'react-color';
 import { MdOutlinePalette } from 'react-icons/md';
 import withAuthorization from 'hoc/with-authorization';

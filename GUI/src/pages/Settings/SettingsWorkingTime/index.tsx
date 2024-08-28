@@ -7,7 +7,7 @@ import { format, parse } from 'date-fns';
 import { Button, Card, FormDatepicker, Switch, Track } from 'components';
 import { OrganizationWorkingTime } from 'types/organizationWorkingTime';
 import { useToast } from 'hooks/useToast';
-import apiDev from 'services/api-dev';
+import { apiDev } from 'services/api';
 import './SettingsWorkingTime.scss';
 import { getOrganizationTimeData, setOrganizationTimeData } from './data';
 import withAuthorization from 'hoc/with-authorization';

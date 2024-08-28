@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, Card, FormInput, Track } from 'components';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useToast } from 'hooks/useToast';
-import apiDev from 'services/api-dev';
+import { apiDev } from 'services/api';
 import './SettingsSessionLength.scss';
 import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';
