@@ -98,6 +98,7 @@
     "unansweredChats": "Vastamata vestlused",
     "unanswered": "Vastamata",
     "forwarded": "Suunatud",
+    "pending": "Ootel",
     "endUser": "Vestleja nimi",
     "endUserId": "Vestleja isikukood",
     "csaName": "Nõustaja nimi",
@@ -360,5 +361,9 @@
       "newUserAdded": "Uus kasutaja lisatud",
       "userUpdated": "Kasutaja uuendatud"
     }
+  },
+  "notification": {
+    "title": "Bürokratt",
+    "newMessage": "Uus sõnum."
   }
 }
