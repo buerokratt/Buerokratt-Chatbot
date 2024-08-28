@@ -77,7 +77,7 @@ const HistoricalChat: FC<ChatProps> = ({
         lastGroup.messages.at(-1) &&
         message.event === CHAT_EVENTS.READ
       ) {
-        lastGroup.messages.at(-1)!.event = CHAT_EVENTS.READ;
+        lastGroup.messages.push(message);
         return;
       }
       if (lastGroup?.type === message.authorRole) {

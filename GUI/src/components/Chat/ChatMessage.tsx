@@ -37,26 +37,30 @@ const ChatMessage: FC<ChatMessageProps> = ({
           'active-chat__message--selected': selected,
         })}
       >
-        <button
-          className={clsx('active-chat__message-text')}
-          onClick={() => {
-            setSelected(!selected);
-            onSelect(message);
-          }}
-        >
-          <Linkifier message={decodeURIComponent(message.content ?? '')} />
-          {!message.content && options.length > 0 && 'ok'}
-        </button>
-        <time
-          dateTime={message.authorTimestamp}
-          className="active-chat__message-date"
-        >
-          {format(new Date(message.authorTimestamp), 'HH:mm:ss')}
-        </time>
-        {selected && (
-          <div className="active-chat__selection-icon">
-            <MdOutlineCheck />
-          </div>
+        {(message.event === CHAT_EVENTS.GREETING || !message.event) && (
+          <>
+            <button
+              className={clsx('active-chat__message-text')}
+              onClick={() => {
+                setSelected(!selected);
+                onSelect(message);
+              }}
+            >
+              <Linkifier message={decodeURIComponent(message.content ?? '')} />
+              {!message.content && options.length > 0 && 'ok'}
+            </button>
+            <time
+              dateTime={message.authorTimestamp}
+              className="active-chat__message-date"
+            >
+              {format(new Date(message.authorTimestamp), 'HH:mm:ss')}
+            </time>
+            {selected && (
+              <div className="active-chat__selection-icon">
+                <MdOutlineCheck />
+              </div>
+            )}
+          </>
         )}
       </div>
       {buttons.length > 0 && <ButtonMessage buttons={buttons} />}
