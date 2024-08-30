@@ -9,7 +9,7 @@ import { CHAT_EVENTS, Chat as ChatType } from 'types/chat';
 import { Message } from 'types/message';
 import ChatMessage from './ChatMessage';
 import './HistoricalChat.scss';
-import apiDev from 'services/api-dev';
+import { apiDev } from 'services/api';
 import ChatEvent from 'components/ChatEvent';
 import { AUTHOR_ROLES } from 'utils/constants';
 
@@ -77,7 +77,7 @@ const HistoricalChat: FC<ChatProps> = ({
         lastGroup.messages.at(-1) &&
         message.event === CHAT_EVENTS.READ
       ) {
-        lastGroup.messages.at(-1)!.event = CHAT_EVENTS.READ;
+        lastGroup.messages.push(message);
         return;
       }
       if (lastGroup?.type === message.authorRole) {

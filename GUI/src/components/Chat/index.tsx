@@ -12,7 +12,7 @@ import { AttachmentTypes, Message } from 'types/message';
 import ChatMessage from './ChatMessage';
 import ChatEvent from '../ChatEvent';
 import { isHiddenFeaturesEnabled, CHAT_INPUT_LENGTH } from 'constants/config';
-import apiDev from 'services/api-dev';
+import { apiDev } from 'services/api';
 import ChatTextArea from './ChatTextArea';
 import { AUTHOR_ROLES, MESSAGE_FILE_SIZE_LIMIT, ROLES } from 'utils/constants';
 import { AxiosError } from 'axios';
@@ -355,7 +355,7 @@ const Chat: FC<ChatProps> = ({
         lastGroup.messages.at(-1) &&
         message.event === CHAT_EVENTS.READ
       ) {
-        lastGroup.messages.at(-1)!.event = CHAT_EVENTS.READ;
+        lastGroup.messages.push(message);
         return;
       }
       if (lastGroup?.type === message.authorRole) {

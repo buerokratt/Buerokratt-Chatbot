@@ -1,4 +1,4 @@
-import apiDev from './api-dev';
+import { apiDev } from './api';
 import { User, UserDTO } from 'types/user';
 
 export async function createUser(userData: UserDTO) {

@@ -6,7 +6,7 @@ import {
   GroupedChat,
   GroupedPendingChat,
 } from 'types/chat';
-import apiDev from 'services/api-dev';
+import { apiDev } from 'services/api';
 
 interface StoreState {
   userInfo: UserInfo | null;

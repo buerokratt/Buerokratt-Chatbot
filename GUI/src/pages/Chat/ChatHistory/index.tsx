@@ -27,7 +27,7 @@ import {
 } from 'components';
 import { CHAT_EVENTS, CHAT_STATUS, Chat as ChatType } from 'types/chat';
 import { useToast } from 'hooks/useToast';
-import apiDev from 'services/api-dev';
+import { apiDev } from 'services/api';
 import useStore from 'store';
 import { Controller, useForm } from 'react-hook-form';
 import {

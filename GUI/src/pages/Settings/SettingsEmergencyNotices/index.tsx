@@ -15,7 +15,7 @@ import { EMERGENCY_NOTICE_LENGTH } from 'constants/config';
 import { EmergencyNotice } from 'types/emergencyNotice';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useToast } from 'hooks/useToast';
-import apiDev from 'services/api-dev';
+import { apiDev } from 'services/api';
 import { format, parse } from 'date-fns';
 import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';

@@ -8,7 +8,7 @@ import useStore from 'store';
 import { userStore as useHeaderStore } from '@buerokratt-ria/header';
 import { User } from 'types/user';
 import { useToast } from 'hooks/useToast';
-import apiDev from 'services/api-dev';
+import { apiDev } from 'services/api';
 import ForwardToColleaugeModal from '../ForwardToColleaugeModal';
 import ForwardToEstablishmentModal from '../ForwardToEstablishmentModal';
 import clsx from 'clsx';

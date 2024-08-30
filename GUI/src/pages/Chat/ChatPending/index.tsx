@@ -7,7 +7,7 @@ import { Chat, Dialog, Button, FormRadios, Track } from 'components';
 import { CHAT_EVENTS, CHAT_STATUS, Chat as ChatType } from 'types/chat';
 import { User } from 'types/user';
 import { useToast } from 'hooks/useToast';
-import apiDev from 'services/api-dev';
+import { apiDev } from 'services/api';
 import ChatTrigger from '../ChatActive/ChatTrigger';
 import clsx from 'clsx';
 import ForwardToColleaugeModal from '../ForwardToColleaugeModal';

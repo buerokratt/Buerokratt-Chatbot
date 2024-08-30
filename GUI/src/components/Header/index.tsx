@@ -21,7 +21,7 @@ import { UserProfileSettings } from 'types/userProfileSettings';
 import { Chat as ChatType } from 'types/chat';
 import { useToast } from 'hooks/useToast';
 import { USER_IDLE_STATUS_TIMEOUT } from 'constants/config';
-import apiDev from 'services/api-dev';
+import { apiDev } from 'services/api';
 import { interval } from 'rxjs';
 import { AUTHORITY } from 'types/authorities';
 import { useCookies } from 'react-cookie';
