@@ -12,6 +12,22 @@ declaration:
         type: string
         description: "Cookie field"
 
+get_sso_info:
+  condition: ${incoming.eval.ssoMaster == null}
+    next: get_cookie_info
+  next: get_sso_from_master
+
+get_sso_from_master:
+  call: http.post
+  args:
+    url: ${incoming.eval.ssoMaster}/backoffice/auth/check-sso
+    contentType: plaintext
+    headers:
+      cookie: ${incoming.headers.cookie}
+    plaintext: "customJwtCookie"
+  result: res
+  next: check_cookie_info_response
+
 get_cookie_info:
   call: http.post
   args:
