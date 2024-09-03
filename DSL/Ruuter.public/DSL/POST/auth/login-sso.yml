@@ -1,0 +1,24 @@
+log_master:
+  log: ${incoming.eval.ssoMaster}
+
+
+check_for_cookie:
+  switch:
+    - condition: ${(incoming.headers == null || incoming.headers.cookie == null) && incoming.eval.ssoMaster != null }
+      next: redirect_sso
+  next: redirect_classic
+
+redirect_sso:
+  headers:
+    Location: ${incoming.eval.ssoMaster}
+  status: 302
+  return: "sso_login"
+  next: end
+
+redirect_classic:
+  headers:
+    Location: "/"
+  status: 302
+  return: "sso_error"
+
+

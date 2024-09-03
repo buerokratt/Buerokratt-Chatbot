@@ -1,0 +1,31 @@
+log_cookie_step:
+  log: ${incoming.headers.cookie}
+
+log_header_step:
+  log: ${incoming.headers.referer}
+
+check_for_cookie:
+  switch:
+    - condition: ${incoming.headers == null || incoming.headers.cookie == null}
+      next: return_fail
+  next: return_cookie_if_exists
+    
+return_cookie_if_exists:
+  headers:
+    Location: ${incoming.headers.referer}_success
+    "Set-Cookie":
+      customJwtCookie: ${incoming.headers.cookie} 
+      Domain: "[#DOMAIN]"
+      Secure: true
+      HttpOnly: true
+      SameSite: "Lax"
+  status: 302
+  return: ${incoming.headers.cookie}
+  next: end
+
+return_fail:
+  headers:
+    Location: ${incoming.headers.referer}_failure
+  status: 302
+  return: "error"
+  
