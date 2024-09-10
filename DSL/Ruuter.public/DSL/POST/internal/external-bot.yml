@@ -26,7 +26,7 @@ get_last_6_messages:
 
 format_messages_for_llm:
   assign:
-    formattedMessages: "${get_last_6_messages_result.response.body.map(msg => `${msg.customer_support_display_name || 'User'}: ${msg.last_message}`).join('|||')}"
+    formattedMessages: "${get_last_6_messages_result.response.body.map(function(msg) { return (msg.customer_support_display_name || 'User') + ' - ' + msg.last_message; }).join('|||')}"
     currentDate: "${new Date().toISOString().split('T')[0]}"
   next: post_answer
 
