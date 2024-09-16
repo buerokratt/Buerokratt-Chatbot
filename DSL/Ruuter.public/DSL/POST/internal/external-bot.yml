@@ -15,18 +15,23 @@ declaration:
         type: string
         description: "Body field 'sender'"
 
-get_last_6_messages:
+get_last_3_messages:
   call: http.post
   args:
     url: "[#CHATBOT_RESQL]/get-chats-by-id"
     body:
       id: ${incoming.body.sender}
-  result: get_last_6_messages_result
+  result: get_last_3_messages_result
+  next: preprocess_messages
+
+preprocess_messages:
+  assign:
+    parsedMessages: "${JSON.parse(get_last_6_messages_result).response.body}"
   next: format_messages_for_llm
 
 format_messages_for_llm:
   assign:
-    formattedMessages: "${get_last_6_messages_result.response.body.map(msg => `${msg.customer_support_display_name || 'User'}: ${msg.last_message}`).join('|||')}"
+    formattedMessages: "${parsedMessages.map('[ (customer_support_display_name ?: \\'User\\') + \\' - \\' + last_message ]').join('|||')}"
     currentDate: "${new Date().toISOString().split('T')[0]}"
   next: post_answer
 
