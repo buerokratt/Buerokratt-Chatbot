@@ -15,13 +15,13 @@ declaration:
         type: string
         description: "Body field 'sender'"
 
-get_last_3_messages:
+get_last_6_messages:
   call: http.post
   args:
     url: "[#CHATBOT_RESQL]/get-chats-by-id"
     body:
       id: ${incoming.body.sender}
-  result: get_last_3_messages_result
+  result: get_last_6_messages_result
   next: preprocess_messages
 
 preprocess_messages:
