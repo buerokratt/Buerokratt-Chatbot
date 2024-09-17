@@ -699,7 +699,7 @@ logstepBUTTONCONTENCT:
 
 check_if_bot_message_start_with_hash:
   switch:
-    - condition: ${botMsgTxt.startsWith('#')}
+    - condition: ${botMsgTxt?.startsWith('#')}
       next: call_service
   next: convert_bot_responses_to_messages
 
@@ -799,8 +799,13 @@ convert_service_bot_responses_to_messages:
   next: add_bot_message_to_db
 
 
-
 add_bot_message_to_db:
+  switch:
+    - condition: ${converted_messages_res.response.body?.length > 0}
+      next: do_add_bot_message_to_db
+  next: return_ok
+
+do_add_bot_message_to_db: 
   call: http.post
   args:
     url: "[#CHATBOT_RESQL]/insert-bot-message"
