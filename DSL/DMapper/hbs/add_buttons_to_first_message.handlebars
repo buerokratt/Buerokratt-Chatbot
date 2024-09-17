@@ -1,0 +1,10 @@
+[
+{{#each messages}}
+{
+"text": "{{{text}}}",
+{{#if (isFirstIndex @index)}}
+"buttons": "[{{#each ../buttons}}{\"title\": \"{{{title}}}\",\"payload\": \"{{{payload}}}\"}{{#unless @last}},{{/unless}}{{/each}}]"
+{{/if}}
+}{{#unless @last}},{{/unless}}
+{{/each}}
+]

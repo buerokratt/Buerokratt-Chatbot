@@ -35,3 +35,7 @@ export function extractServiceTriggerParams(msg) {
     msg = msg.substr(0, msg.length - 1);
   return msg.split(';').splice(1).map(p => p.trim());
 }
+
+export function isFirstIndex(value) {
+  return value === 0;
+}
