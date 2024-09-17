@@ -28,12 +28,6 @@ extractRequestData:
     holidays: ${incoming.body.holidays}
     holidayNames: ${incoming.body.holidayNames}
 
-logstepINCOMINGRECUESTDATA:
-  log: ${content}
-
-
-  next: check_bot_is_active
-
 check_bot_is_active:
   call: http.post
   args:
@@ -41,7 +35,6 @@ check_bot_is_active:
     body:
       key: "is_bot_active"
   result: is_bot_active_result
-  next: check_for_bot_active_result
 
 check_for_bot_active_result:
   switch:
@@ -56,9 +49,6 @@ get_bot_name:
     body:
       key: "bot_institution_id"
   result: get_bot_name_result
-logstepBOTID:
-  log: ${get_bot_name_result}
-  next: check_for_bot_name_result
 
 check_for_bot_name_result:
   switch:
@@ -94,7 +84,7 @@ decode_content_to_be_sent_to_bot:
 skip_rasa_switch:
   switch:
     - condition: ${content.match(/^#revenue/) != null}
-      next: LOGSTEPREVENUE2
+      next: common_service_revenue2
     - condition: ${content.match(/^#employees/) != null}
       next: common_service2
     - condition: ${content.match(/^#taxes/) != null}
@@ -118,24 +108,6 @@ post_message_to_bot:
       sender: ${chatId}
       message: ${decodedContent}
   result: post_message_to_bot_result
-
-logstep:
-  log: ${post_message_to_bot_result}
-
-logstep2:
-  log: ${post_message_to_bot_result.response.body?.[0]?.text}
-
-logstep3:
-  log: ${post_message_to_bot_result.response.body}
-
-logstep4:
-  log: ${decodedContent}
-
-logstep5:
-  log: ${content}
-
-logstep6:
-  log: ${chatId}
 
 check_for_post_message_to_bot_result:
   switch:
@@ -179,7 +151,7 @@ common_service1:
 common_service2:
   call: http.post
   args:
-    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/employees"
+    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL]/common/services/companies/employees"
     body:
       message: ${content.match(/^#employees (.*)/)[1]}
   result: post_message_to_bot_result
@@ -188,21 +160,18 @@ common_service2:
 common_service_revenue1:
   call: http.post
   args:
-    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/search"
+    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL]/common/services/companies/search"
     body:
-      message: ${post_message_to_bot_result.response.body?.[0]?.text.match(/^REVENUEOPENSEARCH(.*)/)}
+      name: ${post_message_to_bot_result.response.body?.[0]?.text.match(/^REVENUEOPENSEARCH(.*)/)}
   result: common_service_revenue1_result
   next: extract_bot_responses_revenue_with_buttons
-
-LOGSTEPREVENUE2:
-  log: ${content.match(/^#revenue (.*)/)[1]}
 
 common_service_revenue2:
   call: http.post
   args:
-    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/revenue"
+    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL]/common/services/companies/revenue"
     body:
-      message: ${content.match(/^#revenue (.*)/)[1]}
+      registry_code: "${content.match(/^#revenue (.*)/)[1]}"
   result: post_message_to_bot_result
   next: extract_bot_responses_opensearch
 
@@ -232,12 +201,6 @@ common_service_workforce_tax1:
       message: ${post_message_to_bot_result.response.body?.[0]?.text.match(/^WORKFORCETAXOPENSEARCH(.*)/)}
   result: common_service_revenue1_result
   next: extract_bot_responses_workforce_tax_with_buttons
-
-logstepTAX2:
-  log: ${common_service_workforce_tax1_result}
-
-logstepTAX2_2:
-  log: ${common_service_workforce_tax1_result.companies[0]}
 
 common_service_workforce_tax2:
   call: http.post
@@ -468,54 +431,58 @@ add_chat_id_to_queue_notification_node:
 
 extract_bot_responses_opensearch:
   assign:
-    botMsg: ${post_message_to_bot_result.response.body}
+    botMsg: ${[post_message_to_bot_result.response.body.response]}
   next: convert_bot_responses_to_messages
 
 extract_bot_responses:
   assign:
     botMsg: ${post_message_to_bot_result.response.body}
     botMsgTxt: ${post_message_to_bot_result.response.body?.[0]?.text}
-  next: check_if_bot_message_start_with_hash
+  next: convert_bot_responses_to_messages
 
 extract_bot_responses_revenue_with_buttons:
   assign:
-    buttons: "$=common_service_revenue1_result?.companies.map((company) => {return {title: company.name, payload: '#revenue '+ company.registry_code} });="
-  next: mergeBotMessageWithButtons
+    buttonPrefix: "#revenue"
+  next: extract_companies
 
 extract_bot_responses_service1_with_buttons:
   assign:
-    buttons: "$=common_service_revenue1_result?.companies.map((company) => {return {title: company.name, payload: '#employees '+ company.registry_code} });="
-  next: mergeBotMessageWithButtons
+    buttonPrefix: "#employees"
+  next: extract_companies
 
 extract_bot_responses_national_tax_with_buttons:
   assign:
-    buttons: "$=common_service_revenue1_result?.companies.map((company) => {return {title: company.name, payload: '#taxes '+ company.registry_code} });="
-  next: mergeBotMessageWithButtons
+    buttonPrefix: "#taxes"
+  next: extract_companies
 
 extract_bot_responses_workforce_tax_with_buttons:
   assign:
-    buttons: "$=common_service_revenue1_result?.companies.map((company) => {return {title: company.name, payload: '#workforcetaxes '+ company.registry_code} });="
-  next: mergeBotMessageWithButtons
+    buttonPrefix: "#workforcetaxes"
+  next: extract_companies
 
 extract_bot_responses_beneficiaries_with_buttons:
   assign:
-    buttons: "$=common_service_revenue1_result?.companies.map((company) => {return {title: company.name, payload: '#beneficiaries '+ company.registry_code} });="
-  next: mergeBotMessageWithButtons
+    buttonPrefix: "#beneficiaries"
+  next: extract_companies
 
 extract_bot_responses_related_people_with_buttons:
   assign:
-    buttons: "$=common_service_revenue1_result?.companies.map((company) => {return {title: company.name, payload: '#relatedpersons '+ company.registry_code} });="
-  next: mergeBotMessageWithButtons
+    buttonPrefix: "#relatedpersons"
+  next: extract_companies
 
 extract_bot_responses_company_details_with_buttons:
   assign:
-    buttons: "$=common_service_revenue1_result?.companies.map((company) => {return {title: company.name, payload: '#companydata '+ company.registry_code} });="
-  next: mergeBotMessageWithButtons
+    buttonPrefix: "#companydata"
+  next: extract_companies
 
 extract_bot_responses_simple_company_with_buttons:
   assign:
-    buttons: "$=common_service_revenue1_result?.companies.map((company) => {return {title: company.name, payload: '#companydatasimple '+ company.registry_code} });="
-  next: mergeBotMessageWithButtons
+    buttonPrefix: "#companydatasimple"
+  next: extract_companies
+
+extract_companies:
+  assign:
+    companies: ${common_service_revenue1_result.response.body.response.companies}
 
 addButtonsToFirstBotMessage:
   call: http.post
@@ -524,45 +491,15 @@ addButtonsToFirstBotMessage:
     headers:
       type: json
     body:
-      data:
-        messages: ${post_message_to_bot_result.response.body}
-        buttons: ${buttons}
+      messages: ${post_message_to_bot_result.response.body}
+      ignoreTexts: ["OPENSEARCH", "REVENUEOPENSEARCH", "NATIONALTAXOPENSEARCH", "WORKFORCETAXOPENSEARCH", "BENEFICIARIESOPENSEARCH", "RELATEDPEOPLEOPENSEARCH", "COMPANYDETAILSOPENSEARCH", "SIMPLECOMPANYOPENSEARCH"]
+      prefix: ${buttonPrefix}
+      companies: ${companies}
   result: merged_messages_res
 
 extractMergedResult:
   assign:
     botMsg: ${merged_messages_res.response.body}
-  next: convert_bot_responses_to_messages
-
-
-check_if_bot_message_start_with_hash:
-  switch:
-    - condition: ${botMsgTxt?.startsWith('#')}
-      next: call_service
-  next: convert_bot_responses_to_messages
-
-call_service:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL]/internal/initiate-service"
-    body:
-      msg: ${botMsg}
-  result: call_service_result
-
-logstepAnswerFromService3:
-  log: ${call_service_result}
-  next: convert_service_bot_responses_to_messages
-
-check_if_call_service_result_is_ok:
-  switch:
-    - condition: ${call_service_result != "service_currently_unavailable"}
-      next: return_ok
-  next: trigger_service_is_not_exist
-
-trigger_service_is_not_exist:
-  assign:
-    botMsgPlaceholder: { "temp": [{"text":"service_currently_unavailable"}] }
-    botMsg: ${botMsgPlaceholder.temp}
 
 convert_bot_responses_to_messages:
   call: http.post
@@ -603,27 +540,6 @@ convert_fallback_bot_responses_to_messages:
         }
   result: converted_messages_res
   next: add_bot_message_to_db
-
-convert_service_bot_responses_to_messages:
-  call: http.post
-  args:
-    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/bot_responses_to_messages"
-    headers:
-      type: json
-    body:
-      data:
-        {
-          "botMessages": "${call_service_result}",
-          "chatId": "${chatId}",
-          "authorId": "${get_bot_name_result.response.body[0].value}",
-          "authorFirstName": "",
-          "authorLastName": "",
-          "authorTimestamp": "${new Date().toISOString()}",
-          "created": "${new Date().toISOString()}",
-        }
-  result: converted_messages_res
-  next: add_bot_message_to_db
-
 
 add_bot_message_to_db:
   switch:
@@ -683,9 +599,4 @@ return_bot_is_not_active:
 return_bad_request:
   status: 400
   return: "Bad Request"
-  next: end
-
-return_incorrect_request:
-  status: 400
-  return: "Required parameter(s) missing"
   next: end

@@ -39,3 +39,11 @@ export function extractServiceTriggerParams(msg) {
 export function isFirstIndex(value) {
   return value === 0;
 }
+
+export function choose(a, b) {
+  return a ? a :  b;
+}
+
+export function ignoreBlacklist(value, blacklist) {
+  return blacklist?.includes(value) ? "" : value;
+}
