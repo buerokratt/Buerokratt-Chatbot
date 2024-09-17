@@ -18,15 +18,29 @@ declaration:
 get_last_6_messages:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/get-chats-by-id"
+    url: "[#CHATBOT_RESQL]/get-last-6-messages-by-id"
     body:
       id: ${incoming.body.sender}
   result: get_last_6_messages_result
   next: format_messages_for_llm
 
 format_messages_for_llm:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/backoffice/hbs/format-messages-for-llm"
+    headers:
+      type: json
+    body:
+      names: ${get_last_6_messages_result.response.body.map{"customer_support_display_name"}}
+      messages: ${get_last_6_messages_result.response.body.map{"last_message"}}
+  result: formattedMessages
+
+logstepFormattedResponse:
+  log: ${formattedMessages.response.body}
+
+assignData:
   assign:
-    formattedMessages: "${get_last_6_messages_result.response.body.map('[ (customer_support_display_name ?: \\'User\\') + \\' - \\' + last_message ]').join('|||')}"
+    formattedMessages: "${formattedMessages.response.body}"
     currentDate: "${new Date().toISOString().split('T')[0]}"
   next: post_answer
 
