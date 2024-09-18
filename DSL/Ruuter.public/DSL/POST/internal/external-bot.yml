@@ -15,8 +15,32 @@ declaration:
         type: string
         description: "Body field 'sender'"
 
-getting_time:
+get_last_6_messages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-last-6-messages-by-id"
+    body:
+      id: ${incoming.body.sender}
+  result: get_last_6_messages_result
+  next: format_messages_for_llm
+
+format_messages_for_llm:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/backoffice/hbs/format-messages-for-llm"
+    headers:
+      type: json
+    body:
+      names: ${get_last_6_messages_result.response.body.map{"customer_support_display_name"}}
+      messages: ${get_last_6_messages_result.response.body.map{"last_message"}}
+  result: formattedMessages
+
+logstepFormattedResponse:
+  log: ${formattedMessages.response.body}
+
+assignData:
   assign:
+    formattedMessages: "${formattedMessages.response.body}"
     currentDate: "${new Date().toISOString().split('T')[0]}"
   next: post_answer
 
@@ -50,7 +74,7 @@ post_answer:
         - "role": "system"
           "content": "You are a government AI assistant with general questions. All the answers MUST be in Estonian. If the question is in any other language than in Estonian, then translate the question into Estonian and the answer MUST also be in Estonian. Today's date is ${currentDate}."
         - "role": "user"
-          "content": ${incoming.body.message}
+          "content": ${formattedMessages}
       temperature: 0
       top_p: 1
       max_tokens: 1000
