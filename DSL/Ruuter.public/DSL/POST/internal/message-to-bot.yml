@@ -151,7 +151,7 @@ common_service1:
 common_service2:
   call: http.post
   args:
-    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL]/common/services/companies/employees"
+    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/employees"
     body:
       message: ${content.match(/^#employees (.*)/)[1]}
   result: post_message_to_bot_result
@@ -160,7 +160,7 @@ common_service2:
 common_service_revenue1:
   call: http.post
   args:
-    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL]/common/services/companies/search"
+    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/search"
     body:
       name: ${post_message_to_bot_result.response.body?.[0]?.text.match(/^REVENUEOPENSEARCH(.*)/)}
   result: common_service_revenue1_result
@@ -169,7 +169,7 @@ common_service_revenue1:
 common_service_revenue2:
   call: http.post
   args:
-    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL]/common/services/companies/revenue"
+    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/revenue"
     body:
       registry_code: "${content.match(/^#revenue (.*)/)[1]}"
   result: post_message_to_bot_result
