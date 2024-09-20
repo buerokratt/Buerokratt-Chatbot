@@ -27,13 +27,6 @@ extractRequestData:
     content: ${incoming.body.content ?? ""}
     holidays: ${incoming.body.holidays}
     holidayNames: ${incoming.body.holidayNames}
-    buttons: []
-
-logstepINCOMINGRECUESTDATA:
-  log: ${content}
-
-
-  next: check_bot_is_active
 
 check_bot_is_active:
   call: http.post
@@ -42,7 +35,6 @@ check_bot_is_active:
     body:
       key: "is_bot_active"
   result: is_bot_active_result
-  next: check_for_bot_active_result
 
 check_for_bot_active_result:
   switch:
@@ -57,9 +49,6 @@ get_bot_name:
     body:
       key: "bot_institution_id"
   result: get_bot_name_result
-logstepBOTID:
-  log: ${get_bot_name_result}
-  next: check_for_bot_name_result
 
 check_for_bot_name_result:
   switch:
@@ -94,21 +83,21 @@ decode_content_to_be_sent_to_bot:
 
 skip_rasa_switch:
   switch:
-    - condition: ${content.match(/^SKIPRASA1/) != null}
-      next: LOGSTEPREVENUE2
-    - condition: ${content.match(/^SKIPRASA2/) != null}
+    - condition: ${content.match(/^#revenue/) != null}
+      next: common_service_revenue2
+    - condition: ${content.match(/^#employees/) != null}
       next: common_service2
-    - condition: ${content.match(/^SKIPRASA3/) != null}
+    - condition: ${content.match(/^#taxes/) != null}
       next: common_service_national_tax2
-    - condition: ${content.match(/^SKIPRASA4/) != null}
+    - condition: ${content.match(/^#workforcetaxes/) != null}
       next: common_service_workforce_tax2
-    - condition: ${content.match(/^SKIPRASA5/) != null}
+    - condition: ${content.match(/^#beneficiaries/) != null}
       next: common_service_beneficiaries2
-    - condition: ${content.match(/^SKIPRASA6/) != null}
+    - condition: ${content.match(/^#relatedpersons/) != null}
       next: common_service_related_people2
-    - condition: ${content.match(/^SKIPRASA7/) != null}
+    - condition: ${content.match(/^#companydata/) != null}
       next: common_service_company_details2
-    - condition: ${content.match(/^SKIPRASA8/) != null}
+    - condition: ${content.match(/^#companydatasimple/) != null}
       next: common_service_simple_company2
 
 post_message_to_bot:
@@ -119,12 +108,6 @@ post_message_to_bot:
       sender: ${chatId}
       message: ${decodedContent}
   result: post_message_to_bot_result
-
-logstep:
-  log: ${post_message_to_bot_result}
-
-logstep2:
-  log: ${post_message_to_bot_result.response.body?.[0]?.text}
 
 check_for_post_message_to_bot_result:
   switch:
@@ -170,7 +153,7 @@ common_service2:
   args:
     url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/employees"
     body:
-      message: ${content.match(/^SKIPRASA2 (.*)/)[1]}
+      message: ${content.match(/^#employees (.*)/)[1]}
   result: post_message_to_bot_result
   next: extract_bot_responses_opensearch
 
@@ -179,26 +162,16 @@ common_service_revenue1:
   args:
     url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/search"
     body:
-      message: ${post_message_to_bot_result.response.body?.[0]?.text.match(/^REVENUEOPENSEARCH(.*)/)}
+      name: ${post_message_to_bot_result.response.body?.[0]?.text.match(/^REVENUEOPENSEARCH(.*)/)}
   result: common_service_revenue1_result
-
-logstepREVENUE1:
-  log: ${common_service_revenue1_result.response.body.response.companies}
   next: extract_bot_responses_revenue_with_buttons
-
-#  switch:
-#    - condition: ${common_service_revenue1_result.response.body.response.companies.length > 1}
-#      next: extract_bot_responses_revenue
-
-LOGSTEPREVENUE2:
-  log: ${content.match(/^SKIPRASA1 (.*)/)[1]}
 
 common_service_revenue2:
   call: http.post
   args:
     url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/revenue"
     body:
-      message: ${content.match(/^SKIPRASA1 (.*)/)[1]}
+      registry_code: "${content.match(/^#revenue (.*)/)[1]}"
   result: post_message_to_bot_result
   next: extract_bot_responses_opensearch
 
@@ -216,7 +189,7 @@ common_service_national_tax2:
   args:
     url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/national-taxes"
     body:
-      message: ${content.match(/^SKIPRASA3 (.*)/)[1]}
+      message: ${content.match(/^#taxes (.*)/)[1]}
   result: post_message_to_bot_result
   next: extract_bot_responses_opensearch
 
@@ -229,17 +202,12 @@ common_service_workforce_tax1:
   result: common_service_revenue1_result
   next: extract_bot_responses_workforce_tax_with_buttons
 
-logstepTAX2:
-  log: ${common_service_workforce_tax1_result}
-logstepTAX2_2:
-  log: ${common_service_workforce_tax1_result.response.body.response.companies[0]}
-
 common_service_workforce_tax2:
   call: http.post
   args:
     url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/work-force-taxes"
     body:
-      message: ${content.match(/^SKIPRASA4 (.*)/)[1]}
+      message: ${content.match(/^#workforcetaxes (.*)/)[1]}
   result: post_message_to_bot_result
   next: extract_bot_responses_opensearch
 
@@ -257,7 +225,7 @@ common_service_beneficiaries2:
   args:
     url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/company-beneficial-owners"
     body:
-      message: ${content.match(/^SKIPRASA5 (.*)/)[1]}
+      message: ${content.match(/^#beneficiaries (.*)/)[1]}
   result: post_message_to_bot_result
   next: extract_bot_responses_opensearch
 
@@ -275,7 +243,7 @@ common_service_related_people2:
   args:
     url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/company-related-persons"
     body:
-      message: ${content.match(/^SKIPRASA6 (.*)/)[1]}
+      message: ${content.match(/^#relatedpersons (.*)/)[1]}
   result: post_message_to_bot_result
   next: extract_bot_responses_opensearch
 
@@ -293,7 +261,7 @@ common_service_company_details2:
   args:
     url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/detailed-company-data"
     body:
-      message: ${content.match(/^SKIPRASA7 (.*)/)[1]}
+      message: ${content.match(/^#companydata (.*)/)[1]}
   result: post_message_to_bot_result
   next: extract_bot_responses_opensearch
 
@@ -311,7 +279,7 @@ common_service_simple_company2:
   args:
     url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/simple-company-data"
     body:
-      message: ${content.match(/^SKIPRASA8 (.*)/)[1]}
+      message: ${content.match(/^#companydatasimple (.*)/)[1]}
   result: post_message_to_bot_result
   next: extract_bot_responses_opensearch
 
@@ -327,13 +295,13 @@ check_for_fallback_bot:
 
 check_for_fallback_bot_result:
   switch:
-    - condition: ${200 <= fallback_bot_result.response.statusCodeValue && fallback_bot_result.response.statusCodeValue < 300}
+    - condition: ${200 <= fallback_bot_result.statusCodeValue && fallback_bot_result.statusCodeValue < 300}
       next: check_if_fallback_bot_is_unable_to_reply
   next: return_bot_error
 
 check_if_fallback_bot_is_unable_to_reply:
   switch:
-    - condition: ${fallback_bot_result.response.body.response == 'ERROR'}
+    - condition: ${fallback_bot_result == 'ERROR'}
       next: check_if_user_wants_csa
   next: convert_fallback_bot_responses_to_messages
 
@@ -461,133 +429,82 @@ add_chat_id_to_queue_notification_node:
       id: ${chatId}
   result: add_chat_id_to_queue_notification_node_res
 
-extract_bot_responses_opensearch:
+extract_bot_responses_after_redirect_to_back_office:
   assign:
     botMsg: ${post_message_to_bot_result.response.body}
   next: convert_bot_responses_to_messages
+
+extract_bot_responses_opensearch:
+  assign:
+    botMsg: ${[post_message_to_bot_result.response.body.response]}
+  next: convert_bot_responses_to_messages
+
 extract_bot_responses:
   assign:
     botMsg: ${post_message_to_bot_result.response.body}
     botMsgTxt: ${post_message_to_bot_result.response.body?.[0]?.text}
-
-logstepBOTMSG294:
-  log: ${botMsg}
-  next: check_if_bot_message_start_with_hash
-
-extract_bot_responses_employees:
-  assign:
-    botMsg: ${common_service2_result.response.body}
-    botMsgTxt: ${common_service2_result.response.body.result}
   next: convert_bot_responses_to_messages
 
-#extract_bot_responses_revenue:
-#  switch:
-#    - condition: ${common_service_revenue2_result != null}
-#      next: extract_bot_responses_revenue_without_buttons
 extract_bot_responses_revenue_with_buttons:
   assign:
-    buttons: "$=common_service_revenue1_result.response.body.response?.companies.map((company) => {return {title: company.name, payload: 'SKIPRASA1 '+ company.registry_code} });="
-    botMsg: ${post_message_to_bot_result.response.body}
-  next: logstepBUTTONCONTENCT
+    buttonPrefix: "#revenue"
+  next: extract_companies
 
 extract_bot_responses_service1_with_buttons:
   assign:
-    buttons: "$=common_service_revenue1_result.response.body.response?.companies.map((company) => {return {title: company.name, payload: 'SKIPRASA2 '+ company.registry_code} });="
-    botMsg: ${post_message_to_bot_result.response.body}
-  next: logstepBUTTONCONTENCT
+    buttonPrefix: "#employees"
+  next: extract_companies
 
 extract_bot_responses_national_tax_with_buttons:
   assign:
-    buttons: "$=common_service_revenue1_result.response.body.response?.companies.map((company) => {return {title: company.name, payload: 'SKIPRASA3 '+ company.registry_code} });="
-    botMsg: ${post_message_to_bot_result.response.body}
-  next: logstepBUTTONCONTENCT
+    buttonPrefix: "#taxes"
+  next: extract_companies
 
 extract_bot_responses_workforce_tax_with_buttons:
   assign:
-    buttons: "$=common_service_revenue1_result.response.body.response?.companies.map((company) => {return {title: company.name, payload: 'SKIPRASA4 '+ company.registry_code} });="
-    botMsg: ${post_message_to_bot_result.response.body}
-  next: logstepBUTTONCONTENCT
+    buttonPrefix: "#workforcetaxes"
+  next: extract_companies
 
 extract_bot_responses_beneficiaries_with_buttons:
   assign:
-    buttons: "$=common_service_revenue1_result.response.body.response?.companies.map((company) => {return {title: company.name, payload: 'SKIPRASA5 '+ company.registry_code} });="
-    botMsg: ${post_message_to_bot_result.response.body}
-  next: logstepBUTTONCONTENCT
+    buttonPrefix: "#beneficiaries"
+  next: extract_companies
 
 extract_bot_responses_related_people_with_buttons:
   assign:
-    buttons: "$=common_service_revenue1_result.response.body.response?.companies.map((company) => {return {title: company.name, payload: 'SKIPRASA6 '+ company.registry_code} });="
-    botMsg: ${post_message_to_bot_result.response.body}
-  next: logstepBUTTONCONTENCT
+    buttonPrefix: "#relatedpersons"
+  next: extract_companies
 
 extract_bot_responses_company_details_with_buttons:
   assign:
-    buttons: "$=common_service_revenue1_result.response.body.response?.companies.map((company) => {return {title: company.name, payload: 'SKIPRASA7 '+ company.registry_code} });="
-    botMsg: ${post_message_to_bot_result.response.body}
-  next: logstepBUTTONCONTENCT
+    buttonPrefix: "#companydata"
+  next: extract_companies
 
 extract_bot_responses_simple_company_with_buttons:
   assign:
-    buttons: "$=common_service_revenue1_result.response.body.response?.companies.map((company) => {return {title: company.name, payload: 'SKIPRASA8 '+ company.registry_code} });="
-    botMsg: ${post_message_to_bot_result.response.body}
-  next: logstepBUTTONCONTENCT
+    buttonPrefix: "#companydatasimple"
+  next: extract_companies
 
-logstepBUTTONCONTENCT:
-  log: ${buttons}
-  next: convert_bot_responses_to_messages
+extract_companies:
+  assign:
+    companies: ${common_service_revenue1_result.response.body.response.companies}
 
-#extract_bot_responses_revenue_without_buttons:
-#  assign:
-#    buttons: []
-#    botMsg: ${common_service_revenue2_result.response.body}
-#    botMsgTxt: ${common_service_revenue2_result.response.body.result}
-#  next: convert_bot_responses_to_messages
-#
-#
-#extract_bot_responses_national_tax:
-#  assign:
-#    botMsg: ${common_service_national_tax2_result.response.body}
-#    botMsgTxt: ${common_service_national_tax2_result.response.body.result}
-#  next: convert_bot_responses_to_messages
-#
-#extract_bot_responses_workforce_tax:
-#  assign:
-#    botMsg: ${common_service_workforce_tax2_result.response.body}
-#    botMsgTxt: ${common_service_workforce_tax2_result.response.body.result}
-#  next: convert_bot_responses_to_messages
-
-check_if_bot_message_start_with_hash:
-  switch:
-    - condition: ${botMsgTxt.startsWith('#')}
-      next: call_service
-  next: convert_bot_responses_to_messages
-
-call_service:
+addButtonsToFirstBotMessage:
   call: http.post
   args:
-    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL]/internal/initiate-service"
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/add_buttons_to_first_message"
+    headers:
+      type: json
     body:
-      msg: ${botMsg}
-  result: call_service_result
+      messages: ${post_message_to_bot_result.response.body}
+      ignoreTexts: ["OPENSEARCH", "REVENUEOPENSEARCH", "NATIONALTAXOPENSEARCH", "WORKFORCETAXOPENSEARCH", "BENEFICIARIESOPENSEARCH", "RELATEDPEOPLEOPENSEARCH", "COMPANYDETAILSOPENSEARCH", "SIMPLECOMPANYOPENSEARCH"]
+      prefix: ${buttonPrefix}
+      companies: ${companies}
+  result: merged_messages_res
 
-logstepAnswerFromService:
-  log: ${call_service_result.response}
-logstepAnswerFromService2:
-  log: ${call_service_result.response.body}
-logstepAnswerFromService3:
-  log: ${call_service_result.response.body.response}
-  next: convert_service_bot_responses_to_messages
-
-check_if_call_service_result_is_ok:
-  switch:
-    - condition: ${call_service_result.response.body.response != "service_currently_unavailable"}
-      next: return_ok
-  next: trigger_service_is_not_exist
-
-trigger_service_is_not_exist:
+extractMergedResult:
   assign:
-    botMsgPlaceholder: { "temp": [{"text":"service_currently_unavailable", "recipient_id": "${chatId}"}] }
-    botMsg: ${botMsgPlaceholder.temp}
+    botMsg: ${merged_messages_res.response.body}
 
 convert_bot_responses_to_messages:
   call: http.post
@@ -599,7 +516,6 @@ convert_bot_responses_to_messages:
       data:
         {
           "botMessages": "${botMsg}",
-          "buttons": "${buttons}",
           "chatId": "${chatId}",
           "authorId": "${get_bot_name_result.response.body[0].value}",
           "authorFirstName": "",
@@ -608,10 +524,6 @@ convert_bot_responses_to_messages:
           "created": "${new Date().toISOString()}",
         }
   result: converted_messages_res
-#  next: add_bot_message_to_db
-
-logstepCONVERTBOTMSG:
-  log: ${converted_messages_res}
   next: add_bot_message_to_db
 
 convert_fallback_bot_responses_to_messages:
@@ -623,7 +535,7 @@ convert_fallback_bot_responses_to_messages:
     body:
       data:
         {
-          "botMessages": "${fallback_bot_result.response.body.response}",
+          "botMessages": "${fallback_bot_result}",
           "chatId": "${chatId}",
           "authorId": "${get_bot_name_result.response.body[0].value}",
           "authorFirstName": "",
@@ -633,30 +545,14 @@ convert_fallback_bot_responses_to_messages:
         }
   result: converted_messages_res
   next: add_bot_message_to_db
-
-convert_service_bot_responses_to_messages:
-  call: http.post
-  args:
-    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/bot_responses_to_messages"
-    headers:
-      type: json
-    body:
-      data:
-        {
-          "botMessages": "${call_service_result.response.body.response}",
-          "chatId": "${chatId}",
-          "authorId": "${get_bot_name_result.response.body[0].value}",
-          "authorFirstName": "",
-          "authorLastName": "",
-          "authorTimestamp": "${new Date().toISOString()}",
-          "created": "${new Date().toISOString()}",
-        }
-  result: converted_messages_res
-  next: add_bot_message_to_db
-
-
 
 add_bot_message_to_db:
+  switch:
+    - condition: ${converted_messages_res.response.body?.length > 0}
+      next: do_add_bot_message_to_db
+  next: return_ok
+
+do_add_bot_message_to_db: 
   call: http.post
   args:
     url: "[#CHATBOT_RESQL]/insert-bot-message"
@@ -708,9 +604,4 @@ return_bot_is_not_active:
 return_bad_request:
   status: 400
   return: "Bad Request"
-  next: end
-
-return_incorrect_request:
-  status: 400
-  return: "Required parameter(s) missing"
   next: end

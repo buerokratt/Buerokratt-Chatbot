@@ -2,8 +2,8 @@
 {{#each data.botMessages}}
 {
 "chatId": "{{../data.chatId}}",
-"content": "{{{text}}}",
-"buttons": "[{{#each ../data.buttons}}{\"title\": \"{{{title}}}\",\"payload\": \"{{{payload}}}\"}{{#unless @last}},{{/unless}}{{/each}}]",
+"content": "{{{choose text result}}}",
+"buttons": "[{{#each buttons}}{\"title\": \"{{{title}}}\",\"payload\": \"{{{payload}}}\"}{{#unless @last}},{{/unless}}{{/each}}]",
 "authorTimestamp": "{{../data.authorTimestamp}}",
 "authorId": "{{../data.authorId}}",
 "authorFirstName": "{{../data.authorFirstName}}",
