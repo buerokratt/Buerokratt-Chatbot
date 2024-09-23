@@ -86,7 +86,6 @@ services:
       - ./DSL:/data
       - ./DSL/DMapper/hbs:/workspace/app/views/chat-bot
       - ./DSL/DMapper/js:/workspace/app/js/chat-bot
-      - ./DSL/DMapper/lib/helpers.js:/workspace/app/lib/helpers.js
     ports:
       - 3000:3000
     networks:
