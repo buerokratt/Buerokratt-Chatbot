@@ -245,7 +245,7 @@ common_service_related_people2:
     body:
       message: ${content.match(/^#relatedpersons (.*)/)[1]}
   result: post_message_to_bot_result
-  next: extract_bot_responses_opensearch_persons
+  next: extract_bot_responses_opensearch
 
 common_service_company_details1:
   call: http.post
@@ -436,11 +436,6 @@ extract_bot_responses_opensearch:
     botMsg: ${[post_message_to_bot_result.response.body.response]}
   next: convert_bot_responses_to_messages
 
-extract_bot_responses_opensearch_persons:
-  assign:
-    botMsg: ${[post_message_to_bot_result.response.body.response]}
-  next: convert_bot_responses_to_messages_persons
-
 extract_bot_responses:
   assign:
     botMsg: ${post_message_to_bot_result.response.body}
@@ -522,26 +517,6 @@ convert_bot_responses_to_messages:
   call: http.post
   args:
     url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/bot_responses_to_messages"
-    headers:
-      type: json
-    body:
-      data:
-        {
-          "botMessages": "${botMsg}",
-          "chatId": "${chatId}",
-          "authorId": "${get_bot_name_result.response.body[0].value}",
-          "authorFirstName": "",
-          "authorLastName": "",
-          "authorTimestamp": "${new Date().toISOString()}",
-          "created": "${new Date().toISOString()}",
-        }
-  result: converted_messages_res
-  next: add_bot_message_to_db
-
-convert_bot_responses_to_messages_persons:
-  call: http.post
-  args:
-    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/filter-company-related-persons"
     headers:
       type: json
     body:
