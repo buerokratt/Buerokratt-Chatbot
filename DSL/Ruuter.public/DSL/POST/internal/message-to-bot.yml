@@ -95,7 +95,7 @@ skip_rasa_switch:
       next: common_service_beneficiaries2
     - condition: ${content.match(/^#relatedpersons/) != null}
       next: common_service_related_people2
-    - condition: ${content.match(/^#companydata/) != null}
+    - condition: ${content.match(/^#companycontacts/) != null}
       next: common_service_company_details2
     - condition: ${content.match(/^#companydatasimple/) != null}
       next: common_service_simple_company2
@@ -261,9 +261,9 @@ common_service_company_details2:
   args:
     url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/detailed-company-data"
     body:
-      message: ${content.match(/^#companydata (.*)/)[1]}
+      message: ${content.match(/^#companycontacts (.*)/)[1]}
   result: post_message_to_bot_result
-  next: extract_bot_responses_opensearch
+  next: extract_bot_responses_opensearch_contacts
 
 common_service_simple_company1:
   call: http.post
@@ -441,6 +441,11 @@ extract_bot_responses_opensearch_persons:
     botMsg: ${[post_message_to_bot_result.response.body.response]}
   next: convert_bot_responses_to_messages_persons
 
+extract_bot_responses_opensearch_contacts:
+  assign:
+    botMsg: ${[post_message_to_bot_result.response.body.response]}
+  next: convert_bot_responses_to_messages_contacts
+
 extract_bot_responses:
   assign:
     botMsg: ${post_message_to_bot_result.response.body}
@@ -479,7 +484,7 @@ extract_bot_responses_related_people_with_buttons:
 
 extract_bot_responses_company_details_with_buttons:
   assign:
-    buttonPrefix: "#companydata"
+    buttonPrefix: "#companycontacts"
   next: extract_companies
 
 extract_bot_responses_simple_company_with_buttons:
@@ -542,6 +547,26 @@ convert_bot_responses_to_messages_persons:
   call: http.post
   args:
     url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/filter-company-related-persons"
+    headers:
+      type: json
+    body:
+      data:
+        {
+          "botMessages": "${botMsg}",
+          "chatId": "${chatId}",
+          "authorId": "${get_bot_name_result.response.body[0].value}",
+          "authorFirstName": "",
+          "authorLastName": "",
+          "authorTimestamp": "${new Date().toISOString()}",
+          "created": "${new Date().toISOString()}",
+        }
+  result: converted_messages_res
+  next: add_bot_message_to_db
+
+convert_bot_responses_to_messages_contacts:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/filter-contact-information-for-business-register"
     headers:
       type: json
     body:
