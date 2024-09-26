@@ -1,0 +1,14 @@
+[
+{{#each data.botMessages}}
+  {
+   "chatId": "{{../data.chatId}}",
+   "content": "{{formatDataByBusinessRegister ../data}}",
+   "buttons": "[{{#each buttons}}{\"title\": \"{{{title}}}\",\"payload\": \"{{{payload}}}\"}{{#unless @last}},{{/unless}}{{/each}}]",
+   "authorTimestamp": "{{../data.authorTimestamp}}",
+   "authorId": "{{../data.authorId}}",
+   "authorFirstName": "{{../data.authorFirstName}}",
+   "authorLastName": "{{../data.authorLastName}}",
+   "created": "{{../data.created}}"
+  }{{#unless @last}},{{/unless}}
+{{/each}}
+]
