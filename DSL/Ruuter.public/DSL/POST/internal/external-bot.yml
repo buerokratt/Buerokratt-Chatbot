@@ -22,25 +22,11 @@ get_last_6_messages:
     body:
       id: ${incoming.body.sender}
   result: get_last_6_messages_result
-  next: format_messages_for_llm
-
-format_messages_for_llm:
-  call: http.post
-  args:
-    url: "[#CHATBOT_DMAPPER]/backoffice/hbs/format-messages-for-llm"
-    headers:
-      type: json
-    body:
-      names: ${get_last_6_messages_result.response.body.map{"customer_support_display_name"}}
-      messages: ${get_last_6_messages_result.response.body.map{"last_message"}}
-  result: formattedMessages
-
-logstepFormattedResponse:
-  log: ${formattedMessages.response.body}
+  next: assignData
 
 assignData:
   assign:
-    formattedMessages: "${formattedMessages.response.body}"
+    formattedMessages: "${(get_last_6_messages_result.response.body || []).slice(0, 3).reverse().map(item => item?.lastMessage || '').join('|||')}"
     currentDate: "${new Date().toISOString().split('T')[0]}"
   next: post_answer
 
@@ -50,35 +36,41 @@ post_answer:
     url: "[#CHATBOT_EXTERNAL_BOT_URL]"
     headers:
       "Content-Type": "application/json"
-      "api-key": "[#CHATBOT_EXTERNAL_API_KEY]"
+      "api-key": "[#CHATBOT_EXTERNAL_KEY]"
     body:
-      dataSources:
-        - type: AzureCognitiveSearch
+      data_sources:
+        - type: "azure_search"
           parameters:
-            "endpoint": "[#SEARCH_ENDPOINT]"
-            "indexName": "[#SEARCH_INDEX_NAME]"
-            "semanticConfiguration": "azureml-default"
-            "queryType": "vector_semantic_hybrid"
-            "inScope": true
-            "roleInformation": "You are an AI assistant that helps people find information."
-            "filter": null
-            "strictness": 3
-            "topNDocuments": 7
-            "authentication":
-              "type": "api_key"
-              "key": "[#CHATBOT_EXTERNAL_KEY]"
-            "embeddingDependency":
-              "type": "deployment_name"
-              "deployment_name": "text-embedding-ada-002"
+            filter: null
+            endpoint: "[#SEARCH_ENDPOINT]"
+            index_name: "[#SEARCH_INDEX_NAME]"
+            semantic_configuration: "azureml-default"
+            authentication:
+              type: "api_key"
+              key: "[#CHATBOT_EXTERNAL_API_KEY]"
+            embedding_dependency:
+              type: "endpoint"
+              endpoint: "[#CHATBOT_EXTERNAL_DEPENDENCY_ENDPOINT]"
+              authentication:
+                type: "api_key"
+                key: "[#CHATBOT_EXTERNAL_KEY]"
+            query_type: "vector_semantic_hybrid"
+            in_scope: true
+            role_information: "You are an AI assistant that helps people find information."
+            strictness: 3
+            top_n_documents: 7
       messages:
-        - "role": "system"
-          "content": "You are a government AI assistant with general questions. All the answers MUST be in Estonian. If the question is in any other language than in Estonian, then translate the question into Estonian and the answer MUST also be in Estonian. Today's date is ${currentDate}."
-        - "role": "user"
-          "content": ${formattedMessages}
+        - role: "system"
+          content: "You are a government AI assistant with general questions. All the answers MUST be in Estonian. If the question is in any other language than in Estonian, then translate the question into Estonian and the answer MUST also be in Estonian. The previous context for the conversation is divided with three vertical bar symbols. You need to answer the last part. Today's date is ${currentDate}."
+        - role: "user"
+          content: ${formattedMessages}
       temperature: 0
-      top_p: 1
-      max_tokens: 1000
+      top_p: 0.95
+      max_tokens: 800
+      stop: null
       stream: false
+      frequency_penalty: 0
+      presence_penalty: 0
   result: test
 
 logstepAZUREBOT:
