@@ -11,7 +11,7 @@
     "prettier": "prettier --write \"{,!(node_modules)/**/}*.{ts,tsx,js,json,css,less,scss}\""
   },
   "dependencies": {
-    "@buerokratt-ria/header": "^0.1.13",
+    "@buerokratt-ria/header": "^0.1.14",
     "@buerokratt-ria/menu": "^0.2.0",
     "@buerokratt-ria/styles": "^0.0.1",
     "@fontsource/roboto": "^4.5.8",
