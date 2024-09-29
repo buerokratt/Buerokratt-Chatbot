@@ -1,0 +1,42 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'TRIGGER-SERVICE'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: intent
+        type: string
+        description: "intent field"
+
+assign_fields:
+  assign:
+    intent: "${incoming.body.intent}"
+
+get_service_by_intent:
+  call: http.post
+  args:
+    url: "[#TRAINING_RESQL]/get-service-trigger-by-intent"
+    body:
+      intent: ${intent}
+  result: res
+
+check_service:
+  switch:
+    - condition: ${res.response.body.length > 0}
+      next: trigger_service # TODO: Implement this service
+    - condition: ${res.response.body.length == 0}
+      next: return_not_found
+
+trigger_service:
+  call: http.post
+  args:
+    url: "[#CHATBOT_EXTERNAL_BOT_URL]" # Should point to a yaml file
+
+return_not_found:
+  status: 404
+  return: "No service found for this intent"
+  next: end
