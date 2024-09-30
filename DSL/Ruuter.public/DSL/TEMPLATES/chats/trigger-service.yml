@@ -8,35 +8,45 @@ declaration:
   namespace: backoffice
   allowlist:
     body:
-      - field: intent
+      - field: message
         type: string
-        description: "intent field"
+        description: "message field"
 
-assign_fields:
+assign_message:
   assign:
-    intent: "${incoming.body.intent}"
+    input: "${incoming.body.message.split(',').map(e => e.trim())}"
+    serviceName: ${input[0].replace('#', '')}
+    serviceInput: "${input.slice(1).length > 0 ? input.slice(1)[0] : ''}"
 
-get_service_by_intent:
-  call: http.post
-  args:
-    url: "[#TRAINING_RESQL]/get-service-trigger-by-intent"
-    body:
-      intent: ${intent}
-  result: res
-
-check_service:
+check_if_service_has_input:
   switch:
-    - condition: ${res.response.body.length > 0}
-      next: trigger_service # TODO: Implement this service
-    - condition: ${res.response.body.length == 0}
-      next: return_not_found
+    - condition: ${serviceInput.length === 0}
+      next: trigger_service    
+  next: trigger_service_with_input    
 
 trigger_service:
   call: http.post
   args:
-    url: "[#CHATBOT_EXTERNAL_BOT_URL]" # Should point to a yaml file
+    url: "[#CHATBOT_RUUTER_PUBLIC]/${serviceName}"
+  error: return_service_error
+  result: res
+  next: return_result
 
-return_not_found:
-  status: 404
-  return: "No service found for this intent"
+trigger_service_with_input:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RUUTER_PUBLIC]/${serviceName}"
+    body:
+      input: ${serviceInput} 
+  error: return_service_error  
+  result: res
+  next: return_result
+
+return_result:
+  return: ${res.response.body.response}
+  next: end
+
+return_service_error:
+  status: 400
+  return: "There was a problem triggering the service"
   next: end
