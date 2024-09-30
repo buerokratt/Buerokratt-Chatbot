@@ -617,7 +617,7 @@ convert_fallback_bot_responses_to_messages:
     body:
       data:
         {
-          "botMessages": "${fallback_bot_result}",
+          "botMessages": "${fallback_bot_result.response.body.response}",
           "chatId": "${chatId}",
           "authorId": "${get_bot_name_result.response.body[0].value}",
           "authorFirstName": "",
