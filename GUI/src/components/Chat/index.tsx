@@ -73,7 +73,7 @@ const Chat: FC<ChatProps> = ({
   const [messagesList, setMessagesList] = useState<Message[]>([]);
   const [latestPermissionMessageCreated, setLatestPermissionMessageCreated] = useState<string>();
   const [latestPermissionMessageSeconds, setLatestPermissionMessageSeconds] = useState<number>(0);
-  const [previewTypingMessage, setPreviewTypingMessage] = useState<string>();
+  const [previewTypingMessage, setPreviewTypingMessage] = useState<string | undefined>();
 
   const [newMessageEffect] = useNewMessageSound();
   const navigate = useNavigate();
@@ -524,7 +524,7 @@ const Chat: FC<ChatProps> = ({
               <div className="active-chat__messages">
                 <PreviewMessage
                   key={`preview-message`}
-                  preview={previewTypingMessage}
+                  preview={previewTypingMessage ?? ''}
                 />
               </div>
             </div>
