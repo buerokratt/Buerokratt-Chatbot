@@ -1,0 +1,22 @@
+clear_notifications:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query?conflicts=proceed"
+    body:
+      query:
+        term:
+          channelId: ${incoming.body.chatId}
+  result: clear_res
+
+notify:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
+    body:
+      channelId: ${incoming.body.chatId}
+      timestamp: ${new Date().toISOString()}
+      payload: { "type": "${incoming.body.type}", "messageId": "${incoming.body.messageId}" }
+  result: notify_res
+
+return_result:
+  return: "Notification sent"
