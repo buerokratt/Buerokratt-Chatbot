@@ -27,6 +27,7 @@ extractRequestData:
     content: ${incoming.body.content ?? ""}
     holidays: ${incoming.body.holidays}
     holidayNames: ${incoming.body.holidayNames}
+  next: check_bot_is_active
 
 check_bot_is_active:
   call: http.post
@@ -35,8 +36,9 @@ check_bot_is_active:
     body:
       key: "is_bot_active"
   result: is_bot_active_result
+  next: check_bot_activity_result
 
-check_for_bot_active_result:
+check_bot_activity_result:
   switch:
     - condition: ${is_bot_active_result.response.body[0]?.value === 'true'}
       next: get_bot_name
@@ -48,13 +50,15 @@ get_bot_name:
     url: "[#CHATBOT_RESQL]/get-configuration"
     body:
       key: "bot_institution_id"
+    error: return_bad_request
   result: get_bot_name_result
+  next: check_if_bot_name_exists
 
-check_for_bot_name_result:
+check_if_bot_name_exists:
   switch:
-    - condition: ${200 <= get_bot_name_result.response.statusCodeValue && get_bot_name_result.response.statusCodeValue < 300 && get_bot_name_result.response.body[0]?.value != null}
+    - condition: ${get_bot_name_result.response.body[0]?.value != null}
       next: get_chat
-  next: return_bad_request
+  next: return_bot_name_does_not_exist
 
 get_chat:
   call: http.post
@@ -63,13 +67,8 @@ get_chat:
     body:
       id: ${chatId}
   result: get_chat_result
-  next: check_for_get_chat_result
-
-check_for_get_chat_result:
-  switch:
-    - condition: ${200 <= get_chat_result.response.statusCodeValue && get_chat_result.response.statusCodeValue < 300}
-      next: check_chat_belongs_to_bot
-  next: return_bad_request
+  error: return_bad_request
+  next: check_chat_belongs_to_bot
 
 check_chat_belongs_to_bot:
   switch:
@@ -107,13 +106,9 @@ post_message_to_bot:
     body:
       sender: ${chatId}
       message: ${decodedContent}
+    error: return_bot_error
   result: post_message_to_bot_result
-
-check_for_post_message_to_bot_result:
-  switch:
-    - condition: ${200 <= post_message_to_bot_result.response.statusCodeValue && post_message_to_bot_result.response.statusCodeValue < 300}
-      next: check_if_bot_is_unable_to_reply
-  next: return_bot_error
+  next: check_if_bot_is_unable_to_reply
 
 check_if_bot_is_unable_to_reply:
   switch:
@@ -291,13 +286,8 @@ check_for_fallback_bot:
       sender: ${chatId}
       message: ${content}
   result: fallback_bot_result
-  next: check_for_fallback_bot_result
-
-check_for_fallback_bot_result:
-  switch:
-    - condition: ${200 <= fallback_bot_result.statusCodeValue && fallback_bot_result.statusCodeValue < 300}
-      next: check_if_fallback_bot_is_unable_to_reply
-  next: return_bot_error
+  error: return_bot_error
+  next: check_if_fallback_bot_is_unable_to_reply
 
 check_if_fallback_bot_is_unable_to_reply:
   switch:
@@ -681,6 +671,11 @@ return_chat_does_not_belong_to_bot:
 return_bot_is_not_active:
   status: 200
   return: "Bot is not active"
+  next: end
+
+return_bot_name_does_not_exist:
+  status: 200
+  return: "Bot name does not exist"
   next: end
 
 return_bad_request:
