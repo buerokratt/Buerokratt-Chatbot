@@ -1,7 +1,7 @@
 declaration:
   call: declare
   version: 0.1
-  description: "Decription placeholder for 'ENDED'"
+  description: "Decription placeholder for 'ENDED-CHATS'"
   method: post
   accepts: json
   returns: json
@@ -23,6 +23,9 @@ declaration:
       - field: sorting
         type: string
         description: "Body field 'sorting'"
+      - field: search
+        type: string
+        description: "Body field 'search'"
 
 extractRequestData:
   assign:
@@ -39,6 +42,7 @@ getEndedChats:
       page: ${incoming.body.page}
       page_size: ${incoming.body.page_size}
       sorting: ${incoming.body.sorting}
+      search: ${incoming.body.search}
   result: res
 
 returnSuccess:
