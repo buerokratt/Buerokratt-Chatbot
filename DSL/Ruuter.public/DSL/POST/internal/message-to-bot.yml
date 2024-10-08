@@ -79,33 +79,43 @@ check_chat_belongs_to_bot:
 decode_content_to_be_sent_to_bot:
   assign:
     decodedContent: ${decodeURIComponent(content)}
-
-# check_for_service:
-#   call: http.post
-#   args:
-#     url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL]/services/service-check"
-#     body:
-#       content: ${content}
-#   result: converted_messages_res
+  next: check_for_service  
 
 check_for_service:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL]/services/service-check"
+    body:
+      content: ${content}
+      chatId: ${chatId}
+      authorId: ${get_bot_name_result.response.body[0].value}
+  result: converted_messages_res
+  next: check_if_service_found
+
+check_if_service_found:
   switch:
-    - condition: ${content.match(/^#revenue/) != null}
-      next: common_service_revenue2
-    - condition: ${content.match(/^#employees/) != null}
-      next: common_service2
-    - condition: ${content.match(/^#taxes/) != null}
-      next: common_service_national_tax2
-    - condition: ${content.match(/^#workforcetaxes/) != null}
-      next: common_service_workforce_tax2
-    - condition: ${content.match(/^#beneficiaries/) != null}
-      next: common_service_beneficiaries2
-    - condition: ${content.match(/^#relatedpersons/) != null}
-      next: common_service_related_people2
-    - condition: ${content.match(/^#companycontacts/) != null}
-      next: common_service_company_details2
-    - condition: ${content.match(/^#companydatasimple/) != null}
-      next: common_service_simple_company2
+    - condition: ${converted_messages_res.response.body.response === "No service found"}
+      next: post_message_to_bot
+  next: add_bot_message_to_db
+
+# check_for_service:
+#   switch:
+#     - condition: ${content.match(/^#revenue/) != null}
+#       next: common_service_revenue2
+#     - condition: ${content.match(/^#employees/) != null}
+#       next: common_service2
+#     - condition: ${content.match(/^#taxes/) != null}
+#       next: common_service_national_tax2
+#     - condition: ${content.match(/^#workforcetaxes/) != null}
+#       next: common_service_workforce_tax2
+#     - condition: ${content.match(/^#beneficiaries/) != null}
+#       next: common_service_beneficiaries2
+#     - condition: ${content.match(/^#relatedpersons/) != null}
+#       next: common_service_related_people2
+#     - condition: ${content.match(/^#companycontacts/) != null}
+#       next: common_service_company_details2
+#     - condition: ${content.match(/^#companydatasimple/) != null}
+#       next: common_service_simple_company2
 
 post_message_to_bot:
   call: http.post

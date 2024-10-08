@@ -7,44 +7,78 @@ extract_body:
 check_for_service:
   switch:
     - condition: ${content.match(/^#revenue/) != null}
-      next: get_company_revenue
+      next: assign_revenue
     - condition: ${content.match(/^#employees/) != null}
-      next: get_company_employees
+      next: assign_employees
     - condition: ${content.match(/^#taxes/) != null}
-      next: common_service_national_tax2
+      next: assign_taxes
     - condition: ${content.match(/^#workforcetaxes/) != null}
-      next: common_service_workforce_tax2
+      next: assign_workforce_taxes
     - condition: ${content.match(/^#beneficiaries/) != null}
-      next: common_service_beneficiaries2
+      next: assign_beneficiaries
     - condition: ${content.match(/^#relatedpersons/) != null}
-      next: common_service_related_people2
+      next: assign_relatedpersons
     - condition: ${content.match(/^#companycontacts/) != null}
-      next: common_service_company_details2
+      next: assign_company_contacts
     - condition: ${content.match(/^#companydatasimple/) != null}
-      next: common_service_simple_company2
+      next: assign_company_data_simple
+  return: return_no_service 
 
-get_company_revenue:
+assign_revenue:
+  assign:
+    url: "revenue"
+  next: get_company_requested_info
+
+assign_employees:
+  assign:
+    url: "employees"
+  next: get_company_requested_info
+
+assign_taxes:
+  assign:
+    url: "taxes"
+  next: get_company_requested_info
+
+assign_workforce_taxes:
+  assign:
+    url: "work-force-taxes"
+  next: get_company_requested_info
+
+assign_beneficiaries:
+  assign:
+    url: "beneficiaries"
+  next: get_company_requested_info
+
+assign_related_persons:
+  assign:
+    url: "related-persons"
+  next: get_company_requested_info
+
+assign_company_contacts:
+  assign:
+    url: "contacts"
+  next: get_company_requested_info
+
+assign_company_data_simple:
+  assign:
+    url: "simple-data"
+  next: get_company_requested_info
+
+get_company_requested_info:
   call: http.post
   args:
-    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/revenue"
+    url: "[#CHATBOT_RUUTER_PUBLIC]/internal/services/companies/${url}"
     body:
       content: "${content}"
       chatId: "${chatId}"
       authorId: "${authorId}"
   result: res
   next: return_result
-
-get_company_employees:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/employees"
-    body:
-      content: "${content}"
-      chatId: "${chatId}"
-      authorId: "${authorId}"
-  result: res
-  next: return_result
-
 
 return_result:
   return: ${res}
+  next: end
+
+return_no_service:
+  return: "No service found"
+  next: end

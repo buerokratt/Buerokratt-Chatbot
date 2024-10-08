@@ -4,21 +4,15 @@ extract_body:
     chatId: ${incoming.body.chatId}
     authorId: ${incoming.body.authorId}
 
-common_service2:
+get_company_employees:
   call: http.post
   args:
     url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/employees"
     body:
       message: ${content.match(/^#employees (.*)/)[1]}
-  result: post_message_to_bot_result
-  next: extract_bot_responses_opensearch
+  result: res
 
-extract_bot_responses_opensearch:
-  assign:
-    botMsg: ${[post_message_to_bot_result.response.body.response]}
-  next: convert_bot_responses_to_messages  
-
-convert_bot_responses_to_messages:
+format_messages:
   call: http.post
   args:
     url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/bot_responses_to_messages"
@@ -27,13 +21,15 @@ convert_bot_responses_to_messages:
     body:
       data:
         {
-          "botMessages": "${botMsg}",
+          "botMessages": "${[res.response.body.response]}",
           "chatId": "${chatId}",
-          "authorId": "${get_bot_name_result.response.body[0].value}",
+          "authorId": "${authorId}",
           "authorFirstName": "",
           "authorLastName": "",
           "authorTimestamp": "${new Date().toISOString()}",
           "created": "${new Date().toISOString()}",
         }
   result: converted_messages_res
-  next: add_bot_message_to_db  
+
+return_result:
+  return: ${converted_messages_res}

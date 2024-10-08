@@ -12,7 +12,7 @@ get_company_revenue:
       registry_code: "${content.match(/^#revenue (.*)/)[1]}"
   result: res
 
-convert_bot_responses_to_messages:
+format_messages:
   call: http.post
   args:
     url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/bot_responses_to_messages"
