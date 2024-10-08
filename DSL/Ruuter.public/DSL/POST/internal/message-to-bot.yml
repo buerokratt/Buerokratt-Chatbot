@@ -80,7 +80,15 @@ decode_content_to_be_sent_to_bot:
   assign:
     decodedContent: ${decodeURIComponent(content)}
 
-skip_rasa_switch:
+# check_for_service:
+#   call: http.post
+#   args:
+#     url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL]/services/service-check"
+#     body:
+#       content: ${content}
+#   result: converted_messages_res
+
+check_for_service:
   switch:
     - condition: ${content.match(/^#revenue/) != null}
       next: common_service_revenue2

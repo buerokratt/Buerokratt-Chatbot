@@ -1,13 +1,15 @@
 extract_body:
   assign:
     content: ${incoming.body.content}
+    chatId: ${incoming.body.chatId}
+    authorId: ${incoming.body.authorId}
 
 check_for_service:
   switch:
     - condition: ${content.match(/^#revenue/) != null}
-      next: common_service_revenue2
+      next: get_company_revenue
     - condition: ${content.match(/^#employees/) != null}
-      next: common_service2
+      next: get_company_employees
     - condition: ${content.match(/^#taxes/) != null}
       next: common_service_national_tax2
     - condition: ${content.match(/^#workforcetaxes/) != null}
@@ -20,3 +22,29 @@ check_for_service:
       next: common_service_company_details2
     - condition: ${content.match(/^#companydatasimple/) != null}
       next: common_service_simple_company2
+
+get_company_revenue:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/revenue"
+    body:
+      content: "${content}"
+      chatId: "${chatId}"
+      authorId: "${authorId}"
+  result: res
+  next: return_result
+
+get_company_employees:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/employees"
+    body:
+      content: "${content}"
+      chatId: "${chatId}"
+      authorId: "${authorId}"
+  result: res
+  next: return_result
+
+
+return_result:
+  return: ${res}

@@ -1,0 +1,35 @@
+extract_body:
+  assign:
+    content: ${incoming.body.content}
+    chatId: ${incoming.body.chatId}
+    authorId: ${incoming.body.authorId}
+
+get_company_revenue:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/revenue"
+    body:
+      registry_code: "${content.match(/^#revenue (.*)/)[1]}"
+  result: res
+
+convert_bot_responses_to_messages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/bot_responses_to_messages"
+    headers:
+      type: json
+    body:
+      data:
+        {
+          "botMessages": "${[res.response.body.response]}",
+          "chatId": "${chatId}",
+          "authorId": "${authorId}",
+          "authorFirstName": "",
+          "authorLastName": "",
+          "authorTimestamp": "${new Date().toISOString()}",
+          "created": "${new Date().toISOString()}",
+        }
+  result: converted_messages_res
+
+return_result:
+  return: ${converted_messages_res}
