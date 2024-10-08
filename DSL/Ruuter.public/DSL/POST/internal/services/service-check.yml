@@ -1,0 +1,22 @@
+extract_body:
+  assign:
+    content: ${incoming.body.content}
+
+check_for_service:
+  switch:
+    - condition: ${content.match(/^#revenue/) != null}
+      next: common_service_revenue2
+    - condition: ${content.match(/^#employees/) != null}
+      next: common_service2
+    - condition: ${content.match(/^#taxes/) != null}
+      next: common_service_national_tax2
+    - condition: ${content.match(/^#workforcetaxes/) != null}
+      next: common_service_workforce_tax2
+    - condition: ${content.match(/^#beneficiaries/) != null}
+      next: common_service_beneficiaries2
+    - condition: ${content.match(/^#relatedpersons/) != null}
+      next: common_service_related_people2
+    - condition: ${content.match(/^#companycontacts/) != null}
+      next: common_service_company_details2
+    - condition: ${content.match(/^#companydatasimple/) != null}
+      next: common_service_simple_company2
