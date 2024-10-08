@@ -8,4 +8,4 @@
 {"channelId": "11111111-7f90-4e4e-b7e5op-111111111111","payload": {"content":"Again, another notification for user 1"},"timestamp": "1801371325797", "sentTo": []}
 {"index":{"_id":"5"}}
 {"channelId": "model-list","payload": {"status":"Status Changed", "state": ""},"timestamp": "1801371325497", "sentTo": []}
-{"index":{"_id":"6"}}
+
