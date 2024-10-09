@@ -123,31 +123,14 @@ insertMessage:
       forwardedFromCsa: ${forwardedFromCsa}
       forwardedToCsa: ${forwardedToCsa}
   result: insertMessageResult
-  next: clearChatList
+  next: notify_chats
 
-clearChatList:
-  call: http.post
-  args:
-    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query?conflicts=proceed"
-    body:
-     query:
-      term:
-       channelId: "chat-list"
-  result: clear_chat_res
-  next: postNotificationAboutAddedChat
-
-postNotificationAboutAddedChat:
-  call: http.post
-  args:
-    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
-    body:
-     channelId: "chat-list"
-     timestamp: ${new Date().toISOString()}
-     payload: {
-        "status": "Chat Status Changed",
-        "chatId": "${id}"
-     }
-  result: chat_notification_result
+notify_chats:
+  template: chats/notify
+  requestType: templates
+  body:
+    chatId: ${id}
+  result: chats_notify_res
   next: getRedirectedChat
 
 getRedirectedChat:
@@ -157,31 +140,16 @@ getRedirectedChat:
     body:
       id: ${id}
   result: redirectedChatRes
-  next: clearMessages
+  next: notify_messages
 
-clearMessages:
-  call: http.post
-  args:
-    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query?conflicts=proceed"
-    body:
-     query:
-      term:
-       channelId: ${activeChat.id ?? uuid}
-  result: clear_messages_res
-  next: postNotificationAboutMessageResponse 
-
-postNotificationAboutMessageResponse:
-  call: http.post
-  args:
-    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
-    body:
-     channelId: ${activeChat.id ?? uuid}
-     timestamp: ${new Date().toISOString()}
-     payload: {
-        "type": "message",
-        "messageId": "${uuid}"
-     }
-  result: message_notification_result
+notify_messages:
+  template: messages/notify
+  requestType: templates
+  body:
+    chatId: ${activeChat.id ?? uuid}
+    type: "message"
+    messageId: ${uuid}
+  result: messages_notify_res
 
 remove_chat_id_from_queue_notification_node_if_existed:
   call: http.post
