@@ -196,7 +196,7 @@ const SettingsWorkingTime: FC = () => {
                     name={'organizationAllWeekdaysTimeStartISO'}
                     control={control}
                     render={({ field }) => {
-                      const {minTime, maxTime } = getStartEndTimeValues(field, true);
+                      const { maxTime } = getStartEndTimeValues(field, true);
                       return (
                           <div className="startTime">
                             <FormDatepicker
@@ -224,7 +224,7 @@ const SettingsWorkingTime: FC = () => {
                     name={'organizationAllWeekdaysTimeEndISO'}
                     control={control}
                     render={({ field }) => {
-                      const {minTime, maxTime } = getStartEndTimeValues(field, false);
+                      const {minTime } = getStartEndTimeValues(field, false);
                       return (
                           <div className="endTime">
                             <FormDatepicker
@@ -299,7 +299,7 @@ const SettingsWorkingTime: FC = () => {
                                   }
                                   control={control}
                                   render={({ field }) => {
-                                    const {minTime, maxTime } = getStartEndTimeValues(field, true);
+                                    const { maxTime } = getStartEndTimeValues(field, true);
                                     return (
                                         <div className="startTime">
                                           <FormDatepicker
@@ -329,7 +329,7 @@ const SettingsWorkingTime: FC = () => {
                                   }
                                   control={control}
                                   render={({ field }) => {
-                                    const {minTime, maxTime } = getStartEndTimeValues(field, false);
+                                    const {minTime } = getStartEndTimeValues(field, false);
                                     return (
                                         <div className="endTime">
                                           <FormDatepicker
