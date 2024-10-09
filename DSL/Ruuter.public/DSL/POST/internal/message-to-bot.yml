@@ -27,6 +27,7 @@ extractRequestData:
     content: ${incoming.body.content ?? ""}
     holidays: ${incoming.body.holidays}
     holidayNames: ${incoming.body.holidayNames}
+  next: check_bot_is_active
 
 check_bot_is_active:
   call: http.post
@@ -35,8 +36,9 @@ check_bot_is_active:
     body:
       key: "is_bot_active"
   result: is_bot_active_result
+  next: check_bot_activity_result
 
-check_for_bot_active_result:
+check_bot_activity_result:
   switch:
     - condition: ${is_bot_active_result.response.body[0]?.value === 'true'}
       next: get_bot_name
@@ -48,13 +50,15 @@ get_bot_name:
     url: "[#CHATBOT_RESQL]/get-configuration"
     body:
       key: "bot_institution_id"
+    error: return_bad_request
   result: get_bot_name_result
+  next: check_if_bot_name_exists
 
-check_for_bot_name_result:
+check_if_bot_name_exists:
   switch:
-    - condition: ${200 <= get_bot_name_result.response.statusCodeValue && get_bot_name_result.response.statusCodeValue < 300 && get_bot_name_result.response.body[0]?.value != null}
+    - condition: ${get_bot_name_result.response.body[0]?.value != null}
       next: get_chat
-  next: return_bad_request
+  next: return_bot_name_does_not_exist
 
 get_chat:
   call: http.post
@@ -63,13 +67,8 @@ get_chat:
     body:
       id: ${chatId}
   result: get_chat_result
-  next: check_for_get_chat_result
-
-check_for_get_chat_result:
-  switch:
-    - condition: ${200 <= get_chat_result.response.statusCodeValue && get_chat_result.response.statusCodeValue < 300}
-      next: check_chat_belongs_to_bot
-  next: return_bad_request
+  error: return_bad_request
+  next: check_chat_belongs_to_bot
 
 check_chat_belongs_to_bot:
   switch:
@@ -80,25 +79,24 @@ check_chat_belongs_to_bot:
 decode_content_to_be_sent_to_bot:
   assign:
     decodedContent: ${decodeURIComponent(content)}
+  next: check_for_service  
 
-skip_rasa_switch:
+check_for_service:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RUUTER_PUBLIC]/internal/services/service-check"
+    body:
+      content: ${content}
+      chatId: ${chatId}
+      authorId: ${get_bot_name_result.response.body[0].value}
+  result: converted_messages_res
+  next: check_if_service_found
+
+check_if_service_found:
   switch:
-    - condition: ${content.match(/^#revenue/) != null}
-      next: common_service_revenue2
-    - condition: ${content.match(/^#employees/) != null}
-      next: common_service2
-    - condition: ${content.match(/^#taxes/) != null}
-      next: common_service_national_tax2
-    - condition: ${content.match(/^#workforcetaxes/) != null}
-      next: common_service_workforce_tax2
-    - condition: ${content.match(/^#beneficiaries/) != null}
-      next: common_service_beneficiaries2
-    - condition: ${content.match(/^#relatedpersons/) != null}
-      next: common_service_related_people2
-    - condition: ${content.match(/^#companycontacts/) != null}
-      next: common_service_company_details2
-    - condition: ${content.match(/^#companydatasimple/) != null}
-      next: common_service_simple_company2
+    - condition: ${converted_messages_res.response.body.response === "No service found"}
+      next: post_message_to_bot
+  next: add_bot_message_to_db
 
 post_message_to_bot:
   call: http.post
@@ -107,13 +105,9 @@ post_message_to_bot:
     body:
       sender: ${chatId}
       message: ${decodedContent}
+    error: return_bot_error
   result: post_message_to_bot_result
-
-check_for_post_message_to_bot_result:
-  switch:
-    - condition: ${200 <= post_message_to_bot_result.response.statusCodeValue && post_message_to_bot_result.response.statusCodeValue < 300}
-      next: check_if_bot_is_unable_to_reply
-  next: return_bot_error
+  next: check_if_bot_is_unable_to_reply
 
 check_if_bot_is_unable_to_reply:
   switch:
@@ -121,167 +115,25 @@ check_if_bot_is_unable_to_reply:
       next: check_for_fallback_bot
     - condition: ${post_message_to_bot_result.response.body?.[0]?.text == 'Suunan teid klienditeenindajale. Varuge natukene kannatust.'}
       next: get_organization_working_details
-    - condition: ${post_message_to_bot_result.response.body?.[0]?.text.match(/^OPENSEARCH/) != null}
-      next: common_service1
-    - condition: ${post_message_to_bot_result.response.body?.[0]?.text.match(/^REVENUEOPENSEARCH/) != null}
-      next: common_service_revenue1
-    - condition: ${post_message_to_bot_result.response.body?.[0]?.text.match(/^NATIONALTAXOPENSEARCH/) != null}
-      next: common_service_national_tax1
-    - condition: ${post_message_to_bot_result.response.body?.[0]?.text.match(/^WORKFORCETAXOPENSEARCH/) != null}
-      next: common_service_workforce_tax1
-    - condition: ${post_message_to_bot_result.response.body?.[0]?.text.match(/^BENEFICIARIESOPENSEARCH/) != null}
-      next: common_service_beneficiaries1
-    - condition: ${post_message_to_bot_result.response.body?.[0]?.text.match(/^RELATEDPEOPLEOPENSEARCH/) != null}
-      next: common_service_related_people1
-    - condition: ${post_message_to_bot_result.response.body?.[0]?.text.match(/^COMPANYDETAILSOPENSEARCH/) != null}
-      next: common_service_company_details1
-    - condition: ${post_message_to_bot_result.response.body?.[0]?.text.match(/^SIMPLECOMPANYOPENSEARCH/) != null}
-      next: common_service_simple_company1
-  next: extract_bot_responses
+  next: check_if_bot_detected_a_common_service
 
-common_service1:
+check_if_bot_detected_a_common_service:
   call: http.post
   args:
-    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/search"
+    url: "[#CHATBOT_RUUTER_PUBLIC]/internal/services/bot-service-detect"
     body:
-      message: ${post_message_to_bot_result.response.body?.[0]?.text.match(/^OPENSEARCH(.*)/)}
-  result: common_service_revenue1_result
-  next: extract_bot_responses_service1_with_buttons
+      content: ${post_message_to_bot_result.response.body?.[0]?.text}
+      chatId: ${chatId}
+      authorId: ${get_bot_name_result.response.body[0].value}
+      botResponse: ${post_message_to_bot_result.response.body}
+  result: converted_messages_res
+  next: check_detection_result
 
-common_service2:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/employees"
-    body:
-      message: ${content.match(/^#employees (.*)/)[1]}
-  result: post_message_to_bot_result
-  next: extract_bot_responses_opensearch
-
-common_service_revenue1:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/search"
-    body:
-      name: ${post_message_to_bot_result.response.body?.[0]?.text.match(/^REVENUEOPENSEARCH(.*)/)}
-  result: common_service_revenue1_result
-  next: extract_bot_responses_revenue_with_buttons
-
-common_service_revenue2:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/revenue"
-    body:
-      registry_code: "${content.match(/^#revenue (.*)/)[1]}"
-  result: post_message_to_bot_result
-  next: extract_bot_responses_opensearch
-
-common_service_national_tax1:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/search"
-    body:
-      message: ${post_message_to_bot_result.response.body?.[0]?.text.match(/^NATIONALTAXOPENSEARCH(.*)/)}
-  result: common_service_revenue1_result
-  next: extract_bot_responses_national_tax_with_buttons
-
-common_service_national_tax2:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/national-taxes"
-    body:
-      message: ${content.match(/^#taxes (.*)/)[1]}
-  result: post_message_to_bot_result
-  next: extract_bot_responses_opensearch
-
-common_service_workforce_tax1:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/search"
-    body:
-      message: ${post_message_to_bot_result.response.body?.[0]?.text.match(/^WORKFORCETAXOPENSEARCH(.*)/)}
-  result: common_service_revenue1_result
-  next: extract_bot_responses_workforce_tax_with_buttons
-
-common_service_workforce_tax2:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/work-force-taxes"
-    body:
-      message: ${content.match(/^#workforcetaxes (.*)/)[1]}
-  result: post_message_to_bot_result
-  next: extract_bot_responses_opensearch
-
-common_service_beneficiaries1:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/search"
-    body:
-      message: ${post_message_to_bot_result.response.body?.[0]?.text.match(/^BENEFICIARIESOPENSEARCH(.*)/)}
-  result: common_service_revenue1_result
-  next: extract_bot_responses_beneficiaries_with_buttons
-
-common_service_beneficiaries2:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/company-beneficial-owners"
-    body:
-      message: ${content.match(/^#beneficiaries (.*)/)[1]}
-  result: post_message_to_bot_result
-  next: extract_bot_responses_opensearch_beneficiaries
-
-common_service_related_people1:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/search"
-    body:
-      message: ${post_message_to_bot_result.response.body?.[0]?.text.match(/^RELATEDPEOPLEOPENSEARCH(.*)/)}
-  result: common_service_revenue1_result
-  next: extract_bot_responses_related_people_with_buttons
-
-common_service_related_people2:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/company-related-persons"
-    body:
-      message: ${content.match(/^#relatedpersons (.*)/)[1]}
-  result: post_message_to_bot_result
-  next: extract_bot_responses_opensearch_persons
-
-common_service_company_details1:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/search"
-    body:
-      message: ${post_message_to_bot_result.response.body?.[0]?.text.match(/^COMPANYDETAILSOPENSEARCH(.*)/)}
-  result: common_service_revenue1_result
-  next: extract_bot_responses_company_details_with_buttons
-
-common_service_company_details2:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/detailed-company-data"
-    body:
-      message: ${content.match(/^#companycontacts (.*)/)[1]}
-  result: post_message_to_bot_result
-  next: extract_bot_responses_opensearch_contacts
-
-common_service_simple_company1:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/search"
-    body:
-      message: ${post_message_to_bot_result.response.body?.[0]?.text.match(/^SIMPLECOMPANYOPENSEARCH(.*)/)}
-  result: common_service_revenue1_result
-  next: extract_bot_responses_simple_company_with_buttons
-
-common_service_simple_company2:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/simple-company-data"
-    body:
-      message: ${content.match(/^#companydatasimple (.*)/)[1]}
-  result: post_message_to_bot_result
-  next: extract_bot_responses_opensearch
+check_detection_result:
+  switch:
+    - condition: ${converted_messages_res.response.body.response === "No common services detected"}
+      next: extract_bot_responses
+  next: add_bot_message_to_db
 
 check_for_fallback_bot:
   call: http.post
@@ -291,19 +143,14 @@ check_for_fallback_bot:
       sender: ${chatId}
       message: ${content}
   result: fallback_bot_result
-  next: check_for_fallback_bot_result
-
-check_for_fallback_bot_result:
-  switch:
-    - condition: ${200 <= fallback_bot_result.statusCodeValue && fallback_bot_result.statusCodeValue < 300}
-      next: check_if_fallback_bot_is_unable_to_reply
-  next: return_bot_error
+  error: return_bot_error
+  next: check_if_fallback_bot_is_unable_to_reply
 
 check_if_fallback_bot_is_unable_to_reply:
   switch:
     - condition: ${fallback_bot_result == 'ERROR'}
       next: check_if_user_wants_csa
-  next: convert_fallback_bot_responses_to_messages
+  next: format_fallback_bot_messages
 
 check_if_user_wants_csa:
   call: http.post
@@ -429,106 +276,15 @@ add_chat_id_to_queue_notification_node:
 extract_bot_responses_after_redirect_to_back_office:
   assign:
     botMsg: ${post_message_to_bot_result.response.body}
-  next: convert_bot_responses_to_messages
-
-extract_bot_responses_opensearch:
-  assign:
-    botMsg: ${[post_message_to_bot_result.response.body.response]}
-  next: convert_bot_responses_to_messages
-
-extract_bot_responses_opensearch_beneficiaries:
-  assign:
-    botMsg: ${[post_message_to_bot_result.response.body.response]}
-  next: convert_bot_responses_to_messages_beneficiaries
-
-extract_bot_responses_opensearch_persons:
-  assign:
-    botMsg: ${[post_message_to_bot_result.response.body.response]}
-  next: convert_bot_responses_to_messages_persons
-
-extract_bot_responses_opensearch_contacts:
-  assign:
-    botMsg: ${[post_message_to_bot_result.response.body.response]}
-  next: convert_bot_responses_to_messages_contacts
+  next: format_bot_messages
 
 extract_bot_responses:
   assign:
     botMsg: ${post_message_to_bot_result.response.body}
     botMsgTxt: ${post_message_to_bot_result.response.body?.[0]?.text}
-  next: convert_bot_responses_to_messages
+  next: format_bot_messages
 
-extract_bot_responses_revenue_with_buttons:
-  assign:
-    buttonPrefix: "#revenue"
-  next: extract_companies
-
-extract_bot_responses_service1_with_buttons:
-  assign:
-    buttonPrefix: "#employees"
-  next: extract_companies
-
-extract_bot_responses_national_tax_with_buttons:
-  assign:
-    buttonPrefix: "#taxes"
-  next: extract_companies
-
-extract_bot_responses_workforce_tax_with_buttons:
-  assign:
-    buttonPrefix: "#workforcetaxes"
-  next: extract_companies
-
-extract_bot_responses_beneficiaries_with_buttons:
-  assign:
-    buttonPrefix: "#beneficiaries"
-  next: extract_companies
-
-extract_bot_responses_related_people_with_buttons:
-  assign:
-    buttonPrefix: "#relatedpersons"
-  next: extract_companies
-
-extract_bot_responses_company_details_with_buttons:
-  assign:
-    buttonPrefix: "#companycontacts"
-  next: extract_companies
-
-extract_bot_responses_simple_company_with_buttons:
-  assign:
-    buttonPrefix: "#companydatasimple"
-  next: extract_companies
-
-extract_companies:
-  assign:
-    companies: ${common_service_revenue1_result.response.body.response.companies}
-
-addButtonsToFirstBotMessage:
-  call: http.post
-  args:
-    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/add_buttons_to_first_message"
-    headers:
-      type: json
-    body:
-      messages: ${post_message_to_bot_result.response.body}
-      ignoreTexts:
-        [
-          "OPENSEARCH",
-          "REVENUEOPENSEARCH",
-          "NATIONALTAXOPENSEARCH",
-          "WORKFORCETAXOPENSEARCH",
-          "BENEFICIARIESOPENSEARCH",
-          "RELATEDPEOPLEOPENSEARCH",
-          "COMPANYDETAILSOPENSEARCH",
-          "SIMPLECOMPANYOPENSEARCH",
-        ]
-      prefix: ${buttonPrefix}
-      companies: ${companies}
-  result: merged_messages_res
-
-extractMergedResult:
-  assign:
-    botMsg: ${merged_messages_res.response.body}
-
-convert_bot_responses_to_messages:
+format_bot_messages:
   call: http.post
   args:
     url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/bot_responses_to_messages"
@@ -548,67 +304,7 @@ convert_bot_responses_to_messages:
   result: converted_messages_res
   next: add_bot_message_to_db
 
-convert_bot_responses_to_messages_beneficiaries:
-  call: http.post
-  args:
-    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/filter-beneficiaries-related-information-for-business-register"
-    headers:
-      type: json
-    body:
-      data:
-        {
-          "botMessages": "${botMsg}",
-          "chatId": "${chatId}",
-          "authorId": "${get_bot_name_result.response.body[0].value}",
-          "authorFirstName": "",
-          "authorLastName": "",
-          "authorTimestamp": "${new Date().toISOString()}",
-          "created": "${new Date().toISOString()}",
-        }
-  result: converted_messages_res
-  next: add_bot_message_to_db
-
-convert_bot_responses_to_messages_persons:
-  call: http.post
-  args:
-    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/filter-company-related-persons"
-    headers:
-      type: json
-    body:
-      data:
-        {
-          "botMessages": "${botMsg}",
-          "chatId": "${chatId}",
-          "authorId": "${get_bot_name_result.response.body[0].value}",
-          "authorFirstName": "",
-          "authorLastName": "",
-          "authorTimestamp": "${new Date().toISOString()}",
-          "created": "${new Date().toISOString()}",
-        }
-  result: converted_messages_res
-  next: add_bot_message_to_db
-
-convert_bot_responses_to_messages_contacts:
-  call: http.post
-  args:
-    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/filter-contact-information-for-business-register"
-    headers:
-      type: json
-    body:
-      data:
-        {
-          "botMessages": "${botMsg}",
-          "chatId": "${chatId}",
-          "authorId": "${get_bot_name_result.response.body[0].value}",
-          "authorFirstName": "",
-          "authorLastName": "",
-          "authorTimestamp": "${new Date().toISOString()}",
-          "created": "${new Date().toISOString()}",
-        }
-  result: converted_messages_res
-  next: add_bot_message_to_db
-
-convert_fallback_bot_responses_to_messages:
+format_fallback_bot_messages:
   call: http.post
   args:
     url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/bot_responses_to_messages"
@@ -681,6 +377,11 @@ return_chat_does_not_belong_to_bot:
 return_bot_is_not_active:
   status: 200
   return: "Bot is not active"
+  next: end
+
+return_bot_name_does_not_exist:
+  status: 200
+  return: "Bot name does not exist"
   next: end
 
 return_bad_request:
