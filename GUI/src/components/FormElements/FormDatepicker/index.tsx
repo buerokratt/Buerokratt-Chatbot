@@ -21,6 +21,8 @@ type FormDatepickerProps = ControllerRenderProps & {
   name: string;
   hideLabel?: boolean;
   disabled?: boolean;
+    minTime?: Date;
+    maxTime?: Date;
   placeholder?: string;
   timePicker?: boolean;
   direction?: 'row' | 'column';
@@ -34,6 +36,8 @@ const FormDatepicker = forwardRef<any, FormDatepickerProps>(
       hideLabel,
       disabled,
       placeholder,
+      maxTime,
+      minTime,
       timePicker,
       direction = 'column',
       ...rest
@@ -74,6 +78,8 @@ const FormDatepicker = forwardRef<any, FormDatepickerProps>(
             showTimeSelectOnly={timePicker}
             timeIntervals={15}
             timeFormat="HH:mm:ss"
+            minTime={minTime ?? new Date().setHours(0,0,0)}
+            maxTime={maxTime ?? new Date().setHours(23,45,0)}
             timeInputLabel=""
             portalId="overlay-root"
             {...rest}

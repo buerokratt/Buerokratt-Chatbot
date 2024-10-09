@@ -13,6 +13,11 @@ import { getOrganizationTimeData, setOrganizationTimeData } from './data';
 import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';
 
+type FieldDateNames = {
+  start: string;
+  end: string;
+}
+
 const weekdaysOptions = [
   'Monday',
   'Tuesday',
@@ -26,7 +31,7 @@ const weekdaysOptions = [
 const SettingsWorkingTime: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
-  const { control, handleSubmit, reset, watch } =
+  const { control, getValues, handleSubmit, reset, watch } =
     useForm<OrganizationWorkingTime>();
   const [key, setKey] = useState(0);
   const isOrganizationClosedOnWeekEnds = watch('organizationClosedOnWeekEnds');
@@ -81,6 +86,39 @@ const SettingsWorkingTime: FC = () => {
 
   if (!workingTime || Object.keys(control._formValues).length === 0) {
     return <>Loading...</>;
+  }
+
+  const handleTime = (field: any, date: any, isStart: boolean) => {
+    const {minTime, maxTime } = getStartEndTimeValues(field, isStart);
+    if(isStart && (date > maxTime)) {
+      field.onChange(minTime)
+    }
+    if(!isStart && (date < minTime)) {
+      field.onChange(maxTime)
+    }
+    setKey(key + 1);
+    field.onChange(date)
+  }
+
+  const getStartEndTimeValues = (field : any, isStart : boolean) => {
+    const fieldNames = getFieldNames(field, isStart);
+    const minTime = parse(format(getValues(fieldNames.start) as Date, 'HH:mm:ss'),'HH:mm:ss',new Date());
+    const maxTime = parse(format(getValues(fieldNames.end) as Date, 'HH:mm:ss'),'HH:mm:ss',new Date());
+    return {minTime: minTime, maxTime: maxTime}
+  }
+
+  const getFieldNames = (field : any, isStart : boolean) : FieldDateNames =>{
+    let startingTime = '';
+    let endingTime = '';
+    if(isStart) {
+      startingTime = field.name;
+      endingTime = (field.name).replace('Start','End');
+    } else {
+      startingTime = (field.name).replace('End','Start');
+      endingTime = field.name;
+    }
+
+    return {start: startingTime, end: endingTime};
   }
 
   return (
@@ -158,6 +196,7 @@ const SettingsWorkingTime: FC = () => {
               name={'organizationAllWeekdaysTimeStartISO'}
               control={control}
               render={({ field }) => {
+                const {minTime, maxTime } = getStartEndTimeValues(field, true);
                 return (
                   <div className="startTime">
                     <FormDatepicker
@@ -173,6 +212,8 @@ const SettingsWorkingTime: FC = () => {
                           new Date()
                         ) ?? new Date('0')
                       }
+                      onChange={(date) => handleTime(field, date,true)}
+                      maxTime={maxTime}
                     />
                   </div>
                 );
@@ -183,6 +224,7 @@ const SettingsWorkingTime: FC = () => {
               name={'organizationAllWeekdaysTimeEndISO'}
               control={control}
               render={({ field }) => {
+                const {minTime, maxTime } = getStartEndTimeValues(field, false);
                 return (
                   <div className="endTime">
                     <FormDatepicker
@@ -198,6 +240,8 @@ const SettingsWorkingTime: FC = () => {
                           new Date()
                         ) ?? new Date('0')
                       }
+                      onChange={(date) => handleTime(field, date,false)}
+                      minTime={minTime}
                     />
                   </div>
                 );
@@ -255,6 +299,7 @@ const SettingsWorkingTime: FC = () => {
                       }
                       control={control}
                       render={({ field }) => {
+                        const {minTime, maxTime } = getStartEndTimeValues(field, true);
                         return (
                           <div className="startTime">
                             <FormDatepicker
@@ -270,6 +315,8 @@ const SettingsWorkingTime: FC = () => {
                                   new Date()
                                 ) ?? new Date('0')
                               }
+                              onChange={(date) => handleTime(field, date,true)}
+                              maxTime={maxTime}
                             />
                           </div>
                         );
@@ -282,6 +329,7 @@ const SettingsWorkingTime: FC = () => {
                       }
                       control={control}
                       render={({ field }) => {
+                        const {minTime, maxTime } = getStartEndTimeValues(field, false);
                         return (
                           <div className="endTime">
                             <FormDatepicker
@@ -297,6 +345,8 @@ const SettingsWorkingTime: FC = () => {
                                   new Date()
                                 ) ?? new Date('0')
                               }
+                              onChange={(date) => handleTime(field, date,false)}
+                              minTime={minTime}
                             />
                           </div>
                         );
