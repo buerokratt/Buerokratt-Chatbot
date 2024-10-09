@@ -29,31 +29,17 @@ insertMessagePreview:
       chatId: ${chatId}
       content: ${content}
   result: res
-  next: clearMessages
+  next: notify_messages
 
-clearMessages:
-  call: http.post
-  args:
-    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query?conflicts=proceed"
-    body:
-     query:
-      term:
-       channelId: ${chatId}
-  result: clear_messages_res
-  next: postNotificationAboutPreview
-
-postNotificationAboutPreview:
-  call: http.post
-  args:
-    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
-    body:
-     channelId: ${chatId}
-     timestamp: ${new Date().toISOString()}
-     payload: {
-        "type": "preview"
-     }
-  result: message_notification_result
-  next: return_result  
+notify_messages:
+  template: messages/notify
+  requestType: templates
+  body:
+    chatId: ${chatId}
+    type: "preview"
+    messageId: ""
+  result: messages_notify_res
+  next: return_result
 
 return_result:
   return: "Message Event Sent Successfully"
