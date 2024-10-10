@@ -102,9 +102,24 @@ const SettingsWorkingTime: FC = () => {
 
   const getStartEndTimeValues = (field : any, isStart : boolean) => {
     const fieldNames = getFieldNames(field, isStart);
-    const minTime = parse(format(getValues(fieldNames.start) as Date, 'HH:mm:ss'),'HH:mm:ss',new Date());
-    const maxTime = parse(format(getValues(fieldNames.end) as Date, 'HH:mm:ss'),'HH:mm:ss',new Date());
+    const minTime = adjustTimeGap(fieldNames.start, true);
+    const maxTime = adjustTimeGap(fieldNames.end, false);
     return {minTime: minTime, maxTime: maxTime}
+  }
+
+  const adjustTimeGap = (date: any, isStart: boolean) => {
+    const convertedDate = parse(format(getValues(date) as Date, 'HH:mm:ss'),'HH:mm:ss',new Date())
+    let adjustedTime = new Date(convertedDate);
+    if(isStart) {
+      adjustedTime.setMinutes(adjustedTime.getMinutes() + 15);
+    } else {
+      adjustedTime.setMinutes(adjustedTime.getMinutes() - 15);
+    }
+    return adjustedTime;
+  }
+
+  const filterTime = (date, isStart, time) => {
+    return date > time
   }
 
   const getFieldNames = (field : any, isStart : boolean) : FieldDateNames =>{
@@ -347,6 +362,7 @@ const SettingsWorkingTime: FC = () => {
                                               }
                                               onChange={(date) => handleTime(field, date,false)}
                                               minTime={minTime}
+                                              filterTime={(date) => filterTime(date, false, minTime)}
                                           />
                                         </div>
                                     );

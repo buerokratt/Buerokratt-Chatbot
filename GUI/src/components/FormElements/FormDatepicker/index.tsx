@@ -52,6 +52,23 @@ const FormDatepicker = forwardRef<any, FormDatepickerProps>(
             disabled && 'datepicker--disabled'
         );
 
+        const validMinTime = minTime ? new Date(minTime) : new Date().setHours(0, 0, 0);
+        const validMaxTime = maxTime ? new Date(maxTime) : new Date().setHours(23, 45, 0);
+
+        const handleChange = (date: Date) => {
+            if (timePicker) {
+                if (date < validMinTime) {
+                    onChange(validMinTime);
+                } else if (date > validMaxTime) {
+                    onChange(validMaxTime);
+                } else {
+                    onChange(date);
+                }
+            } else {
+                onChange(date);
+            }
+        };
+
         return (
             <div className={datepickerClasses}>
                 {label && !hideLabel && (
@@ -79,11 +96,11 @@ const FormDatepicker = forwardRef<any, FormDatepickerProps>(
                         timeIntervals={15}
                         timeFormat="HH:mm:ss"
                         timeInputLabel=""
-                        minTime={minTime ?? new Date().setHours(0,0,0)}
-                        maxTime={maxTime ?? new Date().setHours(23,45,0)}
+                        minTime={validMinTime}
+                        maxTime={validMaxTime}
                         portalId="overlay-root"
                         {...rest}
-                        onChange={onChange}
+                        onChange={handleChange}
                     />
                     <Icon
                         icon={
@@ -100,5 +117,6 @@ const FormDatepicker = forwardRef<any, FormDatepickerProps>(
         );
     }
 );
+
 
 export default FormDatepicker;
