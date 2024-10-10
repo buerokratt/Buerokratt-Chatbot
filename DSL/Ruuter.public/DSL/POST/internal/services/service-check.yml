@@ -17,12 +17,12 @@ check_for_service:
     - condition: ${content.match(/^#beneficiaries/) != null}
       next: assign_beneficiaries
     - condition: ${content.match(/^#relatedpersons/) != null}
-      next: assign_relatedpersons
+      next: assign_related_persons
     - condition: ${content.match(/^#companycontacts/) != null}
       next: assign_company_contacts
     - condition: ${content.match(/^#companydatasimple/) != null}
       next: assign_company_data_simple
-  return: return_no_service 
+  next: return_no_service 
 
 assign_revenue:
   assign:
@@ -76,7 +76,7 @@ get_company_requested_info:
   next: return_result
 
 return_result:
-  return: ${res}
+  return: ${res.response.body}
   next: end
 
 return_no_service:
