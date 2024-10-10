@@ -159,9 +159,9 @@ WHERE (
   TO_CHAR(c.ended, 'DD.MM.YYYY HH24:MI:SS') LIKE '%' || :search || '%' OR
   EXISTS (
     SELECT 1
-    FROM message AS mm
-    WHERE mm.chat_base_id = c.base_id
-    AND LOWER(mm.content) LIKE LOWER('%' || :search || '%')
+    FROM message AS msg
+    WHERE msg.chat_base_id = c.base_id
+    AND LOWER(msg.content) LIKE LOWER('%' || :search || '%')
   )
 )
 ORDER BY 
