@@ -328,6 +328,8 @@ add_bot_message_to_db:
   switch:
     - condition: ${converted_messages_res.response.body?.length > 0}
       next: do_add_bot_message_to_db
+    - condition: ${converted_messages_res.response.body.response?.length > 0}
+      next: do_add_bot_message_to_db  
   next: return_ok
 
 do_add_bot_message_to_db:
@@ -335,7 +337,7 @@ do_add_bot_message_to_db:
   args:
     url: "[#CHATBOT_RESQL]/insert-bot-message"
     body:
-      messages: ${converted_messages_res.response.body}
+      messages: "${converted_messages_res.response.body?.length > 0 ? converted_messages_res.response.body : converted_messages_res.response.body.response}"
   result: add_bot_message_to_bot_result
   next: return_message_sent
 

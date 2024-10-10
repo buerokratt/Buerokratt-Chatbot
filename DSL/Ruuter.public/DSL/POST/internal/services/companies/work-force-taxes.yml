@@ -32,4 +32,4 @@ format_messages:
   result: converted_messages_res
 
 return_result:
-  return: ${converted_messages_res}
+  return: ${converted_messages_res.response.body}

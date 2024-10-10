@@ -29,65 +29,56 @@ assign_open_search:
   assign:
     message: ${content.match(/^OPENSEARCH(.*)/)}
     buttonPrefix: "#employees"
-  next: search_with_message
+  next: search_companies
 
 assign_revenue_open_search:
   assign:
-    name: ${content.match(/^REVENUEOPENSEARCH(.*)/)}
+    message: ${content.match(/^REVENUEOPENSEARCH(.*)/)}
     buttonPrefix: "#revenue"
-  next: search_with_name
+  next: search_companies
   
 assign_taxes_open_search:
   assign:
     message: ${content.match(/^NATIONALTAXOPENSEARCH(.*)/)}
     buttonPrefix: "#taxes"
-  next: search_with_message
+  next: search_companies
 
 assign_workforce_tax_open_search:
   assign:
     message: ${content.match(/^WORKFORCETAXOPENSEARCH(.*)/)}
     buttonPrefix: "#workforcetaxes"
-  next: search_with_message
+  next: search_companies
 
 assign_beneficiaries_open_search:
   assign:
     message: ${content.match(/^BENEFICIARIESOPENSEARCH(.*)/)}
     buttonPrefix: "#beneficiaries"
-  next: search_with_message
+  next: search_companies
 
 assign_related_people_open_search:
   assign:
     message: ${content.match(/^RELATEDPEOPLEOPENSEARCH(.*)/)}
     buttonPrefix: "#relatedpersons"
-  next: search_with_message
+  next: search_companies
 
 assign_company_details_open_search:
   assign:
     message: ${content.match(/^COMPANYDETAILSOPENSEARCH(.*)/)}
     buttonPrefix: "#companycontacts"
-  next: search_with_message
+  next: search_companies
 
 assign_simple_company_open_search:
   assign:
     message: ${content.match(/^SIMPLECOMPANYOPENSEARCH(.*)/)}
     buttonPrefix: "companydatasimple"
-  next: search_with_message
+  next: search_companies
 
-search_with_message:
+search_companies:
   call: http.post
   args:
     url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/search"
     body:
       message: ${message}
-  result: search_res
-  next: extract_companies
-
-search_with_name:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/search"
-    body:
-      name: ${name}
   result: search_res
   next: extract_companies
 
@@ -142,7 +133,7 @@ format_messages:
   result: res
 
 return_result:
-  return: ${res}
+  return: ${res.response.body}
   next: end
 
 return_no_common_service_detected:
