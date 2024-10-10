@@ -148,14 +148,21 @@ CROSS JOIN NPS
 WHERE (
   :search IS NULL OR
   :search = '' OR
-  c.customer_support_display_name LIKE ('%' || :search || '%') OR
-  c.end_user_first_name LIKE ('%' || :search || '%') OR
-  ContactsMessage.content LIKE ('%' || :search || '%') OR
-  s.comment LIKE ('%' || :search || '%') OR
-  c.status LIKE ('%' || :search || '%') OR
-  m.event LIKE ('%' || :search || '%') OR
-  LastContentMessage.content LIKE ('%' || :search || '%') OR
-  c.base_id LIKE ('%' || :search || '%')
+  LOWER(c.customer_support_display_name) LIKE LOWER('%' || :search || '%') OR
+  LOWER(c.end_user_first_name) LIKE LOWER('%' || :search || '%') OR
+  LOWER(ContactsMessage.content) LIKE LOWER('%' || :search || '%') OR
+  LOWER(s.comment) LIKE LOWER('%' || :search || '%') OR
+  LOWER(c.status) LIKE LOWER('%' || :search || '%') OR
+  LOWER(m.event) LIKE LOWER('%' || :search || '%') OR
+  LOWER(c.base_id) LIKE LOWER('%' || :search || '%') OR
+  TO_CHAR(FirstContentMessage.created, 'DD.MM.YYYY HH24:MI:SS') LIKE '%' || :search || '%' OR
+  TO_CHAR(c.ended, 'DD.MM.YYYY HH24:MI:SS') LIKE '%' || :search || '%' OR
+  EXISTS (
+    SELECT 1
+    FROM message AS mm
+    WHERE mm.chat_base_id = c.base_id
+    AND LOWER(mm.content) LIKE LOWER('%' || :search || '%')
+  )
 )
 ORDER BY 
    CASE WHEN :sorting = 'created asc' THEN FirstContentMessage.created END ASC,
