@@ -159,6 +159,8 @@ const DataTable: FC<DataTableProps> = (
   });
 
   const getShownPageIndexes = () => {
+    if (!table.getState().pagination) return [];
+
     const pageOffset = 2;
     const currentPage = table.getState().pagination.pageIndex;
     const startPage = Math.max(0, currentPage - pageOffset);
