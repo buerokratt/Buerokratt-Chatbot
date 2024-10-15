@@ -409,7 +409,7 @@ const Chat: FC<ChatProps> = ({
     const newMessage: Message = {
       chatId: chat.id,
       authorRole: AUTHOR_ROLES.BACKOFFICE_USER,
-      content: encodeURIComponent(responseText),
+      content: responseText,
       authorTimestamp: new Date().toISOString(),
       authorFirstName: userInfo?.displayName ?? '',
       authorLastName: '',
