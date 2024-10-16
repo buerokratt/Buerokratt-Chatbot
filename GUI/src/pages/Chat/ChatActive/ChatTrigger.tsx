@@ -45,9 +45,7 @@ const ChatTrigger: FC<{ chat: ChatType }> = ({ chat }) => {
         {chat.lastMessageTimestamp && <p>{timeStamp}</p>}
       </Track>
       <div className="wrapper">
-        <p className="last_message">
-          {decodeURIComponent(`${chat.lastMessage ?? ''}.`)}
-        </p>
+        <p className="last_message">{`${chat.lastMessage ?? ''}.`}</p>
       </div>
     </div>
   );

@@ -46,7 +46,7 @@ const ChatMessage: FC<ChatMessageProps> = ({
                 onSelect(message);
               }}
             >
-              <Markdownify message={decodeURIComponent(message.content ?? '')} />
+              <Markdownify message={message.content ?? ''} />
               {!message.content && options.length > 0 && 'ok'}
             </button>
             <time
