@@ -23,6 +23,8 @@ check_if_bot_detected_a_common_service:
       next: assign_company_details_open_search
     - condition: ${content.match(/^SIMPLECOMPANYOPENSEARCH/) != null}
       next: assign_simple_company_open_search
+    - condition: ${content.match(/^CALENDAR/) != null} # TODO: Add the correct rasa response
+      next: assign_calendar_keyword
   next: return_no_common_service_detected
 
 assign_open_search:
@@ -36,7 +38,7 @@ assign_revenue_open_search:
     message: ${content.match(/^REVENUEOPENSEARCH(.*)/)}
     buttonPrefix: "#revenue"
   next: search_companies
-  
+
 assign_taxes_open_search:
   assign:
     message: ${content.match(/^NATIONALTAXOPENSEARCH(.*)/)}
@@ -73,6 +75,12 @@ assign_simple_company_open_search:
     buttonPrefix: "companydatasimple"
   next: search_companies
 
+assign_calendar_keyword:
+  assign:
+    message: ${content.match(/^CALENDAR(.*)/)} # TODO: Add the correct rasa response
+    buttonPrefix: "calendar"
+  next: search_companies
+
 search_companies:
   call: http.post
   args:
@@ -82,9 +90,24 @@ search_companies:
   result: search_res
   next: extract_companies
 
+search_calendar:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/calendar/search"
+    body:
+      keyword: ${message}
+  result: search_res
+  next: assign_bot_msg
+
+assign_bot_msg:
+  assign:
+    botMsg: ${search_res.response.body.response}
+  next: format_messages
+
 extract_companies:
   assign:
     companies: ${search_res.response.body.response.companies}
+  next: addButtonsToFirstBotMessage
 
 addButtonsToFirstBotMessage:
   call: http.post
@@ -108,10 +131,12 @@ addButtonsToFirstBotMessage:
       prefix: ${buttonPrefix}
       companies: ${companies}
   result: merged_messages_res
+  next: extractMergedResult
 
 extractMergedResult:
   assign:
     botMsg: ${merged_messages_res.response.body}
+  next: format_messages
 
 format_messages:
   call: http.post
@@ -131,6 +156,7 @@ format_messages:
           "created": "${new Date().toISOString()}",
         }
   result: res
+  next: return_result
 
 return_result:
   return: ${res.response.body}
