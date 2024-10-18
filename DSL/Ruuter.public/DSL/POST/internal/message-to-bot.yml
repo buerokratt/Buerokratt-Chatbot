@@ -73,13 +73,8 @@ get_chat:
 check_chat_belongs_to_bot:
   switch:
     - condition: ${get_chat_result.response.body[0].customerSupportId == get_bot_name_result.response.body[0].value}
-      next: decode_content_to_be_sent_to_bot
+      next: check_for_service
   next: return_chat_does_not_belong_to_bot
-
-decode_content_to_be_sent_to_bot:
-  assign:
-    decodedContent: ${decodeURIComponent(content)}
-  next: check_for_service  
 
 check_for_service:
   call: http.post
@@ -104,7 +99,7 @@ post_message_to_bot:
     url: "[#CHATBOT_BOT]/webhooks/rest/webhook"
     body:
       sender: ${chatId}
-      message: ${decodedContent}
+      message: ${content}
     error: return_bot_error
   result: post_message_to_bot_result
   next: check_if_bot_is_unable_to_reply

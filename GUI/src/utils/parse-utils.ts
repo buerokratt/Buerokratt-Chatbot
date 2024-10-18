@@ -4,7 +4,7 @@ export const parseOptions = (message: Message): string[] => {
   try {
     if(!message?.options || message.options === '')
       return [];
-    return JSON.parse(decodeURIComponent(message.options)) as string[];
+    return JSON.parse(message.options) as string[];
   } catch(e) {
     console.error(e);
     return [];
@@ -15,7 +15,7 @@ export const parseButtons = (message: Message): MessageButton[] => {
   try {
     if(!message?.buttons || message.buttons === '')
       return [];
-    return JSON.parse(decodeURIComponent(message.buttons)) as MessageButton[];
+    return JSON.parse(message.buttons) as MessageButton[];
   } catch(e) {
     console.error(e);
     return [];
