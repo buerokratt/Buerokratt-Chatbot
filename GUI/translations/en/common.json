@@ -309,7 +309,11 @@
       "closed": "Closed",
       "until": "Until",
       "allWeekdaysExceptWeekend": "M-F",
-      "allWeekdays": "M-S"
+      "allWeekdays": "M-S",
+      "availableAllTime": "Working hours are 24/7",
+      "showIfCSAIsNotAvailable": "Send a notification of absence to the client",
+      "showIfCSAIsNotAvailableWithContactsRequest": "Send a notification of absence to the client with a contact request",
+      "noCsaAvailableMessage": "No CSA available message"
     },
     "userSession": {
       "title": "User session",

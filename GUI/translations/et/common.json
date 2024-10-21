@@ -309,7 +309,11 @@
       "closed": "Suletud",
       "until": "kuni",
       "allWeekdaysExceptWeekend": "E-R",
-      "allWeekdays": "E-P"
+      "allWeekdays": "E-P",
+      "availableAllTime": "Asutuse tööaeg on 24/7",
+      "showIfCSAIsNotAvailable": "Saada kliendile teavitus eemalolekust",
+      "showIfCSAIsNotAvailableWithContactsRequest": "Saada kliendile teavitus eemalolekust koos kontakti päringuga",
+      "noCsaAvailableMessage": "CSA pole saadaval teade"
     },
     "userSession": {
       "title": "Kasutaja sessioon",

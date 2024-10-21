@@ -19,4 +19,7 @@ export interface OrganizationWorkingTime {
   organizationWorkingTimeNationalHolidays: boolean;
   organizationClosedOnWeekEnds: boolean;
   organizationTheSameOnAllWorkingDays: boolean;
+  organizationWorkingAllTime: boolean;
+  organizationNoCsaAskForContacts: boolean;
+  organizationNoCsaAvailableMessage: string;
 }
