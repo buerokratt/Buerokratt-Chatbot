@@ -262,7 +262,7 @@ send_csas_not_available_message:
         - chatId: ${chatId}
           content: ${base_config.noCsaMessage}
           authorTimestamp: ${new Date().toISOString()}
-          event: "${base_config.askForContacts === 'true' ? 'unavailable_csas_req_contacts' : 'unavailable_csas'}"
+          event: "${base_config.askForContacts === 'true' ? 'unavailable_csas_ask_contacts' : 'unavailable_csas'}"
           authorId: ${get_bot_name_result.response.body[0].value}
           authorFirstName: ""
           authorLastName: ""

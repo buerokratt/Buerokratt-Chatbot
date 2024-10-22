@@ -37,6 +37,7 @@ export enum CHAT_EVENTS {
   REQUESTED_CHAT_FORWARD_REJECTED = 'requested-chat-forward-rejected',
   UNAVAILABLE_ORGANIZATION = 'unavailable_organization',
   UNAVAILABLE_CSAS = 'unavailable_csas',
+  UNAVAILABLE_CSAS_ASK_CONTACTS = 'unavailable_csas_ask_contacts',
   UNAVAILABLE_HOLIDAY = 'unavailable_holiday',
   ASSIGN_PENDING_CHAT_CSA = 'pending-assigned',
   PENDING_USER_REACHED = 'user-reached',
@@ -105,4 +106,4 @@ export enum MessageSseEvent {
 export type MessageStatus = {
   messageId: string | null;
   readTime: any;
-}
+};
