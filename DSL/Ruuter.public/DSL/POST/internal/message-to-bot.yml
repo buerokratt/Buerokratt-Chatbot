@@ -109,7 +109,7 @@ check_if_bot_is_unable_to_reply:
     - condition: ${post_message_to_bot_result.response.body?.[0]?.text == 'UNKNOWN'}
       next: check_for_fallback_bot
     - condition: ${post_message_to_bot_result.response.body?.[0]?.text == 'Suunan teid klienditeenindajale. Varuge natukene kannatust.'}
-      next: get_organization_working_details
+      next: get_organization_base_config
   next: check_if_bot_detected_a_common_service
 
 check_if_bot_detected_a_common_service:
@@ -156,6 +156,24 @@ check_if_user_wants_csa:
       message: "csa"
   result: post_message_to_bot_result
   next: check_for_post_message_to_bot_result
+
+get_organization_base_config:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-organization-base-config"
+  result: org_base_config_res
+  next: assign_organization_base_config
+
+assign_organization_base_config:
+  assign:
+    base_config: ${org_base_config_res.response.body[0]}
+  next: check_if_organization_is_available_all_time
+
+check_if_organization_is_available_all_time:
+  switch:
+    - condition: ${base_config.isAvailableAllTime === 'true'}
+      next: get_all_available_csas
+  next: get_organization_working_details
 
 get_organization_working_details:
   call: http.post
@@ -242,9 +260,9 @@ send_csas_not_available_message:
     body:
       messages:
         - chatId: ${chatId}
-          content: "Hetkel nõustajad puuduvad, palun jätke oma kontaktandmed ja võtame Teiega esimesel võimalusel ühendust"
+          content: ${base_config.noCsaMessage}
           authorTimestamp: ${new Date().toISOString()}
-          event: "unavailable_csas"
+          event: "${base_config.askForContacts === 'true' ? 'unavailable_csas_req_contacts' : 'unavailable_csas'}"
           authorId: ${get_bot_name_result.response.body[0].value}
           authorFirstName: ""
           authorLastName: ""
@@ -324,7 +342,7 @@ add_bot_message_to_db:
     - condition: ${converted_messages_res.response.body?.length > 0}
       next: do_add_bot_message_to_db
     - condition: ${converted_messages_res.response.body.response?.length > 0}
-      next: do_add_bot_message_to_db  
+      next: do_add_bot_message_to_db
   next: return_ok
 
 do_add_bot_message_to_db:
