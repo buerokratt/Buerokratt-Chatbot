@@ -68,6 +68,15 @@ declaration:
       - field: organizationWorkingTimeWeekdays
         type: string
         description: "Body field 'organizationWorkingTimeWeekdays'"
+      - field: organizationWorkingAllTime
+        type: string
+        description: "Body field 'organizationWorkingAllTime'"
+      - field: organizationNoCsaAskForContacts
+        type: string
+        description: "Body field 'organizationNoCsaAskForContacts'"
+      - field: organizationNoCsaAvailableMessage
+        type: string
+        description: "Body field 'organizationNoCsaAvailableMessage'"
 
 extractRequestData:
   assign:
@@ -91,6 +100,9 @@ extractRequestData:
     organizationClosedOnWeekEnds: ${incoming.body.organizationClosedOnWeekEnds}
     organizationTheSameOnAllWorkingDays: ${incoming.body.organizationTheSameOnAllWorkingDays}
     organizationWorkingTimeNationalHolidays: ${incoming.body.organizationWorkingTimeNationalHolidays}
+    organizationWorkingAllTime: ${incoming.body.organizationWorkingAllTime}
+    organizationNoCsaAskForContacts: ${incoming.body.organizationNoCsaAskForContacts}
+    organizationNoCsaAvailableMessage: ${incoming.body.organizationNoCsaAvailableMessage}
 
 setOrganizationWorkingTime:
   call: http.post
@@ -117,6 +129,9 @@ setOrganizationWorkingTime:
       organizationClosedOnWeekEnds: ${organizationClosedOnWeekEnds}
       organizationTheSameOnAllWorkingDays: ${organizationTheSameOnAllWorkingDays}
       organizationWorkingTimeNationalHolidays: ${organizationWorkingTimeNationalHolidays}
+      organizationWorkingAllTime: ${organizationWorkingAllTime}
+      organizationNoCsaAskForContacts: ${organizationNoCsaAskForContacts}
+      organizationNoCsaAvailableMessage: ${organizationNoCsaAvailableMessage}
       created: ${new Date().toISOString()}
   result: setOrganizationWorkingTimeResult
 
