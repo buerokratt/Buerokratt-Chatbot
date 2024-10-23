@@ -194,6 +194,7 @@
       "unavailable-contact-information-fulfilled": "Kontaktandmed on antud",
       "unavailable_organization": "Organisatsioon pole saadaval",
       "unavailable_csas": "Nõustajad pole saadaval",
+      "unavailable_csas_ask_contacts": "CSA pole saadaval ja küsis kontakte",
       "unavailable_holiday": "Puhkus",
       "user-reached": "Kasutajaga võeti ühendust",
       "user-not-reached": "Kasutajaga ei õnnestunud ühendust saada"
@@ -230,6 +231,7 @@
       "unavailable-contact-information-fulfilled": "Kontaktandmed on antud",
       "unavailable_organization": "Organisatsioon pole saadaval",
       "unavailable_csas": "Nõustajad pole saadaval",
+      "unavailable_csas_ask_contacts": "CSA pole saadaval ja küsis kontakte",
       "unavailable_holiday": "Puhkus",
       "pending-assigned": "{{name}} määratud kontaktkasutajale",
       "user-reached": "{{name}} võttis kasutajaga ühendust",
@@ -309,7 +311,11 @@
       "closed": "Suletud",
       "until": "kuni",
       "allWeekdaysExceptWeekend": "E-R",
-      "allWeekdays": "E-P"
+      "allWeekdays": "E-P",
+      "availableAllTime": "Asutuse tööaeg on 24/7",
+      "showIfCSAIsNotAvailable": "Saada kliendile teavitus eemalolekust",
+      "showIfCSAIsNotAvailableWithContactsRequest": "Saada kliendile teavitus eemalolekust koos kontakti päringuga",
+      "noCsaAvailableMessage": "CSA pole saadaval teade"
     },
     "userSession": {
       "title": "Kasutaja sessioon",

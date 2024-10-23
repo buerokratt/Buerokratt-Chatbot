@@ -57,6 +57,11 @@ export function getOrganizationTimeData(data: OrganizationWorkingTime) {
     organizationWorkingTimeNationalHolidays:
       data.organizationWorkingTimeNationalHolidays.toString() === 'true',
     organizationWorkingTimeWeekdays: data.organizationWorkingTimeWeekdays ?? [],
+    organizationWorkingAllTime:
+      data.organizationWorkingAllTime.toString() === 'true',
+    organizationNoCsaAskForContacts:
+      data.organizationNoCsaAskForContacts.toString() === 'true',
+    organizationNoCsaAvailableMessage: data.organizationNoCsaAvailableMessage,
   };
 }
 
@@ -69,6 +74,9 @@ export function setOrganizationTimeData(data: OrganizationWorkingTime) {
     organizationWorkingTimeNationalHolidays:
       data.organizationWorkingTimeNationalHolidays.toString(),
     organizationWorkingTimeWeekdays: data.organizationWorkingTimeWeekdays ?? [],
+    organizationWorkingAllTime: data.organizationWorkingAllTime.toString(),
+    organizationNoCsaAskForContacts:
+      data.organizationNoCsaAskForContacts.toString(),
   };
 }
 
