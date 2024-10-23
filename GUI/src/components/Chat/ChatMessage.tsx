@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import { MdOutlineCheck } from 'react-icons/md';
 import { Message } from '../../types/message';
 import { CHAT_EVENTS, MessageStatus } from '../../types/chat';
-import Linkifier from './linkifier';
+import Markdownify from './Markdownify';
 import { useTranslation } from 'react-i18next';
 import './Typing.scss';
 import { parseButtons, parseOptions } from 'utils/parse-utils';
@@ -46,7 +46,7 @@ const ChatMessage: FC<ChatMessageProps> = ({
                 onSelect(message);
               }}
             >
-              <Linkifier message={decodeURIComponent(message.content ?? '')} />
+              <Markdownify message={message.content ?? ''} />
               {!message.content && options.length > 0 && 'ok'}
             </button>
             <time

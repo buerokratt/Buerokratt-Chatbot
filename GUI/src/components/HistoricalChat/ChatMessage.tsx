@@ -1,7 +1,7 @@
 import { FC, useMemo } from 'react';
 import { format } from 'date-fns';
 import { Message } from 'types/message';
-import Linkifier from 'components/Chat/linkifier';
+import Markdownify from 'components/Chat/Markdownify';
 import { parseButtons, parseOptions } from 'utils/parse-utils';
 import ButtonMessage from 'components/ButtonMessage';
 import OptionMessage from 'components/OptionMessage';
@@ -22,7 +22,7 @@ const ChatMessage: FC<ChatMessageProps> = ({ message, onMessageClick }) => {
           className="historical-chat__message-text"
           onClick={onMessageClick ? () => onMessageClick(message) : undefined}
         >
-          <Linkifier message={decodeURIComponent(message.content ?? '')} />
+          <Markdownify message={message.content ?? ''} />
         </button>
         <time
           dateTime={message.authorTimestamp}

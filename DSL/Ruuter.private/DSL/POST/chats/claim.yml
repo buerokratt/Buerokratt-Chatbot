@@ -111,31 +111,14 @@ insertMessage:
       forwardedFromCsa: ""
       forwardedToCsa: ""
   result: insertMessageResult
-  next: clearChatList
+  next: notify_chats
 
-clearChatList:
-  call: http.post
-  args:
-    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query?conflicts=proceed"
-    body:
-     query:
-      term:
-       channelId: "chat-list"
-  result: clear_chat_res
-  next: postNotificationAboutAddedChat
-
-postNotificationAboutAddedChat:
-  call: http.post
-  args:
-    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
-    body:
-     channelId: "chat-list"
-     timestamp: ${new Date().toISOString()}
-     payload: {
-        "status": "Chat Status Changed",
-        "chatId": "${activeChat.id}"
-     }
-  result: chat_notification_result
+notify_chats:
+  template: chats/notify
+  requestType: templates
+  body:
+    chatId: ${activeChat.id}
+  result: chats_notify_res
   next: getClaimedChat
 
 getClaimedChat:
@@ -146,18 +129,14 @@ getClaimedChat:
       id: ${id}
   result: claimedChatRes
 
-postNotificationAboutMessageResponse:
-  call: http.post
-  args:
-    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
-    body:
-     channelId: ${activeChat.id}
-     timestamp: ${new Date().toISOString()}
-     payload: {
-        "type": "message",
-        "messageId": "${messageUuid}"
-     }
-  result: message_notification_result
+notify_messages:
+  template: messages/notify
+  requestType: templates
+  body:
+    chatId: ${activeChat.id}
+    type: "message"
+    messageId: ${messageUuid}
+  result: messages_notify_res
 
 remove_chat_id_from_queue_notification_node_if_existed:
   call: http.post

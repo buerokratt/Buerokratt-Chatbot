@@ -1,0 +1,35 @@
+extract_body:
+  assign:
+    content: ${incoming.body.content}
+    chatId: ${incoming.body.chatId}
+    authorId: ${incoming.body.authorId}
+
+get_company_related_persons:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]/services/companies/company-related-persons"
+    body:
+      message: ${content.match(/^#relatedpersons (.*)/)[1]}
+  result: res
+
+format_messages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/filter-company-related-persons"
+    headers:
+      type: json
+    body:
+      data:
+        {
+          "botMessages": "${[res.response.body.response]}",
+          "chatId": "${chatId}",
+          "authorId": "${authorId}",
+          "authorFirstName": "",
+          "authorLastName": "",
+          "authorTimestamp": "${new Date().toISOString()}",
+          "created": "${new Date().toISOString()}",
+        }
+  result: converted_messages_res
+
+return_result:
+  return: ${converted_messages_res.response.body}

@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import clsx from 'clsx';
-import Linkifier from './linkifier';
+import Markdownify from './Markdownify';
 import Track from 'components/Track';
 import './Typing.scss';
 
@@ -15,7 +15,7 @@ const PreviewMessage: FC<PreviewMessageProps> = ({ preview }) => {
         <div className={clsx('active-chat__message-preview')}>
           {!!preview && (
             <Track>
-              <Linkifier message={decodeURIComponent(preview ?? '')} />
+              <Markdownify message={preview ?? ''} />
               <div className="typing">
                 <span></span>
                 <span></span>

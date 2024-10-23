@@ -35,11 +35,12 @@ import {
   setToLocalStorage,
 } from 'utils/local-storage-utils';
 import { CHAT_HISTORY_PREFERENCES_KEY } from 'constants/config';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { unifyDateFromat } from './unfiyDate';
 import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';
 import { et } from 'date-fns/locale';
+import { useDebouncedCallback } from 'use-debounce';
 
 const ChatHistory: FC = () => {
   const { t, i18n } = useTranslation();
@@ -47,19 +48,22 @@ const ChatHistory: FC = () => {
   const userInfo = useStore((state) => state.userInfo);
   const routerLocation = useLocation();
   const params = new URLSearchParams(routerLocation.search);
-  let passedChatId = params.get('chat');
+  let passedChatId = new URLSearchParams(routerLocation.search).get('chat');
   const passedStartDate = params.get('start');
   const passedEndDate = params.get('end');
   const preferences = getFromLocalStorage(
     CHAT_HISTORY_PREFERENCES_KEY
   ) as string[];
+  const [search, setSearch] = useState('');
   const [selectedChat, setSelectedChat] = useState<ChatType | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
   const [statusChangeModal, setStatusChangeModal] = useState<string | null>(
     null
   );
-
   const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
+    pageIndex: searchParams.get('page')
+      ? parseInt(searchParams.get('page') as string) - 1
+      : 0,
     pageSize: 10,
   });
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -72,6 +76,7 @@ const ChatHistory: FC = () => {
   const [filteredEndedChatsList, setFilteredEndedChatsList] = useState<
     ChatType[]
   >([]);
+
   const [messagesTrigger, setMessagesTrigger] = useState(false);
   const [selectedColumns, setSelectedColumns] = useState<string[]>(
     preferences ?? []
@@ -102,6 +107,16 @@ const ChatHistory: FC = () => {
   const startDate = watch('startDate');
   const endDate = watch('endDate');
 
+  const debouncedGetAllEnded = useDebouncedCallback((search) => {
+    getAllEndedChats.mutate({
+      startDate: format(new Date(startDate), 'yyyy-MM-dd'),
+      endDate: format(new Date(endDate), 'yyyy-MM-dd'),
+      pagination,
+      sorting,
+      search,
+    });
+  }, 500);
+
   useEffect(() => {
     if (passedChatId != null) {
       getChatById.mutate();
@@ -115,6 +130,7 @@ const ChatHistory: FC = () => {
       endDate: format(new Date(endDate), 'yyyy-MM-dd'),
       pagination,
       sorting,
+      search,
     });
   }, []);
 
@@ -124,19 +140,24 @@ const ChatHistory: FC = () => {
       endDate: string;
       pagination: PaginationState;
       sorting: SortingState;
-    }) =>
-      apiDev.post('agents/chats/ended', {
+      search: string;
+    }) => {
+      let sortBy = 'created desc';
+      if (sorting.length > 0) {
+        const sortType = sorting[0].desc ? 'desc' : 'asc';
+        sortBy = `${sorting[0].id} ${sortType}`;
+      }
+
+      return apiDev.post('agents/chats/ended', {
         startDate: data.startDate,
         endDate: data.endDate,
         page: pagination.pageIndex + 1,
         page_size: pagination.pageSize,
-        sorting:
-          sorting.length === 0
-            ? 'created desc'
-            : sorting[0].id + ' ' + (sorting[0].desc ? 'desc' : 'asc'),
-      }),
+        sorting: sortBy,
+        search,
+      });
+    },
     onSuccess: (res: any) => {
-      setEndedChatsList(res.data.response ?? []);
       filterChatsList(res.data.response ?? []);
       setTotalPages(res?.data?.response[0]?.totalPages ?? 1);
     },
@@ -168,22 +189,6 @@ const ChatHistory: FC = () => {
     ],
     [t]
   );
-
-  const searchChatsMutation = useMutation({
-    mutationFn: (searchKey: string) =>
-      apiDev.post('chats/search', {
-        searchKey: searchKey,
-      }),
-    onSuccess: (res: any) => {
-      const responseList = (res.data.response ?? []).map(
-        (item: any) => item.chatId
-      );
-      const filteredChats = endedChatsList.filter((item) =>
-        responseList.includes(item.id)
-      );
-      filterChatsList(filteredChats);
-    },
-  });
 
   const chatStatusChangeMutation = useMutation({
     mutationFn: async (data: { chatId: string | number; event: string }) => {
@@ -221,6 +226,7 @@ const ChatHistory: FC = () => {
         endDate: format(new Date(endDate), 'yyyy-MM-dd'),
         pagination,
         sorting,
+        search,
       });
       toast.open({
         type: 'success',
@@ -477,11 +483,10 @@ const ChatHistory: FC = () => {
             hideLabel
             name="searchChats"
             placeholder={t('chat.history.searchChats') + '...'}
-            onChange={(e) =>
-              e.target.value.length === 0
-                ? filterChatsList(endedChatsList)
-                : searchChatsMutation.mutate(e.target.value)
-            }
+            onChange={(e) => {
+              setSearch(e.target.value);
+              debouncedGetAllEnded(e.target.value);
+            }}
           />
           <Track style={{ width: '100%' }} gap={16}>
             <Track gap={10}>
@@ -497,11 +502,17 @@ const ChatHistory: FC = () => {
                       value={field.value ?? new Date()}
                       onChange={(v) => {
                         field.onChange(v);
+                        const start = format(new Date(v), 'yyyy-MM-dd');
+                        setSearchParams((params) => {
+                          params.set('start', start);
+                          return params;
+                        });
                         getAllEndedChats.mutate({
-                          startDate: format(new Date(v), 'yyyy-MM-dd'),
+                          startDate: start,
                           endDate: format(new Date(endDate), 'yyyy-MM-dd'),
                           pagination,
                           sorting,
+                          search,
                         });
                       }}
                     />
@@ -522,11 +533,17 @@ const ChatHistory: FC = () => {
                       value={field.value ?? new Date()}
                       onChange={(v) => {
                         field.onChange(v);
+                        const end = format(new Date(v), 'yyyy-MM-dd');
+                        setSearchParams((params) => {
+                          params.set('end', end);
+                          return params;
+                        });
                         getAllEndedChats.mutate({
                           startDate: format(new Date(startDate), 'yyyy-MM-dd'),
-                          endDate: format(new Date(v), 'yyyy-MM-dd'),
+                          endDate: end,
                           pagination,
                           sorting,
+                          search,
                         });
                       }}
                     />
@@ -571,6 +588,7 @@ const ChatHistory: FC = () => {
               endDate: format(new Date(endDate), 'yyyy-MM-dd'),
               pagination: state,
               sorting,
+              search,
             });
           }}
           setSorting={(state: SortingState) => {
@@ -580,6 +598,7 @@ const ChatHistory: FC = () => {
               endDate: format(new Date(endDate), 'yyyy-MM-dd'),
               pagination,
               sorting: state,
+              search,
             });
           }}
           isClientSide={false}

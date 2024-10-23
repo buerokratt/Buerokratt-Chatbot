@@ -1,7 +1,8 @@
+---
 declaration:
   call: declare
   version: 0.1
-  description: "Description placeholder for 'EXTERNAL-BOT'"
+  description: Description placeholder for 'EXTERNAL-BOT'
   method: post
   accepts: json
   returns: json
@@ -10,63 +11,77 @@ declaration:
     body:
       - field: message
         type: string
-        description: "Body field 'message'"
+        description: Body field 'message'
       - field: sender
         type: string
-        description: "Body field 'sender'"
-
+        description: Body field 'sender'
 getting_time:
   assign:
-    currentDate: "${new Date().toISOString().split('T')[0]}"
-  next: post_answer
-
+    currentDate: ${new Date().toISOString().split('T')[0]}
+logstepAZURESAADAME:
+  log: ${incoming.body.message}
+assign_data_sources:
+  assign:
+    data_sources:
+      - type: azure_search
+        parameters:
+          endpoint: "[#SEARCH_ENDPOINT]"
+          index_name: "[#SEARCH_INDEX_NAME]"
+          semantic_configuration: azureml-default
+          query_type: vector_semantic_hybrid
+          in_scope: true
+          role_information: You are an AI assistant that helps people find information.
+          filter: null
+          strictness: 3
+          top_n_documents: 7
+          authentication:
+            type: api_key
+            key: "[#CHATBOT_EXTERNAL_KEY]"
+          embedding_dependency:
+            type: endpoint
+            endpoint: "[#EMBEDDED_ENDPOINT_AZURE]"
+            authentication:
+              type: api_key
+              key: "[#CHATBOT_EXTERNAL_API_KEY]"
+logstepAZUREDS:
+  log: ${data_sources}
+assign_messages:
+  assign:
+    messages:
+      - role: system
+        content: You are a government AI assistant with general questions. All the
+          answers MUST be in Estonian. If the question is in any other language
+          than in Estonian, then translate the question into Estonian and the
+          answer MUST also be in Estonian. Today's date is ${currentDate}.
+      - role: user
+        content: ${incoming.body.message}
+logstepAZUREMSG:
+  log: ${messages}
 post_answer:
   call: http.post
   args:
     url: "[#CHATBOT_EXTERNAL_BOT_URL]"
     headers:
-      "Content-Type": "application/json"
-      "api-key": "[#CHATBOT_EXTERNAL_API_KEY]"
+      Content-Type: application/json
+      api-key: "[#CHATBOT_EXTERNAL_API_KEY]"
     body:
-      dataSources:
-        - type: AzureCognitiveSearch
-          parameters:
-            "endpoint": "[#SEARCH_ENDPOINT]"
-            "indexName": "[#SEARCH_INDEX_NAME]"
-            "semanticConfiguration": "azureml-default"
-            "queryType": "vector_semantic_hybrid"
-            "inScope": true
-            "roleInformation": "You are an AI assistant that helps people find information."
-            "filter": null
-            "strictness": 3
-            "topNDocuments": 7
-            "authentication":
-              "type": "api_key"
-              "key": "[#CHATBOT_EXTERNAL_KEY]"
-            "embeddingDependency":
-              "type": "deployment_name"
-              "deployment_name": "text-embedding-ada-002"
-      messages:
-        - "role": "system"
-          "content": "You are a government AI assistant with general questions. All the answers MUST be in Estonian. If the question is in any other language than in Estonian, then translate the question into Estonian and the answer MUST also be in Estonian. Today's date is ${currentDate}."
-        - "role": "user"
-          "content": ${incoming.body.message}
+      data_sources: ${data_sources}
+      messages: ${messages}
       temperature: 0
       top_p: 1
       max_tokens: 1000
       stream: false
+      frequency_penalty: 0
+      presence_penalty: 0
   result: test
-
 logstepAZUREBOT:
   log: ${test}
-
 assign_value:
   assign:
     correct_value:
       - recipient_id: ${incoming.body.sender}
-        text: ${test.response.body.choices[0].message.content.replace(/\n/g," ").replace(/%/g," protsenti").replace(/\s*\[doc\s*\d+\]\s*,?\s*/g,"").replace(" \. ", ". ")}
+        text: ${test.response.body.choices[0].message.content.replace(/\n/g,"\\n").replace(/%/g," protsenti").replace(/\s*\[doc\s*\d+\]\s*,?\s*/g,"").replace(" \. ", ". ")}
   next: return_value
-
 return_value:
   return: ${correct_value}
   next: end

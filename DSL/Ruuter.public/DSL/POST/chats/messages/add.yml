@@ -114,7 +114,7 @@ insertMessage:
 check_skip_bot:
   switch:
     - condition: ${silent == 'true' || silent == true}
-      next: clearChatList
+      next: notify_chats
   next: postMessageToBot
 
 postMessageToBot:
@@ -133,57 +133,25 @@ check_for_post_message_to_bot_result:
   switch:
     - condition: ${message_to_bot_result.response.body.response === 'Bot error'}
       next: return_bot_error
-  next: clearChatList
+  next: notify_chats
 
-clearChatList:
-  call: http.post
-  args:
-    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query?conflicts=proceed"
-    body:
-     query:
-      term:
-       channelId: "chat-list"
-  result: clear_chat_res
-  next: postNotificationAboutAddedChat
+notify_chats:
+  template: chats/notify
+  requestType: templates
+  body:
+    chatId: ${chatId}
+  result: chats_notify_res
+  next: notify_messages
 
-postNotificationAboutAddedChat:
-  call: http.post
-  args:
-    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
-    body:
-     channelId: "chat-list"
-     timestamp: ${new Date().toISOString()}
-     payload: {
-        "status": "Chat Status Changed",
-        "chatId": "${chatId}"
-     }
-  result: chat_notification_result
-  next: clearMessages
-
-clearMessages:
-  call: http.post
-  args:
-    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query?conflicts=proceed"
-    body:
-     query:
-      term:
-       channelId: ${chatId}
-  result: clear_messages_res
-  next: postNotificationAboutMessageResponse 
-
-postNotificationAboutMessageResponse:
-  call: http.post
-  args:
-    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
-    body:
-     channelId: ${chatId}
-     timestamp: ${new Date().toISOString()}
-     payload: {
-        "type": "message",
-        "messageId": "${uuid}"
-     }
-  result: message_notification_result
-  next: return_result 
+notify_messages:
+  template: messages/notify
+  requestType: templates
+  body:
+    chatId: ${chatId}
+    type: "message"
+    messageId: ${uuid}
+  result: messages_notify_res
+  next: return_result
 
 return_result:
   return: "Message Sent Successfully"

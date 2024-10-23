@@ -1,0 +1,52 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'TRIGGER-SERVICE'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: message
+        type: string
+        description: "message field"
+
+assign_message:
+  assign:
+    input: "${incoming.body.message.split(',').map(e => e.trim())}"
+    serviceName: ${input[0].replace('#', '')}
+    serviceInput: "${input.slice(1).length > 0 ? input.slice(1)[0] : ''}"
+
+check_if_service_has_input:
+  switch:
+    - condition: ${serviceInput.length === 0}
+      next: trigger_service    
+  next: trigger_service_with_input    
+
+trigger_service:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RUUTER_PUBLIC]/${serviceName}"
+  error: return_service_error
+  result: res
+  next: return_result
+
+trigger_service_with_input:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RUUTER_PUBLIC]/${serviceName}"
+    body:
+      input: ${serviceInput} 
+  error: return_service_error  
+  result: res
+  next: return_result
+
+return_result:
+  return: ${res.response.body.response}
+  next: end
+
+return_service_error:
+  status: 400
+  return: "There was a problem triggering the service"
+  next: end
