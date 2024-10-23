@@ -1,0 +1,2 @@
+#!/bin/bash
+docker run --rm --network bykstack -v `pwd`/DSL/Liquibase:/liquibase/changelog liquibase/liquibase --defaultsFile=/liquibase/changelog/liquibase.properties generate-changelog --changelog-file=changelog/initialize.sql --diff-types=catalogs,checkconstraints,columns,databasepackage,databasepackagebody,foreignkeys,functions,indexes,primarykeys,sequences,storedprocedures,tables,triggers,uniqueconstraints,views,data

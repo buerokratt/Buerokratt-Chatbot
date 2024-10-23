@@ -50,7 +50,7 @@ http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibas
                                  referencedTableName="user"/>
 
         <loadData
-                file="data/authority.csv"
+                file="changelog/data/authority.csv"
                 separator=";"
                 tableName="authority">
             <column name="name" type="string"/>

@@ -11,7 +11,7 @@ http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
             </column>
         </createTable>
         <loadData
-                file="data/statuses.csv"
+                file="changelog/data/statuses.csv"
                 separator=";"
                 tableName="allowed_statuses">
             <column name="name" type="string"/>
