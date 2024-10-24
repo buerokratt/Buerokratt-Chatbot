@@ -238,6 +238,23 @@
       "taken-over": "Inimene võttis vestluse üle"
     }
   },
+  "deleteConversation": {
+    "deletionTime": "Kustutamise kellaeg",
+    "deletionNote": "Määrab aja, mille möödudes anonüümsed sõnumid automaatselt kustutatakse.",
+    "conversationDeleting": "Vestluste kustutamine",
+    "generateCsv": "Genereeri CSV",
+    "periodConversations": "Vestlusi perioodis",
+    "expiringConversationsRules": "Automaatse aegumise ja kustutamise reeglid",
+    "showExpiring": "Näita tulevikus aeguvaid vestlusi",
+    "authConversationsRemoval": "Autentitud vestlused kustutatakse",
+    "anonymConversationsDelete": "Anonüümsed vestlused kustutatakse",
+    "period": "Periood",
+    "days": "days",
+    "oneDay": "1 päev",
+    "sevenDays": "7 päeva",
+    "thirtyOneDay": "31 päeva",
+    "ninetyDays": "90 päeva"
+  },
   "roles": {
     "ROLE_ADMINISTRATOR": "Administraator",
     "ROLE_SERVICE_MANAGER": "Teenuse haldur",

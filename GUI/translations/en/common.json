@@ -238,6 +238,23 @@
       "taken-over": "A human took the conversation over"
     }
   },
+  "deleteConversation": {
+    "deletionTime": "Deletion time",
+    "deletionNote": "Defines the time after which anonymous messages are automatically deleted.",
+    "conversationDeleting": "Conversation deletion",
+    "generateCsv": "Generate CSV",
+    "periodConversations": "Conversations in period",
+    "expiringConversationsRules": "Automatic expiration and deletion rules",
+    "showExpiring": "Show expiring conversations",
+    "authConversationsRemoval": "Authenticated conversations removal",
+    "anonymConversationsDelete": "Anonymous conversations removal",
+    "period": "Period",
+    "days": "days",
+    "oneDay": "1 day",
+    "sevenDays": "7 days",
+    "thirtyOneDay": "31 day",
+    "ninetyDays": "90 days"
+  },
   "roles": {
     "ROLE_ADMINISTRATOR": "Administrator",
     "ROLE_SERVICE_MANAGER": "Service manager",

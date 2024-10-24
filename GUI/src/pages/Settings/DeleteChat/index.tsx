@@ -4,37 +4,28 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { useTranslation } from 'react-i18next';
 import { format, parse } from 'date-fns';
-import { Button, Card, FormDatepicker, Switch, Track } from 'components';
+import {Button, Card, FormDatepicker, FormInput, Section, Switch, Track} from 'components';
 import { OrganizationWorkingTime } from 'types/organizationWorkingTime';
 import { useToast } from 'hooks/useToast';
 import { apiDev } from 'services/api';
-import '../SettingsWorkingTime/SettingsWorkingTime.scss';
+import './DeleteChat.scss';
 import { getOrganizationTimeData, setOrganizationTimeData } from '../SettingsWorkingTime/data';
 import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';
-
-const weekdaysOptions = [
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
-    'Sunday',
-];
+import {DeleteChatSettings} from "../../../types/deleteChatSettings";
 
 const DeleteChat: FC = () => {
     const { t } = useTranslation();
     const toast = useToast();
     const { control, handleSubmit, reset, watch } =
-        useForm<OrganizationWorkingTime>();
+        useForm<DeleteChatSettings>();
     const [key, setKey] = useState(0);
     const isOrganizationClosedOnWeekEnds = watch('organizationClosedOnWeekEnds');
     const isOrganizationTheSameOnAllWorkingDays = watch(
         'organizationTheSameOnAllWorkingDays'
     );
-    const organizationWorkingTimeWeekdays = watch(
-        'organizationWorkingTimeWeekdays'
+    const isAuthConversation = watch(
+        'authConversations'
     );
     const { data: workingTime } = useQuery<OrganizationWorkingTime>({
         queryKey: ['configs/organization-working-time', 'prod'],
@@ -44,6 +35,18 @@ const DeleteChat: FC = () => {
             setKey(key + 1);
         },
     });
+
+    const [isAuthMessaged, setIsAuthMessages] = useState<boolean>(false);
+    const [isAnonymMessaged, setIsAnonymMessaged] = useState<boolean>(false);
+    const [sessionLength, setSessionLength] = useState<string>('');
+
+    const handleAuth = (value) => {
+        setIsAuthMessages(value)
+    }
+
+    const handleAnonym = (value) => {
+        setIsAnonymMessaged(value)
+    }
 
     const workingTimeMutation = useMutation({
         mutationFn: (data: OrganizationWorkingTime) =>
@@ -67,6 +70,8 @@ const DeleteChat: FC = () => {
         },
     });
 
+
+
     const handleFormSubmit = handleSubmit((data) =>
         workingTimeMutation.mutate(data)
     );
@@ -85,8 +90,11 @@ const DeleteChat: FC = () => {
 
     return (
         <>
-            <h1>{t('settings.workingTime.title')}</h1>
-            <p>{t('settings.workingTime.description')}</p>
+            <div className={"heading"}>
+                <h1>{t('deleteConversation.conversationDeleting')}</h1>
+                <p>{t('deleteConversation.expiringConversationsRules')}</p>
+            </div>
+
             <Card
                 key={key}
                 isHeaderLight={true}
@@ -96,216 +104,189 @@ const DeleteChat: FC = () => {
                         <Button onClick={handleFormSubmit}>{t('global.save')}</Button>
                     </Track>
                 }
-                header={
-                    <Track gap={8} direction="vertical" align="left">
-                        <Controller
-                            name="organizationWorkingTimeNationalHolidays"
-                            control={control}
-                            render={({ field }) => (
-                                <Switch
-                                    label={t('settings.workingTime.publicHolidays')}
-                                    onLabel={t('settings.workingTime.consider').toString()}
-                                    offLabel={t('settings.workingTime.dontConsider').toString()}
-                                    onCheckedChange={field.onChange}
-                                    checked={field.value}
-                                    {...field}
-                                />
-                            )}
-                        />
-                        <Controller
-                            name="organizationClosedOnWeekEnds"
-                            control={control}
-                            render={({ field }) => (
-                                <Switch
-                                    label={t('settings.workingTime.closedOnWeekends')}
-                                    onLabel={t('global.yes').toString()}
-                                    offLabel={t('global.no').toString()}
-                                    onCheckedChange={field.onChange}
-                                    checked={field.value}
-                                    {...field}
-                                />
-                            )}
-                        />
-                        <Controller
-                            name="organizationTheSameOnAllWorkingDays"
-                            control={control}
-                            render={({ field }) => (
-                                <Switch
-                                    label={t('settings.workingTime.theSameOnAllWorkingDays')}
-                                    onLabel={t('global.yes').toString()}
-                                    offLabel={t('global.no').toString()}
-                                    onCheckedChange={field.onChange}
-                                    checked={field.value}
-                                    {...field}
-                                />
-                            )}
-                        />
-                    </Track>
-                }
             >
-                {isOrganizationTheSameOnAllWorkingDays && (
-                    <Track>
-                        <label className="Label">
-                            {t(
-                                `${
-                                    isOrganizationClosedOnWeekEnds
-                                        ? 'settings.workingTime.allWeekdaysExceptWeekend'
-                                        : 'settings.workingTime.allWeekdays'
-                                }`
-                            )}
-                        </label>
+                <Track gap={10} direction={"vertical"} align={"left"}>
                         <Controller
-                            name={'organizationAllWeekdaysTimeStartISO'}
+                            name="authConversations"
                             control={control}
-                            render={({ field }) => {
-                                return (
-                                    <div className="startTime">
-                                        <FormDatepicker
-                                            {...field}
-                                            timePicker
-                                            hideLabel
-                                            direction="row"
-                                            label=""
-                                            value={
-                                                parse(
-                                                    format(field.value as Date, 'HH:mm:ss'),
-                                                    'HH:mm:ss',
-                                                    new Date()
-                                                ) ?? new Date('0')
-                                            }
-                                        />
-                                    </div>
-                                );
-                            }}
-                        />
-                        <label>{t('settings.workingTime.until')}</label>
-                        <Controller
-                            name={'organizationAllWeekdaysTimeEndISO'}
-                            control={control}
-                            render={({ field }) => {
-                                return (
-                                    <div className="endTime">
-                                        <FormDatepicker
-                                            {...field}
-                                            timePicker
-                                            hideLabel
-                                            direction="row"
-                                            label=""
-                                            value={
-                                                parse(
-                                                    format(field.value as Date, 'HH:mm:ss'),
-                                                    'HH:mm:ss',
-                                                    new Date()
-                                                ) ?? new Date('0')
-                                            }
-                                        />
-                                    </div>
-                                );
-                            }}
-                        />
-                    </Track>
-                )}
-                {!isOrganizationTheSameOnAllWorkingDays &&
-                    weekdaysOptions
-                        .filter(
-                            (d) =>
-                                !(
-                                    isOrganizationClosedOnWeekEnds &&
-                                    (d === 'Saturday' || d === 'Sunday')
-                                )
-                        )
-                        .map((d) => (
-                            <Track key={d}>
-                                <label className="Label switch">
-                                    {t(`settings.weekdays.${d}`.toLowerCase())}
-                                </label>
-                                <Controller
-                                    name="organizationWorkingTimeWeekdays"
-                                    control={control}
-                                    render={({ field }) => (
-                                        <div>
-                                            <Switch
-                                                label=""
-                                                onLabel={t('settings.workingTime.open').toString()}
-                                                offLabel={t('settings.workingTime.closed').toString()}
-                                                onCheckedChange={(value) => {
-                                                    field.onChange(
-                                                        value
-                                                            ? sortAndJoin([
-                                                                ...field.value.toString().split(','),
-                                                                d.toLowerCase(),
-                                                            ])
-                                                            : filterAndJoin(
-                                                                field.value.toString().split(','),
-                                                                d
-                                                            )
-                                                    );
-                                                }}
-                                                checked={field.value?.includes(d.toLowerCase())}
-                                                {...field}
-                                            />
-                                        </div>
-                                    )}
+                            render={({ field }) => (
+                                <Switch
+                                    label={t('deleteConversation.authConversationsRemoval')}
+                                    onLabel="yes"
+                                    offLabel="no"
+                                    onCheckedChange={(value) => handleAuth(value)}
+                                    checked={isAuthMessaged}
+                                    {...field}
                                 />
-                                {organizationWorkingTimeWeekdays.includes(d.toLowerCase()) && (
-                                    <Track>
-                                        <Controller
-                                            name={
-                                                `organization${d}WorkingTimeStartISO` as keyof OrganizationWorkingTime
-                                            }
-                                            control={control}
-                                            render={({ field }) => {
-                                                return (
-                                                    <div className="startTime">
-                                                        <FormDatepicker
-                                                            {...field}
-                                                            timePicker
-                                                            hideLabel
-                                                            direction="row"
-                                                            label=""
-                                                            value={
-                                                                parse(
-                                                                    format(field.value as Date, 'HH:mm:ss'),
-                                                                    'HH:mm:ss',
-                                                                    new Date()
-                                                                ) ?? new Date('0')
-                                                            }
-                                                        />
-                                                    </div>
-                                                );
-                                            }}
-                                        />
-                                        <label>{t('settings.workingTime.until')}</label>
-                                        <Controller
-                                            name={
-                                                `organization${d}WorkingTimeEndISO` as keyof OrganizationWorkingTime
-                                            }
-                                            control={control}
-                                            render={({ field }) => {
-                                                return (
-                                                    <div className="endTime">
-                                                        <FormDatepicker
-                                                            {...field}
-                                                            timePicker
-                                                            hideLabel
-                                                            direction="row"
-                                                            label=""
-                                                            value={
-                                                                parse(
-                                                                    format(field.value as Date, 'HH:mm:ss'),
-                                                                    'HH:mm:ss',
-                                                                    new Date()
-                                                                ) ?? new Date('0')
-                                                            }
-                                                        />
-                                                    </div>
-                                                );
-                                            }}
-                                        />
+                            )}
+                        />
+                        {isAuthMessaged && (
+                            <Controller
+                                name="authPeriod"
+                                control={control}
+                                render={({field}) => (
+                                    <Track justify={"start"} align={"left"}  direction={"vertical"} isMultiline={true}>
+                                        <Track gap={3} align={"center"} justify={"start"} direction={"horizontal"}>
+                                            <FormInput
+                                                name="authNumber"
+                                                label={t('deleteConversation.period')}
+                                                type="number"
+                                                hideLabel={false}
+                                                onChange={(e) => setSessionLength(e.target.value)}
+                                                value={12}
+                                            />
+                                            <label className="minute">
+                                                {t('deleteConversation.days')}
+                                            </label>
+                                        </Track>
+                                        <label className="rule">
+                                            {t('deleteConversation.deletionNote')}
+                                        </label>
                                     </Track>
                                 )}
+                            />
+                            )}
+                </Track>
+
+                {/*SECOND BLOCK*/}
+                <Track gap={10} direction={"vertical"} align={"left"}>
+                    <Controller
+                        name="authConversations"
+                        control={control}
+                        render={({ field }) => (
+                            <Switch
+                                label={t('deleteConversation.anonymConversationsDelete')}
+                                onLabel="yes"
+                                offLabel="no"
+                                onCheckedChange={(value) => handleAnonym(value)}
+                                checked={isAnonymMessaged}
+                                {...field}
+                            />
+                        )}
+                    />
+                    {isAnonymMessaged && (
+                        <Controller
+                            name="authPeriod"
+                            control={control}
+                            render={({field}) => (
+                                <Track justify={"start"} align={"left"}  direction={"vertical"} isMultiline={true}>
+                                    <Track gap={3} align={"center"} justify={"start"} direction={"horizontal"}>
+                                        <FormInput
+                                            name="authNumber"
+                                            label={t('deleteConversation.period')}
+                                            type="number"
+                                            hideLabel={false}
+                                            onChange={(e) => setSessionLength(e.target.value)}
+                                            value={12}
+                                        />
+                                        <label className="minute">
+                                            {t('deleteConversation.days')}
+                                        </label>
+                                    </Track>
+                                    <label className="rule">
+                                        {t('deleteConversation.deletionNote')}
+                                    </label>
+                                </Track>
+                            )}
+                        />
+                    )}
+                </Track>
+
+
+                {/* REST OF PAGE */}
+
+                {(isAnonymMessaged || isAuthMessaged) && (
+                    <>
+                        <Controller
+                            name="authPeriod"
+                            control={control}
+                            render={({field}) => (
+                                <Track gap={100} justify={"start"} align={"center"} direction={"horizontal"} isMultiline={false}>
+                                    <Track gap={10} align={"center"} direction={"horizontal"}>
+                                        {t('deleteConversation.deletionTime')}
+                                    </Track>
+                                    <Track>
+                                        <FormDatepicker
+                                            {...field}
+                                            timePicker
+                                            hideLabel
+                                            direction="row"
+                                            value={new Date('0')}
+                                        />
+                                    </Track>
+                                </Track>
+                            )}
+                        />
+
+                        <Track gap={10} direction={"vertical"} align={"left"} justify={"between"}>
+                        <Track align={"center"}>
+                            <label>{t('deleteConversation.showExpiring')}</label>
+                            <Controller
+                                name={'organizationAllWeekdaysTimeStartISO'}
+                                control={control}
+                                render={({field}) => {
+                                    return (
+                                        <div className="startTime">
+                                            <FormDatepicker
+                                                {...field}
+                                                datePicker
+                                                hideLabel
+                                                direction="row"
+                                                label="123"
+                                                value={
+                                                    parse(
+                                                        format(field.value as Date, 'HH:mm:ss'),
+                                                        'HH:mm:ss',
+                                                        new Date()
+                                                    ) ?? new Date('0')
+                                                }
+                                            />
+                                        </div>
+                                    );
+                                }}
+                            />
+                            <label>{t('settings.workingTime.until')}</label>
+                            <Controller
+                                name={'organizationAllWeekdaysTimeEndISO'}
+                                control={control}
+                                render={({field}) => {
+                                    return (
+                                        <div className="endTime">
+                                            <FormDatepicker
+                                                {...field}
+                                                datePicker
+                                                hideLabel
+                                                direction="row"
+                                                label=""
+                                                value={
+                                                    parse(
+                                                        format(field.value as Date, 'HH:mm:ss'),
+                                                        'HH:mm:ss',
+                                                        new Date()
+                                                    ) ?? new Date('0')
+                                                }
+                                            />
+
+                                        </div>
+                                    );
+                                }}
+                            />
+                            <Track gap={8}>
+                                <Button appearance={"text"} onClick={handleFormSubmit}>{t('deleteConversation.oneDay')}</Button>
+                                <Button appearance={"text"} onClick={handleFormSubmit}>{t('deleteConversation.sevenDays')}</Button>
+                                <Button appearance={"text"} onClick={handleFormSubmit}>{t('deleteConversation.thirtyOneDay')}</Button>
+                                <Button appearance={"text"} onClick={handleFormSubmit}>{t('deleteConversation.ninetyDays')}</Button>
                             </Track>
-                        ))}
+                        </Track>
+                        <Track gap={40} align={"center"}>
+                            {t('deleteConversation.periodConversations')} <b>69483</b>
+                            <Track justify="end">
+                                <Button appearance={"secondary"} onClick={handleFormSubmit}>{t('deleteConversation.generateCsv')}</Button>
+                            </Track>
+                        </Track>
+                        </Track>
+                    </>
+                )}
             </Card>
         </>
     );
