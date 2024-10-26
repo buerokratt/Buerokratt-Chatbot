@@ -31,9 +31,6 @@ assign_data:
     serviceInput: ${input.slice(2).map(item => item.replace(/[()]/g, ""))}
     baseUrl: "${serviceType === 'common_service' ? '[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]' : '[#CHATBOT_RUUTER_PUBLIC_INTERNAL_SERVICE]'}"
 
-logTest:
-  log: "service type ${input} ${serviceType} service method ${serviceMethod} service path ${servicePath} ${serviceInput} ${baseUrl}"
-
 check_for_service_method:
   switch:
     - condition: ${serviceMethod === 'post'}
