@@ -19,10 +19,6 @@ declaration:
         description: "chatId field"    
 
 # TODO: Handle Service Module Services
-
-logmessage:
-  log: "incoming body ${incoming.body}"
-
 assign_data:
   assign:
     message: ${incoming.body.message}
