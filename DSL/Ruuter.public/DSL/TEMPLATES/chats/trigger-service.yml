@@ -41,7 +41,7 @@ trigger_get_service:
   call: http.get
   args:
     url: "${baseUrl}/${servicePath}"
-    params:
+    query:
       input: ${serviceInput}
       authorId: ${authorId}
       chatId: ${chatId}
