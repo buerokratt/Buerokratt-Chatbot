@@ -18,6 +18,7 @@ declaration:
         type: string
         description: "Body field 'msg'"
 
+# TODO: Refactor to work with the new refactored flow
 extract_body:
   assign:
     msg: ${incoming.body.msg}
