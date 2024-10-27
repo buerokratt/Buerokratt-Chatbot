@@ -42,7 +42,7 @@ trigger_get_service:
   args:
     url: "${baseUrl}/${servicePath}"
     query:
-      input: ${serviceInput}
+      input: ${serviceInput.join(',')}
       authorId: ${authorId}
       chatId: ${chatId}
   error: return_service_error
