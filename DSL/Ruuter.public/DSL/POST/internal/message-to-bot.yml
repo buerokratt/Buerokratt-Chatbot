@@ -1,7 +1,7 @@
 declaration:
   call: declare
   version: 0.1
-  description: "Decription placeholder for 'MESSAGE-TO-BOT'"
+  description: "Decription placeholder for the 'MESSAGE-TO-BOT'"
   method: post
   accepts: json
   returns: json
