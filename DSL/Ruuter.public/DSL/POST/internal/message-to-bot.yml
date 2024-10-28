@@ -77,21 +77,15 @@ check_chat_belongs_to_bot:
   next: return_chat_does_not_belong_to_bot
 
 check_for_service:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RUUTER_PUBLIC]/internal/services/service-check"
-    body:
-      content: ${content}
-      chatId: ${chatId}
-      authorId: ${get_bot_name_result.response.body[0].value}
-  result: converted_messages_res
-  next: check_if_service_found
-
-check_if_service_found:
   switch:
-    - condition: ${converted_messages_res.response.body.response === "No service found"}
-      next: post_message_to_bot
-  next: add_bot_message_to_db
+    - condition: ${content.startsWith("#common_service") || content.startsWith("#service")}
+      next: assign_service_content
+  next: post_message_to_bot
+
+assign_service_content:
+  assign:
+   service_content: ${content}
+  next: trigger_service 
 
 post_message_to_bot:
   call: http.post
@@ -110,24 +104,24 @@ check_if_bot_is_unable_to_reply:
       next: check_for_fallback_bot
     - condition: ${post_message_to_bot_result.response.body?.[0]?.text == 'Suunan teid klienditeenindajale. Varuge natukene kannatust.'}
       next: get_organization_base_config
-  next: check_if_bot_detected_a_common_service
+    - condition: ${post_message_to_bot_result.response.body?.[0]?.text.startsWith("#common_service") || post_message_to_bot_result.response.body?.[0]?.text.startsWith("#service")}
+      next: assign_service_content_from_bot_response  
+  next: extract_bot_responses
 
-check_if_bot_detected_a_common_service:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RUUTER_PUBLIC]/internal/services/bot-service-detect"
-    body:
-      content: ${post_message_to_bot_result.response.body?.[0]?.text}
-      chatId: ${chatId}
-      authorId: ${get_bot_name_result.response.body[0].value}
-      botResponse: ${post_message_to_bot_result.response.body}
+assign_service_content_from_bot_response:
+  assign:
+   service_content: ${post_message_to_bot_result.response.body?.[0]?.text}
+  next: trigger_service 
+
+trigger_service:
+  template: chats/trigger-service
+  requestType: templates
+  body:
+    message: ${service_content}
+    chatId: ${chatId}
+    authorId: ${get_bot_name_result.response.body[0].value}
   result: converted_messages_res
-  next: check_detection_result
-
-check_detection_result:
-  switch:
-    - condition: ${converted_messages_res.response.body.response === "No common services detected"}
-      next: extract_bot_responses
+  error: return_bot_error
   next: add_bot_message_to_db
 
 check_for_fallback_bot:
@@ -137,15 +131,15 @@ check_for_fallback_bot:
     body:
       sender: ${chatId}
       message: ${content}
-  result: fallback_bot_result
+  result: converted_messages_res
   error: return_bot_error
   next: check_if_fallback_bot_is_unable_to_reply
 
 check_if_fallback_bot_is_unable_to_reply:
   switch:
-    - condition: ${fallback_bot_result == 'ERROR'}
+    - condition: ${converted_messages_res == 'ERROR'}
       next: check_if_user_wants_csa
-  next: format_fallback_bot_messages
+  next: add_bot_message_to_db
 
 check_if_user_wants_csa:
   call: http.post
@@ -315,33 +309,16 @@ format_bot_messages:
           "created": "${new Date().toISOString()}",
         }
   result: converted_messages_res
-  next: add_bot_message_to_db
+  next: assign_converted_messages_res
 
-format_fallback_bot_messages:
-  call: http.post
-  args:
-    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/bot_responses_to_messages"
-    headers:
-      type: json
-    body:
-      data:
-        {
-          "botMessages": "${fallback_bot_result.response.body.response}",
-          "chatId": "${chatId}",
-          "authorId": "${get_bot_name_result.response.body[0].value}",
-          "authorFirstName": "",
-          "authorLastName": "",
-          "authorTimestamp": "${new Date().toISOString()}",
-          "created": "${new Date().toISOString()}",
-        }
-  result: converted_messages_res
+assign_converted_messages_res:
+  assign:
+    converted_messages_res: ${converted_messages_res.response.body}
   next: add_bot_message_to_db
 
 add_bot_message_to_db:
   switch:
-    - condition: ${converted_messages_res.response.body?.length > 0}
-      next: do_add_bot_message_to_db
-    - condition: ${converted_messages_res.response.body.response?.length > 0}
+    - condition: ${converted_messages_res.length > 0}
       next: do_add_bot_message_to_db
   next: return_ok
 
@@ -350,7 +327,7 @@ do_add_bot_message_to_db:
   args:
     url: "[#CHATBOT_RESQL]/insert-bot-message"
     body:
-      messages: "${converted_messages_res.response.body?.length > 0 ? converted_messages_res.response.body : converted_messages_res.response.body.response}"
+      messages: ${converted_messages_res}
   result: add_bot_message_to_bot_result
   next: return_message_sent
 

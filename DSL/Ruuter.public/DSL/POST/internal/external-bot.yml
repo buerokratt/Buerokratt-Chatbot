@@ -82,6 +82,37 @@ assign_value:
       - recipient_id: ${incoming.body.sender}
         text: ${test.response.body.choices[0].message.content.replace(/\n/g,"\\n").replace(/%/g," protsenti").replace(/\s*\[doc\s*\d+\]\s*,?\s*/g,"").replace(" \. ", ". ")}
   next: return_value
+
+check_value:
+  switch:
+    - condition: ${correct_value === 'ERROR'}
+      next: return_value
+  next: format_messages
+  
 return_value:
   return: ${correct_value}
   next: end
+
+format_messages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/bot_responses_to_messages"
+    headers:
+      type: json
+    body:
+      data:
+        {
+          "botMessages": "${correct_value.response.body.response}",
+          "chatId": "${chatId}",
+          "authorId": "${get_bot_name_result.response.body[0].value}",
+          "authorFirstName": "",
+          "authorLastName": "",
+          "authorTimestamp": "${new Date().toISOString()}",
+          "created": "${new Date().toISOString()}",
+        }
+  result: converted_messages_res
+  next: return_formatted_value
+
+return_formatted_value:
+  return: ${converted_messages_res.response.body.response}
+  next: end 
