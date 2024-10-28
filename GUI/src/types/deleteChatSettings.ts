@@ -3,5 +3,7 @@ export interface DeleteChatSettings {
     authPeriod: number;
     isAnonymConversations: boolean;
     anonymPeriod: number;
-    deletionTimeISO: Date | string;
+    deletionTimeISO:  string;
+    startDate: Date | string;
+    endDate: Date | string;
 }
