@@ -116,7 +116,7 @@ format_messages:
     body:
       data:
         {
-          "botMessages": "${[correct_value]}",
+          "botMessages": "${correct_value}",
           "chatId": "${sender}",
           "authorId": "${authorId}",
           "authorFirstName": "",
