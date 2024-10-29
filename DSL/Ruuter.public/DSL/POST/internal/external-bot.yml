@@ -19,7 +19,7 @@ declaration:
         type: string
         description: "Parameter 'authorId'"
 
-getting_time:
+extract_data:
   assign:
     currentDate: ${new Date().toISOString().split('T')[0]}
     sender: ${incoming.body.sender}
