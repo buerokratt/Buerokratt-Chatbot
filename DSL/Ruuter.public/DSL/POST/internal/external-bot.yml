@@ -15,11 +15,19 @@ declaration:
       - field: sender
         type: string
         description: Body field 'sender'
-getting_time:
+      - field: authorId
+        type: string
+        description: "Parameter 'authorId'"
+
+extract_data:
   assign:
     currentDate: ${new Date().toISOString().split('T')[0]}
+    sender: ${incoming.body.sender}
+    authorId: ${incoming.body.authorId}
+
 logstepAZURESAADAME:
   log: ${incoming.body.message}
+
 assign_data_sources:
   assign:
     data_sources:
@@ -43,8 +51,10 @@ assign_data_sources:
             authentication:
               type: api_key
               key: "[#CHATBOT_EXTERNAL_API_KEY]"
+
 logstepAZUREDS:
   log: ${data_sources}
+
 assign_messages:
   assign:
     messages:
@@ -55,8 +65,10 @@ assign_messages:
           answer MUST also be in Estonian. Today's date is ${currentDate}.
       - role: user
         content: ${incoming.body.message}
+
 logstepAZUREMSG:
   log: ${messages}
+
 post_answer:
   call: http.post
   args:
@@ -74,14 +86,16 @@ post_answer:
       frequency_penalty: 0
       presence_penalty: 0
   result: test
+
 logstepAZUREBOT:
   log: ${test}
+
 assign_value:
   assign:
     correct_value:
-      - recipient_id: ${incoming.body.sender}
+      - recipient_id: ${sender}
         text: ${test.response.body.choices[0].message.content.replace(/\n/g,"\\n").replace(/%/g," protsenti").replace(/\s*\[doc\s*\d+\]\s*,?\s*/g,"").replace(" \. ", ". ")}
-  next: return_value
+  next: check_value
 
 check_value:
   switch:
@@ -102,9 +116,9 @@ format_messages:
     body:
       data:
         {
-          "botMessages": "${correct_value.response.body.response}",
-          "chatId": "${chatId}",
-          "authorId": "${get_bot_name_result.response.body[0].value}",
+          "botMessages": "${correct_value}",
+          "chatId": "${sender}",
+          "authorId": "${authorId}",
           "authorFirstName": "",
           "authorLastName": "",
           "authorTimestamp": "${new Date().toISOString()}",
