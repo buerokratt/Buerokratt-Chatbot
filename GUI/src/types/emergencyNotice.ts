@@ -4,3 +4,7 @@ export interface EmergencyNotice {
   emergencyNoticeEndISO: Date | string;
   isEmergencyNoticeVisible: boolean;
 }
+
+export interface EmergencyNoticeResponse {
+  response: EmergencyNotice;
+}
