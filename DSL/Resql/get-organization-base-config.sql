@@ -1,40 +1,20 @@
-WITH all_time_availability_config AS
-  (SELECT id,
-          KEY,
-          value
-   FROM configuration
-   WHERE KEY IN ('organizationWorkingAllTime')
-     AND id IN
-       (SELECT max(id)
-        FROM configuration
-        GROUP BY KEY)
-     AND NOT deleted),
-     ask_for_contacts_config AS
-  (SELECT id,
-          KEY,
-          value
-   FROM configuration
-   WHERE KEY IN ('organizationNoCsaAskForContacts')
-     AND id IN
-       (SELECT max(id)
-        FROM configuration
-        GROUP BY KEY)
-     AND NOT deleted),
-     csa_no_available_message_config AS
-  (SELECT id,
-          KEY,
-          value
-   FROM configuration
-   WHERE KEY IN ('organizationNoCsaAvailableMessage')
-     AND id IN
-       (SELECT max(id)
-        FROM configuration
-        GROUP BY KEY)
-     AND NOT deleted)
+WITH configuration_values AS (
+    SELECT id,
+           KEY,
+           value
+    FROM configuration
+    WHERE KEY IN ('organizationWorkingAllTime', 
+                  'organizationNoCsaAskForContacts', 
+                  'organizationNoCsaAvailableMessage',
+                  'organizationOutsideWorkingHoursAskForContacts',
+                  'organizationOutsideWorkingHoursMessage')
+      AND id IN (SELECT max(id) FROM configuration GROUP BY KEY)
+      AND NOT deleted
+)
 SELECT
-  (SELECT value AS is_available_all_time
-   FROM all_time_availability_config),
-  (SELECT value AS ask_for_contacts
-   FROM ask_for_contacts_config),
-  (SELECT value AS no_csa_message
-   FROM csa_no_available_message_config);
+    MAX(CASE WHEN KEY = 'organizationWorkingAllTime' THEN value END) AS is_available_all_time,
+    MAX(CASE WHEN KEY = 'organizationNoCsaAskForContacts' THEN value END) AS ask_for_contacts,
+    MAX(CASE WHEN KEY = 'organizationNoCsaAvailableMessage' THEN value END) AS no_csa_message,
+    MAX(CASE WHEN KEY = 'organizationOutsideWorkingHoursAskForContacts' THEN value END) AS outside_working_hours_ask_for_contacts,
+    MAX(CASE WHEN KEY = 'organizationOutsideWorkingHoursMessage' THEN value END) AS outside_working_hours_message
+FROM configuration_values;
