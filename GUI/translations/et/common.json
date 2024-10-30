@@ -197,6 +197,7 @@
       "unavailable_csas": "Nõustajad pole saadaval",
       "unavailable_csas_ask_contacts": "Nõustajad ei ole kättesaadavad ja küsitakse kontakte",
       "unavailable_holiday": "Puhkus",
+      "unavailable_holiday_ask_contacts": "Puhkus ja küsis kontakte",
       "user-reached": "Kasutajaga võeti ühendust",
       "user-not-reached": "Kasutajaga ei õnnestunud ühendust saada"
     },
@@ -235,6 +236,7 @@
       "unavailable_csas": "Nõustajad pole saadaval",
       "unavailable_csas_ask_contacts": "Nõustajad ei ole kättesaadavad ja küsitakse kontakte",
       "unavailable_holiday": "Puhkus",
+      "unavailable_holiday_ask_contacts": "Puhkus ja küsis kontakte",
       "pending-assigned": "{{name}} määratud kontaktkasutajale",
       "user-reached": "{{name}} võttis kasutajaga ühendust",
       "user-not-reached": "{{name}} ei saanud kasutajaga ühendust",
