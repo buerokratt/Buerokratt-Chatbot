@@ -31,3 +31,10 @@
   margin-top: 10px;
   size: 16px;
 }
+
+.parent-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Full viewport height */
+  overflow-y: auto; /* Enables vertical scrolling */
+}
