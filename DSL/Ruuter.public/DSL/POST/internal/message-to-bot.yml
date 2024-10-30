@@ -210,7 +210,7 @@ return_is_a_holiday:
         - chatId: ${chatId}
           content: ${org_details.holidayMessage}
           authorTimestamp: ${new Date().toISOString()}
-          event: "unavailable_holiday"
+          event: "${base_config.outsideWorkingHoursAskForContacts === 'true' ? 'unavailable_holiday_ask_contacts' : 'unavailable_holiday'}"
           authorId: ${get_bot_name_result.response.body[0].value}
           authorFirstName: ""
           authorLastName: ""
