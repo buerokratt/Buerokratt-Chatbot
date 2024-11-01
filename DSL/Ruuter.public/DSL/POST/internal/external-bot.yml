@@ -15,11 +15,19 @@ declaration:
       - field: sender
         type: string
         description: Body field 'sender'
-getting_time:
+      - field: authorId
+        type: string
+        description: "Parameter 'authorId'"
+
+extract_data:
   assign:
     currentDate: ${new Date().toISOString().split('T')[0]}
+    sender: ${incoming.body.sender}
+    authorId: ${incoming.body.authorId}
+
 logstepAZURESAADAME:
   log: ${incoming.body.message}
+
 assign_data_sources:
   assign:
     data_sources:
@@ -43,8 +51,10 @@ assign_data_sources:
             authentication:
               type: api_key
               key: "[#CHATBOT_EXTERNAL_API_KEY]"
+
 logstepAZUREDS:
   log: ${data_sources}
+
 assign_messages:
   assign:
     messages:
@@ -55,8 +65,10 @@ assign_messages:
           answer MUST also be in Estonian. Today's date is ${currentDate}.
       - role: user
         content: ${incoming.body.message}
+
 logstepAZUREMSG:
   log: ${messages}
+
 post_answer:
   call: http.post
   args:
@@ -79,9 +91,40 @@ logstepAZUREBOT:
 assign_value:
   assign:
     correct_value:
-      - recipient_id: ${incoming.body.sender}
+      - recipient_id: ${sender}
         text: ${test.response.body.choices[0].message.content.replace(/\n/g,"\\n").replace(/%/g," protsenti").replace(/\s*\[doc\s*\d+\]\s*,?\s*/g,"").replace(" \. ", ". ")}
-  next: return_value
+  next: check_value
+
+check_value:
+  switch:
+    - condition: ${correct_value === 'ERROR'}
+      next: return_value
+  next: format_messages
+  
 return_value:
   return: ${correct_value}
   next: end
+
+format_messages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/bot_responses_to_messages"
+    headers:
+      type: json
+    body:
+      data:
+        {
+          "botMessages": "${correct_value}",
+          "chatId": "${sender}",
+          "authorId": "${authorId}",
+          "authorFirstName": "",
+          "authorLastName": "",
+          "authorTimestamp": "${new Date().toISOString()}",
+          "created": "${new Date().toISOString()}",
+        }
+  result: converted_messages_res
+  next: return_formatted_value
+
+return_formatted_value:
+  return: ${converted_messages_res.response.body.response}
+  next: end 

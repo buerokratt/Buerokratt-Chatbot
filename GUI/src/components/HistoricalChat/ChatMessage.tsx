@@ -22,7 +22,7 @@ const ChatMessage: FC<ChatMessageProps> = ({ message, onMessageClick }) => {
           className="historical-chat__message-text"
           onClick={onMessageClick ? () => onMessageClick(message) : undefined}
         >
-          <Markdownify message={decodeURIComponent(message.content ?? '')} />
+          <Markdownify message={message.content ?? ''} />
         </button>
         <time
           dateTime={message.authorTimestamp}
