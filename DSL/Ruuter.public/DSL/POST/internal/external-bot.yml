@@ -86,10 +86,8 @@ post_answer:
       frequency_penalty: 0
       presence_penalty: 0
   result: test
-
 logstepAZUREBOT:
   log: ${test}
-
 assign_value:
   assign:
     correct_value:

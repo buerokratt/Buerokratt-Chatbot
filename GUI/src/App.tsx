@@ -21,6 +21,7 @@ import SettingsWelcomeMessage from 'pages/Settings/SettingsWelcomeMessage';
 import SettingsSessionLength from 'pages/Settings/SettingsSessionLength';
 import './locale/et_EE';
 import ChatPending from 'pages/Chat/ChatPending';
+import DeleteConversations from "./pages/Settings/DeleteConversations";
 
 const App: FC = () => {
   useQuery<{
@@ -39,6 +40,7 @@ const App: FC = () => {
         <Route index element={<Navigate to="/active" />} />
         <Route path="/unanswered" element={<ChatUnanswered />} />
         <Route path="/active" element={<ChatActive />} />
+        <Route path="/delete-conversations" element={<DeleteConversations />} />
         <Route path="/history" element={<ChatHistory />} />
         <Route path="/pending" element={<ChatPending />} />
         <Route path="/users" element={<SettingsUsers />} />

@@ -1,0 +1,105 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'Delete conversations cron'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: training
+  allowlist:
+    body:
+      - field: expression
+        type: string
+        description: "Body field 'expression'"
+
+assignCronFileLocation:
+  assign:
+    cronFileLocation: "/CronManager/delete_messages.yml"
+    expression: ${incoming.body.expression}
+
+checkCronFile:
+  call: http.post
+  args:
+    url: "[#TRAINING_DMAPPER]/file-manager/exists"
+    body:
+      file_path: ${cronFileLocation}
+  result: fileExists
+
+assignValues:
+  assign:
+    daysOfWeek: ${dbResult.response.body[0].daysOfWeek}
+    fromDate: ${dbResult.response.body[0].fromDate}
+    scheduled: ${dbResult.response.body[0].scheduled}
+    cornExists: ${fileExists.response.body}
+
+checkForDeletion:
+  switch:
+    - condition: ${fileExists.response.body.error === false && !scheduled}
+      next: deleteCronTask
+    - condition: ${fileExists.response.body.error === true && !scheduled}
+      next: returnSuccess
+  next: generateCronExpression
+
+deleteCronTask:
+  call: http.post
+  args:
+    url: "[#TRAINING_DMAPPER]/file-manager/delete"
+    body:
+      file_path: ${cronTask}
+  result: deleted
+  next: returnSuccess
+
+generateCronExpression:
+  call: http.post
+  args:
+    url: "[#TRAINING_DMAPPER]/cron/generate-expression-date-days"
+    body:
+      date: ${fromDate}
+      days: ${daysOfWeek}
+  result: cronExpression
+
+createCronJson:
+  call: http.post
+  args:
+    url: "[#TRAINING_DMAPPER]/hbs/training/get_cron_shell_execution_file"
+    headers:
+      type: "json"
+    body:
+      cronExpression: ${cronExpression.response.body.expression}
+      type: "exec"
+      command: "./scripts/delete_messages.sh"
+      allowedEnvs: ["test"]
+      startDate: ${cronExpression.response.body.startDate}
+  result: cronJson
+
+convertJsonToYaml:
+  call: http.post
+  args:
+    url: "[#TRAINING_DMAPPER]/conversion/json_to_yaml"
+    body:
+      train_bot_now: ${cronJson.response.body}
+  result: cronYaml
+
+saveCronFile:
+  call: http.post
+  args:
+    url: "[#TRAINING_DMAPPER]/file-manager/create"
+    body:
+      file_path: ${cronFileLocation}
+      content: ${cronYaml.response.body.json}
+  result: fileResult
+
+refreshCronManager:
+  call: http.post
+  args:
+    url: "[#CRON_MANAGER]/reload/delete_messages"
+  result: cronResult
+  next: returnSuccess
+
+returnSuccess:
+  return: "Cron Task updated."
+  next: end
+
+returnError:
+  return: "Could not get data from DB."
+  next: end
