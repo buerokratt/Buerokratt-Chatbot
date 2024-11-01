@@ -15,7 +15,7 @@ const PreviewMessage: FC<PreviewMessageProps> = ({ preview }) => {
         <div className={clsx('active-chat__message-preview')}>
           {!!preview && (
             <Track>
-              <Markdownify message={decodeURIComponent(preview ?? '')} />
+              <Markdownify message={preview ?? ''} />
               <div className="typing">
                 <span></span>
                 <span></span>
