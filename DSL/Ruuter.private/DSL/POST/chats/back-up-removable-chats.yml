@@ -1,0 +1,51 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'Back up conversations'"
+  method: get
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: fromDate
+        type: string
+        description: "Body field 'fromDate'"
+
+getRemovableConversations:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RUUTER_PRIVATE]/chats-to-remove"
+    body:
+      fromDate: ${incoming.body.fromDate}
+  result: res
+  next: validate_res
+
+validate_res:
+  switch:
+    - condition: "${res.response.body.length > 0}"
+      next: getConversationsToBackUp
+  next: return_not_found
+
+getConversationsToBackUp:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-chats-to-remove"
+    body:
+      chats: ${res.response.body}
+  result: conversations
+  next: return_result
+
+validate_conversations:
+  switch:
+    - condition: "${conversations.response.body.length > 0}"
+      next: return_result
+  next: return_result
+
+return_result:
+  return: ${res.response.body}
+  next: end
+
+return_not_found:
+  return: "error: not found"
+  next: end

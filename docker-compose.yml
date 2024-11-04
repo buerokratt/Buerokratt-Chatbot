@@ -23,6 +23,19 @@ services:
     cpus: "0.5"
     mem_limit: "512M"
 
+  cron-manager:
+    container_name: cron-manager
+    image: cron-manager
+    # user: root # This root user is only for local development due to multi container mounted volume permissions
+    volumes:
+      - ./DSL/CronManager:/DSL
+    environment:
+      - server.port=9010
+    ports:
+      - 9010:9010
+    networks:
+      - bykstack
+
   ruuter-private:
     container_name: ruuter-private
     image: ruuter

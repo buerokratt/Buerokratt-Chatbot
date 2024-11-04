@@ -1,0 +1,36 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'Chats To Remove'"
+  method: get
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: fromDate
+        type: string
+        description: "Body field 'fromDate'"
+
+getRemovableConversations:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-chats-to-remove"
+    body:
+      fromDate: ${incoming.body.fromDate}
+  result: res
+  next: validate_res
+
+validate_res:
+  switch:
+    - condition: "${res.response.body.length > 0}"
+      next: return_result
+  next: return_not_found
+
+return_result:
+  return: ${res.response.body}
+  next: end
+
+return_not_found:
+  return: "error: not found"
+  next: end
