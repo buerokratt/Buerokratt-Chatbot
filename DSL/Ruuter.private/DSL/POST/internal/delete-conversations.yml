@@ -31,14 +31,27 @@ validateResponse:
       next: emptyMessages
   next: convertAnonJsonToYaml
 
+getRemovableConversations:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RUUTER_PRIVATE]/chats-to-remove"
+    body:
+      isAuth: ${incoming.body.isAuth}
+  result: chats
+  next: validate_res
 
+validate_res:
+  switch:
+    - condition: "${chats.response.body.length > 0}"
+      next: getConversationsToBackUp
+  next: return_not_found
 
 emptyMessages:
   call: http.post
   args:
     url: "[#CHATBOT_RUUTER_PRIVATE]/chats/empty"
     body:
-      chatIds: ${chatIds}
+      chatIds: ${chats.response.body}
   result: res
 
 returnSuccess:
