@@ -1,0 +1,6 @@
+anon_conversations:
+  trigger: 43 1 * * *
+  type: exec
+  command: ./scripts/get-anonym-conversations.sh
+  allowedEnvs:
+    - test

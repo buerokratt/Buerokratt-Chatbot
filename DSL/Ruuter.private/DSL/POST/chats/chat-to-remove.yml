@@ -11,11 +11,29 @@ declaration:
       - field: fromDate
         type: string
         description: "Body field 'fromDate'"
+      - field: isAuth
+        type: boolean
+        description: "Body field 'isAuth'"
 
-getRemovableConversations:
+splitCall:
+  switch:
+    - condition: ${incoming.body.isAuth}
+      next: getAuthRemovableConversations
+  next: getAnonymRemovableConversations
+
+getAuthRemovableConversations:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/get-chats-to-remove"
+    url: "[#CHATBOT_RESQL]/get-auth-chats-to-remove"
+    body:
+      fromDate: ${incoming.body.fromDate}
+  result: res
+  next: validate_res
+
+getAnonymRemovableConversations:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-anonym-chats-to-remove"
     body:
       fromDate: ${incoming.body.fromDate}
   result: res

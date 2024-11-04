@@ -15,6 +15,8 @@ This repo will primarily contain:
 - Navigate to Resql and build the image `docker build -t resql .`
 - Clone [Data Mapper](https://github.com/buerokratt/DataMapper)
 - Navigate to Data Mapper and build the image `docker build -t data-mapper .`
+- Clone [Data Mapper](https://github.com/buerokratt/CronManager)
+- Navigate to Cron Manager and build the image `docker build -t cron-manager .`
 - Clone [TIM](https://github.com/buerokratt/TIM)
 - Navigate to TIM and build the image `docker build -t tim .`
 - Clone [Chat Widget](https://github.com/buerokratt/Chat-Widget)

@@ -11,88 +11,120 @@ declaration:
       - field: expression
         type: string
         description: "Body field 'expression'"
+      - field: anonEnabled
+        type: boolean
+        description: "Body field 'anonEnabled'"
+      - field: authEnabled
+        type: boolean
+        description: "Body field 'authEnabled'"
 
 assignCronFileLocation:
   assign:
-    cronFileLocation: "/CronManager/delete_messages.yml"
+    cronFileLocation: "/CronManager/delete_conversations.yml"
     expression: ${incoming.body.expression}
+    anonEnabled: ${incoming.body.anonEnabled}
+    authEnabled: ${incoming.body.authEnabled}
 
 checkCronFile:
   call: http.post
   args:
-    url: "[#TRAINING_DMAPPER]/file-manager/exists"
+    url: "[#CHATBOT_DMAPPER]/file-manager/exists"
     body:
       file_path: ${cronFileLocation}
   result: fileExists
 
-assignValues:
-  assign:
-    daysOfWeek: ${dbResult.response.body[0].daysOfWeek}
-    fromDate: ${dbResult.response.body[0].fromDate}
-    scheduled: ${dbResult.response.body[0].scheduled}
-    cornExists: ${fileExists.response.body}
-
 checkForDeletion:
   switch:
-    - condition: ${fileExists.response.body.error === false && !scheduled}
+    - condition: ${fileExists.response.body.error === false && !anonEnabled && !authEnabled}
       next: deleteCronTask
-    - condition: ${fileExists.response.body.error === true && !scheduled}
+    - condition: ${fileExists.response.body.error === true && !anonEnabled && !authEnabled}
       next: returnSuccess
-  next: generateCronExpression
+  next: createAuthCronJson
 
 deleteCronTask:
   call: http.post
   args:
-    url: "[#TRAINING_DMAPPER]/file-manager/delete"
+    url: "[#CHATBOT_DMAPPER]/file-manager/delete"
     body:
-      file_path: ${cronTask}
+      file_path: ${cronFileLocation}
   result: deleted
   next: returnSuccess
 
-generateCronExpression:
+createAuthCronJson:
   call: http.post
   args:
-    url: "[#TRAINING_DMAPPER]/cron/generate-expression-date-days"
-    body:
-      date: ${fromDate}
-      days: ${daysOfWeek}
-  result: cronExpression
-
-createCronJson:
-  call: http.post
-  args:
-    url: "[#TRAINING_DMAPPER]/hbs/training/get_cron_shell_execution_file"
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/delete_conversations_cron_shell"
     headers:
       type: "json"
     body:
-      cronExpression: ${cronExpression.response.body.expression}
+      cronExpression: ${expression}
       type: "exec"
-      command: "./scripts/delete_messages.sh"
+      command: "./scripts/get-auth-conversations.sh"
       allowedEnvs: ["test"]
-      startDate: ${cronExpression.response.body.startDate}
-  result: cronJson
+  result: authCronJson
 
-convertJsonToYaml:
+createAnonCronJson:
   call: http.post
   args:
-    url: "[#TRAINING_DMAPPER]/conversion/json_to_yaml"
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/delete_conversations_cron_shell"
+    headers:
+      type: "json"
     body:
-      train_bot_now: ${cronJson.response.body}
-  result: cronYaml
+      cronExpression: ${expression}
+      type: "exec"
+      command: "./scripts/get-anonym-conversations.sh"
+      allowedEnvs: ["test"]
+  result: anonCronJson
 
-saveCronFile:
+checkAuthConditions:
+  switch:
+    - condition: ${anonEnabled && authEnabled}
+      next: convertFullJsonToYaml
+    - condition: ${!anonEnabled && authEnabled}
+      next: convertAuthJsonToYaml
+  next: convertAnonJsonToYaml
+
+convertAnonJsonToYaml:
   call: http.post
   args:
-    url: "[#TRAINING_DMAPPER]/file-manager/create"
+    url: "[#CHATBOT_DMAPPER]/conversion/json_to_yaml"
+    body:
+      anon_conversations: ${anonCronJson.response.body}
+  result: converted
+  next: saveFile
+
+convertAuthJsonToYaml:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/conversion/json_to_yaml"
+    body:
+      auth_conversations: ${authCronJson.response.body}
+  result: converted
+  next: saveFile
+
+convertFullJsonToYaml:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/conversion/json_to_yaml"
+    body:
+      anon_conversations: ${anonCronJson.response.body}
+      auth_conversations: ${authCronJson.response.body}
+  result: converted
+  next: saveFile
+
+saveFile:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/file-manager/create"
     body:
       file_path: ${cronFileLocation}
-      content: ${cronYaml.response.body.json}
+      content: ${converted.response.body.json}
   result: fileResult
 
 refreshCronManager:
   call: http.post
   args:
-    url: "[#CRON_MANAGER]/reload/delete_messages"
+    url: "[#CHATBOT_CRON_MANAGER]/reload/delete_conversations"
   result: cronResult
   next: returnSuccess
 
