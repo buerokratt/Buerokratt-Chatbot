@@ -53,27 +53,27 @@ deleteCronTask:
 createAuthCronJson:
   call: http.post
   args:
-    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/delete_conversations_cron_shell"
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/delete_conversations_cron"
     headers:
       type: "json"
     body:
       cronExpression: ${expression}
-      type: "exec"
-      command: "./scripts/get-auth-conversations.sh"
-      allowedEnvs: ["test"]
+      method: "POST"
+      url: "[#CHATBOT_RUUTER_PRIVATE_INTERNAL]/internal/delete-conversations"
+      isAuth: true
   result: authCronJson
 
 createAnonCronJson:
   call: http.post
   args:
-    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/delete_conversations_cron_shell"
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/delete_conversations_cron"
     headers:
       type: "json"
     body:
       cronExpression: ${expression}
-      type: "exec"
-      command: "./scripts/get-anonym-conversations.sh"
-      allowedEnvs: ["test"]
+      method: "POST"
+      url: "[#CHATBOT_RUUTER_PRIVATE_INTERNAL]/internal/delete-conversations"
+      isAuth: false
   result: anonCronJson
 
 checkAuthConditions:

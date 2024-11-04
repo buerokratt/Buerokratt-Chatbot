@@ -8,12 +8,15 @@ declaration:
   namespace: backoffice
   allowlist:
     body:
-      - field: fromDate
-        type: string
-        description: "Body field 'fromDate'"
       - field: isAuth
         type: boolean
         description: "Body field 'isAuth'"
+
+getConfigurations:
+  call: http.get
+  args:
+    url: "[#CHATBOT_RUUTER_PRIVATE_INTERNAL]/configs/delete-conversation-config"
+  result: configs
 
 splitCall:
   switch:
@@ -21,21 +24,37 @@ splitCall:
       next: getAuthRemovableConversations
   next: getAnonymRemovableConversations
 
+convertAuthTime:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/utils/today-minus-days"
+    body:
+      days: ${configs.response.body.authPeriod}
+  result: dateTime
+
 getAuthRemovableConversations:
   call: http.post
   args:
     url: "[#CHATBOT_RESQL]/get-auth-chats-to-remove"
     body:
-      fromDate: ${incoming.body.fromDate}
+      fromDate: ${dateTime.response.body.data}
   result: res
   next: validate_res
+
+convertAnonTime:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/utils/today-minus-days"
+    body:
+      days: ${configs.response.body.anonPeriod}
+  result: dateTime
 
 getAnonymRemovableConversations:
   call: http.post
   args:
     url: "[#CHATBOT_RESQL]/get-anonym-chats-to-remove"
     body:
-      fromDate: ${incoming.body.fromDate}
+      fromDate: ${dateTime.response.body.data}
   result: res
   next: validate_res
 

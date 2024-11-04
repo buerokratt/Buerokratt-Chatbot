@@ -8,16 +8,16 @@ declaration:
   namespace: backoffice
   allowlist:
     body:
-      - field: fromDate
-        type: string
-        description: "Body field 'fromDate'"
+      - field: isAuth
+        type: boolean
+        description: "Body field 'isAuth'"
 
 getRemovableConversations:
   call: http.post
   args:
     url: "[#CHATBOT_RUUTER_PRIVATE]/chats-to-remove"
     body:
-      fromDate: ${incoming.body.fromDate}
+      isAuth: ${incoming.body.isAuth}
   result: res
   next: validate_res
 

@@ -1,6 +1,0 @@
-{
-    "trigger": "{{ cronExpression }}",
-    "type": "{{ type }}",
-    "command": "{{ command }}",
-    "allowedEnvs": [{{#each allowedEnvs}}"{{this}}"{{#unless @last}},{{/unless}}{{/each}}]
-}

@@ -41,8 +41,8 @@ const DeleteConversations: FC = () => {
         setEndDate(new Date())
         setStartDate(new Date())
         if (deleteConfig) {
-            setIsAnonymMessaged(deleteConfig.isAnonymConversations ?? false);
-            setIsAuthMessages(deleteConfig.isAuthConversations ?? false);
+            setIsAnonymMessaged(deleteConfig.isAnonymConversations === 'true');
+            setIsAuthMessages(deleteConfig.isAuthConversations === 'true');
             setAuthPeriod(deleteConfig.authPeriod ?? 60);
             setAnonymPeriod(deleteConfig.anonymPeriod ?? 60);
             setDeletionTime(new Date(deleteConfig.deletionTimeISO).toISOString());
@@ -51,7 +51,6 @@ const DeleteConversations: FC = () => {
     }, [deleteConfig]);
 
     useEffect(() => {
-        console.log('deletion', deletionTime)
         getAllEndedChats.mutate({
             startDate,
             endDate
