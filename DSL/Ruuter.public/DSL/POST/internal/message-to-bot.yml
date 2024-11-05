@@ -122,6 +122,12 @@ trigger_service:
     authorId: ${get_bot_name_result.response.body[0].value}
   result: converted_messages_res
   error: return_bot_error
+  next: check_for_trigger_service_response
+
+check_for_trigger_service_response:
+  switch:
+    - condition: ${converted_messages_res === 'Service is not approved'}
+      next: post_message_to_bot
   next: add_bot_message_to_db
 
 check_for_fallback_bot:
