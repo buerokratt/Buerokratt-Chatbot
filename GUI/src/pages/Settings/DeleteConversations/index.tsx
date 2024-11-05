@@ -43,8 +43,8 @@ const DeleteConversations: FC = () => {
         if (deleteConfig) {
             setIsAnonymMessaged(deleteConfig.isAnonymConversations === 'true');
             setIsAuthMessages(deleteConfig.isAuthConversations === 'true');
-            setAuthPeriod(deleteConfig.authPeriod ?? 60);
-            setAnonymPeriod(deleteConfig.anonymPeriod ?? 60);
+            setAuthPeriod(Number(deleteConfig.authPeriod ?? 60));
+            setAnonymPeriod(Number(deleteConfig.anonymPeriod ?? 60));
             setDeletionTime(new Date(deleteConfig.deletionTimeISO).toISOString());
             reset(deleteConfig)
         }
@@ -62,7 +62,7 @@ const DeleteConversations: FC = () => {
             startDate: string | Date;
             endDate: string | Date;
         }) => {
-            return apiDev.post('agents/chats/ended-count', {
+            return apiDev.post('agents/ended-count', {
                 startDate: format(new Date(startDate), 'yyyy-MM-dd'),
                 endDate: format(new Date(endDate), 'yyyy-MM-dd')
             });
@@ -132,7 +132,7 @@ const DeleteConversations: FC = () => {
         const minutes = deletionTime.getMinutes();
         const hours = deletionTime.getHours();
 
-        return `${minutes} ${hours} * * *`;
+        return `${minutes} ${hours} * * * ?`;
     }
 
     const handleFormSubmit = handleSubmit((data) => {
@@ -288,7 +288,7 @@ const DeleteConversations: FC = () => {
                                             direction="row"
                                             value={
                                                 parse(
-                                                    format(new Date(field.value), 'HH:mm:ss'),
+                                                    format(new Date(deletionTime), 'HH:mm:ss'),
                                                     'HH:mm:ss',
                                                     new Date()
                                                 ) ?? new Date('0')
