@@ -1,0 +1,63 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'Delete conversations'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: training
+  allowlist:
+    body:
+      - field: isAuth
+        type: boolean
+        description: "Body field 'isAuth'"
+
+assignValue:
+  assign:
+    isAuth: ${incoming.body.isAuth}
+
+backupConversations:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RUUTER_PRIVATE]/chats/back-up-removable-chats"
+    body:
+      isAuth: ${isAuth}
+  result: res
+  next: validateResponse
+
+validateResponse:
+  switch:
+    - condition: ${res.response.body}
+      next: emptyMessages
+  next: convertAnonJsonToYaml
+
+getRemovableConversations:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RUUTER_PRIVATE]/chats-to-remove"
+    body:
+      isAuth: ${incoming.body.isAuth}
+  result: chats
+  next: validate_res
+
+validate_res:
+  switch:
+    - condition: "${chats.response.body.length > 0}"
+      next: getConversationsToBackUp
+  next: return_not_found
+
+emptyMessages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RUUTER_PRIVATE]/chats/empty"
+    body:
+      chatIds: ${chats.response.body}
+  result: res
+
+returnSuccess:
+  return: "Conversations emptied."
+  next: end
+
+returnError:
+  return: "ERROR."
+  next: end

@@ -11,13 +11,12 @@ import withAuthorization from 'hoc/with-authorization';
 import {ROLES} from 'utils/constants';
 import {DeleteChatSettings} from "../../../types/deleteChatSettings";
 import {format, parse} from "date-fns";
-import ChatHistory from "../../Chat/ChatHistory";
 import ChatOverview from "../../../components/ChatOverview";
 
 const DeleteConversations: FC = () => {
     const {t} = useTranslation();
     const toast = useToast();
-    const {control, handleSubmit, reset,getValues} =
+    const {control, handleSubmit, reset} =
         useForm<DeleteChatSettings>(
             {
                 mode: 'onChange',
@@ -42,14 +41,36 @@ const DeleteConversations: FC = () => {
         setEndDate(new Date())
         setStartDate(new Date())
         if (deleteConfig) {
-            setIsAnonymMessaged(deleteConfig.isAnonymConversations ?? false);
-            setIsAuthMessages(deleteConfig.isAuthConversations ?? false);
-            setAuthPeriod(deleteConfig.authPeriod ?? 0);
-            setAnonymPeriod(deleteConfig.anonymPeriod ?? 0);
-            setDeletionTime(deleteConfig.deletionTimeISO);
+            setIsAnonymMessaged(deleteConfig.isAnonymConversations === 'true');
+            setIsAuthMessages(deleteConfig.isAuthConversations === 'true');
+            setAuthPeriod(Number(deleteConfig.authPeriod ?? 60));
+            setAnonymPeriod(Number(deleteConfig.anonymPeriod ?? 60));
+            setDeletionTime(new Date(deleteConfig.deletionTimeISO).toISOString());
             reset(deleteConfig)
         }
     }, [deleteConfig]);
+
+    useEffect(() => {
+        getAllEndedChats.mutate({
+            startDate,
+            endDate
+        })
+    }, [startDate, endDate]);
+
+    const getAllEndedChats = useMutation({
+        mutationFn: (data: {
+            startDate: string | Date;
+            endDate: string | Date;
+        }) => {
+            return apiDev.post('agents/ended-count', {
+                startDate: format(new Date(startDate), 'yyyy-MM-dd'),
+                endDate: format(new Date(endDate), 'yyyy-MM-dd')
+            });
+        },
+        onSuccess: (res: any) => {
+            setRemovableChats(res.data.response[0].totalCount);
+        },
+    });
 
     const setDeleteConversationsData = (data: DeleteChatSettings)=> {
         return {
@@ -85,9 +106,9 @@ const DeleteConversations: FC = () => {
     });
 
     const cronUpdateMutation = useMutation({
-        mutationFn: (data: {expression: string})=>
+        mutationFn: (data: { expression: string, anonEnabled: boolean, authEnabled: boolean }) =>
             apiDev.post<any>(
-                'internal/sync/delete-conversation-cron',
+                'internal/sync/delete-conversations-cron',
                 data
             ),
         onSuccess: () => {
@@ -107,34 +128,23 @@ const DeleteConversations: FC = () => {
 
     })
 
-    const getCronExpression = (deletionTime: string) => {
-        // const minutes = date.getMinutes();
-        // const hours = date.getHours();
+    const getCronExpression = (deletionTime: Date) => {
+        const minutes = deletionTime.getMinutes();
+        const hours = deletionTime.getHours();
 
-        // return `${minutes} ${hours} * * *`;
-        return '';
+        return `${minutes} ${hours} * * * ?`;
     }
 
     const handleFormSubmit = handleSubmit((data) => {
-        // const expression = getCronExpression(data.deletionTimeISO);
-        // cronUpdateMutation.mutate({expression});
-        // deleteSettingsMutation.mutate(data);
-        console.log('date type', typeof  data.deletionTimeISO, data.deletionTimeISO)
+        const expression = getCronExpression(new Date(data.deletionTimeISO));
+        cronUpdateMutation.mutate({expression, anonEnabled: isAnonymMessaged, authEnabled: isAuthMessaged});
+        deleteSettingsMutation.mutate(data);
     });
 
     const handleDatesUpdate = (day: number) => {
         const today = new Date();
         today.setDate(today.getDate() - day);
         setStartDate(new Date(today.toISOString().split('T')[0]));
-        apiDev.post<any>('chats/chat-to-remove',{fromDate: new Date(startDate), untilDate: new Date(endDate)}).then(
-            (res) => {
-                console.log('result',res);
-                if(res){
-                    console.log(res.data.response.length ?? 0)
-                    setRemovableChats(res.data.response.length ?? 0)
-                }
-            }
-        )
     }
 
 
@@ -190,7 +200,8 @@ const DeleteConversations: FC = () => {
                                             hideLabel={false}
                                             onChange={(e) => {
                                                 field.onChange(e.target.value)
-                                                setAuthPeriod(e.target.value)}
+                                                setAuthPeriod(e.target.value)
+                                            }
                                             }
                                             value={authPeriod}
                                         />
@@ -218,8 +229,9 @@ const DeleteConversations: FC = () => {
                                 offLabel={t('global.no') ?? 'no'}
                                 onCheckedChange={(value) => {
                                     field.onChange(value)
-                                    setIsAnonymMessaged(value)}
-                            }
+                                    setIsAnonymMessaged(value)
+                                }
+                                }
                                 checked={isAnonymMessaged}
                                 {...field}
                             />
@@ -276,7 +288,7 @@ const DeleteConversations: FC = () => {
                                             direction="row"
                                             value={
                                                 parse(
-                                                    format(new Date(field.value), 'HH:mm:ss'),
+                                                    format(new Date(deletionTime), 'HH:mm:ss'),
                                                     'HH:mm:ss',
                                                     new Date()
                                                 ) ?? new Date('0')
@@ -352,7 +364,7 @@ const DeleteConversations: FC = () => {
                                 </Track>
                             </Track>
                             <Track gap={40} align={"center"}>
-                                {t('deleteConversation.periodConversations')} <b>{ removableChats }</b>
+                                {t('deleteConversation.periodConversations')} <b>{removableChats}</b>
                             </Track>
                             <ChatOverview fromDate={startDate.toString()} untilDate={endDate.toString()}></ChatOverview>
                         </Track>

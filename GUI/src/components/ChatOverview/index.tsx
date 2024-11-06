@@ -453,7 +453,7 @@ const ChatOverview: FC<PropsWithChildren<ChatOverViewProps>> = ({fromDate, until
 
     return (
         <div className={'full-width'}>
-            <Card>
+            <div className={'margin-auto'}>
                 <FormMultiselect
                     name="visibleColumns"
                     label=''
@@ -467,7 +467,7 @@ const ChatOverview: FC<PropsWithChildren<ChatOverViewProps>> = ({fromDate, until
                         setToLocalStorage(CHAT_HISTORY_PREFERENCES_KEY, columns);
                     }}
                 />
-            </Card>
+            </div>
 
             <DataTable
                 data={filteredEndedChatsList}
