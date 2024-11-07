@@ -73,6 +73,10 @@
           background-color: get-color(sapphire-blue-10);
           color: get-color(white);
 
+          :any-link {
+            color:  get-color(white);
+          }
+
           &:hover {
             background-color: get-color(sapphire-blue-13);
           }
@@ -90,6 +94,10 @@
         &__message-text {
           background-color: get-color(black-coral-10);
           color: get-color(white);
+
+          :any-link {
+            color:  get-color(white);
+          }
 
           &:hover {
             background-color: #535665;
@@ -146,6 +154,10 @@
     line-height: $veera-line-height-500;
     transition: all .25s ease-out;
     cursor: pointer;
+
+    :any-link {
+      text-decoration: underline;
+    }
 
     &:hover {
       background-color: get-color(black-coral-1);
