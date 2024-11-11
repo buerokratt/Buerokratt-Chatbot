@@ -30,8 +30,8 @@ const DeleteConversations: FC = () => {
 
     const [isAuthMessaged, setIsAuthMessages] = useState<boolean>(false);
     const [isAnonymMessaged, setIsAnonymMessaged] = useState<boolean>(false);
-    const [authPeriod, setAuthPeriod] = useState<number>(30);
-    const [anonymPeriod, setAnonymPeriod] = useState<number>(30);
+    const [authPeriod, setAuthPeriod] = useState<number>(160);
+    const [anonymPeriod, setAnonymPeriod] = useState<number>(160);
     const [deletionTime, setDeletionTime] = useState<string>();
     const [startDate, setStartDate] = useState<Date | string>(new Date());
     const [endDate, setEndDate] = useState<Date>(new Date());
@@ -43,9 +43,9 @@ const DeleteConversations: FC = () => {
         if (deleteConfig) {
             setIsAnonymMessaged(deleteConfig.isAnonymConversations === 'true');
             setIsAuthMessages(deleteConfig.isAuthConversations === 'true');
-            setAuthPeriod(Number(deleteConfig.authPeriod ?? 60));
-            setAnonymPeriod(Number(deleteConfig.anonymPeriod ?? 60));
-            setDeletionTime(new Date(deleteConfig.deletionTimeISO).toISOString());
+            setAuthPeriod(Number(deleteConfig.authPeriod ?? 160));
+            setAnonymPeriod(Number(deleteConfig.anonymPeriod ?? 160));
+            setDeletionTime(deleteConfig?.deletionTimeISO === '' ?  new Date().toISOString() : new Date(deleteConfig.deletionTimeISO).toISOString());
             reset(deleteConfig)
         }
     }, [deleteConfig]);
