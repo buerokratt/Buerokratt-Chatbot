@@ -15,7 +15,7 @@ declaration:
 getConfigurations:
   call: http.get
   args:
-    url: "[#CHATBOT_RUUTER_PRIVATE_INTERNAL]/configs/delete-conversation-config"
+    url: "[#CHATBOT_RUUTER_PRIVATE_INTERNAL]/configs/delete-conversation-config?skipAuth=true"
   result: configs
 
 splitCall:

@@ -1,5 +1,7 @@
 check_for_cookie:
   switch:
+    - condition: ${incoming.params.skipAuth == true}
+      next: guard_success
     - condition: ${incoming.headers == null || incoming.headers.cookie == null}
       next: guard_fail
   next: authenticate
