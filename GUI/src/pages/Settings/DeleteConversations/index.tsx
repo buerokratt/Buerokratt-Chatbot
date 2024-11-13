@@ -75,11 +75,11 @@ const DeleteConversations: FC = () => {
     const setDeleteConversationsData = (data: DeleteChatSettings)=> {
         return {
             ...data,
-            isAnonymConversations: data.isAnonymConversations,
-            isAuthConversations: data.isAuthConversations,
-            anonymPeriod: data.anonymPeriod,
-            authPeriod: data.authPeriod,
-            deletionTimeISO: data.deletionTimeISO
+            isAnonymConversations: data.isAnonymConversations || false,
+            isAuthConversations: data.isAuthConversations || false,
+            anonymPeriod: data.anonymPeriod || 360,
+            authPeriod: data.authPeriod || 360,
+            deletionTimeISO: data.deletionTimeISO || new Date().toISOString()
         };
     }
 
