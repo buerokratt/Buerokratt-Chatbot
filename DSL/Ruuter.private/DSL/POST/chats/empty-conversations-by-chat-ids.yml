@@ -12,18 +12,28 @@ declaration:
         type: string
         description: "Body field 'ChatIds'"
 
+mapChatIds:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/map_chat_ids"
+    headers:
+      type: json
+    body:
+      chats: ${incoming.body.chatIds}
+  result: convertedIds
+
 validate_input:
   switch:
-    - condition: "${incoming.body.chats.length > 0}"
+    - condition: ${convertedIds.response.body.length > 0}
       next: emptyMessages
   next: return_badInput
 
 emptyMessages:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/empty-message-content"
+    url: "[#CHATBOT_RESQL]/empty-message-contents"
     body:
-      chats: ${incoming.body.chats}
+      chats: ${convertedIds.response.body}
   result: emptyMessages
 
 return_result:

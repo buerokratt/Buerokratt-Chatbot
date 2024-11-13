@@ -1,14 +1,10 @@
 anon_conversations:
-  trigger: 43 1 * * * ?
+  trigger: 0 15 * * * ?
   type: http
-  method: POST
-  url: http://localhost:8088/internal/delete-conversations
-  body:
-    isAuth: "false"
+  method: GET
+  url: http://localhost:8088/tasks/delete-conversations?isAuth=false&skipAuth=true
 auth_conversations:
-  trigger: 43 1 * * * ?
+  trigger: 0 15 * * * ?
   type: http
-  method: POST
-  url: http://localhost:8088/internal/delete-conversations
-  body:
-    isAuth: "true"
+  method: GET
+  url: http://localhost:8088/tasks/delete-conversations?isAuth=true&skipAuth=true

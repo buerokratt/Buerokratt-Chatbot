@@ -7,14 +7,14 @@ declaration:
   returns: json
   namespace: training
   allowlist:
-    body:
+    params:
       - field: isAuth
         type: boolean
         description: "Body field 'isAuth'"
 
 assignValue:
   assign:
-    isAuth: ${incoming.body.isAuth}
+    isAuth: ${incoming.params.isAuth}
 
 backupConversations:
   call: http.post
@@ -22,42 +22,26 @@ backupConversations:
     url: "[#CHATBOT_RUUTER_PRIVATE]/chats/back-up-removable-chats"
     body:
       isAuth: ${isAuth}
-  result: res
-  next: validateResponse
+  result: chats
 
 validateResponse:
   switch:
-    - condition: ${res.response.body}
+    - condition: ${chats.response.body.response.length > 0}
       next: emptyMessages
-  next: convertAnonJsonToYaml
-
-getRemovableConversations:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RUUTER_PRIVATE]/chats-to-remove"
-    body:
-      isAuth: ${incoming.body.isAuth}
-  result: chats
-  next: validate_res
-
-validate_res:
-  switch:
-    - condition: "${chats.response.body.length > 0}"
-      next: getConversationsToBackUp
   next: return_not_found
 
 emptyMessages:
   call: http.post
   args:
-    url: "[#CHATBOT_RUUTER_PRIVATE]/chats/empty"
+    url: "[#CHATBOT_RUUTER_PRIVATE]/chats/empty-conversations-by-chat-ids"
     body:
-      chatIds: ${chats.response.body}
+      chatIds: ${chats.response.body.response}
   result: res
 
 returnSuccess:
   return: "Conversations emptied."
   next: end
 
-returnError:
-  return: "ERROR."
+return_not_found:
+  return: "No messages were found."
   next: end

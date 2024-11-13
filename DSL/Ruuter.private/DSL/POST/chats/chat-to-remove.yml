@@ -21,8 +21,8 @@ getConfigurations:
 splitCall:
   switch:
     - condition: ${incoming.body.isAuth}
-      next: getAuthRemovableConversations
-  next: getAnonymRemovableConversations
+      next: convertAuthTime
+  next: convertAnonTime
 
 convertAuthTime:
   call: http.post
@@ -46,7 +46,7 @@ convertAnonTime:
   args:
     url: "[#CHATBOT_DMAPPER]/utils/today-minus-days"
     body:
-      days: ${configs.response.body.anonPeriod}
+      days: ${configs.response.body.anonymPeriod}
   result: dateTime
 
 getAnonymRemovableConversations:

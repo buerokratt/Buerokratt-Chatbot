@@ -15,7 +15,7 @@ declaration:
 getRemovableConversations:
   call: http.post
   args:
-    url: "[#CHATBOT_RUUTER_PRIVATE]/chats-to-remove"
+    url: "[#CHATBOT_RUUTER_PRIVATE]/chats/chat-to-remove"
     body:
       isAuth: ${incoming.body.isAuth}
   result: res
@@ -23,27 +23,13 @@ getRemovableConversations:
 
 validate_res:
   switch:
-    - condition: "${res.response.body.length > 0}"
-      next: getConversationsToBackUp
-  next: return_not_found
-
-getConversationsToBackUp:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RESQL]/get-chats-to-remove"
-    body:
-      chats: ${res.response.body}
-  result: conversations
-  next: return_result
-
-validate_conversations:
-  switch:
-    - condition: "${conversations.response.body.length > 0}"
+    - condition: ${res.response.body.response.length > 0}
       next: return_result
-  next: return_result
+  next: return_not_found
 
 return_result:
   return: ${res.response.body}
+  wrapper: false
   next: end
 
 return_not_found:
