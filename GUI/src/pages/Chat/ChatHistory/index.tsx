@@ -60,6 +60,7 @@ const ChatHistory: FC = () => {
   const [statusChangeModal, setStatusChangeModal] = useState<string | null>(
     null
   );
+  const [chatState, setChatState] = useState<string | null> (statusChangeModal);
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: searchParams.get('page')
       ? parseInt(searchParams.get('page') as string) - 1
@@ -233,7 +234,7 @@ const ChatHistory: FC = () => {
         title: t('global.notification'),
         message: t('toast.success.chatStatusChanged'),
       });
-      setStatusChangeModal(null);
+      setStatusChangeModal(statusChangeModal);
     },
     onError: (error: AxiosError) => {
       toast.open({
@@ -620,6 +621,7 @@ const ChatHistory: FC = () => {
             chat={selectedChat}
             trigger={messagesTrigger}
             onChatStatusChange={setStatusChangeModal}
+            selectedStatus={chatState}
             onCommentChange={handleCommentChange}
           />
         </Drawer>
@@ -633,13 +635,18 @@ const ChatHistory: FC = () => {
             <>
               <Button
                 appearance="secondary"
-                onClick={() => setStatusChangeModal(null)}
+                onClick={() => {
+                  setChatState(null)
+                  setStatusChangeModal(null)}}
               >
                 {t('global.cancel')}
               </Button>
               <Button
                 appearance="error"
-                onClick={() => handleChatStatusChange(statusChangeModal)}
+                onClick={() => {
+                  setChatState(statusChangeModal)
+                  handleChatStatusChange(statusChangeModal)
+                }}
               >
                 {t('global.yes')}
               </Button>
