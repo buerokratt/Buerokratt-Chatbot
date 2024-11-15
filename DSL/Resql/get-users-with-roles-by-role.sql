@@ -38,6 +38,11 @@ WHERE u.status <> 'deleted'
   AND (:search_display_name IS NULL OR u.display_name ILIKE '%' || :search_display_name || '%')
   AND (:search_csa_title IS NULL OR u.csa_title ILIKE '%' || :search_csa_title || '%')
   AND (:search_csa_email IS NULL OR u.csa_email ILIKE '%' || :search_csa_email || '%')
+  AND (:search_authority IS NULL OR EXISTS (
+      SELECT 1
+      FROM unnest(ua.authority_name) AS authority
+      WHERE authority ILIKE '%' || :search_authority || '%'
+  ))
 ORDER BY 
    CASE WHEN :sorting = 'name asc' THEN u.first_name END ASC,
    CASE WHEN :sorting = 'name desc' THEN u.first_name END DESC,
