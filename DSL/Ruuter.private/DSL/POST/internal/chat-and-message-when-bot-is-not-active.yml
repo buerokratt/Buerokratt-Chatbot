@@ -26,7 +26,7 @@ endOldBotChats:
     body:
       authorId: ${botName}
       authorRole: "buerokratt"
-      content: "Teie vestlus antakse üle nõustajale."
+      content: "Bürokratt ei tööta hetkel, Teie vestlus suunatakse edasi nõustajale"
       currentDatetime: ${new Date().toISOString()}
       currentStatus: "OPEN"
       event: "inactive-chat-ended"
@@ -43,7 +43,7 @@ insertMessageContent:
       customerSupportId: ${botName}
       authorId: ${botName}
       authorRole: "buerokratt"
-      content: "Teie vestlus antakse üle nõustajale."
+      content: "Bürokratt ei tööta hetkel, Teie vestlus suunatakse edasi nõustajale"
       event: ""
       created: ${new Date().toISOString()}
   result: insert_message_content_res
