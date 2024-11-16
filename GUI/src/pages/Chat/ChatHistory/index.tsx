@@ -171,6 +171,7 @@ const ChatHistory: FC = () => {
       }),
     onSuccess: (res: any) => {
       setSelectedChat(res.data.response);
+      setChatState(res.data.response)
     },
   });
 
@@ -234,7 +235,7 @@ const ChatHistory: FC = () => {
         title: t('global.notification'),
         message: t('toast.success.chatStatusChanged'),
       });
-      setStatusChangeModal(statusChangeModal);
+      setStatusChangeModal(null);
     },
     onError: (error: AxiosError) => {
       toast.open({
@@ -331,7 +332,10 @@ const ChatHistory: FC = () => {
   const detailsView = (props: any) => (
     <Button
       appearance="text"
-      onClick={() => setSelectedChat(props.row.original)}
+      onClick={() => {
+        setSelectedChat(props.row.original)
+        setChatState(props.row.original.lastMessageEvent)
+      }}
     >
       <Icon icon={<MdOutlineRemoveRedEye color={'rgba(0,0,0,0.54)'} />} />
       {t('global.view')}
