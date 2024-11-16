@@ -186,7 +186,7 @@ const ChatHistory: FC = () => {
       { label: t('chat.history.feedback'), value: 'feedbackText' },
       { label: t('global.status'), value: 'status' },
       { label: 'ID', value: 'id' },
-      { label: 'www', value: 'www' },
+      { label: 'www', value: 'www' }
     ],
     [t]
   );
@@ -310,12 +310,12 @@ const ChatHistory: FC = () => {
 
   const wwwView = (props: any) => (
       <Tooltip content={props.getValue()}>
-      <span
+      <button
           onClick={() => copyValueToClipboard(props.getValue())}
           style={{ cursor: 'pointer' }}
       >
         {props.getValue() ?? ''}
-      </span>
+      </button>
       </Tooltip>
   );
 
