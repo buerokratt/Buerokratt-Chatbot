@@ -237,7 +237,7 @@
       "user-reached": "{{name}} võttis kasutajaga ühendust",
       "user-not-reached": "{{name}} ei saanud kasutajaga ühendust",
       "user-authenticated": "{{name}} on autenditud {{date}}",
-      "taken-over": "Inimene võttis vestluse üle"
+      "taken-over": "Klienditeenindaja võttis vestluse üle"
     }
   },
   "deleteConversation": {
