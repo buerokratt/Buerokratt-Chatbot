@@ -5,7 +5,7 @@ const Markdownify = (props: { message: string | undefined }): JSX.Element => {
 
   return (
     <div>
-      <Markdown target="_blank" options={{ enforceAtxHeadings: true }}>
+      <Markdown options={{ enforceAtxHeadings: true, overrides: { a: { props: { target: "_blank" } } } }}>
         {message ?? ''}
       </Markdown>
     </div>
