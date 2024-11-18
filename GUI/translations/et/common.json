@@ -193,9 +193,11 @@
       "contact-information-skipped": "Kontaktandmeid ei saadetud",
       "unavailable-contact-information-fulfilled": "Kontaktandmed on antud",
       "unavailable_organization": "Organisatsioon pole saadaval",
+      "unavailable_organization_ask_contacts": "Organisatsioon pole saadaval ja küsitakse kontakte",
       "unavailable_csas": "Nõustajad pole saadaval",
-      "unavailable_csas_ask_contacts": "CSA pole saadaval ja küsis kontakte",
+      "unavailable_csas_ask_contacts": "Nõustajad ei ole kättesaadavad ja küsitakse kontakte",
       "unavailable_holiday": "Puhkus",
+      "unavailable_holiday_ask_contacts": "Puhkus ja küsis kontakte",
       "user-reached": "Kasutajaga võeti ühendust",
       "user-not-reached": "Kasutajaga ei õnnestunud ühendust saada"
     },
@@ -230,9 +232,11 @@
       "contact-information-skipped": "Kontaktandmeid pole esitatud",
       "unavailable-contact-information-fulfilled": "Kontaktandmed on antud",
       "unavailable_organization": "Organisatsioon pole saadaval",
+      "unavailable_organization_ask_contacts": "Organisatsioon pole saadaval ja küsitakse kontakte",
       "unavailable_csas": "Nõustajad pole saadaval",
-      "unavailable_csas_ask_contacts": "CSA pole saadaval ja küsis kontakte",
+      "unavailable_csas_ask_contacts": "Nõustajad ei ole kättesaadavad ja küsitakse kontakte",
       "unavailable_holiday": "Puhkus",
+      "unavailable_holiday_ask_contacts": "Puhkus ja küsis kontakte",
       "pending-assigned": "{{name}} määratud kontaktkasutajale",
       "user-reached": "{{name}} võttis kasutajaga ühendust",
       "user-not-reached": "{{name}} ei saanud kasutajaga ühendust",
@@ -332,7 +336,10 @@
       "availableAllTime": "Asutuse tööaeg on 24/7",
       "showIfCSAIsNotAvailable": "Saada kliendile teavitus eemalolekust",
       "showIfCSAIsNotAvailableWithContactsRequest": "Saada kliendile teavitus eemalolekust koos kontakti päringuga",
-      "noCsaAvailableMessage": "CSA pole saadaval teade"
+      "noCsaAvailableMessage": "Klienditeenindaja eemaloleku teavitus",
+      "showIfOrganizationIsOutsideWorkingHours": "Saada kliendile teavitus ettevõtte välisest tööajast",
+      "showIfOrganizationIsOutsideWorkingHoursWithContactsRequest": "Saada kliendile teavitus töövälisest ajast koos kontakti päringuga",
+      "outsideWorkingHoursMessage": "Väljaspool tööaega teade"
     },
     "userSession": {
       "title": "Kasutaja sessioon",
