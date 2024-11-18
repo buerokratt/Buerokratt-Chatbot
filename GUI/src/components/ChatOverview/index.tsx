@@ -404,8 +404,7 @@ const ChatOverview: FC<PropsWithChildren<ChatOverViewProps>> = ({fromDate, until
                 id: 'detail',
                 cell: detailsView,
                 meta: {
-                    size: '2%',
-                    sticky: 'left',
+                    size: '2%'
                 },
             }),
         ],

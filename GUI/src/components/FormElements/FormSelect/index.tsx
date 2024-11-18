@@ -1,4 +1,4 @@
-import { forwardRef, ReactNode, SelectHTMLAttributes, useId, useState } from 'react';
+import {forwardRef, ReactNode, SelectHTMLAttributes, useEffect, useId, useState} from 'react';
 import { useSelect } from 'downshift';
 import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';
@@ -13,6 +13,7 @@ type FormSelectProps = Partial<ControllerRenderProps> & SelectHTMLAttributes<HTM
   name: string;
   hideLabel?: boolean;
   direction?: 'down' | 'up';
+  defaultValue?: string | null;
   options: {
     label: string;
     value: string;
@@ -59,6 +60,11 @@ const FormSelect= forwardRef<HTMLSelectElement, FormSelectProps>((
       if (onSelectionChange) onSelectionChange(newSelectedItem ?? null);
     },
   });
+
+  useEffect(() => {
+    const updatedSelection = options.find((o) => o.value === defaultValue) || placeholderValue;
+    setSelectedItem(updatedSelection);
+  }, [defaultValue, options]);
 
   const selectClasses = clsx(
     'select',

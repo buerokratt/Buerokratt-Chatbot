@@ -84,8 +84,8 @@ check_for_service:
 
 assign_service_content:
   assign:
-   service_content: ${content}
-  next: trigger_service 
+    service_content: ${content}
+  next: trigger_service
 
 post_message_to_bot:
   call: http.post
@@ -105,13 +105,13 @@ check_if_bot_is_unable_to_reply:
     - condition: ${post_message_to_bot_result.response.body?.[0]?.text == 'Suunan teid klienditeenindajale. Varuge natukene kannatust.'}
       next: get_organization_base_config
     - condition: ${post_message_to_bot_result.response.body?.[0]?.text.startsWith("#common_service") || post_message_to_bot_result.response.body?.[0]?.text.startsWith("#service")}
-      next: assign_service_content_from_bot_response  
+      next: assign_service_content_from_bot_response
   next: extract_bot_responses
 
 assign_service_content_from_bot_response:
   assign:
-   service_content: ${post_message_to_bot_result.response.body?.[0]?.text}
-  next: trigger_service 
+    service_content: ${post_message_to_bot_result.response.body?.[0]?.text}
+  next: trigger_service
 
 trigger_service:
   template: chats/trigger-service
@@ -217,7 +217,7 @@ return_is_a_holiday:
         - chatId: ${chatId}
           content: ${org_details.holidayMessage}
           authorTimestamp: ${new Date().toISOString()}
-          event: "unavailable_holiday"
+          event: "${base_config.outsideWorkingHoursAskForContacts === 'true' ? 'unavailable_holiday_ask_contacts' : 'unavailable_holiday'}"
           authorId: ${get_bot_name_result.response.body[0].value}
           authorFirstName: ""
           authorLastName: ""
@@ -232,9 +232,9 @@ return_organization_is_not_available:
     body:
       messages:
         - chatId: ${chatId}
-          content: "Bürokratt on hetkel väljaspool tööaega, palun jäta oma kontaktandmed ja võtame Sinuga esimesel võimalusel ühendust"
+          content: ${base_config.outsideWorkingHoursMessage}
           authorTimestamp: ${new Date().toISOString()}
-          event: "unavailable_organization"
+          event: "${base_config.outsideWorkingHoursAskForContacts === 'true' ? 'unavailable_organization_ask_contacts' : 'unavailable_organization'}"
           authorId: ${get_bot_name_result.response.body[0].value}
           authorFirstName: ""
           authorLastName: ""
