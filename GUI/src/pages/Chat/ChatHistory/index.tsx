@@ -188,6 +188,7 @@ const ChatHistory: FC = () => {
       { label: t('chat.history.feedback'), value: 'feedbackText' },
       { label: t('global.status'), value: 'status' },
       { label: 'ID', value: 'id' },
+      { label: 'www', value: 'www' }
     ],
     [t]
   );
@@ -309,6 +310,17 @@ const ChatHistory: FC = () => {
     );
   };
 
+  const wwwView = (props: any) => (
+      <Tooltip content={props.getValue()}>
+      <button
+          onClick={() => copyValueToClipboard(props.getValue())}
+          style={{ cursor: 'pointer' }}
+      >
+        {props.getValue() ?? ''}
+      </button>
+      </Tooltip>
+  );
+
   const statusView = (props: any) => {
     const isLastMessageEvent =
       props.row.original.lastMessageEvent != null &&
@@ -425,6 +437,11 @@ const ChatHistory: FC = () => {
         id: 'id',
         header: 'ID',
         cell: idView,
+      }),
+      columnHelper.accessor('endUserUrl', {
+        id: 'www',
+        header: 'www',
+        cell: wwwView,
       }),
       columnHelper.display({
         id: 'detail',
