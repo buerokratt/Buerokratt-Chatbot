@@ -60,6 +60,7 @@ const ChatHistory: FC = () => {
   const [statusChangeModal, setStatusChangeModal] = useState<string | null>(
     null
   );
+  const [chatState, setChatState] = useState<string | null> (statusChangeModal);
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: searchParams.get('page')
       ? parseInt(searchParams.get('page') as string) - 1
@@ -170,6 +171,7 @@ const ChatHistory: FC = () => {
       }),
     onSuccess: (res: any) => {
       setSelectedChat(res.data.response);
+      setChatState(res.data.response)
     },
   });
 
@@ -330,7 +332,10 @@ const ChatHistory: FC = () => {
   const detailsView = (props: any) => (
     <Button
       appearance="text"
-      onClick={() => setSelectedChat(props.row.original)}
+      onClick={() => {
+        setSelectedChat(props.row.original)
+        setChatState(props.row.original.lastMessageEvent)
+      }}
     >
       <Icon icon={<MdOutlineRemoveRedEye color={'rgba(0,0,0,0.54)'} />} />
       {t('global.view')}
@@ -620,6 +625,7 @@ const ChatHistory: FC = () => {
             chat={selectedChat}
             trigger={messagesTrigger}
             onChatStatusChange={setStatusChangeModal}
+            selectedStatus={chatState}
             onCommentChange={handleCommentChange}
           />
         </Drawer>
@@ -633,13 +639,18 @@ const ChatHistory: FC = () => {
             <>
               <Button
                 appearance="secondary"
-                onClick={() => setStatusChangeModal(null)}
+                onClick={() => {
+                  setChatState(null)
+                  setStatusChangeModal(null)}}
               >
                 {t('global.cancel')}
               </Button>
               <Button
                 appearance="error"
-                onClick={() => handleChatStatusChange(statusChangeModal)}
+                onClick={() => {
+                  setChatState(statusChangeModal)
+                  handleChatStatusChange(statusChangeModal)
+                }}
               >
                 {t('global.yes')}
               </Button>
