@@ -1,6 +1,11 @@
 [
   {{#each data}}
     {
+      "index": {
+          "_index": "notifications"
+      }
+    },
+    {
       "channelId": "{{chatBaseId}}",
       "timestamp": "{{getISODate}}",
       "payload": {

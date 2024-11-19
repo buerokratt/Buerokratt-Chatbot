@@ -53,6 +53,24 @@ map_open_chats_messages:
       data: ${res.response.body}
   result: open_chat_messages_res
 
+map_open_chats_notifications:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/return_open_chats_notifications"
+    headers:
+      type: json
+    body:
+      data: ${res.response.body}
+  result: open_chat_notifications_res
+
+notify_end_users:
+  template: messages/notify-all
+  requestType: templates
+  body:
+    chats: ${open_chat_messages_res.response.body}
+    notifications: ${open_chat_notifications_res.response.body}
+  result: notification_res
+
 return_result:
-  return: ${res.response.body}
+  return: "Success"
   next: end
