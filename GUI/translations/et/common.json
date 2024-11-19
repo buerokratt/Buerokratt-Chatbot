@@ -381,6 +381,7 @@
     }
   },
   "toast": {
+    "copied": "Kopeeriti lõikelauale",
     "success": {
       "updateSuccess": "Värskendamine õnnestus",
       "messageToUserEmail": "Sõnum saadeti kasutaja e-posti",
