@@ -71,6 +71,7 @@ const Chat: FC<ChatProps> = ({
   const [responseText, setResponseText] = useState('');
   const chatCsaActive = useHeaderStore((state) => state.chatCsaActive);
   const [messagesList, setMessagesList] = useState<Message[]>([]);
+  const messageListRef = useRef(messagesList); 
   const [latestPermissionMessageCreated, setLatestPermissionMessageCreated] = useState<string>();
   const [latestPermissionMessageSeconds, setLatestPermissionMessageSeconds] = useState<number>(0);
   const [previewTypingMessage, setPreviewTypingMessage] = useState<string | undefined>();
@@ -113,13 +114,17 @@ const Chat: FC<ChatProps> = ({
   }, []);
 
   useEffect(() => {
+    messageListRef.current = messagesList;
+  }, [messagesList]);
+
+  useEffect(() => {
     const onMessage = async (res: any) => {
       if (res.type === 'preview') {
         const previewMessage = await apiDev.get(
           'agents/chats/messages/preview?chatId=' + chat.id
         );
         setPreviewTypingMessage(previewMessage.data.response);
-      } else if (messagesList?.length > 0) {
+      } else if (messageListRef.current?.length > 0) {
         const res =
           (await apiDev.get(
             `agents/chats/messages/new?chatId=${chat.id}&lastRead=${
@@ -129,7 +134,7 @@ const Chat: FC<ChatProps> = ({
         const messages = res.data.response;
         setPreviewTypingMessage(undefined);
         const filteredMessages = messages?.filter((newMessage: Message) => {
-          return filterMessages(messagesList, newMessage);
+          return filterMessages(messageListRef.current, newMessage);
         });
 
         let newDisplayableMessages = filteredMessages?.filter(
@@ -145,13 +150,31 @@ const Chat: FC<ChatProps> = ({
 
         handlePermissionMessages();
 
-        const permissionsHandeledMessages: Message[] = filteredMessages?.filter(
-          (e: Message) =>
-            e.event === 'ask-permission-accepted' ||
-            e.event === 'ask-permission-rejected' ||
-            e.event === 'ask-permission-ignored'
+        const actionEventTypes = [
+          'ask-permission-accepted',
+          'ask-permission-rejected',
+          'ask-permission-ignored',
+          'contact-information-fulfilled',
+          'contact-information-rejected',
+          'requested-chat-forward',
+          'requested-chat-forward-accepted',
+          'requested-chat-forward-rejected',
+          'pending-assigned',
+          'user-reached',
+          'user-not-reached',
+          'user-authenticated',
+          'authentication-successful',
+          'authentication-failed',
+          'redirectedMessageByOwner',
+          'redirectedMessageClaimed',
+          'redirectedMessage',
+        ];
+
+        const eventMessages: Message[] = filteredMessages?.filter(
+          (e: Message) => actionEventTypes.includes(e.event ?? '')
         );
-        if (permissionsHandeledMessages?.length > 0) {
+        
+        if (eventMessages?.length > 0) {
           await getMessages();
         }
       }
@@ -162,7 +185,7 @@ const Chat: FC<ChatProps> = ({
     return () => {
       events.close();
     };
-  }, [chat.id, messagesList]);
+  }, [chat.id]);
 
   const getMessages = async () => {
     const { data: res } = await apiDev.post('agents/chats/messages/all', {
