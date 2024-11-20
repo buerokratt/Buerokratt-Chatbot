@@ -2,7 +2,6 @@ SELECT u.login,
        u.first_name,
        u.last_name,
        u.id_code,
-    --    todo two below are filterable
        u.display_name,
        u.csa_title,
        u.csa_email,
