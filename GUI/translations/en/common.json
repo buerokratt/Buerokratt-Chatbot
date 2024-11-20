@@ -381,6 +381,7 @@
     }
   },
   "toast": {
+    "copied": "Copied to clipboard",
     "success": {
       "updateSuccess": "Updated Successfully",
       "messageToUserEmail": "Message sent to user email",
