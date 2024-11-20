@@ -2,6 +2,7 @@ SELECT u.login,
        u.first_name,
        u.last_name,
        u.id_code,
+    --    todo two below are filterable
        u.display_name,
        u.csa_title,
        u.csa_email,
@@ -29,6 +30,11 @@ WHERE u.status <> 'deleted'
       SELECT max(id)
       FROM "user"
       GROUP BY id_code
+  )
+  AND (
+      :filter IS NULL 
+      OR LOWER(u.display_name) LIKE LOWER('%' || :filter || '%')
+      OR LOWER(u.csa_title) LIKE LOWER('%' || :filter || '%')
   )
   AND (:show_active_only <> true OR csa.status <> 'offline')
 ORDER BY 

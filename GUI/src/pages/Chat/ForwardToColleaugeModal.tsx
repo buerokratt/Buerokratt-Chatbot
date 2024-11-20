@@ -1,5 +1,9 @@
 import { FC, useEffect, useMemo, useState } from 'react';
-import { createColumnHelper, PaginationState, SortingState } from '@tanstack/react-table';
+import {
+  createColumnHelper,
+  PaginationState,
+  SortingState,
+} from '@tanstack/react-table';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { MdOutlineArrowForward } from 'react-icons/md';
@@ -16,6 +20,7 @@ import {
 } from 'components';
 import { User } from 'types/user';
 import { Chat } from 'types/chat';
+import { useDebouncedCallback } from 'use-debounce';
 
 type ForwardToColleaugeModalProps = {
   chat: Chat;
@@ -38,7 +43,12 @@ const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({
   const [sorting, setSorting] = useState<SortingState>([]);
   const [usersList, setUsersList] = useState<User[] | null>(null);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const getUsers = (pagination: PaginationState, sorting: SortingState, showActiveOnly: boolean = false) => {
+  const getUsers = (
+    pagination: PaginationState,
+    filter: string,
+    sorting: SortingState,
+    showActiveOnly: boolean = false
+  ) => {
     const sort =
       sorting.length === 0
         ? 'name asc'
@@ -47,6 +57,7 @@ const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({
       .post(`accounts/customer-support-agents`, {
         page: pagination.pageIndex + 1,
         page_size: pagination.pageSize,
+        filter,
         sorting: sort,
         show_active_only: showActiveOnly,
       })
@@ -57,8 +68,10 @@ const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({
       .catch((error: any) => console.log(error));
   };
 
+  const debouncedGetUsers = useDebouncedCallback(getUsers, 300);
+
   useEffect(() => {
-    getUsers(pagination, sorting, showActiveAgents);
+    getUsers(pagination, filter, sorting, showActiveAgents);
   }, [showActiveAgents]);
 
   const columnHelper = createColumnHelper<User>();
@@ -131,7 +144,13 @@ const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({
           name="search"
           placeholder={t('chat.active.searchByName') + '...'}
           hideLabel
-          onChange={(e) => setFilter(e.target.value)}
+          onChange={(e) => {
+            const filter = e.target.value;
+
+            setFilter(filter);
+            setPagination({ pageIndex: 0, pageSize: pagination.pageSize });
+            debouncedGetUsers(pagination, filter, sorting, showActiveAgents);
+          }}
         />
         <FormCheckbox
           label={t('chat.active.onlyActiveAgents')}
@@ -148,8 +167,6 @@ const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({
         <DataTable
           data={usersList}
           columns={usersColumns}
-          globalFilter={filter}
-          setGlobalFilter={setFilter}
           sortable
           pagination={pagination}
           setPagination={(state: PaginationState) => {
@@ -159,12 +176,12 @@ const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({
             )
               return;
             setPagination(state);
-            getUsers(state, sorting, showActiveAgents);
+            getUsers(state, filter, sorting, showActiveAgents);
           }}
           sorting={sorting}
           setSorting={(state: SortingState) => {
             setSorting(state);
-            getUsers(pagination, state, showActiveAgents);
+            getUsers(pagination, filter, state, showActiveAgents);
           }}
           pagesCount={totalPages}
           isClientSide={false}
