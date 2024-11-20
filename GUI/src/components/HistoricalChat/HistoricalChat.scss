@@ -63,15 +63,27 @@
       #{$self} {
         &__group-initials {
           background-color: get-color(sapphire-blue-10);
+          left: 0;
+          top: 0;
         }
 
         &__group-name {
           color: get-color(sapphire-blue-10);
+          text-align: left;
+          margin-left: 0;
+        }
+
+        &__messages {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          align-items: flex-start;
         }
 
         &__message-text {
           background-color: get-color(sapphire-blue-10);
           color: get-color(white);
+          margin-left: 0;
 
           :any-link {
             color:  get-color(white);
@@ -89,11 +101,25 @@
         &__group-initials {
           background-color: get-color(black-coral-10);
           color: get-color(white);
+          left: 0;
+        }
+
+        &__group-name {
+          text-align: left;
+          margin-left: 0;
+        }
+
+        &__messages {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          align-items: flex-start;
         }
 
         &__message-text {
           background-color: get-color(black-coral-10);
           color: get-color(white);
+          margin-left: 0;
 
           :any-link {
             color:  get-color(white);
@@ -120,7 +146,7 @@
     font-weight: $veera-font-weight-delta;
     color: get-color(black-coral-6);
     position: absolute;
-    left: 0;
+    right: 0;
     top: 0;
   }
 
@@ -129,13 +155,17 @@
     line-height: $veera-line-height-500;
     font-weight: $veera-font-weight-delta;
     text-transform: capitalize;
+    margin-left: 10rem;
+    margin-right: 3rem;
+    text-align: right;
+    padding-top: 7px;
   }
 
   &__messages {
     display: flex;
     flex-direction: column;
     gap: 4px;
-    align-items: flex-start;
+    align-items: flex-end;
   }
 
   &__message {
