@@ -20,6 +20,10 @@
     }
   }
 
+  &--scrollable {
+    overflow-y: auto;
+  }
+
   &__header,
   &__body,
   &__footer {

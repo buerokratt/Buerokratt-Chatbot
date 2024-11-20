@@ -160,6 +160,7 @@ const SettingsWorkingTime: FC = () => {
         key={key}
         isHeaderLight={true}
         isBodyDivided={true}
+        isScrollable={true}
         footer={
           <Track justify="end">
             <Button onClick={handleFormSubmit}>{t('global.save')}</Button>
