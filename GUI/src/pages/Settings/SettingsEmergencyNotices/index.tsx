@@ -122,11 +122,7 @@ const SettingsEmergencyNotices: FC = () => {
                     hideLabel
                     {...field}
                     value={
-                      isEmergencyNoticeVisible
-                        ? new Date(
-                            emergencyNotice.response.emergencyNoticeStartISO
-                          )
-                        : parse(
+                      parse(
                             format(field.value as Date, 'yyyy-MM-dd'),
                             'yyyy-MM-dd',
                             new Date()
