@@ -92,6 +92,7 @@
     "workingHours": "Working hours"
   },
   "chat": {
+    "userTyping": "User Typing",
     "chatForwardedTo": "Chat forwarded to",
     "chatEnded": "Chat ended",
     "reply": "Reply",

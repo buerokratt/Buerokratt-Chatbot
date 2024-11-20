@@ -92,6 +92,7 @@
     "workingHours": "Tööaeg"
   },
   "chat": {
+    "userTyping": "Kasutaja kirjutab",
     "chatForwardedTo": "Vestlus edastati aadressile",
     "chatEnded": "Vestlus lõppes",
     "reply": "Vasta",
