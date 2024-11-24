@@ -12,6 +12,7 @@
   &__scrollWrapper {
     height: 100%;
     white-space: nowrap;
+    overflow-x: auto;
     display: block;
     max-height: 60vh;
   }
@@ -68,18 +69,8 @@
   }
 
   &__filter {
-    position: absolute;
-    bottom: 80%;
-    left: 0;
-    right: 0;
-    padding: get-spacing(paldiski);
-    background-color: get-color(white);
-    box-shadow: 0 0px 10px rgba(0, 0, 0, 0.10);
-    border-radius: 0 0 4px 4px;
-    border: 1px solid get-color(black-coral-2);
-
     input {
-      width: 100%;
+      width: 120px;
       display: block;
       appearance: none;
       background-color: get-color(white);
