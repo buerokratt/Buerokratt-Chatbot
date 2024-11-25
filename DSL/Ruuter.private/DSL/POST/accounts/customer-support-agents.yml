@@ -14,9 +14,9 @@ declaration:
       - field: page_size
         type: number
         description: "Body field 'page_size'"
-      - field: filter
+      - field: search_display_name_and_csa_title
         type: string
-        description: "Body field 'filter'"
+        description: "Body field 'search_display_name_and_csa_title'"
       - field: sorting
         type: string
         description: "Body field 'sorting'"
