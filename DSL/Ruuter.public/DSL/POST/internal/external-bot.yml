@@ -86,13 +86,16 @@ post_answer:
       frequency_penalty: 0
       presence_penalty: 0
   result: test
+  
 logstepAZUREBOT:
   log: ${test}
+
 assign_value:
   assign:
     correct_value:
       - recipient_id: ${sender}
-        text: ${test.response.body.choices[0].message.content.replace(/\n/g,"\\n").replace(/%/g," protsenti").replace(/\s*\[doc\s*\d+\]\s*,?\s*/g,"").replace(" \. ", ". ")}
+        text: ${test.response.body.choices[0].message.content.replace(/\n/g,"\\n").replace(/%/g," protsenti").replace(" \. ", ". ")}
+        context: ${test.response.body.choices[0].message.context}
   next: check_value
 
 check_value:
@@ -108,7 +111,7 @@ return_value:
 format_messages:
   call: http.post
   args:
-    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/bot_responses_to_messages"
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/llm_responses_to_messages"
     headers:
       type: json
     body:
