@@ -9,7 +9,7 @@
   border: 1px solid get-color(black-coral-2);
   border-radius: $veera-radius-s;
   max-height: 80vh;
-  overflow-y: auto;
+  overflow-y: visible;
 
   &--borderless {
     border: 0;
@@ -18,6 +18,10 @@
     #{$self}__header {
       border-radius: 0;
     }
+  }
+
+  &--scrollable {
+    overflow-y: auto;
   }
 
   &__header,

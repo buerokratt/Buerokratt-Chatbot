@@ -77,6 +77,12 @@ declaration:
       - field: organizationNoCsaAvailableMessage
         type: string
         description: "Body field 'organizationNoCsaAvailableMessage'"
+      - field: organizationOutsideWorkingHoursAskForContacts
+        type: string
+        description: "Body field 'organizationOutsideWorkingHoursAskForContacts'"
+      - field: organizationOutsideWorkingHoursMessage
+        type: string
+        description: "Body field 'organizationOutsideWorkingHoursMessage'"
 
 extractRequestData:
   assign:
@@ -103,6 +109,8 @@ extractRequestData:
     organizationWorkingAllTime: ${incoming.body.organizationWorkingAllTime}
     organizationNoCsaAskForContacts: ${incoming.body.organizationNoCsaAskForContacts}
     organizationNoCsaAvailableMessage: ${incoming.body.organizationNoCsaAvailableMessage}
+    organizationOutsideWorkingHoursAskForContacts: ${incoming.body.organizationOutsideWorkingHoursAskForContacts}
+    organizationOutsideWorkingHoursMessage: ${incoming.body.organizationOutsideWorkingHoursMessage}
 
 setOrganizationWorkingTime:
   call: http.post
@@ -132,6 +140,8 @@ setOrganizationWorkingTime:
       organizationWorkingAllTime: ${organizationWorkingAllTime}
       organizationNoCsaAskForContacts: ${organizationNoCsaAskForContacts}
       organizationNoCsaAvailableMessage: ${organizationNoCsaAvailableMessage}
+      organizationOutsideWorkingHoursAskForContacts: ${organizationOutsideWorkingHoursAskForContacts}
+      organizationOutsideWorkingHoursMessage: ${organizationOutsideWorkingHoursMessage}
       created: ${new Date().toISOString()}
   result: setOrganizationWorkingTimeResult
 

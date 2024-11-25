@@ -22,4 +22,6 @@ export interface OrganizationWorkingTime {
   organizationWorkingAllTime: boolean;
   organizationNoCsaAskForContacts: boolean;
   organizationNoCsaAvailableMessage: string;
+  organizationOutsideWorkingHoursAskForContacts: boolean;
+  organizationOutsideWorkingHoursMessage: string;
 }

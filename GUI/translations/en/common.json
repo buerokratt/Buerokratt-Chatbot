@@ -191,10 +191,12 @@
       "inactive-chat-ended": "Ended cue to inactivity",
       "contact-information-skipped": "Contact Information Skipped",
       "unavailable-contact-information-fulfilled": "Contact information provided",
-      "unavailable_organization": "Organization Unavailable",
-      "unavailable_csas": "CSA's Unavailable",
-      "unavailable_csas_ask_contacts": "CSA's Unavailable and asked for contacts",
+      "unavailable_organization": "Organization is unavailable",
+      "unavailable_organization_ask_contacts": "Organization is unavailable and asked for contacts",
+      "unavailable_csas": "Advisors are not available",
+      "unavailable_csas_ask_contacts": "Advisors are not available and asked for contacts",
       "unavailable_holiday": "Holiday",
+      "unavailable_holiday_ask_contacts": "Holiday and asked for contacts",
       "message-read": "Read",
       "user-reached": "User contacted",
       "user-not-reached": "User could not be reached"
@@ -229,10 +231,12 @@
       "message-read": "Read",
       "contact-information-skipped": "Contact Information Skipped",
       "unavailable-contact-information-fulfilled": "Contact information provided",
-      "unavailable_organization": "Organization Unavailable",
-      "unavailable_csas": "CSA's Unavailable",
-      "unavailable_csas_ask_contacts": "CSA's Unavailable and asked for contacts",
+      "unavailable_organization": "Organization is unavailable",
+      "unavailable_organization_ask_contacts": "Organization is unavailable and asked for contacts",
+      "unavailable_csas": "Advisors are not available",
+      "unavailable_csas_ask_contacts": "Advisors are not available and asked for contacts",
       "unavailable_holiday": "Holiday",
+      "unavailable_holiday_ask_contacts": "Holiday and asked for contacts",
       "pending-assigned": "{{name}} assigned to contact user",
       "user-reached": "{{name}} contacted the user",
       "user-not-reached": "{{name}} could not reach the user",
@@ -332,7 +336,10 @@
       "availableAllTime": "Working hours are 24/7",
       "showIfCSAIsNotAvailable": "Send a notification of absence to the client",
       "showIfCSAIsNotAvailableWithContactsRequest": "Send a notification of absence to the client with a contact request",
-      "noCsaAvailableMessage": "No CSA available message"
+      "noCsaAvailableMessage": "Notification of the absence of a customer service representative",
+      "showIfOrganizationIsOutsideWorkingHours": "Send a notification to the client about the company's outside working hours",
+      "showIfOrganizationIsOutsideWorkingHoursWithContactsRequest": "Send a notification to the client about the company's outside working hours with a contact request",
+      "outsideWorkingHoursMessage": "Outside working hours message"
     },
     "userSession": {
       "title": "User session",
@@ -374,6 +381,7 @@
     }
   },
   "toast": {
+    "copied": "Copied to clipboard",
     "success": {
       "updateSuccess": "Updated Successfully",
       "messageToUserEmail": "Message sent to user email",
