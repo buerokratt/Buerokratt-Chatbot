@@ -57,7 +57,7 @@ const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({
       .post(`accounts/customer-support-agents`, {
         page: pagination.pageIndex + 1,
         page_size: pagination.pageSize,
-        filter,
+        search_display_name_and_csa_title: filter,
         sorting: sort,
         show_active_only: showActiveOnly,
       })
