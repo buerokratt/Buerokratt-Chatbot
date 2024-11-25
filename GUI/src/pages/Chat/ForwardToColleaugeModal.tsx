@@ -16,6 +16,7 @@ import {
 } from 'components';
 import { User } from 'types/user';
 import { Chat } from 'types/chat';
+import useStore from 'store';
 
 type ForwardToColleaugeModalProps = {
   chat: Chat;
@@ -38,6 +39,7 @@ const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({
   const [sorting, setSorting] = useState<SortingState>([]);
   const [usersList, setUsersList] = useState<User[] | null>(null);
   const [totalPages, setTotalPages] = useState<number>(1);
+  const userInfo = useStore((state) => state.userInfo);
   const getUsers = (pagination: PaginationState, sorting: SortingState, showActiveOnly: boolean = false) => {
     const sort =
       sorting.length === 0
@@ -49,6 +51,7 @@ const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({
         page_size: pagination.pageSize,
         sorting: sort,
         show_active_only: showActiveOnly,
+        current_user_id: userInfo?.idCode ?? '',
       })
       .then((res: any) => {
         setUsersList(res?.data?.response ?? []);
