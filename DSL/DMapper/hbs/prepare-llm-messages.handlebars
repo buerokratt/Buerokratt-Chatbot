@@ -1,0 +1,47 @@
+[
+    {
+        "role": "system",
+        "content": [
+            {
+                "type": "text",
+                "text": "{{prompt_message}}"
+            }
+        ]
+    }
+  {{#if messages}}
+    {{#each messages}}
+      {{#if (eq authorRole "end-user")}},
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "{{content}}"
+            }
+        ]
+    }
+      {{else}},
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": "{{content}}"
+            }
+        ]
+    }
+      {{/if}}
+    {{/each}}
+  {{/if}}
+  {{#if new_message}},
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "{{new_message}}"
+            }
+        ]
+    }
+  {{/if}}
+]
