@@ -93,11 +93,15 @@ const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({
 
   const usersColumns = useMemo(
     () => [
-      columnHelper.accessor('displayName', {
-        header: t('settings.users.name') ?? '',
-      }),
+        columnHelper.accessor(
+            (row) => `${row.firstName ?? ''} ${row.lastName ?? ''}`,
+            {
+                id: `name`,
+                header: t('settings.users.name') ?? '',
+            }
+      ),
       columnHelper.accessor('csaTitle', {
-        header: t('settings.users.displayName') ?? '',
+        header: t('settings.users.userTitle') ?? '',
       }),
       columnHelper.accessor('customerSupportStatus', {
         header: t('global.status') ?? '',
