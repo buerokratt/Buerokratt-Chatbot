@@ -538,12 +538,13 @@ const Chat: FC<ChatProps> = ({
               )}
             </div>
           ))}
+          {/* Preview commented Out as requested by clients in task -1024- */}
           {previewTypingMessage && (
             <div className={clsx(['active-chat__group'])} key={`group`}>
               <div className="active-chat__group-initials">
                 {<BykLogoWhite height={24} />}
               </div>
-              <div className="active-chat__group-name">{'User Typing'}</div>
+              <div className="active-chat__group-name">{t('chat.userTyping')}</div>
               <div className="active-chat__messages">
                 <PreviewMessage
                   key={`preview-message`}
@@ -729,7 +730,8 @@ const Chat: FC<ChatProps> = ({
                 >
                   {t('chat.active.askPermission')}
                 </Button>
-                {latestPermissionMessageSeconds <= askPermissionsTimeoutInSeconds && (
+                {latestPermissionMessageSeconds <=
+                  askPermissionsTimeoutInSeconds && (
                   <LoaderOverlay
                     maxPercent={askPermissionsTimeoutInSeconds}
                     currentPercent={latestPermissionMessageSeconds}
