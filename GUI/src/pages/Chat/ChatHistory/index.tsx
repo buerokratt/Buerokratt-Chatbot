@@ -26,6 +26,7 @@ import {
   Tooltip,
   Track,
 } from 'components';
+
 import { CHAT_EVENTS, CHAT_STATUS, Chat as ChatType } from 'types/chat';
 import { useToast } from 'hooks/useToast';
 import { apiDev } from 'services/api';
@@ -253,7 +254,7 @@ const ChatHistory: FC = () => {
     mutationFn: (data: { chatId: string | number; comment: string }) =>
       apiDev.post('comments/history', data),
     onSuccess: (res, { chatId, comment }) => {
-      const updatedChatList = endedChatsList.map((chat) =>
+      const updatedChatList = filteredEndedChatsList.map((chat) =>
         chat.id === chatId ? { ...chat, comment } : chat
       );
       filterChatsList(updatedChatList);
@@ -487,8 +488,8 @@ const ChatHistory: FC = () => {
 
     setFilteredEndedChatsList(
       chatsList.filter((c) => {
-        const created = Date.parse(format(new Date(c.created), 'MM/dd/yyyy'));
-        return created >= startDate && created <= endDate;
+        const ended = Date.parse(format(new Date(c.ended), 'MM/dd/yyyy'));
+        return ended >= startDate && ended <= endDate;
       })
     );
   };

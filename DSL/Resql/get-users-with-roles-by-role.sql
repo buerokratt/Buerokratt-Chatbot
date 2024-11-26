@@ -43,6 +43,7 @@ WHERE u.status <> 'deleted'
       FROM unnest(ua.authority_name) AS authority
       WHERE authority ILIKE '%' || :search_authority || '%'
   ))
+  AND u.id_code NOT IN (:excluded_users)
 ORDER BY 
    CASE WHEN :sorting = 'name asc' THEN u.first_name END ASC,
    CASE WHEN :sorting = 'name desc' THEN u.first_name END DESC,

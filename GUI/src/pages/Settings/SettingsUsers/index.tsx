@@ -146,6 +146,23 @@ const SettingsUsers: FC = () => {
      return searchfilters;
   }
 
+  const customerSupportStatusView = (props: any) => {
+    const isIdle = props.getValue() === 'idle' ? '#FFB511' : '#D73E3E';
+    return (
+      <span
+        style={{
+          marginLeft: 'auto',
+          marginRight: 'auto',
+          display: 'block',
+          width: 16,
+          height: 16,
+          borderRadius: '50%',
+          backgroundColor: props.getValue() === 'online' ? '#308653' : isIdle,
+        }}
+      ></span>
+    );
+  };
+
   const usersColumns = useMemo(
     () => [
       columnHelper.accessor(
@@ -186,6 +203,11 @@ const SettingsUsers: FC = () => {
       }),
       columnHelper.accessor('csaTitle', {
         header: t('settings.users.userTitle') ?? '',
+      }),
+      columnHelper.accessor('customerSupportStatus', {
+        header: t('global.status') ?? '',
+        enableColumnFilter: false,
+        cell: customerSupportStatusView,
       }),
       columnHelper.accessor('csaEmail', {
         header: t('settings.users.email') ?? '',

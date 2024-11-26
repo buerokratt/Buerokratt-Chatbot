@@ -33,6 +33,7 @@ extractRequestData:
     search_csa_title: ${incoming.body.search_csa_title ?? ""}
     search_csa_email: ${incoming.body.search_csa_email ?? ""}
     search_authority: ${incoming.body.search_authority ?? ""}
+    current_user_id: ${incoming.body.current_user_id ?? ""}
 
 getCustomerSupportAgents:
   call: http.post
@@ -49,6 +50,7 @@ getCustomerSupportAgents:
       search_csa_title: ${search_csa_title}
       search_csa_email: ${search_csa_email}
       search_authority: ${search_authority}
+      excluded_users: ${current_user_id}
       roles:
         [
           "ROLE_ADMINISTRATOR",
