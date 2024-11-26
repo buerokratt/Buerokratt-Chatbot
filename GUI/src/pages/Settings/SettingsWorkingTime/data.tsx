@@ -62,6 +62,9 @@ export function getOrganizationTimeData(data: OrganizationWorkingTime) {
     organizationNoCsaAskForContacts:
       data.organizationNoCsaAskForContacts.toString() === 'true',
     organizationNoCsaAvailableMessage: data.organizationNoCsaAvailableMessage,
+    organizationOutsideWorkingHoursAskForContacts: data.organizationOutsideWorkingHoursAskForContacts.toString() === 'true',
+    organizationOutsideWorkingHoursMessage: data.organizationOutsideWorkingHoursMessage,
+
   };
 }
 
@@ -77,6 +80,7 @@ export function setOrganizationTimeData(data: OrganizationWorkingTime) {
     organizationWorkingAllTime: data.organizationWorkingAllTime.toString(),
     organizationNoCsaAskForContacts:
       data.organizationNoCsaAskForContacts.toString(),
+    organizationOutsideWorkingHoursAskForContacts: data.organizationOutsideWorkingHoursAskForContacts.toString(),
   };
 }
 

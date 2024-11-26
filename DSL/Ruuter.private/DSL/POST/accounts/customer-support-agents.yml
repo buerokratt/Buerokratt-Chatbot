@@ -21,15 +21,36 @@ declaration:
         type: boolean
         description: "Body field 'show_active_only'"
 
+extractRequestData:
+  assign:
+    page: ${incoming.body.page ?? 1}
+    page_size: ${incoming.body.page_size ?? 10}
+    sorting: ${incoming.body.sorting ?? 'name asc'}
+    show_active_only: ${incoming.body.show_active_only ?? false}
+    search_full_name: ${incoming.body.search_full_name ?? ""}
+    search_id_code: ${incoming.body.search_id_code ?? ""}
+    search_display_name: ${incoming.body.search_display_name ?? ""}
+    search_csa_title: ${incoming.body.search_csa_title ?? ""}
+    search_csa_email: ${incoming.body.search_csa_email ?? ""}
+    search_authority: ${incoming.body.search_authority ?? ""}
+    current_user_id: ${incoming.body.current_user_id ?? ""}
+
 getCustomerSupportAgents:
   call: http.post
   args:
     url: "[#CHATBOT_RESQL]/get-users-with-roles-by-role"
     body:
-      page: ${incoming.body.page}
-      page_size: ${incoming.body.page_size}
-      sorting: ${incoming.body.sorting}
-      show_active_only: ${incoming.body.show_active_only ?? false}
+      page: ${page}
+      page_size: ${page_size}
+      sorting: ${sorting}
+      show_active_only: ${show_active_only}
+      search_full_name: ${search_full_name}
+      search_id_code: ${search_id_code}
+      search_display_name: ${search_display_name}
+      search_csa_title: ${search_csa_title}
+      search_csa_email: ${search_csa_email}
+      search_authority: ${search_authority}
+      excluded_users: ${current_user_id}
       roles:
         [
           "ROLE_ADMINISTRATOR",

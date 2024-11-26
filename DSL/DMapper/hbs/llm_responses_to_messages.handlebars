@@ -2,7 +2,7 @@
 {{#each data.botMessages}}
   {
    "chatId": "{{../data.chatId}}",
-   "content": "{{{choose text result}}}",
+   "content": "{{replaceDocs text context}}",
    "buttons": "[{{#each buttons}}{\"title\": \"{{{title}}}\",\"payload\": \"{{{payload}}}\"}{{#unless @last}},{{/unless}}{{/each}}]",
    "authorTimestamp": "{{../data.authorTimestamp}}",
    "authorId": "{{../data.authorId}}",

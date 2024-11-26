@@ -19,7 +19,10 @@ import './SettingsWorkingTime.scss';
 import { getOrganizationTimeData, setOrganizationTimeData } from './data';
 import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';
-import { NO_CSA_MESSAGE_LENGTH } from 'constants/config';
+import {
+  NO_CSA_MESSAGE_LENGTH,
+  OUTSIDE_WORKING_HOURS_MESSAGE_LENGTH,
+} from 'constants/config';
 
 type FieldDateNames = {
   start: string;
@@ -105,7 +108,6 @@ const SettingsWorkingTime: FC = () => {
     if (!isStart && date < minTime) {
       field.onChange(maxTime);
     }
-    setKey(key + 1);
     field.onChange(date);
   };
 
@@ -157,6 +159,7 @@ const SettingsWorkingTime: FC = () => {
         key={key}
         isHeaderLight={true}
         isBodyDivided={true}
+        isScrollable={true}
         footer={
           <Track justify="end">
             <Button onClick={handleFormSubmit}>{t('global.save')}</Button>
@@ -411,6 +414,62 @@ const SettingsWorkingTime: FC = () => {
                 )}
               </Track>
             ))}
+        {!isOrganizationAvailableAllTime && (
+          <Controller
+            name="organizationOutsideWorkingHoursAskForContacts"
+            control={control}
+            render={({ field }) => (
+              <Switch
+                label={t(
+                  'settings.workingTime.showIfOrganizationIsOutsideWorkingHours'
+                )}
+                onLabel={t('global.yes').toString()}
+                offLabel={t('global.no').toString()}
+                onCheckedChange={(e) => field.onChange(!e)}
+                checked={!field.value}
+                {...field}
+              />
+            )}
+          />
+        )}
+        {!isOrganizationAvailableAllTime && (
+          <Controller
+            name="organizationOutsideWorkingHoursAskForContacts"
+            control={control}
+            render={({ field }) => (
+              <Switch
+                label={t(
+                  'settings.workingTime.showIfOrganizationIsOutsideWorkingHoursWithContactsRequest'
+                )}
+                onLabel={t('global.yes').toString()}
+                offLabel={t('global.no').toString()}
+                onCheckedChange={field.onChange}
+                checked={field.value}
+                {...field}
+              />
+            )}
+          />
+        )}
+        {!isOrganizationAvailableAllTime && (
+          <div style={{ paddingRight: '20px' }}>
+            <Controller
+              name="organizationOutsideWorkingHoursMessage"
+              control={control}
+              render={({ field }) => (
+                <FormTextarea
+                  label={t('settings.workingTime.outsideWorkingHoursMessage')}
+                  minRows={4}
+                  maxLength={OUTSIDE_WORKING_HOURS_MESSAGE_LENGTH}
+                  showMaxLength
+                  maxLengthBottom
+                  onChange={field.onChange}
+                  value={field.value}
+                  name="label"
+                />
+              )}
+            />
+          </div>
+        )}
         <Controller
           name="organizationNoCsaAskForContacts"
           control={control}
