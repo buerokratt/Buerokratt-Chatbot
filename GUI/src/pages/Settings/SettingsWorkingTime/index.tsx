@@ -108,7 +108,6 @@ const SettingsWorkingTime: FC = () => {
     if (!isStart && date < minTime) {
       field.onChange(maxTime);
     }
-    setKey(key + 1);
     field.onChange(date);
   };
 
