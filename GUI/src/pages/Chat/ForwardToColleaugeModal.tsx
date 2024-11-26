@@ -21,6 +21,7 @@ import {
 import { User } from 'types/user';
 import { Chat } from 'types/chat';
 import { useDebouncedCallback } from 'use-debounce';
+import useStore from 'store';
 
 type ForwardToColleaugeModalProps = {
   chat: Chat;
@@ -43,6 +44,7 @@ const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({
   const [sorting, setSorting] = useState<SortingState>([]);
   const [usersList, setUsersList] = useState<User[] | null>(null);
   const [totalPages, setTotalPages] = useState<number>(1);
+  const userInfo = useStore((state) => state.userInfo);
   const getUsers = (
     pagination: PaginationState,
     filter: string,
@@ -60,6 +62,7 @@ const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({
         search_display_name_and_csa_title: filter,
         sorting: sort,
         show_active_only: showActiveOnly,
+        current_user_id: userInfo?.idCode ?? '',
       })
       .then((res: any) => {
         setUsersList(res?.data?.response ?? []);
