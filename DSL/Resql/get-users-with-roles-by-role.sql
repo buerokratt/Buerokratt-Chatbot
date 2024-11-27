@@ -30,6 +30,11 @@ WHERE u.status <> 'deleted'
       FROM "user"
       GROUP BY id_code
   )
+  AND (
+      :search_display_name_and_csa_title IS NULL 
+      OR LOWER(u.display_name) LIKE LOWER('%' || :search_display_name_and_csa_title || '%')
+      OR LOWER(u.csa_title) LIKE LOWER('%' || :search_display_name_and_csa_title || '%')
+  )
   AND (:show_active_only <> true OR csa.status <> 'offline')
   AND (:search_full_name IS NULL OR (
       (u.first_name || ' ' || u.last_name) ILIKE '%' || :search_full_name || '%'

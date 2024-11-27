@@ -57,7 +57,20 @@ const HistoricalChat: FC<ChatProps> = ({
     getMessages();
   }, [trigger]);
 
+  useEffect(() => {
+    const initializeComponent = () => {
+      setMessageGroups([]);
+      setMessagesList([]);
+      setLastMessage(undefined);
+      setStatuses(chatStatuses);
+      getMessages();
+    };
+
+    initializeComponent();
+  }, [chat]);
+
   const getMessages = async () => {
+    if (!chat.id) return;
     const { data: res } = await apiDev.post('agents/chats/messages/all', {
       chatId: chat.id,
     });
