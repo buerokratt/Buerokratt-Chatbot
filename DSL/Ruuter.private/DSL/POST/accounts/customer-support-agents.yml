@@ -14,6 +14,9 @@ declaration:
       - field: page_size
         type: number
         description: "Body field 'page_size'"
+      - field: search_display_name_and_csa_title
+        type: string
+        description: "Body field 'search_display_name_and_csa_title'"
       - field: sorting
         type: string
         description: "Body field 'sorting'"
@@ -33,6 +36,7 @@ extractRequestData:
     search_csa_title: ${incoming.body.search_csa_title ?? ""}
     search_csa_email: ${incoming.body.search_csa_email ?? ""}
     search_authority: ${incoming.body.search_authority ?? ""}
+    search_display_name_and_csa_title: ${incoming.body.search_display_name_and_csa_title ?? ""}
     current_user_id: ${incoming.body.current_user_id ?? ""}
 
 getCustomerSupportAgents:
@@ -50,6 +54,7 @@ getCustomerSupportAgents:
       search_csa_title: ${search_csa_title}
       search_csa_email: ${search_csa_email}
       search_authority: ${search_authority}
+      search_display_name_and_csa_title: ${search_display_name_and_csa_title}
       excluded_users: ${current_user_id}
       roles:
         [
