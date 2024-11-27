@@ -1,34 +1,19 @@
 [
     {
         "role": "system",
-        "content": [
-            {
-                "type": "text",
-                "text": "{{prompt_message}}"
-            }
-        ]
+        "content": "{{prompt_message}}"
     }
   {{#if messages}}
     {{#each messages}}
       {{#if (eq authorRole "end-user")}},
     {
         "role": "user",
-        "content": [
-            {
-                "type": "text",
-                "text": "{{content}}"
-            }
-        ]
+        "content": "{{content}}"
     }
       {{else}},
     {
         "role": "assistant",
-        "content": [
-            {
-                "type": "text",
-                "text": "{{content}}"
-            }
-        ]
+        "content": "{{content}}"
     }
       {{/if}}
     {{/each}}
@@ -36,12 +21,7 @@
   {{#if new_message}},
     {
         "role": "user",
-        "content": [
-            {
-                "type": "text",
-                "text": "{{new_message}}"
-            }
-        ]
+        "content": "{{new_message}}"
     }
   {{/if}}
 ]
