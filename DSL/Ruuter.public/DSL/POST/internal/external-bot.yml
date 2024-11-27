@@ -119,10 +119,16 @@ check_value:
   switch:
     - condition: ${correct_value === 'ERROR'}
       next: return_value
+    - condition: ${correct_value.text === '$backoffice'}
+      next: return_backoffice_value  
   next: format_messages
   
 return_value:
   return: ${correct_value}
+  next: end
+
+return_backoffice_value:
+  return: ${correct_value.text}
   next: end
 
 format_messages:
