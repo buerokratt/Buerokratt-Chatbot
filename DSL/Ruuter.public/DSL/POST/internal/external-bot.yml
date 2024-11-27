@@ -146,5 +146,5 @@ format_messages:
   next: return_formatted_value
 
 return_formatted_value:
-  return: ${converted_messages_res.response.body.response}
+  return: ${converted_messages_res.response.body}
   next: end 
