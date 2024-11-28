@@ -12,6 +12,7 @@ import './HistoricalChat.scss';
 import { apiDev } from 'services/api';
 import ChatEvent from 'components/ChatEvent';
 import { AUTHOR_ROLES } from 'utils/constants';
+import { BACKOFFICE_NAME } from "types/chat";
 
 type ChatProps = {
   chat: ChatType;
@@ -113,7 +114,7 @@ const HistoricalChat: FC<ChatProps> = ({
       } else {
         const isBackOfficeUser = message.authorRole === 'backoffice-user'
               ? `${message.authorFirstName} ${message.authorLastName}`
-              : message.authorRole;
+              : BACKOFFICE_NAME.DEFAULT;
         groupedMessages.push({
           name:
             message.authorRole === 'end-user'

@@ -5,6 +5,10 @@ export enum CHAT_STATUS {
   IDLE = 'IDLE',
 }
 
+export enum BACKOFFICE_NAME {
+  DEFAULT = 'Bürokratt'
+}
+
 export enum CHAT_EVENTS {
   ANSWERED = 'answered',
   TERMINATED = 'terminated',

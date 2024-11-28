@@ -6,7 +6,7 @@ import clsx from 'clsx';
 import { MdOutlineAttachFile, MdOutlineSend } from 'react-icons/md';
 import { Button, Icon, Label, Track } from 'components';
 import { ReactComponent as BykLogoWhite } from 'assets/logo-white.svg';
-import { Chat as ChatType, CHAT_EVENTS, CHAT_STATUS } from 'types/chat';
+import {BACKOFFICE_NAME, Chat as ChatType, CHAT_EVENTS, CHAT_STATUS} from 'types/chat';
 import { useMutation } from '@tanstack/react-query';
 import { AttachmentTypes, Message } from 'types/message';
 import ChatMessage from './ChatMessage';
@@ -403,7 +403,7 @@ const Chat: FC<ChatProps> = ({
         const isBackOfficeUser =
           message.authorRole === 'backoffice-user'
             ? `${message.authorFirstName} ${message.authorLastName}`
-            : message.authorRole;
+            : BACKOFFICE_NAME.DEFAULT;
         groupedMessages.push({
           name:
             message.authorRole === 'end-user'
