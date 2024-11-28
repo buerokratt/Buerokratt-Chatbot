@@ -33,22 +33,26 @@ const SettingsEmergencyNotices: FC = () => {
   const { data: emergencyNotice } = useQuery<EmergencyNoticeResponse>({
     queryKey: ['configs/emergency-notice', 'prod'],
     onSuccess: (data: EmergencyNoticeResponse) => {
-      // todo pick from res
-      const res = data.response;
+      const {
+        isEmergencyNoticeVisible,
+        emergencyNoticeStartISO,
+        emergencyNoticeEndISO,
+        emergencyNoticeText,
+      } = data.response;
+
       if (Object.keys(control._formValues).length > 0) return;
-      // todo clean === true
-      setIsEmergencyNoticeVisible(
-        res.isEmergencyNoticeVisible === 'true' ?? false
-      );
-      setEmergencyNoticeText(res.emergencyNoticeText ?? '');
+
+      const isEmergencyNoticeVisibleBoolean =
+        isEmergencyNoticeVisible === 'true';
+      setIsEmergencyNoticeVisible(isEmergencyNoticeVisibleBoolean);
+      setEmergencyNoticeText(emergencyNoticeText ?? '');
       reset({
-        emergencyNoticeStartISO:
-          res.isEmergencyNoticeVisible === 'true'
-            ? new Date(res.emergencyNoticeStartISO)
-            : new Date(),
-        emergencyNoticeEndISO: new Date(res.emergencyNoticeEndISO ?? '0'),
-        emergencyNoticeText: res.emergencyNoticeText ?? '',
-        isEmergencyNoticeVisible: res.isEmergencyNoticeVisible,
+        emergencyNoticeStartISO: isEmergencyNoticeVisibleBoolean
+          ? new Date(emergencyNoticeStartISO)
+          : new Date(),
+        emergencyNoticeEndISO: new Date(emergencyNoticeEndISO ?? '0'),
+        emergencyNoticeText,
+        isEmergencyNoticeVisible,
       });
     },
   });
