@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { AxiosError } from 'axios';
 import { useTranslation } from 'react-i18next';
@@ -27,18 +27,36 @@ const SettingsEmergencyNotices: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
   const { register, control, handleSubmit, reset } = useForm<EmergencyNotice>();
-  const [isEmergencyNoticeVisible, setIsEmergencyNoticeVisible] =
+  // const [isEmergencyNoticeVisible, setIsEmergencyNoticeVisible] =
+  //   useState(false);
+  const [isEmergencyNoticeSwitchActive, setIsEmergencyNoticeSwitchActive] =
     useState(false);
   const [emergencyNoticeText, setEmergencyNoticeText] = useState('');
   const { data: emergencyNotice } = useQuery<EmergencyNoticeResponse>({
     queryKey: ['configs/emergency-notice', 'prod'],
     onSuccess: (data: EmergencyNoticeResponse) => {
+      // todo pick from res
       const res = data.response;
+      console.log(res);
       if (Object.keys(control._formValues).length > 0) return;
-      setIsEmergencyNoticeVisible(res.isEmergencyNoticeVisible ?? false);
+      // setIsEmergencyNoticeVisible(
+      //   res.isEmergencyNoticeVisible === 'true' ?? false
+      // );
+      setIsEmergencyNoticeSwitchActive(
+        res.isEmergencyNoticeVisible === 'true' ?? false
+      );
       setEmergencyNoticeText(res.emergencyNoticeText ?? '');
+
+      // console.log(
+      //   res.isEmergencyNoticeVisible === 'false'
+      //     ? new Date()
+      //     : new Date(res.emergencyNoticeStartISO)
+      // );
       reset({
-        emergencyNoticeStartISO: new Date(res.emergencyNoticeStartISO ?? '0'),
+        emergencyNoticeStartISO:
+          res.isEmergencyNoticeVisible === 'true'
+            ? new Date(res.emergencyNoticeStartISO)
+            : new Date(),
         emergencyNoticeEndISO: new Date(res.emergencyNoticeEndISO ?? '0'),
         emergencyNoticeText: res.emergencyNoticeText ?? '',
         isEmergencyNoticeVisible: res.isEmergencyNoticeVisible ?? false,
@@ -68,7 +86,7 @@ const SettingsEmergencyNotices: FC = () => {
   const handleFormSubmit = handleSubmit((data) => {
     emergencyNoticeMutation.mutate({
       ...data,
-      isEmergencyNoticeVisible,
+      isEmergencyNoticeVisible: isEmergencyNoticeSwitchActive.toString(),
       emergencyNoticeText,
     });
   });
@@ -92,8 +110,8 @@ const SettingsEmergencyNotices: FC = () => {
             control={control}
             render={({ field }) => (
               <Switch
-                checked={isEmergencyNoticeVisible}
-                onCheckedChange={(c) => setIsEmergencyNoticeVisible(c)}
+                checked={isEmergencyNoticeSwitchActive}
+                onCheckedChange={(c) => setIsEmergencyNoticeSwitchActive(c)}
                 label={t('settings.emergencyNotices.noticeActive')}
                 {...field}
               />
@@ -121,13 +139,11 @@ const SettingsEmergencyNotices: FC = () => {
                     label={t('global.startDate')}
                     hideLabel
                     {...field}
-                    value={
-                      parse(
-                            format(field.value as Date, 'yyyy-MM-dd'),
-                            'yyyy-MM-dd',
-                            new Date()
-                          )
-                    }
+                    value={parse(
+                      format(field.value as Date, 'yyyy-MM-dd'),
+                      'yyyy-MM-dd',
+                      new Date()
+                    )}
                   />
                 )}
               />

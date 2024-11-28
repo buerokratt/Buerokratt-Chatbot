@@ -2,7 +2,8 @@ export interface EmergencyNotice {
   emergencyNoticeText: string;
   emergencyNoticeStartISO: Date | string;
   emergencyNoticeEndISO: Date | string;
-  isEmergencyNoticeVisible: boolean;
+  // todo BE?
+  isEmergencyNoticeVisible: string;
 }
 
 export interface EmergencyNoticeResponse {
