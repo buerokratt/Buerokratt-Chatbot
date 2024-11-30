@@ -146,8 +146,6 @@ check_if_fallback_bot_is_unable_to_reply:
   switch:
     - condition: ${converted_messages_res == 'ERROR'}
       next: check_if_user_wants_csa
-    - condition: ${converted_messages_res == '$backoffice'}
-      next: get_organization_base_config
   next: assign_fallback_converted_messages_res
 
 assign_fallback_converted_messages_res:
