@@ -146,23 +146,28 @@ LEFT JOIN ContactsMessage ON ContactsMessage.chat_base_id = c.base_id
 CROSS JOIN TitleVisibility
 CROSS JOIN NPS
 WHERE (
-  :search IS NULL OR
-  :search = '' OR
-  LOWER(c.customer_support_display_name) LIKE LOWER('%' || :search || '%') OR
-  LOWER(c.end_user_first_name) LIKE LOWER('%' || :search || '%') OR
-  LOWER(ContactsMessage.content) LIKE LOWER('%' || :search || '%') OR
-  LOWER(s.comment) LIKE LOWER('%' || :search || '%') OR
-  LOWER(c.status) LIKE LOWER('%' || :search || '%') OR
-  LOWER(m.event) LIKE LOWER('%' || :search || '%') OR
-  LOWER(c.base_id) LIKE LOWER('%' || :search || '%') OR
-  TO_CHAR(FirstContentMessage.created, 'DD.MM.YYYY HH24:MI:SS') LIKE '%' || :search || '%' OR
-  TO_CHAR(c.ended, 'DD.MM.YYYY HH24:MI:SS') LIKE '%' || :search || '%' OR
-  EXISTS (
-    SELECT 1
-    FROM message AS msg
-    WHERE msg.chat_base_id = c.base_id
-    AND LOWER(msg.content) LIKE LOWER('%' || :search || '%')
-  )
+    (
+        LENGTH(:customerSupportIds) = 0 OR
+        c.customer_support_id = ANY(string_to_array(:customerSupportIds, ','))
+    ) AND (
+        :search IS NULL OR
+        :search = '' OR
+        LOWER(c.customer_support_display_name) LIKE LOWER('%' || :search || '%') OR
+        LOWER(c.end_user_first_name) LIKE LOWER('%' || :search || '%') OR
+        LOWER(ContactsMessage.content) LIKE LOWER('%' || :search || '%') OR
+        LOWER(s.comment) LIKE LOWER('%' || :search || '%') OR
+        LOWER(c.status) LIKE LOWER('%' || :search || '%') OR
+        LOWER(m.event) LIKE LOWER('%' || :search || '%') OR
+        LOWER(c.base_id) LIKE LOWER('%' || :search || '%') OR
+        TO_CHAR(FirstContentMessage.created, 'DD.MM.YYYY HH24:MI:SS') LIKE '%' || :search || '%' OR
+        TO_CHAR(c.ended, 'DD.MM.YYYY HH24:MI:SS') LIKE '%' || :search || '%' OR
+        EXISTS (
+            SELECT 1
+            FROM message AS msg
+            WHERE msg.chat_base_id = c.base_id
+            AND LOWER(msg.content) LIKE LOWER('%' || :search || '%')
+        )
+    )
 )
 ORDER BY 
    CASE WHEN :sorting = 'created asc' THEN FirstContentMessage.created END ASC,
