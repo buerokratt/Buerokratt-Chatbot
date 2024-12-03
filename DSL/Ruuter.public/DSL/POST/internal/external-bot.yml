@@ -24,6 +24,7 @@ extract_data:
     currentDate: ${new Date().toISOString().split('T')[0]}
     sender: ${incoming.body.sender}
     authorId: ${incoming.body.authorId}
+    event: ""
 
 logstepAZURESAADAME:
   log: ${incoming.body.message}
@@ -119,11 +120,22 @@ check_value:
   switch:
     - condition: ${correct_value === 'ERROR'}
       next: return_value
+    - condition: ${correct_value.map((item) => item.text)[0] === '$backoffice'}
+      next: assign_back_office_event  
   next: format_messages
   
 return_value:
   return: ${correct_value}
   next: end
+
+assign_back_office_event:
+  assign:
+    correct_value:
+      - recipient_id: ${sender}
+        text: "Kahjuks ei oska ma hetkel Teie küsimusele vastata. Kas soovite, et suunan teie küsimuse nõustajale ?"
+        context: ${test.response.body.choices[0].message.context}
+    event: "ask_to_forward_to_csa"
+  next: format_messages
 
 format_messages:
   call: http.post
@@ -139,6 +151,7 @@ format_messages:
           "authorId": "${authorId}",
           "authorFirstName": "",
           "authorLastName": "",
+          "event": "${event ?? ''}",
           "authorTimestamp": "${new Date().toISOString()}",
           "created": "${new Date().toISOString()}",
         }
