@@ -201,7 +201,7 @@
       "unavailable_holiday_ask_contacts": "Puhkus ja küsis kontakte",
       "user-reached": "Kasutajaga võeti ühendust",
       "user-not-reached": "Kasutajaga ei õnnestunud ühendust saada",
-      "ask-to-forward-to-csa": "Paluti vestlus klienditeenindajale üle kanda",
+      "ask_to_forward_to_csa": "Paluti vestlus klienditeenindajale üle kanda",
       "forwarded_to_backoffice": "Vestlus suunatakse tagasi kontorisse"
     },
     "events": {
@@ -245,7 +245,7 @@
       "user-not-reached": "{{name}} ei saanud kasutajaga ühendust",
       "user-authenticated": "{{name}} on autenditud {{date}}",
       "taken-over": "Klienditeenindaja võttis vestluse üle",
-      "ask-to-forward-to-csa": "Paluti vestlus klienditeenindajale üle kanda",
+      "ask_to_forward_to_csa": "Paluti vestlus klienditeenindajale üle kanda",
       "forwarded_to_backoffice": "Vestlus suunatakse tagasi kontorisse"
     }
   },
