@@ -1,0 +1,84 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'Edit'"
+  method: get
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: chatId
+        type: string
+        description: "Body field 'chatId'"
+      - field: messageId
+        type: string
+        description: "Body field 'messageId'"
+      - field: content
+        type: string
+        description: "Body field 'content'"  
+
+extractRequestData:
+  assign:
+    chatId: "${incoming.body.chatId}"
+    messageId: "${incoming.body.messageId}"
+    content: "${incoming.body.content}"
+  next: getMessageById
+
+getMessageById:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-message-by-id"
+    body:
+      id: ${messageId}
+  result: message_res
+  next: assignMessage  
+
+assignMessage:
+  assign:
+    message: ${message_res.response.body[0]}
+  next: insertMessage
+
+insertMessage:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-message"
+    body:
+      messageId: ${message.base_id}
+      chatId: ${message.chatBaseId}
+      authorId: ${message.authorId ?? ""}
+      authorTimestamp: ${message.authorTimestamp ?? new Date().toISOString()}
+      authorFirstName: ${message.authorFirstName ?? ""}
+      authorLastName: ${message.authorLastName ?? ""}
+      authorRole: ${message,authorRole ?? ""}
+      created: ${new Date().toISOString()}
+      content: ${content ?? ""}
+      event: ${message.event ?? ""}
+      forwardedByUser: ${message.forwardedByUser ?? ""}
+      forwardedFromCsa: ${message.forwardedFromCsa ?? ""}
+      forwardedToCsa: ${message.forwardedToCsa ?? ""}
+      rating: ${message.rating ?? ""}
+  result: insert_message_res
+  next: notify_chats
+
+notify_chats:
+  template: chats/notify
+  requestType: templates
+  body:
+    chatId: ${chatId}
+  result: chats_notify_res
+  next: notify_messages
+
+notify_messages:
+  template: messages/notify
+  requestType: templates
+  body:
+    chatId: ${chatId}
+    type: "message"
+    messageId: ${messageId}
+  result: messages_notify_res
+  next: return_result
+
+return_result:
+  return: "Message Edited Successfully"
+  next: end          

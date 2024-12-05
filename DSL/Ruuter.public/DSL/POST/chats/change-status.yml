@@ -1,0 +1,152 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'CHANGE STATUS'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: chatId
+        type: string
+        description: "Body field 'chatId'"
+      - field: status
+        type: string
+        description: "Body field 'status'"
+
+extractRequestData:
+  assign:
+    chatId: ${incoming.body.chatId}
+    status: ${incoming.body.status}
+
+get_organization_base_config:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-organization-base-config"
+  result: org_base_config_res
+  next: assign_organization_base_config
+
+assign_organization_base_config:
+  assign:
+    base_config: ${org_base_config_res.response.body[0]}
+  next: check_if_organization_is_available_all_time
+
+check_if_organization_is_available_all_time:
+  switch:
+    - condition: ${base_config.isAvailableAllTime === 'true'}
+      next: get_all_available_csas
+  next: get_organization_working_details
+
+get_organization_working_details:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-is-organization-available"
+    body:
+      holidays: ''
+      holiday_names: ''
+      current_timestamp: ${new Date().toISOString()}
+  result: org_res
+  next: assign_organization_details
+
+assign_organization_details:
+  assign:
+    org_details: ${org_res.response.body[0]}
+  next: check_if_organization_is_available
+
+check_if_organization_is_available:
+  switch:
+    - condition: ${org_details.isWithinWorkingTime === true && org_details.isWithinWorkingDays === true && org_details.isAllowedToWorkAtHolidays === true}
+      next: get_all_available_csas
+    - condition: ${org_details.isWithinWorkingTime === true && org_details.isWithinWorkingDays === true && org_details.isAllowedToWorkAtHolidays === false && org_details.isHoliday == true}
+      next: return_is_a_holiday
+    - condition: ${org_details.isWithinWorkingTime === true && org_details.isWithinWorkingDays === true && org_details.isAllowedToWorkAtHolidays === false && org_details.isHoliday == false}
+      next: get_all_available_csas
+  next: return_organization_is_not_available
+
+get_all_available_csas:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-all-available-customer-support-agents"
+  result: csas_res
+  next: assign_available_csas
+
+assign_available_csas:
+  assign:
+    available_csas: ${csas_res.response.body.length}
+  next: check_if_csas_are_available
+
+check_if_csas_are_available:
+  switch:
+    - condition: ${available_csas == 0}
+      next: return_csa_not_available
+  next: getActiveChatById
+
+getActiveChatById:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-active-chat-by-id"
+    body:
+      id: ${chatId}
+  result: activeChatRes
+  next: checkActiveChatResult 
+
+checkActiveChatResult:
+  switch:
+    - condition: ${activeChatRes.response.body.length > 0}
+      next: assignChat
+  next: return_chat_ended
+
+assignChat:
+  assign:
+    activeChat: ${activeChatRes.response.body[0]}
+  next: changeStatus  
+
+changeStatus:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-chat"
+    body:
+      id: ${chatId}
+      customerSupportId: ''
+      customerSupportDisplayName: ''
+      csaTitle: ${activeChat.csaTitle}
+      endUserId: ${activeChat.endUserId}
+      endUserFirstName: ${activeChat.endUserFirstName}
+      endUserLastName: ${activeChat.endUserLastName}
+      status: ${status}
+      endUserEmail: ${activeChat.endUserEmail}
+      endUserPhone: ${activeChat.endUserPhone}
+      endUserOs: ${activeChat.endUserOs}
+      endUserUrl: ${activeChat.endUserUrl}
+      feedbackText: ""
+      feedbackRating: ""
+      externalId: ''
+      created: ${activeChat.created}
+      ended: ''
+      forwardedTo: ${activeChat.forwardedTo}
+      forwardedToName: ${activeChat.forwardedToName}
+      receivedFrom: ${activeChat.receivedFrom}
+      receivedFromName: ${activeChat.receivedFromName}
+  result: change_status_res
+  next: return_result
+
+return_result:
+  return: "Status Changed Successfully"
+  next: end
+
+return_organization_is_not_available:
+  return: "Organization Is Not Available"
+  next: end
+
+return_is_a_holiday:
+  return: "Its a Holiday"
+  next: end
+
+return_csa_not_available:
+  return: "CSA Is Not Available"
+  next: end
+
+return_chat_ended:
+  return: "Chat Has Ended"
+  next: end
