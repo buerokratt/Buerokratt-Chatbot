@@ -50,6 +50,7 @@ const SettingsAppearance: FC = () => {
       if (!hasRendered.current) {
         reset({
           ...res,
+          isWidgetActive: res.isWidgetActive === 'true',
           widgetAnimation:
             res.widgetAnimation.length === 0
               ? 'shockwave'
@@ -60,6 +61,10 @@ const SettingsAppearance: FC = () => {
     },
   });
 
+  const isWidgetActive = useWatch({
+    control,
+    name: 'isWidgetActive',
+  });
   const widgetProactiveSeconds = useWatch({
     control,
     name: 'widgetProactiveSeconds',
@@ -259,7 +264,7 @@ const SettingsAppearance: FC = () => {
           >
             <img src={bykLogo} alt="Buerokratt logo" width={45} />
           </motion.div>
-          {control._formValues.isWidgetActive && (
+          {isWidgetActive && (
             <div
               className={clsx('profile__greeting-message', {
                 'profile__greeting-message--active': delayFinished,

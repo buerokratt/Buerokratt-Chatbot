@@ -17,4 +17,5 @@ WHERE chat_base_id IN (SELECT base_id
                        WHERE id IN (SELECT max(id) FROM chat GROUP BY base_id)
                          AND customer_support_id = :customerSupportId
                          AND ended IS null)
-  AND id IN (SELECT max(id) FROM message GROUP BY chat_base_id);
+  AND id IN (SELECT max(id) FROM message GROUP BY chat_base_id)
+RETURNING id, chat_base_id, base_id;

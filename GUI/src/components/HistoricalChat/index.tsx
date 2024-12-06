@@ -18,6 +18,7 @@ type ChatProps = {
   trigger: boolean;
   onChatStatusChange: (event: string) => void;
   onCommentChange: (comment: string) => void;
+  selectedStatus: string | null;
 };
 
 type GroupedMessage = {
@@ -39,6 +40,7 @@ const chatStatuses = [
 const HistoricalChat: FC<ChatProps> = ({
   chat,
   trigger,
+  selectedStatus,
   onChatStatusChange,
   onCommentChange,
 }) => {
@@ -47,6 +49,7 @@ const HistoricalChat: FC<ChatProps> = ({
   const [messageGroups, setMessageGroups] = useState<GroupedMessage[]>([]);
   const [editingComment, setEditingComment] = useState<string | null>(null);
   const [messagesList, setMessagesList] = useState<Message[]>([]);
+  const [status, setStatus] = useState<string | null>(selectedStatus ?? null);
   const [lastMessage, setLastMessage] = useState<Message>();
   const [statuses, setStatuses] = useState(chatStatuses);
 
@@ -54,7 +57,20 @@ const HistoricalChat: FC<ChatProps> = ({
     getMessages();
   }, [trigger]);
 
+  useEffect(() => {
+    const initializeComponent = () => {
+      setMessageGroups([]);
+      setMessagesList([]);
+      setLastMessage(undefined);
+      setStatuses(chatStatuses);
+      getMessages();
+    };
+
+    initializeComponent();
+  }, [chat]);
+
   const getMessages = async () => {
+    if (!chat.id) return;
     const { data: res } = await apiDev.post('agents/chats/messages/all', {
       chatId: chat.id,
     });
@@ -65,6 +81,10 @@ const HistoricalChat: FC<ChatProps> = ({
     chat.endUserFirstName !== '' && chat.endUserLastName !== ''
       ? `${chat.endUserFirstName} ${chat.endUserLastName}`
       : t('global.anonymous');
+
+  useEffect(() => {
+    setStatus(selectedStatus)
+  }, [selectedStatus,status]);
 
   useEffect(() => {
     if (!messagesList) return;
@@ -239,6 +259,7 @@ const HistoricalChat: FC<ChatProps> = ({
                   name="chatStatus"
                   label={t('chat.chatStatus')}
                   direction="up"
+                  defaultValue={status}
                   onSelectionChange={(selection) =>
                     selection ? onChatStatusChange(selection.value) : null
                   }

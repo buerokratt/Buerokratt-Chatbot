@@ -92,6 +92,7 @@
     "workingHours": "Working hours"
   },
   "chat": {
+    "userTyping": "User Typing",
     "chatForwardedTo": "Chat forwarded to",
     "chatEnded": "Chat ended",
     "reply": "Reply",
@@ -191,12 +192,17 @@
       "inactive-chat-ended": "Ended cue to inactivity",
       "contact-information-skipped": "Contact Information Skipped",
       "unavailable-contact-information-fulfilled": "Contact information provided",
-      "unavailable_organization": "Organization Unavailable",
-      "unavailable_csas": "CSA's Unavailable",
+      "unavailable_organization": "Organization is unavailable",
+      "unavailable_organization_ask_contacts": "Organization is unavailable and asked for contacts",
+      "unavailable_csas": "Advisors are not available",
+      "unavailable_csas_ask_contacts": "Advisors are not available and asked for contacts",
       "unavailable_holiday": "Holiday",
+      "unavailable_holiday_ask_contacts": "Holiday and asked for contacts",
       "message-read": "Read",
       "user-reached": "User contacted",
-      "user-not-reached": "User could not be reached"
+      "user-not-reached": "User could not be reached",
+      "ask_to_forward_to_csa": "Asked to forward the conversation to a customer service agent",
+      "forwarded_to_backoffice": "Conversation forwarded to back office"
     },
     "events": {
       "answered": "Answered {{date}}",
@@ -228,15 +234,37 @@
       "message-read": "Read",
       "contact-information-skipped": "Contact Information Skipped",
       "unavailable-contact-information-fulfilled": "Contact information provided",
-      "unavailable_organization": "Organization Unavailable",
-      "unavailable_csas": "CSA's Unavailable",
+      "unavailable_organization": "Organization is unavailable",
+      "unavailable_organization_ask_contacts": "Organization is unavailable and asked for contacts",
+      "unavailable_csas": "Advisors are not available",
+      "unavailable_csas_ask_contacts": "Advisors are not available and asked for contacts",
       "unavailable_holiday": "Holiday",
+      "unavailable_holiday_ask_contacts": "Holiday and asked for contacts",
       "pending-assigned": "{{name}} assigned to contact user",
       "user-reached": "{{name}} contacted the user",
       "user-not-reached": "{{name}} could not reach the user",
       "user-authenticated": "{{name}} is authenticated {{date}}",
-      "taken-over": "A human took the conversation over"
+      "taken-over": "A human took the conversation over",
+      "ask_to_forward_to_csa": "Asked to forward the conversation to a customer service agent",
+      "forwarded_to_backoffice": "Conversation forwarded to back office"
     }
+  },
+  "deleteConversation": {
+    "deletionTime": "Deletion time",
+    "deletionNote": "Defines the time after which anonymous messages are automatically deleted.",
+    "conversationDeleting": "Conversation deletion",
+    "generateCsv": "Generate CSV",
+    "periodConversations": "Conversations in period",
+    "expiringConversationsRules": "Automatic expiration and deletion rules",
+    "showExpiring": "Show expiring conversations",
+    "authConversationsRemoval": "Authenticated conversations removal",
+    "anonymConversationsDelete": "Anonymous conversations removal",
+    "period": "Period",
+    "days": "days",
+    "oneDay": "1 day",
+    "sevenDays": "7 days",
+    "thirtyOneDay": "31 day",
+    "ninetyDays": "90 days"
   },
   "roles": {
     "ROLE_ADMINISTRATOR": "Administrator",
@@ -309,7 +337,14 @@
       "closed": "Closed",
       "until": "Until",
       "allWeekdaysExceptWeekend": "M-F",
-      "allWeekdays": "M-S"
+      "allWeekdays": "M-S",
+      "availableAllTime": "Working hours are 24/7",
+      "showIfCSAIsNotAvailable": "Send a notification of absence to the client",
+      "showIfCSAIsNotAvailableWithContactsRequest": "Send a notification of absence to the client with a contact request",
+      "noCsaAvailableMessage": "Notification of the absence of a customer service representative",
+      "showIfOrganizationIsOutsideWorkingHours": "Send a notification to the client about the company's outside working hours",
+      "showIfOrganizationIsOutsideWorkingHoursWithContactsRequest": "Send a notification to the client about the company's outside working hours with a contact request",
+      "outsideWorkingHoursMessage": "Outside working hours message"
     },
     "userSession": {
       "title": "User session",
@@ -351,6 +386,7 @@
     }
   },
   "toast": {
+    "copied": "Copied to clipboard",
     "success": {
       "updateSuccess": "Updated Successfully",
       "messageToUserEmail": "Message sent to user email",

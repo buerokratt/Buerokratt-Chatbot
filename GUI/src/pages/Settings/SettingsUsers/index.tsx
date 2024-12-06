@@ -2,6 +2,7 @@ import { FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation } from '@tanstack/react-query';
 import {
+  ColumnFiltersState,
   PaginationState,
   Row,
   SortingState,
@@ -11,7 +12,7 @@ import { AxiosError } from 'axios';
 import { MdOutlineEdit, MdOutlineDeleteOutline } from 'react-icons/md';
 import { apiDev } from 'services/api';
 import { Button, Card, DataTable, Dialog, Icon, Track } from 'components';
-import { User } from 'types/user';
+import { User, UserSearchFilters } from 'types/user';
 import { deleteUser } from 'services/users';
 import { useToast } from 'hooks/useToast';
 import UserModal from './UserModal';
@@ -29,26 +30,36 @@ const SettingsUsers: FC = () => {
   const [usersList, setUsersList] = useState<User[] | null>(null);
   const [totalPages, setTotalPages] = useState<number>(1);
 
-  const getUsers = (pagination: PaginationState, sorting: SortingState) => {
+  const getUsers = (pagination: PaginationState, sorting: SortingState, columnFilters: ColumnFiltersState, setTablePagination: boolean = false) => {
     const sort =
       sorting.length === 0
         ? 'name asc'
         : sorting[0].id + ' ' + (sorting[0].desc ? 'desc' : 'asc');
+    const searchfilters = checkFilters(columnFilters);    
     apiDev
       .post(`accounts/customer-support-agents`, {
         page: pagination.pageIndex + 1,
         page_size: pagination.pageSize,
         sorting: sort,
+        search_full_name: searchfilters.search_full_name,
+        search_id_code: searchfilters.search_id_code,
+        search_display_name: searchfilters.search_display_name,
+        search_csa_title: searchfilters.search_csa_title,
+        search_csa_email: searchfilters.search_csa_email,
+        search_authority: searchfilters.search_authority,
       })
       .then((res: any) => {
         setUsersList(res?.data?.response ?? []);
         setTotalPages(res?.data?.response[0]?.totalPages ?? 1);
+        if (setTablePagination) {
+          setPagination(pagination);
+        }
       })
       .catch((error: any) => console.log(error));
   };
 
   useEffect(() => {
-    getUsers(pagination, sorting);
+    getUsers(pagination, sorting, columnFilters);
   }, []);
 
   const [pagination, setPagination] = useState<PaginationState>({
@@ -56,12 +67,13 @@ const SettingsUsers: FC = () => {
     pageSize: 10,
   });
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const columnHelper = createColumnHelper<User>();
 
   const deleteUserMutation = useMutation({
     mutationFn: ({ id }: { id: string | number }) => deleteUser(id),
     onSuccess: async () => {
-      getUsers(pagination, sorting);
+      getUsers(pagination, sorting, columnFilters);
       toast.open({
         type: 'success',
         title: t('global.notification'),
@@ -97,6 +109,59 @@ const SettingsUsers: FC = () => {
       {t('global.delete')}
     </Button>
   );
+
+  const checkFilters = (state: ColumnFiltersState) => {
+    const searchfilters: UserSearchFilters = {
+      search_full_name: '',
+      search_id_code: '',
+      search_display_name: '',
+      search_csa_title: '',
+      search_csa_email: '',
+      search_authority: '',
+    };
+     for (const filter of state) {
+       switch (filter.id) {
+         case 'name':
+           searchfilters.search_full_name = (filter.value as string) ?? '';
+           break;
+         case 'idCode':
+           searchfilters.search_id_code = (filter.value as string) ?? '';
+           break;
+         case 'displayName':
+           searchfilters.search_display_name = (filter.value as string) ?? '';
+           break;
+         case 'csaTitle':
+           searchfilters.search_csa_title = (filter.value as string) ?? '';
+           break;
+         case 'csaEmail':
+           searchfilters.search_csa_email = (filter.value as string) ?? '';
+           break;
+         case 'Role':
+           searchfilters.search_authority = (filter.value as string) ?? '';
+           break;
+         default:
+           break;
+       }
+     }
+     return searchfilters;
+  }
+
+  const customerSupportStatusView = (props: any) => {
+    const isIdle = props.getValue() === 'idle' ? '#FFB511' : '#D73E3E';
+    return (
+      <span
+        style={{
+          marginLeft: 'auto',
+          marginRight: 'auto',
+          display: 'block',
+          width: 16,
+          height: 16,
+          borderRadius: '50%',
+          backgroundColor: props.getValue() === 'online' ? '#308653' : isIdle,
+        }}
+      ></span>
+    );
+  };
 
   const usersColumns = useMemo(
     () => [
@@ -139,6 +204,11 @@ const SettingsUsers: FC = () => {
       columnHelper.accessor('csaTitle', {
         header: t('settings.users.userTitle') ?? '',
       }),
+      columnHelper.accessor('customerSupportStatus', {
+        header: t('global.status') ?? '',
+        enableColumnFilter: false,
+        cell: customerSupportStatusView,
+      }),
       columnHelper.accessor('csaEmail', {
         header: t('settings.users.email') ?? '',
       }),
@@ -178,6 +248,7 @@ const SettingsUsers: FC = () => {
           sortable
           filterable
           pagination={pagination}
+          columnFilters={columnFilters}
           setPagination={(state: PaginationState) => {
             if (
               state.pageIndex === pagination.pageIndex &&
@@ -185,12 +256,24 @@ const SettingsUsers: FC = () => {
             )
               return;
             setPagination(state);
-            getUsers(state, sorting);
+            getUsers(state, sorting, columnFilters);
           }}
           sorting={sorting}
           setSorting={(state: SortingState) => {
             setSorting(state);
-            getUsers(pagination, state);
+            getUsers(pagination, state, columnFilters);
+          }}
+          setFiltering={(state: ColumnFiltersState) => {
+            setColumnFilters(state);
+            const searchfilters = checkFilters(state);
+            const hasData = Object.values(searchfilters).some((value) => value !== '');
+
+            if (hasData) {
+              const intialPagination = { pageIndex: 0, pageSize: 10 };
+              getUsers(intialPagination, sorting, state, true);
+            } else {
+              getUsers(pagination, sorting, state);
+            }
           }}
           pagesCount={totalPages}
           isClientSide={false}
@@ -200,14 +283,14 @@ const SettingsUsers: FC = () => {
       {
         newUserModal && <UserModal onClose={() => {
           setNewUserModal(false);
-          getUsers(pagination, sorting);
+          getUsers(pagination, sorting, columnFilters);
         }} />
       }
 
       {
         editableRow && <UserModal user={editableRow} onClose={() => {
           setEditableRow(null);
-          getUsers(pagination, sorting);
+          getUsers(pagination, sorting, columnFilters);
         }} />
       }
 

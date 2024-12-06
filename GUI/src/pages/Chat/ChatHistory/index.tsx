@@ -9,6 +9,7 @@ import {
 } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { AxiosError } from 'axios';
+import './History.scss';
 import { MdOutlineRemoveRedEye } from 'react-icons/md';
 
 import {
@@ -25,6 +26,7 @@ import {
   Tooltip,
   Track,
 } from 'components';
+
 import { CHAT_EVENTS, CHAT_STATUS, Chat as ChatType } from 'types/chat';
 import { useToast } from 'hooks/useToast';
 import { apiDev } from 'services/api';
@@ -61,6 +63,7 @@ const ChatHistory: FC = () => {
   const [statusChangeModal, setStatusChangeModal] = useState<string | null>(
     null
   );
+  const [chatState, setChatState] = useState<string | null> (statusChangeModal);
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: searchParams.get('page')
       ? parseInt(searchParams.get('page') as string) - 1
@@ -180,6 +183,7 @@ const ChatHistory: FC = () => {
       }),
     onSuccess: (res: any) => {
       setSelectedChat(res.data.response);
+      setChatState(res.data.response)
     },
   });
 
@@ -212,6 +216,7 @@ const ChatHistory: FC = () => {
       { label: t('chat.history.feedback'), value: 'feedbackText' },
       { label: t('global.status'), value: 'status' },
       { label: 'ID', value: 'id' },
+      { label: 'www', value: 'www' }
     ],
     [t]
   );
@@ -276,7 +281,7 @@ const ChatHistory: FC = () => {
     mutationFn: (data: { chatId: string | number; comment: string }) =>
       apiDev.post('comments/history', data),
     onSuccess: (res, { chatId, comment }) => {
-      const updatedChatList = endedChatsList.map((chat) =>
+      const updatedChatList = filteredEndedChatsList.map((chat) =>
         chat.id === chatId ? { ...chat, comment } : chat
       );
       filterChatsList(updatedChatList);
@@ -334,6 +339,17 @@ const ChatHistory: FC = () => {
     );
   };
 
+  const wwwView = (props: any) => (
+      <Tooltip content={props.getValue() ?? ''}>
+      <button
+          onClick={() => copyValueToClipboard(props.getValue())}
+          style={{ cursor: 'pointer' }}
+      >
+        {props.getValue() ?? ''}
+      </button>
+      </Tooltip>
+  );
+
   const statusView = (props: any) => {
     const isLastMessageEvent =
       props.row.original.lastMessageEvent != null &&
@@ -357,7 +373,10 @@ const ChatHistory: FC = () => {
   const detailsView = (props: any) => (
     <Button
       appearance="text"
-      onClick={() => setSelectedChat(props.row.original)}
+      onClick={() => {
+        setSelectedChat(props.row.original)
+        setChatState(props.row.original.lastMessageEvent)
+      }}
     >
       <Icon icon={<MdOutlineRemoveRedEye color={'rgba(0,0,0,0.54)'} />} />
       {t('global.view')}
@@ -448,12 +467,17 @@ const ChatHistory: FC = () => {
         header: 'ID',
         cell: idView,
       }),
+      columnHelper.accessor('endUserUrl', {
+        id: 'www',
+        header: 'www',
+        cell: wwwView,
+      }),
       columnHelper.display({
         id: 'detail',
         cell: detailsView,
         meta: {
-          size: '1%',
-          sticky: 'right',
+          size: '3%',
+          sticky: 'right'
         },
       }),
     ],
@@ -491,8 +515,8 @@ const ChatHistory: FC = () => {
 
     setFilteredEndedChatsList(
       chatsList.filter((c) => {
-        const created = Date.parse(format(new Date(c.created), 'MM/dd/yyyy'));
-        return created >= startDate && created <= endDate;
+        const ended = Date.parse(format(new Date(c.ended), 'MM/dd/yyyy'));
+        return ended >= startDate && ended <= endDate;
       })
     );
   };
@@ -500,209 +524,217 @@ const ChatHistory: FC = () => {
   if (!filteredEndedChatsList) return <>Loading...</>;
 
   return (
-    <>
-      <h1>{t('chat.history.title')}</h1>
+      <>
+        <h1>{t('chat.history.title')}</h1>
 
-      <Card>
-        <Track gap={16}>
-          <FormInput
-            label={t('chat.history.searchChats')}
-            hideLabel
-            name="searchChats"
-            placeholder={t('chat.history.searchChats') + '...'}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              debouncedGetAllEnded(e.target.value);
-            }}
-          />
-          <Track style={{ width: '100%' }} gap={16}>
-            <Track gap={10}>
-              <p>{t('global.from')}</p>
-              <Controller
-                name="startDate"
-                control={control}
-                render={({ field }) => {
-                  return (
-                    <FormDatepicker
-                      {...field}
-                      label={''}
-                      value={field.value ?? new Date()}
-                      onChange={(v) => {
-                        field.onChange(v);
-                        const start = format(new Date(v), 'yyyy-MM-dd');
-                        setSearchParams((params) => {
-                          params.set('start', start);
-                          return params;
-                        });
-                        getAllEndedChats.mutate({
-                          startDate: start,
-                          endDate: format(new Date(endDate), 'yyyy-MM-dd'),
-                          customerSupportIds: passedCustomerSupportIds,
-                          pagination,
-                          sorting,
-                          search,
-                        });
-                      }}
-                    />
-                  );
+        <Card>
+          <Track gap={16}>
+            <FormInput
+                label={t('chat.history.searchChats')}
+                hideLabel
+                name="searchChats"
+                placeholder={t('chat.history.searchChats') + '...'}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  debouncedGetAllEnded(e.target.value);
+                }}
+            />
+            <Track style={{width: '100%'}} gap={16}>
+              <Track gap={10}>
+                <p>{t('global.from')}</p>
+                <Controller
+                    name="startDate"
+                    control={control}
+                    render={({field}) => {
+                      return (
+                          <FormDatepicker
+                              {...field}
+                              label={''}
+                              value={field.value ?? new Date()}
+                              onChange={(v) => {
+                                field.onChange(v);
+                                const start = format(new Date(v), 'yyyy-MM-dd');
+                                setSearchParams((params) => {
+                                  params.set('start', start);
+                                  return params;
+                                });
+                                getAllEndedChats.mutate({
+                                  startDate: start,
+                                  endDate: format(new Date(endDate), 'yyyy-MM-dd'),
+                                  pagination,
+                                  sorting,
+                                  search,
+                                });
+                              }}
+                          />
+                      );
+                    }}
+                />
+              </Track>
+              <Track gap={10}>
+                <p>{t('global.to')}</p>
+                <Controller
+                    name="endDate"
+                    control={control}
+                    render={({field}) => {
+                      return (
+                          <FormDatepicker
+                              {...field}
+                              label={''}
+                              value={field.value ?? new Date()}
+                              onChange={(v) => {
+                                field.onChange(v);
+                                const end = format(new Date(v), 'yyyy-MM-dd');
+                                setSearchParams((params) => {
+                                  params.set('end', end);
+                                  return params;
+                                });
+                                getAllEndedChats.mutate({
+                                  startDate: format(new Date(startDate), 'yyyy-MM-dd'),
+                                  endDate: end,
+                                  pagination,
+                                  sorting,
+                                  search,
+                                });
+                              }}
+                          />
+                      );
+                    }}
+                />
+              </Track>
+              <FormMultiselect
+                name="agent"
+                label={t('')}
+                options={customerSupportAgents}
+                selectedOptions={customerSupportAgents.filter((item) => passedCustomerSupportIds.includes(item.value))}
+                onSelectionChange={(selection) => {
+                  setSearchParams(params => {
+                    params.delete('customerSupportIds')
+                    selection?.forEach((s) => params.append('customerSupportIds', s.value))
+                    return params;
+                  })
+
+                  getAllEndedChats.mutate({
+                    customerSupportIds: selection?.map((s) => s.value),
+                    startDate,
+                    endDate,
+                    pagination,
+                    sorting,
+                    search,
+                  });
                 }}
               />
-            </Track>
-            <Track gap={10}>
-              <p>{t('global.to')}</p>
-              <Controller
-                name="endDate"
-                control={control}
-                render={({ field }) => {
-                  return (
-                    <FormDatepicker
-                      {...field}
-                      label={''}
-                      value={field.value ?? new Date()}
-                      onChange={(v) => {
-                        field.onChange(v);
-                        const end = format(new Date(v), 'yyyy-MM-dd');
-                        setSearchParams((params) => {
-                          params.set('end', end);
-                          return params;
-                        });
-                        getAllEndedChats.mutate({
-                          startDate: format(new Date(startDate), 'yyyy-MM-dd'),
-                          customerSupportIds: passedCustomerSupportIds,
-                          endDate: end,
-                          pagination,
-                          sorting,
-                          search,
-                        });
-                      }}
-                    />
-                  );
-                }}
+              <FormMultiselect
+                  name="visibleColumns"
+                  label={t('')}
+                  options={visibleColumnOptions}
+                  selectedOptions={visibleColumnOptions.filter((o) =>
+                      selectedColumns.includes(o.value)
+                  )}
+                  onSelectionChange={(selection) => {
+                    const columns = selection?.map((s) => s.value) ?? [];
+                    setSelectedColumns(columns);
+                    setToLocalStorage(CHAT_HISTORY_PREFERENCES_KEY, columns);
+                  }}
               />
             </Track>
-            <FormMultiselect
-              name="agent"
-              label={t('')}
-              options={customerSupportAgents}
-              selectedOptions={customerSupportAgents.filter((item) => passedCustomerSupportIds.includes(item.value))}
-              onSelectionChange={(selection) => {
-                setSearchParams(params => {
-                  params.delete('customerSupportIds')
-                  selection?.forEach((s) => params.append('customerSupportIds', s.value))
-                  return params;
-                })
-
-                getAllEndedChats.mutate({
-                  customerSupportIds: selection?.map((s) => s.value),
-                  startDate,
-                  endDate,
-                  pagination,
-                  sorting,
-                  search,
-                });
-              }}
-            />
-            <FormMultiselect
-              name="visibleColumns"
-              label={t('')}
-              options={visibleColumnOptions}
-              selectedOptions={visibleColumnOptions.filter((o) =>
-                selectedColumns.includes(o.value)
-              )}
-              onSelectionChange={(selection) => {
-                const columns = selection?.map((s) => s.value) ?? [];
-                setSelectedColumns(columns);
-                setToLocalStorage(CHAT_HISTORY_PREFERENCES_KEY, columns);
-              }}
-            />
           </Track>
-        </Track>
-      </Card>
+        </Card>
 
-      <Card>
-        <DataTable
-          data={filteredEndedChatsList}
-          sortable
-          columns={getFilteredColumns()}
-          pagination={pagination}
-          columnPinning={columnPinning}
-          sorting={sorting}
-          setPagination={(state: PaginationState) => {
-            if (
-              state.pageIndex === pagination.pageIndex &&
-              state.pageSize === pagination.pageSize
-            )
-              return;
-            setPagination(state);
-            getAllEndedChats.mutate({
-              startDate: format(new Date(startDate), 'yyyy-MM-dd'),
-              endDate: format(new Date(endDate), 'yyyy-MM-dd'),
-              customerSupportIds: passedCustomerSupportIds,
-              pagination: state,
-              sorting,
-              search,
-            });
-          }}
-          setSorting={(state: SortingState) => {
-            setSorting(state);
-            getAllEndedChats.mutate({
-              startDate: format(new Date(startDate), 'yyyy-MM-dd'),
-              endDate: format(new Date(endDate), 'yyyy-MM-dd'),
-              customerSupportIds: passedCustomerSupportIds,
-              pagination,
-              sorting: state,
-              search,
-            });
-          }}
-          isClientSide={false}
-          pagesCount={totalPages}
-        />
-      </Card>
+        <div className="card-drawer-container">
+          <div className="card-wrapper">
+            <Card>
+              <DataTable
+                  data={filteredEndedChatsList}
+                  sortable
+                  columns={getFilteredColumns()}
+                  pagination={pagination}
+                  columnPinning={columnPinning}
+                  sorting={sorting}
+                  setPagination={(state: PaginationState) => {
+                    if (
+                        state.pageIndex === pagination.pageIndex &&
+                        state.pageSize === pagination.pageSize
+                    )
+                      return;
+                    setPagination(state);
+                    getAllEndedChats.mutate({
+                      startDate: format(new Date(startDate), 'yyyy-MM-dd'),
+                      endDate: format(new Date(endDate), 'yyyy-MM-dd'),
+                      pagination: state,
+                      sorting,
+                      search,
+                    });
+                  }}
+                  setSorting={(state: SortingState) => {
+                    setSorting(state);
+                    getAllEndedChats.mutate({
+                      startDate: format(new Date(startDate), 'yyyy-MM-dd'),
+                      endDate: format(new Date(endDate), 'yyyy-MM-dd'),
+                      pagination,
+                      sorting: state,
+                      search,
+                    });
+                  }}
+                  isClientSide={false}
+                  pagesCount={totalPages}
+              />
+            </Card>
+          </div>
 
-      {selectedChat && (
-        <Drawer
-          title={
-            selectedChat.endUserFirstName !== '' &&
-            selectedChat.endUserLastName !== ''
-              ? `${selectedChat.endUserFirstName} ${selectedChat.endUserLastName}`
-              : t('global.anonymous')
-          }
-          onClose={() => setSelectedChat(null)}
-        >
-          <HistoricalChat
-            chat={selectedChat}
-            trigger={messagesTrigger}
-            onChatStatusChange={setStatusChangeModal}
-            onCommentChange={handleCommentChange}
-          />
-        </Drawer>
-      )}
+          {selectedChat && (
+              <div className="drawer-container">
+                <Drawer
+                    title={
+                      selectedChat.endUserFirstName !== '' && selectedChat.endUserLastName !== ''
+                          ? `${selectedChat.endUserFirstName} ${selectedChat.endUserLastName}`
+                          : t('global.anonymous')
+                    }
+                    onClose={() => setSelectedChat(null)}
+                >
+                  <HistoricalChat
+                      chat={selectedChat}
+                      trigger={messagesTrigger}
+                      onChatStatusChange={setStatusChangeModal}
+                      selectedStatus={chatState}
+                      onCommentChange={handleCommentChange}
+                  />
+                </Drawer>
+              </div>
+          )}
+        </div>
 
-      {statusChangeModal && (
-        <Dialog
-          title={t('chat.changeStatus')}
-          onClose={() => setStatusChangeModal(null)}
-          footer={
-            <>
-              <Button
-                appearance="secondary"
-                onClick={() => setStatusChangeModal(null)}
-              >
-                {t('global.cancel')}
-              </Button>
-              <Button
-                appearance="error"
-                onClick={() => handleChatStatusChange(statusChangeModal)}
-              >
-                {t('global.yes')}
-              </Button>
-            </>
-          }
-        >
-          <p>{t('global.removeValidation')}</p>
-        </Dialog>
-      )}
-    </>
+        {statusChangeModal && (
+            <Dialog
+                title={t('chat.changeStatus')}
+                onClose={() => setStatusChangeModal(null)}
+                footer={
+                  <>
+                    <Button
+                        appearance="secondary"
+                        onClick={() => {
+                          setChatState(null)
+                          setStatusChangeModal(null)
+                        }}
+                    >
+                      {t('global.cancel')}
+                    </Button>
+                    <Button
+                        appearance="error"
+                        onClick={() => {
+                          setChatState(statusChangeModal)
+                          handleChatStatusChange(statusChangeModal)
+                        }}
+                    >
+                      {t('global.yes')}
+                    </Button>
+                  </>
+                }
+            >
+              <p>{t('global.removeValidation')}</p>
+            </Dialog>
+        )}
+      </>
   );
 };
 

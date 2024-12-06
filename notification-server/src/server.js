@@ -6,7 +6,7 @@ const {
   buildNotificationSearchInterval,
   buildQueueCounter,
 } = require("./addOns");
-const { enqueueChatId, dequeueChatId } = require("./openSearch");
+const { enqueueChatId, dequeueChatId, sendBulkNotification } = require("./openSearch");
 const { addToTerminationQueue, removeFromTerminationQueue } = require("./terminationQueue");
 const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
@@ -36,6 +36,15 @@ app.get("/sse/queue/:id", (req, res) => {
     res,
     buildCallbackFunction: buildQueueCounter({ id }),
   });
+});
+
+app.post("/bulk-notifications", async (req, res) => {
+  try {
+    await sendBulkNotification(req.body);
+    res.status(200).json({ response: 'sent successfully' });
+  } catch {
+    res.status(500).json({ response: 'error' });
+  }
 });
 
 app.post("/enqueue", async (req, res) => {

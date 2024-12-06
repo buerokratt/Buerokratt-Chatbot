@@ -6,5 +6,5 @@ WHERE status = 'approved'
 AND id = (
     SELECT MAX(id)
     FROM service_trigger
-    WHERE intent = :intent
+    WHERE service_name = :serviceName
 );

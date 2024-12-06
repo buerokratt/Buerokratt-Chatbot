@@ -1,6 +1,6 @@
 WITH LatestActiveUser AS (
   SELECT
-    u.id_code, u.created, u.csa_title
+    u.id_code, u.created, u.csa_title, u.first_name, u.last_name, u.display_name
   FROM
     "user" u INNER JOIN (
         SELECT iu.id_code, max(created) AS MaxCreated

@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { AxiosError } from 'axios';
 import { useTranslation } from 'react-i18next';
@@ -12,7 +12,10 @@ import {
   Track,
 } from 'components';
 import { EMERGENCY_NOTICE_LENGTH } from 'constants/config';
-import { EmergencyNotice } from 'types/emergencyNotice';
+import {
+  EmergencyNotice,
+  EmergencyNoticeResponse,
+} from 'types/emergencyNotice';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useToast } from 'hooks/useToast';
 import { apiDev } from 'services/api';
@@ -27,9 +30,9 @@ const SettingsEmergencyNotices: FC = () => {
   const [isEmergencyNoticeVisible, setIsEmergencyNoticeVisible] =
     useState(false);
   const [emergencyNoticeText, setEmergencyNoticeText] = useState('');
-  const { data: emergencyNotice } = useQuery<EmergencyNotice>({
+  const { data: emergencyNotice } = useQuery<EmergencyNoticeResponse>({
     queryKey: ['configs/emergency-notice', 'prod'],
-    onSuccess: (data: any) => {
+    onSuccess: (data: EmergencyNoticeResponse) => {
       const res = data.response;
       if (Object.keys(control._formValues).length > 0) return;
       setIsEmergencyNoticeVisible(res.isEmergencyNoticeVisible ?? false);
@@ -120,10 +123,10 @@ const SettingsEmergencyNotices: FC = () => {
                     {...field}
                     value={
                       parse(
-                        format(field.value as Date, 'yyyy-MM-dd'),
-                        'yyyy-MM-dd',
-                        new Date()
-                      ) ?? new Date('0')
+                            format(field.value as Date, 'yyyy-MM-dd'),
+                            'yyyy-MM-dd',
+                            new Date()
+                          )
                     }
                   />
                 )}
@@ -155,4 +158,6 @@ const SettingsEmergencyNotices: FC = () => {
   );
 };
 
-export default withAuthorization(SettingsEmergencyNotices, [ROLES.ROLE_ADMINISTRATOR]);
+export default withAuthorization(SettingsEmergencyNotices, [
+  ROLES.ROLE_ADMINISTRATOR,
+]);
