@@ -58,8 +58,7 @@ createAuthCronJson:
       type: "json"
     body:
       cronExpression: ${expression}
-      method: "GET"
-      url: "[#CHATBOT_RUUTER_PRIVATE_INTERNAL]/cron-tasks/delete-conversations?isAuth=true&skipAuth=true"
+      command: "./scripts/remove-auth-conversations.sh"
   result: authCronJson
 
 createAnonCronJson:
@@ -70,8 +69,7 @@ createAnonCronJson:
       type: "json"
     body:
       cronExpression: ${expression}
-      method: "GET"
-      url: "[#CHATBOT_RUUTER_PRIVATE_INTERNAL]/cron-tasks/delete-conversations?isAuth=false&skipAuth=true"
+      command: "./scripts/remove-anonym-conversations.sh"
   result: anonCronJson
 
 checkAuthConditions:

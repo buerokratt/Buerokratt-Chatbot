@@ -1,8 +1,40 @@
-check_for_cookie:
+process_request:
   switch:
+    - condition: ${ incoming.headers['x-ruuter-nonce'] != null }
+      next: verify_header_nonce
+    - condition: ${ incoming.params['ruuter-nonce'] != null }
+      next: verify_param_nonce
     - condition: ${incoming.headers == null || incoming.headers.cookie == null}
-      next: guard_fail
+      next: guard_fail  
   next: authenticate
+
+verify_header_nonce:
+  call: http.post
+  args:
+    url: "[#TRAINING_RESQL]/use-nonce"
+    body:
+      updated_nonce: ${incoming.headers['x-ruuter-nonce']}
+  result: nonce_response
+  next: check_inline
+
+verify_param_nonce:
+  call: http.post
+  args:
+    url: "[#TRAINING_RESQL]/use-nonce"
+    body:
+      updated_nonce: ${incoming.params['ruuter-nonce']}
+  result: nonce_response
+  next: check_inline
+
+check_inline:
+  inline: extAuth
+  result: extauth
+
+check_nonce:
+  switch:
+    - condition: ${ !extauth || (nonce_response.response.body[0] == null) }
+      next: guard_fail
+  next: guard_success
 
 authenticate:
   template: check-user-authority
@@ -10,6 +42,7 @@ authenticate:
   headers:
     cookie: ${incoming.headers.cookie}
   result: authority_result
+  next: check_authority_result
 
 check_authority_result:
   switch:
@@ -24,5 +57,5 @@ guard_success:
 
 guard_fail:
   return: "unauthorized"
-  status: 200
+  status: 403
   next: end
