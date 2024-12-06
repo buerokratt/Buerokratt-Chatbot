@@ -43,8 +43,8 @@ get_organization_working_details:
   args:
     url: "[#CHATBOT_RESQL]/get-is-organization-available"
     body:
-      holidays: ''
-      holiday_names: ''
+      holidays: '' # TODO: GET Holidays From Api Side
+      holiday_names: '' # TODO: GET Holiday Names From Api Side
       current_timestamp: ${new Date().toISOString()}
   result: org_res
   next: assign_organization_details
@@ -110,24 +110,24 @@ changeStatus:
       id: ${chatId}
       customerSupportId: ''
       customerSupportDisplayName: ''
-      csaTitle: ${activeChat.csaTitle}
-      endUserId: ${activeChat.endUserId}
-      endUserFirstName: ${activeChat.endUserFirstName}
-      endUserLastName: ${activeChat.endUserLastName}
+      csaTitle: ${activeChat.csaTitle ?? ''}
+      endUserId: ${activeChat.endUserId ?? ''}
+      endUserFirstName: ${activeChat.endUserFirstName ?? ''}
+      endUserLastName: ${activeChat.endUserLastName ?? ''}
       status: ${status}
-      endUserEmail: ${activeChat.endUserEmail}
-      endUserPhone: ${activeChat.endUserPhone}
-      endUserOs: ${activeChat.endUserOs}
-      endUserUrl: ${activeChat.endUserUrl}
-      feedbackText: ""
-      feedbackRating: ""
-      externalId: ''
-      created: ${activeChat.created}
+      endUserEmail: ${activeChat.endUserEmail ?? ''}
+      endUserPhone: ${activeChat.endUserPhone ?? ''}
+      endUserOs: ${activeChat.endUserOs ?? ''}
+      endUserUrl: ${activeChat.endUserUrl ?? ''}
+      feedbackText: ${activeChat.feedbackText ?? ''}
+      feedbackRating: ${activeChat.feedbackRating ?? ''}
+      externalId: ${activeChat.externalId ?? ''}
+      created: ${new Date().toISOString()}
       ended: ''
-      forwardedTo: ${activeChat.forwardedTo}
-      forwardedToName: ${activeChat.forwardedToName}
-      receivedFrom: ${activeChat.receivedFrom}
-      receivedFromName: ${activeChat.receivedFromName}
+      forwardedTo: ${activeChat.forwardedTo ?? ''}
+      forwardedToName: ${activeChat.forwardedToName ?? ''}
+      receivedFrom: ${activeChat.receivedFrom ?? ''}
+      receivedFromName: ${activeChat.receivedFromName ?? ''}
   result: change_status_res
   next: return_result
 

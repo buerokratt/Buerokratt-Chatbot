@@ -44,13 +44,13 @@ insertMessage:
   args:
     url: "[#CHATBOT_RESQL]/insert-message"
     body:
-      messageId: ${message.base_id}
-      chatId: ${message.chatBaseId}
+      messageId: ${messageId}
+      chatId: ${chatId}
       authorId: ${message.authorId ?? ""}
       authorTimestamp: ${message.authorTimestamp ?? new Date().toISOString()}
       authorFirstName: ${message.authorFirstName ?? ""}
       authorLastName: ${message.authorLastName ?? ""}
-      authorRole: ${message,authorRole ?? ""}
+      authorRole: ${message.authorRole ?? ""}
       created: ${new Date().toISOString()}
       content: ${content ?? ""}
       event: ${message.event ?? ""}
