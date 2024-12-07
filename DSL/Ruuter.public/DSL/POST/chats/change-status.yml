@@ -14,11 +14,19 @@ declaration:
       - field: status
         type: string
         description: "Body field 'status'"
+      - field: holidayNames
+        type: string
+        description: "Body field 'holidayNames'"
+      - field: holidays
+        type: string
+        description: "Body field 'holidays'"  
 
 extractRequestData:
   assign:
     chatId: ${incoming.body.chatId}
     status: ${incoming.body.status}
+    holidays: ${incoming.body.holidays}
+    holidayNames: ${incoming.body.holidayNames}
 
 get_organization_base_config:
   call: http.post
@@ -43,8 +51,8 @@ get_organization_working_details:
   args:
     url: "[#CHATBOT_RESQL]/get-is-organization-available"
     body:
-      holidays: '' # TODO: GET Holidays From Api Side
-      holiday_names: '' # TODO: GET Holiday Names From Api Side
+      holidays: ${holidays}
+      holiday_names: ${holidayNames}
       current_timestamp: ${new Date().toISOString()}
   result: org_res
   next: assign_organization_details

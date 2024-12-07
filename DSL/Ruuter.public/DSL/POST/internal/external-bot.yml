@@ -18,12 +18,20 @@ declaration:
       - field: authorId
         type: string
         description: "Parameter 'authorId'"
+      - field: holidayNames
+        type: string
+        description: "Body field 'holidayNames'"
+      - field: holidays
+        type: string
+        description: "Body field 'holidays'"  
 
 extract_data:
   assign:
     currentDate: ${new Date().toISOString().split('T')[0]}
     sender: ${incoming.body.sender}
     authorId: ${incoming.body.authorId}
+    holidays: ${incoming.body.holidays}
+    holidayNames: ${incoming.body.holidayNames}
     event: ""
 
 # logstepAZURESAADAME:
@@ -146,6 +154,8 @@ change_chat_status:
     body:
       chatId: ${sender}
       status: "VALIDATING"
+      holidays: ${holidays}
+      holidayNames: ${holidayNames}
   result: change_chat_status_res
   next: check_chat_status_result
 
