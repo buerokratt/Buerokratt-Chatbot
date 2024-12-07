@@ -46,6 +46,8 @@ export enum CHAT_EVENTS {
   PENDING_USER_NOT_REACHED = 'user-not-reached',
   USER_AUTHENTICATED = 'user-authenticated',
   READ = 'message-read',
+  WAITING_VALIDATION = 'waiting_validation',
+  APPROVED_VALIDATION = 'approved_validation',
 }
 
 export interface Chat {

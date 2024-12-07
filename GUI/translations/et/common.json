@@ -119,6 +119,8 @@
     },
     "chatStatus": "Vestluse staatus",
     "changeStatus": "Muuda staatust",
+    "waiting_validation": "Vastust koostatakse",
+    "approved_validation": "Kinnitatud valideerimine",
     "active": {
       "list": "Aktiivsed vestlused",
       "myChats": "Minu vestlused",

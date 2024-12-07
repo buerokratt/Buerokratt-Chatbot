@@ -119,6 +119,8 @@
     },
     "chatStatus": "Chat status",
     "changeStatus": "Change status",
+    "waiting_validation": "Waiting for validation",
+    "approved_validation": "Approved Validation",
     "active": {
       "list": "Active chat list",
       "myChats": "My chats",

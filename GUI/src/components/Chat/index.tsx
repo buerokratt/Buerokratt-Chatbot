@@ -168,6 +168,8 @@ const Chat: FC<ChatProps> = ({
           'redirectedMessageByOwner',
           'redirectedMessageClaimed',
           'redirectedMessage',
+          'waiting_validation',
+          'approved_validation',
         ];
 
         const eventMessages: Message[] = filteredMessages?.filter(
@@ -385,9 +387,11 @@ const Chat: FC<ChatProps> = ({
         if (
           !message.event ||
           message.event === '' ||
-          message.event === 'greeting'
+          message.event === CHAT_EVENTS.GREETING ||
+          message.event === CHAT_EVENTS.WAITING_VALIDATION ||
+          message.event === CHAT_EVENTS.APPROVED_VALIDATION
         ) {
-          lastGroup.messages.push({ ...message });
+          lastGroup.messages.push({ ...message, content: message.event === CHAT_EVENTS.WAITING_VALIDATION ? t('chat.waiting_validation').toString() : message.content });
         } else {
           groupedMessages.push({
             name: '',
@@ -398,7 +402,9 @@ const Chat: FC<ChatProps> = ({
       } else if (
         !message.event ||
         message.event === '' ||
-        message.event === 'greeting'
+        message.event === CHAT_EVENTS.GREETING ||
+        message.event === CHAT_EVENTS.WAITING_VALIDATION ||
+        message.event === CHAT_EVENTS.APPROVED_VALIDATION
       ) {
         const isBackOfficeUser =
           message.authorRole === 'backoffice-user'
@@ -410,7 +416,15 @@ const Chat: FC<ChatProps> = ({
               ? endUserFullName
               : isBackOfficeUser,
           type: message.authorRole,
-          messages: [{ ...message }],
+          messages: [
+            {
+              ...message,
+              content:
+                message.event === CHAT_EVENTS.WAITING_VALIDATION
+                  ? t('chat.waiting_validation').toString()
+                  : message.content,
+            },
+          ],
         });
       } else {
         groupedMessages.push({
