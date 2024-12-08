@@ -249,6 +249,13 @@
       "taken-over": "A human took the conversation over",
       "ask_to_forward_to_csa": "Asked to forward the conversation to a customer service agent",
       "forwarded_to_backoffice": "Conversation forwarded to back office"
+    },
+    "validations": {
+      "title": "Validations",
+      "description": "Responses from the chatbot that require validation before being sent to the end user are displayed here",
+      "messageChanged": "Message changed successfully",
+      "messageApproved": "Message approved successfully",
+      "messageChangeFailed": "Message change failed"
     }
   },
   "deleteConversation": {

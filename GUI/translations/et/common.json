@@ -249,6 +249,13 @@
       "taken-over": "Klienditeenindaja võttis vestluse üle",
       "ask_to_forward_to_csa": "Vestlus paluti klienditeenindajale suunata",
       "forwarded_to_backoffice": "Vestlus suunatakse klienditeenindajale"
+    },
+    "validations": {
+      "title": "Valideerimised",
+      "description": "Siin kuvatakse vestlusroboti poolt tulnud vastused, mis nõuavad valideerimist enne kui need lõppkasutajale saadetakse",
+      "messageChanged": "Sõnumi muutmine õnnestus",
+      "messageApproved": "Sõnum kinnitati edukalt",
+      "messageChangeFailed": "Sõnumi muutmine ebaõnnestus"
     }
   },
   "deleteConversation": {
