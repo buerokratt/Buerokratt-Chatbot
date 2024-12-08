@@ -204,7 +204,8 @@
       "user-reached": "Kasutajaga võeti ühendust",
       "user-not-reached": "Kasutajaga ei õnnestunud ühendust saada",
       "ask_to_forward_to_csa": "Vestlus paluti klienditeenindajale suunata",
-      "forwarded_to_backoffice": "Vestlus suunatakse klienditeenindajale"
+      "forwarded_to_backoffice": "Vestlus suunatakse klienditeenindajale",
+      "continue_chatting_with_bot": "Jätkake vestlust kasutajaga bürokratt"
     },
     "events": {
       "answered": "Vastatud {{date}}",
@@ -248,7 +249,8 @@
       "user-authenticated": "{{name}} on autenditud {{date}}",
       "taken-over": "Klienditeenindaja võttis vestluse üle",
       "ask_to_forward_to_csa": "Vestlus paluti klienditeenindajale suunata",
-      "forwarded_to_backoffice": "Vestlus suunatakse klienditeenindajale"
+      "forwarded_to_backoffice": "Vestlus suunatakse klienditeenindajale",
+      "continue_chatting_with_bot": "Jätkake vestlust kasutajaga bürokratt"
     },
     "validations": {
       "title": "Valideerimised",
