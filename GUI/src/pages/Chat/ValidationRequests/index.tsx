@@ -6,13 +6,8 @@ import {
   createColumnHelper,
 } from '@tanstack/react-table';
 import { format } from 'date-fns';
-import {
-  AiFillCheckCircle,
-  AiOutlineCheck,
-  AiOutlineClose,
-  AiOutlineEdit,
-} from 'react-icons/ai';
-import { Card, DataTable, FormInput, Icon, Tooltip, Track } from 'components';
+import { AiFillCheckCircle } from 'react-icons/ai';
+import { Card, DataTable, Icon, Tooltip } from 'components';
 import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';
 import { useMutation } from '@tanstack/react-query';
@@ -22,6 +17,7 @@ import { apiDev } from 'services/api';
 import { AxiosError } from 'axios';
 import { userStore as useHeaderStore } from '@buerokratt-ria/header';
 import sse from 'services/sse-service';
+import MessageContentView from './MessageContentView';
 
 const ValidationRequests: React.FC = () => {
   const { t } = useTranslation();
@@ -32,9 +28,13 @@ const ValidationRequests: React.FC = () => {
   });
   const [sorting, setSorting] = useState<SortingState>([]);
 
-  const validationRequests = useHeaderStore((state) => state.getValidationMessages());
+  const validationRequests = useHeaderStore((state) =>
+    state.getValidationMessages()
+  );
 
-  const loadValidationMessages = useHeaderStore((state) => state.loadValidationMessages);
+  const loadValidationMessages = useHeaderStore(
+    (state) => state.loadValidationMessages
+  );
 
   useEffect(() => {
     useHeaderStore.getState().loadValidationMessages();
@@ -75,98 +75,39 @@ const ValidationRequests: React.FC = () => {
 
   const idView = (props: any) => (
     <Tooltip content={props.getValue()}>
-      <span
+      <button
         onClick={() => copyValueToClipboard(props.getValue())}
-        style={{ cursor: 'pointer' }}
+        style={{ cursor: 'pointer', fontSize: 16 }}
       >
         {props.getValue().split('-')[0]}
-      </span>
+      </button>
     </Tooltip>
   );
 
-  const contentView = (props: any) => {
-    const [isEditing, setIsEditing] = useState(false);
-    const [content, setContent] = useState(props.getValue());
-    const [inputContent, setInputContent] = useState(content);
+  const approveView = (props: any) => (
+    <Icon
+      style={{ marginLeft: '15%', cursor: 'pointer' }}
+      icon={
+        <AiFillCheckCircle
+          fontSize={22}
+          color="#308653"
+          onClick={() =>
+            approveMessage.mutate({
+              chatId: props.row.original.chatId,
+              messageId: props.row.original.id ?? '',
+            })
+          }
+        />
+      }
+      size="medium"
+    />
+  );
 
-    return (
-      <Track gap={10}>
-        {!isEditing && <label>{content}</label>}
-        {isEditing && (
-          <div style={{ width: '50%' }}>
-            <FormInput
-              name={''}
-              label={''}
-              defaultValue={content}
-              onChange={(e) => {
-                setInputContent(e.target.value);
-              }}
-            ></FormInput>
-          </div>
-        )}
-        {!isEditing && (
-          <Icon
-            style={{ cursor: 'pointer' }}
-            icon={
-              <AiOutlineEdit fontSize={22} onClick={() => setIsEditing(true)} />
-            }
-            size="medium"
-          />
-        )}
-        {isEditing && (
-          <Icon
-            style={{ cursor: 'pointer' }}
-            icon={
-              <AiOutlineCheck
-                fontSize={22}
-                color="#308653"
-                onClick={async () => {
-                  if (inputContent.length === 0) return;
-                  try {
-                    await apiDev.post('chats/messages/edit', {
-                      chatId: props.row.original.chatId,
-                      messageId: props.row.original.id,
-                      content: inputContent,
-                    });
-                    setIsEditing(false);
-                    setContent(inputContent);
-                    toast.open({
-                      type: 'success',
-                      title: t('global.notification'),
-                      message: t('chat.validations.messageApproved'),
-                    });
-                  } catch (_) {
-                    toast.open({
-                      type: 'error',
-                      title: t('global.notificationError'),
-                      message: t('chat.validations.messageChangeFailed'),
-                    });
-                  }
-                }}
-              />
-            }
-            size="medium"
-          />
-        )}
-        {isEditing && (
-          <Icon
-            style={{ cursor: 'pointer' }}
-            icon={
-              <AiOutlineClose
-                fontSize={22}
-                color="#D73E3E"
-                onClick={() => {
-                  setIsEditing(false);
-                  setContent(content);
-                }}
-              />
-            }
-            size="medium"
-          />
-        )}
-      </Track>
-    );
-  };
+  const dateView = (props: any) => (
+    <span>
+      {format(new Date(props.getValue() ?? ''), 'dd-MM-yyyy HH:mm:ss')}
+    </span>
+  );
 
   const copyValueToClipboard = async (value: string) => {
     await navigator.clipboard.writeText(value);
@@ -192,37 +133,16 @@ const ValidationRequests: React.FC = () => {
       }),
       columnHelper.accessor('content', {
         header: 'Message',
-        cell: contentView,
+        cell: MessageContentView,
       }),
       columnHelper.accessor('created', {
         header: 'Requested At',
-        cell: (props) => (
-          <span>
-            {format(new Date(props.getValue() ?? ''), 'dd-MM-yyyy HH:mm:ss')}
-          </span>
-        ),
+        cell: dateView,
       }),
       columnHelper.display({
-        header: 'Approve',
-        cell: (props) => (
-          <Icon
-            style={{ marginLeft: '15%', cursor: 'pointer' }}
-            icon={
-              <AiFillCheckCircle
-                fontSize={22}
-                color="#308653"
-                onClick={() =>
-                  approveMessage.mutate({
-                    chatId: props.row.original.chatId,
-                    messageId: props.row.original.id ?? '',
-                  })
-                }
-              />
-            }
-            size="medium"
-          />
-        ),
         id: 'approve',
+        header: 'Approve',
+        cell: approveView,
       }),
     ],
     []
