@@ -3,6 +3,7 @@ export enum CHAT_STATUS {
   OPEN = 'OPEN',
   REDIRECTED = 'REDIRECTED',
   IDLE = 'IDLE',
+  VALIDATING = 'VALIDATING',
 }
 
 export enum CHAT_EVENTS {
