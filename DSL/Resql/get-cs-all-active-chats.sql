@@ -72,6 +72,7 @@ ActiveChats AS (
   JOIN MaxChats ON id = maxId
   AND ended IS NULL
   AND customer_support_id != BotName.value
+  AND status != 'VALIDATING'
 ),
 ContactsMessage AS (
   SELECT chat_base_id, content

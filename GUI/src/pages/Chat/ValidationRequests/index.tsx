@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   PaginationState,
@@ -15,25 +15,35 @@ import {
 import { Card, DataTable, FormInput, Icon, Tooltip, Track } from 'components';
 import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { Message } from 'types/message';
 import { useToast } from 'hooks/useToast';
 import { apiDev } from 'services/api';
 import { AxiosError } from 'axios';
+import { userStore as useHeaderStore } from '@buerokratt-ria/header';
+import sse from 'services/sse-service';
 
 const ValidationRequests: React.FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
-  const queryClient = useQueryClient();
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
   });
   const [sorting, setSorting] = useState<SortingState>([]);
 
-  const { data: validationRequests } = useQuery<{ response: Message[] }>({
-    queryKey: ['chats/messages/waiting-validation', 'prod'],
-  });
+  const validationRequests = useHeaderStore((state) => state.getValidationMessages());
+
+  const loadValidationMessages = useHeaderStore((state) => state.loadValidationMessages);
+
+  useEffect(() => {
+    useHeaderStore.getState().loadValidationMessages();
+  }, []);
+
+  useEffect(() => {
+    const events = sse(`/chat-list`, loadValidationMessages);
+    return () => events.close();
+  }, []);
 
   const approveMessage = useMutation({
     mutationFn: (data: { chatId: string; messageId: string }) => {
@@ -43,10 +53,7 @@ const ValidationRequests: React.FC = () => {
       });
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries([
-        'chats/messages/waiting-validation',
-        'prod',
-      ]);
+      loadValidationMessages();
       toast.open({
         type: 'success',
         title: t('global.notification'),
@@ -227,7 +234,7 @@ const ValidationRequests: React.FC = () => {
       <p>{t('chat.validations.description')}</p>
       <Card>
         <DataTable
-          data={validationRequests?.response ?? []}
+          data={validationRequests ?? []}
           columns={validationColumns}
           sortable
           sorting={sorting}
