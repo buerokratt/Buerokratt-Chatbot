@@ -257,7 +257,14 @@
       "description": "Siin kuvatakse vestlusroboti poolt tulnud vastused, mis nõuavad valideerimist enne kui need lõppkasutajale saadetakse",
       "messageChanged": "Sõnumi muutmine õnnestus",
       "messageApproved": "Sõnum kinnitati edukalt",
-      "messageChangeFailed": "Sõnumi muutmine ebaõnnestus"
+      "messageChangeFailed": "Sõnumi muutmine ebaõnnestus",
+      "header": {
+        "id": "Id",
+        "chatId": "Vestluse ID",
+        "message": "Sõnum",
+        "requestedAt": "Taotletud Kell",
+        "approve": "Kinnita"
+      }
     }
   },
   "deleteConversation": {

@@ -257,7 +257,14 @@
       "description": "Responses from the chatbot that require validation before being sent to the end user are displayed here",
       "messageChanged": "Message changed successfully",
       "messageApproved": "Message approved successfully",
-      "messageChangeFailed": "Message change failed"
+      "messageChangeFailed": "Message change failed",
+      "header": {
+        "id" : "Id",
+        "chatId": "Chat Id",
+        "message": "Message",
+        "requestedAt": "Requested At",
+        "approve": "Approve"
+      }
     }
   },
   "deleteConversation": {

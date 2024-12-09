@@ -123,25 +123,25 @@ const ValidationRequests: React.FC = () => {
     () => [
       columnHelper.accessor('id', {
         id: 'id',
-        header: 'Id',
+        header: t('chat.validations.header.id') ?? '',
         cell: idView,
       }),
       columnHelper.accessor('chatId', {
         id: 'chatId',
-        header: 'Chat Id',
+        header: t('chat.validations.header.chatId') ?? '',
         cell: idView,
       }),
       columnHelper.accessor('content', {
-        header: 'Message',
+        header: t('chat.validations.header.message') ?? '',
         cell: MessageContentView,
       }),
       columnHelper.accessor('created', {
-        header: 'Requested At',
+        header: t('chat.validations.header.requestedAt') ?? '',
         cell: dateView,
       }),
       columnHelper.display({
         id: 'approve',
-        header: 'Approve',
+        header: t('chat.validations.header.approve') ?? '',
         cell: approveView,
       }),
     ],
