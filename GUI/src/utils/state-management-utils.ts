@@ -3,6 +3,8 @@ import { Message } from "types/message";
 
 export const isStateChangingEventMessage = (msg: Message): boolean =>
   msg.event === CHAT_EVENTS.GREETING ||
+  msg.event === CHAT_EVENTS.WAITING_VALIDATION ||
+  msg.event === CHAT_EVENTS.APPROVED_VALIDATION ||
   msg.event === CHAT_EVENTS.ASK_PERMISSION_IGNORED ||
   (msg.event === CHAT_EVENTS.CONTACT_INFORMATION && msg.content?.length === 0) ||
   msg.event === CHAT_EVENTS.ANSWERED ||

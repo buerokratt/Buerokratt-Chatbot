@@ -3,6 +3,7 @@ export enum CHAT_STATUS {
   OPEN = 'OPEN',
   REDIRECTED = 'REDIRECTED',
   IDLE = 'IDLE',
+  VALIDATING = 'VALIDATING',
 }
 
 export enum CHAT_EVENTS {
@@ -27,6 +28,7 @@ export enum CHAT_EVENTS {
   ASK_PERMISSION_IGNORED = 'ask-permission-ignored',
   ASK_TO_FORWARD_TO_CSA = 'ask_to_forward_to_csa',
   FORWARDED_TO_BACKOFFICE = 'forwarded_to_backoffice',
+  CONTINUE_CHATTING_WITH_BOT = 'continue_chatting_with_bot',
   RATING = 'rating',
   REDIRECTED = 'redirected',
   CONTACT_INFORMATION = 'contact-information',
@@ -46,6 +48,8 @@ export enum CHAT_EVENTS {
   PENDING_USER_NOT_REACHED = 'user-not-reached',
   USER_AUTHENTICATED = 'user-authenticated',
   READ = 'message-read',
+  WAITING_VALIDATION = 'waiting_validation',
+  APPROVED_VALIDATION = 'approved_validation',
 }
 
 export interface Chat {

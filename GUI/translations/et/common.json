@@ -119,6 +119,8 @@
     },
     "chatStatus": "Vestluse staatus",
     "changeStatus": "Muuda staatust",
+    "waiting_validation": "Vastust koostatakse",
+    "approved_validation": "Kinnitatud valideerimine",
     "active": {
       "list": "Aktiivsed vestlused",
       "myChats": "Minu vestlused",
@@ -202,7 +204,8 @@
       "user-reached": "Kasutajaga võeti ühendust",
       "user-not-reached": "Kasutajaga ei õnnestunud ühendust saada",
       "ask_to_forward_to_csa": "Vestlus paluti klienditeenindajale suunata",
-      "forwarded_to_backoffice": "Vestlus suunatakse klienditeenindajale"
+      "forwarded_to_backoffice": "Vestlus suunatakse klienditeenindajale",
+      "continue_chatting_with_bot": "Jätkake vestlust kasutajaga bürokratt"
     },
     "events": {
       "answered": "Vastatud {{date}}",
@@ -246,7 +249,22 @@
       "user-authenticated": "{{name}} on autenditud {{date}}",
       "taken-over": "Klienditeenindaja võttis vestluse üle",
       "ask_to_forward_to_csa": "Vestlus paluti klienditeenindajale suunata",
-      "forwarded_to_backoffice": "Vestlus suunatakse klienditeenindajale"
+      "forwarded_to_backoffice": "Vestlus suunatakse klienditeenindajale",
+      "continue_chatting_with_bot": "Jätkake vestlust kasutajaga bürokratt"
+    },
+    "validations": {
+      "title": "Valideerimised",
+      "description": "Siin kuvatakse vestlusroboti poolt tulnud vastused, mis nõuavad valideerimist enne kui need lõppkasutajale saadetakse",
+      "messageChanged": "Sõnumi muutmine õnnestus",
+      "messageApproved": "Sõnum kinnitati edukalt",
+      "messageChangeFailed": "Sõnumi muutmine ebaõnnestus",
+      "header": {
+        "id": "Id",
+        "chatId": "Vestluse ID",
+        "message": "Sõnum",
+        "requestedAt": "Taotletud Kell",
+        "approve": "Kinnita"
+      }
     }
   },
   "deleteConversation": {
@@ -295,6 +313,7 @@
       "popupNotifications": "Pop-up märguanded",
       "newUnansweredChat": "Uus vastamata vestlus",
       "newForwardedChat": "Uus suunatud vestlus",
+      "newValidationMessage": "Uus teade kinnitamiseks",
       "useAutocorrect": "Teksti autokorrektor",
       "required": "Nõutud",
       "invalidemail": "Kehtetu e-posti aadress",
