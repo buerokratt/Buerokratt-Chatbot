@@ -28,7 +28,7 @@ export enum CHAT_EVENTS {
   ASK_PERMISSION_IGNORED = 'ask-permission-ignored',
   ASK_TO_FORWARD_TO_CSA = 'ask_to_forward_to_csa',
   FORWARDED_TO_BACKOFFICE = 'forwarded_to_backoffice',
-  CONTINUE_CHATTING_WITH_BOT = "continue_chatting_with_bot",
+  CONTINUE_CHATTING_WITH_BOT = 'continue_chatting_with_bot',
   RATING = 'rating',
   REDIRECTED = 'redirected',
   CONTACT_INFORMATION = 'contact-information',

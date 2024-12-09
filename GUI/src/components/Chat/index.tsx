@@ -532,7 +532,6 @@ const Chat: FC<ChatProps> = ({
               )}
             </div>
           ))}
-          {/* Preview commented Out as requested by clients in task -1024- */}
           {previewTypingMessage && (
             <div className={clsx(['active-chat__group'])} key={`group`}>
               <div className="active-chat__group-initials">
