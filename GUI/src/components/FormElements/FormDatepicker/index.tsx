@@ -99,6 +99,7 @@ const FormDatepicker = forwardRef<any, FormDatepickerProps>(
                         minTime={validMinTime}
                         maxTime={validMaxTime}
                         portalId="overlay-root"
+                        disabled={disabled}
                         {...rest}
                         onChange={handleChange}
                     />

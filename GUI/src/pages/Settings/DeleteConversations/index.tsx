@@ -28,18 +28,22 @@ const DeleteConversations: FC = () => {
         queryKey: ['configs/delete-conversation-config', 'prod'],
     });
 
+    const plusDays = (date: Date, days: number): Date => {
+        date.setDate(date.getDate() + days)
+        return new Date(date.toISOString())
+    }
+
     const [isAuthMessaged, setIsAuthMessages] = useState<boolean>(false);
     const [isAnonymMessaged, setIsAnonymMessaged] = useState<boolean>(false);
     const [authPeriod, setAuthPeriod] = useState<number>(160);
     const [anonymPeriod, setAnonymPeriod] = useState<number>(160);
     const [deletionTime, setDeletionTime] = useState<string>();
-    const [startDate, setStartDate] = useState<Date | string>(new Date());
+    const startDate = plusDays(new Date(), 1);
     const [endDate, setEndDate] = useState<Date>(new Date());
     const [removableChats, setRemovableChats] = useState<number>(0);
 
     useEffect(() => {
         setEndDate(new Date())
-        setStartDate(new Date())
         if (deleteConfig) {
             setIsAnonymMessaged(deleteConfig.isAnonymConversations === 'true');
             setIsAuthMessages(deleteConfig.isAuthConversations === 'true');
@@ -55,7 +59,7 @@ const DeleteConversations: FC = () => {
             startDate,
             endDate
         })
-    }, [startDate, endDate]);
+    }, [endDate]);
 
     const getAllEndedChats = useMutation({
         mutationFn: (data: {
@@ -142,11 +146,10 @@ const DeleteConversations: FC = () => {
     });
 
     const handleDatesUpdate = (day: number) => {
-        const today = new Date();
-        today.setDate(today.getDate() - day);
-        setStartDate(new Date(today.toISOString().split('T')[0]));
+        if(day === undefined) return;
+        const resultDate = plusDays(new Date(),day)
+        setEndDate(new Date(resultDate.toISOString().split('T')[0]));
     }
-
 
     if (!deleteConfig) {
         return <>Loading...</>;
@@ -316,13 +319,10 @@ const DeleteConversations: FC = () => {
                                                     {...field}
                                                     label={t('global.startDate')}
                                                     timePicker={false}
+                                                    disabled={true}
                                                     hideLabel
                                                     direction="row"
-                                                    value={startDate ?? new Date()}
-                                                    onChange={(val) => {
-                                                        field.onChange(val)
-                                                        setStartDate(val)
-                                                    }}
+                                                    value={startDate}
                                                 />
                                             </div>
                                         );
