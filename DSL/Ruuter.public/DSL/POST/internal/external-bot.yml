@@ -128,7 +128,7 @@ check_value:
   switch:
     - condition: ${correct_value === 'ERROR'}
       next: return_value
-    - condition: ${correct_value.map((item) => item.text)[0] === '$backoffice'}
+    - condition: ${correct_value.map((item) => item.text)[0] === '$backoffice' || correct_value.map((item) => item.text)[0].startsWith('$backoffice')}
       next: assign_back_office_event  
     - condition: ${correct_value.map((item) => item.text)[0].startsWith('$validate_')}
       next: assign_validation_event  
