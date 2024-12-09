@@ -1,9 +1,7 @@
 import { FC } from 'react';
 import clsx from 'clsx';
-import Markdownify from './Markdownify';
 import Track from 'components/Track';
 import './Typing.scss';
-import { format } from 'date-fns';
 
 type PreviewMessageProps = {
   preview: string | undefined;
