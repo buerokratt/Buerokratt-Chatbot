@@ -1,4 +1,4 @@
-import { FormInput, Icon, Track } from 'components';
+import { FormTextarea, Icon, Track } from 'components';
 import { useToast } from 'hooks/useToast';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -14,17 +14,33 @@ const MessageContentView = (props: any) => {
 
   return (
     <Track gap={10}>
-      {!isEditing && <label>{content}</label>}
+      {!isEditing && (
+        <label
+          style={{
+            display: 'block',
+            maxWidth: '250px',
+            overflowY: 'auto',
+            overflowWrap: 'break-word',
+            whiteSpace: 'pre-wrap',
+            maxHeight: '70px',
+            fontSize: '15.5px',
+          }}
+        >
+          {content}
+        </label>
+      )}
       {isEditing && (
         <div style={{ width: '50%' }}>
-          <FormInput
+          <FormTextarea
             name={''}
             label={''}
+            minRows={1}
+            maxRows={3}
             defaultValue={content}
             onChange={(e) => {
               setInputContent(e.target.value);
             }}
-          ></FormInput>
+          ></FormTextarea>
         </div>
       )}
       {!isEditing && (
