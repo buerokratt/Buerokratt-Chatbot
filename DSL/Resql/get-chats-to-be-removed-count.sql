@@ -3,7 +3,11 @@ WITH ChatsToDelete AS (
     FROM chat c
     WHERE c.ended IS NOT NULL
       AND c.status = 'ENDED'
-      AND c.created::date BETWEEN :start::date AND :end::date
+      AND (
+        (end_user_id IS NOT NULL AND end_user_id <> '' AND ended::date <= :auth_date::date)
+            OR
+        (end_user_id IS NULL OR end_user_id = '' AND ended::date <= :anon_date::date)
+        )
       AND EXISTS (
         SELECT 1
         FROM message m
