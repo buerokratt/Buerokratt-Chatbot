@@ -23,6 +23,7 @@ type ChatProps = {
 
 type GroupedMessage = {
   name: string;
+  title: string;
   type: string;
   messages: Message[];
 };
@@ -118,6 +119,7 @@ const HistoricalChat: FC<ChatProps> = ({
           groupedMessages.push({
             name: '',
             type: 'event',
+            title: '',
             messages: [{ ...message }],
           });
         }
@@ -131,6 +133,7 @@ const HistoricalChat: FC<ChatProps> = ({
               ? endUserFullName
               : isBackOfficeUser,
           type: message.authorRole,
+          title: message.csaTitle ?? '',
           messages: [{ ...message }],
         });
       }
@@ -208,6 +211,11 @@ const HistoricalChat: FC<ChatProps> = ({
                   </div>
                   <div className="historical-chat__group-name">
                     {group.name}
+                    {
+                        group.title.length > 0 && (
+                            <div className="title">{group.title}</div>
+                        )
+                    }
                   </div>
                   <div className="historical-chat__messages">
                     {group.messages.map((message, i) => (

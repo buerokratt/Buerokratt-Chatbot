@@ -23,6 +23,7 @@ export interface Message {
   chatId: string;
   content?: string;
   event?: string;
+  csaTitle?: string;
   authorId?: string;
   authorTimestamp: string;
   authorFirstName: string;
