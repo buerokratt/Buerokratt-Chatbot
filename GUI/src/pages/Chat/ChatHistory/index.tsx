@@ -102,7 +102,7 @@ const ChatHistory: FC = () => {
         : new Date(
             new Date().getUTCFullYear(),
             new Date().getUTCMonth(),
-            new Date().getUTCDate() + 1
+            new Date().getUTCDate()
           ),
     },
   });
