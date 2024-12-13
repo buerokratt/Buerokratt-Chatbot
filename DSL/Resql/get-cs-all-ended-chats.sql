@@ -146,6 +146,10 @@ FROM EndedChatMessages AS c
          CROSS JOIN TitleVisibility
          CROSS JOIN NPS
 WHERE (
+    (
+        LENGTH(:customerSupportIds) = 0 OR
+        c.customer_support_id = ANY(string_to_array(:customerSupportIds, ','))
+    ) AND (
           :search IS NULL OR
           :search = '' OR
           LOWER(c.customer_support_display_name) LIKE LOWER('%' || :search || '%') OR
@@ -164,6 +168,7 @@ WHERE (
                 AND LOWER(msg.content) LIKE LOWER('%' || :search || '%')
           )
           )
+    )
 ORDER BY
     CASE WHEN :sorting = 'created asc' THEN FirstContentMessage.created END ASC,
     CASE WHEN :sorting = 'created desc' THEN FirstContentMessage.created END DESC,

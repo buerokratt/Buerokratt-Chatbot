@@ -101,7 +101,7 @@ const Chat: FC<ChatProps> = ({
         e.event === 'ask-permission-ignored'
     );
 
-    setLatestPermissionMessageCreated(permissionsMessages[permissionsMessages.length - 1]?.created || '');
+    setLatestPermissionMessageCreated(permissionsMessages[permissionsMessages.length - 1]?.created ?? '');
     calculatePermissionMessageSeconds();
   }
 
@@ -168,6 +168,8 @@ const Chat: FC<ChatProps> = ({
           'redirectedMessageByOwner',
           'redirectedMessageClaimed',
           'redirectedMessage',
+          'waiting_validation',
+          'approved_validation',
         ];
 
         const eventMessages: Message[] = filteredMessages?.filter(
@@ -371,55 +373,46 @@ const Chat: FC<ChatProps> = ({
     if (!messagesList) return;
     let groupedMessages: GroupedMessage[] = [];
     messagesList.forEach((message) => {
+      const isAMessageEvent =
+        !message.event ||
+        message.event === '' ||
+        message.event === CHAT_EVENTS.GREETING ||
+        message.event === CHAT_EVENTS.WAITING_VALIDATION ||
+        message.event === CHAT_EVENTS.APPROVED_VALIDATION;
+
       const lastGroup = groupedMessages[groupedMessages.length - 1];
-      if (
-        lastGroup &&
-        lastGroup.type === AUTHOR_ROLES.BACKOFFICE_USER &&
-        lastGroup.messages.at(-1) &&
-        message.event === CHAT_EVENTS.READ
-      ) {
+
+      const isReadEvent = lastGroup && lastGroup.type === AUTHOR_ROLES.BACKOFFICE_USER && lastGroup.messages.at(-1) && message.event === CHAT_EVENTS.READ
+      if (isReadEvent) {
         lastGroup.messages.push(message);
         return;
       }
-      if (lastGroup?.type === message.authorRole) {
-        if (
-          !message.event ||
-          message.event === '' ||
-          message.event === 'greeting'
-        ) {
-          lastGroup.messages.push({ ...message });
-        } else {
-          groupedMessages.push({
-            name: '',
-            type: 'event',
-            messages: [{ ...message }],
-          });
-        }
-      } else if (
-        !message.event ||
-        message.event === '' ||
-        message.event === 'greeting'
-      ) {
-        const isBackOfficeUser =
-          message.authorRole === 'backoffice-user'
+
+      const formattedMessage = {
+        ...message,
+        content:
+          message.event === CHAT_EVENTS.WAITING_VALIDATION
+            ? t('chat.waiting_validation').toString()
+            : message.content,
+      };
+
+      if (lastGroup?.type === message.authorRole && isAMessageEvent) {
+        lastGroup.messages.push(formattedMessage);
+      } else {
+        const backOfficeUserName =
+          message.authorRole === AUTHOR_ROLES.BACKOFFICE_USER
             ? `${message.authorFirstName} ${message.authorLastName}`
             : BACKOFFICE_NAME.DEFAULT;
         groupedMessages.push({
-          name:
-            message.authorRole === 'end-user'
-              ? endUserFullName
-              : isBackOfficeUser,
-          type: message.authorRole,
-          messages: [{ ...message }],
-        });
-      } else {
-        groupedMessages.push({
-          name: '',
-          type: 'event',
-          messages: [{ ...message }],
+          name: message.authorRole === AUTHOR_ROLES.END_USER
+            ? endUserFullName
+            : backOfficeUserName,
+          type: isAMessageEvent ? message.authorRole : 'event',
+          messages: [formattedMessage],
         });
       }
     });
+    
     setMessageGroupsState(groupedMessages);
   }, [messagesList, endUserFullName]);
 
@@ -538,7 +531,6 @@ const Chat: FC<ChatProps> = ({
               )}
             </div>
           ))}
-          {/* Preview commented Out as requested by clients in task -1024- */}
           {previewTypingMessage && (
             <div className={clsx(['active-chat__group'])} key={`group`}>
               <div className="active-chat__group-initials">

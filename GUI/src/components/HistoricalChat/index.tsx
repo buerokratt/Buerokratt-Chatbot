@@ -16,6 +16,7 @@ import { BACKOFFICE_NAME } from "types/chat";
 
 type ChatProps = {
   chat: ChatType;
+  header_link?: string;
   trigger: boolean;
   onChatStatusChange: (event: string) => void;
   onCommentChange: (comment: string) => void;
@@ -40,6 +41,7 @@ const chatStatuses = [
 
 const HistoricalChat: FC<ChatProps> = ({
   chat,
+  header_link,
   trigger,
   selectedStatus,
   onChatStatusChange,
@@ -102,8 +104,19 @@ const HistoricalChat: FC<ChatProps> = ({
         return;
       }
       if (lastGroup?.type === message.authorRole) {
-        if (!message.event || message.event.toLowerCase() === 'greeting') {
-          lastGroup.messages.push({ ...message });
+        if (
+          !message.event ||
+          message.event.toLowerCase() === CHAT_EVENTS.GREETING ||
+          message.event.toLowerCase() === CHAT_EVENTS.WAITING_VALIDATION ||
+          message.event.toLowerCase() === CHAT_EVENTS.APPROVED_VALIDATION
+        ) {
+          lastGroup.messages.push({
+            ...message,
+            content:
+              message.event === CHAT_EVENTS.WAITING_VALIDATION
+                ? t('chat.waiting_validation').toString()
+                : message.content,
+          });
         } else {
           groupedMessages.push({
             name: '',
@@ -170,6 +183,9 @@ const HistoricalChat: FC<ChatProps> = ({
   return (
     <div className="historical-chat">
       <div className="historical-chat__body">
+          {header_link && (
+              <div className={'header-link'}>{header_link}</div>
+          )}
         <div className="historical-chat__group-wrapper">
           {messageGroups?.map((group, index) => (
             <div

@@ -119,6 +119,8 @@
     },
     "chatStatus": "Chat status",
     "changeStatus": "Change status",
+    "waiting_validation": "Waiting for validation",
+    "approved_validation": "Approved Validation",
     "active": {
       "list": "Active chat list",
       "myChats": "My chats",
@@ -200,7 +202,10 @@
       "unavailable_holiday_ask_contacts": "Holiday and asked for contacts",
       "message-read": "Read",
       "user-reached": "User contacted",
-      "user-not-reached": "User could not be reached"
+      "user-not-reached": "User could not be reached",
+      "ask_to_forward_to_csa": "Asked to forward the conversation to a customer service agent",
+      "forwarded_to_backoffice": "Conversation forwarded to back office",
+      "continue_chatting_with_bot": "Continue conversation with bürokratt"
     },
     "events": {
       "answered": "Answered {{date}}",
@@ -242,7 +247,24 @@
       "user-reached": "{{name}} contacted the user",
       "user-not-reached": "{{name}} could not reach the user",
       "user-authenticated": "{{name}} is authenticated {{date}}",
-      "taken-over": "A human took the conversation over"
+      "taken-over": "A human took the conversation over",
+      "ask_to_forward_to_csa": "Asked to forward the conversation to a customer service agent",
+      "forwarded_to_backoffice": "Conversation forwarded to back office",
+      "continue_chatting_with_bot": "Continue conversation with bürokratt"
+    },
+    "validations": {
+      "title": "Validations",
+      "description": "Responses from the chatbot that require validation before being sent to the end user are displayed here",
+      "messageChanged": "Message changed successfully",
+      "messageApproved": "Message approved successfully",
+      "messageChangeFailed": "Message change failed",
+      "header": {
+        "id" : "Id",
+        "chatId": "Chat Id",
+        "message": "Message",
+        "requestedAt": "Requested At",
+        "approve": "Approve"
+      }
     }
   },
   "deleteConversation": {
@@ -291,6 +313,7 @@
       "popupNotifications": "Popup notifications",
       "newUnansweredChat": "New unanswered chat",
       "newForwardedChat": "New forwarded chat",
+      "newValidationMessage": "New message to validate",
       "useAutocorrect": "Text auto corrector",
       "required": "Required",
       "invalidemail": "Invalid email",

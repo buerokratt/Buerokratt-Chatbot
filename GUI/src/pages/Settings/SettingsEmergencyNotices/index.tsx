@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { AxiosError } from 'axios';
 import { useTranslation } from 'react-i18next';
@@ -33,15 +33,26 @@ const SettingsEmergencyNotices: FC = () => {
   const { data: emergencyNotice } = useQuery<EmergencyNoticeResponse>({
     queryKey: ['configs/emergency-notice', 'prod'],
     onSuccess: (data: EmergencyNoticeResponse) => {
-      const res = data.response;
+      const {
+        isEmergencyNoticeVisible,
+        emergencyNoticeStartISO,
+        emergencyNoticeEndISO,
+        emergencyNoticeText,
+      } = data.response;
+
       if (Object.keys(control._formValues).length > 0) return;
-      setIsEmergencyNoticeVisible(res.isEmergencyNoticeVisible ?? false);
-      setEmergencyNoticeText(res.emergencyNoticeText ?? '');
+
+      const isEmergencyNoticeVisibleBoolean =
+        isEmergencyNoticeVisible === 'true';
+      setIsEmergencyNoticeVisible(isEmergencyNoticeVisibleBoolean);
+      setEmergencyNoticeText(emergencyNoticeText ?? '');
       reset({
-        emergencyNoticeStartISO: new Date(res.emergencyNoticeStartISO ?? '0'),
-        emergencyNoticeEndISO: new Date(res.emergencyNoticeEndISO ?? '0'),
-        emergencyNoticeText: res.emergencyNoticeText ?? '',
-        isEmergencyNoticeVisible: res.isEmergencyNoticeVisible ?? false,
+        emergencyNoticeStartISO: isEmergencyNoticeVisibleBoolean
+          ? new Date(emergencyNoticeStartISO)
+          : new Date(),
+        emergencyNoticeEndISO: new Date(emergencyNoticeEndISO ?? '0'),
+        emergencyNoticeText,
+        isEmergencyNoticeVisible,
       });
     },
   });
@@ -68,7 +79,7 @@ const SettingsEmergencyNotices: FC = () => {
   const handleFormSubmit = handleSubmit((data) => {
     emergencyNoticeMutation.mutate({
       ...data,
-      isEmergencyNoticeVisible,
+      isEmergencyNoticeVisible: isEmergencyNoticeVisible.toString(),
       emergencyNoticeText,
     });
   });
@@ -121,13 +132,11 @@ const SettingsEmergencyNotices: FC = () => {
                     label={t('global.startDate')}
                     hideLabel
                     {...field}
-                    value={
-                      parse(
-                            format(field.value as Date, 'yyyy-MM-dd'),
-                            'yyyy-MM-dd',
-                            new Date()
-                          )
-                    }
+                    value={parse(
+                      format(field.value as Date, 'yyyy-MM-dd'),
+                      'yyyy-MM-dd',
+                      new Date()
+                    )}
                   />
                 )}
               />

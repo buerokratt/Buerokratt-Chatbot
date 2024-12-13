@@ -87,7 +87,7 @@
           margin-left: 0;
 
           :any-link {
-            color:  get-color(white);
+            color: get-color(white);
           }
 
           &:hover {
@@ -124,7 +124,7 @@
           margin-left: 0;
 
           :any-link {
-            color:  get-color(white);
+            color: get-color(white);
           }
 
           &:hover {
@@ -209,4 +209,11 @@
       color: get-color(black-coral-6);
     }
   }
+}
+
+.header-link {
+  text-decoration: none;
+  padding: 15px 35px;
+  font-family: Roboto , sans-serif;
+  font-weight: 400;
 }

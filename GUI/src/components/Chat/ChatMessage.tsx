@@ -37,7 +37,10 @@ const ChatMessage: FC<ChatMessageProps> = ({
           'active-chat__message--selected': selected,
         })}
       >
-        {(message.event === CHAT_EVENTS.GREETING || !message.event) && (
+        {(message.event === CHAT_EVENTS.GREETING ||
+          message.event === CHAT_EVENTS.WAITING_VALIDATION ||
+          message.event === CHAT_EVENTS.APPROVED_VALIDATION ||
+          !message.event) && (
           <>
             <button
               className={clsx('active-chat__message-text')}
