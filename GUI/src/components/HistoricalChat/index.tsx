@@ -59,7 +59,20 @@ const HistoricalChat: FC<ChatProps> = ({
     getMessages();
   }, [trigger]);
 
+  useEffect(() => {
+    const initializeComponent = () => {
+      setMessageGroups([]);
+      setMessagesList([]);
+      setLastMessage(undefined);
+      setStatuses(chatStatuses);
+      getMessages();
+    };
+
+    initializeComponent();
+  }, [chat]);
+
   const getMessages = async () => {
+    if (!chat.id) return;
     const { data: res } = await apiDev.post('agents/chats/messages/all', {
       chatId: chat.id,
     });
@@ -90,8 +103,19 @@ const HistoricalChat: FC<ChatProps> = ({
         return;
       }
       if (lastGroup?.type === message.authorRole) {
-        if (!message.event || message.event.toLowerCase() === 'greeting') {
-          lastGroup.messages.push({ ...message });
+        if (
+          !message.event ||
+          message.event.toLowerCase() === CHAT_EVENTS.GREETING ||
+          message.event.toLowerCase() === CHAT_EVENTS.WAITING_VALIDATION ||
+          message.event.toLowerCase() === CHAT_EVENTS.APPROVED_VALIDATION
+        ) {
+          lastGroup.messages.push({
+            ...message,
+            content:
+              message.event === CHAT_EVENTS.WAITING_VALIDATION
+                ? t('chat.waiting_validation').toString()
+                : message.content,
+          });
         } else {
           groupedMessages.push({
             name: '',

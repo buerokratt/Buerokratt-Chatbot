@@ -48,7 +48,7 @@
   },
   "mainMenu": {
     "menuLabel": "Põhinavigatsioon",
-    "closeMenu": "Kitsendan menüü",
+    "closeMenu": "Kitsenda menüü",
     "openMenu": "Ava menüü",
     "openMenuIcon": "Ava menüü ikoon",
     "closeMenuIcon": "Sulge menüü ikoon"
@@ -64,7 +64,7 @@
     "userStories": "Vestlusvood",
     "configuration": "Seaded",
     "forms": "Vormid",
-    "slots": "Pilud",
+    "slots": "Mälukohad",
     "historicalConversations": "Ajaloolised vestlused",
     "modelBankAndAnalytics": "Mudelipank ja analüütika",
     "overviewOfTopics": "Teemade ülevaade",
@@ -119,6 +119,8 @@
     },
     "chatStatus": "Vestluse staatus",
     "changeStatus": "Muuda staatust",
+    "waiting_validation": "Vastust koostatakse",
+    "approved_validation": "Kinnitatud valideerimine",
     "active": {
       "list": "Aktiivsed vestlused",
       "myChats": "Minu vestlused",
@@ -137,7 +139,7 @@
       "onlyActiveAgents": "Näita ainult kohal olevaid nõustajaid",
       "establishment": "Asutus",
       "searchByEstablishmentName": "Otsi asutuse nime järgi",
-      "sendToEmail": "Saada e-posti",
+      "sendToEmail": "Saada e-postile",
       "chooseChatStatus": "Vali vestluse staatus",
       "statusChange": "Vestluse staatus",
       "startService": "Alusta teenust",
@@ -165,7 +167,7 @@
     "plainEvents": {
       "answered": "Vastatud",
       "terminated": "Määramata",
-      "sent_to_csa_email": "Vestlus saadetud nõustaja e-posti",
+      "sent_to_csa_email": "Vestlus saadetud nõustaja e-postile",
       "client-left": "Klient lahkus",
       "client_left_with_accepted": "Klient lahkus aktsepteeritud vastusega",
       "client_left_with_no_resolution": "Klient lahkus vastuseta",
@@ -193,19 +195,22 @@
       "message-read": "Loetud",
       "contact-information-skipped": "Kontaktandmeid ei saadetud",
       "unavailable-contact-information-fulfilled": "Kontaktandmed on antud",
-      "unavailable_organization": "Organisatsioon pole saadaval",
-      "unavailable_organization_ask_contacts": "Organisatsioon pole saadaval ja küsitakse kontakte",
-      "unavailable_csas": "Nõustajad pole saadaval",
-      "unavailable_csas_ask_contacts": "Nõustajad ei ole kättesaadavad ja küsitakse kontakte",
+      "unavailable_organization": "Asutus ei ole kättesaadav",
+      "unavailable_organization_ask_contacts": "Asutus ei ole kättesaadav ja küsitakse kontakte",
+      "unavailable_csas": "Klienditeenindajad ei ole kättesaadavad",
+      "unavailable_csas_ask_contacts": "Klienditeenindajad ei ole kättesaadavad ja küsitakse kontakte",
       "unavailable_holiday": "Puhkus",
-      "unavailable_holiday_ask_contacts": "Puhkus ja küsis kontakte",
+      "unavailable_holiday_ask_contacts": "Puhkus ja küsitakse kontakte",
       "user-reached": "Kasutajaga võeti ühendust",
-      "user-not-reached": "Kasutajaga ei õnnestunud ühendust saada"
+      "user-not-reached": "Kasutajaga ei õnnestunud ühendust saada",
+      "ask_to_forward_to_csa": "Vestlus paluti klienditeenindajale suunata",
+      "forwarded_to_backoffice": "Vestlus suunatakse klienditeenindajale",
+      "continue_chatting_with_bot": "Jätkake vestlust kasutajaga bürokratt"
     },
     "events": {
       "answered": "Vastatud {{date}}",
       "terminated": "Määramata {{date}}",
-      "sent_to_csa_email": "Vestlus saadetud nõustaja e-posti {{date}}",
+      "sent_to_csa_email": "Vestlus saadetud nõustaja e-postile {{date}}",
       "client-left": "Klient lahkus {{date}}",
       "client_left_with_accepted": "Klient lahkus aktsepteeritud vastusega {{date}}",
       "client_left_with_no_resolution": "Klient lahkus vastuseta {{date}}",
@@ -230,19 +235,36 @@
       "requested-chat-forward-accepted": "Vestluse suunamine aktsepteeritud {{date}}",
       "requested-chat-forward-rejected": "Vestluse suunamine tagasi lükatud {{date}}",
       "message-read": "Loetud",
-      "contact-information-skipped": "Kontaktandmeid pole esitatud",
+      "contact-information-skipped": "Kontaktandmeid ei saadetud",
       "unavailable-contact-information-fulfilled": "Kontaktandmed on antud",
-      "unavailable_organization": "Organisatsioon pole saadaval",
-      "unavailable_organization_ask_contacts": "Organisatsioon pole saadaval ja küsitakse kontakte",
-      "unavailable_csas": "Nõustajad pole saadaval",
-      "unavailable_csas_ask_contacts": "Nõustajad ei ole kättesaadavad ja küsitakse kontakte",
+      "unavailable_organization": "Asutus ei ole kättesaadav",
+      "unavailable_organization_ask_contacts": "Asutus ei ole kättesaadav ja küsitakse kontakte",
+      "unavailable_csas": "Klienditeenindajad ei ole kättesaadavad",
+      "unavailable_csas_ask_contacts": "Klienditeenindajad ei ole kättesaadavad ja küsitakse kontakte",
       "unavailable_holiday": "Puhkus",
-      "unavailable_holiday_ask_contacts": "Puhkus ja küsis kontakte",
+      "unavailable_holiday_ask_contacts": "Puhkus ja küsitakse kontakte",
       "pending-assigned": "{{name}} määratud kontaktkasutajale",
       "user-reached": "{{name}} võttis kasutajaga ühendust",
       "user-not-reached": "{{name}} ei saanud kasutajaga ühendust",
       "user-authenticated": "{{name}} on autenditud {{date}}",
-      "taken-over": "Klienditeenindaja võttis vestluse üle"
+      "taken-over": "Klienditeenindaja võttis vestluse üle",
+      "ask_to_forward_to_csa": "Vestlus paluti klienditeenindajale suunata",
+      "forwarded_to_backoffice": "Vestlus suunatakse klienditeenindajale",
+      "continue_chatting_with_bot": "Jätkake vestlust kasutajaga bürokratt"
+    },
+    "validations": {
+      "title": "Valideerimised",
+      "description": "Siin kuvatakse vestlusroboti poolt tulnud vastused, mis nõuavad valideerimist enne kui need lõppkasutajale saadetakse",
+      "messageChanged": "Sõnumi muutmine õnnestus",
+      "messageApproved": "Sõnum kinnitati edukalt",
+      "messageChangeFailed": "Sõnumi muutmine ebaõnnestus",
+      "header": {
+        "id": "Id",
+        "chatId": "Vestluse ID",
+        "message": "Sõnum",
+        "requestedAt": "Taotletud Kell",
+        "approve": "Kinnita"
+      }
     }
   },
   "deleteConversation": {
@@ -291,9 +313,10 @@
       "popupNotifications": "Pop-up märguanded",
       "newUnansweredChat": "Uus vastamata vestlus",
       "newForwardedChat": "Uus suunatud vestlus",
+      "newValidationMessage": "Uus teade kinnitamiseks",
       "useAutocorrect": "Teksti autokorrektor",
       "required": "Nõutud",
-      "invalidemail": "Kehtetu e-posti",
+      "invalidemail": "Kehtetu e-posti aadress",
       "invalidIdCode": "Kehtetu isikukood",
       "idCodePlaceholder": "Isikukood peab algama riigi eesliitega, (eg.EE12345678910)",
       "choose": "Vali",
@@ -315,7 +338,7 @@
       "title": "Välimus ja käitumine",
       "widgetBubbleMessageText": "Märguandesõnum",
       "widgetProactiveSeconds": "Animatsiooni kestus sekundites",
-      "widgetDisplayBubbleMessageSeconds": "Aeg animatsiooni alguseni sekundites",
+      "widgetDisplayBubbleMessageSeconds": "Animatsiooni viivitus sekundites",
       "widgetColor": "Põhivärv",
       "widgetAnimation": "Animatsioon"
     },
@@ -335,12 +358,12 @@
       "allWeekdaysExceptWeekend": "E-R",
       "allWeekdays": "E-P",
       "availableAllTime": "Asutuse tööaeg on 24/7",
-      "showIfCSAIsNotAvailable": "Saada kliendile teavitus eemalolekust",
-      "showIfCSAIsNotAvailableWithContactsRequest": "Saada kliendile teavitus eemalolekust koos kontakti päringuga",
+      "showIfCSAIsNotAvailable": "Saada kliendile klienditeenindaja eemaloleku teavitus",
+      "showIfCSAIsNotAvailableWithContactsRequest": "Saada kliendile klienditeenindaja eemaloleku teavitus koos kontakti päringuga",
       "noCsaAvailableMessage": "Klienditeenindaja eemaloleku teavitus",
-      "showIfOrganizationIsOutsideWorkingHours": "Saada kliendile teavitus ettevõtte välisest tööajast",
-      "showIfOrganizationIsOutsideWorkingHoursWithContactsRequest": "Saada kliendile teavitus töövälisest ajast koos kontakti päringuga",
-      "outsideWorkingHoursMessage": "Väljaspool tööaega teade"
+      "showIfOrganizationIsOutsideWorkingHours": "Saada kliendile töövälise aja teavitus",
+      "showIfOrganizationIsOutsideWorkingHoursWithContactsRequest": "Saada kliendile töövälise aja teavitus koos kontakti päringuga",
+      "outsideWorkingHoursMessage": "Töövälise aja teavitus"
     },
     "userSession": {
       "title": "Kasutaja sessioon",
@@ -348,9 +371,9 @@
       "description": "Kasutaja sessiooni pikkus, mille möödumisel logitakse mitteaktiivsed kasutajad välja",
       "rule": "Sessiooni pikkus on lubatud vahemikus 30 min - 480 min (8h)",
       "minutes": "minutit",
-      "sessionChanged": "Seansi pikkuse muutmine õnnestus",
-      "emptySession": "Seansi pikkuse väli ei tohi olla tühi",
-      "invalidSession": "Seansi pikkus peab olema vahemikus 30 - 480 minutit"
+      "sessionChanged": "Sessiooni pikkuse muutmine õnnestus",
+      "emptySession": "Sessiooni pikkuse väli ei tohi olla tühi",
+      "invalidSession": "Sessiooni pikkus peab olema vahemikus 30 - 480 minutit"
     },
     "greeting": {
       "title": "Tervitussõnum"
@@ -365,7 +388,7 @@
       "saturday": "Laupäev",
       "sunday": "Pühapäev"
     },
-    "nationalHolidays": "Riiklikud pühad",
+    "nationalHolidays": "Riigipühad",
     "welcomeMessage": {
       "welcomeMessage": "Tervitussõnum",
       "description": "Bürokrati automaatne tervitussõnum, mida kuvatakse esimese sõnumina vestlusakna avamisel",
@@ -382,10 +405,10 @@
     }
   },
   "toast": {
-    "copied": "Kopeeriti lõikelauale",
+    "copied": "Kopeeritud",
     "success": {
       "updateSuccess": "Värskendamine õnnestus",
-      "messageToUserEmail": "Sõnum saadeti kasutaja e-posti",
+      "messageToUserEmail": "Sõnum saadeti kasutaja e-postile",
       "chatStatusChanged": "Vestluse staatus muudetud",
       "chatCommentChanged": "Vestluse kommentaar muudetud",
       "copied": "Kopeeritud",

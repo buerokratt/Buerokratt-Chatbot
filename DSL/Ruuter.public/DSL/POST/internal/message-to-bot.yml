@@ -138,8 +138,9 @@ check_for_fallback_bot:
       sender: ${chatId}
       message: ${content}
       authorId: ${get_bot_name_result.response.body[0].value}
+      holidays: ${holidays}
+      holidayNames: ${holidayNames}
   result: converted_messages_res
-
   error: return_bot_error
   next: check_if_fallback_bot_is_unable_to_reply
 

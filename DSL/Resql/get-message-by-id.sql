@@ -12,7 +12,9 @@ SELECT
     forwarded_by_user,
     forwarded_from_csa,
     forwarded_to_csa,
-    created
+    created,
+    event,
+    rating
 FROM message
 WHERE base_id = :id
 ORDER BY updated DESC

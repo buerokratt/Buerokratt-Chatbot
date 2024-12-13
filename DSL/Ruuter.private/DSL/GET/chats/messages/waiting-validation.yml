@@ -1,0 +1,17 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'WAITING VALIDATION'"
+  method: get
+  accepts: json
+  returns: json
+  namespace: backoffice
+
+getMessagesWaitingValidations:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-messages-waiting-validation"
+  result: res
+
+return_result:
+  return: ${res.response.body}
