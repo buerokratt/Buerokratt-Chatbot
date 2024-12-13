@@ -6,6 +6,10 @@ export enum CHAT_STATUS {
   VALIDATING = 'VALIDATING',
 }
 
+export enum BACKOFFICE_NAME {
+  DEFAULT = 'Bürokratt'
+}
+
 export enum CHAT_EVENTS {
   ANSWERED = 'answered',
   TERMINATED = 'terminated',

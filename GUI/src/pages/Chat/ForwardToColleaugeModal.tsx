@@ -24,9 +24,9 @@ import { useDebouncedCallback } from 'use-debounce';
 import useStore from 'store';
 
 type ForwardToColleaugeModalProps = {
-  chat: Chat;
-  onModalClose: () => void;
-  onForward: (chat: Chat, user: User) => void;
+    chat: Chat;
+    onModalClose: () => void;
+    onForward: (chat: Chat, user: User) => void;
 };
 
 const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({
@@ -59,7 +59,7 @@ const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({
       .post(`accounts/customer-support-agents`, {
         page: pagination.pageIndex + 1,
         page_size: pagination.pageSize,
-        search_display_name_and_csa_title: filter,
+        search_full_name_and_csa_title: filter,
         sorting: sort,
         show_active_only: showActiveOnly,
         current_user_id: userInfo?.idCode ?? '',
@@ -77,55 +77,59 @@ const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({
     getUsers(pagination, filter, sorting, showActiveAgents);
   }, [showActiveAgents]);
 
-  const columnHelper = createColumnHelper<User>();
+    const columnHelper = createColumnHelper<User>();
 
-  const customerSupportStatusView = (props: any) => {
-    const isIdle = props.getValue() === 'idle' ? '#FFB511' : '#D73E3E';
-    return (
-      <span
-        style={{
-          display: 'block',
-          width: 16,
-          height: 16,
-          borderRadius: '50%',
-          backgroundColor: props.getValue() === 'online' ? '#308653' : isIdle,
-        }}
-      ></span>
+    const customerSupportStatusView = (props: any) => {
+        const isIdle = props.getValue() === 'idle' ? '#FFB511' : '#D73E3E';
+        return (
+            <span
+                style={{
+                    display: 'block',
+                    width: 16,
+                    height: 16,
+                    borderRadius: '50%',
+                    backgroundColor: props.getValue() === 'online' ? '#308653' : isIdle,
+                }}
+            ></span>
+        );
+    };
+
+    const forwardView = (props: any) => (
+        <Button
+            appearance="text"
+            onClick={() => onForward(chat, props.row.original)}
+        >
+            <Icon icon={<MdOutlineArrowForward color="rgba(0, 0, 0, 0.54)"/>}/>
+            {t('global.forward')}
+        </Button>
     );
-  };
 
-  const forwardView = (props: any) => (
-    <Button
-      appearance="text"
-      onClick={() => onForward(chat, props.row.original)}
-    >
-      <Icon icon={<MdOutlineArrowForward color="rgba(0, 0, 0, 0.54)" />} />
-      {t('global.forward')}
-    </Button>
-  );
-
-  const usersColumns = useMemo(
-    () => [
-      columnHelper.accessor('displayName', {
-        header: t('settings.users.name') ?? '',
-      }),
-      columnHelper.accessor('csaTitle', {
-        header: t('settings.users.displayName') ?? '',
-      }),
-      columnHelper.accessor('customerSupportStatus', {
-        header: t('global.status') ?? '',
-        cell: customerSupportStatusView,
-      }),
-      columnHelper.display({
-        id: 'forward',
-        cell: forwardView,
-        meta: {
-          size: '1%',
-        },
-      }),
-    ],
-    []
-  );
+    const usersColumns = useMemo(
+        () => [
+            columnHelper.accessor(
+                (row) => `${row.firstName ?? ''} ${row.lastName ?? ''}`,
+                {
+                    id: `name`,
+                    header: t('settings.users.name') ?? '',
+                }
+            ),
+            columnHelper.accessor('csaTitle', {
+                header: t('settings.users.userTitle') ?? '',
+            }),
+            columnHelper.accessor('customerSupportStatus', {
+                header: t('global.status') ?? '',
+                cell: customerSupportStatusView,
+            }),
+            columnHelper.display({
+                id: 'forward',
+                cell: forwardView,
+                meta: {
+                    size: '1%',
+                },
+            }),
+        ],
+        []
+    );
 
   return (
     <Dialog
