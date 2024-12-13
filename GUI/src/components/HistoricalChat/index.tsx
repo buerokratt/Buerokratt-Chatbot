@@ -12,9 +12,11 @@ import './HistoricalChat.scss';
 import { apiDev } from 'services/api';
 import ChatEvent from 'components/ChatEvent';
 import { AUTHOR_ROLES } from 'utils/constants';
+import { BACKOFFICE_NAME } from "types/chat";
 
 type ChatProps = {
   chat: ChatType;
+  header_link?: string;
   trigger: boolean;
   onChatStatusChange: (event: string) => void;
   onCommentChange: (comment: string) => void;
@@ -40,6 +42,7 @@ const chatStatuses = [
 
 const HistoricalChat: FC<ChatProps> = ({
   chat,
+  header_link,
   trigger,
   selectedStatus,
   onChatStatusChange,
@@ -126,7 +129,7 @@ const HistoricalChat: FC<ChatProps> = ({
       } else {
         const isBackOfficeUser = message.authorRole === 'backoffice-user'
               ? `${message.authorFirstName} ${message.authorLastName}`
-              : message.authorRole;
+              : BACKOFFICE_NAME.DEFAULT;
         groupedMessages.push({
           name:
             message.authorRole === 'end-user'
@@ -183,6 +186,9 @@ const HistoricalChat: FC<ChatProps> = ({
   return (
     <div className="historical-chat">
       <div className="historical-chat__body">
+          {header_link && (
+              <div className={'header-link'}>{header_link}</div>
+          )}
         <div className="historical-chat__group-wrapper">
           {messageGroups?.map((group, index) => (
             <div
