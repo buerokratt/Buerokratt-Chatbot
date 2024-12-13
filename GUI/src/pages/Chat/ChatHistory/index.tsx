@@ -53,6 +53,7 @@ const ChatHistory: FC = () => {
   let passedChatId = new URLSearchParams(routerLocation.search).get('chat');
   const passedStartDate = params.get('start');
   const passedEndDate = params.get('end');
+  const passedCustomerSupportIds = params.getAll('customerSupportIds');
   const preferences = getFromLocalStorage(
     CHAT_HISTORY_PREFERENCES_KEY
   ) as string[];
@@ -84,6 +85,7 @@ const ChatHistory: FC = () => {
   const [selectedColumns, setSelectedColumns] = useState<string[]>(
     preferences ?? []
   );
+  const [customerSupportAgents, setCustomerSupportAgents] = useState<any[]>([]);
 
   const { control, watch } = useForm<{
     startDate: Date | string;
@@ -114,6 +116,7 @@ const ChatHistory: FC = () => {
     getAllEndedChats.mutate({
       startDate: format(new Date(startDate), 'yyyy-MM-dd'),
       endDate: format(new Date(endDate), 'yyyy-MM-dd'),
+      customerSupportIds: passedCustomerSupportIds,
       pagination,
       sorting,
       search,
@@ -131,16 +134,22 @@ const ChatHistory: FC = () => {
     getAllEndedChats.mutate({
       startDate: format(new Date(startDate), 'yyyy-MM-dd'),
       endDate: format(new Date(endDate), 'yyyy-MM-dd'),
+      customerSupportIds: passedCustomerSupportIds,
       pagination,
       sorting,
       search,
     });
   }, []);
 
+  useEffect(() => {
+    listCustomerSupportAgents.mutate();
+  }, [])
+
   const getAllEndedChats = useMutation({
     mutationFn: (data: {
       startDate: string;
       endDate: string;
+      customerSupportIds: string[];
       pagination: PaginationState;
       sorting: SortingState;
       search: string;
@@ -152,12 +161,13 @@ const ChatHistory: FC = () => {
       }
 
       return apiDev.post('agents/chats/ended', {
+        customerSupportIds: data.customerSupportIds,
         startDate: data.startDate,
         endDate: data.endDate,
         page: pagination.pageIndex + 1,
         page_size: pagination.pageSize,
         sorting: sortBy,
-        search,
+        search
       });
     },
     onSuccess: (res: any) => {
@@ -175,6 +185,22 @@ const ChatHistory: FC = () => {
       setSelectedChat(res.data.response);
       setChatState(res.data.response)
     },
+  });
+
+  const listCustomerSupportAgents = useMutation({
+    mutationFn: () => apiDev.post('accounts/customer-support-agents', {
+      page: 0,
+      page_size: 99999,
+      sorting: 'name asc',
+      show_active_only: false,
+      roles: ["ROLE_CUSTOMER_SUPPORT_AGENT"],
+    }),
+    onSuccess: (res: any) => {
+      setCustomerSupportAgents(res.data.response.map(item => ({
+        label: [item.firstName, item.lastName].join(' ').trim(),
+        value: item.idCode,
+      })));
+    }
   });
 
   const visibleColumnOptions = useMemo(
@@ -229,6 +255,7 @@ const ChatHistory: FC = () => {
       getAllEndedChats.mutate({
         startDate: format(new Date(startDate), 'yyyy-MM-dd'),
         endDate: format(new Date(endDate), 'yyyy-MM-dd'),
+        customerSupportIds: passedCustomerSupportIds,
         pagination,
         sorting,
         search,
@@ -575,6 +602,28 @@ const ChatHistory: FC = () => {
                     }}
                 />
               </Track>
+              <FormMultiselect
+                name="agent"
+                label={t('')}
+                options={customerSupportAgents}
+                selectedOptions={customerSupportAgents.filter((item) => passedCustomerSupportIds.includes(item.value))}
+                onSelectionChange={(selection) => {
+                  setSearchParams(params => {
+                    params.delete('customerSupportIds')
+                    selection?.forEach((s) => params.append('customerSupportIds', s.value))
+                    return params;
+                  })
+
+                  getAllEndedChats.mutate({
+                    customerSupportIds: selection?.map((s) => s.value),
+                    startDate,
+                    endDate,
+                    pagination,
+                    sorting,
+                    search,
+                  });
+                }}
+              />
               <FormMultiselect
                   name="visibleColumns"
                   label={t('')}
