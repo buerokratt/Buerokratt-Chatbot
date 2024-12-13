@@ -10,8 +10,8 @@ import './DeleteConversations.scss';
 import withAuthorization from 'hoc/with-authorization';
 import {ROLES} from 'utils/constants';
 import {DeleteChatSettings} from "../../../types/deleteChatSettings";
-import {format, parse} from "date-fns";
-import ChatOverview from "../../../components/ChatOverview";
+import {differenceInCalendarDays, format, parse, subDays} from "date-fns";
+import DeletionChatOverview from "../../../components/DeletionChatOverview";
 
 const DeleteConversations: FC = () => {
     const {t} = useTranslation();
@@ -28,51 +28,71 @@ const DeleteConversations: FC = () => {
         queryKey: ['configs/delete-conversation-config', 'prod'],
     });
 
+    const plusDays = (date: Date, days: number): Date => {
+        date.setDate(date.getDate() + days)
+        return new Date(date.toISOString())
+    }
+
+    const calculateDateFrom = (daysForward: number): Date => {
+        const today = new Date();
+        if (!daysForward || daysForward === 0) return today;
+        const differenceInDays = differenceInCalendarDays(today, endDate);
+        const futureDate = daysForward + differenceInDays;
+        return subDays(new Date(), futureDate);
+    }
+
     const [isAuthMessaged, setIsAuthMessages] = useState<boolean>(false);
     const [isAnonymMessaged, setIsAnonymMessaged] = useState<boolean>(false);
     const [authPeriod, setAuthPeriod] = useState<number>(160);
     const [anonymPeriod, setAnonymPeriod] = useState<number>(160);
     const [deletionTime, setDeletionTime] = useState<string>();
-    const [startDate, setStartDate] = useState<Date | string>(new Date());
+    const startDate = plusDays(new Date(), 1);
     const [endDate, setEndDate] = useState<Date>(new Date());
-    const [removableChats, setRemovableChats] = useState<number>(0);
+    const [removableChatsCount, setremovableChatsCount] = useState<number>(0);
+    const [authDate, setAuthDate] = useState<Date>(new Date());
+    const [anonDate, setAnonDate] = useState<Date>(new Date());
 
     useEffect(() => {
         setEndDate(new Date())
-        setStartDate(new Date())
         if (deleteConfig) {
             setIsAnonymMessaged(deleteConfig.isAnonymConversations === 'true');
             setIsAuthMessages(deleteConfig.isAuthConversations === 'true');
             setAuthPeriod(Number(deleteConfig.authPeriod ?? 160));
             setAnonymPeriod(Number(deleteConfig.anonymPeriod ?? 160));
-            setDeletionTime(deleteConfig?.deletionTimeISO === '' ?  new Date().toISOString() : new Date(deleteConfig.deletionTimeISO).toISOString());
+            setDeletionTime(deleteConfig?.deletionTimeISO === '' ? new Date().toISOString() : new Date(deleteConfig.deletionTimeISO).toISOString());
             reset(deleteConfig)
         }
     }, [deleteConfig]);
 
     useEffect(() => {
-        getAllEndedChats.mutate({
-            startDate,
-            endDate
-        })
-    }, [startDate, endDate]);
+        const never = new Date(0);
+        setAnonDate(isAnonymMessaged ? calculateDateFrom(anonymPeriod) : never);
+        setAuthDate(isAuthMessaged ? calculateDateFrom(authPeriod) : never);
+    }, [endDate, isAnonymMessaged, isAuthMessaged, anonymPeriod, authPeriod]);
 
-    const getAllEndedChats = useMutation({
+    useEffect(() => {
+        getAllFutureRemovableChatsCount.mutate({
+            authDate: authDate,
+            anonDate: anonDate,
+        });
+    }, [authDate, anonDate]);
+
+    const getAllFutureRemovableChatsCount = useMutation({
         mutationFn: (data: {
-            startDate: string | Date;
-            endDate: string | Date;
+            authDate: Date;
+            anonDate: Date;
         }) => {
-            return apiDev.post('agents/ended-count', {
-                startDate: format(new Date(startDate), 'yyyy-MM-dd'),
-                endDate: format(new Date(endDate), 'yyyy-MM-dd')
+            return apiDev.post('agents/removable-count', {
+                authDate: format(data.authDate, 'yyyy-MM-dd'),
+                anonDate: format(data.anonDate, 'yyyy-MM-dd')
             });
         },
         onSuccess: (res: any) => {
-            setRemovableChats(res.data.response[0].totalCount);
+            setremovableChatsCount(res.data.response[0].totalCount);
         },
     });
 
-    const setDeleteConversationsData = (data: DeleteChatSettings)=> {
+    const setDeleteConversationsData = (data: DeleteChatSettings) => {
         return {
             ...data,
             isAnonymConversations: data.isAnonymConversations || false,
@@ -142,11 +162,10 @@ const DeleteConversations: FC = () => {
     });
 
     const handleDatesUpdate = (day: number) => {
-        const today = new Date();
-        today.setDate(today.getDate() - day);
-        setStartDate(new Date(today.toISOString().split('T')[0]));
+        if (day === undefined) return;
+        const resultDate = plusDays(new Date(), day)
+        setEndDate(new Date(resultDate.toISOString().split('T')[0]));
     }
-
 
     if (!deleteConfig) {
         return <>Loading...</>;
@@ -317,13 +336,10 @@ const DeleteConversations: FC = () => {
                                                     {...field}
                                                     label={t('global.startDate')}
                                                     timePicker={false}
+                                                    disabled={true}
                                                     hideLabel
                                                     direction="row"
-                                                    value={startDate ?? new Date()}
-                                                    onChange={(val) => {
-                                                        field.onChange(val)
-                                                        setStartDate(val)
-                                                    }}
+                                                    value={startDate}
                                                 />
                                             </div>
                                         );
@@ -365,9 +381,9 @@ const DeleteConversations: FC = () => {
                                 </Track>
                             </Track>
                             <Track gap={40} align={"center"}>
-                                {t('deleteConversation.periodConversations')} <b>{removableChats}</b>
+                                {t('deleteConversation.periodConversations')} <b>{removableChatsCount}</b>
                             </Track>
-                            <ChatOverview fromDate={startDate.toString()} untilDate={endDate.toString()}></ChatOverview>
+                            <DeletionChatOverview authDate={authDate} anonDate={anonDate}></DeletionChatOverview>
                         </Track>
                     </>
                 )}
