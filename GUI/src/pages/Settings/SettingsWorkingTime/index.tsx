@@ -8,7 +8,7 @@ import {
   Button,
   Card,
   FormDatepicker,
-  RichTextArea,
+  FormTextarea,
   Switch,
   Track,
 } from 'components';
@@ -456,7 +456,7 @@ const SettingsWorkingTime: FC = () => {
               name="organizationOutsideWorkingHoursMessage"
               control={control}
               render={({ field }) => (
-                <RichTextArea
+                <FormTextarea
                   label={t('settings.workingTime.outsideWorkingHoursMessage')}
                   maxLength={OUTSIDE_WORKING_HOURS_MESSAGE_LENGTH}
                   showMaxLength
@@ -464,6 +464,7 @@ const SettingsWorkingTime: FC = () => {
                   onChange={field.onChange}
                   defaultValue={field.value}
                   name="label"
+                  useRichText
                 />
               )}
             />
@@ -504,7 +505,7 @@ const SettingsWorkingTime: FC = () => {
             name="organizationNoCsaAvailableMessage"
             control={control}
             render={({ field }) => (
-              <RichTextArea
+              <FormTextarea
                 label={t('settings.workingTime.noCsaAvailableMessage')}
                 maxLength={NO_CSA_MESSAGE_LENGTH}
                 showMaxLength
@@ -512,6 +513,7 @@ const SettingsWorkingTime: FC = () => {
                 onChange={field.onChange}
                 defaultValue={field.value}
                 name="label"
+                useRichText
               />
             )}
           />
