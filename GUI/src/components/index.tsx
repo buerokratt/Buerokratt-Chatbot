@@ -27,6 +27,7 @@ import HistoricalChat from './HistoricalChat';
 import Dialog from './Dialog';
 import Section from './Section';
 import Chat from './Chat';
+import RichTextArea from './RichTextArea/RichTextArea';
 
 export {
   Layout,
@@ -53,6 +54,7 @@ export {
   Box,
   Drawer,
   HistoricalChat,
+  RichTextArea,
   Dialog,
   Section,
   Chat,
