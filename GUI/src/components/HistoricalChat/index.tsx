@@ -15,6 +15,7 @@ import { AUTHOR_ROLES } from 'utils/constants';
 
 type ChatProps = {
   chat: ChatType;
+  header_link?: string;
   trigger: boolean;
   onChatStatusChange: (event: string) => void;
   onCommentChange: (comment: string) => void;
@@ -39,6 +40,7 @@ const chatStatuses = [
 
 const HistoricalChat: FC<ChatProps> = ({
   chat,
+  header_link,
   trigger,
   selectedStatus,
   onChatStatusChange,
@@ -180,6 +182,9 @@ const HistoricalChat: FC<ChatProps> = ({
   return (
     <div className="historical-chat">
       <div className="historical-chat__body">
+          {header_link && (
+              <div className={'header-link'}>{header_link}</div>
+          )}
         <div className="historical-chat__group-wrapper">
           {messageGroups?.map((group, index) => (
             <div

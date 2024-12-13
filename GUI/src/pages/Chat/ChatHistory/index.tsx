@@ -693,6 +693,7 @@ const ChatHistory: FC = () => {
                     onClose={() => setSelectedChat(null)}
                 >
                   <HistoricalChat
+                      header_link={selectedChat.endUserUrl}
                       chat={selectedChat}
                       trigger={messagesTrigger}
                       onChatStatusChange={setStatusChangeModal}
