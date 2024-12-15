@@ -6,10 +6,6 @@ export enum CHAT_STATUS {
   VALIDATING = 'VALIDATING',
 }
 
-export enum BACKOFFICE_NAME {
-  DEFAULT = 'Bürokratt'
-}
-
 export enum CHAT_EVENTS {
   ANSWERED = 'answered',
   TERMINATED = 'terminated',
@@ -61,6 +57,8 @@ export interface Chat {
   csaTitle?: string | null;
   customerSupportId?: string;
   customerSupportDisplayName?: string;
+  customerSupportFirstName?: string;
+  customerSupportLastName?: string;
   endUserId?: string;
   endUserEmail?: string;
   endUserPhone?: string;
@@ -82,10 +80,13 @@ export interface Chat {
   forwardedToCsa?: string;
   receivedFrom?: string;
   comment?: string;
+  commentAddedDate?: string;
+  commentAuthor?: string;
   labels: string;
   feedbackText?: string;
   feedbackRating?: number;
   nps?: number;
+  userDisplayName?: string;
 }
 export interface GroupedChat {
   myChats: Chat[];
@@ -116,4 +117,4 @@ export enum MessageSseEvent {
 export type MessageStatus = {
   messageId: string | null;
   readTime: any;
-}
+};

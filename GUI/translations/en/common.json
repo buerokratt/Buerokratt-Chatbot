@@ -162,7 +162,11 @@
       "forwarded": "Forwarded",
       "addACommentToTheConversation": "Add a comment to the conversation",
       "rating": "Rating",
-      "feedback": "Feedback"
+      "feedback": "Feedback",
+      "commentAuthor": "Commenter",
+      "commentAddedDate": "Comment added date",
+      "statusAdder": "Status adder",
+      "statusAddedDate": "Status added date"
     },
     "plainEvents": {
       "answered": "Answered",
@@ -259,7 +263,7 @@
       "messageApproved": "Message approved successfully",
       "messageChangeFailed": "Message change failed",
       "header": {
-        "id" : "Id",
+        "id": "Id",
         "chatId": "Chat Id",
         "message": "Message",
         "requestedAt": "Requested At",
