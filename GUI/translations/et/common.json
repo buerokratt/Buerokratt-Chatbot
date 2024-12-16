@@ -395,6 +395,35 @@
       "greetingActive": "Tervitus aktiivne",
       "messageChanged": "Tervitust muudeti edukalt",
       "emptyMessage": "Tervitussõnumi väli ei tohi olla tühi"
+    },
+    "skmConfiguration": {
+      "title": "SKMi konfiguratsioon",
+      "description": "_",
+      "range": "Rangus",
+      "documents": "Leitud dokumendid",
+      "systemMessage": "Süsteemi juhis",
+      "maxTokens": "Maksimaalne tokenite arv",
+      "indexName": "Indeks",
+      "queryType": "Otsingutüüp",
+      "semantic": "Semantiline",
+      "vector": "Vektor",
+      "simple": "Märksõna",
+      "vectorSimpleHybrid": "Hübriid (märksõna + vektor)",
+      "vectorSemanticHybrid": "Hübriid + semantiline",
+      "tooltip": {
+        "range": "Rangus määrab künnise, mille alusel dokumente peetakse teie päringutele asjakohasteks. Ranguse tõstmine tähendab kõrgemat asjakohasuse künnist ja rohkemate vähem asjakohaste dokumentide filtreerimist. Väga kõrge rangus võib aga põhjustada vastuste genereerimise ebaõnnestumise, kuna kättesaadavaid dokumente on liiga vähe. Vaikimisi on ranguse tase 3.Võimalikud väärtused: 1 - 5",
+        "documents": "See määrab teie andmeindeksist vastuste koostamiseks kasutatavate kõrgeima skooriga dokumentide arvu. Seda väärtust tasub suurendada, kui teil on lühikesed dokumendid või soovite pakkuda rohkem konteksti. Vaikeväärtus on 5.Võimalikud väärtused: 1 - 20",
+        "systemMessage": "Anna mudelile juhised ja kontekst selle kohta, kuidas see peaks käituma.",
+        "maxTokens": "Sea piirang mudeli vastuses kasutatavate tokenite arvule.Võimalikud väärtused: 1 - 2000",
+        "indexName": "Azures loodud indeksi nimi.",
+        "queryType": "Vali otsingutüüp."
+      },
+      "validation": {
+        "range": "Rangus peab olema vahemikus 1 kuni 5",
+        "documents": "Leitud dokumendid peab olema vahemikus 1 kuni 20",
+        "maxTokens": "Maksimaalne tokenite arv peab olema vahemikus 1 kuni 2000",
+        "systemMessage": "Süsteemisõnumi väli ei tohi olla tühi"
+      }
     }
   },
   "monitoring": {

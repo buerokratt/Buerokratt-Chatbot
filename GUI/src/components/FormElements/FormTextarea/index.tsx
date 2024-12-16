@@ -68,7 +68,7 @@ const FormTextarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             <RichTextarea
               id={id}
               style={{ width: '100%', height: '95px' }}
-              maxLength={maxLength}
+              maxLength={maxLength === -1 ? undefined : maxLength}
               ref={ref}
               defaultValue={defaultValue ?? ''}
               aria-label={hideLabel ? label : undefined}

@@ -21,8 +21,9 @@ import SettingsWelcomeMessage from 'pages/Settings/SettingsWelcomeMessage';
 import SettingsSessionLength from 'pages/Settings/SettingsSessionLength';
 import './locale/et_EE';
 import ChatPending from 'pages/Chat/ChatPending';
-import DeleteConversations from "./pages/Settings/DeleteConversations";
+import DeleteConversations from './pages/Settings/DeleteConversations';
 import ValidationRequests from './pages/Chat/ValidationRequests';
+import SettingsSkmConfiguration from 'pages/Settings/SettingsSkmConfiguration';
 
 const App: FC = () => {
   useQuery<{
@@ -58,6 +59,7 @@ const App: FC = () => {
         <Route path="/chatbot/appearance" element={<SettingsAppearance />} />
         <Route path="/working-time" element={<SettingsWorkingTime />} />
         <Route path="/session-length" element={<SettingsSessionLength />} />
+        <Route path="/skm-configuration" element={<SettingsSkmConfiguration />} />
         <Route path="/uptime" element={<MonitoringUptime />} />
       </Route>
     </Routes>

@@ -1,0 +1,54 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'SKM-CONFIG'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: range
+        type: string
+        description: "Body field 'range'"
+      - field: documents
+        type: string
+        description: "Body field 'documents'"
+      - field: systemMessage
+        type: string
+        description: "Body field 'systemMessage'"
+      - field: maxTokens
+        type: string
+        description: "Body field 'maxTokens'"
+      - field: indexName
+        type: string
+        description: "Body field 'indexName'"
+      - field: queryType
+        type: string
+        description: "Body field 'queryType'"    
+
+extractRequestData:
+  assign:
+    skm_range: ${incoming.body.range}
+    skm_documents: ${incoming.body.documents}
+    skm_system_message: ${incoming.body.systemMessage}
+    skm_max_tokens: ${incoming.body.maxTokens}
+    skm_index_name: ${incoming.body.indexName}
+    skm_query_type: ${incoming.body.queryType}
+
+setSkmConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-skm-config"
+    body:
+      skm_range: ${skm_range}
+      skm_documents: ${skm_documents}
+      skm_system_message: ${skm_system_message}
+      skm_max_tokens: ${skm_max_tokens}
+      skm_index_name: ${skm_index_name}
+      skm_query_type: ${skm_query_type}
+      created: ${new Date().toISOString()}
+  result: return_result
+
+return_result:
+  return: 'Skm configurations changed successfully'
