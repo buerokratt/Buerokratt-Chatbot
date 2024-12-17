@@ -7,7 +7,15 @@ import {
 } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { AiFillCheckCircle } from 'react-icons/ai';
-import { Card, DataTable, Icon, Tooltip } from 'components';
+import {
+  Button,
+  Card,
+  DataTable,
+  Drawer,
+  HistoricalChat,
+  Icon,
+  Tooltip,
+} from 'components';
 import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';
 import { useMutation } from '@tanstack/react-query';
@@ -18,10 +26,14 @@ import { AxiosError } from 'axios';
 import { userStore as useHeaderStore } from '@buerokratt-ria/header';
 import sse from 'services/sse-service';
 import MessageContentView from './MessageContentView';
+import { MdOutlineRemoveRedEye } from 'react-icons/md';
+import { Chat as ChatType } from 'types/chat';
+import './ValidationRequests.scss';
 
 const ValidationRequests: React.FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
+  const [selectedChat, setSelectedChat] = useState<ChatType | null>(null);
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
@@ -109,6 +121,21 @@ const ValidationRequests: React.FC = () => {
     </span>
   );
 
+  const detailsView = (props: any) => (
+    <Button
+      appearance="text"
+      onClick={() => {
+        const chat: any = {
+          id: props.row.original.chatId,
+        };
+        setSelectedChat(chat);
+      }}
+    >
+      <Icon icon={<MdOutlineRemoveRedEye color={'rgba(0,0,0,0.54)'} />} />
+      {t('global.view')}
+    </Button>
+  );
+
   const copyValueToClipboard = async (value: string) => {
     await navigator.clipboard.writeText(value);
 
@@ -144,6 +171,14 @@ const ValidationRequests: React.FC = () => {
         header: t('chat.validations.header.approve') ?? '',
         cell: approveView,
       }),
+      columnHelper.display({
+        id: 'detail',
+        cell: detailsView,
+        meta: {
+          size: '3%',
+          sticky: 'right',
+        },
+      }),
     ],
     []
   );
@@ -152,26 +187,48 @@ const ValidationRequests: React.FC = () => {
     <>
       <h1>{t('chat.validations.title')}</h1>
       <p>{t('chat.validations.description')}</p>
-      <Card>
-        <DataTable
-          data={validationRequests ?? []}
-          columns={validationColumns}
-          sortable
-          sorting={sorting}
-          pagination={pagination}
-          setPagination={(state: PaginationState) => {
-            if (
-              state.pageIndex === pagination.pageIndex &&
-              state.pageSize === pagination.pageSize
-            )
-              return;
-            setPagination(state);
-          }}
-          setSorting={(state: SortingState) => {
-            setSorting(state);
-          }}
-        />
-      </Card>
+      <div className="card-drawer-container">
+        <div className="card-wrapper">
+          <Card>
+            <DataTable
+              data={validationRequests ?? []}
+              columns={validationColumns}
+              sortable
+              sorting={sorting}
+              pagination={pagination}
+              setPagination={(state: PaginationState) => {
+                if (
+                  state.pageIndex === pagination.pageIndex &&
+                  state.pageSize === pagination.pageSize
+                )
+                  return;
+                setPagination(state);
+              }}
+              setSorting={(state: SortingState) => {
+                setSorting(state);
+              }}
+            />
+          </Card>
+        </div>
+        {selectedChat && (
+          <div className="drawer-container">
+            <Drawer
+              title={selectedChat.id}
+              onClose={() => setSelectedChat(null)}
+            >
+              <HistoricalChat
+                chat={selectedChat}
+                trigger={false}
+                onChatStatusChange={() => {}}
+                selectedStatus={null}
+                onCommentChange={() => {}}
+                showComment={false}
+                showStatus={false}
+              />
+            </Drawer>
+          </div>
+        )}
+      </div>
     </>
   );
 };

@@ -18,7 +18,7 @@ const MessageContentView = (props: any) => {
         <label
           style={{
             display: 'block',
-            maxWidth: '250px',
+            maxWidth: '300px',
             overflowY: 'auto',
             overflowWrap: 'break-word',
             whiteSpace: 'pre-wrap',
@@ -30,12 +30,12 @@ const MessageContentView = (props: any) => {
         </label>
       )}
       {isEditing && (
-        <div style={{ width: '50%' }}>
+        <div style={{ width: '80%' }}>
           <FormTextarea
             name={''}
             label={''}
             minRows={1}
-            maxRows={3}
+            maxRows={5}
             defaultValue={content}
             onChange={(e) => {
               setInputContent(e.target.value);
