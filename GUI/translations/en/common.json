@@ -398,7 +398,7 @@
     },
     "skmConfiguration": {
       "title": "SKM Configuration",
-      "description": "_",
+      "description": "Here it is possible to set SKM parameters.",
       "range": "Strictness",
       "documents": "Found Documents",
       "systemMessage": "System Instruction",

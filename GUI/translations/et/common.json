@@ -398,7 +398,7 @@
     },
     "skmConfiguration": {
       "title": "SKMi konfiguratsioon",
-      "description": "_",
+      "description": "Siin on võimalik SKMi parameetreid sätestada.",
       "range": "Rangus",
       "documents": "Leitud dokumendid",
       "systemMessage": "Süsteemi juhis",
