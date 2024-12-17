@@ -162,7 +162,11 @@
       "forwarded": "Suunatud",
       "addACommentToTheConversation": "Lisa vestlusele kommentaar",
       "rating": "Hinnang",
-      "feedback": "Tagasiside"
+      "feedback": "Tagasiside",
+      "commentAuthor": "Kommentaari lisaja",
+      "commentAddedDate": "Kommentaari lisamise kuupäev",
+      "statusAdder": "Staatuse lisaja",
+      "statusAddedDate": "Staatuse lisamise kuupäev"
     },
     "plainEvents": {
       "answered": "Vastatud",

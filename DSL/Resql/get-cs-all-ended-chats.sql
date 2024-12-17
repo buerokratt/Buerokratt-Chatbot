@@ -3,10 +3,23 @@ WITH MaxChatHistoryComments AS (
     FROM chat_history_comments
     GROUP BY chat_id
 ),
+     ChatUser AS (
+         SELECT DISTINCT ON (id_code)
+             id_code,
+             display_name,
+             first_name,
+             last_name
+         FROM "user"
+         ORDER BY id_code, id DESC
+     ),
      ChatHistoryComments AS (
-         SELECT comment, chat_id
+         SELECT 
+             comment, 
+             chat_id, 
+             created, 
+             author_display_name
          FROM chat_history_comments
-                  JOIN MaxChatHistoryComments ON id = maxId
+         JOIN MaxChatHistoryComments ON id = maxId
      ),
      MessageWithContent AS (
          SELECT
@@ -52,7 +65,7 @@ FROM message
 GROUP BY chat_base_id
     ),
     Messages AS (
-SELECT event, updated, chat_base_id
+SELECT event, updated, chat_base_id, author_id
 FROM message
     JOIN MaxMessages ON id = maxID
     ),
@@ -129,6 +142,11 @@ SELECT c.base_id AS id,
        c.received_from,
        c.labels,
        s.comment,
+       s.created as comment_added_date,
+       s.author_display_name as comment_author,
+       mu.display_name AS user_display_name,
+       cu.first_name AS customer_support_first_name,
+       cu.last_name AS customer_support_last_name,
        LastContentMessage.content AS last_message,
        (CASE WHEN m.event = '' THEN NULL ELSE LOWER(m.event) END) AS last_message_event,
        ContactsMessage.content AS contacts_message,
@@ -140,16 +158,14 @@ SELECT c.base_id AS id,
 FROM EndedChatMessages AS c
          JOIN Messages AS m ON c.base_id = m.chat_base_id
          LEFT JOIN ChatHistoryComments AS s ON s.chat_id =  m.chat_base_id
+         LEFT JOIN ChatUser AS mu ON mu.id_code = m.author_id
+         LEFT JOIN ChatUser AS cu ON cu.id_code = c.customer_support_id
          JOIN LastContentMessage ON c.base_id = LastContentMessage.chat_base_id
          JOIN FirstContentMessage ON c.base_id = FirstContentMessage.chat_base_id
          LEFT JOIN ContactsMessage ON ContactsMessage.chat_base_id = c.base_id
          CROSS JOIN TitleVisibility
          CROSS JOIN NPS
 WHERE (
-    (
-        LENGTH(:customerSupportIds) = 0 OR
-        c.customer_support_id = ANY(string_to_array(:customerSupportIds, ','))
-    ) AND (
           :search IS NULL OR
           :search = '' OR
           LOWER(c.customer_support_display_name) LIKE LOWER('%' || :search || '%') OR
@@ -168,7 +184,6 @@ WHERE (
                 AND LOWER(msg.content) LIKE LOWER('%' || :search || '%')
           )
           )
-    )
 ORDER BY
     CASE WHEN :sorting = 'created asc' THEN FirstContentMessage.created END ASC,
     CASE WHEN :sorting = 'created desc' THEN FirstContentMessage.created END DESC,
