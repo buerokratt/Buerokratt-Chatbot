@@ -1,4 +1,4 @@
-import React, { CSSProperties, FC, ReactNode, useId } from 'react';
+import React, {CSSProperties, FC, ReactNode, useId} from 'react';
 import {
   ColumnDef,
   useReactTable,
@@ -56,6 +56,7 @@ type DataTableProps = {
   disableHead?: boolean;
   pagesCount?: number;
   meta?: TableMeta<any>;
+  selectedRow?: (row: Row<any>) => boolean;
 };
 
 type ColumnMeta = {
@@ -115,6 +116,7 @@ const DataTable: FC<DataTableProps> = ({
   disableHead,
   pagesCount,
   meta,
+  selectedRow
 }) => {
   const id = useId();
   const { t } = useTranslation();
@@ -254,7 +256,11 @@ const DataTable: FC<DataTableProps> = ({
           <tbody>
             {tableBodyPrefix}
             {table.getRowModel().rows.map((row) => (
-              <tr key={row.id} style={table.options.meta?.getRowStyles(row)}>
+              <tr
+                  key={row.id}
+                  style={table.options.meta?.getRowStyles(row)}
+                  className={selectedRow?.(row) ? 'highlighted' : 'default'}
+              >
                 {row.getVisibleCells().map((cell) => (
                   <td
                     key={cell.id}
@@ -270,7 +276,6 @@ const DataTable: FC<DataTableProps> = ({
                         cell.column.columnDef.meta?.sticky === 'right'
                           ? `${cell.column.getAfter('right') * 0.675}px`
                           : undefined,
-                      backgroundColor: 'white',
                       zIndex: cell.column.columnDef.meta?.sticky ? 1 : 0,
                     }}
                   >
