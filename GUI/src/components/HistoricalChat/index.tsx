@@ -12,7 +12,7 @@ import './HistoricalChat.scss';
 import { apiDev } from 'services/api';
 import ChatEvent from 'components/ChatEvent';
 import { AUTHOR_ROLES } from 'utils/constants';
-import { BACKOFFICE_NAME } from "types/chat";
+import { BACKOFFICE_NAME } from 'types/chat';
 
 type ChatProps = {
   chat: ChatType;
@@ -21,6 +21,8 @@ type ChatProps = {
   onChatStatusChange: (event: string) => void;
   onCommentChange: (comment: string) => void;
   selectedStatus: string | null;
+  showComment?: boolean;
+  showStatus?: boolean;
 };
 
 type GroupedMessage = {
@@ -47,6 +49,8 @@ const HistoricalChat: FC<ChatProps> = ({
   selectedStatus,
   onChatStatusChange,
   onCommentChange,
+  showComment = true,
+  showStatus = true,
 }) => {
   const { t } = useTranslation();
   const chatRef = useRef<HTMLDivElement>(null);
@@ -82,13 +86,16 @@ const HistoricalChat: FC<ChatProps> = ({
   };
 
   const endUserFullName =
-    chat.endUserFirstName !== '' && chat.endUserLastName !== ''
+    chat.endUserFirstName &&
+    chat.endUserLastName &&
+    chat.endUserFirstName !== '' &&
+    chat.endUserLastName !== ''
       ? `${chat.endUserFirstName} ${chat.endUserLastName}`
       : t('global.anonymous');
 
   useEffect(() => {
-    setStatus(selectedStatus)
-  }, [selectedStatus,status]);
+    setStatus(selectedStatus);
+  }, [selectedStatus, status]);
 
   useEffect(() => {
     if (!messagesList) return;
@@ -127,9 +134,10 @@ const HistoricalChat: FC<ChatProps> = ({
           });
         }
       } else {
-        const isBackOfficeUser = message.authorRole === 'backoffice-user'
-              ? `${message.authorFirstName} ${message.authorLastName}`
-              : BACKOFFICE_NAME.DEFAULT;
+        const isBackOfficeUser =
+          message.authorRole === 'backoffice-user'
+            ? `${message.authorFirstName} ${message.authorLastName}`
+            : BACKOFFICE_NAME.DEFAULT;
         groupedMessages.push({
           name:
             message.authorRole === 'end-user'
@@ -186,9 +194,7 @@ const HistoricalChat: FC<ChatProps> = ({
   return (
     <div className="historical-chat">
       <div className="historical-chat__body">
-          {header_link && (
-              <div className={'header-link'}>{header_link}</div>
-          )}
+        {header_link && <div className={'header-link'}>{header_link}</div>}
         <div className="historical-chat__group-wrapper">
           {messageGroups?.map((group, index) => (
             <div
@@ -217,15 +223,16 @@ const HistoricalChat: FC<ChatProps> = ({
                   </div>
                   <div className="historical-chat__group-name">
                     {group.name}
-                    {
-                        group.title.length > 0 && (
-                            <div className="title">{group.title}</div>
-                        )
-                    }
+                    {group.title.length > 0 && (
+                      <div className="title">{group.title}</div>
+                    )}
                   </div>
                   <div className="historical-chat__messages">
                     {group.messages.map((message, i) => (
-                      <ChatMessage message={message} key={`${message.id ?? ''}-${i}`} />
+                      <ChatMessage
+                        message={message}
+                        key={`${message.id ?? ''}-${i}`}
+                      />
                     ))}
                   </div>
                 </>
@@ -236,55 +243,57 @@ const HistoricalChat: FC<ChatProps> = ({
         </div>
         {lastMessage && (
           <div className="historical-chat__toolbar">
-            <div className="historical-chat__toolbar-row">
-              <Track gap={16} justify="between">
-                {editingComment || editingComment === '' ? (
-                  <FormTextarea
-                    name="comment"
-                    label={t('global.comment')}
-                    value={editingComment}
-                    hideLabel
-                    onChange={(e) => setEditingComment(e.target.value)}
-                  />
-                ) : (
-                  <p
-                    className={`historical-chat__comment-text ${
-                      chat.comment ? '' : 'placeholder'
-                    }`}
-                  >
-                    {chat.comment ??
-                      t('chat.history.addACommentToTheConversation')}
-                  </p>
-                )}
-                {editingComment || editingComment === '' ? (
-                  <Button
-                    appearance="text"
-                    onClick={() => {
-                      onCommentChange(editingComment);
-                      setEditingComment(null);
-                    }}
-                  >
-                    <Icon icon={<MdOutlineSave />} />
-                    {t('global.save')}
-                  </Button>
-                ) : (
-                  <Button
-                    appearance="text"
-                    onClick={() => setEditingComment(chat.comment ?? '')}
-                  >
-                    <Icon icon={<MdOutlineModeEditOutline />} />
-                    {t('global.edit')}
-                  </Button>
-                )}
-              </Track>
-            </div>
-            {statuses.length > 0 && (
+            {showComment && (
+              <div className="historical-chat__toolbar-row">
+                <Track gap={16} justify="between">
+                  {editingComment || editingComment === '' ? (
+                    <FormTextarea
+                      name="comment"
+                      label={t('global.comment')}
+                      value={editingComment}
+                      hideLabel
+                      onChange={(e) => setEditingComment(e.target.value)}
+                    />
+                  ) : (
+                    <p
+                      className={`historical-chat__comment-text ${
+                        chat.comment ? '' : 'placeholder'
+                      }`}
+                    >
+                      {chat.comment ??
+                        t('chat.history.addACommentToTheConversation')}
+                    </p>
+                  )}
+                  {editingComment || editingComment === '' ? (
+                    <Button
+                      appearance="text"
+                      onClick={() => {
+                        onCommentChange(editingComment);
+                        setEditingComment(null);
+                      }}
+                    >
+                      <Icon icon={<MdOutlineSave />} />
+                      {t('global.save')}
+                    </Button>
+                  ) : (
+                    <Button
+                      appearance="text"
+                      onClick={() => setEditingComment(chat.comment ?? '')}
+                    >
+                      <Icon icon={<MdOutlineModeEditOutline />} />
+                      {t('global.edit')}
+                    </Button>
+                  )}
+                </Track>
+              </div>
+            )}
+            {showStatus && statuses.length > 0 && (
               <div className="historical-chat__toolbar-row">
                 <FormSelect
                   name="chatStatus"
                   label={t('chat.chatStatus')}
                   direction="up"
-                  defaultValue={status}
+                  defaultValue={status ?? ''}
                   onSelectionChange={(selection) =>
                     selection ? onChatStatusChange(selection.value) : null
                   }

@@ -57,10 +57,8 @@ assign_data_sources:
           semantic_configuration: azureml-default
           query_type: ${skm_config.queryType}
           in_scope: true
-          role_information: You are an AI assistant that helps people find information.
-          filter: null
-          strictness: ${skm_config.range}
-          top_n_documents: ${skm_config.documents}
+          strictness: ${parseInt(skm_config.range ?? '3')}
+          top_n_documents: ${parseInt(skm_config.documents ?? '5')}
           authentication:
             type: api_key
             key: "[#CHATBOT_EXTERNAL_KEY]"
@@ -112,7 +110,7 @@ post_answer:
       data_sources: ${data_sources}
       messages: ${messages}
       temperature: 0
-      max_tokens: ${skm_config.maxTokens}
+      max_tokens: ${parseInt(skm_config.maxTokens ?? '1000')}
       stream: false
       frequency_penalty: 0
       presence_penalty: 0
