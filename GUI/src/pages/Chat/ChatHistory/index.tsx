@@ -1,6 +1,6 @@
 import { FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useMutation } from '@tanstack/react-query';
+import {useMutation} from '@tanstack/react-query';
 import {
   ColumnPinningState,
   createColumnHelper,
@@ -128,6 +128,36 @@ const ChatHistory: FC = () => {
   }, [passedChatId]);
 
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await apiDev.get('/accounts/get-page-preference', {
+          params: { user_id: userInfo?.idCode, page_name: window.location.pathname},
+        });
+        if(response.data.pageResults !== undefined) {
+          updatePagePreference(response.data.pageResults)
+        }
+      }
+      catch (err) {
+        console.error('Failed to fetch data');
+      }
+    };
+
+    fetchData();
+  }, [userInfo?.idCode]);
+
+  const updatePagePreference = (pageResults: number ): void => {
+    const updatedPagination: PaginationState = { ...pagination, pageSize: pageResults };
+    setPagination(updatedPagination);
+    getAllEndedChats.mutate({
+      startDate: format(new Date(startDate), 'yyyy-MM-dd'),
+      endDate: format(new Date(endDate), 'yyyy-MM-dd'),
+      updatedPagination,
+      sorting,
+      search,
+    });
+  }
+
+  useEffect(() => {
     getAllEndedChats.mutate({
       startDate: format(new Date(startDate), 'yyyy-MM-dd'),
       endDate: format(new Date(endDate), 'yyyy-MM-dd'),
@@ -136,6 +166,18 @@ const ChatHistory: FC = () => {
       search,
     });
   }, []);
+
+  const updatePageSize = useMutation({
+    mutationFn: (data: {
+      page_results: number;
+    }) => {
+      return apiDev.post('accounts/update-page-preference', {
+        user_id: userInfo?.idCode,
+        page_name: window.location.pathname,
+        page_results: data.page_results,
+      });
+    }
+  });
 
   const getAllEndedChats = useMutation({
     mutationFn: (data: {
@@ -637,6 +679,7 @@ const ChatHistory: FC = () => {
                 )
                   return;
                 setPagination(state);
+                updatePageSize.mutate({page_results: state.pageSize});
                 getAllEndedChats.mutate({
                   startDate: format(new Date(startDate), 'yyyy-MM-dd'),
                   endDate: format(new Date(endDate), 'yyyy-MM-dd'),

@@ -23,15 +23,17 @@ extractRequestData:
     user_id: ${incoming.body.user_id}
     page_name: ${incoming.body.page_name}
     page_results: ${incoming.body.page_results}
+    created: ${new Date().toISOString()}
 
 setUserPagePreferences:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/update_user_page_preferences"
+    url: "[#CHATBOT_RESQL]/update-user-page-preferences"
     body:
       user_id: ${user_id}
       page_name: ${page_name}
       page_results: ${page_results}
+      created: ${created}
   result: returnSuccess
 
 returnSuccess:

@@ -17,32 +17,29 @@ declaration:
 
 extractRequestData:
   assign:
-    user_id: ${incoming.body.user_id}
-    page_name: ${incoming.body.page_name}
+    user_id: ${incoming.params.user_id}
+    page_name: ${incoming.params.page_name}
 
 getUserPagePreferences:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/get_user_page_preferences"
+    url: "[#CHATBOT_RESQL]/get-user-page-preferences"
     body:
       user_id: ${user_id}
       page_name: ${page_name}
   result: getUserPagePreferencesResult
-#  next: validateUserPagePreferencesResult
-
-loging:
-  log: ${getUserPagePreferencesResult.response.body}
 
 validateUserPagePreferencesResult:
   switch:
     - condition: "${getUserPagePreferencesResult.response.body.length > 0}"
       next: returnSuccess
-  next: return_bad_request
+  next: return_not_found
 
 returnSuccess:
-  return: ${getUserSettingsResult.response.body}
+  return: ${getUserPagePreferencesResult.response.body[0]}
+  wrapper: false
   next: end
 
-return_bad_request:
-  return: "error: bad request"
+return_not_found:
+  return: "error: not found"
   next: end
