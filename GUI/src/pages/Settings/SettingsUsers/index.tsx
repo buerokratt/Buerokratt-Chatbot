@@ -34,8 +34,10 @@ const SettingsUsers: FC = () => {
     const sort =
       sorting.length === 0
         ? 'name asc'
-        : sorting[0].id + ' ' + (sorting[0].desc ? 'desc' : 'asc');
-    const searchfilters = checkFilters(columnFilters);    
+          : sorting[0].id === t('settings.users.role')
+              ? `Role ${sorting[0].desc ? 'desc' : 'asc'}`
+                : sorting[0].id + ' ' + (sorting[0].desc ? 'desc' : 'asc');
+    const searchfilters = checkFilters(columnFilters);
     apiDev
       .post(`accounts/customer-support-agents`, {
         page: pagination.pageIndex + 1,
