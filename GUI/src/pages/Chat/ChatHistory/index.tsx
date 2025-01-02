@@ -627,6 +627,7 @@ const ChatHistory: FC = () => {
               data={filteredEndedChatsList}
               sortable
               columns={getFilteredColumns()}
+              selectedRow={(row) => row.original.id === selectedChat?.id}
               pagination={pagination}
               columnPinning={columnPinning}
               sorting={sorting}
