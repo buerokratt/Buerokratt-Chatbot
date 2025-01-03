@@ -375,3 +375,40 @@
   color: get-color(black-coral-6);
   padding-top: 2px;
 }
+
+.reset {
+  margin: 0;
+  padding: 0;
+  line-height: 1.5;
+}
+
+.reset h1,
+.reset h2,
+.reset h3,
+.reset h4,
+.reset h5,
+.reset h6 {
+  margin: 0;
+  padding: 0;
+}
+
+.reset p {
+  margin: 0;
+  padding: 0;
+}
+
+.reset ul,
+.reset ol {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.reset li {
+  margin: 0;
+  padding: 0;
+}
+
+.reset a {
+  text-decoration: none;
+  color: inherit;
+}
