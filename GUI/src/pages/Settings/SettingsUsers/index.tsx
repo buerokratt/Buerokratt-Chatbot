@@ -1,27 +1,23 @@
-import { FC, useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useMutation } from '@tanstack/react-query';
-import {
-  ColumnFiltersState,
-  PaginationState,
-  Row,
-  SortingState,
-  createColumnHelper,
-} from '@tanstack/react-table';
-import { AxiosError } from 'axios';
-import { MdOutlineEdit, MdOutlineDeleteOutline } from 'react-icons/md';
-import { apiDev } from 'services/api';
-import { Button, Card, DataTable, Dialog, Icon, Track } from 'components';
-import { User, UserSearchFilters } from 'types/user';
-import { deleteUser } from 'services/users';
-import { useToast } from 'hooks/useToast';
+import {FC, useEffect, useMemo, useState} from 'react';
+import {useTranslation} from 'react-i18next';
+import {useMutation} from '@tanstack/react-query';
+import {ColumnFiltersState, createColumnHelper, PaginationState, Row, SortingState,} from '@tanstack/react-table';
+import {AxiosError} from 'axios';
+import {MdOutlineDeleteOutline, MdOutlineEdit} from 'react-icons/md';
+import {apiDev} from 'services/api';
+import {Button, Card, DataTable, Dialog, Icon, Track} from 'components';
+import {User, UserSearchFilters} from 'types/user';
+import {deleteUser} from 'services/users';
+import {useToast} from 'hooks/useToast';
 import UserModal from './UserModal';
-import { ROLES } from 'utils/constants';
+import {ROLES} from 'utils/constants';
 import withAuthorization from 'hoc/with-authorization';
+import useStore from "../../../store";
 
 const SettingsUsers: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
+  const userInfo = useStore((state) => state.userInfo);
   const [newUserModal, setNewUserModal] = useState(false);
   const [editableRow, setEditableRow] = useState<User | null>(null);
   const [deletableRow, setDeletableRow] = useState<string | number | null>(
@@ -35,7 +31,7 @@ const SettingsUsers: FC = () => {
       sorting.length === 0
         ? 'name asc'
         : sorting[0].id + ' ' + (sorting[0].desc ? 'desc' : 'asc');
-    const searchfilters = checkFilters(columnFilters);    
+    const searchfilters = checkFilters(columnFilters);
     apiDev
       .post(`accounts/customer-support-agents`, {
         page: pagination.pageIndex + 1,
@@ -59,8 +55,12 @@ const SettingsUsers: FC = () => {
   };
 
   useEffect(() => {
-    getUsers(pagination, sorting, columnFilters);
+      getUsers(pagination, sorting, columnFilters);
   }, []);
+
+    useEffect(() => {
+        fetchData()
+    }, [userInfo?.idCode]);
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -69,6 +69,39 @@ const SettingsUsers: FC = () => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const columnHelper = createColumnHelper<User>();
+
+    const fetchData = async () => {
+        try {
+            const response = await apiDev.get('/accounts/get-page-preference', {
+                params: {user_id: userInfo?.idCode, page_name: window.location.pathname},
+            });
+            if (response.data.pageResults !== undefined) {
+                updatePagePreference(response.data.pageResults)
+            } else {
+                getUsers(pagination, sorting, columnFilters);
+            }
+        } catch (err) {
+            console.error('Failed to fetch data');
+        }
+    };
+
+    const updatePagePreference = (pageResults: number): void => {
+        const updatedPagination = { ...pagination, pageSize: pageResults };
+        setPagination(updatedPagination);
+        getUsers(updatedPagination, sorting, columnFilters);
+    }
+
+    const updatePageSize = useMutation({
+        mutationFn: (data: {
+            page_results: number;
+        }) => {
+            return apiDev.post('accounts/update-page-preference', {
+                user_id: userInfo?.idCode,
+                page_name: window.location.pathname,
+                page_results: data.page_results,
+            });
+        }
+    });
 
   const deleteUserMutation = useMutation({
     mutationFn: ({ id }: { id: string | number }) => deleteUser(id),
@@ -256,6 +289,7 @@ const SettingsUsers: FC = () => {
             )
               return;
             setPagination(state);
+            updatePageSize.mutate({page_results: state.pageSize});
             getUsers(state, sorting, columnFilters);
           }}
           sorting={sorting}

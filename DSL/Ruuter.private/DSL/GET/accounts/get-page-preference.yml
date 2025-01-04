@@ -1,0 +1,45 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'USER-PROFILE-SETTINGS'"
+  method: get
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    params:
+      - field: user_id
+        type: string
+        description: "Body field 'user_id'"
+      - field: page_name
+        type: string
+        description: "Body field 'page_name'"
+
+extractRequestData:
+  assign:
+    user_id: ${incoming.params.user_id}
+    page_name: ${incoming.params.page_name}
+
+getUserPagePreferences:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-user-page-preferences"
+    body:
+      user_id: ${user_id}
+      page_name: ${page_name}
+  result: getUserPagePreferencesResult
+
+validateUserPagePreferencesResult:
+  switch:
+    - condition: "${getUserPagePreferencesResult.response.body.length > 0}"
+      next: returnSuccess
+  next: return_not_found
+
+returnSuccess:
+  return: ${getUserPagePreferencesResult.response.body[0]}
+  wrapper: false
+  next: end
+
+return_not_found:
+  return: "error: not found"
+  next: end
