@@ -201,8 +201,24 @@ ORDER BY
     CASE WHEN :sorting = 'comment desc' THEN s.comment END DESC,
     CASE WHEN :sorting = 'labels asc' THEN c.labels END ASC,
     CASE WHEN :sorting = 'labels desc' THEN c.labels END DESC,
-    CASE WHEN :sorting = 'status asc' THEN c.status END ASC,
-    CASE WHEN :sorting = 'status desc' THEN c.status END DESC,
+    CASE
+        WHEN :sorting = 'status asc' THEN
+            CASE
+                WHEN m.event IS NULL OR m.event = '' THEN NULL
+                ELSE m.event
+                END
+        END ASC NULLS LAST,
+    CASE
+        WHEN :sorting = 'status desc' THEN
+            CASE
+                WHEN m.event IS NULL OR m.event = '' THEN NULL
+                ELSE m.event
+                END
+        END DESC NULLS LAST,
+    CASE WHEN :sorting = 'feedbackRating desc' THEN c.feedback_rating END DESC NULLS LAST,
+    CASE WHEN :sorting = 'feedbackRating asc' THEN c.feedback_rating END ASC,
+    CASE WHEN :sorting = 'customerSupportFullName desc' THEN (cu.first_name || ' ' || cu.last_name) END DESC NULLS LAST,
+    CASE WHEN :sorting = 'customerSupportFullName asc' THEN (cu.first_name || ' ' || cu.last_name) END ASC NULLS LAST,
     CASE WHEN :sorting = 'id asc' THEN c.base_id END ASC,
     CASE WHEN :sorting = 'id desc' THEN c.base_id END DESC
 OFFSET ((GREATEST(:page, 1) - 1) * :page_size) LIMIT :page_size;
