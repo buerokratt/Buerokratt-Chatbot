@@ -1,16 +1,11 @@
-import { FC, useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useMutation } from '@tanstack/react-query';
-import {
-  ColumnPinningState,
-  createColumnHelper,
-  PaginationState,
-  SortingState,
-} from '@tanstack/react-table';
-import { format } from 'date-fns';
-import { AxiosError } from 'axios';
+import {FC, useEffect, useMemo, useState} from 'react';
+import {useTranslation} from 'react-i18next';
+import {useMutation} from '@tanstack/react-query';
+import {ColumnPinningState, createColumnHelper, PaginationState, SortingState,} from '@tanstack/react-table';
+import {format} from 'date-fns';
+import {AxiosError} from 'axios';
 import './History.scss';
-import { MdOutlineRemoveRedEye } from 'react-icons/md';
+import {MdOutlineRemoveRedEye} from 'react-icons/md';
 
 import {
   Button,
@@ -27,22 +22,19 @@ import {
   Track,
 } from 'components';
 
-import { CHAT_EVENTS, CHAT_STATUS, Chat as ChatType } from 'types/chat';
-import { useToast } from 'hooks/useToast';
-import { apiDev } from 'services/api';
+import {Chat as ChatType, CHAT_EVENTS, CHAT_STATUS} from 'types/chat';
+import {useToast} from 'hooks/useToast';
+import {apiDev} from 'services/api';
 import useStore from 'store';
-import { Controller, useForm } from 'react-hook-form';
-import {
-  getFromLocalStorage,
-  setToLocalStorage,
-} from 'utils/local-storage-utils';
-import { CHAT_HISTORY_PREFERENCES_KEY } from 'constants/config';
-import { useLocation, useSearchParams } from 'react-router-dom';
-import { unifyDateFromat } from './unfiyDate';
+import {Controller, useForm} from 'react-hook-form';
+import {getFromLocalStorage, setToLocalStorage,} from 'utils/local-storage-utils';
+import {CHAT_HISTORY_PREFERENCES_KEY} from 'constants/config';
+import {useLocation, useSearchParams} from 'react-router-dom';
+import {unifyDateFromat} from './unfiyDate';
 import withAuthorization from 'hoc/with-authorization';
-import { ROLES } from 'utils/constants';
-import { et } from 'date-fns/locale';
-import { useDebouncedCallback } from 'use-debounce';
+import {ROLES} from 'utils/constants';
+import {et} from 'date-fns/locale';
+import {useDebouncedCallback} from 'use-debounce';
 
 const ChatHistory: FC = () => {
   const { t, i18n } = useTranslation();
@@ -76,6 +68,7 @@ const ChatHistory: FC = () => {
   };
   const [totalPages, setTotalPages] = useState<number>(1);
   const [endedChatsList, setEndedChatsList] = useState<ChatType[]>([]);
+  const [initialLoad, setInitialLoad] = useState<boolean>(true);
   const [filteredEndedChatsList, setFilteredEndedChatsList] = useState<
     ChatType[]
   >([]);
@@ -127,15 +120,58 @@ const ChatHistory: FC = () => {
     }
   }, [passedChatId]);
 
+  const fetchData = async () => {
+    setInitialLoad(false);
+    try {
+      const response = await apiDev.get('/accounts/get-page-preference', {
+        params: {user_id: userInfo?.idCode, page_name: window.location.pathname},
+      });
+      if (response.data.pageResults !== undefined) {
+        const updatedPagination = updatePagePreference(response.data.pageResults)
+        getAllEndedChats.mutate({
+          startDate: format(new Date(startDate), 'yyyy-MM-dd'),
+          endDate: format(new Date(endDate), 'yyyy-MM-dd'),
+          updatedPagination,
+          sorting,
+          search,
+        });
+      }
+    } catch (err) {
+      console.error('Failed to fetch data');
+    }
+  };
+
+  const updatePagePreference = (pageResults: number): PaginationState => {
+    const updatedPagination: PaginationState = {...pagination, pageSize: pageResults};
+    setPagination(updatedPagination);
+    return updatedPagination;
+  }
+
   useEffect(() => {
-    getAllEndedChats.mutate({
-      startDate: format(new Date(startDate), 'yyyy-MM-dd'),
-      endDate: format(new Date(endDate), 'yyyy-MM-dd'),
-      pagination,
-      sorting,
-      search,
-    });
+    if(initialLoad) {
+      fetchData();
+    } else {
+      getAllEndedChats.mutate({
+        startDate: format(new Date(startDate), 'yyyy-MM-dd'),
+        endDate: format(new Date(endDate), 'yyyy-MM-dd'),
+        pagination,
+        sorting,
+        search,
+      });
+    }
   }, []);
+
+  const updatePageSize = useMutation({
+    mutationFn: (data: {
+      page_results: number;
+    }) => {
+      return apiDev.post('accounts/update-page-preference', {
+        user_id: userInfo?.idCode,
+        page_name: window.location.pathname,
+        page_results: data.page_results,
+      });
+    }
+  });
 
   const getAllEndedChats = useMutation({
     mutationFn: (data: {
@@ -627,6 +663,7 @@ const ChatHistory: FC = () => {
               data={filteredEndedChatsList}
               sortable
               columns={getFilteredColumns()}
+              selectedRow={(row) => row.original.id === selectedChat?.id}
               pagination={pagination}
               columnPinning={columnPinning}
               sorting={sorting}
@@ -637,6 +674,7 @@ const ChatHistory: FC = () => {
                 )
                   return;
                 setPagination(state);
+                updatePageSize.mutate({page_results: state.pageSize});
                 getAllEndedChats.mutate({
                   startDate: format(new Date(startDate), 'yyyy-MM-dd'),
                   endDate: format(new Date(endDate), 'yyyy-MM-dd'),
