@@ -16,7 +16,6 @@ import StartAServiceModal from '../StartAServiceModal';
 import ChatTrigger from './ChatTrigger';
 import { v4 as uuidv4 } from 'uuid';
 import { useLocation } from 'react-router-dom';
-import sse from 'services/sse-service';
 import './ChatActive.scss';
 import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';
@@ -56,11 +55,6 @@ const ChatActive: FC = () => {
 
   useEffect(() => {
     useHeaderStore.getState().loadActiveChats();
-  }, []);
-
-  useEffect(() => {
-    const events = sse(`/chat-list`, loadActiveChats);
-    return () => events.close();
   }, []);
 
   const { data: csaNameVisiblity } = useQuery<{ isVisible: boolean }>({

@@ -14,7 +14,6 @@ import ChatTrigger from '../ChatActive/ChatTrigger';
 import clsx from 'clsx';
 import ForwardToColleaugeModal from '../ForwardToColleaugeModal';
 import ForwardToEstablishmentModal from '../ForwardToEstablishmentModal';
-import sse from 'services/sse-service';
 import './ChatUnanswered.scss';
 import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';
@@ -49,11 +48,6 @@ const ChatUnanswered: FC = () => {
 
   useEffect(() => {
     useHeaderStore.getState().loadActiveChats();
-  }, []);
-
-  useEffect(() => {
-    const events = sse(`/chat-list`, loadActiveChats);
-    return () => events.close();
   }, []);
 
   const { data: csaNameVisiblity } = useQuery<{ isVisible: boolean }>({
