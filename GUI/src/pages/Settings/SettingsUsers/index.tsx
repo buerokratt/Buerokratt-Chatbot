@@ -26,16 +26,15 @@ const SettingsUsers: FC = () => {
   const [usersList, setUsersList] = useState<User[] | null>(null);
   const [totalPages, setTotalPages] = useState<number>(1);
 
-  const getUsers = (
-    pagination: PaginationState,
-    sorting: SortingState,
-    columnFilters: ColumnFiltersState,
-    setTablePagination: boolean = false
-  ) => {
-    const sort =
-      sorting.length === 0
-        ? 'name asc'
-        : sorting[0].id + ' ' + (sorting[0].desc ? 'desc' : 'asc');
+  const getUsers = (pagination: PaginationState, sorting: SortingState, columnFilters: ColumnFiltersState, setTablePagination: boolean = false) => {
+      let sort = 'name asc';
+      if(sorting.length > 0) {
+          if(sorting[0].id === t('settings.users.role')) {
+              sort = `Role ${sorting[0].desc ? 'desc' : 'asc'}`
+          } else {
+          sort = sorting[0].id + ' ' + (sorting[0].desc ? 'desc' : 'asc')
+          }
+      }
     const searchfilters = checkFilters(columnFilters);
     apiDev
       .post(`accounts/customer-support-agents`, {
