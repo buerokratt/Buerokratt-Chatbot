@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Markdown from 'markdown-to-jsx';
+import './Chat.scss';
 
 interface MarkdownifyProps {
   message: string | undefined;
@@ -22,7 +23,7 @@ const LinkPreview: React.FC<{ href: string }> = ({ href }) => {
 };
 
 const Markdownify: React.FC<MarkdownifyProps> = ({ message }) => (
-  <div>
+  <div className={'reset'}>
     <Markdown
       options={{
         enforceAtxHeadings: true,

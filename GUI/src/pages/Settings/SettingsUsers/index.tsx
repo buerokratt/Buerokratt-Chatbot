@@ -47,6 +47,7 @@ const SettingsUsers: FC = () => {
         search_csa_title: searchfilters.search_csa_title,
         search_csa_email: searchfilters.search_csa_email,
         search_authority: searchfilters.search_authority,
+        search_department: searchfilters.search_department,
       })
       .then((res: any) => {
         setUsersList(res?.data?.response ?? []);
@@ -155,33 +156,37 @@ const SettingsUsers: FC = () => {
       search_csa_title: '',
       search_csa_email: '',
       search_authority: '',
+      search_department: '',
     };
-     for (const filter of state) {
-       switch (filter.id) {
-         case 'name':
-           searchfilters.search_full_name = (filter.value as string) ?? '';
-           break;
-         case 'idCode':
-           searchfilters.search_id_code = (filter.value as string) ?? '';
-           break;
-         case 'displayName':
-           searchfilters.search_display_name = (filter.value as string) ?? '';
-           break;
-         case 'csaTitle':
-           searchfilters.search_csa_title = (filter.value as string) ?? '';
-           break;
-         case 'csaEmail':
-           searchfilters.search_csa_email = (filter.value as string) ?? '';
-           break;
-         case 'Role':
-           searchfilters.search_authority = (filter.value as string) ?? '';
-           break;
-         default:
-           break;
-       }
-     }
-     return searchfilters;
-  }
+    for (const filter of state) {
+      switch (filter.id) {
+        case 'name':
+          searchfilters.search_full_name = (filter.value as string) ?? '';
+          break;
+        case 'idCode':
+          searchfilters.search_id_code = (filter.value as string) ?? '';
+          break;
+        case 'displayName':
+          searchfilters.search_display_name = (filter.value as string) ?? '';
+          break;
+        case 'csaTitle':
+          searchfilters.search_csa_title = (filter.value as string) ?? '';
+          break;
+        case 'csaEmail':
+          searchfilters.search_csa_email = (filter.value as string) ?? '';
+          break;
+        case 'Role':
+          searchfilters.search_authority = (filter.value as string) ?? '';
+          break;
+        case 'department':
+          searchfilters.search_department = (filter.value as string) ?? '';
+          break;
+        default:
+          break;
+      }
+    }
+    return searchfilters;
+  };
 
   const customerSupportStatusView = (props: any) => {
     const isIdle = props.getValue() === 'idle' ? '#FFB511' : '#D73E3E';
@@ -249,6 +254,9 @@ const SettingsUsers: FC = () => {
       columnHelper.accessor('csaEmail', {
         header: t('settings.users.email') ?? '',
       }),
+      columnHelper.accessor('department', {
+        header: t('settings.users.department') ?? '',
+      }),
       columnHelper.display({
         id: 'edit',
         cell: editView,
@@ -304,7 +312,9 @@ const SettingsUsers: FC = () => {
           setFiltering={(state: ColumnFiltersState) => {
             setColumnFilters(state);
             const searchfilters = checkFilters(state);
-            const hasData = Object.values(searchfilters).some((value) => value !== '');
+            const hasData = Object.values(searchfilters).some(
+              (value) => value !== ''
+            );
 
             if (hasData) {
               const intialPagination = { pageIndex: 0, pageSize: 10 };
@@ -318,19 +328,24 @@ const SettingsUsers: FC = () => {
         />
       </Card>
 
-      {
-        newUserModal && <UserModal onClose={() => {
-          setNewUserModal(false);
-          getUsers(pagination, sorting, columnFilters);
-        }} />
-      }
+      {newUserModal && (
+        <UserModal
+          onClose={() => {
+            setNewUserModal(false);
+            getUsers(pagination, sorting, columnFilters);
+          }}
+        />
+      )}
 
-      {
-        editableRow && <UserModal user={editableRow} onClose={() => {
-          setEditableRow(null);
-          getUsers(pagination, sorting, columnFilters);
-        }} />
-      }
+      {editableRow && (
+        <UserModal
+          user={editableRow}
+          onClose={() => {
+            setEditableRow(null);
+            getUsers(pagination, sorting, columnFilters);
+          }}
+        />
+      )}
 
       {deletableRow !== null && (
         <Dialog
