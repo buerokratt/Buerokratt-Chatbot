@@ -163,7 +163,7 @@ const DeleteConversations: FC = () => {
 
     const handleDatesUpdate = (day: number) => {
         if (day === undefined) return;
-        const resultDate = plusDays(new Date(), day)
+        const resultDate = plusDays(new Date(), Number(day))
         setEndDate(new Date(resultDate.toISOString().split('T')[0]));
     }
 
@@ -220,7 +220,7 @@ const DeleteConversations: FC = () => {
                                             hideLabel={false}
                                             onChange={(e) => {
                                                 field.onChange(e.target.value)
-                                                setAuthPeriod(e.target.value)
+                                                setAuthPeriod(Number(e.target.value))
                                             }
                                             }
                                             value={authPeriod}
@@ -271,7 +271,7 @@ const DeleteConversations: FC = () => {
                                             hideLabel={false}
                                             onChange={(e) => {
                                                 field.onChange(e.target.value)
-                                                setAnonymPeriod(e.target.value)
+                                                setAnonymPeriod(Number(e.target.value))
                                             }}
                                             value={anonymPeriod}
                                         />
