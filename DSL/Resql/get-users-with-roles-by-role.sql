@@ -5,6 +5,7 @@ SELECT u.login,
        u.display_name,
        u.csa_title,
        u.csa_email,
+       u.department,
        ua.authority_name AS authorities,
        csa.status AS customer_support_status,
        CEIL(COUNT(*) OVER() / :page_size::DECIMAL) AS total_pages
@@ -53,6 +54,7 @@ WHERE u.status <> 'deleted'
       FROM unnest(ua.authority_name) AS authority
       WHERE authority ILIKE '%' || :search_authority || '%'
   ))
+  AND (:search_department IS NULL OR u.department ILIKE '%' || :search_department || '%')
   AND u.id_code NOT IN (:excluded_users)
 ORDER BY 
    CASE WHEN :sorting = 'name asc' THEN u.first_name END ASC,
@@ -67,6 +69,8 @@ ORDER BY
    CASE WHEN :sorting = 'csaTitle desc' THEN u.csa_title END DESC,
    CASE WHEN :sorting = 'csaEmail asc' THEN u.csa_email END ASC,
    CASE WHEN :sorting = 'csaEmail desc' THEN u.csa_email END DESC,
+   CASE WHEN :sorting = 'department asc' THEN u.department END ASC,
+   CASE WHEN :sorting = 'department desc' THEN u.department END DESC,
    CASE WHEN :sorting = 'customerSupportStatus asc' THEN csa.status END ASC,
    CASE WHEN :sorting = 'customerSupportStatus desc' THEN csa.status END DESC
 OFFSET ((GREATEST(:page, 1) - 1) * :page_size) LIMIT :page_size;
