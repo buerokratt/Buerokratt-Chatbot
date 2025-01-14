@@ -24,7 +24,6 @@ import { useToast } from 'hooks/useToast';
 import { apiDev } from 'services/api';
 import { AxiosError } from 'axios';
 import { userStore as useHeaderStore } from '@buerokratt-ria/header';
-import sse from 'services/sse-service';
 import MessageContentView from './MessageContentView';
 import { MdOutlineRemoveRedEye } from 'react-icons/md';
 import { Chat as ChatType } from 'types/chat';
@@ -50,11 +49,6 @@ const ValidationRequests: React.FC = () => {
 
   useEffect(() => {
     useHeaderStore.getState().loadValidationMessages();
-  }, []);
-
-  useEffect(() => {
-    const events = sse(`/chat-list`, loadValidationMessages);
-    return () => events.close();
   }, []);
 
   const approveMessage = useMutation({
