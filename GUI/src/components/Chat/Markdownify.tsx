@@ -6,18 +6,18 @@ interface MarkdownifyProps {
   message: string | undefined;
 }
 
-const LinkPreview: React.FC<{ href: string }> = ({ href }) => {
+const LinkPreview: React.FC<{ href: string; children: React.ReactNode }> = ({ href, children }) => {
   const [hasError, setHasError] = useState(false);
   return !hasError ? (
     <img
       src={href}
-      alt="Image Preview"
-      style={{ maxWidth: '100%', height: 'auto', borderRadius: '20px' }}
+      alt={typeof children === "string" ? children : "Preview"}
+      style={{ maxWidth: "100%", height: "auto", borderRadius: "20px" }}
       onError={() => setHasError(true)}
     />
   ) : (
     <a href={href} target="_blank" rel="noopener noreferrer">
-      {href}
+      {children}
     </a>
   );
 };
