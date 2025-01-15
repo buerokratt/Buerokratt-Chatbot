@@ -166,7 +166,9 @@
       "commentAuthor": "Kommentaari lisaja",
       "commentAddedDate": "Kommentaari lisamise kuupäev",
       "statusAdder": "Staatuse lisaja",
-      "statusAddedDate": "Staatuse lisamise kuupäev"
+      "statusAddedDate": "Staatuse lisamise kuupäev",
+      "chosenCsa": "Valitud nõustaja(d)",
+      "chosenColumn": "Valitud tulba(d)"
     },
     "plainEvents": {
       "answered": "Vastatud",

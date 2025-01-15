@@ -597,6 +597,7 @@ const ChatHistory: FC = () => {
       <Card>
         <Track gap={16}>
           <FormInput
+            className="input-wrapper"
             label={t('chat.history.searchChats')}
             hideLabel
             name="searchChats"
@@ -628,6 +629,7 @@ const ChatHistory: FC = () => {
                         getAllEndedChats.mutate({
                           startDate: start,
                           endDate: format(new Date(endDate), 'yyyy-MM-dd'),
+                          customerSupportIds: passedCustomerSupportIds,
                           pagination,
                           sorting,
                           search,
@@ -659,6 +661,7 @@ const ChatHistory: FC = () => {
                         getAllEndedChats.mutate({
                           startDate: format(new Date(startDate), 'yyyy-MM-dd'),
                           endDate: end,
+                          customerSupportIds: passedCustomerSupportIds,
                           pagination,
                           sorting,
                           search,
@@ -670,8 +673,23 @@ const ChatHistory: FC = () => {
               />
             </Track>
             <FormMultiselect
+              name="visibleColumns"
+              label={t('')}
+              placeholder={t('chat.history.chosenColumn')}
+              options={visibleColumnOptions}
+              selectedOptions={visibleColumnOptions.filter((o) =>
+                selectedColumns.includes(o.value)
+              )}
+              onSelectionChange={(selection) => {
+                const columns = selection?.map((s) => s.value) ?? [];
+                setSelectedColumns(columns);
+                setToLocalStorage(CHAT_HISTORY_PREFERENCES_KEY, columns);
+              }}
+            />
+            <FormMultiselect
               name="agent"
               label={t('')}
+              placeholder={t('chat.history.chosenCsa')}
               options={customerSupportAgents}
               selectedOptions={customerSupportAgents.filter((item) =>
                 passedCustomerSupportIds.includes(item.value)
@@ -693,19 +711,6 @@ const ChatHistory: FC = () => {
                   sorting,
                   search,
                 });
-              }}
-            />
-            <FormMultiselect
-              name="visibleColumns"
-              label={t('')}
-              options={visibleColumnOptions}
-              selectedOptions={visibleColumnOptions.filter((o) =>
-                selectedColumns.includes(o.value)
-              )}
-              onSelectionChange={(selection) => {
-                const columns = selection?.map((s) => s.value) ?? [];
-                setSelectedColumns(columns);
-                setToLocalStorage(CHAT_HISTORY_PREFERENCES_KEY, columns);
               }}
             />
           </Track>
@@ -730,7 +735,7 @@ const ChatHistory: FC = () => {
                 )
                   return;
                 setPagination(state);
-                updatePageSize.mutate({page_results: state.pageSize});
+                updatePageSize.mutate({ page_results: state.pageSize });
                 getAllEndedChats.mutate({
                   startDate: format(new Date(startDate), 'yyyy-MM-dd'),
                   endDate: format(new Date(endDate), 'yyyy-MM-dd'),
