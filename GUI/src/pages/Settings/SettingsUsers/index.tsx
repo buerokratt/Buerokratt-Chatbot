@@ -36,16 +36,15 @@ const SettingsUsers: FC = () => {
   const [usersList, setUsersList] = useState<User[] | null>(null);
   const [totalPages, setTotalPages] = useState<number>(1);
 
-  const getUsers = (
-    pagination: PaginationState,
-    sorting: SortingState,
-    columnFilters: ColumnFiltersState,
-    setTablePagination: boolean = false
-  ) => {
-    const sort =
-      sorting.length === 0
-        ? 'name asc'
-        : sorting[0].id + ' ' + (sorting[0].desc ? 'desc' : 'asc');
+  const getUsers = (pagination: PaginationState, sorting: SortingState, columnFilters: ColumnFiltersState, setTablePagination: boolean = false) => {
+      let sort = 'name asc';
+      if(sorting.length > 0) {
+          if(sorting[0].id === t('settings.users.role')) {
+              sort = `Role ${sorting[0].desc ? 'desc' : 'asc'}`
+          } else {
+          sort = sorting[0].id + ' ' + (sorting[0].desc ? 'desc' : 'asc')
+          }
+      }
     const searchfilters = checkFilters(columnFilters);
     apiDev
       .post(`accounts/customer-support-agents`, {
@@ -58,6 +57,7 @@ const SettingsUsers: FC = () => {
         search_csa_title: searchfilters.search_csa_title,
         search_csa_email: searchfilters.search_csa_email,
         search_authority: searchfilters.search_authority,
+        search_department: searchfilters.search_department,
       })
       .then((res: any) => {
         setUsersList(res?.data?.response ?? []);
@@ -195,6 +195,7 @@ const SettingsUsers: FC = () => {
       search_csa_title: '',
       search_csa_email: '',
       search_authority: '',
+      search_department: '',
     };
     for (const filter of state) {
       switch (filter.id) {
@@ -215,6 +216,9 @@ const SettingsUsers: FC = () => {
           break;
         case 'Role':
           searchfilters.search_authority = (filter.value as string) ?? '';
+          break;
+        case 'department':
+          searchfilters.search_department = (filter.value as string) ?? '';
           break;
         default:
           break;
@@ -300,6 +304,9 @@ const SettingsUsers: FC = () => {
       }),
       columnHelper.accessor('csaEmail', {
         header: t('settings.users.email') ?? '',
+      }),
+      columnHelper.accessor('department', {
+        header: t('settings.users.department') ?? '',
       }),
       columnHelper.display({
         id: 'edit',

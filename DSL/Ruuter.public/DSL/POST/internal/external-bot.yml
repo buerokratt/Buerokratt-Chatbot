@@ -181,7 +181,7 @@ assign_back_office_event:
   assign:
     correct_value:
       - recipient_id: ${sender}
-        text: "Kahjuks ei oska ma hetkel Teie küsimusele vastata. Kas soovite, et suunan teie küsimuse nõustajale ?"
+        text: "Kahjuks ei oska ma hetkel teie küsimusele vastata. Kas soovite, et suunan küsimuse nõustajale?"
         context: ${test.response.body.choices[0].message.context}
     event: "ask_to_forward_to_csa"
   next: format_messages

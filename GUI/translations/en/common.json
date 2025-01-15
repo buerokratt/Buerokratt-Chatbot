@@ -306,6 +306,7 @@
       "displayName": "Display Name",
       "userTitle": "User title",
       "email": "E-mail",
+      "department": "Department",
       "addUser": "Add user",
       "editUser": "Edit user",
       "deleteUser": "Delete user",

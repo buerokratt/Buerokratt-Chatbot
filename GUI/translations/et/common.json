@@ -306,6 +306,7 @@
       "displayName": "Kuvatav nimi",
       "userTitle": "Tiitel",
       "email": "E-post",
+      "department": "Osakond",
       "addUser": "Lisa kasutaja",
       "editUser": "Muuda kasutajat",
       "deleteUser": "Kustuta kasutaja",
