@@ -96,6 +96,7 @@ services:
     environment:
       - PORT=3000
       - CONTENT_FOLDER=/data
+      - RATE_LIMIT=5000
     volumes:
       - ./DSL:/data
       - ./DSL/DMapper/hbs:/workspace/app/views/chat-bot
