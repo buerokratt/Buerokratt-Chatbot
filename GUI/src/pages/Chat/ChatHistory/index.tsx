@@ -628,6 +628,7 @@ const ChatHistory: FC = () => {
                         getAllEndedChats.mutate({
                           startDate: start,
                           endDate: format(new Date(endDate), 'yyyy-MM-dd'),
+                          customerSupportIds: passedCustomerSupportIds,
                           pagination,
                           sorting,
                           search,
@@ -659,6 +660,7 @@ const ChatHistory: FC = () => {
                         getAllEndedChats.mutate({
                           startDate: format(new Date(startDate), 'yyyy-MM-dd'),
                           endDate: end,
+                          customerSupportIds: passedCustomerSupportIds,
                           pagination,
                           sorting,
                           search,
@@ -734,6 +736,7 @@ const ChatHistory: FC = () => {
                 getAllEndedChats.mutate({
                   startDate: format(new Date(startDate), 'yyyy-MM-dd'),
                   endDate: format(new Date(endDate), 'yyyy-MM-dd'),
+                  customerSupportIds: passedCustomerSupportIds,
                   pagination: state,
                   sorting,
                   search,
@@ -744,6 +747,7 @@ const ChatHistory: FC = () => {
                 getAllEndedChats.mutate({
                   startDate: format(new Date(startDate), 'yyyy-MM-dd'),
                   endDate: format(new Date(endDate), 'yyyy-MM-dd'),
+                  customerSupportIds: passedCustomerSupportIds,
                   pagination,
                   sorting: state,
                   search,

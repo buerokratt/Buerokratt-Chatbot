@@ -1,4 +1,4 @@
-import React, {CSSProperties, FC, ReactNode, useId} from 'react';
+import React, { CSSProperties, FC, ReactNode, useId } from 'react';
 import {
   ColumnDef,
   useReactTable,
@@ -13,13 +13,11 @@ import {
   PaginationState,
   TableMeta,
   Row,
-  RowData, ColumnFiltersState,
+  RowData,
+  ColumnFiltersState,
   ColumnPinningState,
 } from '@tanstack/react-table';
-import {
-  RankingInfo,
-  rankItem,
-} from '@tanstack/match-sorter-utils';
+import { RankingInfo, rankItem } from '@tanstack/match-sorter-utils';
 import {
   MdUnfoldMore,
   MdExpandMore,
@@ -116,7 +114,7 @@ const DataTable: FC<DataTableProps> = ({
   disableHead,
   pagesCount,
   meta,
-  selectedRow
+  selectedRow,
 }) => {
   const id = useId();
   const { t } = useTranslation();
@@ -182,6 +180,9 @@ const DataTable: FC<DataTableProps> = ({
     return pages;
   };
   const pageIndexes = getShownPageIndexes();
+
+  const searchParamsWithoutPage = new URLSearchParams(searchParams);
+  searchParamsWithoutPage.delete('page');
 
   return (
     <>
@@ -257,9 +258,9 @@ const DataTable: FC<DataTableProps> = ({
             {tableBodyPrefix}
             {table.getRowModel().rows.map((row) => (
               <tr
-                  key={row.id}
-                  style={table.options.meta?.getRowStyles(row)}
-                  className={selectedRow?.(row) ? 'highlighted' : 'default'}
+                key={row.id}
+                style={table.options.meta?.getRowStyles(row)}
+                className={selectedRow?.(row) ? 'highlighted' : 'default'}
               >
                 {row.getVisibleCells().map((cell) => (
                   <td
@@ -317,7 +318,7 @@ const DataTable: FC<DataTableProps> = ({
                     <>
                       <li key={`${id}-0`}>
                         <Link
-                          to={`?page=1`}
+                          to={`?page=1&${searchParamsWithoutPage.toString()}`}
                           onClick={() => {
                             table.setPageIndex(0);
                             setSearchParams((params) => {
@@ -344,7 +345,7 @@ const DataTable: FC<DataTableProps> = ({
                       })}
                     >
                       <Link
-                        to={`?page=${index + 1}`}
+                        to={`?page=${index + 1}&${searchParamsWithoutPage.toString()}`}
                         onClick={() => table.setPageIndex(index)}
                         aria-label={t('global.gotoPage') + index}
                         aria-current={
@@ -362,7 +363,7 @@ const DataTable: FC<DataTableProps> = ({
                         table.getPageCount() - 2 && <li>...</li>}
                       <li key={`${id}-${table.getPageCount() - 1}`}>
                         <Link
-                          to={`?page=${table.getPageCount()}`}
+                          to={`?page=${table.getPageCount()}&${searchParamsWithoutPage.toString()}`}
                           onClick={() => {
                             table.setPageIndex(table.getPageCount() - 1);
                             setSearchParams((params) => {
