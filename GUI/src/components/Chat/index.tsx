@@ -493,399 +493,407 @@ const Chat: FC<ChatProps> = ({
             userInfo?.authorities.includes('ROLE_ADMINISTRATOR'));
 
     return (
-        <div className="active-chat">
-            <div className="active-chat__body">
-                <div className="active-chat__header">
-                    <Track direction="vertical" gap={8} align="left">
-                        <p style={{fontSize: 14, lineHeight: '1.5', color: '#4D4F5D'}}>
-                            {t('chat.active.startedAt', {
-                                date: format(new Date(chat.created), 'dd. MMMM Y HH:mm:ss', {
-                                    locale: et,
-                                }),
-                            })}
-                        </p>
-                        <h3>{endUserFullName}</h3>
-                    </Track>
+      <div className="active-chat">
+        <div className="active-chat__body">
+          <div className="active-chat__header">
+            <Track direction="vertical" gap={8} align="left">
+              <p style={{ fontSize: 14, lineHeight: '1.5', color: '#4D4F5D' }}>
+                {t('chat.active.startedAt', {
+                  date: format(new Date(chat.created), 'dd. MMMM Y HH:mm:ss', {
+                    locale: et,
+                  }),
+                })}
+              </p>
+              <h3>{endUserFullName}</h3>
+            </Track>
+          </div>
+
+          <div className="active-chat__group-wrapper">
+            {messageGroups?.map((group, index) => (
+              <div
+                className={clsx([
+                  'active-chat__group',
+                  `active-chat__group--${group.type}`,
+                ])}
+                key={`${group.type}-${index}`}
+              >
+                {group.type === 'event' ? (
+                  <ChatEvent message={group.messages[0]} />
+                ) : (
+                  <>
+                    <div className="active-chat__group-initials">
+                      {group.type === 'buerokratt' ||
+                      group.type === 'chatbot' ? (
+                        <BykLogoWhite height={24} />
+                      ) : (
+                        <>
+                          {group.name
+                            .split(' ')
+                            .map((n) => n[0])
+                            .join('')
+                            .toUpperCase()}
+                        </>
+                      )}
+                    </div>
+                    <div className="active-chat__group-name">
+                      {group.name}
+                      {group.title.length > 0 && (
+                        <div className="title">{group.title}</div>
+                      )}
+                    </div>
+
+                    <div className="active-chat__messages">
+                      {group.messages.map((message, i) => (
+                        <ChatMessage
+                          message={message}
+                          readStatus={messageReadStatusRef}
+                          key={`${message.id ?? ''}-${i}`}
+                          onSelect={(message) => {
+                            // To be added: message selection logic
+                            console.log(message);
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            ))}
+            {/* Preview commented Out as requested by clients in task -1024- */}
+            {previewTypingMessage && (
+              <div className={clsx(['active-chat__group'])} key={`group`}>
+                <div className="active-chat__group-initials">
+                  {<BykLogoWhite height={24} />}
                 </div>
-
-                <div className="active-chat__group-wrapper">
-                    {messageGroups?.map((group, index) => (
-                        <div
-                            className={clsx([
-                                'active-chat__group',
-                                `active-chat__group--${group.type}`,
-                            ])}
-                            key={`${group.type}-${index}`}
-                        >
-                            {group.type === 'event' ? (
-                                <ChatEvent message={group.messages[0]}/>
-                            ) : (
-                                <>
-                                    <div className="active-chat__group-initials">
-                                        {group.type === 'buerokratt' || group.type === 'chatbot' ? (
-                                            <BykLogoWhite height={24}/>
-                                        ) : (
-                                            <>
-                                                {group.name
-                                                    .split(' ')
-                                                    .map((n) => n[0])
-                                                    .join('')
-                                                    .toUpperCase()}
-                                            </>
-                                        )}
-                                    </div>
-                                    <div className="active-chat__group-name">
-                                        {group.name}
-                                        {
-                                            group.title.length > 0 && (
-                                                <div className="title">{group.title}</div>
-                                            )
-                                        }
-                                    </div>
-
-                                    <div className="active-chat__messages">
-                                        {group.messages.map((message, i) => (
-                                            <ChatMessage
-                                                message={message}
-                                                readStatus={messageReadStatusRef}
-                                                key={`${message.id ?? ''}-${i}`}
-                                                onSelect={(message) => {
-                                                    // To be added: message selection logic
-                                                    console.log(message);
-                                                }}
-                                            />
-                                        ))}
-                                    </div>
-                                </>
-                            )}
-                        </div>
-                    ))}
-                    {/* Preview commented Out as requested by clients in task -1024- */}
-                    {previewTypingMessage && (
-                        <div className={clsx(['active-chat__group'])} key={`group`}>
-                            <div className="active-chat__group-initials">
-                                {<BykLogoWhite height={24}/>}
-                            </div>
-                            <div className="active-chat__group-name">{t('chat.userTyping')}</div>
-                            <div className="active-chat__messages">
-                                <PreviewMessage
-                                    key={`preview-message`}
-                                    preview={previewTypingMessage ?? ''}
-                                />
-                            </div>
-                        </div>
-                    )}
-
-                    <div id="anchor" ref={chatRef}></div>
+                <div className="active-chat__group-name">
+                  {t('chat.userTyping')}
                 </div>
-
-                {chat.customerSupportId == userInfo?.idCode &&
-                    chat.status != CHAT_STATUS.IDLE && (
-                        <div className="active-chat__toolbar">
-                            <Track>
-                                <ChatTextArea
-                                    name="message"
-                                    label={t('')}
-                                    id="chatArea"
-                                    placeholder={t('chat.reply') + '...'}
-                                    minRows={1}
-                                    maxRows={8}
-                                    value={responseText}
-                                    onSubmit={(e) => handleResponseTextSend()}
-                                    maxLength={CHAT_INPUT_LENGTH}
-                                    onChange={(e) => setResponseText(e.target.value)}
-                                />
-                                <div className="active-chat__toolbar-actions">
-                                    <Button
-                                        id="myButton"
-                                        appearance="primary"
-                                        onClick={handleResponseTextSend}
-                                    >
-                                        <Icon
-                                            icon={<MdOutlineSend fontSize={18}/>}
-                                            size="medium"
-                                        />
-                                        <input
-                                            type="file"
-                                            ref={hiddenFileInputRef}
-                                            onChange={handleFileChange}
-                                            style={{display: 'none'}}
-                                        />
-                                    </Button>
-                                    {isHiddenFeaturesEnabled && (
-                                        <Button appearance="secondary" onClick={handleUploadClick}>
-                                            <Icon
-                                                icon={<MdOutlineAttachFile fontSize={18}/>}
-                                                size="medium"
-                                            />
-                                        </Button>
-                                    )}
-                                </div>
-                            </Track>
-                        </div>
-                    )}
-
-                {takeOverCondition &&
-                    chatCsaActive === true &&
-                    chat.status != CHAT_STATUS.IDLE && (
-                        <div className="active-chat__toolbar">
-                            <Track justify="center">
-                                <div className="active-chat__toolbar-actions">
-                                    <Button
-                                        appearance="primary"
-                                        style={{
-                                            backgroundColor: '#25599E',
-                                            color: '#FFFFFF',
-                                            borderRadius: '50px',
-                                            paddingLeft: '40px',
-                                            paddingRight: '40px',
-                                        }}
-                                        onClick={() => takeOverChatMutation.mutate()}
-                                    >
-                                        {t('chat.active.takeOver')}
-                                    </Button>
-                                </div>
-                            </Track>
-                        </div>
-                    )}
-
-                {chat.status === CHAT_STATUS.IDLE &&
-                    (chat.customerSupportId === 'chatbot' ||
-                        chat.customerSupportId != userInfo?.idCode) && (
-                        <div className="active-chat__toolbar">
-                            <Track justify="center">
-                                <div className="active-chat__toolbar-actions">
-                                    <Button
-                                        appearance="primary"
-                                        style={{
-                                            backgroundColor: '#25599E',
-                                            color: '#FFFFFF',
-                                            borderRadius: '50px',
-                                            paddingLeft: '40px',
-                                            paddingRight: '40px',
-                                        }}
-                                        onClick={() => assignPendingChatMutation.mutate()}
-                                    >
-                                        {t('chat.active.takeOver')}
-                                    </Button>
-                                </div>
-                            </Track>
-                        </div>
-                    )}
-
-                {chat.status === CHAT_STATUS.IDLE &&
-                    chat.customerSupportId != 'chatbot' &&
-                    chat.customerSupportId === userInfo?.idCode && (
-                        <div className="active-chat__toolbar">
-                            <Track justify="center">
-                                <div className="active-chat__toolbar-actions">
-                                    <Button
-                                        appearance="error"
-                                        style={{
-                                            borderRadius: '50px',
-                                            paddingLeft: '40px',
-                                            paddingRight: '40px',
-                                        }}
-                                        onClick={() => endPendingChat.mutate('user-not-reached')}
-                                    >
-                                        {t('chat.active.couldNotReachUser')}
-                                    </Button>
-                                    <Button
-                                        appearance="success"
-                                        style={{
-                                            borderRadius: '50px',
-                                            paddingLeft: '40px',
-                                            paddingRight: '40px',
-                                        }}
-                                        onClick={() => endPendingChat.mutate('user-reached')}
-                                    >
-                                        {t('chat.active.ContactedUser')}
-                                    </Button>
-                                </div>
-                            </Track>
-                        </div>
-                    )}
-            </div>
-            <div className="active-chat__side">
-                {(chat.customerSupportId === '' ||
-                        chat.customerSupportId === userInfo?.idCode) &&
-                    chat.status != CHAT_STATUS.IDLE && (
-                        <div className="active-chat__side-actions">
-                            <Button appearance="success" onClick={chatEnd()}>
-                                {t('chat.active.endChat')}
-                            </Button>
-                            <Button
-                                appearance="secondary"
-                                disabled={
-                                    chat.customerSupportId != userInfo?.idCode ||
-                                    chat.endUserId != ''
-                                }
-                                onClick={() =>
-                                    handleChatEvent(CHAT_EVENTS.REQUESTED_AUTHENTICATION)
-                                }
-                            >
-                                {t('chat.active.askAuthentication')}
-                            </Button>
-                            <Button
-                                appearance="secondary"
-                                disabled={chat.customerSupportId != userInfo?.idCode}
-                                onClick={() => handleChatEvent(CHAT_EVENTS.CONTACT_INFORMATION)}
-                            >
-                                {t('chat.active.askForContact')}
-                            </Button>
-                            <div style={{position: 'relative', display: 'inline-block'}}>
-                                <Button
-                                    appearance="secondary"
-                                    style={{width: '100%'}}
-                                    disabledWithoutStyle={disableAskForPermission}
-                                    disabled={chat.customerSupportId != userInfo?.idCode}
-                                    onClick={() => {
-                                        const message: Message | undefined = messagesList.findLast(
-                                            (e) => e.event === CHAT_EVENTS.ASK_PERMISSION
-                                        );
-                                        if (message != undefined) {
-                                            postMessageWithNewEventMutation.mutate(message);
-                                        } else {
-                                            handleChatEvent(CHAT_EVENTS.ASK_PERMISSION);
-                                        }
-                                    }}
-                                >
-                                    {t('chat.active.askPermission')}
-                                </Button>
-                                {latestPermissionMessageSeconds <=
-                                    askPermissionsTimeoutInSeconds && (
-                                        <LoaderOverlay
-                                            maxPercent={askPermissionsTimeoutInSeconds}
-                                            currentPercent={latestPermissionMessageSeconds}
-                                        />
-                                    )}
-                            </div>
-                            <Button
-                                appearance="secondary"
-                                disabled={!chatCsaActive}
-                                onClick={forwardToColleague()}
-                            >
-                                {t('chat.active.forwardToColleague')}
-                            </Button>
-                            {isHiddenFeaturesEnabled && (
-                                <Button
-                                    appearance="secondary"
-                                    disabled={!chatCsaActive}
-                                    onClick={forwardToEstablishment()}
-                                >
-                                    {t('chat.active.forwardToOrganization')}
-                                </Button>
-                            )}
-                            {isHiddenFeaturesEnabled && (
-                                <Button
-                                    appearance="secondary"
-                                    disabled={chat.customerSupportId != userInfo?.idCode}
-                                    onClick={sendToEmail()}
-                                >
-                                    {t('chat.active.sendToEmail')}
-                                </Button>
-                            )}
-                            {isHiddenFeaturesEnabled && (
-                                <Button
-                                    appearance="secondary"
-                                    disabled={chat.customerSupportId != userInfo?.idCode}
-                                    onClick={StartAService()}
-                                >
-                                    {t('chat.active.startService')}
-                                </Button>
-                            )}
-                        </div>
-                    )}
-                {chat.customerSupportId !== '' &&
-                    chat.customerSupportId !== userInfo?.idCode &&
-                    !chatCsaActive && (
-                        <div className="active-chat__side-actions">
-                            <Track gap={8} style={{marginBottom: 36}}>
-                                <Label type="warning">!</Label>
-                                <p className="csa-away">Nõustaja on eemal.</p>
-                            </Track>
-                            {userInfo?.authorities.some((authority) =>
-                                [
-                                    ROLES.ROLE_ADMINISTRATOR,
-                                    ROLES.ROLE_CUSTOMER_SUPPORT_AGENT,
-                                ].includes(authority as ROLES)
-                            ) && (
-                                <Button appearance="secondary" onClick={forwardToColleague()}>
-                                    {t('chat.active.forwardToColleague')}
-                                </Button>
-                            )}
-                        </div>
-                    )}
-                <div className="active-chat__side-meta">
-                    <div>
-                        <p>
-                            <strong>ID</strong>
-                        </p>
-                        <p>{chat.id}</p>
-                    </div>
-                    <div>
-                        <p>
-                            <strong>{t('chat.endUser')}</strong>
-                        </p>
-                        <p>{endUserFullName}</p>
-                    </div>
-                    {chat.endUserId && (
-                        <div>
-                            <p>
-                                <strong>{t('chat.endUserId')}</strong>
-                            </p>
-                            <p>{chat.endUserId ?? ''}</p>
-                        </div>
-                    )}
-                    {chat.endUserEmail && (
-                        <div>
-                            <p>
-                                <strong>{t('chat.endUserEmail')}</strong>
-                            </p>
-                            <p>{chat.endUserEmail}</p>
-                        </div>
-                    )}
-                    {chat.endUserPhone && (
-                        <div>
-                            <p>
-                                <strong>{t('chat.endUserPhoneNumber')}</strong>
-                            </p>
-                            <p>{chat.endUserPhone}</p>
-                        </div>
-                    )}
-                    {chat.customerSupportDisplayName && (
-                        <div>
-                            <p>
-                                <strong>{t('chat.csaName')}</strong>
-                            </p>
-                            <p>{chat.customerSupportDisplayName}</p>
-                        </div>
-                    )}
-                    <div>
-                        <p>
-                            <strong>{t('chat.startedAt')}</strong>
-                        </p>
-                        <p>
-                            {format(new Date(chat.created), 'dd. MMMM Y HH:mm:ss', {
-                                locale: et,
-                            }).toLowerCase()}
-                        </p>
-                    </div>
-                    <div>
-                        <p>
-                            <strong>{t('chat.device')}</strong>
-                        </p>
-                        <p>{chat.endUserOs}</p>
-                    </div>
-                    <div>
-                        <p>
-                            <strong>{t('chat.location')}</strong>
-                        </p>
-                        <p>{chat.endUserUrl}</p>
-                    </div>
+                <div className="active-chat__messages">
+                  <PreviewMessage
+                    key={`preview-message`}
+                    preview={previewTypingMessage ?? ''}
+                  />
                 </div>
-            </div>
+              </div>
+            )}
+
+            <div id="anchor" ref={chatRef}></div>
+          </div>
+
+          {chat.customerSupportId == userInfo?.idCode &&
+            chat.status != CHAT_STATUS.IDLE && (
+              <div className="active-chat__toolbar">
+                <Track>
+                  <ChatTextArea
+                    name="message"
+                    label={t('')}
+                    id="chatArea"
+                    placeholder={t('chat.reply') + '...'}
+                    minRows={1}
+                    maxRows={8}
+                    value={responseText}
+                    onSubmit={(e) => handleResponseTextSend()}
+                    maxLength={CHAT_INPUT_LENGTH}
+                    onChange={(e) => setResponseText(e.target.value)}
+                  />
+                  <div className="active-chat__toolbar-actions">
+                    <Button
+                      id="myButton"
+                      appearance="primary"
+                      onClick={handleResponseTextSend}
+                    >
+                      <Icon
+                        icon={<MdOutlineSend fontSize={18} />}
+                        size="medium"
+                      />
+                      <input
+                        type="file"
+                        ref={hiddenFileInputRef}
+                        onChange={handleFileChange}
+                        style={{ display: 'none' }}
+                      />
+                    </Button>
+                    {isHiddenFeaturesEnabled && (
+                      <Button
+                        appearance="secondary"
+                        onClick={handleUploadClick}
+                      >
+                        <Icon
+                          icon={<MdOutlineAttachFile fontSize={18} />}
+                          size="medium"
+                        />
+                      </Button>
+                    )}
+                  </div>
+                </Track>
+              </div>
+            )}
+
+          {takeOverCondition &&
+            chatCsaActive === true &&
+            chat.status != CHAT_STATUS.IDLE &&
+            chat.status != CHAT_STATUS.VALIDATING && (
+              <div className="active-chat__toolbar">
+                <Track justify="center">
+                  <div className="active-chat__toolbar-actions">
+                    <Button
+                      appearance="primary"
+                      style={{
+                        backgroundColor: '#25599E',
+                        color: '#FFFFFF',
+                        borderRadius: '50px',
+                        paddingLeft: '40px',
+                        paddingRight: '40px',
+                      }}
+                      onClick={() => takeOverChatMutation.mutate()}
+                    >
+                      {t('chat.active.takeOver')}
+                    </Button>
+                  </div>
+                </Track>
+              </div>
+            )}
+
+          {chat.status === CHAT_STATUS.IDLE &&
+            (chat.customerSupportId === 'chatbot' ||
+              chat.customerSupportId != userInfo?.idCode) && (
+              <div className="active-chat__toolbar">
+                <Track justify="center">
+                  <div className="active-chat__toolbar-actions">
+                    <Button
+                      appearance="primary"
+                      style={{
+                        backgroundColor: '#25599E',
+                        color: '#FFFFFF',
+                        borderRadius: '50px',
+                        paddingLeft: '40px',
+                        paddingRight: '40px',
+                      }}
+                      onClick={() => assignPendingChatMutation.mutate()}
+                    >
+                      {t('chat.active.takeOver')}
+                    </Button>
+                  </div>
+                </Track>
+              </div>
+            )}
+
+          {chat.status === CHAT_STATUS.IDLE &&
+            chat.customerSupportId != 'chatbot' &&
+            chat.customerSupportId === userInfo?.idCode && (
+              <div className="active-chat__toolbar">
+                <Track justify="center">
+                  <div className="active-chat__toolbar-actions">
+                    <Button
+                      appearance="error"
+                      style={{
+                        borderRadius: '50px',
+                        paddingLeft: '40px',
+                        paddingRight: '40px',
+                      }}
+                      onClick={() => endPendingChat.mutate('user-not-reached')}
+                    >
+                      {t('chat.active.couldNotReachUser')}
+                    </Button>
+                    <Button
+                      appearance="success"
+                      style={{
+                        borderRadius: '50px',
+                        paddingLeft: '40px',
+                        paddingRight: '40px',
+                      }}
+                      onClick={() => endPendingChat.mutate('user-reached')}
+                    >
+                      {t('chat.active.ContactedUser')}
+                    </Button>
+                  </div>
+                </Track>
+              </div>
+            )}
         </div>
+        <div className="active-chat__side">
+          {(chat.customerSupportId === '' ||
+            chat.customerSupportId === userInfo?.idCode) &&
+            chat.status != CHAT_STATUS.IDLE && chat.status != CHAT_STATUS.VALIDATING && (
+              <div className="active-chat__side-actions">
+                <Button appearance="success" onClick={chatEnd()}>
+                  {t('chat.active.endChat')}
+                </Button>
+                <Button
+                  appearance="secondary"
+                  disabled={
+                    chat.customerSupportId != userInfo?.idCode ||
+                    chat.endUserId != ''
+                  }
+                  onClick={() =>
+                    handleChatEvent(CHAT_EVENTS.REQUESTED_AUTHENTICATION)
+                  }
+                >
+                  {t('chat.active.askAuthentication')}
+                </Button>
+                <Button
+                  appearance="secondary"
+                  disabled={chat.customerSupportId != userInfo?.idCode}
+                  onClick={() =>
+                    handleChatEvent(CHAT_EVENTS.CONTACT_INFORMATION)
+                  }
+                >
+                  {t('chat.active.askForContact')}
+                </Button>
+                <div style={{ position: 'relative', display: 'inline-block' }}>
+                  <Button
+                    appearance="secondary"
+                    style={{ width: '100%' }}
+                    disabledWithoutStyle={disableAskForPermission}
+                    disabled={chat.customerSupportId != userInfo?.idCode}
+                    onClick={() => {
+                      const message: Message | undefined =
+                        messagesList.findLast(
+                          (e) => e.event === CHAT_EVENTS.ASK_PERMISSION
+                        );
+                      if (message != undefined) {
+                        postMessageWithNewEventMutation.mutate(message);
+                      } else {
+                        handleChatEvent(CHAT_EVENTS.ASK_PERMISSION);
+                      }
+                    }}
+                  >
+                    {t('chat.active.askPermission')}
+                  </Button>
+                  {latestPermissionMessageSeconds <=
+                    askPermissionsTimeoutInSeconds && (
+                    <LoaderOverlay
+                      maxPercent={askPermissionsTimeoutInSeconds}
+                      currentPercent={latestPermissionMessageSeconds}
+                    />
+                  )}
+                </div>
+                <Button
+                  appearance="secondary"
+                  disabled={!chatCsaActive}
+                  onClick={forwardToColleague()}
+                >
+                  {t('chat.active.forwardToColleague')}
+                </Button>
+                {isHiddenFeaturesEnabled && (
+                  <Button
+                    appearance="secondary"
+                    disabled={!chatCsaActive}
+                    onClick={forwardToEstablishment()}
+                  >
+                    {t('chat.active.forwardToOrganization')}
+                  </Button>
+                )}
+                {isHiddenFeaturesEnabled && (
+                  <Button
+                    appearance="secondary"
+                    disabled={chat.customerSupportId != userInfo?.idCode}
+                    onClick={sendToEmail()}
+                  >
+                    {t('chat.active.sendToEmail')}
+                  </Button>
+                )}
+                {isHiddenFeaturesEnabled && (
+                  <Button
+                    appearance="secondary"
+                    disabled={chat.customerSupportId != userInfo?.idCode}
+                    onClick={StartAService()}
+                  >
+                    {t('chat.active.startService')}
+                  </Button>
+                )}
+              </div>
+            )}
+          {chat.customerSupportId !== '' &&
+            chat.customerSupportId !== userInfo?.idCode &&
+            !chatCsaActive && (
+              <div className="active-chat__side-actions">
+                <Track gap={8} style={{ marginBottom: 36 }}>
+                  <Label type="warning">!</Label>
+                  <p className="csa-away">Nõustaja on eemal.</p>
+                </Track>
+                {userInfo?.authorities.some((authority) =>
+                  [
+                    ROLES.ROLE_ADMINISTRATOR,
+                    ROLES.ROLE_CUSTOMER_SUPPORT_AGENT,
+                  ].includes(authority as ROLES)
+                ) && (
+                  <Button appearance="secondary" onClick={forwardToColleague()}>
+                    {t('chat.active.forwardToColleague')}
+                  </Button>
+                )}
+              </div>
+            )}
+          <div className="active-chat__side-meta">
+            <div>
+              <p>
+                <strong>ID</strong>
+              </p>
+              <p>{chat.id}</p>
+            </div>
+            <div>
+              <p>
+                <strong>{t('chat.endUser')}</strong>
+              </p>
+              <p>{endUserFullName}</p>
+            </div>
+            {chat.endUserId && (
+              <div>
+                <p>
+                  <strong>{t('chat.endUserId')}</strong>
+                </p>
+                <p>{chat.endUserId ?? ''}</p>
+              </div>
+            )}
+            {chat.endUserEmail && (
+              <div>
+                <p>
+                  <strong>{t('chat.endUserEmail')}</strong>
+                </p>
+                <p>{chat.endUserEmail}</p>
+              </div>
+            )}
+            {chat.endUserPhone && (
+              <div>
+                <p>
+                  <strong>{t('chat.endUserPhoneNumber')}</strong>
+                </p>
+                <p>{chat.endUserPhone}</p>
+              </div>
+            )}
+            {chat.customerSupportDisplayName && (
+              <div>
+                <p>
+                  <strong>{t('chat.csaName')}</strong>
+                </p>
+                <p>{chat.customerSupportDisplayName}</p>
+              </div>
+            )}
+            <div>
+              <p>
+                <strong>{t('chat.startedAt')}</strong>
+              </p>
+              <p>
+                {format(new Date(chat.created), 'dd. MMMM Y HH:mm:ss', {
+                  locale: et,
+                }).toLowerCase()}
+              </p>
+            </div>
+            <div>
+              <p>
+                <strong>{t('chat.device')}</strong>
+              </p>
+              <p>{chat.endUserOs}</p>
+            </div>
+            <div>
+              <p>
+                <strong>{t('chat.location')}</strong>
+              </p>
+              <p>{chat.endUserUrl}</p>
+            </div>
+          </div>
+        </div>
+      </div>
     );
 
     function chatEnd() {
