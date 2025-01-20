@@ -10,6 +10,10 @@ import './Typing.scss';
 import { parseButtons, parseOptions } from 'utils/parse-utils';
 import ButtonMessage from 'components/ButtonMessage';
 import OptionMessage from 'components/OptionMessage';
+import Track from 'components/Track';
+import Icon from 'components/Icon';
+import { HiOutlinePencil } from 'react-icons/hi';
+import Button from 'components/Button';
 
 type ChatMessageProps = {
   message: Message;
@@ -26,7 +30,7 @@ const ChatMessage: FC<ChatMessageProps> = ({
 }) => {
   const { t } = useTranslation();
   const [selected, setSelected] = useState(false);
-  
+
   const buttons = useMemo(() => parseButtons(message), [message.buttons]);
   const options = useMemo(() => parseOptions(message), [message.options]);
 
@@ -49,8 +53,28 @@ const ChatMessage: FC<ChatMessageProps> = ({
                 onSelect(message);
               }}
             >
-              <Markdownify message={message.content ?? ''} />
-              {!message.content && options.length > 0 && 'ok'}
+              <Track direction="vertical">
+                <Markdownify message={message.content ?? ''} />
+                {!message.content && options.length > 0 && 'ok'}
+                {message.event === CHAT_EVENTS.WAITING_VALIDATION && (
+                  <button
+                    style={{
+                      color: 'white',
+                      alignSelf: 'end',
+                      paddingTop: '0.3rem',
+                    }}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      console.log('edit');
+                    }}
+                  >
+                    <Icon
+                      icon={<HiOutlinePencil fontSize={18} />}
+                      size="medium"
+                    />
+                  </button>
+                )}
+              </Track>
             </button>
             <time
               dateTime={message.authorTimestamp}

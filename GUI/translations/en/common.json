@@ -262,6 +262,7 @@
       "messageChanged": "Message changed successfully",
       "messageApproved": "Message approved successfully",
       "messageChangeFailed": "Message change failed",
+      "confirmAnswer": "Confirm Answer",
       "header": {
         "id": "Id",
         "chatId": "Chat Id",

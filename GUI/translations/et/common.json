@@ -262,6 +262,7 @@
       "messageChanged": "Sõnumi muutmine õnnestus",
       "messageApproved": "Sõnum kinnitati edukalt",
       "messageChangeFailed": "Sõnumi muutmine ebaõnnestus",
+      "confirmAnswer": "Kinnita vastus",
       "header": {
         "id": "Id",
         "chatId": "Vestluse ID",

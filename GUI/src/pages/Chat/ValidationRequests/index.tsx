@@ -1,53 +1,25 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  PaginationState,
-  SortingState,
-  createColumnHelper,
-} from '@tanstack/react-table';
 import * as Tabs from '@radix-ui/react-tabs';
-import { format } from 'date-fns';
-import { AiFillCheckCircle } from 'react-icons/ai';
-import {
-  Button,
-  Card,
-  Chat,
-  DataTable,
-  Dialog,
-  Drawer,
-  FormRadios,
-  HistoricalChat,
-  Icon,
-  Tooltip,
-  Track,
-} from 'components';
+import { Chat } from 'components';
 import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { Message } from 'types/message';
-import { useToast } from 'hooks/useToast';
-import { apiDev } from 'services/api';
-import { AxiosError } from 'axios';
+import { useQuery } from '@tanstack/react-query';
 import { userStore as useHeaderStore } from '@buerokratt-ria/header';
-import MessageContentView from './MessageContentView';
-import { MdOutlineRemoveRedEye } from 'react-icons/md';
-import { CHAT_EVENTS, CHAT_STATUS, Chat as ChatType } from 'types/chat';
 import './ValidationRequests.scss';
 import clsx from 'clsx';
-import { userInfo } from 'os';
-import useStore from 'store';
-import { v4 as uuidv4 } from 'uuid';
 import ChatTrigger from '../ChatActive/ChatTrigger';
-import ForwardToColleaugeModal from '../ForwardToColleaugeModal';
-import ForwardToEstablishmentModal from '../ForwardToEstablishmentModal';
-import { User } from 'types/user';
 
 const ValidationRequests: React.FC = () => {
   const { t } = useTranslation();
   const selectedChatId = useHeaderStore((state) => state.selectedChatId);
-  const selectedChat = useHeaderStore((state) => state.selectedValidationChat());
+  const selectedChat = useHeaderStore((state) =>
+    state.selectedValidationChat()
+  );
 
-  const loadValidationRequests = useHeaderStore((state) => state.loadValidationChats);
+  const loadValidationRequests = useHeaderStore(
+    (state) => state.loadValidationChats
+  );
 
   useEffect(() => {
     useHeaderStore.getState().loadValidationChats();
@@ -61,13 +33,9 @@ const ValidationRequests: React.FC = () => {
     queryKey: ['agents/admin/title-visibility', 'prod'],
   });
 
-  const validationChats = useHeaderStore((state) =>
-    state.getValidationChats()
-  );
+  const validationChats = useHeaderStore((state) => state.getValidationChats());
 
-  useEffect(() => {
-    console.log('selectedChatId', selectedChat);
-  }, [selectedChatId]);
+  useEffect(() => {}, [selectedChatId]);
 
   return (
     <Tabs.Root
