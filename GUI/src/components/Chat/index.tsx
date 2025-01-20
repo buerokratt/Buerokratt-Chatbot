@@ -409,7 +409,10 @@ const Chat: FC<ChatProps> = ({
           message.event === 'greeting'
         ) {
           lastGroup.messages.push({ ...message });
-        } else if (message.event === CHAT_EVENTS.WAITING_VALIDATION) {
+        } else if (
+          message.event === CHAT_EVENTS.WAITING_VALIDATION &&
+          chat.status === CHAT_STATUS.VALIDATING
+        ) {
           groupedMessages.push({
             name: 'Bürokratt',
             type: 'buerokratt',
@@ -442,7 +445,10 @@ const Chat: FC<ChatProps> = ({
           title: message.csaTitle ?? '',
           messages: [{ ...message }],
         });
-      } else if (message.event === CHAT_EVENTS.WAITING_VALIDATION) {
+      } else if (
+        message.event === CHAT_EVENTS.WAITING_VALIDATION &&
+        chat.status === CHAT_STATUS.VALIDATING
+      ) {
         groupedMessages.push({
           name: 'Bürokratt',
           type: 'buerokratt',
@@ -467,7 +473,6 @@ const Chat: FC<ChatProps> = ({
   }, [messageGroups, previewTypingMessage]);
 
   const handleResponseTextSend = () => {
-    console.log('?????????????');
     const newMessage: Message = {
       chatId: chat.id,
       authorRole: AUTHOR_ROLES.BACKOFFICE_USER,
@@ -482,10 +487,7 @@ const Chat: FC<ChatProps> = ({
       forwardedToCsa: chat.forwardedToCsa ?? '',
     };
 
-    console.log('response tet', responseText);
-
     if (responseText !== '') {
-      console.log('Mutate', newMessage, chat, userInfo);
       postMessageMutation.mutate(newMessage);
       setMessagesList((oldMessages) => [...oldMessages, newMessage]);
       setResponseText('');
@@ -493,7 +495,6 @@ const Chat: FC<ChatProps> = ({
   };
 
   const handleChatEvent = (event: string) => {
-    console.log('handling new event?', event);
     const newMessage: Message = {
       chatId: chat.id,
       authorRole: AUTHOR_ROLES.BACKOFFICE_USER,
@@ -509,8 +510,6 @@ const Chat: FC<ChatProps> = ({
       forwardedFromCsa: chat.forwardedFromCsa ?? '',
       forwardedToCsa: chat.forwardedToCsa ?? '',
     };
-
-    console.log('message data', chat, event);
 
     postEventMutation.mutate(newMessage);
     setMessagesList((oldMessages) => [...oldMessages, newMessage]);
@@ -583,7 +582,6 @@ const Chat: FC<ChatProps> = ({
                         key={`${message.id ?? ''}-${i}`}
                         onSelect={(message) => {
                           // To be added: message selection logic
-                          console.log(message);
                         }}
                       />
                     ))}
@@ -592,19 +590,6 @@ const Chat: FC<ChatProps> = ({
               )}
             </div>
           ))}
-          {chat.status === CHAT_STATUS.VALIDATING && (
-            <Button
-              appearance="success"
-              style={{
-                borderRadius: '50px',
-                paddingLeft: '40px',
-                paddingRight: '40px',
-              }}
-              onClick={() => {}}
-            >
-              {t('chat.validations.confirmAnswer')}
-            </Button>
-          )}
           {/* Preview commented Out as requested by clients in task -1024- */}
           {previewTypingMessage && (
             <div className={clsx(['active-chat__group'])} key={`group`}>
