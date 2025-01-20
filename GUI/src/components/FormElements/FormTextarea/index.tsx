@@ -76,6 +76,12 @@ const FormTextarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
                 if (onChange) onChange(e);
                 handleOnChange(e);
               }}
+              onFocus={(e) =>
+                e.currentTarget.setSelectionRange(
+                  e.currentTarget.value.length,
+                  e.currentTarget.value.length
+                )
+              }
             >
               {createRegexRenderer([
                 [
@@ -100,9 +106,9 @@ const FormTextarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           ) : (
             <TextareaAutosize
               id={id}
-              maxLength={maxLength}
+              maxLength={maxLength === -1 ? undefined : maxLength}
               minRows={minRows}
-              maxRows={maxRows}
+              maxRows={maxRows === -1 ? undefined : maxRows}
               ref={ref}
               defaultValue={defaultValue}
               aria-label={hideLabel ? label : undefined}
@@ -111,6 +117,12 @@ const FormTextarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
                 handleOnChange(e);
               }}
               {...rest}
+              onFocus={(e) =>
+                e.currentTarget.setSelectionRange(
+                  e.currentTarget.value.length,
+                  e.currentTarget.value.length
+                )
+              }
             />
           )}
           {showMaxLength && (

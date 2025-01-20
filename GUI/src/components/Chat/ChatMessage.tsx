@@ -97,22 +97,26 @@ const ChatMessage: FC<ChatMessageProps> = ({
               <Track direction="vertical">
                 {message.event === CHAT_EVENTS.WAITING_VALIDATION &&
                   isEditing && (
-                    <div style={{ width: '100%' }}>
-                      <FormTextarea
-                        name={''}
-                        label={''}
-                        minRows={1}
-                        style={{
-                          backgroundColor: 'transparent',
-                          border: 'none',
-                          width: '100%',
-                        }}
-                        defaultValue={content}
-                        onChange={(e) => {
-                          setInputContent(e.target.value);
-                        }}
-                      />
-                    </div>
+                    <FormTextarea
+                      name={''}
+                      label={''}
+                      minRows={1}
+                      maxRows={-1}
+                      maxLength={-1}
+                      style={{
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        width: '400px',
+                      }}
+                      defaultValue={content}
+                      onChange={(e) => {
+                        setInputContent(e.target.value);
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }}
+                      autoFocus
+                    />
                   )}
                 {!isEditing && <Markdownify message={content} />}
                 {!message.content && options.length > 0 && 'ok'}
@@ -228,7 +232,7 @@ const ChatMessage: FC<ChatMessageProps> = ({
           style={{
             borderRadius: '50px',
             marginTop: '5px',
-            marginLeft: '-29%',
+            marginLeft: '-55px',
             paddingLeft: '40px',
             paddingRight: '40px',
             display: 'absolute',
