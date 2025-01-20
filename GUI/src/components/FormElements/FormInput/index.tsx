@@ -8,11 +8,12 @@ type InputProps = PropsWithChildren<InputHTMLAttributes<HTMLInputElement>> & {
   name: string;
   hideLabel?: boolean;
   maxLength?: number;
+  className?: string;
 };
 
 const FieldInput = forwardRef<HTMLInputElement, InputProps>(
   (
-    { label, name, disabled, hideLabel, maxLength, children, ...rest },
+    { label, name, disabled, hideLabel, maxLength, className, children, ...rest },
     ref
   ) => {
     const id = useId();
@@ -20,7 +21,7 @@ const FieldInput = forwardRef<HTMLInputElement, InputProps>(
     const inputClasses = clsx('input', disabled && 'input--disabled');
 
     return (
-      <div className={inputClasses}>
+      <div className={`${inputClasses} ${className}`}>
         {label && !hideLabel && (
           <label htmlFor={id} className="input__label">
             {label}

@@ -166,7 +166,9 @@
       "commentAuthor": "Commenter",
       "commentAddedDate": "Comment added date",
       "statusAdder": "Status adder",
-      "statusAddedDate": "Status added date"
+      "statusAddedDate": "Status added date",
+      "chosenCsa": "Chosen csa(s)",
+      "chosenColumn": "Chosen column(s)"
     },
     "plainEvents": {
       "answered": "Answered",

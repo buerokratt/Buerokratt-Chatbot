@@ -2,6 +2,10 @@
 @import 'src/styles/tools/color';
 @import 'src/styles/settings/variables/typography';
 
+.input-wrapper {
+  width: 40%;
+}
+
 .card-drawer-container {
   display: flex;
   width: 100%;
