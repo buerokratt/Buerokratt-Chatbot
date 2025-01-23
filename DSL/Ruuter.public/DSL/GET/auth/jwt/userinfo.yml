@@ -20,7 +20,7 @@ get_user_info:
    headers:
     cookie: ${incoming.headers.cookie}
    plaintext: 
-      "clientCustomJwtCookie"
+      "userJwt"
   result: res
 
 return_result:

@@ -152,14 +152,14 @@ blacklist_client_jwt:
     contentType: plaintext
     headers:
       cookie: ${incoming.headers.cookie}
-    plaintext: "clientCustomJwtCookie"
+    plaintext: "userJwt"
   result: client_blacklist_res
-  next: assign_client_cookie
+  next: assign_user_cookie
 
-assign_client_cookie:
+assign_user_cookie:
   assign:
-    clientCookie:
-      clientCustomJwtCookie: null
+    userCookie:
+      userJwt: null
       Domain: "[#DOMAIN]"
       Secure: true
       HttpOnly: true
@@ -183,8 +183,9 @@ remove_chat_id_from_queue_notification_node_if_existed:
   result: remove_chat_id_from_queue_notification_node_if_existed_res
 
 return_result:
-  headers:
-    Set-Cookie: ${chatCookie}
+  headers: 
+    Set-Cookie: ${chatCookie},
+    Set-Cookie2: ${userCookie}
   return: "Ended Chat Successfully"
   next: end
 
