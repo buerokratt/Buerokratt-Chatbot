@@ -1,11 +1,16 @@
-import {FC, useEffect, useMemo, useState} from 'react';
-import {useTranslation} from 'react-i18next';
-import {useMutation} from '@tanstack/react-query';
-import {ColumnPinningState, createColumnHelper, PaginationState, SortingState,} from '@tanstack/react-table';
-import {format} from 'date-fns';
-import {AxiosError} from 'axios';
+import { FC, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useMutation } from '@tanstack/react-query';
+import {
+  ColumnPinningState,
+  createColumnHelper,
+  PaginationState,
+  SortingState,
+} from '@tanstack/react-table';
+import { format } from 'date-fns';
+import { AxiosError } from 'axios';
 import './History.scss';
-import {MdOutlineRemoveRedEye} from 'react-icons/md';
+import { MdOutlineRemoveRedEye } from 'react-icons/md';
 
 import {
   Button,
@@ -22,19 +27,22 @@ import {
   Track,
 } from 'components';
 
-import {Chat as ChatType, CHAT_EVENTS, CHAT_STATUS} from 'types/chat';
-import {useToast} from 'hooks/useToast';
-import {apiDev} from 'services/api';
+import { Chat as ChatType, CHAT_EVENTS, CHAT_STATUS } from 'types/chat';
+import { useToast } from 'hooks/useToast';
+import { apiDev } from 'services/api';
 import useStore from 'store';
-import {Controller, useForm} from 'react-hook-form';
-import {getFromLocalStorage, setToLocalStorage,} from 'utils/local-storage-utils';
-import {CHAT_HISTORY_PREFERENCES_KEY} from 'constants/config';
-import {useLocation, useSearchParams} from 'react-router-dom';
-import {unifyDateFromat} from './unfiyDate';
+import { Controller, useForm } from 'react-hook-form';
+import {
+  getFromLocalStorage,
+  setToLocalStorage,
+} from 'utils/local-storage-utils';
+import { CHAT_HISTORY_PREFERENCES_KEY } from 'constants/config';
+import { useLocation, useSearchParams } from 'react-router-dom';
+import { unifyDateFromat } from './unfiyDate';
 import withAuthorization from 'hoc/with-authorization';
-import {ROLES} from 'utils/constants';
-import {et} from 'date-fns/locale';
-import {useDebouncedCallback} from 'use-debounce';
+import { ROLES } from 'utils/constants';
+import { et } from 'date-fns/locale';
+import { useDebouncedCallback } from 'use-debounce';
 
 const ChatHistory: FC = () => {
   const { t, i18n } = useTranslation();
@@ -127,10 +135,15 @@ const ChatHistory: FC = () => {
     setInitialLoad(false);
     try {
       const response = await apiDev.get('/accounts/get-page-preference', {
-        params: {user_id: userInfo?.idCode, page_name: window.location.pathname},
+        params: {
+          user_id: userInfo?.idCode,
+          page_name: window.location.pathname,
+        },
       });
       if (response.data.pageResults !== undefined) {
-        const updatedPagination = updatePagePreference(response.data.pageResults)
+        const updatedPagination = updatePagePreference(
+          response.data.pageResults
+        );
         getAllEndedChats.mutate({
           startDate: format(new Date(startDate), 'yyyy-MM-dd'),
           endDate: format(new Date(endDate), 'yyyy-MM-dd'),
@@ -145,13 +158,16 @@ const ChatHistory: FC = () => {
   };
 
   const updatePagePreference = (pageResults: number): PaginationState => {
-    const updatedPagination: PaginationState = {...pagination, pageSize: pageResults};
+    const updatedPagination: PaginationState = {
+      ...pagination,
+      pageSize: pageResults,
+    };
     setPagination(updatedPagination);
     return updatedPagination;
-  }
+  };
 
   useEffect(() => {
-    if(initialLoad) {
+    if (initialLoad) {
       fetchData();
     } else {
       getAllEndedChats.mutate({
@@ -170,15 +186,13 @@ const ChatHistory: FC = () => {
   }, []);
 
   const updatePageSize = useMutation({
-    mutationFn: (data: {
-      page_results: number;
-    }) => {
+    mutationFn: (data: { page_results: number }) => {
       return apiDev.post('accounts/update-page-preference', {
         user_id: userInfo?.idCode,
         page_name: window.location.pathname,
         page_results: data.page_results,
       });
-    }
+    },
   });
 
   const getAllEndedChats = useMutation({
@@ -375,9 +389,9 @@ const ChatHistory: FC = () => {
           onClick={() => copyValueToClipboard(props.getValue())}
           style={{ cursor: 'pointer' }}
         >
-          {props.getValue().length <= 30
+          {props.getValue().length <= 25
             ? props.getValue()
-            : `${props.getValue()?.slice(0, 30)}...`}
+            : `${props.getValue()?.slice(0, 25)}...`}
         </span>
       </Tooltip>
     );
