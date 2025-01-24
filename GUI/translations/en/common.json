@@ -333,8 +333,11 @@
     },
     "chat": {
       "chatActive": "Chatbot active",
+      "burokrattActive": "Bürokratt active",
       "showSupportName": "Show support name",
-      "showSupportTitle": "Show support title"
+      "showSupportTitle": "Show support title",
+      "showBurokrattConfirmation": "Do you want to make Bürokrat visible on the website?",
+      "hideBurokrattConfirmation": "Do you want to hide the Bureaucrat on the website?"
     },
     "emergencyNotices": {
       "title": "Emergency notices",
