@@ -1,0 +1,17 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'BOT-CONFIG'"
+  method: get
+  accepts: json
+  returns: json
+  namespace: backoffice
+
+getBotConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-bot-config"
+  result: res
+
+return_result:
+  return: ${res.response.body[0]}
