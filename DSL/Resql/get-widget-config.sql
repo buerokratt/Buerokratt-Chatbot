@@ -6,6 +6,7 @@ WHERE key IN (
    'widgetBubbleMessageText',
    'widgetColor',
    'isWidgetActive',
-   'widgetAnimation')
+   'widgetAnimation',
+   'is_burokratt_active')
   AND id IN (SELECT max(id) from configuration GROUP BY key)
   AND NOT deleted;
