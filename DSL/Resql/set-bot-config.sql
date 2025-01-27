@@ -5,7 +5,8 @@ WITH last_configuration AS (
      'is_bot_active',
      'is_burokratt_active',
      'is_csa_name_visible',
-     'is_csa_title_visible')
+     'is_csa_title_visible',
+     'is_edit_chat_visible')
     AND id IN (SELECT max(id) from configuration GROUP BY key)
     AND deleted = FALSE
 ), new_configuration as (
@@ -15,7 +16,8 @@ WITH last_configuration AS (
         ('is_bot_active', :is_bot_active),
         ('is_burokratt_active', :is_burokratt_active),
         ('is_csa_name_visible', :is_csa_name_visible),
-        ('is_csa_title_visible', :is_csa_title_visible)
+        ('is_csa_title_visible', :is_csa_title_visible),
+        ('is_edit_chat_visible', :is_edit_chat_visible)
    ) as new_values (key, value)
 )
 INSERT INTO configuration (key, value, created)

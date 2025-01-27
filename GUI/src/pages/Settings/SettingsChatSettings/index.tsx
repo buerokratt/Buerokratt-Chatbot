@@ -28,6 +28,9 @@ const SettingsChatSettings: FC = () => {
   const [isTitleVisible, setIsTitleVisible] = useState<boolean | undefined>(
     undefined
   );
+  const [isEditChatVisible, setIsEditChatVisible] = useState<
+    boolean | undefined
+  >(undefined);
   const queryClient = useQueryClient();
   const [burokrattConfirmationModal, setBurokrattConfirmationModal] = useState<
     boolean | null
@@ -42,6 +45,7 @@ const SettingsChatSettings: FC = () => {
       setCurrentIsBurokrattActive(res.isBurokrattActive === 'true');
       setIsNameVisible(res.isCsaNameVisible === 'true');
       setIsTitleVisible(res.isCsaTitleVisible === 'true');
+      setIsEditChatVisible(res.isEditChatVisible === 'true');
     },
   });
 
@@ -51,12 +55,14 @@ const SettingsChatSettings: FC = () => {
       is_burokratt_active: boolean;
       is_csa_name_visible: boolean;
       is_csa_title_visible: boolean;
+      is_edit_chat_visible: boolean;
     }) => {
       return apiDev.post(`configs/bot-config`, {
         isBotActive: data.is_bot_active.toString(),
         isBurokrattActive: data.is_burokratt_active.toString(),
         isCsaNameVisible: data.is_csa_name_visible.toString(),
         isCsaTitleVisible: data.is_csa_title_visible.toString(),
+        isEditChatVisible: data.is_edit_chat_visible.toString(),
       });
     },
     onSuccess: async () => {
@@ -88,6 +94,7 @@ const SettingsChatSettings: FC = () => {
       is_burokratt_active: isBurokrattActive ?? true,
       is_csa_name_visible: isNameVisible ?? true,
       is_csa_title_visible: isTitleVisible ?? true,
+      is_edit_chat_visible: isEditChatVisible ?? true,
     });
   };
 
@@ -143,6 +150,14 @@ const SettingsChatSettings: FC = () => {
               onCheckedChange={setIsTitleVisible}
             />
           )}
+          {isEditChatVisible != undefined && (
+            <Switch
+              name="is_edit_chat_visible"
+              label={t('settings.chat.editActiveChat')}
+              checked={isEditChatVisible}
+              onCheckedChange={setIsEditChatVisible}
+            />
+          )}
         </Track>
       </Card>
       {burokrattConfirmationModal && (
@@ -167,6 +182,7 @@ const SettingsChatSettings: FC = () => {
                     is_burokratt_active: isBurokrattActive ?? true,
                     is_csa_name_visible: isNameVisible ?? true,
                     is_csa_title_visible: isTitleVisible ?? true,
+                    is_edit_chat_visible: isEditChatVisible ?? true,
                   });
                 }}
               >

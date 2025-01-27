@@ -20,6 +20,9 @@ declaration:
       - field: isCsaTitleVisible
         type: string
         description: "Body field 'isCsaTitleVisible'"
+      - field: isEditChatVisible
+        type: string
+        description: "Body field 'isEditChatVisible'"
 
 extractRequestData:
   assign:
@@ -27,6 +30,7 @@ extractRequestData:
     is_burokratt_active: ${incoming.body.isBurokrattActive}
     is_csa_name_visible: ${incoming.body.isCsaNameVisible}
     is_csa_title_visible: ${incoming.body.isCsaTitleVisible}
+    is_edit_chat_visible: ${incoming.body.isEditChatVisible}
 
 setBotConfig:
   call: http.post
@@ -37,6 +41,7 @@ setBotConfig:
       is_burokratt_active: ${is_burokratt_active}
       is_csa_name_visible: ${is_csa_name_visible}
       is_csa_title_visible: ${is_csa_title_visible}
+      is_edit_chat_visible: ${is_edit_chat_visible}
       created: ${new Date().toISOString()}
   result: set_bot_config_res
 

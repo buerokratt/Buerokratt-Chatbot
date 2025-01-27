@@ -1,7 +1,12 @@
 import { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { format } from 'date-fns';
 import clsx from 'clsx';
-import { MdCheck, MdClose, MdOutlineCheck } from 'react-icons/md';
+import {
+  MdCheck,
+  MdClose,
+  MdOutlineCreate,
+  MdOutlineCheck,
+} from 'react-icons/md';
 import { Message } from '../../types/message';
 import { CHAT_EVENTS, MessageStatus } from '../../types/chat';
 import Markdownify from './Markdownify';
@@ -23,18 +28,17 @@ import { AxiosError } from 'axios';
 type ChatMessageProps = {
   message: Message;
   onSelect: (message: Message) => void;
-  readStatus: {
-    current: MessageStatus;
-  };
+  selected: boolean;
+  editableMessage?: boolean;
 };
 
 const ChatMessage: FC<ChatMessageProps> = ({
   message,
   onSelect,
-  readStatus,
+  selected,
+  editableMessage,
 }) => {
   const { t } = useTranslation();
-  const [selected, setSelected] = useState(false);
 
   const buttons = useMemo(() => parseButtons(message), [message.buttons]);
   const options = useMemo(() => parseOptions(message), [message.options]);
@@ -89,12 +93,9 @@ const ChatMessage: FC<ChatMessageProps> = ({
             <button
               className={clsx('active-chat__message-text')}
               ref={messageRef}
-              onClick={() => {
-                setSelected(!selected);
-                onSelect(message);
-              }}
+              onClick={() => onSelect(message)}
             >
-              <Track direction="vertical">
+              <Track direction={isEditing ? 'vertical' : 'horizontal'}>
                 {message.event === CHAT_EVENTS.WAITING_VALIDATION &&
                   isEditing && (
                     <FormTextarea
@@ -120,6 +121,9 @@ const ChatMessage: FC<ChatMessageProps> = ({
                   )}
                 {!isEditing && <Markdownify message={content} />}
                 {!message.content && options.length > 0 && 'ok'}
+                {editableMessage && !isEditing && (
+                  <MdOutlineCreate className="active-chat__edit-icon" />
+                )}
                 {message.event === CHAT_EVENTS.WAITING_VALIDATION && (
                   <button
                     style={{
@@ -150,11 +154,11 @@ const ChatMessage: FC<ChatMessageProps> = ({
             >
               <div>
                 <time
-                  dateTime={message.authorTimestamp}
+                  dateTime={message.created}
                   className="active-chat__message-date"
                   style={{ alignSelf: 'center' }}
                 >
-                  {format(new Date(message.authorTimestamp), 'HH:mm:ss')}
+                  {format(new Date(message.created), 'HH:mm:ss')}
                 </time>
               </div>
               {message.event === CHAT_EVENTS.WAITING_VALIDATION &&
