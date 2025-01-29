@@ -101,15 +101,6 @@ const HistoricalChat: FC<ChatProps> = ({
     let groupedMessages: GroupedMessage[] = [];
     messagesList.forEach((message) => {
       const lastGroup = groupedMessages[groupedMessages.length - 1];
-      if (
-        lastGroup &&
-        lastGroup.type === AUTHOR_ROLES.BACKOFFICE_USER &&
-        lastGroup.messages.at(-1) &&
-        message.event === CHAT_EVENTS.READ
-      ) {
-        lastGroup.messages.push(message);
-        return;
-      }
       if (lastGroup?.type === message.authorRole) {
         if (
           !message.event ||
