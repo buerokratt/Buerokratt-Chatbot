@@ -254,12 +254,13 @@ const ChatHistory: FC = () => {
         roles: ['ROLE_CUSTOMER_SUPPORT_AGENT'],
       }),
     onSuccess: (res: any) => {
-      setCustomerSupportAgents(
-        res.data.response.map((item) => ({
+      setCustomerSupportAgents([
+        { label: 'Bürokratt', value: 'chatbot' },
+        ...res.data.response.map((item) => ({
           label: [item.firstName, item.lastName].join(' ').trim(),
           value: item.idCode,
-        }))
-      );
+        })),
+      ]);
     },
   });
 
@@ -476,8 +477,12 @@ const ChatHistory: FC = () => {
       }),
       columnHelper.accessor(
         (row) =>
-          `${row.customerSupportFirstName ?? ''} ${
-            row.customerSupportLastName ?? ''
+          `${
+            row.customerSupportId === 'chatbot'
+              ? row.customerSupportDisplayName
+              : row.customerSupportId
+                ? `${row.customerSupportFirstName ?? ''} ${row.customerSupportLastName ?? ''}`
+                : '-'
           }`,
         {
           id: `customerSupportFullName`,
