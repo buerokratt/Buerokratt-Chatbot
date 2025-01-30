@@ -99,10 +99,10 @@ const SettingsWelcomeMessage: FC = () => {
             label={t('settings.welcomeMessage.welcomeMessage')}
             minRows={4}
             maxLength={WELCOME_MESSAGE_LENGTH}
-            showMaxLength
+            showMaxLength={true}
             maxLengthBottom
             onChange={(e) => setWelcomeMessage(e.target.value)}
-            value={welcomeMessage}
+            defaultValue={welcomeMessage}
             name="label"
           />
         </Track>
