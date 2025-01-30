@@ -3,7 +3,13 @@ import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { et } from 'date-fns/locale';
 import clsx from 'clsx';
-import { MdOutlineAttachFile, MdOutlineSend } from 'react-icons/md';
+import {
+  MdClose,
+  MdDoneOutline,
+  MdOutlineAttachFile,
+  MdOutlineCreate,
+  MdOutlineSend,
+} from 'react-icons/md';
 import { Button, Icon, Label, Track } from 'components';
 import { ReactComponent as BykLogoWhite } from 'assets/logo-white.svg';
 import {
@@ -12,7 +18,7 @@ import {
   CHAT_EVENTS,
   CHAT_STATUS,
 } from 'types/chat';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { AttachmentTypes, Message } from 'types/message';
 import ChatMessage from './ChatMessage';
 import ChatEvent from '../ChatEvent';
@@ -31,6 +37,7 @@ import LoaderOverlay from './LoaderOverlay';
 import { useNewMessageSound } from 'hooks/useAudio';
 import './Chat.scss';
 import { useInterval } from 'usehooks-ts';
+import { BotConfig } from 'types/botConfig';
 
 type ChatProps = {
   chat: ChatType;
@@ -85,6 +92,9 @@ const Chat: FC<ChatProps> = ({
   const [previewTypingMessage, setPreviewTypingMessage] = useState<
     string | undefined
   >();
+  const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
+  const [isChatEditingAllowed, setIsChatEditingAllowed] =
+    useState<boolean>(false);
 
   const [newMessageEffect] = useNewMessageSound();
   const navigate = useNavigate();
@@ -254,9 +264,22 @@ const Chat: FC<ChatProps> = ({
   };
 
   const postMessageMutation = useMutation({
-    mutationFn: (message: Message) =>
-      apiDev.post('agents/chats/messages/insert', message),
-    onSuccess: () => {},
+    mutationFn: ({
+      message,
+      editing,
+    }: {
+      message: Message;
+      editing: boolean;
+    }) => {
+      if (editing) {
+        return apiDev.post('agents/chats/messages/edit', message);
+      } else {
+        return apiDev.post('agents/chats/messages/insert', message);
+      }
+    },
+    onSuccess: (res: any) => {
+      return res.data.response;
+    },
     onError: (error: AxiosError) => {
       toast.open({
         type: 'error',
@@ -472,7 +495,7 @@ const Chat: FC<ChatProps> = ({
     chatRef.current.scrollIntoView({ block: 'end', inline: 'end' });
   }, [messageGroups, previewTypingMessage]);
 
-  const handleResponseTextSend = () => {
+  const handleResponseTextSend = async (editMessage: boolean) => {
     const newMessage: Message = {
       chatId: chat.id,
       authorRole: AUTHOR_ROLES.BACKOFFICE_USER,
@@ -485,12 +508,30 @@ const Chat: FC<ChatProps> = ({
       forwardedByUser: chat.forwardedByUser ?? '',
       forwardedFromCsa: chat.forwardedFromCsa ?? '',
       forwardedToCsa: chat.forwardedToCsa ?? '',
+      ...(editMessage && {
+        originalBaseId: selectedMessage?.id,
+        originalCreated: selectedMessage?.created,
+      }),
     };
 
     if (responseText !== '') {
-      postMessageMutation.mutate(newMessage);
-      setMessagesList((oldMessages) => [...oldMessages, newMessage]);
+      const res = await postMessageMutation.mutateAsync({
+        message: newMessage,
+        editing: editMessage,
+      });
+      const message = { ...res.data.response, id: res.data.response.baseId };
+      if (selectedMessage) {
+        const index = messagesList.findIndex(
+          (m) => m.id === selectedMessage.id
+        );
+        const updatedMessages = [...messagesList];
+        updatedMessages[index] = message;
+        setMessagesList(updatedMessages);
+      } else {
+        setMessagesList((oldMessages) => [...oldMessages, message]);
+      }
       setResponseText('');
+      setSelectedMessage(null);
     }
   };
 
@@ -514,6 +555,23 @@ const Chat: FC<ChatProps> = ({
     postEventMutation.mutate(newMessage);
     setMessagesList((oldMessages) => [...oldMessages, newMessage]);
   };
+
+  const handleSelectMessage = (message: Message) => {
+    if (selectedMessage?.id === message.id) {
+      setSelectedMessage(null);
+      setResponseText('');
+    } else {
+      setSelectedMessage(message);
+      setResponseText(message.content);
+    }
+  };
+
+  useQuery<{ config: BotConfig }>({
+    queryKey: ['configs/bot-config', 'prod'],
+    onSuccess(data: any) {
+      setIsChatEditingAllowed(data.response.isEditChatVisible === 'true');
+    },
+  });
 
   const disableAskForPermission =
     chat.customerSupportId != userInfo?.idCode ||
@@ -580,9 +638,20 @@ const Chat: FC<ChatProps> = ({
                         message={message}
                         readStatus={messageReadStatusRef}
                         key={`${message.id ?? ''}-${i}`}
-                        onSelect={(message) => {
-                          // To be added: message selection logic
+                        onSelect={(m) => {
+                          if (
+                            isChatEditingAllowed &&
+                            chat.customerSupportId === userInfo.idCode &&
+                            message.authorId === userInfo.idCode
+                          )
+                            handleSelectMessage(m);
                         }}
+                        selected={selectedMessage?.id === message.id}
+                        editableMessage={
+                          isChatEditingAllowed &&
+                          chat.customerSupportId === userInfo.idCode &&
+                          message.authorId === userInfo.idCode
+                        }
                       />
                     ))}
                   </div>
@@ -613,48 +682,100 @@ const Chat: FC<ChatProps> = ({
 
         {chat.customerSupportId == userInfo?.idCode &&
           chat.status != CHAT_STATUS.IDLE && (
-            <div className="active-chat__toolbar">
-              <Track>
-                <ChatTextArea
-                  name="message"
-                  label={t('')}
-                  id="chatArea"
-                  placeholder={t('chat.reply') + '...'}
-                  minRows={1}
-                  maxRows={8}
-                  value={responseText}
-                  onSubmit={(e) => handleResponseTextSend()}
-                  maxLength={CHAT_INPUT_LENGTH}
-                  onChange={(e) => setResponseText(e.target.value)}
-                />
-                <div className="active-chat__toolbar-actions">
-                  <Button
-                    id="myButton"
-                    appearance="primary"
-                    onClick={handleResponseTextSend}
-                  >
-                    <Icon
-                      icon={<MdOutlineSend fontSize={18} />}
-                      size="medium"
+            <>
+              {selectedMessage ? (
+                <div className="active-chat__toolbar edit-toolbar">
+                  <div className="edit-toolbar__header">
+                    Vestluse muutmine
+                    <MdOutlineCreate className="active-chat__edit-icon" />
+                  </div>
+                  <div className="edit-toolbar__textarea">
+                    <ChatTextArea
+                      name="message"
+                      label={t('')}
+                      id="chatArea"
+                      placeholder={t('chat.reply') + '...'}
+                      minRows={1}
+                      maxRows={8}
+                      value={responseText}
+                      onSubmit={(e) => handleResponseTextSend(true)}
+                      maxLength={CHAT_INPUT_LENGTH}
+                      onChange={(e) => setResponseText(e.target.value)}
                     />
-                    <input
-                      type="file"
-                      ref={hiddenFileInputRef}
-                      onChange={handleFileChange}
-                      style={{ display: 'none' }}
-                    />
-                  </Button>
-                  {isHiddenFeaturesEnabled && (
-                    <Button appearance="secondary" onClick={handleUploadClick}>
+                  </div>
+
+                  <div className="edit-toolbar__edit-actions">
+                    <Button
+                      id="myButton"
+                      appearance="primary"
+                      size="s"
+                      onClick={() => handleResponseTextSend(true)}
+                    >
                       <Icon
-                        icon={<MdOutlineAttachFile fontSize={18} />}
+                        icon={<MdDoneOutline fontSize={18} />}
                         size="medium"
                       />
                     </Button>
-                  )}
+                    <Button
+                      appearance="secondary"
+                      size="s"
+                      onClick={() => {
+                        setSelectedMessage(null);
+                        setResponseText('');
+                      }}
+                    >
+                      <Icon icon={<MdClose fontSize={18} />} size="medium" />
+                    </Button>
+                  </div>
                 </div>
-              </Track>
-            </div>
+              ) : (
+                <div className="active-chat__toolbar">
+                  <Track>
+                    <ChatTextArea
+                      name="message"
+                      label={t('')}
+                      id="chatArea"
+                      placeholder={t('chat.reply') + '...'}
+                      minRows={1}
+                      maxRows={8}
+                      value={responseText}
+                      onSubmit={(e) => handleResponseTextSend(false)}
+                      maxLength={CHAT_INPUT_LENGTH}
+                      onChange={(e) => setResponseText(e.target.value)}
+                    />
+                    <div className="active-chat__toolbar-actions">
+                      <Button
+                        id="myButton"
+                        appearance="primary"
+                        onClick={() => handleResponseTextSend(false)}
+                      >
+                        <Icon
+                          icon={<MdOutlineSend fontSize={18} />}
+                          size="medium"
+                        />
+                        <input
+                          type="file"
+                          ref={hiddenFileInputRef}
+                          onChange={handleFileChange}
+                          style={{ display: 'none' }}
+                        />
+                      </Button>
+                      {isHiddenFeaturesEnabled && (
+                        <Button
+                          appearance="secondary"
+                          onClick={handleUploadClick}
+                        >
+                          <Icon
+                            icon={<MdOutlineAttachFile fontSize={18} />}
+                            size="medium"
+                          />
+                        </Button>
+                      )}
+                    </div>
+                  </Track>
+                </div>
+              )}
+            </>
           )}
 
         {takeOverCondition &&

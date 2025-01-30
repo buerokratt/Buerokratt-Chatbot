@@ -3,4 +3,5 @@ export interface BotConfig {
   isBurokrattActive: string;
   isCsaNameVisible: string;
   isCsaTitleVisible: string;
+  isEditChatVisible: string;
 }

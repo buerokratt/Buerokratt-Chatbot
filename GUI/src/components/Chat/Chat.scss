@@ -303,6 +303,12 @@
     transform: translateY(-50%);
   }
 
+  &__edit-icon {
+    height: 25px;
+    margin-left: 5px;
+    width: 20px;
+  }
+
   &__message-text {
     display: flex;
     align-items: center;
@@ -369,6 +375,33 @@
     }
   }
 }
+
+.edit-toolbar {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 10px;
+
+    &__header {
+      align-items: center;
+      display: flex;
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    &__textarea {
+      grid-column: 1;
+      grid-row: 2;
+    }
+
+    &__edit-actions {
+      display: flex;
+      grid-column: 2;
+      grid-row: 2;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+  }
 
 .title {
   font-size: 13px;

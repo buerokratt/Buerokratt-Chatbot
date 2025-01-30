@@ -1,7 +1,7 @@
 declaration:
   call: declare
   version: 0.1
-  description: "Decription placeholder for 'INSERT'"
+  description: "Decription placeholder for 'EDIT'"
   method: post
   accepts: json
   returns: json
@@ -29,6 +29,12 @@ declaration:
       - field: event
         type: string
         description: "Body field 'event'"
+      - field: originalBaseId
+        type: string
+        description: "Body field 'originalBaseId'"
+      - field: originalCreated
+        type: string
+        description: "Body field 'originalCreated'"
     headers:
       - field: cookie
         type: string
@@ -43,6 +49,8 @@ extractRequestData:
     authorTimestamp: ${incoming.body.authorTimestamp}
     content: ${incoming.body.content}
     event: ${incoming.body.event}
+    originalBaseId: ${incoming.body.originalBaseId}
+    originalCreated: ${incoming.body.originalCreated}
     cookie: ${incoming.headers.cookie}
   next: get_user_info
 
@@ -81,12 +89,43 @@ getUuid:
 assignUuid:
   assign:
     uuid: ${uuid_result.response.body.uuid}
-  next: insertMessage
 
-insertMessage:
+check_is_edited_message:
+  switch:
+    - condition: ${originalBaseId != null}
+      next: getOriginalMessageById
+  next: return_bad_request
+
+getOriginalMessageById:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/insert-message"
+    url: "[#CHATBOT_RESQL]/get-message-by-id"
+    body:
+      id: ${originalBaseId}
+  result: original_message
+
+check_message_belongs_to_author:
+  switch:
+    - condition: ${original_message.response.body[0].authorId == idCode}
+      next: getBotConfig
+  next: return_bad_request
+
+getBotConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-bot-config"
+  result: configRes
+
+check_is_editing_Allowed:
+  switch:
+    - condition: ${configRes.response.body[0].isEditChatVisible == 'true'}
+      next: insertEditedMessage
+  next: return_message_edit_not_allowed
+
+insertEditedMessage:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-edited-message"
     body:
       chatId: ${chatId}
       messageId: ${uuid}
@@ -95,14 +134,16 @@ insertMessage:
       authorId: ${idCode}
       authorFirstName: ${authorFirstName ?? ""}
       authorRole: ${authorRole ?? "backoffice-user"}
-      created: ${new Date().toISOString()}
+      created: ${originalCreated}
       authorLastName: ""
       rating: ""
       event: ${event ?? ""}
       forwardedByUser: ""
       forwardedFromCsa: ""
       forwardedToCsa: ""
+      originalBaseId: ${originalBaseId}
   result: insertMessageResult
+  next: getMessageById
 
 getMessageById:
   call: http.post
@@ -137,5 +178,10 @@ return_result:
 return_bad_request:
   status: 400
   return: false
+  next: end  
+
+return_message_edit_not_allowed:
+  status: 409
+  return: "Message editing not allowed."
   next: end  
 
