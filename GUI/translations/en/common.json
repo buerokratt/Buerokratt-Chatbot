@@ -241,6 +241,7 @@
       "requested-chat-forward-accepted": "Requested chat forward accepted {{date}}",
       "requested-chat-forward-rejected": "Requested chat forward rejected {{date}}",
       "message-read": "Read",
+      "read": "Read {{ date }}",
       "contact-information-skipped": "Contact Information Skipped",
       "unavailable-contact-information-fulfilled": "Contact information provided",
       "unavailable_organization": "Organization is unavailable",
