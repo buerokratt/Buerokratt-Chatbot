@@ -129,6 +129,7 @@ AND MessagesUpdateTime.event_lowercase IN (
         'unavailable-contact-information-fulfilled',
         'contact-information-skipped',
         'unavailable_organization',
-        'unavailable_csas')
+        'unavailable_csas',
+        'unavailable_csas_ask_contacts')
 ORDER BY created ASC
 LIMIT :limit;

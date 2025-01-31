@@ -21,7 +21,12 @@ WITH last_configuration AS (
      'organizationWorkingTimeWeekdays',
      'organizationClosedOnWeekEnds',
      'organizationTheSameOnAllWorkingDays',
-     'organizationWorkingTimeNationalHolidays')
+     'organizationWorkingTimeNationalHolidays',
+     'organizationWorkingAllTime',
+     'organizationNoCsaAskForContacts',
+     'organizationNoCsaAvailableMessage',
+     'organizationOutsideWorkingHoursAskForContacts',
+     'organizationOutsideWorkingHoursMessage')
     AND id IN (SELECT max(id) from configuration GROUP BY key)
     AND deleted = FALSE
 ), new_configuration as (
@@ -47,7 +52,12 @@ WITH last_configuration AS (
         ('organizationWorkingTimeWeekdays', :organizationWorkingTimeWeekdays),
         ('organizationClosedOnWeekEnds', :organizationClosedOnWeekEnds),
         ('organizationTheSameOnAllWorkingDays', :organizationTheSameOnAllWorkingDays),
-        ('organizationWorkingTimeNationalHolidays', :organizationWorkingTimeNationalHolidays)
+        ('organizationWorkingTimeNationalHolidays', :organizationWorkingTimeNationalHolidays),
+        ('organizationWorkingAllTime', :organizationWorkingAllTime),
+        ('organizationNoCsaAskForContacts', :organizationNoCsaAskForContacts),
+        ('organizationNoCsaAvailableMessage', :organizationNoCsaAvailableMessage),
+        ('organizationOutsideWorkingHoursAskForContacts', :organizationOutsideWorkingHoursAskForContacts),
+        ('organizationOutsideWorkingHoursMessage', :organizationOutsideWorkingHoursMessage)
    ) as new_values (key, value)
 )
 INSERT INTO configuration (key, value, created)

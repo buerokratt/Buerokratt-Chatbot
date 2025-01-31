@@ -1,0 +1,37 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'Back up conversations'"
+  method: get
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: isAuth
+        type: boolean
+        description: "Body field 'isAuth'"
+
+getRemovableConversations:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RUUTER_PRIVATE]/chats/chat-to-remove"
+    body:
+      isAuth: ${incoming.body.isAuth}
+  result: res
+  next: validate_res
+
+validate_res:
+  switch:
+    - condition: ${res.response.body.response.length > 0}
+      next: return_result
+  next: return_not_found
+
+return_result:
+  return: ${res.response.body}
+  wrapper: false
+  next: end
+
+return_not_found:
+  return: "error: not found"
+  next: end

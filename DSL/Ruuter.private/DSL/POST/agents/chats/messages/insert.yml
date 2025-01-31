@@ -81,7 +81,7 @@ getUuid:
 assignUuid:
   assign:
     uuid: ${uuid_result.response.body.uuid}
-  next: insertMessage  
+  next: insertMessage
 
 insertMessage:
   call: http.post
@@ -103,7 +103,14 @@ insertMessage:
       forwardedFromCsa: ""
       forwardedToCsa: ""
   result: insertMessageResult
-  next: notify_chats
+
+getMessageById:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-message-by-id"
+    body:
+      id: ${uuid}
+  result: message_res
 
 notify_chats:
   template: chats/notify
@@ -124,7 +131,7 @@ notify_messages:
   next: return_result
 
 return_result:
-  return: "Message Sent Successfully"
+  return: ${message_res.response.body[0]}
   next: end
 
 return_bad_request:

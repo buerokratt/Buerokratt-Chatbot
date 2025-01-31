@@ -14,6 +14,9 @@ declaration:
       - field: customerSupportStatus
         type: string
         description: "Body field 'customerSupportStatus'"
+      - field: userIdCode
+        type: string
+        description: "Body field 'userIdCode'"
     headers:
       - field: cookie
         type: string
@@ -23,6 +26,13 @@ extractRequestData:
   assign:
     active: ${incoming.body.customerSupportActive}
     status: ${incoming.body.customerSupportStatus}  
+    idCode: ${incoming.body.userIdCode}
+
+check_body_user_id_code:
+  switch:
+    - condition: ${incoming.body.userIdCode != null}
+      next: setCustomerSupportActivity
+  next: get_user_info
 
 get_user_info:
   call: http.post

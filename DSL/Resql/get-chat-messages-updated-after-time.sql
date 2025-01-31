@@ -39,6 +39,7 @@ SELECT m.base_id AS id,
        m.forwarded_by_user,
        m.forwarded_from_csa,
        m.forwarded_to_csa,
+       m.original_base_id,
        mp.content AS preview,
        rating,
        m.created,
@@ -49,5 +50,10 @@ LEFT JOIN MessagePreviews mp ON m.chat_base_id = mp.chat_base_id
 LEFT JOIN LatestActiveUser u ON m.author_id = u.id_code
 JOIN MaxMessages ON m.id = maxId
 WHERE :timeRangeBegin::timestamp with time zone < m.updated
+AND m.base_id NOT IN (
+	SELECT DISTINCT original_base_id
+	FROM message
+  WHERE original_base_id IS NOT NULL
+)
 ORDER BY m.created;
 

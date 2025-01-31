@@ -21,6 +21,9 @@ import SettingsWelcomeMessage from 'pages/Settings/SettingsWelcomeMessage';
 import SettingsSessionLength from 'pages/Settings/SettingsSessionLength';
 import './locale/et_EE';
 import ChatPending from 'pages/Chat/ChatPending';
+import DeleteConversations from './pages/Settings/DeleteConversations';
+import ValidationRequests from './pages/Chat/ValidationRequests';
+import SettingsSkmConfiguration from 'pages/Settings/SettingsSkmConfiguration';
 
 const App: FC = () => {
   useQuery<{
@@ -39,7 +42,9 @@ const App: FC = () => {
         <Route index element={<Navigate to="/active" />} />
         <Route path="/unanswered" element={<ChatUnanswered />} />
         <Route path="/active" element={<ChatActive />} />
+        <Route path="/delete-conversations" element={<DeleteConversations />} />
         <Route path="/history" element={<ChatHistory />} />
+        <Route path="/validations" element={<ValidationRequests />} />
         <Route path="/pending" element={<ChatPending />} />
         <Route path="/users" element={<SettingsUsers />} />
         <Route path="/chatbot/settings" element={<SettingsChatSettings />} />
@@ -54,6 +59,7 @@ const App: FC = () => {
         <Route path="/chatbot/appearance" element={<SettingsAppearance />} />
         <Route path="/working-time" element={<SettingsWorkingTime />} />
         <Route path="/session-length" element={<SettingsSessionLength />} />
+        <Route path="/skm-configuration" element={<SettingsSkmConfiguration />} />
         <Route path="/uptime" element={<MonitoringUptime />} />
       </Route>
     </Routes>

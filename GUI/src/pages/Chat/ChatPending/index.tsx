@@ -12,7 +12,6 @@ import ChatTrigger from '../ChatActive/ChatTrigger';
 import clsx from 'clsx';
 import ForwardToColleaugeModal from '../ForwardToColleaugeModal';
 import ForwardToEstablishmentModal from '../ForwardToEstablishmentModal';
-import sse from 'services/sse-service';
 import { v4 as uuidv4 } from 'uuid';
 import './ChatPending.scss';
 import { userStore as useHeaderStore } from '@buerokratt-ria/header';
@@ -47,11 +46,6 @@ const ChatPending: FC = () => {
 
   useEffect(() => {
     useHeaderStore.getState().loadPendingChats();
-  }, []);
-
-  useEffect(() => {
-    const events = sse(`/chat-list`, loadPendingChats);
-    return () => events.close();
   }, []);
 
   const { data: csaNameVisiblity } = useQuery<{ isVisible: boolean }>({

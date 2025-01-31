@@ -11,34 +11,74 @@ declaration:
       - field: message
         type: string
         description: "message field"
+      - field: authorId
+        type: string
+        description: "authorId field"
+      - field: chatId
+        type: string
+        description: "chatId field"    
 
-assign_message:
+# TODO: Handle Service Module Services
+assign_data:
   assign:
-    input: "${incoming.body.message.split(',').map(e => e.trim())}"
-    serviceName: ${input[0].replace('#', '')}
-    serviceInput: "${input.slice(1).length > 0 ? input.slice(1)[0] : ''}"
+    message: ${incoming.body.message}
+    chatId: ${incoming.body.chatId}
+    authorId: ${incoming.body.authorId}
+    input: "${message.split(',').map(part => part.trim())}"
+    serviceType: ${input[0].replace('#', '')}
+    serviceMethod: "${input[1].startsWith('/POST') ? 'post' : 'get'}"
+    servicePath: "${input[1].split(serviceMethod === 'post' ? '/POST/' : '/GET/', 2)[1]}"
+    serviceInput: ${input.slice(2).map(item => item.replace(/[()]/g, ""))}
+    baseUrl: "${serviceType === 'common_service' ? '[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]' : '[#CHATBOT_RUUTER_PUBLIC_INTERNAL_SERVICE]'}"
 
-check_if_service_has_input:
+check_for_service_type:
   switch:
-    - condition: ${serviceInput.length === 0}
-      next: trigger_service    
-  next: trigger_service_with_input    
+    - condition: ${serviceType === 'common_service'}
+      next: check_for_service_method
+  next: get_service_trigger_for_service
 
-trigger_service:
+get_service_trigger_for_service:
   call: http.post
   args:
-    url: "[#CHATBOT_RUUTER_PUBLIC]/${serviceName}"
+    url: "[#TRAINING_RESQL]/check-if-service-trigger-exists"
+    body:
+      serviceName: ${servicePath.split('/')[servicePath.split('/').length - 1]}
+  result: trigger_res
+  next: check_service_is_approved
+
+check_service_is_approved:
+  switch:
+    - condition: ${trigger_res.response.body.length > 0}
+      next: check_for_service_method
+  next: return_service_is_not_approved
+ 
+check_for_service_method:
+  switch:
+    - condition: ${serviceMethod === 'post'}
+      next: trigger_post_service
+  next: trigger_get_service   
+
+trigger_get_service:
+  call: http.get
+  args:
+    url: "${baseUrl}/${servicePath}"
+    query:
+      input: ${serviceInput.join(',')}
+      authorId: ${authorId}
+      chatId: ${chatId}
   error: return_service_error
   result: res
   next: return_result
 
-trigger_service_with_input:
+trigger_post_service:
   call: http.post
   args:
-    url: "[#CHATBOT_RUUTER_PUBLIC]/${serviceName}"
+    url: "${baseUrl}/${servicePath}"
     body:
-      input: ${serviceInput} 
-  error: return_service_error  
+      input: ${serviceInput}
+      authorId: ${authorId}
+      chatId: ${chatId}
+  error: return_service_error
   result: res
   next: return_result
 
@@ -49,4 +89,9 @@ return_result:
 return_service_error:
   status: 400
   return: "There was a problem triggering the service"
+  next: end
+
+return_service_is_not_approved:
+  status: 200
+  return: "Service is not approved"
   next: end

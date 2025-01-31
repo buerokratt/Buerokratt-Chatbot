@@ -1,0 +1,14 @@
+@import 'src/styles/tools/spacing';
+@import 'src/styles/tools/color';
+@import 'src/styles/settings/variables/other';
+@import 'src/styles/settings/variables/typography';
+
+.full-width {
+  width: 100%
+}
+
+.margin-auto {
+  padding-right: 20px;
+  padding-bottom: 20px ;
+  margin: auto;
+}

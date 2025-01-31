@@ -5,5 +5,10 @@ if [[ $# -eq 0 ]] ; then
     exit 0
 fi
 
-echo "-- liquibase formatted sql" > "DSL/Liquibase/changelog/`date '+%s'`-$1.sql"
-echo "-- changeset $(git config user.name):`date '+%s'`" >> "DSL/Liquibase/changelog/`date '+%s'`-$1.sql"
+timestamp=$(date '+%Y%m%d%H%M%S')
+migration_file="DSL/Liquibase/changelog/${timestamp}-$1.sql"
+
+echo "-- liquibase formatted sql" > "$migration_file"
+echo "-- changeset $(git config user.name):$timestamp" >> "$migration_file"
+
+echo "Migration file created: $migration_file"

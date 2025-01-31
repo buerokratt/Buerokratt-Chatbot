@@ -26,6 +26,9 @@ declaration:
       - field: search
         type: string
         description: "Body field 'search'"
+      - field: customerSupportIds
+        type: array
+        description: "Body field 'customerSupportIds'"
 
 extractRequestData:
   assign:
@@ -43,6 +46,7 @@ getEndedChats:
       page_size: ${incoming.body.page_size}
       sorting: ${incoming.body.sorting}
       search: ${incoming.body.search}
+      customerSupportIds: ${incoming.body.customerSupportIds?.join(',') ?? ''}
   result: res
 
 returnSuccess:

@@ -1,0 +1,12 @@
+[
+  {{#each data}}
+    {
+      "channelId": "{{chatBaseId}}",
+      "timestamp": "{{getISODate}}",
+      "payload": {
+          "type": "message",
+          "messageId": "{{baseId}}"
+      }
+    }{{#unless @last}},{{/unless}}
+  {{/each}}
+]

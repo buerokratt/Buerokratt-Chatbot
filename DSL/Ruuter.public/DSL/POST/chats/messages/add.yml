@@ -35,6 +35,12 @@ extractRequestData:
     holidayNames: ${incoming.body.holidayNames}
     cookie: ${incoming.headers.cookie}
     silent: ${incoming.body.silent}
+  next: checkContentLength
+
+checkContentLength:
+  switch:
+    - condition: ${content.length > 1000}
+      next: return_content_length_exceeded
   next: get_chat_info
 
 get_chat_info:
@@ -166,6 +172,11 @@ return_bad_request:
   status: 400
   return: "Error: Bad Request"
   next: end  
+
+return_content_length_exceeded:
+  status: 400
+  return: "Error: Your input exceeds the maximum allowed length of 1000 characters"
+  next: end
 
 return_bot_error:
   status: 420

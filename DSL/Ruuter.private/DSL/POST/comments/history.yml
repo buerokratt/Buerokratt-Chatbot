@@ -14,11 +14,15 @@ declaration:
       - field: comment
         type: string
         description: "Body field 'comment'"
+      - field: authorDisplayName
+        type: string
+        description: "Body field 'authorDisplayName'"
 
 extractRequestData:
   assign:
     comment: ${incoming.body.comment}
     chatId: ${incoming.body.chatId}
+    authorDisplayName: ${incoming.body.authorDisplayName}
 
 setChatComment:
   call: http.post
@@ -27,6 +31,8 @@ setChatComment:
     body:
       comment: ${comment}
       chatId: ${chatId}
+      created: "${new Date().toISOString()}"
+      authorDisplayName: ${authorDisplayName}
   result: res
 
 return_result:
