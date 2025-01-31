@@ -4,12 +4,14 @@ process_request:
       next: verify_header_nonce
     - condition: ${ incoming.params['ruuter-nonce'] != null }
       next: verify_param_nonce
+    - condition: ${incoming.headers == null || incoming.headers.cookie == null}
+      next: guard_fail
   next: authenticate
 
 verify_header_nonce:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/use-nonce"
+    url: "[#TRAINING_RESQL]/use-nonce"
     body:
       updated_nonce: ${incoming.headers['x-ruuter-nonce']}
   result: nonce_response
@@ -18,7 +20,7 @@ verify_header_nonce:
 verify_param_nonce:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/use-nonce"
+    url: "[#TRAINING_RESQL]/use-nonce"
     body:
       updated_nonce: ${incoming.params['ruuter-nonce']}
   result: nonce_response
