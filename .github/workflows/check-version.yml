@@ -52,7 +52,7 @@ jobs:
       - name: Build Docker image
         run: |
           echo "Building Docker image for branch: ${{ env.BRANCH }} major: ${{ env.MAJOR }} minor: ${{ env.MINOR }} patch: ${{ env.PATCH }}"
-          docker image build --tag $DOCKER_TAG_CUSTOM --no-cache .
+          cd GUI && docker image build --tag $DOCKER_TAG_CUSTOM --no-cache .
         if: ${{ env.BRANCH == 'test' }}
 
       - name: Log in to GitHub container registry
