@@ -1,4 +1,4 @@
-import { ChangeEvent, forwardRef, useId, useState } from 'react';
+import {ChangeEvent, forwardRef, useEffect, useId, useState} from 'react';
 import TextareaAutosize, {
   TextareaAutosizeProps,
 } from 'react-textarea-autosize';
@@ -41,6 +41,7 @@ const FormTextarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     ref
   ) => {
     const id = useId();
+    const [initial, setInitial] = useState<boolean>(true);
     const [currentLength, setCurrentLength] = useState(
       (typeof defaultValue === 'string' && defaultValue.length) || 0
     );
@@ -55,6 +56,14 @@ const FormTextarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         setCurrentLength(e.target.value.length);
       }
     };
+
+    useEffect(() => {
+        if(!initial) return;
+        if(showMaxLength && defaultValue && typeof defaultValue === 'string') {
+            setInitial(false);
+            setCurrentLength(defaultValue.toString().length)
+        }
+    }, [defaultValue]);
 
     return (
       <div className={textareaClasses}>
