@@ -26,20 +26,19 @@ setConfigurationValue:
       value: ${isActive}
   result: setConfigurationResult
 
+check_if_bot_is_active:
+  switch:
+    - condition: ${isActive === 'true' || isActive === true}
+      next: return_result
+  next: insertChatAndMessageWhenBotNotActive
+
 insertChatAndMessageWhenBotNotActive:
   call: http.post
   args:
     url: "[#CHATBOT_RUUTER_PRIVATE_INTERNAL]/internal/chat-and-message-when-bot-is-not-active"
   result: insertChatAndMessageWhenBotNotActiveResult
-
-getConfigurationValue:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RESQL]/get-configuration"
-    body:
-      key: "is_bot_active"
-  result: res
+  next: return_result
 
 return_result:
-  return: ${res.response.body[0]?.value}
+  return: ${isActive}
   status: 200

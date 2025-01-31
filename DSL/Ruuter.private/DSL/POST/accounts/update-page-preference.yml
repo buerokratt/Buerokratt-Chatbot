@@ -1,0 +1,45 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'Update page preference'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: user_id
+        type: string
+        description: "Body field 'user_id'"
+      - field: page_name
+        type: string
+        description: "Body field 'page_name'"
+      - field: page_results
+        type: number
+        description: "Body field 'page_results'"
+
+extractRequestData:
+  assign:
+    user_id: ${incoming.body.user_id}
+    page_name: ${incoming.body.page_name}
+    page_results: ${incoming.body.page_results}
+    created: ${new Date().toISOString()}
+
+setUserPagePreferences:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/update-user-page-preferences"
+    body:
+      user_id: ${user_id}
+      page_name: ${page_name}
+      page_results: ${page_results}
+      created: ${created}
+  result: returnSuccess
+
+returnSuccess:
+  return: ${returnSuccess.response.body}
+  next: end
+
+return_bad_request:
+  return: "error: bad request"
+  next: end

@@ -31,7 +31,7 @@ check_cookie_info_response:
 
 check_user_authority:
   switch:
-    - condition: ${res.response.body.authorities.includes("ROLE_ADMINISTRATOR") || res.response.body.authorities.includes("ROLE_CUSTOMER_SUPPORT_AGENT") || res.response.body.authorities.includes("ROLE_CHATBOT_TRAINER")}
+    - condition: ${res.response.body.authorities.includes("ROLE_ADMINISTRATOR") || res.response.body.authorities.includes("ROLE_CUSTOMER_SUPPORT_AGENT")}
       next: return_authorized
   next: return_unauthorized
 

@@ -3,7 +3,7 @@ name: Build and publish GUI with nginx
 on:
   push:
     branches:
-      - dev
+      - v2.0.2
     paths:
       - '.env.test'
 

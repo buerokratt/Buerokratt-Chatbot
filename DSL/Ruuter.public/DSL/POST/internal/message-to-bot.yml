@@ -1,7 +1,7 @@
 declaration:
   call: declare
   version: 0.1
-  description: "Decription placeholder for 'MESSAGE-TO-BOT'"
+  description: "Decription placeholder for the 'MESSAGE-TO-BOT'"
   method: post
   accepts: json
   returns: json
@@ -36,9 +36,9 @@ check_bot_is_active:
     body:
       key: "is_bot_active"
   result: is_bot_active_result
-  next: check_for_bot_active_result
+  next: check_bot_activity_result
 
-check_for_bot_active_result:
+check_bot_activity_result:
   switch:
     - condition: ${is_bot_active_result.response.body[0]?.value === 'true'}
       next: get_bot_name
@@ -50,14 +50,15 @@ get_bot_name:
     url: "[#CHATBOT_RESQL]/get-configuration"
     body:
       key: "bot_institution_id"
+    error: return_bad_request
   result: get_bot_name_result
-  next: check_for_bot_name_result
+  next: check_if_bot_name_exists
 
-check_for_bot_name_result:
+check_if_bot_name_exists:
   switch:
-    - condition: ${200 <= get_bot_name_result.response.statusCodeValue && get_bot_name_result.response.statusCodeValue < 300 && get_bot_name_result.response.body[0]?.value != null}
+    - condition: ${get_bot_name_result.response.body[0]?.value != null}
       next: get_chat
-  next: return_bad_request
+  next: return_bot_name_does_not_exist
 
 get_chat:
   call: http.post
@@ -66,23 +67,25 @@ get_chat:
     body:
       id: ${chatId}
   result: get_chat_result
-  next: check_for_get_chat_result
-
-check_for_get_chat_result:
-  switch:
-    - condition: ${200 <= get_chat_result.response.statusCodeValue && get_chat_result.response.statusCodeValue < 300}
-      next: check_chat_belongs_to_bot
-  next: return_bad_request
+  error: return_bad_request
+  next: check_chat_belongs_to_bot
 
 check_chat_belongs_to_bot:
   switch:
     - condition: ${get_chat_result.response.body[0].customerSupportId == get_bot_name_result.response.body[0].value}
-      next: decode_content_to_be_sent_to_bot
+      next: check_for_service
   next: return_chat_does_not_belong_to_bot
 
-decode_content_to_be_sent_to_bot:
+check_for_service:
+  switch:
+    - condition: ${content.startsWith("#common_service") || content.startsWith("#service")}
+      next: assign_service_content
+  next: post_message_to_bot
+
+assign_service_content:
   assign:
-    decodedContent: ${decodeURIComponent(content)}
+    service_content: ${content}
+  next: trigger_service
 
 post_message_to_bot:
   call: http.post
@@ -90,22 +93,42 @@ post_message_to_bot:
     url: "[#CHATBOT_BOT]/webhooks/rest/webhook"
     body:
       sender: ${chatId}
-      message: ${decodedContent}
+      message: ${content}
+    error: return_bot_error
   result: post_message_to_bot_result
-  
-check_for_post_message_to_bot_result:
-  switch:
-    - condition: ${200 <= post_message_to_bot_result.response.statusCodeValue && post_message_to_bot_result.response.statusCodeValue < 300}
-      next: check_if_bot_is_unable_to_reply
-  next: return_bad_request
+  next: check_if_bot_is_unable_to_reply
 
 check_if_bot_is_unable_to_reply:
   switch:
     - condition: ${post_message_to_bot_result.response.body?.[0]?.text == 'UNKNOWN'}
       next: check_for_fallback_bot
     - condition: ${post_message_to_bot_result.response.body?.[0]?.text == 'Suunan teid klienditeenindajale. Varuge natukene kannatust.'}
-      next: get_organization_working_details
+      next: get_organization_base_config
+    - condition: ${post_message_to_bot_result.response.body?.[0]?.text.startsWith("#common_service") || post_message_to_bot_result.response.body?.[0]?.text.startsWith("#service")}
+      next: assign_service_content_from_bot_response
   next: extract_bot_responses
+
+assign_service_content_from_bot_response:
+  assign:
+    service_content: ${post_message_to_bot_result.response.body?.[0]?.text}
+  next: trigger_service
+
+trigger_service:
+  template: chats/trigger-service
+  requestType: templates
+  body:
+    message: ${service_content}
+    chatId: ${chatId}
+    authorId: ${get_bot_name_result.response.body[0].value}
+  result: converted_messages_res
+  error: return_bot_error
+  next: check_for_trigger_service_response
+
+check_for_trigger_service_response:
+  switch:
+    - condition: ${converted_messages_res === 'Service is not approved'}
+      next: post_message_to_bot
+  next: add_bot_message_to_db
 
 check_for_fallback_bot:
   call: http.post
@@ -114,14 +137,23 @@ check_for_fallback_bot:
     body:
       sender: ${chatId}
       message: ${content}
-  result: fallback_bot_result
+      authorId: ${get_bot_name_result.response.body[0].value}
+      holidays: ${holidays}
+      holidayNames: ${holidayNames}
+  result: converted_messages_res
+  error: return_bot_error
   next: check_if_fallback_bot_is_unable_to_reply
 
 check_if_fallback_bot_is_unable_to_reply:
   switch:
-    - condition: ${fallback_bot_result.response.body.response[0].text == 'ERROR'}
+    - condition: ${converted_messages_res == 'ERROR'}
       next: check_if_user_wants_csa
-  next: convert_fallback_bot_responses_to_messages
+  next: assign_fallback_converted_messages_res
+
+assign_fallback_converted_messages_res:
+  assign:
+    converted_messages_res: ${converted_messages_res.response.body.response}
+  next: add_bot_message_to_db
 
 check_if_user_wants_csa:
   call: http.post
@@ -130,8 +162,26 @@ check_if_user_wants_csa:
     body:
       sender: ${chatId}
       message: "csa"
-  result: post_message_to_client_result
+  result: post_message_to_bot_result
   next: check_for_post_message_to_bot_result
+
+get_organization_base_config:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-organization-base-config"
+  result: org_base_config_res
+  next: assign_organization_base_config
+
+assign_organization_base_config:
+  assign:
+    base_config: ${org_base_config_res.response.body[0]}
+  next: check_if_organization_is_available_all_time
+
+check_if_organization_is_available_all_time:
+  switch:
+    - condition: ${base_config.isAvailableAllTime === 'true'}
+      next: get_all_available_csas
+  next: get_organization_working_details
 
 get_organization_working_details:
   call: http.post
@@ -165,11 +215,10 @@ return_is_a_holiday:
     url: "[#CHATBOT_RESQL]/insert-bot-message"
     body:
       messages:
-        - 
-          chatId: ${chatId}
+        - chatId: ${chatId}
           content: ${org_details.holidayMessage}
           authorTimestamp: ${new Date().toISOString()}
-          event: "unavailable_holiday"
+          event: "${base_config.outsideWorkingHoursAskForContacts === 'true' ? 'unavailable_holiday_ask_contacts' : 'unavailable_holiday'}"
           authorId: ${get_bot_name_result.response.body[0].value}
           authorFirstName: ""
           authorLastName: ""
@@ -183,11 +232,10 @@ return_organization_is_not_available:
     url: "[#CHATBOT_RESQL]/insert-bot-message"
     body:
       messages:
-        - 
-          chatId: ${chatId}
-          content: "Bürokratt on hetkel väljaspool tööaega, palun jäta oma kontaktandmed ja võtame Sinuga esimesel võimalusel ühendust"
+        - chatId: ${chatId}
+          content: ${base_config.outsideWorkingHoursMessage}
           authorTimestamp: ${new Date().toISOString()}
-          event: "unavailable_organization"
+          event: "${base_config.outsideWorkingHoursAskForContacts === 'true' ? 'unavailable_organization_ask_contacts' : 'unavailable_organization'}"
           authorId: ${get_bot_name_result.response.body[0].value}
           authorFirstName: ""
           authorLastName: ""
@@ -219,11 +267,10 @@ send_csas_not_available_message:
     url: "[#CHATBOT_RESQL]/insert-bot-message"
     body:
       messages:
-        - 
-          chatId: ${chatId}
-          content: "Hetkel nõustajad puuduvad, palun jätke oma kontaktandmed ja võtame Teiega esimesel võimalusel ühendust"
+        - chatId: ${chatId}
+          content: ${base_config.noCsaMessage}
           authorTimestamp: ${new Date().toISOString()}
-          event: "unavailable_csas"
+          event: "${base_config.askForContacts === 'true' ? 'unavailable_csas_ask_contacts' : 'unavailable_csas'}"
           authorId: ${get_bot_name_result.response.body[0].value}
           authorFirstName: ""
           authorLastName: ""
@@ -247,39 +294,18 @@ add_chat_id_to_queue_notification_node:
       id: ${chatId}
   result: add_chat_id_to_queue_notification_node_res
 
+extract_bot_responses_after_redirect_to_back_office:
+  assign:
+    botMsg: ${post_message_to_bot_result.response.body}
+  next: format_bot_messages
+
 extract_bot_responses:
   assign:
     botMsg: ${post_message_to_bot_result.response.body}
     botMsgTxt: ${post_message_to_bot_result.response.body?.[0]?.text}
+  next: format_bot_messages
 
-check_if_bot_message_start_with_hash:
-  switch:
-    - condition: ${botMsgTxt.startsWith('#')}
-      next: call_service
-  next: convert_bot_responses_to_messages
-
-call_service:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL]/internal/call-service"
-    body:
-      chatId: ${chatId}
-      msg: ${botMsgTxt}
-      authorId: ${get_bot_name_result.response.body?.[0]?.value}
-  result: call_service_result
-
-check_if_call_service_result_is_ok:
-  switch:
-    - condition: ${call_service_result.response.body.response != "service_currently_unavailable"}
-      next: return_ok
-  next: trigger_service_is_not_exist
-
-trigger_service_is_not_exist:
-  assign:
-    botMsgPlaceholder: { "temp": [{"text":"service_currently_unavailable", "recipient_id": "${chatId}"}] }
-    botMsg: ${botMsgPlaceholder.temp}
-
-convert_bot_responses_to_messages:
+format_bot_messages:
   call: http.post
   args:
     url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/bot_responses_to_messages"
@@ -297,34 +323,25 @@ convert_bot_responses_to_messages:
           "created": "${new Date().toISOString()}",
         }
   result: converted_messages_res
-  next: add_bot_message_to_db
+  next: assign_converted_messages_res
 
-convert_fallback_bot_responses_to_messages:
-  call: http.post
-  args:
-    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/bot_responses_to_messages"
-    headers:
-      type: json
-    body:
-      data:
-        {
-          "botMessages": "${fallback_bot_result.response.body.response}",
-          "chatId": "${chatId}",
-          "authorId": "${get_bot_name_result.response.body[0].value}",
-          "authorFirstName": "",
-          "authorLastName": "",
-          "authorTimestamp": "${new Date().toISOString()}",
-          "created": "${new Date().toISOString()}",
-        }
-  result: converted_messages_res
+assign_converted_messages_res:
+  assign:
+    converted_messages_res: ${converted_messages_res.response.body}
   next: add_bot_message_to_db
 
 add_bot_message_to_db:
+  switch:
+    - condition: ${converted_messages_res.length > 0}
+      next: do_add_bot_message_to_db
+  next: return_ok
+
+do_add_bot_message_to_db:
   call: http.post
   args:
     url: "[#CHATBOT_RESQL]/insert-bot-message"
     body:
-      messages: ${converted_messages_res.response.body}
+      messages: ${converted_messages_res}
   result: add_bot_message_to_bot_result
   next: return_message_sent
 
@@ -348,6 +365,11 @@ return_csa_is_not_available:
   return: "CSA's are not available"
   next: end
 
+return_bot_error:
+  status: 200
+  return: "Bot error"
+  next: end
+
 return_message_sent:
   status: 200
   return: "Message Sent Successfully"
@@ -363,12 +385,12 @@ return_bot_is_not_active:
   return: "Bot is not active"
   next: end
 
+return_bot_name_does_not_exist:
+  status: 200
+  return: "Bot name does not exist"
+  next: end
+
 return_bad_request:
   status: 400
   return: "Bad Request"
-  next: end
-
-return_incorrect_request:
-  status: 400
-  return: "Required parameter(s) missing"
   next: end

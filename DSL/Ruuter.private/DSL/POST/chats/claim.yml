@@ -75,31 +75,50 @@ claimChat:
       receivedFrom: ${activeChat.receivedFrom ?? ""}
       receivedFromName: ${activeChat.receivedFromName ?? ""}
   result: claimChatRes
-  next: clearChatList
+  next: getMessageUuid
 
-clearChatList:
+getMessageUuid:
   call: http.post
   args:
-    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query?conflicts=proceed"
-    body:
-     query:
-      term:
-       channelId: "chat-list"
-  result: clear_chat_res
-  next: postNotificationAboutAddedChat
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/return_uuid"
+    headers:
+      type: json
+  result: message_uuid_result
+  next: assignMessageUuid
 
-postNotificationAboutAddedChat:
+assignMessageUuid:
+  assign:
+    messageUuid: ${message_uuid_result.response.body.uuid}
+  next: insertMessage
+
+insertMessage:
   call: http.post
   args:
-    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
+    url: "[#CHATBOT_RESQL]/insert-message"
     body:
-     channelId: "chat-list"
-     timestamp: ${new Date().toISOString()}
-     payload: {
-        "status": "Chat Status Changed",
-        "chatId": ""
-     }
-  result: chat_notification_result
+      chatId: ${activeChat.id}
+      messageId: ${messageUuid}
+      content: ""
+      authorTimestamp: ${new Date().toISOString()}
+      authorId: ""
+      authorFirstName: ""
+      authorRole: "buerokratt"
+      created: ${new Date().toISOString()}
+      authorLastName: ""
+      rating: ""
+      event: "taken-over"
+      forwardedByUser: ""
+      forwardedFromCsa: ""
+      forwardedToCsa: ""
+  result: insertMessageResult
+  next: notify_chats
+
+notify_chats:
+  template: chats/notify
+  requestType: templates
+  body:
+    chatId: ${activeChat.id}
+  result: chats_notify_res
   next: getClaimedChat
 
 getClaimedChat:
@@ -109,6 +128,15 @@ getClaimedChat:
     body:
       id: ${id}
   result: claimedChatRes
+
+notify_messages:
+  template: messages/notify
+  requestType: templates
+  body:
+    chatId: ${activeChat.id}
+    type: "message"
+    messageId: ${messageUuid}
+  result: messages_notify_res
 
 remove_chat_id_from_queue_notification_node_if_existed:
   call: http.post

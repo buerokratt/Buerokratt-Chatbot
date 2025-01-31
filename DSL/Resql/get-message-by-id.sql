@@ -3,6 +3,7 @@ SELECT
     base_id,
     content,
     buttons,
+    options,
     author_id,
     author_timestamp,
     author_first_name,
@@ -11,7 +12,9 @@ SELECT
     forwarded_by_user,
     forwarded_from_csa,
     forwarded_to_csa,
-    created
+    created,
+    event,
+    rating
 FROM message
 WHERE base_id = :id
 ORDER BY updated DESC

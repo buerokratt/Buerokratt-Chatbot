@@ -81,7 +81,7 @@ getUuid:
 assignUuid:
   assign:
     uuid: ${uuid_result.response.body.uuid}
-  next: insertMessage  
+  next: insertMessage
 
 insertMessage:
   call: http.post
@@ -103,60 +103,35 @@ insertMessage:
       forwardedFromCsa: ""
       forwardedToCsa: ""
   result: insertMessageResult
-  next: clearChatList
 
-clearChatList:
+getMessageById:
   call: http.post
   args:
-    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query?conflicts=proceed"
+    url: "[#CHATBOT_RESQL]/get-message-by-id"
     body:
-     query:
-      term:
-       channelId: "chat-list"
-  result: clear_chat_res
-  next: postNotificationAboutAddedChat
+      id: ${uuid}
+  result: message_res
 
-postNotificationAboutAddedChat:
-  call: http.post
-  args:
-    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
-    body:
-     channelId: "chat-list"
-     timestamp: ${new Date().toISOString()}
-     payload: {
-        "status": "Chat Status Changed",
-        "chatId": "${chatId}"
-     }
-  result: chat_notification_result
-  next: clearMessages
+notify_chats:
+  template: chats/notify
+  requestType: templates
+  body:
+    chatId: ${chatId}
+  result: chats_notify_res
+  next: notify_messages
 
-clearMessages:
-  call: http.post
-  args:
-    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query?conflicts=proceed"
-    body:
-     query:
-      term:
-       channelId: ${chatId}
-  result: clear_messages_res
-  next: postNotificationAboutMessageResponse 
-
-postNotificationAboutMessageResponse:
-  call: http.post
-  args:
-    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
-    body:
-     channelId: ${chatId}
-     timestamp: ${new Date().toISOString()}
-     payload: {
-        "type": "message",
-        "messageId": "${uuid}"
-     }
-  result: message_notification_result
-  next: return_result   
+notify_messages:
+  template: messages/notify
+  requestType: templates
+  body:
+    chatId: ${chatId}
+    type: "message"
+    messageId: ${uuid}
+  result: messages_notify_res
+  next: return_result
 
 return_result:
-  return: "Message Sent Successfully"
+  return: ${message_res.response.body[0]}
   next: end
 
 return_bad_request:

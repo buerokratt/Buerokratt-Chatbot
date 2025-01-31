@@ -118,28 +118,14 @@ endChat:
       receivedFrom: ${activeChat.receivedFrom ?? ""}
       receivedFromName: ${activeChat.receivedFromName ?? ""}
   result: end_chat_res
-  next: clearChatList
+  next: notify_chats
 
-clearChatList:
-  call: http.post
-  args:
-    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query?conflicts=proceed"
-    body:
-      query:
-        term:
-          channelId: "chat-list"
-  result: clear_chat_res
-  next: postNotificationAboutAddedChat
-
-postNotificationAboutAddedChat:
-  call: http.post
-  args:
-    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
-    body:
-      channelId: "chat-list"
-      timestamp: ${new Date().toISOString()}
-      payload: { "status": "Chat Status Changed", "chatId": "${chatId}" }
-  result: chat_notification_result
+notify_chats:
+  template: chats/notify
+  requestType: templates
+  body:
+    chatId: ${chatId}
+  result: chats_notify_res
 
 remove_chat_id_from_queue_notification_node_if_existed:
   call: http.post

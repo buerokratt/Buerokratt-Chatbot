@@ -165,6 +165,12 @@ postMessageToBot:
       holidays: ${holidays}
       holidayNames: ${holidayNames}
   result: message_to_bot_result
+  next: check_for_post_message_to_bot_result
+
+check_for_post_message_to_bot_result:
+  switch:
+    - condition: ${message_to_bot_result.response.body.response === 'Bot error'}
+      next: return_bot_error
   next: getChat
 
 getChat:
@@ -174,54 +180,33 @@ getChat:
     body:
       id: ${chatUuid}
   result: chat_result
-  next: clearChatList
+  next: notify_chats
 
-clearChatList:
-  call: http.post
-  args:
-    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query?conflicts=proceed"
-    body:
-      query:
-        term:
-          channelId: "chat-list"
-  result: clear_chat_res
-  next: postNotificationAboutAddedChat
+notify_chats:
+  template: chats/notify
+  requestType: templates
+  body:
+    chatId: ${chatUuid}
+  result: chats_notify_res
+  next: notify_messages
 
-postNotificationAboutAddedChat:
-  call: http.post
-  args:
-    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
-    body:
-      channelId: "chat-list"
-      timestamp: ${new Date().toISOString()}
-      payload: { "status": "Chat Status Changed", "chatId": "${chatUuid}" }
-  result: chat_notification_result
-  next: clearMessages
-
-clearMessages:
-  call: http.post
-  args:
-    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query?conflicts=proceed"
-    body:
-      query:
-        term:
-          channelId: ${chatUuid}
-  result: clear_messages_res
-  next: postNotificationAboutMessageResponse
-
-postNotificationAboutMessageResponse:
-  call: http.post
-  args:
-    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
-    body:
-      channelId: ${chatUuid}
-      timestamp: ${new Date().toISOString()}
-      payload: { "type": "message", "messageId": "${messageUuid}" }
-  result: message_notification_result
+notify_messages:
+  template: messages/notify
+  requestType: templates
+  body:
+    chatId: ${chatUuid}
+    type: "message"
+    messageId: ${messageUuid}
+  result: messages_notify_res
   next: return_result
 
 return_result:
   headers:
     Set-Cookie: ${setCookie}
   return: ${chat_result.response.body[0]}
+  next: end
+
+return_bot_error:
+  status: 420
+  return: "Bot error"
   next: end

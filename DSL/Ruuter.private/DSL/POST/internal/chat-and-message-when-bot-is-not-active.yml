@@ -19,23 +19,18 @@ assignBotName:
   assign:
     botName: ${bot_name_res.response.body[0].value}
 
-endOldBotChats:
+get_organization_base_config:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/insert-chat-ended-by-last-message-datetime"
-    body:
-      authorId: ${botName}
-      authorRole: "buerokratt"
-      content: "Teie vestlus antakse üle nõustajale."
-      currentDatetime: ${new Date().toISOString()}
-      currentStatus: "OPEN"
-      event: "inactive-chat-ended"
-      interval: "2 hours"
-      newStatus: "ENDED"
-      targetUser: "end-user"
-  result: end_old_bot_chats_res    
+    url: "[#CHATBOT_RESQL]/get-organization-base-config"
+  result: org_base_config_res
+  next: assign_organization_base_config
 
-insertMessageContent:
+assign_organization_base_config:
+  assign:
+    base_config: ${org_base_config_res.response.body[0]}
+
+notify_chats_and_return_chats_and_messages:
   call: http.post
   args:
     url: "[#CHATBOT_RESQL]/insert-message-content-by-customer-support-id"
@@ -43,19 +38,39 @@ insertMessageContent:
       customerSupportId: ${botName}
       authorId: ${botName}
       authorRole: "buerokratt"
-      content: "Teie vestlus antakse üle nõustajale."
-      event: ""
+      content: ${base_config.outsideWorkingHoursMessage}
+      event: "${base_config.outsideWorkingHoursAskForContacts === 'true' ? 'unavailable_organization_ask_contacts' : 'unavailable_organization'}"
       created: ${new Date().toISOString()}
-  result: insert_message_content_res
+  result: res
 
-insertChatCustomerSupport:
+map_open_chats_messages:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/insert-chat-customer-support-by-customer-support-id"
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/return_open_chats_messages"
+    headers:
+      type: json
     body:
-      customerSupportId: ${botName}
-  result: insert_chat_customer_support_res
+      data: ${res.response.body}
+  result: open_chat_messages_res
+
+map_open_chats_notifications:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/return_open_chats_notifications"
+    headers:
+      type: json
+    body:
+      data: ${res.response.body}
+  result: open_chat_notifications_res
+
+notify_end_users:
+  template: messages/notify-all
+  requestType: templates
+  body:
+    chats: ${open_chat_messages_res.response.body}
+    notifications: ${open_chat_notifications_res.response.body}
+  result: notification_res
 
 return_result:
-  return: "success"
+  return: "Success"
   next: end

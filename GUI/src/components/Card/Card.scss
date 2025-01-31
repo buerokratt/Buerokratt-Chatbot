@@ -8,6 +8,8 @@
   background-color: get-color(white);
   border: 1px solid get-color(black-coral-2);
   border-radius: $veera-radius-s;
+  max-height: 80vh;
+  overflow-y: visible;
 
   &--borderless {
     border: 0;
@@ -16,6 +18,10 @@
     #{$self}__header {
       border-radius: 0;
     }
+  }
+
+  &--scrollable {
+    overflow-y: auto;
   }
 
   &__header,
@@ -30,7 +36,7 @@
     border-radius: $veera-radius-s $veera-radius-s 0 0;
 
     &.white {
-      background-color: white
+      background-color: white;
     }
   }
 
@@ -56,5 +62,8 @@
 
   &__footer {
     border-top: 1px solid get-color(black-coral-2);
+    position: sticky;
+    bottom: 0;
+    background-color: get-color(white);
   }
 }

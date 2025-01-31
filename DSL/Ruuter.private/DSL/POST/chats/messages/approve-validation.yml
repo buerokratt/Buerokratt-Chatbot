@@ -1,0 +1,148 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'Approve Validation'"
+  method: get
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: chatId
+        type: string
+        description: "Body field 'chatId'"
+      - field: messageId
+        type: string
+        description: "Body field 'messageId'"
+
+extractRequestData:
+  assign:
+    chatId: "${incoming.body.chatId}"
+    messageId: "${incoming.body.messageId}"
+  next: getBotName
+
+getBotName:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-configuration"
+    body:
+      key: "bot_institution_id"
+  result: bot_name_res
+  next: assignBotName
+
+assignBotName:
+  assign:
+    botName: ${bot_name_res.response.body[0].value}
+  next: getChatById  
+
+getChatById:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-chat-by-id"
+    body:
+      id: ${chatId}
+  result: chat_res
+  next: checkChatResult 
+
+checkChatResult:
+  switch:
+    - condition: ${chat_res.response.body.length > 0}
+      next: assignChat
+  next: return_chat_ended
+
+assignChat:
+  assign:
+    chat: ${chat_res.response.body[0]}
+  next: changeStatus
+
+changeStatus:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-chat"
+    body:
+      id: ${chatId}
+      customerSupportId: ${botName}
+      customerSupportDisplayName: 'Bürokratt'
+      csaTitle: ${chat.csaTitle}
+      endUserId: ${chat.endUserId}
+      endUserFirstName: ${chat.endUserFirstName}
+      endUserLastName: ${chat.endUserLastName}
+      status: 'OPEN'
+      endUserEmail: ${chat.endUserEmail}
+      endUserPhone: ${chat.endUserPhone}
+      endUserOs: ${chat.endUserOs}
+      endUserUrl: ${chat.endUserUrl}
+      feedbackText: ""
+      feedbackRating: ""
+      externalId: ''
+      created: ${chat.created}
+      ended: ''
+      forwardedTo: ${chat.forwardedTo}
+      forwardedToName: ${chat.forwardedToName}
+      receivedFrom: ${chat.receivedFrom}
+      receivedFromName: ${chat.receivedFromName}
+  result: change_status_res
+  next: getMessageById
+
+getMessageById:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-message-by-id"
+    body:
+      id: ${messageId}
+  result: message_res
+  next: assignMessage  
+
+assignMessage:
+  assign:
+    message: ${message_res.response.body[0]}
+  next: insertMessage
+
+insertMessage:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-message"
+    body:
+      messageId: ${messageId}
+      chatId: ${chatId}
+      authorId: ${message.authorId ?? ""}
+      authorTimestamp: ${message.authorTimestamp ?? new Date().toISOString()}
+      authorFirstName: ${message.authorFirstName ?? ""}
+      authorLastName: ${message.authorLastName ?? ""}
+      authorRole: ${message.authorRole ?? ""}
+      created: ${new Date().toISOString()}
+      content: ${message.content ?? ""}
+      event: "approved_validation"
+      forwardedByUser: ${message.forwardedByUser ?? ""}
+      forwardedFromCsa: ${message.forwardedFromCsa ?? ""}
+      forwardedToCsa: ${message.forwardedToCsa ?? ""}
+      rating: ${message.rating ?? ""}
+  result: insert_message_res
+  next: notify_chats
+
+notify_chats:
+  template: chats/notify
+  requestType: templates
+  body:
+    chatId: ${chatId}
+  result: chats_notify_res
+  next: notify_messages
+
+notify_messages:
+  template: messages/notify
+  requestType: templates
+  body:
+    chatId: ${chatId}
+    type: "message"
+    messageId: ${messageId}
+  result: messages_notify_res
+  next: return_result
+
+return_result:
+  return: "Message Approved Successfully"
+  next: end  
+
+return_chat_ended:
+  return: "Chat Has Ended"
+  status: 400
+  next: end 
