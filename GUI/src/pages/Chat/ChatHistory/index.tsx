@@ -214,8 +214,8 @@ const ChatHistory: FC = () => {
         customerSupportIds: data.customerSupportIds,
         startDate: data.startDate,
         endDate: data.endDate,
-        page: pagination.pageIndex + 1,
-        page_size: pagination.pageSize,
+        page: data.pagination.pageIndex + 1,
+        page_size: data.pagination.pageSize,
         sorting: sortBy,
         search,
       });
@@ -255,6 +255,7 @@ const ChatHistory: FC = () => {
       }),
     onSuccess: (res: any) => {
       setCustomerSupportAgents([
+        { label: '-', value: ',' },
         { label: 'Bürokratt', value: 'chatbot' },
         ...res.data.response.map((item) => ({
           label: [item.firstName, item.lastName].join(' ').trim(),
@@ -716,17 +717,20 @@ const ChatHistory: FC = () => {
               onSelectionChange={(selection) => {
                 setSearchParams((params) => {
                   params.delete('customerSupportIds');
+                  params.set('page', '1');
                   selection?.forEach((s) =>
                     params.append('customerSupportIds', s.value)
                   );
                   return params;
                 });
 
+                setPagination({ pageIndex: 0, pageSize: pagination.pageSize });
+
                 getAllEndedChats.mutate({
                   customerSupportIds: selection?.map((s) => s.value),
                   startDate,
                   endDate,
-                  pagination,
+                  pagination: { pageIndex: 0, pageSize: pagination.pageSize },
                   sorting,
                   search,
                 });
