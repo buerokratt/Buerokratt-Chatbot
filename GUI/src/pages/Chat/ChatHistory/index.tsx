@@ -105,7 +105,7 @@ const ChatHistory: FC = () => {
         : new Date(
             new Date().getUTCFullYear(),
             new Date().getUTCMonth(),
-            new Date().getUTCDate() + 1
+            new Date().getUTCDate()
           ),
     },
   });
@@ -147,7 +147,8 @@ const ChatHistory: FC = () => {
         getAllEndedChats.mutate({
           startDate: format(new Date(startDate), 'yyyy-MM-dd'),
           endDate: format(new Date(endDate), 'yyyy-MM-dd'),
-          updatedPagination,
+          customerSupportIds: passedCustomerSupportIds,
+          pagination: updatedPagination,
           sorting,
           search,
         });
