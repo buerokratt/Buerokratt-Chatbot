@@ -116,6 +116,7 @@ const SettingsUsers: FC = () => {
         user_id: userInfo?.idCode,
         page_name: window.location.pathname,
         page_results: data.page_results,
+        selected_columns: "{}"
       });
     },
   });

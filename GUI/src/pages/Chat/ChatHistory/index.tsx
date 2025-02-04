@@ -32,11 +32,6 @@ import { useToast } from 'hooks/useToast';
 import { apiDev } from 'services/api';
 import useStore from 'store';
 import { Controller, useForm } from 'react-hook-form';
-import {
-  getFromLocalStorage,
-  setToLocalStorage,
-} from 'utils/local-storage-utils';
-import { CHAT_HISTORY_PREFERENCES_KEY } from 'constants/config';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { unifyDateFromat } from './unfiyDate';
 import withAuthorization from 'hoc/with-authorization';
@@ -54,9 +49,6 @@ const ChatHistory: FC = () => {
   const passedStartDate = params.get('start');
   const passedEndDate = params.get('end');
   const passedCustomerSupportIds = params.getAll('customerSupportIds');
-  const preferences = getFromLocalStorage(
-    CHAT_HISTORY_PREFERENCES_KEY
-  ) as string[];
   const [search, setSearch] = useState('');
   const [selectedChat, setSelectedChat] = useState<ChatType | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -83,10 +75,9 @@ const ChatHistory: FC = () => {
   >([]);
 
   const [messagesTrigger, setMessagesTrigger] = useState(false);
-  const [selectedColumns, setSelectedColumns] = useState<string[]>(
-    preferences ?? []
-  );
+  const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
   const [customerSupportAgents, setCustomerSupportAgents] = useState<any[]>([]);
+  const [counterKey, setCounterKey] = useState<number>(0)
 
   const { control, watch } = useForm<{
     startDate: Date | string;
@@ -141,9 +132,12 @@ const ChatHistory: FC = () => {
         },
       });
       if (response.data.pageResults !== undefined) {
+        const newSelectedColumns = response.data?.selectedColumns.length === 1 && response.data?.selectedColumns[0] === "" ? [] : response.data?.selectedColumns;
+        setSelectedColumns(newSelectedColumns)
         const updatedPagination = updatePagePreference(
-          response.data.pageResults
+          response.data.pageResults ?? 10
         );
+        setCounterKey(counterKey + 1)
         getAllEndedChats.mutate({
           startDate: format(new Date(startDate), 'yyyy-MM-dd'),
           endDate: format(new Date(endDate), 'yyyy-MM-dd'),
@@ -179,18 +173,22 @@ const ChatHistory: FC = () => {
         search,
       });
     }
-  }, []);
+  }, [selectedColumns]);
 
   useEffect(() => {
     listCustomerSupportAgents.mutate();
   }, []);
 
-  const updatePageSize = useMutation({
-    mutationFn: (data: { page_results: number }) => {
+  const updatePagePreferences = useMutation({
+    mutationFn: (data: {
+      page_results: number;
+      selected_columns: string[];
+    }) => {
       return apiDev.post('accounts/update-page-preference', {
         user_id: userInfo?.idCode,
         page_name: window.location.pathname,
         page_results: data.page_results,
+        selected_columns: `{"${data.selected_columns.join('","')}"}`
       });
     },
   });
@@ -209,6 +207,8 @@ const ChatHistory: FC = () => {
         const sortType = sorting[0].desc ? 'desc' : 'asc';
         sortBy = `${sorting[0].id} ${sortType}`;
       }
+
+      console.log('data', data, data.pagination, data.pagination.pageSize)
 
       return apiDev.post('agents/chats/ended', {
         customerSupportIds: data.customerSupportIds,
@@ -693,6 +693,7 @@ const ChatHistory: FC = () => {
               />
             </Track>
             <FormMultiselect
+              key={counterKey}
               name="visibleColumns"
               label={t('')}
               placeholder={t('chat.history.chosenColumn')}
@@ -703,7 +704,7 @@ const ChatHistory: FC = () => {
               onSelectionChange={(selection) => {
                 const columns = selection?.map((s) => s.value) ?? [];
                 setSelectedColumns(columns);
-                setToLocalStorage(CHAT_HISTORY_PREFERENCES_KEY, columns);
+                updatePagePreferences.mutate({page_results: pagination.pageSize, selected_columns: columns})
               }}
             />
             <FormMultiselect
@@ -727,9 +728,9 @@ const ChatHistory: FC = () => {
                 setPagination({ pageIndex: 0, pageSize: pagination.pageSize });
 
                 getAllEndedChats.mutate({
-                  customerSupportIds: selection?.map((s) => s.value),
                   startDate,
                   endDate,
+                  customerSupportIds: selection?.map((s) => s.value) || [],
                   pagination: { pageIndex: 0, pageSize: pagination.pageSize },
                   sorting,
                   search,
@@ -758,7 +759,7 @@ const ChatHistory: FC = () => {
                 )
                   return;
                 setPagination(state);
-                updatePageSize.mutate({ page_results: state.pageSize });
+                updatePagePreferences.mutate({ page_results: state.pageSize, selected_columns: selectedColumns });
                 getAllEndedChats.mutate({
                   startDate: format(new Date(startDate), 'yyyy-MM-dd'),
                   endDate: format(new Date(endDate), 'yyyy-MM-dd'),
