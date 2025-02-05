@@ -1,229 +1,96 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  PaginationState,
-  SortingState,
-  createColumnHelper,
-} from '@tanstack/react-table';
-import { format } from 'date-fns';
-import { AiFillCheckCircle } from 'react-icons/ai';
-import {
-  Button,
-  Card,
-  DataTable,
-  Drawer,
-  HistoricalChat,
-  Icon,
-  Tooltip,
-} from 'components';
+import * as Tabs from '@radix-ui/react-tabs';
+import { Chat } from 'components';
 import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';
-import { useMutation } from '@tanstack/react-query';
-import { Message } from 'types/message';
-import { useToast } from 'hooks/useToast';
-import { apiDev } from 'services/api';
-import { AxiosError } from 'axios';
+import { useQuery } from '@tanstack/react-query';
 import { userStore as useHeaderStore } from '@buerokratt-ria/header';
-import MessageContentView from './MessageContentView';
-import { MdOutlineRemoveRedEye } from 'react-icons/md';
-import { Chat as ChatType } from 'types/chat';
 import './ValidationRequests.scss';
+import clsx from 'clsx';
+import ChatTrigger from '../ChatActive/ChatTrigger';
 
 const ValidationRequests: React.FC = () => {
   const { t } = useTranslation();
-  const toast = useToast();
-  const [selectedChat, setSelectedChat] = useState<ChatType | null>(null);
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 10,
-  });
-  const [sorting, setSorting] = useState<SortingState>([]);
-
-  const validationRequests = useHeaderStore((state) =>
-    state.getValidationMessages()
+  const selectedChatId = useHeaderStore((state) => state.selectedChatId);
+  const selectedChat = useHeaderStore((state) =>
+    state.selectedValidationChat()
   );
 
-  const loadValidationMessages = useHeaderStore(
-    (state) => state.loadValidationMessages
+  const loadValidationRequests = useHeaderStore(
+    (state) => state.loadValidationChats
   );
 
   useEffect(() => {
-    useHeaderStore.getState().loadValidationMessages();
+    useHeaderStore.getState().loadValidationChats();
   }, []);
 
-  const approveMessage = useMutation({
-    mutationFn: (data: { chatId: string; messageId: string }) => {
-      return apiDev.post(`chats/messages/approve-validation`, {
-        chatId: data.chatId,
-        messageId: data.messageId,
-      });
-    },
-    onSuccess: async () => {
-      loadValidationMessages();
-      toast.open({
-        type: 'success',
-        title: t('global.notification'),
-        message: t('chat.validations.messageApproved'),
-      });
-      return true;
-    },
-    onError: (error: AxiosError) => {
-      toast.open({
-        type: 'error',
-        title: t('global.notificationError'),
-        message: error.message,
-      });
-      return false;
-    },
+  const { data: csaNameVisiblity } = useQuery<{ isVisible: boolean }>({
+    queryKey: ['agents/admin/name-visibility', 'prod'],
   });
 
-  const columnHelper = createColumnHelper<Message>();
+  const { data: csaTitleVisibility } = useQuery<{ isVisible: boolean }>({
+    queryKey: ['agents/admin/title-visibility', 'prod'],
+  });
 
-  const idView = (props: any) => (
-    <Tooltip content={props.getValue()}>
-      <button
-        onClick={() => copyValueToClipboard(props.getValue())}
-        style={{ cursor: 'pointer', fontSize: 16 }}
-      >
-        {props.getValue().split('-')[0]}
-      </button>
-    </Tooltip>
-  );
+  const validationChats = useHeaderStore((state) => state.getValidationChats());
 
-  const approveView = (props: any) => (
-    <Icon
-      style={{ marginLeft: '15%', cursor: 'pointer' }}
-      icon={
-        <AiFillCheckCircle
-          fontSize={22}
-          color="#308653"
-          onClick={() =>
-            approveMessage.mutate({
-              chatId: props.row.original.chatId,
-              messageId: props.row.original.id ?? '',
-            })
-          }
-        />
-      }
-      size="medium"
-    />
-  );
-
-  const dateView = (props: any) => (
-    <span>
-      {format(new Date(props.getValue() ?? ''), 'dd-MM-yyyy HH:mm:ss')}
-    </span>
-  );
-
-  const detailsView = (props: any) => (
-    <Button
-      appearance="text"
-      onClick={() => {
-        const chat: any = {
-          id: props.row.original.chatId,
-        };
-        setSelectedChat(chat);
-      }}
-    >
-      <Icon icon={<MdOutlineRemoveRedEye color={'rgba(0,0,0,0.54)'} />} />
-      {t('global.view')}
-    </Button>
-  );
-
-  const copyValueToClipboard = async (value: string) => {
-    await navigator.clipboard.writeText(value);
-
-    toast.open({
-      type: 'success',
-      title: t('global.notification'),
-      message: t('toast.success.copied'),
-    });
-  };
-
-  const validationColumns = useMemo(
-    () => [
-      columnHelper.accessor('id', {
-        id: 'id',
-        header: t('chat.validations.header.id') ?? '',
-        cell: idView,
-      }),
-      columnHelper.accessor('chatId', {
-        id: 'chatId',
-        header: t('chat.validations.header.chatId') ?? '',
-        cell: idView,
-      }),
-      columnHelper.accessor('content', {
-        header: t('chat.validations.header.message') ?? '',
-        cell: MessageContentView,
-      }),
-      columnHelper.accessor('created', {
-        header: t('chat.validations.header.requestedAt') ?? '',
-        cell: dateView,
-      }),
-      columnHelper.display({
-        id: 'approve',
-        header: t('chat.validations.header.approve') ?? '',
-        cell: approveView,
-      }),
-      columnHelper.display({
-        id: 'detail',
-        cell: detailsView,
-        meta: {
-          size: '3%',
-          sticky: 'right',
-        },
-      }),
-    ],
-    []
-  );
+  useEffect(() => {}, [selectedChatId]);
 
   return (
-    <>
-      <h1>{t('chat.validations.title')}</h1>
-      <p>{t('chat.validations.description')}</p>
-      <div className="card-drawer-container">
-        <div className="card-wrapper">
-          <Card>
-            <DataTable
-              data={validationRequests ?? []}
-              columns={validationColumns}
-              sortable
-              sorting={sorting}
-              pagination={pagination}
-              setPagination={(state: PaginationState) => {
-                if (
-                  state.pageIndex === pagination.pageIndex &&
-                  state.pageSize === pagination.pageSize
-                )
-                  return;
-                setPagination(state);
-              }}
-              setSorting={(state: SortingState) => {
-                setSorting(state);
-              }}
-            />
-          </Card>
+    <Tabs.Root
+      className="vertical-tabs"
+      orientation="vertical"
+      onValueChange={useHeaderStore.getState().setSelectedChatId}
+      style={{ height: '100%', overflow: 'hidden' }}
+    >
+      <Tabs.List
+        className="vertical-tabs__list"
+        aria-label={t('chat.active.list') ?? ''}
+        style={{ overflow: 'auto' }}
+      >
+        <div className="vertical-tabs__group-header">
+          <p>{`${t('chat.validations.title')} ${
+            (validationChats?.length ?? 0) == 0
+              ? ''
+              : `(${validationChats?.length ?? 0})`
+          }`}</p>
         </div>
-        {selectedChat && (
-          <div className="drawer-container">
-            <Drawer
-              title={selectedChat.id}
-              onClose={() => setSelectedChat(null)}
-            >
-              <HistoricalChat
-                chat={selectedChat}
-                trigger={false}
-                onChatStatusChange={() => {}}
-                selectedStatus={null}
-                onCommentChange={() => {}}
-                showComment={false}
-                showStatus={false}
-              />
-            </Drawer>
-          </div>
-        )}
-      </div>
-    </>
+        {validationChats?.map((chat) => (
+          <Tabs.Trigger
+            key={chat.id}
+            className={clsx('vertical-tabs__trigger')}
+            value={chat.id}
+            style={{ borderBottom: '1px solid #D2D3D8' }}
+          >
+            <ChatTrigger chat={chat} />
+          </Tabs.Trigger>
+        ))}
+      </Tabs.List>
+
+      {selectedChatId ? (
+        <Tabs.Content className="vertical-tabs__body" value={selectedChatId}>
+          {selectedChat && (
+            <Chat
+              chat={selectedChat}
+              isCsaNameVisible={csaNameVisiblity?.isVisible ?? false}
+              isCsaTitleVisible={csaTitleVisibility?.isVisible ?? false}
+              onChatEnd={() => {}}
+              onForwardToColleauge={() => {}}
+              onForwardToEstablishment={() => {}}
+              onSendToEmail={() => {}} // To be added when endpoint is ready
+              onRefresh={loadValidationRequests}
+            />
+          )}
+        </Tabs.Content>
+      ) : (
+        <div className="vertical-tabs__body-placeholder">
+          <p className="h3" style={{ color: '#9799A4' }}>
+            {t('chat.active.chooseChat')}
+          </p>
+        </div>
+      )}
+    </Tabs.Root>
   );
 };
 

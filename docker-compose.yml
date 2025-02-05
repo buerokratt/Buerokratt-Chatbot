@@ -66,6 +66,7 @@ services:
       - tim-postgresql
     environment:
       - SECURITY_ALLOWLIST_JWT=ruuter-private,ruuter-public,data-mapper,resql,tim,tim-postgresql,chat-widget,authentication-layer,127.0.0.1,::1
+      - JWT_INTEGRATION_SIGNATURE_KEY_STORE_PASSWORD=defaultpassword
     ports:
       - 8085:8085
     networks:

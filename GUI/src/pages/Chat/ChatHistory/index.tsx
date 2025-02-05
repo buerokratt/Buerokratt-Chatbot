@@ -1,11 +1,16 @@
-import {FC, useEffect, useMemo, useState} from 'react';
-import {useTranslation} from 'react-i18next';
-import {useMutation} from '@tanstack/react-query';
-import {ColumnPinningState, createColumnHelper, PaginationState, SortingState,} from '@tanstack/react-table';
-import {format} from 'date-fns';
-import {AxiosError} from 'axios';
+import { FC, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useMutation } from '@tanstack/react-query';
+import {
+  ColumnPinningState,
+  createColumnHelper,
+  PaginationState,
+  SortingState,
+} from '@tanstack/react-table';
+import { format } from 'date-fns';
+import { AxiosError } from 'axios';
 import './History.scss';
-import {MdOutlineRemoveRedEye} from 'react-icons/md';
+import { MdOutlineRemoveRedEye } from 'react-icons/md';
 
 import {
   Button,
@@ -22,19 +27,17 @@ import {
   Track,
 } from 'components';
 
-import {Chat as ChatType, CHAT_EVENTS, CHAT_STATUS} from 'types/chat';
-import {useToast} from 'hooks/useToast';
-import {apiDev} from 'services/api';
+import { Chat as ChatType, CHAT_EVENTS, CHAT_STATUS } from 'types/chat';
+import { useToast } from 'hooks/useToast';
+import { apiDev } from 'services/api';
 import useStore from 'store';
-import {Controller, useForm} from 'react-hook-form';
-import {getFromLocalStorage, setToLocalStorage,} from 'utils/local-storage-utils';
-import {CHAT_HISTORY_PREFERENCES_KEY} from 'constants/config';
-import {useLocation, useSearchParams} from 'react-router-dom';
-import {unifyDateFromat} from './unfiyDate';
+import { Controller, useForm } from 'react-hook-form';
+import { useLocation, useSearchParams } from 'react-router-dom';
+import { unifyDateFromat } from './unfiyDate';
 import withAuthorization from 'hoc/with-authorization';
-import {ROLES} from 'utils/constants';
-import {et} from 'date-fns/locale';
-import {useDebouncedCallback} from 'use-debounce';
+import { ROLES } from 'utils/constants';
+import { et } from 'date-fns/locale';
+import { useDebouncedCallback } from 'use-debounce';
 
 const ChatHistory: FC = () => {
   const { t, i18n } = useTranslation();
@@ -46,9 +49,6 @@ const ChatHistory: FC = () => {
   const passedStartDate = params.get('start');
   const passedEndDate = params.get('end');
   const passedCustomerSupportIds = params.getAll('customerSupportIds');
-  const preferences = getFromLocalStorage(
-    CHAT_HISTORY_PREFERENCES_KEY
-  ) as string[];
   const [search, setSearch] = useState('');
   const [selectedChat, setSelectedChat] = useState<ChatType | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -75,10 +75,9 @@ const ChatHistory: FC = () => {
   >([]);
 
   const [messagesTrigger, setMessagesTrigger] = useState(false);
-  const [selectedColumns, setSelectedColumns] = useState<string[]>(
-    preferences ?? []
-  );
+  const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
   const [customerSupportAgents, setCustomerSupportAgents] = useState<any[]>([]);
+  const [counterKey, setCounterKey] = useState<number>(0)
 
   const { control, watch } = useForm<{
     startDate: Date | string;
@@ -97,7 +96,7 @@ const ChatHistory: FC = () => {
         : new Date(
             new Date().getUTCFullYear(),
             new Date().getUTCMonth(),
-            new Date().getUTCDate() + 1
+            new Date().getUTCDate()
           ),
     },
   });
@@ -127,14 +126,23 @@ const ChatHistory: FC = () => {
     setInitialLoad(false);
     try {
       const response = await apiDev.get('/accounts/get-page-preference', {
-        params: {user_id: userInfo?.idCode, page_name: window.location.pathname},
+        params: {
+          user_id: userInfo?.idCode,
+          page_name: window.location.pathname,
+        },
       });
       if (response.data.pageResults !== undefined) {
-        const updatedPagination = updatePagePreference(response.data.pageResults)
+        const newSelectedColumns = response.data?.selectedColumns.length === 1 && response.data?.selectedColumns[0] === "" ? [] : response.data?.selectedColumns;
+        setSelectedColumns(newSelectedColumns)
+        const updatedPagination = updatePagePreference(
+          response.data.pageResults ?? 10
+        );
+        setCounterKey(counterKey + 1)
         getAllEndedChats.mutate({
           startDate: format(new Date(startDate), 'yyyy-MM-dd'),
           endDate: format(new Date(endDate), 'yyyy-MM-dd'),
-          updatedPagination,
+          customerSupportIds: passedCustomerSupportIds,
+          pagination: updatedPagination,
           sorting,
           search,
         });
@@ -145,13 +153,16 @@ const ChatHistory: FC = () => {
   };
 
   const updatePagePreference = (pageResults: number): PaginationState => {
-    const updatedPagination: PaginationState = {...pagination, pageSize: pageResults};
+    const updatedPagination: PaginationState = {
+      ...pagination,
+      pageSize: pageResults,
+    };
     setPagination(updatedPagination);
     return updatedPagination;
-  }
+  };
 
   useEffect(() => {
-    if(initialLoad) {
+    if (initialLoad) {
       fetchData();
     } else {
       getAllEndedChats.mutate({
@@ -163,22 +174,24 @@ const ChatHistory: FC = () => {
         search,
       });
     }
-  }, []);
+  }, [selectedColumns]);
 
   useEffect(() => {
     listCustomerSupportAgents.mutate();
   }, []);
 
-  const updatePageSize = useMutation({
+  const updatePagePreferences = useMutation({
     mutationFn: (data: {
       page_results: number;
+      selected_columns: string[];
     }) => {
       return apiDev.post('accounts/update-page-preference', {
         user_id: userInfo?.idCode,
         page_name: window.location.pathname,
         page_results: data.page_results,
+        selected_columns: `{"${data.selected_columns.join('","')}"}`
       });
-    }
+    },
   });
 
   const getAllEndedChats = useMutation({
@@ -196,12 +209,14 @@ const ChatHistory: FC = () => {
         sortBy = `${sorting[0].id} ${sortType}`;
       }
 
+      console.log('data', data, data.pagination, data.pagination.pageSize)
+
       return apiDev.post('agents/chats/ended', {
         customerSupportIds: data.customerSupportIds,
         startDate: data.startDate,
         endDate: data.endDate,
-        page: pagination.pageIndex + 1,
-        page_size: pagination.pageSize,
+        page: data.pagination.pageIndex + 1,
+        page_size: data.pagination.pageSize,
         sorting: sortBy,
         search,
       });
@@ -240,12 +255,14 @@ const ChatHistory: FC = () => {
         roles: ['ROLE_CUSTOMER_SUPPORT_AGENT'],
       }),
     onSuccess: (res: any) => {
-      setCustomerSupportAgents(
-        res.data.response.map((item) => ({
+      setCustomerSupportAgents([
+        { label: '-', value: ',' },
+        { label: 'Bürokratt', value: 'chatbot' },
+        ...res.data.response.map((item) => ({
           label: [item.firstName, item.lastName].join(' ').trim(),
           value: item.idCode,
-        }))
-      );
+        })),
+      ]);
     },
   });
 
@@ -375,9 +392,9 @@ const ChatHistory: FC = () => {
           onClick={() => copyValueToClipboard(props.getValue())}
           style={{ cursor: 'pointer' }}
         >
-          {props.getValue().length <= 30
+          {props.getValue().length <= 25
             ? props.getValue()
-            : `${props.getValue()?.slice(0, 30)}...`}
+            : `${props.getValue()?.slice(0, 25)}...`}
         </span>
       </Tooltip>
     );
@@ -462,8 +479,12 @@ const ChatHistory: FC = () => {
       }),
       columnHelper.accessor(
         (row) =>
-          `${row.customerSupportFirstName ?? ''} ${
-            row.customerSupportLastName ?? ''
+          `${
+            row.customerSupportId === 'chatbot'
+              ? row.customerSupportDisplayName
+              : row.customerSupportId
+                ? `${row.customerSupportFirstName ?? ''} ${row.customerSupportLastName ?? ''}`
+                : '-'
           }`,
         {
           id: `customerSupportFullName`,
@@ -673,6 +694,7 @@ const ChatHistory: FC = () => {
               />
             </Track>
             <FormMultiselect
+              key={counterKey}
               name="visibleColumns"
               label={t('')}
               placeholder={t('chat.history.chosenColumn')}
@@ -683,7 +705,7 @@ const ChatHistory: FC = () => {
               onSelectionChange={(selection) => {
                 const columns = selection?.map((s) => s.value) ?? [];
                 setSelectedColumns(columns);
-                setToLocalStorage(CHAT_HISTORY_PREFERENCES_KEY, columns);
+                updatePagePreferences.mutate({page_results: pagination.pageSize, selected_columns: columns})
               }}
             />
             <FormMultiselect
@@ -697,17 +719,20 @@ const ChatHistory: FC = () => {
               onSelectionChange={(selection) => {
                 setSearchParams((params) => {
                   params.delete('customerSupportIds');
+                  params.set('page', '1');
                   selection?.forEach((s) =>
                     params.append('customerSupportIds', s.value)
                   );
                   return params;
                 });
 
+                setPagination({ pageIndex: 0, pageSize: pagination.pageSize });
+
                 getAllEndedChats.mutate({
-                  customerSupportIds: selection?.map((s) => s.value),
                   startDate,
                   endDate,
-                  pagination,
+                  customerSupportIds: selection?.map((s) => s.value) || [],
+                  pagination: { pageIndex: 0, pageSize: pagination.pageSize },
                   sorting,
                   search,
                 });
@@ -735,7 +760,7 @@ const ChatHistory: FC = () => {
                 )
                   return;
                 setPagination(state);
-                updatePageSize.mutate({ page_results: state.pageSize });
+                updatePagePreferences.mutate({ page_results: state.pageSize, selected_columns: selectedColumns });
                 getAllEndedChats.mutate({
                   startDate: format(new Date(startDate), 'yyyy-MM-dd'),
                   endDate: format(new Date(endDate), 'yyyy-MM-dd'),

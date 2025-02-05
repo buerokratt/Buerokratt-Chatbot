@@ -10,7 +10,9 @@ declaration:
 getMessagesWaitingValidations:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/get-messages-waiting-validation"
+    url: "[#CHATBOT_RESQL]/get-cs-all-validation-chats"
+    body:
+      limit: 1000
   result: res
 
 return_result:

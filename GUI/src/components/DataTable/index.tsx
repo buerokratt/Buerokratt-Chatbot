@@ -265,6 +265,7 @@ const DataTable: FC<DataTableProps> = ({
                 {row.getVisibleCells().map((cell) => (
                   <td
                     key={cell.id}
+                    className={selectedRow?.(row) ? 'highlighted' : 'default'}
                     style={{
                       position: cell.column.columnDef.meta?.sticky
                         ? 'sticky'
@@ -345,7 +346,9 @@ const DataTable: FC<DataTableProps> = ({
                       })}
                     >
                       <Link
-                        to={`?page=${index + 1}&${searchParamsWithoutPage.toString()}`}
+                        to={`?page=${
+                          index + 1
+                        }&${searchParamsWithoutPage.toString()}`}
                         onClick={() => table.setPageIndex(index)}
                         aria-label={t('global.gotoPage') + index}
                         aria-current={
