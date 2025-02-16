@@ -1,0 +1,169 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'REDIRECT'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: csaTitle
+        type: string
+        description: "Body field 'csaTitle'"
+      - field: customerSupportDisplayName
+        type: string
+        description: "Body field 'customerSupportDisplayName'"
+      - field: customerSupportId
+        type: string
+        description: "Body field 'customerSupportId'"
+      - field: forwardedByUser
+        type: string
+        description: "Body field 'forwardedByUser'"
+      - field: forwardedFromCsa
+        type: string
+        description: "Body field 'forwardedFromCsa'"
+      - field: forwardedToCsa
+        type: string
+        description: "Body field 'forwardedToCsa'"
+      - field: id
+        type: string
+        description: "Body field 'id'"
+
+extractRequestData:
+  assign:
+    id: "${incoming.body.id}"
+    customerSupportId: "${incoming.body.customerSupportId}"
+    customerSupportDisplayName: "${incoming.body.customerSupportDisplayName}"
+    csaTitle: "${incoming.body.csaTitle}"
+    forwardedByUser: "${incoming.body.forwardedByUser}"
+    forwardedFromCsa: "${incoming.body.forwardedFromCsa}"
+    forwardedToCsa: "${incoming.body.forwardedToCsa}"
+
+getActiveChatById:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-active-chat-by-id"
+    body:
+      id: ${id}
+  result: activeChatRes
+  next: checkActiveChatResult 
+
+checkActiveChatResult:
+  switch:
+    - condition: ${activeChatRes.response.body.length > 0}
+      next: assignChat
+  next: return_chat_ended
+
+assignChat:
+  assign:
+    activeChat: ${activeChatRes.response.body[0]}
+  next: redirectChat
+
+redirectChat:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-chat"
+    body:
+      id: ${id}
+      customerSupportId: ${customerSupportId}
+      customerSupportDisplayName: ${customerSupportDisplayName}
+      csaTitle: ${csaTitle}
+      endUserId: ${activeChat.endUserId ?? ""}
+      endUserFirstName: ${activeChat.endUserFirstName ?? ""}
+      endUserLastName: ${activeChat.endUserLastName ?? ""}
+      status: "REDIRECTED"
+      endUserEmail: ${activeChat.endUserEmail ?? ""}
+      endUserPhone: ${activeChat.endUserPhone ?? ""}
+      endUserOs: ${activeChat.endUserOs ?? ""}
+      endUserUrl: ${activeChat.endUserUrl ?? ""}
+      feedbackText: ""
+      feedbackRating: ""
+      externalId: ${activeChat.externalId ?? ""}
+      created: ${activeChat.created ?? new Date().toISOString()}
+      ended: ${activeChat.ended ?? ""}
+      forwardedTo: ${activeChat.forwardedTo ?? ""}
+      forwardedToName: ${activeChat.forwardedToName ?? ""}
+      receivedFrom: ${activeChat.receivedFrom ?? ""}
+      receivedFromName: ${activeChat.receivedFromName ?? ""}
+  result: redirectChatRes
+  next: getUuid
+
+getUuid:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_HBS]/return_uuid"
+    headers:
+      type: json
+  result: uuid_result
+  next: assignUuid
+
+assignUuid:
+  assign:
+    uuid: ${uuid_result.response.body.uuid}
+  next: insertMessage  
+
+insertMessage:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-message"
+    body:
+      chatId: ${activeChat.id ?? uuid}
+      messageId: ${uuid}
+      content: ""
+      authorTimestamp: ${new Date().toISOString()}
+      authorId: ""
+      authorFirstName: ""
+      authorRole: "buerokratt"
+      created: ${new Date().toISOString()}
+      authorLastName: ""
+      rating: ""
+      event: "redirected"
+      forwardedByUser: ${forwardedByUser}
+      forwardedFromCsa: ${forwardedFromCsa}
+      forwardedToCsa: ${forwardedToCsa}
+  result: insertMessageResult
+  next: notify_chats
+
+notify_chats:
+  template: chats/notify
+  requestType: templates
+  body:
+    chatId: ${id}
+  result: chats_notify_res
+  next: getRedirectedChat
+
+getRedirectedChat:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-active-chat-by-id"
+    body:
+      id: ${id}
+  result: redirectedChatRes
+  next: notify_messages
+
+notify_messages:
+  template: messages/notify
+  requestType: templates
+  body:
+    chatId: ${activeChat.id ?? uuid}
+    type: "message"
+    messageId: ${uuid}
+  result: messages_notify_res
+
+remove_chat_id_from_queue_notification_node_if_existed:
+  call: http.post
+  args:
+    url: "[#CHATBOT_NOTIFICATIONS]/dequeue"
+    body:
+      id: ${id}
+  result: remove_chat_id_from_queue_notification_node_if_existed_res  
+
+return_result:
+  return: ${redirectedChatRes.response.body}
+  next: end
+
+return_chat_ended:
+  return: "Chat Has Ended"
+  status: 400
+  next: end 

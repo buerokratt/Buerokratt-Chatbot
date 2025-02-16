@@ -1,0 +1,212 @@
+---
+declaration:
+  call: declare
+  version: 0.1
+  description: Description placeholder for 'EXTERNAL-BOT'
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: message
+        type: string
+        description: Body field 'message'
+      - field: sender
+        type: string
+        description: Body field 'sender'
+      - field: authorId
+        type: string
+        description: "Parameter 'authorId'"
+      - field: holidayNames
+        type: string
+        description: "Body field 'holidayNames'"
+      - field: holidays
+        type: string
+        description: "Body field 'holidays'"  
+
+extract_data:
+  assign:
+    currentDate: ${new Date().toISOString().split('T')[0]}
+    sender: ${incoming.body.sender}
+    authorId: ${incoming.body.authorId}
+    holidays: ${incoming.body.holidays}
+    holidayNames: ${incoming.body.holidayNames}
+    event: ""
+
+getSkmConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-skm-config"
+  result: skm_res
+
+assignSkmConfig:
+  assign:
+    skm_config: ${skm_res.response.body[0]}
+
+logstepAZURESAADAME:
+  log: ${incoming.body.message}
+
+assign_data_sources:
+  assign:
+    data_sources:
+      - type: azure_search
+        parameters:
+          endpoint: "[#SEARCH_ENDPOINT]"
+          index_name: ${skm_config.indexName}
+          semantic_configuration: azureml-default
+          query_type: ${skm_config.queryType}
+          in_scope: true
+          strictness: ${parseInt(skm_config.range ?? '3')}
+          top_n_documents: ${parseInt(skm_config.documents ?? '5')}
+          authentication:
+            type: api_key
+            key: "[#CHATBOT_EXTERNAL_KEY]"
+          embedding_dependency:
+            type: endpoint
+            endpoint: "[#EMBEDDED_ENDPOINT_AZURE]"
+            authentication:
+              type: api_key
+              key: "[#CHATBOT_EXTERNAL_API_KEY]"
+
+logstepAZUREDS:
+  log: ${data_sources}
+
+get_chat_messages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-chat-messages"
+    body:
+      chatId: ${sender}
+  result: chat_messages_res
+
+prepare_messages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_HBS]/prepare-llm-messages"
+    headers:
+      type: json
+    body:
+      prompt_message: ${skm_config.systemMessage}
+      messages: ${chat_messages_res.response.body}
+      new_message: ${incoming.body.message ?? ''}
+  result: prepare_messages_res
+
+assign_messages:
+  assign:
+    messages: ${prepare_messages_res.response.body}
+
+logstepAZUREMSG:
+  log: ${messages}
+
+post_answer:
+  call: http.post
+  args:
+    url: "[#CHATBOT_EXTERNAL_BOT_URL]"
+    headers:
+      Content-Type: application/json
+      api-key: "[#CHATBOT_EXTERNAL_API_KEY]"
+    body:
+      data_sources: ${data_sources}
+      messages: ${messages}
+      temperature: 0
+      max_tokens: ${parseInt(skm_config.maxTokens ?? '1000')}
+      stream: false
+      frequency_penalty: 0
+      presence_penalty: 0
+  result: test
+  
+logstepAZUREBOT:
+  log: ${test}
+
+assign_value:
+  assign:
+    correct_value:
+      - recipient_id: ${sender}
+        text: ${test.response.body.choices[0].message.content.replace(/\n/g,"\\n").replace(/%/g," protsenti").replace(" \. ", ". ")}
+        context: ${test.response.body.choices[0].message.context}
+  next: check_value
+
+check_value:
+  switch:
+    - condition: ${correct_value === 'ERROR'}
+      next: return_value
+    - condition: ${correct_value.map((item) => item.text)[0] === '$backoffice' || correct_value.map((item) => item.text)[0].startsWith('$backoffice')}
+      next: assign_back_office_event  
+    - condition: ${correct_value.map((item) => item.text)[0].startsWith('$validate_')}
+      next: assign_validation_event  
+  next: format_messages
+  
+return_value:
+  return: ${correct_value}
+  next: end
+
+assign_validation_event:
+  assign:
+    correct_value:
+      - recipient_id: ${sender}
+        text: ${correct_value.map((item) => item.text)[0].replace('$validate_', '')}
+        context: ${test.response.body.choices[0].message.context}
+    event: "waiting_validation"
+  next: change_chat_status 
+
+change_chat_status:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RUUTER_PUBLIC]/chats/change-status"
+    body:
+      chatId: ${sender}
+      status: "VALIDATING"
+      holidays: ${holidays}
+      holidayNames: ${holidayNames}
+  result: change_chat_status_res
+  next: check_chat_status_result
+
+check_chat_status_result:
+  switch:
+    - condition: ${change_chat_status_res.response.body.response === "Status Changed Successfully"}
+      next: format_messages
+  next: assign_unavailable_message
+
+assign_unavailable_message:
+  assign:
+    correct_value:
+      - recipient_id: ${sender}
+        text: "Edasine lahendamine toimub vastavalt pöördumiste protsessile väljaspool AI-assistendi lahendust."
+        context: ${test.response.body.choices[0].message.context}
+    event: ""
+  next: format_messages
+
+assign_back_office_event:
+  assign:
+    correct_value:
+      - recipient_id: ${sender}
+        text: "Kahjuks ei oska ma hetkel teie küsimusele vastata. Kas soovite, et suunan küsimuse nõustajale?"
+        context: ${test.response.body.choices[0].message.context}
+    event: "ask_to_forward_to_csa"
+  next: format_messages
+
+format_messages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_HBS]/llm_responses_to_messages"
+    headers:
+      type: json
+    body:
+      data:
+        {
+          "botMessages": "${correct_value}",
+          "chatId": "${sender}",
+          "authorId": "${authorId}",
+          "authorFirstName": "",
+          "authorLastName": "",
+          "event": "${event ?? ''}",
+          "authorTimestamp": "${new Date().toISOString()}",
+          "created": "${new Date().toISOString()}",
+        }
+  result: converted_messages_res
+  next: return_formatted_value
+
+return_formatted_value:
+  return: ${converted_messages_res.response.body}
+  next: end 

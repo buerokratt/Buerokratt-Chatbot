@@ -1,0 +1,96 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'OPTIONS-INSERT'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: chatId
+        type: string
+        description: "Body field 'chatId'"
+      - field: options
+        type: string
+        description: "Body field 'options'"
+
+extractRequestData:
+  assign:
+    chatId: ${incoming.body.chatId}
+    options: ${incoming.body.options}
+
+getActiveChatById:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-active-chat-by-id"
+    body:
+      id: ${chatId}
+  result: activeChatRes
+
+checkActiveChatResult:
+  switch:
+    - condition: ${activeChatRes.response.body.length > 0}
+      next: get_message_uuid
+  next: return_chat_ended
+
+get_message_uuid:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_HBS]/return_uuid"
+    headers:
+      type: json
+  result: message_uuid_result
+
+assignMessageUuid:
+  assign:
+    messageUuid: ${message_uuid_result.response.body.uuid}
+
+add_message_to_db:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-message-with-options"
+    body:
+      chatId: ${chatId}
+      messageId: ${messageUuid}
+      content: ""
+      options: ${options ?? "[]"}
+      authorTimestamp: ${new Date().toISOString()}
+      authorRole: "buerokratt"
+      created: ${new Date().toISOString()}
+      rating: ""
+      event: ""
+      forwardedByUser: ""
+      forwardedFromCsa: ""
+      forwardedToCsa: ""
+      authorId: ""
+      authorFirstName: ""
+      authorLastName: ""
+  result: insertMessageResult
+
+notify_chats:
+  template: chats/notify
+  requestType: templates
+  body:
+    chatId: ${chatId}
+  result: chats_notify_res
+  next: notify_messages
+
+notify_messages:
+  template: messages/notify
+  requestType: templates
+  body:
+    chatId: ${chatId}
+    type: "message"
+    messageId: ${messageUuid}
+  result: messages_notify_res
+
+return_message_sent:
+  status: 200
+  return: "Message Sent Successfully"
+  next: end
+
+return_chat_ended:
+  return: "Chat Has Ended"
+  status: 400
+  next: end  

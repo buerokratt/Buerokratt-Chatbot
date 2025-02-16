@@ -1,0 +1,212 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'INIT'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: holidayNames
+        type: string
+        description: "Body field 'holidayNames'"
+      - field: holidays
+        type: string
+        description: "Body field 'holidays'"
+      - field: message
+        type: json
+        description: "Body field 'message'"
+      - field: endUserTechnicalData
+        type: json
+        description: "Body field 'endUserTechnicalData'"
+
+extractRequestData:
+  assign:
+    authorRole: ${incoming.body.message.authorRole}
+    authorTimestamp: ${incoming.body.message.authorTimestamp}
+    content: ${incoming.body.message.content ?? ""}
+    endUserId: ""
+    endUserEmail: ""
+    endUserPhone: ""
+    endUserOs: ${incoming.body.endUserTechnicalData.endUserOs}
+    endUserUrl: ${incoming.body.endUserTechnicalData.endUserUrl}
+    forwardedByUser: ""
+    forwardedFromCsa: ""
+    forwardedToCsa: ""
+    holidays: ${incoming.body.holidays}
+    holidayNames: ${incoming.body.holidayNames}
+  next: getChatUuid
+
+getChatUuid:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_HBS]/return_uuid"
+    headers:
+      type: json
+  result: chat_uuid_result
+  next: assignChatUuid
+
+assignChatUuid:
+  assign:
+    chatUuid: ${chat_uuid_result.response.body.uuid}
+  next: getMessageUuid
+
+getMessageUuid:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_HBS]/return_uuid"
+    headers:
+      type: json
+  result: message_uuid_result
+  next: assignMessageUuid
+
+assignMessageUuid:
+  assign:
+    messageUuid: ${message_uuid_result.response.body.uuid}
+  next: get_session_length
+
+get_session_length:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-configuration"
+    body:
+      key: "session_length"
+  result: session_result
+  next: generate_cookie
+
+generate_cookie:
+  call: http.post
+  args:
+    url: "[#CHATBOT_TIM]/jwt/custom-jwt-generate"
+    body:
+      JWTName: "chatJwt"
+      expirationInMinutes: ${session_result.response.body[0]?.value ?? '120'}
+      content: { "chatId": "${chatUuid}", "forwardTo": "" }
+  result: cookie_result
+  next: assign_cookie
+
+assign_cookie:
+  assign:
+    setCookie:
+      chatJwt: ${cookie_result.response.body.token}
+      Domain: "[#DOMAIN]"
+      Secure: true
+      HttpOnly: true
+      SameSite: "Lax"
+  next: postGreetingMessage
+
+postGreetingMessage:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RUUTER_PUBLIC]/chats/messages/greeting"
+    body:
+      chatId: ${chatUuid}
+      authorTimestamp: ${authorTimestamp}
+  result: greeting_result
+  next: postClientMessage
+
+postClientMessage:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-message"
+    body:
+      chatId: ${chatUuid}
+      messageId: ${messageUuid}
+      content: ${content}
+      event: ""
+      authorTimestamp: ${authorTimestamp}
+      authorId: ${endUserId}
+      authorFirstName: ""
+      authorRole: ${authorRole}
+      created: ${new Date().toISOString()}
+      authorLastName: ""
+      rating: ""
+      forwardedByUser: ${forwardedByUser}
+      forwardedFromCsa: ${forwardedFromCsa}
+      forwardedToCsa: ${forwardedToCsa}
+  result: insertMessageResult
+  next: insertChat
+
+insertChat:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/init-chat"
+    body:
+      id: ${chatUuid}
+      endUserId: ${endUserId}
+      endUserFirstName: ""
+      endUserLastName: ""
+      status: "OPEN"
+      lastMessage: ${content}
+      created: ${new Date().toISOString()}
+      ended: ""
+      feedbackRating: ""
+      feedbackText: ""
+      endUserEmail: ${endUserEmail}
+      endUserPhone: ${endUserPhone}
+      endUserOs: ${endUserOs}
+      endUserUrl: ${endUserUrl}
+      externalId: ""
+      forwardedTo: ""
+      forwardedToName: ""
+      receivedFrom: ""
+      receivedFromName: ""
+  result: insertMessageResult
+  next: postMessageToBot
+
+postMessageToBot:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RUUTER_PUBLIC]/internal/message-to-bot"
+    body:
+      chatId: ${chatUuid}
+      content: ${content}
+      holidays: ${holidays}
+      holidayNames: ${holidayNames}
+  result: message_to_bot_result
+  next: check_for_post_message_to_bot_result
+
+check_for_post_message_to_bot_result:
+  switch:
+    - condition: ${message_to_bot_result.response.body.response === 'Bot error'}
+      next: return_bot_error
+  next: getChat
+
+getChat:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-chat-by-id"
+    body:
+      id: ${chatUuid}
+  result: chat_result
+  next: notify_chats
+
+notify_chats:
+  template: chats/notify
+  requestType: templates
+  body:
+    chatId: ${chatUuid}
+  result: chats_notify_res
+  next: notify_messages
+
+notify_messages:
+  template: messages/notify
+  requestType: templates
+  body:
+    chatId: ${chatUuid}
+    type: "message"
+    messageId: ${messageUuid}
+  result: messages_notify_res
+  next: return_result
+
+return_result:
+  headers:
+    Set-Cookie: ${setCookie}
+  return: ${chat_result.response.body[0]}
+  next: end
+
+return_bot_error:
+  status: 420
+  return: "Bot error"
+  next: end

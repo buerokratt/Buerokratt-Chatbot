@@ -1,0 +1,184 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'ADD'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: holidayNames
+        type: string
+        description: "Body field 'holidayNames'"
+      - field: holidays
+        type: string
+        description: "Body field 'holidays'"
+      - field: silent
+        type: string
+        description: "Body field 'silent'"
+      - field: message
+        type: json
+        description: "Body field 'message'"
+    headers:
+      - field: cookie
+        type: string
+        description: "Cookie field"
+
+extractRequestData:
+  assign:
+    authorTimestamp: ${incoming.body.message.authorTimestamp}
+    authorRole: ${incoming.body.message.authorRole}
+    content: ${incoming.body.message.content ?? ""}
+    event: ${incoming.body.message.event}
+    holidays: ${incoming.body.holidays}
+    holidayNames: ${incoming.body.holidayNames}
+    cookie: ${incoming.headers.cookie}
+    silent: ${incoming.body.silent}
+  next: checkContentLength
+
+checkContentLength:
+  switch:
+    - condition: ${content.length > 1000}
+      next: return_content_length_exceeded
+  next: get_chat_info
+
+get_chat_info:
+  call: http.post
+  args:
+   url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
+   contentType: plaintext
+   headers:
+    cookie: ${cookie}
+   plaintext:
+      "chatJwt"
+  result: res
+  next: check_chat_info_response
+
+check_chat_info_response:
+  switch:
+    - condition: ${200 <= res.response.statusCodeValue && res.response.statusCodeValue < 300}
+      next: assignChatId
+  next: return_bad_request
+
+assignChatId:
+  assign:
+    chatId: ${res.response.body.chatId}
+  next: getActiveChatById
+
+getActiveChatById:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-active-chat-by-id"
+    body:
+      id: ${chatId}
+  result: activeChatRes
+  next: checkActiveChatResult    
+
+checkActiveChatResult:
+  switch:
+    - condition: ${activeChatRes.response.body.length > 0}
+      next: getUuid
+  next: return_chat_ended
+
+getUuid:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_HBS]/return_uuid"
+    headers:
+      type: json
+  result: uuid_result
+  next: assignUuid
+
+assignUuid:
+  assign:
+    uuid: ${uuid_result.response.body.uuid}
+  next: insertMessage  
+
+insertMessage:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-message"
+    body:
+      chatId: ${chatId}
+      messageId: ${uuid}
+      content: ${content}
+      authorTimestamp: ${authorTimestamp}
+      authorId: ""
+      authorFirstName: ""
+      authorRole: ${authorRole}
+      created: ${new Date().toISOString()}
+      authorLastName: ""
+      rating: ""
+      event: ${event ?? ""}
+      forwardedByUser: ""
+      forwardedFromCsa: ""
+      forwardedToCsa: ""
+  result: insertMessageResult
+  next: check_skip_bot
+
+check_skip_bot:
+  switch:
+    - condition: ${silent == 'true' || silent == true}
+      next: notify_chats
+  next: postMessageToBot
+
+postMessageToBot:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL]/internal/message-to-bot"
+    body:
+      chatId: ${chatId}
+      content: ${content}
+      holidays: ${holidays}
+      holidayNames: ${holidayNames}
+  result: message_to_bot_result
+  next: check_for_post_message_to_bot_result
+
+check_for_post_message_to_bot_result:
+  switch:
+    - condition: ${message_to_bot_result.response.body.response === 'Bot error'}
+      next: return_bot_error
+  next: notify_chats
+
+notify_chats:
+  template: chats/notify
+  requestType: templates
+  body:
+    chatId: ${chatId}
+  result: chats_notify_res
+  next: notify_messages
+
+notify_messages:
+  template: messages/notify
+  requestType: templates
+  body:
+    chatId: ${chatId}
+    type: "message"
+    messageId: ${uuid}
+  result: messages_notify_res
+  next: return_result
+
+return_result:
+  return: "Message Sent Successfully"
+  next: end
+
+return_chat_ended:
+  return: "Chat Has Ended"
+  status: 400
+  next: end  
+
+return_bad_request:
+  status: 400
+  return: "Error: Bad Request"
+  next: end  
+
+return_content_length_exceeded:
+  status: 400
+  return: "Error: Your input exceeds the maximum allowed length of 1000 characters"
+  next: end
+
+return_bot_error:
+  status: 420
+  return: "Bot error"
+  next: end  
