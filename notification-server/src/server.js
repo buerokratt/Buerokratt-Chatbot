@@ -19,6 +19,7 @@ app.use(helmet.hidePoweredBy());
 app.use(express.json({ extended: false }));
 app.use(cookieParser());
 app.use(csurf({ cookie: true, ignoreMethods: ['GET', 'POST']}));
+app.use(express.raw({ type: '*/*' }));
 
 app.get("/sse/notifications/:channelId", (req, res) => {
   const { channelId } = req.params;
@@ -65,19 +66,32 @@ app.post("/dequeue", async (req, res) => {
   }
 });
 
+// app.post(API_PREFIX + '/log',
+//   express.json(), express.text(), function(req, res) {
+//   if (typeof req.body === "string") req.body = JSON.parse(req.body);
+//   ...
+// });
+
 app.post("/add-chat-to-termination-queue", (req, res) => {
-  try{
+  try {
+    let body = req.body;
+    if (Buffer.isBuffer(req.body)) {
+      console.log('stringified', req.body.toString());
+      body = JSON.parse(req.body.toString());
+    }
+    console.log('TERMINATOR', body);
+    
     addToTerminationQueue(
-      req.body.chatId,
+      body.chatId,
       () => fetch(`${process.env.RUUTER_URL}/chats/end`, {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
-          'cookie': req.body.cookie || req.headers.cookie,
+          'cookie': body.cookie || req.headers.cookie,
         },
         body: JSON.stringify({
           message: {
-            chatId: req.body.chatId,
+            chatId: body.chatId,
             authorRole: 'end-user',
             event: 'CLIENT_LEFT_FOR_UNKNOWN_REASONS',
             authorTimestamp: new Date().toISOString(),
@@ -87,7 +101,8 @@ app.post("/add-chat-to-termination-queue", (req, res) => {
     );
 
     res.status(200).json({ response: 'Chat will be terminated soon' });
-  } catch {
+  } catch (error) {
+    console.error('Termination queue error:', error);
     res.status(500).json({ response: 'error' });
   }
 });

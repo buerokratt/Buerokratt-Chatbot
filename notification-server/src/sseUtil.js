@@ -8,6 +8,7 @@ function buildSSEResponse({ res, req, buildCallbackFunction }) {
   
   const cleanUp = buildCallbackFunction({ connectionId, sender });
 
+  // todo on close here
   req.on('close', () => {
     console.log('Client disconnected from SSE');
     cleanUp?.();
