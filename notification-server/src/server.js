@@ -68,7 +68,6 @@ app.post("/dequeue", async (req, res) => {
 app.post("/add-chat-to-termination-queue", express.json(), express.text(), (req, res) => {
   try {
     const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
-    console.log('TERMINATOR', body);
     
     addToTerminationQueue(
       body.chatId,
