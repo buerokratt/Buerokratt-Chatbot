@@ -19,7 +19,6 @@ app.use(helmet.hidePoweredBy());
 app.use(express.json({ extended: false }));
 app.use(cookieParser());
 app.use(csurf({ cookie: true, ignoreMethods: ['GET', 'POST']}));
-app.use(express.raw({ type: '*/*' }));
 
 app.get("/sse/notifications/:channelId", (req, res) => {
   const { channelId } = req.params;
@@ -66,19 +65,9 @@ app.post("/dequeue", async (req, res) => {
   }
 });
 
-// app.post(API_PREFIX + '/log',
-//   express.json(), express.text(), function(req, res) {
-//   if (typeof req.body === "string") req.body = JSON.parse(req.body);
-//   ...
-// });
-
-app.post("/add-chat-to-termination-queue", (req, res) => {
+app.post("/add-chat-to-termination-queue", express.json(), express.text(), (req, res) => {
   try {
-    let body = req.body;
-    if (Buffer.isBuffer(req.body)) {
-      console.log('stringified', req.body.toString());
-      body = JSON.parse(req.body.toString());
-    }
+    const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
     console.log('TERMINATOR', body);
     
     addToTerminationQueue(
