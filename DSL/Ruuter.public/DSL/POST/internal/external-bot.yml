@@ -123,7 +123,7 @@ assign_value:
   assign:
     correct_value:
       - recipient_id: ${sender}
-        text: ${test.response.body.choices[0].message.content.replace(/\n/g,"\\n").replace(/%/g," protsenti").replace(" \. ", ". ")}
+        text: ${test.response.body.choices[0].message.content.replace(/\n/g,"\\n").replace(" \. ", ". ")}
         context: ${test.response.body.choices[0].message.context}
   next: check_value
 
