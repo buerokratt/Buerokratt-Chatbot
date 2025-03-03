@@ -133,7 +133,7 @@ check_for_trigger_service_response:
 check_if_skm_bot_is_active:
   switch:
     - condition: ${[#SKM_ACTIVE] === true}
-      next: 
+      next: check_for_skm_bot
   next: check_for_bgk_bot
 
 check_for_skm_bot:
