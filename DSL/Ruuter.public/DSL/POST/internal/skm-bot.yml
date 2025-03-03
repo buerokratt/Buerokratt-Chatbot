@@ -2,7 +2,7 @@
 declaration:
   call: declare
   version: 0.1
-  description: Description placeholder for 'EXTERNAL-BOT'
+  description: Description placeholder for 'SKM-BOT'
   method: post
   accepts: json
   returns: json
