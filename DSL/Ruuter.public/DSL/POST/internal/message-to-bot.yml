@@ -101,7 +101,7 @@ post_message_to_bot:
 check_if_bot_is_unable_to_reply:
   switch:
     - condition: ${post_message_to_bot_result.response.body?.[0]?.text == 'UNKNOWN'}
-      next: check_if_skm_bot_is_active
+      next: check_if_client_bot_is_active
     - condition: ${post_message_to_bot_result.response.body?.[0]?.text == 'Suunan teid klienditeenindajale. Varuge natukene kannatust.'}
       next: get_organization_base_config
     - condition: ${post_message_to_bot_result.response.body?.[0]?.text.startsWith("#common_service") || post_message_to_bot_result.response.body?.[0]?.text.startsWith("#service")}
@@ -130,7 +130,7 @@ check_for_trigger_service_response:
       next: post_message_to_bot
   next: add_bot_message_to_db
 
-check_if_skm_bot_is_active:
+check_if_client_bot_is_active:
   switch:
     - condition: ${[#SKM_ACTIVE] === true}
       next: check_for_client_bot
