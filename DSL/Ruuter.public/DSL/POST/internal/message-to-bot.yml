@@ -133,13 +133,13 @@ check_for_trigger_service_response:
 check_if_skm_bot_is_active:
   switch:
     - condition: ${[#SKM_ACTIVE] === true}
-      next: check_for_skm_bot
+      next: check_for_client_bot
   next: check_for_bgk_bot
 
-check_for_skm_bot:
+check_for_client_bot:
   call: http.post
   args:
-    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL]/internal/skm-bot"
+    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL]/internal/client-external-bot"
     body:
       sender: ${chatId}
       message: ${content}
@@ -148,9 +148,9 @@ check_for_skm_bot:
       holidayNames: ${holidayNames}
   result: converted_messages_res
   error: return_bot_error
-  next: check_if_skm_bot_is_unable_to_reply
+  next: check_if_client_bot_is_unable_to_reply
 
-check_if_skm_bot_is_unable_to_reply:
+check_if_client_bot_is_unable_to_reply:
   switch:
     - condition: ${converted_messages_res == 'ERROR'}
       next: check_for_bgk_bot
@@ -159,7 +159,7 @@ check_if_skm_bot_is_unable_to_reply:
 check_for_bgk_bot:
   call: http.post
   args:
-    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL]/internal/bgk-bot"
+    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL]/internal/bgk-external-bot"
     body:
       sender: ${chatId}
       message: ${content}
