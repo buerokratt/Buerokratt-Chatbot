@@ -1,7 +1,7 @@
 declaration:
   call: declare
   version: 0.1
-  description: "Decription placeholder for 'EDIT'"
+  description: "Decription placeholder for 'SMAX CONNECTION'"
   method: post
   accepts: json
   returns: json
@@ -35,6 +35,9 @@ declaration:
       - field: smaxAccountId
         type: string
         description: "Body field 'smaxAccountId'"
+      - field: smaxConnectDisconnect
+        type: boolean
+        description: "Body field 'smaxConnectDisconnect'"
 
 extractRequestData:
   assign:
@@ -60,8 +63,59 @@ getUser:
 checkIfUserExists:
   switch:
     - condition: "${res.response.body.length > 0}"
-      next: updateUser
+      next: checkSmaxConnectDisconnect
   next: return_not_exists
+
+checkSmaxConnectDisconnect:
+  switch:
+    - condition: ${incoming.body.smaxConnectDisconnect && !incoming.body.smaxAccountId.length}
+      # connect smax
+      next: getAuthToken
+    - condition: ${incoming.body.smaxConnectDisconnect && incoming.body.smaxAccountId.length > 0}
+      # disconnect smax
+      next: removeSmaxAccountId
+  next: updateUser
+
+# TODO: technical dept - ruuter is not able to parse plaintext response.
+getAuthToken:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/tmp/smax-auth"
+    body:
+      Login: "[#SMAX_LOGIN]"
+      Password: "[#SMAX_PASSWORD]"
+  result: smaxAuthRes
+
+checkIfAuthorized:
+  switch:
+    - condition: "${smaxAuthRes.response.statusCodeValue === 200}"
+      next: getSmaxAccount
+  next: return_unauthorized
+
+getSmaxAccount:
+  call: http.get
+  args:
+    url: "[#SMAX_CLOUD_DOMAIN]/rest/[#SMAX_TENANT_ID]/ems/Person?filter=Upn='${csa_email}'&layout=Id,Upn&size=1"
+    headers:
+      Accept: "application/json"
+      Content-Type: "application/json"
+      Cookie: 'LWSSO_COOKIE_KEY=${smaxAuthRes.response.body.token}'
+  result: smax_user_res
+
+checkSmaxUserRes:
+  switch:
+    - condition: ${smax_user_res.response.body.entities[0]?.properties.Upn === csa_email}
+      next: assignSmaxAccountId
+  next: return_not_exists
+
+assignSmaxAccountId:
+  assign:
+    smax_account_id: ${smax_user_res.response.body.entities[0].properties.Id}
+  next: updateUser
+
+removeSmaxAccountId:
+  assign:
+    smax_account_id: ""
 
 updateUser:
   call: http.post
@@ -77,7 +131,7 @@ updateUser:
       csaTitle: ${csaTitle}
       csaEmail: ${csa_email}
       department: ${department}
-      smaxAccountId: ${smax_account_id ?? ""}
+      smaxAccountId: ${smax_account_id}
   result: add_user_res
   next: updateRoles
 
@@ -102,3 +156,7 @@ return_not_exists:
   status: 400
   next: end
 
+return_unauthorized:
+  status: 401
+  return: "error: unauthorized"
+  next: end

@@ -1,0 +1,127 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Sync chat to SMAX"
+  method: get
+  accepts: json
+  returns: json
+  namespace: backoffice
+
+# TODO: technical dept - ruuter is not able to parse plaintext response.
+getAuthToken:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/tmp/smax-auth"
+    body:
+      Login: "[#SMAX_LOGIN]"
+      Password: "[#SMAX_PASSWORD]"
+  result: smaxAuthRes
+
+checkIfAuthorized:
+  switch:
+    - condition: "${smaxAuthRes.response.statusCodeValue === 200}"
+      next: getLastSynchronization
+  next: return_unauthorized
+
+getLastSynchronization:
+  call: http.post
+  maxRecursions: "[#SMAX_MAX_SYNC_RECURSION]"
+  args:
+    url: "[#CHATBOT_RESQL]/get-smax-synchronization"
+  result: synchronization
+
+getNextChatForSynchronization:
+  call: http.post
+  maxRecursions: "[#SMAX_MAX_SYNC_RECURSION]"
+  args:
+    url: "[#CHATBOT_RESQL]/get-smax-chat"
+    body:
+      chatBaseId: ${synchronization.response.body[0]?.chatBaseId ?? ""}
+  result: chat
+
+checkIfChatExists:
+  maxRecursions: "[#SMAX_MAX_SYNC_RECURSION]"
+  switch:
+    - condition: "${chat.response.body.length > 0}"
+      next: getChatCustomerSupportSmaxId
+  next: return_chat_not_found
+
+getChatCustomerSupportSmaxId:
+  call: http.post
+  maxRecursions: "[#SMAX_MAX_SYNC_RECURSION]"
+  args:
+    url: "[#CHATBOT_RESQL]/get-user-smax-id-by-chat-csi"
+    body:
+      chatCustomerSupportId: ${chat.response.body[0].customerSupportId}
+  result: chatCustomerSupportSmaxId
+
+setCustomerSupportSmaxAccountId:
+  maxRecursions: "[#SMAX_MAX_SYNC_RECURSION]"
+  assign:
+    csaSmaxAccountId: ${chatCustomerSupportSmaxId.response.body[0]?.smaxAccountId || ""}
+
+setData:
+  maxRecursions: "[#SMAX_MAX_SYNC_RECURSION]"
+  assign:
+    smax_entities: [
+      {
+        "entity_type": "Request",
+        "properties": {
+          "DisplayLabel": '${chat.response.body[0].id}',
+          "Description": "Link vestlusele: <a href='[#CHATBOT_GUI]/chat/history?chat=${chat.response.body[0].baseId}'>[#CHATBOT_GUI]/chat/history?chat=${chat.response.body[0].baseId}</a><br>Lõppkasutaja email: ${chat.response.body[0].endUserEmail}<br>Lõppkasutaja nimi: ${chat.response.body[0].endUserFirstName} ${chat.response.body[0].endUserLastName}",
+          "RequestedByPerson": "[#SMAX_REQUESTED_BY_PERSON]",
+          "ServiceDeskGroup": "[#SMAX_SERVICE_DESK_GROUP]",
+          "OwnedByPerson": "${csaSmaxAccountId}",
+          "RequestedForPerson": "${chat.response.body[0].endUserId}",
+          "CreationSource": "CreationSourceExternal",
+          "CreationSourceName_c": "Bürokratt",
+          "RequestsOffering": "[#SMAX_REQUEST_OFFERING]"
+        }
+      }
+    ]
+
+createSmaxIssue:
+  call: http.post
+  maxRecursions: "[#SMAX_MAX_SYNC_RECURSION]"
+  args:
+    url: "[#SMAX_CLOUD_DOMAIN]/rest/[#SMAX_TENANT_ID]/ems/bulk"
+    headers:
+      Accept: "application/json"
+      Content-Type: "application/json"
+      Cookie: 'LWSSO_COOKIE_KEY=${smaxAuthRes.response.body.token}'
+    body: 
+      entities: ${smax_entities}
+      operation: "CREATE"
+  result: res_smax
+
+setResponseBody:
+  maxRecursions: "[#SMAX_MAX_SYNC_RECURSION]"
+  assign:
+    res_smax_body: ${res_smax.response.body}
+  next: createSynchronization
+
+createSynchronization:
+  call: http.post
+  maxRecursions: "[#SMAX_MAX_SYNC_RECURSION]"
+  args:
+    url: "[#CHATBOT_RESQL]/insert-chat-smax-synchronization"
+    body:
+      chatBaseId: ${chat.response.body[0]?.baseId ?? ""}
+      status: "${res_smax_body.meta?.completion_status === 'OK' ? 'SUCCESS' : 'ERROR'}"
+      smaxStatusCode: "${res_smax_body.meta?.completion_status === 'OK' ? 200 : res_smax_body.entity_result_list[0].errorDetails.httpStatus}"
+      smaxErrorMessage: "${res_smax_body.meta?.completion_status === 'OK' ? '' : res_smax_body.entity_result_list[0].errorDetails.message}"
+  result: create_res
+  next: getLastSynchronization
+
+return_result:
+  return: "success"
+  next: end
+
+return_chat_not_found:
+  return: "error: chat with ENDED status not found"
+  next: end
+
+return_unauthorized:
+  status: 401
+  return: "error: unauthorized"
+  next: end

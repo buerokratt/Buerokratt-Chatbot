@@ -48,7 +48,7 @@ services:
       - application.logging.printStackTrace=true
       - application.internalRequests.disabled=true
       - server.port=8088
-      - application.externalAuthAllowed=/cron-tasks/delete-conversations
+      - application.externalAuthAllowed=/cron-tasks/delete-conversations,smax/chats/sync
     volumes:
       - ./DSL/Ruuter.private/DSL:/DSL
       - ./constants.ini:/app/constants.ini
@@ -98,6 +98,7 @@ services:
       - PORT=3000
       - CONTENT_FOLDER=/data
       - RATE_LIMIT_PER_MINUTE=1000
+      - SMAX_AUTHENTICATION_URL=https://smax.example.com/auth/authentication-endpoint/authenticate/token
     volumes:
       - ./DSL:/data
       - ./DSL/DMapper/hbs:/workspace/app/views/chat-bot

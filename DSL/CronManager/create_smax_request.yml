@@ -1,0 +1,4 @@
+create_smax_request_now:
+  trigger: "0 0 0/1 * * ?"
+  type: exec
+  command: "./scripts/create_smax_request.sh"
