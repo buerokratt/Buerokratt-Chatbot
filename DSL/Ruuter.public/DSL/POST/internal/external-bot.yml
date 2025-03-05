@@ -87,7 +87,7 @@ prepare_messages:
     headers:
       type: json
     body:
-      prompt_message: ${skm_config.systemMessage}
+      prompt_message: "${skm_config.systemMessage} The current date is ${currentDate}"
       messages: ${chat_messages_res.response.body}
       new_message: ${incoming.body.message ?? ''}
   result: prepare_messages_res
