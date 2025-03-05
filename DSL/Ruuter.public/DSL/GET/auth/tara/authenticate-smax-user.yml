@@ -1,0 +1,117 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'AUTHENTICATE-SMAX-USER'"
+  method: get
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    headers:
+      - field: cookie
+        type: string
+        description: "Cookie field"
+
+getEndUserEmail:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/extract-smax-email"
+    body:
+      cookieString: ${incoming.headers.cookie ?? ""}
+  result: end_user_email_result
+
+checkEmailResult:
+  switch:
+    - condition: "${end_user_email_result.response.statusCodeValue === 200}"
+      next: assignEndUserEmail
+  next: returnUnauthorized
+
+assignEndUserEmail:
+  assign:
+    endUserEmail: ${end_user_email_result.response.body.email}
+
+# TODO: technical dept - ruuter is not able to parse plaintext response.
+getAuthToken:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/tmp/smax-auth"
+    body:
+      Login: "[#SMAX_LOGIN]"
+      Password: "[#SMAX_PASSWORD]"
+  result: smaxAuthRes
+
+checkIfAuthorized:
+  switch:
+    - condition: "${smaxAuthRes.response.statusCodeValue === 200}"
+      next: getSmaxAccount
+  next: returnUnauthorized
+
+getSmaxAccount:
+  call: http.get
+  args:
+    url: "[#SMAX_CLOUD_DOMAIN]/rest/[#SMAX_TENANT_ID]/ems/Person?filter=Upn='${endUserEmail}'&layout=Id,FirstName,LastName&size=1"
+    headers:
+      Accept: "application/json"
+      Content-Type: "application/json"
+      Cookie: 'LWSSO_COOKIE_KEY=${smaxAuthRes.response.body.token}'
+  result: smax_user_res
+
+checkSmaxUserRes:
+  switch:
+    - condition: ${smax_user_res.response.body.entities.length > 0}
+      next: assignSmaxFields
+  next: returnNotFound
+
+assignSmaxFields:
+  assign:
+    smaxAccountId: ${smax_user_res.response.body.entities[0].properties.Id}
+    smaxAccountFirstName: ${smax_user_res.response.body.entities[0].properties.FirstName}
+    smaxAccountLastName: ${smax_user_res.response.body.entities[0].properties.LastName}
+
+getSessionLength:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-configuration"
+    body:
+      key: "session_length"
+  result: session_result
+
+generateCookie:
+  call: http.post
+  args:
+    url: "[#CHATBOT_TIM]/jwt/custom-jwt-generate"
+    body:
+      JWTName: "customSmaxJwtCookie"
+      expirationInMinutes: ${session_result.response.body[0]?.value ?? '120'}
+      content: {
+        "personalCode": "${smaxAccountId}",
+        "login": "${endUserEmail}",
+        "firstName": "${smaxAccountFirstName}",
+        "lastName": "${smaxAccountLastName}"
+      }
+  result: cookie_result
+
+assign_cookie:
+  assign:
+    setCookie:
+      customSmaxJwtCookie: ${cookie_result.response.body.token}
+      Domain: "[#DOMAIN]"
+      Secure: true
+      HttpOnly: true
+      SameSite: "Lax"
+
+returnValue:
+  headers:
+    Set-Cookie: ${setCookie}
+  return: ${cookie_result.response.body.token}
+  next: end 
+
+returnUnauthorized:
+  status: 401
+  return: "error: unauthorized"
+  next: end
+
+returnNotFound:
+  status: 404
+  return: "error: not found"
+  next: end

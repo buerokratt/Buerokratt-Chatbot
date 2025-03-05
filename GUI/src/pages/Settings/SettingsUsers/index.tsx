@@ -315,6 +315,11 @@ const SettingsUsers: FC = () => {
       columnHelper.accessor('department', {
         header: t('settings.users.department') ?? '',
       }),
+      columnHelper.accessor('smaxAccountId', {
+        header: t('settings.users.connectedToSmax') ?? '',
+        enableColumnFilter: false,
+        cell: (props) => (props.getValue() ? t('global.yes') : t('global.no')),
+      }),
       columnHelper.display({
         id: 'edit',
         cell: editView,

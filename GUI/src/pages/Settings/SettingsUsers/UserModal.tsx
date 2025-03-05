@@ -36,6 +36,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
       csaEmail: user?.csaEmail,
       fullName: user?.fullName,
       department: user?.department,
+      smaxAccountId: user?.smaxAccountId,
     },
   });
 
@@ -86,10 +87,12 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
     mutationFn: ({
       id,
       userData,
+      smaxConnectDisconnect = false,
     }: {
       id: string | number;
       userData: UserDTO;
-    }) => editUser(id, userData),
+      smaxConnectDisconnect?: boolean;
+    }) => editUser(id, userData, smaxConnectDisconnect),
     onSuccess: async () => {
       await queryClient.invalidateQueries([
         'accounts/customer-support-agents',
@@ -146,6 +149,18 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
     }
   });
 
+  const handleSmaxConnection = handleSubmit((data) => {
+    if (user) {
+      userEditMutation.mutate({
+        id: user.idCode,
+        userData: data,
+        smaxConnectDisconnect: true,
+      });
+    } else {
+      checkIfUserExistsMutation.mutate({ userData: data });
+    }
+  });
+
   const requiredText = t('settings.users.required') ?? '*';
 
   return (
@@ -157,6 +172,13 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
           <Button appearance="secondary" onClick={onClose}>
             {t('global.cancel')}
           </Button>
+          {user && (
+            <Button onClick={handleSmaxConnection}>
+              {user.smaxAccountId
+                ? t('settings.users.disconnectFromSmax')
+                : t('settings.users.connectToSmax')}
+            </Button>
+          )}
           <Button onClick={handleUserSubmit}>
             {user ? t('settings.users.editUser') : t('settings.users.addUser')}
           </Button>

@@ -6,6 +6,7 @@ SELECT u.login,
        u.csa_title,
        u.csa_email,
        u.department,
+       u.smax_account_id,
        ua.authority_name AS authorities,
        csa.status AS customer_support_status,
        CEIL(COUNT(*) OVER() / :page_size::DECIMAL) AS total_pages
@@ -71,6 +72,8 @@ ORDER BY
    CASE WHEN :sorting = 'csaEmail desc' THEN u.csa_email END DESC,
    CASE WHEN :sorting = 'department asc' THEN u.department END ASC,
    CASE WHEN :sorting = 'department desc' THEN u.department END DESC,
+   CASE WHEN :sorting = 'smaxAccountId asc' THEN u.smax_account_id END ASC,
+   CASE WHEN :sorting = 'smaxAccountId desc' THEN u.smax_account_id END DESC,
    CASE WHEN :sorting = 'customerSupportStatus asc' THEN csa.status END ASC,
    CASE WHEN :sorting = 'customerSupportStatus desc' THEN csa.status END DESC
 OFFSET ((GREATEST(:page, 1) - 1) * :page_size) LIMIT :page_size;
