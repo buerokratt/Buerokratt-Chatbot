@@ -101,7 +101,7 @@ post_message_to_bot:
 check_if_bot_is_unable_to_reply:
   switch:
     - condition: ${post_message_to_bot_result.response.body?.[0]?.text == 'UNKNOWN'}
-      next: check_for_fallback_bot
+      next: check_if_client_bot_is_active
     - condition: ${post_message_to_bot_result.response.body?.[0]?.text == 'Suunan teid klienditeenindajale. Varuge natukene kannatust.'}
       next: get_organization_base_config
     - condition: ${post_message_to_bot_result.response.body?.[0]?.text.startsWith("#common_service") || post_message_to_bot_result.response.body?.[0]?.text.startsWith("#service")}
@@ -130,10 +130,16 @@ check_for_trigger_service_response:
       next: post_message_to_bot
   next: add_bot_message_to_db
 
-check_for_fallback_bot:
+check_if_client_bot_is_active:
+  switch:
+    - condition: ${[#SKM_ACTIVE] === true}
+      next: check_for_client_bot
+  next: check_for_bgk_bot
+
+check_for_client_bot:
   call: http.post
   args:
-    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL]/internal/external-bot"
+    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL]/internal/client-external-bot"
     body:
       sender: ${chatId}
       message: ${content}
@@ -142,15 +148,35 @@ check_for_fallback_bot:
       holidayNames: ${holidayNames}
   result: converted_messages_res
   error: return_bot_error
-  next: check_if_fallback_bot_is_unable_to_reply
+  next: check_if_client_bot_is_unable_to_reply
 
-check_if_fallback_bot_is_unable_to_reply:
+check_if_client_bot_is_unable_to_reply:
+  switch:
+    - condition: ${converted_messages_res == 'ERROR'}
+      next: check_for_bgk_bot
+  next: assign_fallback_bot_converted_messages_res
+
+check_for_bgk_bot:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL]/internal/bgk-external-bot"
+    body:
+      sender: ${chatId}
+      message: ${content}
+      authorId: ${get_bot_name_result.response.body[0].value}
+      holidays: ${holidays}
+      holidayNames: ${holidayNames}
+  result: converted_messages_res
+  error: return_bot_error
+  next: check_if_bgk_bot_is_unable_to_reply
+
+check_if_bgk_bot_is_unable_to_reply:
   switch:
     - condition: ${converted_messages_res == 'ERROR'}
       next: check_if_user_wants_csa
-  next: assign_fallback_converted_messages_res
+  next: assign_fallback_bot_converted_messages_res
 
-assign_fallback_converted_messages_res:
+assign_fallback_bot_converted_messages_res:
   assign:
     converted_messages_res: ${converted_messages_res.response.body.response}
   next: add_bot_message_to_db
