@@ -2,7 +2,7 @@
 declaration:
   call: declare
   version: 0.1
-  description: Description placeholder for 'SKM-BOT'
+  description: Description placeholder for 'bgk-BOT'
   method: post
   accepts: json
   returns: json
@@ -34,15 +34,14 @@ extract_data:
     holidayNames: ${incoming.body.holidayNames}
     event: ""
 
-getSkmConfig:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RESQL]/get-skm-config"
-  result: skm_res
-
-assignSkmConfig:
+assignBgkConfig:
   assign:
-    skm_config: ${skm_res.response.body[0]}
+    strictness: "[#BGK_STRICTNESS]"
+    max_tokens: "[#BGK_MAX_TOKENS]"
+    documents: "[#BGK_DOCUMENTS]"
+    index_name: "[#BGK_INDEX_NAME]"
+    query_type: "[#BGK_QUERY_TYPE]"
+    system_message: "[#BGK_SYSTEM_MESSAGE]"
 
 logstepAZURESAADAME:
   log: ${incoming.body.message}
@@ -53,12 +52,12 @@ assign_data_sources:
       - type: azure_search
         parameters:
           endpoint: "[#SEARCH_ENDPOINT]"
-          index_name: ${skm_config.indexName}
+          index_name: ${index_name}
           semantic_configuration: azureml-default
-          query_type: ${skm_config.queryType}
+          query_type: ${query_type}
           in_scope: true
-          strictness: ${parseInt(skm_config.range ?? '3')}
-          top_n_documents: ${parseInt(skm_config.documents ?? '5')}
+          strictness: ${parseInt(strictness ?? '3')}
+          top_n_documents: ${parseInt(documents ?? '5')}
           authentication:
             type: api_key
             key: "[#CHATBOT_EXTERNAL_KEY]"
@@ -75,7 +74,7 @@ logstepAZUREDS:
 get_chat_messages:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/get-llm-chat-messages"
+    url: "[#CHATBOT_RESQL]/get-chat-messages"
     body:
       chatId: ${sender}
   result: chat_messages_res
@@ -83,11 +82,11 @@ get_chat_messages:
 prepare_messages:
   call: http.post
   args:
-    url: "[#CHATBOT_DMAPPER_HBS]/prepare-llm-messages"
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/prepare-llm-messages"
     headers:
       type: json
     body:
-      prompt_message: "${skm_config.systemMessage} The current date is ${currentDate}"
+      prompt_message: "${system_message} The current date is ${currentDate}"
       messages: ${chat_messages_res.response.body}
       new_message: ${incoming.body.message ?? ''}
   result: prepare_messages_res
@@ -110,7 +109,7 @@ post_answer:
       data_sources: ${data_sources}
       messages: ${messages}
       temperature: 0
-      max_tokens: ${parseInt(skm_config.maxTokens ?? '1000')}
+      max_tokens: ${parseInt(max_tokens ?? '1000')}
       stream: false
       frequency_penalty: 0
       presence_penalty: 0
@@ -189,7 +188,7 @@ assign_back_office_event:
 format_messages:
   call: http.post
   args:
-    url: "[#CHATBOT_DMAPPER_HBS]/llm_responses_to_messages"
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/llm_responses_to_messages"
     headers:
       type: json
     body:

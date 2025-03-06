@@ -1,4 +1,11 @@
-import { ChangeEvent, FC, useEffect, useRef, useState } from 'react';
+import {
+  ChangeEvent,
+  FC,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { et } from 'date-fns/locale';
@@ -9,6 +16,7 @@ import {
   MdOutlineAttachFile,
   MdOutlineCreate,
   MdOutlineSend,
+  MdOutlineErrorOutline,
 } from 'react-icons/md';
 import { Button, Icon, Label, Track } from 'components';
 import { ReactComponent as BykLogoWhite } from 'assets/logo-white.svg';
@@ -139,6 +147,27 @@ const Chat: FC<ChatProps> = ({
       ? 1000
       : null
   );
+
+  const onVisibilityChange = () => {
+    if (document.visibilityState === 'visible') {
+      localStorage.setItem('focused_chat', chat.id);
+    } else if (document.visibilityState === 'hidden') {
+      localStorage.removeItem('focused_chat');
+    }
+  };
+
+  useEffect(() => {
+    localStorage.setItem('focused_chat', chat.id);
+    return () => {
+      localStorage.removeItem('focused_chat');
+    };
+  }, []);
+
+  useLayoutEffect(() => {
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () =>
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+  }, []);
 
   useEffect(() => {
     getMessages();
@@ -515,23 +544,32 @@ const Chat: FC<ChatProps> = ({
     };
 
     if (responseText !== '') {
-      const res = await postMessageMutation.mutateAsync({
-        message: newMessage,
-        editing: editMessage,
-      });
-      const message = { ...res.data.response, id: res.data.response.baseId };
-      if (selectedMessage) {
-        const index = messagesList.findIndex(
-          (m) => m.id === selectedMessage.id
-        );
-        const updatedMessages = [...messagesList];
-        updatedMessages[index] = message;
-        setMessagesList(updatedMessages);
-      } else {
-        setMessagesList((oldMessages) => [...oldMessages, message]);
+      try {
+        const res = await postMessageMutation.mutateAsync({
+          message: newMessage,
+          editing: editMessage,
+        });
+        const message = {
+          ...res.data.response,
+          id: res.data.response.baseId,
+        };
+
+        if (selectedMessage) {
+          const index = messagesList.findIndex(
+            (m) => m.id === selectedMessage.id
+          );
+          const updatedMessages = [...messagesList];
+          updatedMessages[index] = message;
+          setMessagesList(updatedMessages);
+        } else {
+          setMessagesList((oldMessages) => [...oldMessages, message]);
+        }
+      } catch (error) {
+        setMessagesList((oldMessages) => [...oldMessages, newMessage]);
+      } finally {
+        setResponseText('');
+        setSelectedMessage(null);
       }
-      setResponseText('');
-      setSelectedMessage(null);
     }
   };
 
@@ -563,6 +601,51 @@ const Chat: FC<ChatProps> = ({
     } else {
       setSelectedMessage(message);
       setResponseText(message.content);
+    }
+  };
+
+  const checkIsMessageEditable = (message: Message): boolean => {
+    return (
+      isChatEditingAllowed &&
+      chat.customerSupportId === userInfo.idCode &&
+      message.authorId === userInfo.idCode &&
+      message.id
+    );
+  };
+
+  const deleteMessageFromList = (message: Message) => {
+    setMessagesList((oldMessages) => {
+      const filteredMessages = oldMessages.filter(
+        (m) => m.authorTimestamp !== message.authorTimestamp
+      );
+      return filteredMessages;
+    });
+  };
+
+  const handleRetry = async (message: Message) => {
+    deleteMessageFromList(message);
+    const retryMessage = {
+      ...message,
+      authorTimestamp: new Date().toISOString(),
+    };
+
+    try {
+      const res = await postMessageMutation.mutateAsync({
+        message: retryMessage,
+        editing: false,
+      });
+      setMessagesList((oldMessages) => {
+        const updatedMessages = [
+          ...oldMessages,
+          {
+            ...res.data.response,
+            id: res.data.response.baseId,
+          },
+        ];
+        return updatedMessages;
+      });
+    } catch (error) {
+      setMessagesList((oldMessages) => [...oldMessages, retryMessage]);
     }
   };
 
@@ -634,25 +717,46 @@ const Chat: FC<ChatProps> = ({
 
                   <div className="active-chat__messages">
                     {group.messages.map((message, i) => (
-                      <ChatMessage
-                        message={message}
-                        readStatus={messageReadStatusRef}
-                        key={`${message.id ?? ''}-${i}`}
-                        onSelect={(m) => {
-                          if (
-                            isChatEditingAllowed &&
-                            chat.customerSupportId === userInfo.idCode &&
-                            message.authorId === userInfo.idCode
-                          )
-                            handleSelectMessage(m);
-                        }}
-                        selected={selectedMessage?.id === message.id}
-                        editableMessage={
-                          isChatEditingAllowed &&
-                          chat.customerSupportId === userInfo.idCode &&
-                          message.authorId === userInfo.idCode
-                        }
-                      />
+                      <div key={`${message.authorTimestamp}-${i}`}>
+                        <ChatMessage
+                          message={message}
+                          readStatus={messageReadStatusRef}
+                          onSelect={(m) => {
+                            if (checkIsMessageEditable(message))
+                              handleSelectMessage(m);
+                          }}
+                          selected={selectedMessage?.id === message.id}
+                          editableMessage={checkIsMessageEditable(message)}
+                        />
+                        {!message.id && (
+                          <div className="active-chat__message-failed-wrapper active-chat__message-failed">
+                            <MdOutlineErrorOutline fontSize={22} />
+                            <div className="active-chat__message-failed-content">
+                              <span>
+                                {t('chat.active.messageSendingFailed')}
+                              </span>
+                              <div className="active-chat__message-failed-buttons">
+                                <Button
+                                  appearance="text"
+                                  className="active-chat__message-failed"
+                                  onClick={() => handleRetry(message)}
+                                >
+                                  <strong>{t('chat.active.sendAgain')}</strong>
+                                </Button>
+                                <Button
+                                  appearance="text"
+                                  className="active-chat__message-failed"
+                                  onClick={() => {
+                                    deleteMessageFromList(message);
+                                  }}
+                                >
+                                  <strong>{t('global.delete')}</strong>
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     ))}
                   </div>
                 </>
