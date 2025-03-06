@@ -1,4 +1,11 @@
-import { ChangeEvent, FC, useEffect, useRef, useState } from 'react';
+import {
+  ChangeEvent,
+  FC,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { et } from 'date-fns/locale';
@@ -140,6 +147,27 @@ const Chat: FC<ChatProps> = ({
       ? 1000
       : null
   );
+
+  const onVisibilityChange = () => {
+    if (document.visibilityState === 'visible') {
+      localStorage.setItem('focused_chat', chat.id);
+    } else if (document.visibilityState === 'hidden') {
+      localStorage.removeItem('focused_chat');
+    }
+  };
+
+  useEffect(() => {
+    localStorage.setItem('focused_chat', chat.id);
+    return () => {
+      localStorage.removeItem('focused_chat');
+    };
+  }, []);
+
+  useLayoutEffect(() => {
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () =>
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+  }, []);
 
   useEffect(() => {
     getMessages();
