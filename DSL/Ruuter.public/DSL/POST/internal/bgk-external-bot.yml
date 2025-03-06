@@ -86,7 +86,7 @@ prepare_messages:
     headers:
       type: json
     body:
-      prompt_message: ${system_message}
+      prompt_message: "${system_message} The current date is ${currentDate}"
       messages: ${chat_messages_res.response.body}
       new_message: ${incoming.body.message ?? ''}
   result: prepare_messages_res
@@ -122,7 +122,7 @@ assign_value:
   assign:
     correct_value:
       - recipient_id: ${sender}
-        text: ${test.response.body.choices[0].message.content.replace(/\n/g,"\\n").replace(/%/g," protsenti").replace(" \. ", ". ")}
+        text: ${test.response.body.choices[0].message.content.replace(/\n/g,"\\n").replace(" \. ", ". ")}
         context: ${test.response.body.choices[0].message.context}
   next: check_value
 
