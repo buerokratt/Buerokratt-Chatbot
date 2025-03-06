@@ -41,7 +41,7 @@ const Markdownify: React.FC<MarkdownifyProps> = ({ message }) => (
         disableParsingRawHTML: true,
       }}
     >
-      {message ?? ''}
+      {message?.replace(/&#x([0-9A-Fa-f]+);/g, (_, hex) => { return String.fromCharCode(parseInt(hex, 16)); }) ?? ""}
     </Markdown>
   </div>
 );

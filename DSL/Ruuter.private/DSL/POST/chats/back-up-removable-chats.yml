@@ -11,11 +11,23 @@ declaration:
       - field: isAuth
         type: boolean
         description: "Body field 'isAuth'"
+    headers:
+      - field: x-ruuter-nonce
+        type: string
+        description: "Nonce field"
+
+getNewNonce:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-new-nonce"
+  result: newNonce
 
 getRemovableConversations:
   call: http.post
   args:
     url: "[#CHATBOT_RUUTER_PRIVATE]/chats/chat-to-remove"
+    headers:
+      x-ruuter-nonce: ${newNonce.response.body[0].nonce}
     body:
       isAuth: ${incoming.body.isAuth}
   result: res
