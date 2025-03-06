@@ -58,7 +58,7 @@ jobs:
       - name: Build Notification image
         run: |
           echo "Building Docker image for branch: ${{ env.BRANCH }} major: ${{ env.MAJOR }} minor: ${{ env.MINOR }} patch: ${{ env.PATCH }}"
-          cd notification-server && docker image build --tag notification-node-$DOCKER_TAG_CUSTOM --no-cache .
+          cd notification-server && docker image build --tag $DOCKER_TAG_CUSTOM-notification-node --no-cache .
         if: ${{ env.BRANCH == 'test' }}
 
       - name: Log in to GitHub container registry
@@ -73,7 +73,7 @@ jobs:
       - name: Push Notification image to GitHub Packages
         run: |
           echo "Pushing Docker image to GitHub Packages"
-          docker push notification-node-$DOCKER_TAG_CUSTOM
+          docker push $DOCKER_TAG_CUSTOM-notification-node
         if: ${{ env.BRANCH == 'test' }}
 
       - name: Create Release
