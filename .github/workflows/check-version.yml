@@ -55,6 +55,12 @@ jobs:
           cd GUI && docker image build --tag $DOCKER_TAG_CUSTOM --no-cache .
         if: ${{ env.BRANCH == 'test' }}
 
+      - name: Build Notification image
+        run: |
+          echo "Building Docker image for branch: ${{ env.BRANCH }} major: ${{ env.MAJOR }} minor: ${{ env.MINOR }} patch: ${{ env.PATCH }}"
+          cd notification-server && docker image build --tag notification-node-$DOCKER_TAG_CUSTOM --no-cache .
+        if: ${{ env.BRANCH == 'test' }}
+
       - name: Log in to GitHub container registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
 
@@ -62,6 +68,12 @@ jobs:
         run: |
           echo "Pushing Docker image to GitHub Packages"
           docker push $DOCKER_TAG_CUSTOM
+        if: ${{ env.BRANCH == 'test' }}
+
+      - name: Push Notification image to GitHub Packages
+        run: |
+          echo "Pushing Docker image to GitHub Packages"
+          docker push notification-node-$DOCKER_TAG_CUSTOM
         if: ${{ env.BRANCH == 'test' }}
 
       - name: Create Release
