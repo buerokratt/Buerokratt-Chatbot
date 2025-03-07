@@ -142,7 +142,7 @@ check_for_post_message_to_bot_result:
   next: notify_chats
 
 notify_chats:
-  template: chats/notify
+  template: "[#CHATBOT_PROJECT_LAYER]/chats/notify"
   requestType: templates
   body:
     chatId: ${chatId}
@@ -150,7 +150,7 @@ notify_chats:
   next: notify_messages
 
 notify_messages:
-  template: messages/notify
+  template: "[#CHATBOT_PROJECT_LAYER]/messages/notify"
   requestType: templates
   body:
     chatId: ${chatId}

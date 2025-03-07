@@ -64,7 +64,7 @@ map_open_chats_notifications:
   result: open_chat_notifications_res
 
 notify_end_users:
-  template: messages/notify-all
+  template: "[#CHATBOT_PROJECT_LAYER]/messages/notify-all"
   requestType: templates
   body:
     chats: ${open_chat_messages_res.response.body}

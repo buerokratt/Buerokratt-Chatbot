@@ -41,7 +41,7 @@ insertEmailAndPhone:
   result: notify_messages
 
 notify_messages:
-  template: messages/notify
+  template: "[#CHATBOT_PROJECT_LAYER]/messages/notify"
   requestType: templates
   body:
     chatId: ${chatId}

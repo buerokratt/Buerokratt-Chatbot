@@ -121,7 +121,7 @@ endChat:
   next: notify_chats
 
 notify_chats:
-  template: chats/notify
+  template: "[#CHATBOT_PROJECT_LAYER]/chats/notify"
   requestType: templates
   body:
     chatId: ${chatId}
