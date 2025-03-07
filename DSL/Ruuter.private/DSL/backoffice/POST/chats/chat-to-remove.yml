@@ -19,7 +19,7 @@ declaration:
 getNewNonce:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/get-new-nonce"
+    url: "[#TRAINING_RESQL]/get-new-nonce"
   result: newNonce
 
 getConfigurations:

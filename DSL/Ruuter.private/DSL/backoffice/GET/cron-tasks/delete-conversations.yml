@@ -23,7 +23,7 @@ assignValue:
 getNewNonce:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/get-new-nonce"
+    url: "[#TRAINING_RESQL]/get-new-nonce"
   result: newNonce
 
 backupConversations:
@@ -45,7 +45,7 @@ validateResponse:
 getNewNonceToEmpty:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/get-new-nonce"
+    url: "[#TRAINING_RESQL]/get-new-nonce"
   result: newNonceToEmpty
 
 emptyMessages:
