@@ -74,7 +74,7 @@ logstepAZUREDS:
 get_chat_messages:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/get-chat-messages"
+    url: "[#CHATBOT_RESQL]/get-llm-chat-messages"
     body:
       chatId: ${sender}
   result: chat_messages_res
