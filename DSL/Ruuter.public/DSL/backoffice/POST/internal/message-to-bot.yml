@@ -152,7 +152,7 @@ check_for_client_bot:
 
 check_if_client_bot_is_unable_to_reply:
   switch:
-    - condition: ${converted_messages_res == 'ERROR'}
+    - condition: ${converted_messages_res == 'ERROR' || converted_messages_res.response.body.response === 'ERROR'}
       next: check_for_bgk_bot
   next: assign_fallback_bot_converted_messages_res
 
