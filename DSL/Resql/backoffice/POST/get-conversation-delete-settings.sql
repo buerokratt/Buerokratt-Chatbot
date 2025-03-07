@@ -7,4 +7,4 @@ WHERE created IN (
     GROUP BY key
     )
   AND key IN ('isAuthConversations', 'authPeriod', 'isAnonymConversations', 'anonymPeriod', 'deletionTimeISO')
-ORDER BY key;
+ORDER BY key ASC;

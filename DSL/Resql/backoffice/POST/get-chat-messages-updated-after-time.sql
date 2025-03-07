@@ -55,5 +55,5 @@ AND m.base_id NOT IN (
 	FROM message
   WHERE original_base_id IS NOT NULL
 )
-ORDER BY m.created;
+ORDER BY m.created ASC;
 
