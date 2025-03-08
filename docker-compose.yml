@@ -14,7 +14,7 @@ services:
       - application.internalRequests.disabled=true
       - server.port=8086
     volumes:
-      - ./DSL/Ruuter.public/DSL:/DSL
+      - ./DSL/Ruuter.public:/DSL
       - ./constants.ini:/app/constants.ini
     ports:
       - 8086:8086
@@ -50,7 +50,7 @@ services:
       - server.port=8088
       - application.externalAuthAllowed=/cron-tasks/delete-conversations,chats/back-up-removable-chats,chats/chat-to-remove,chats/empty-conversations-by-chat-ids
     volumes:
-      - ./DSL/Ruuter.private/DSL:/DSL
+      - ./DSL/Ruuter.private:/DSL
       - ./constants.ini:/app/constants.ini
     ports:
       - 8088:8088
@@ -196,13 +196,13 @@ services:
     cpus: "0.5"
     mem_limit: "1G"
 
-  chat-widget:
-    container_name: chat-widget
-    image: chat-widget
-    ports:
-      - 3003:3003
-    networks:
-      - bykstack
+  # chat-widget:
+  #   container_name: chat-widget
+  #   image: chat-widget
+  #   ports:
+  #     - 3003:3003
+  #   networks:
+  #     - bykstack
 
   authentication-layer:
     container_name: authentication-layer
