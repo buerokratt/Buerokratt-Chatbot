@@ -1,0 +1,160 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'ORGANIZATION-WORKING-TIME'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: organizationAllWeekdaysTimeEndISO
+        type: string
+        description: "Body field 'organizationAllWeekdaysTimeEndISO'"
+      - field: organizationAllWeekdaysTimeStartISO
+        type: string
+        description: "Body field 'organizationAllWeekdaysTimeStartISO'"
+      - field: organizationClosedOnWeekEnds
+        type: string
+        description: "Body field 'organizationClosedOnWeekEnds'"
+      - field: organizationFridayWorkingTimeEndISO
+        type: string
+        description: "Body field 'organizationFridayWorkingTimeEndISO'"
+      - field: organizationFridayWorkingTimeStartISO
+        type: string
+        description: "Body field 'organizationFridayWorkingTimeStartISO'"
+      - field: organizationMondayWorkingTimeEndISO
+        type: string
+        description: "Body field 'organizationMondayWorkingTimeEndISO'"
+      - field: organizationMondayWorkingTimeStartISO
+        type: string
+        description: "Body field 'organizationMondayWorkingTimeStartISO'"
+      - field: organizationSaturdayWorkingTimeEndISO
+        type: string
+        description: "Body field 'organizationSaturdayWorkingTimeEndISO'"
+      - field: organizationSaturdayWorkingTimeStartISO
+        type: string
+        description: "Body field 'organizationSaturdayWorkingTimeStartISO'"
+      - field: organizationSundayWorkingTimeEndISO
+        type: string
+        description: "Body field 'organizationSundayWorkingTimeEndISO'"
+      - field: organizationSundayWorkingTimeStartISO
+        type: string
+        description: "Body field 'organizationSundayWorkingTimeStartISO'"
+      - field: organizationTheSameOnAllWorkingDays
+        type: string
+        description: "Body field 'organizationTheSameOnAllWorkingDays'"
+      - field: organizationThursdayWorkingTimeEndISO
+        type: string
+        description: "Body field 'organizationThursdayWorkingTimeEndISO'"
+      - field: organizationThursdayWorkingTimeStartISO
+        type: string
+        description: "Body field 'organizationThursdayWorkingTimeStartISO'"
+      - field: organizationTuesdayWorkingTimeEndISO
+        type: string
+        description: "Body field 'organizationTuesdayWorkingTimeEndISO'"
+      - field: organizationTuesdayWorkingTimeStartISO
+        type: string
+        description: "Body field 'organizationTuesdayWorkingTimeStartISO'"
+      - field: organizationWednesdayWorkingTimeEndISO
+        type: string
+        description: "Body field 'organizationWednesdayWorkingTimeEndISO'"
+      - field: organizationWednesdayWorkingTimeStartISO
+        type: string
+        description: "Body field 'organizationWednesdayWorkingTimeStartISO'"
+      - field: organizationWorkingTimeNationalHolidays
+        type: string
+        description: "Body field 'organizationWorkingTimeNationalHolidays'"
+      - field: organizationWorkingTimeWeekdays
+        type: string
+        description: "Body field 'organizationWorkingTimeWeekdays'"
+      - field: organizationWorkingAllTime
+        type: string
+        description: "Body field 'organizationWorkingAllTime'"
+      - field: organizationNoCsaAskForContacts
+        type: string
+        description: "Body field 'organizationNoCsaAskForContacts'"
+      - field: organizationNoCsaAvailableMessage
+        type: string
+        description: "Body field 'organizationNoCsaAvailableMessage'"
+      - field: organizationOutsideWorkingHoursAskForContacts
+        type: string
+        description: "Body field 'organizationOutsideWorkingHoursAskForContacts'"
+      - field: organizationOutsideWorkingHoursMessage
+        type: string
+        description: "Body field 'organizationOutsideWorkingHoursMessage'"
+
+extractRequestData:
+  assign:
+    organizationMondayWorkingTimeStartISO: ${incoming.body.organizationMondayWorkingTimeStartISO}
+    organizationMondayWorkingTimeEndISO: ${incoming.body.organizationMondayWorkingTimeEndISO}
+    organizationTuesdayWorkingTimeStartISO: ${incoming.body.organizationTuesdayWorkingTimeStartISO}
+    organizationTuesdayWorkingTimeEndISO: ${incoming.body.organizationTuesdayWorkingTimeEndISO}
+    organizationWednesdayWorkingTimeStartISO: ${incoming.body.organizationWednesdayWorkingTimeStartISO}
+    organizationWednesdayWorkingTimeEndISO: ${incoming.body.organizationWednesdayWorkingTimeEndISO}
+    organizationThursdayWorkingTimeStartISO: ${incoming.body.organizationThursdayWorkingTimeStartISO}
+    organizationThursdayWorkingTimeEndISO: ${incoming.body.organizationThursdayWorkingTimeEndISO}
+    organizationFridayWorkingTimeStartISO: ${incoming.body.organizationFridayWorkingTimeStartISO}
+    organizationFridayWorkingTimeEndISO: ${incoming.body.organizationFridayWorkingTimeEndISO}
+    organizationSaturdayWorkingTimeStartISO: ${incoming.body.organizationSaturdayWorkingTimeStartISO}
+    organizationSaturdayWorkingTimeEndISO: ${incoming.body.organizationSaturdayWorkingTimeEndISO}
+    organizationSundayWorkingTimeStartISO: ${incoming.body.organizationSundayWorkingTimeStartISO}
+    organizationSundayWorkingTimeEndISO: ${incoming.body.organizationSundayWorkingTimeEndISO}
+    organizationAllWeekdaysTimeStartISO: ${incoming.body.organizationAllWeekdaysTimeStartISO}
+    organizationAllWeekdaysTimeEndISO: ${incoming.body.organizationAllWeekdaysTimeEndISO}
+    organizationWorkingTimeWeekdays: ${incoming.body.organizationWorkingTimeWeekdays}
+    organizationClosedOnWeekEnds: ${incoming.body.organizationClosedOnWeekEnds}
+    organizationTheSameOnAllWorkingDays: ${incoming.body.organizationTheSameOnAllWorkingDays}
+    organizationWorkingTimeNationalHolidays: ${incoming.body.organizationWorkingTimeNationalHolidays}
+    organizationWorkingAllTime: ${incoming.body.organizationWorkingAllTime}
+    organizationNoCsaAskForContacts: ${incoming.body.organizationNoCsaAskForContacts}
+    organizationNoCsaAvailableMessage: ${incoming.body.organizationNoCsaAvailableMessage}
+    organizationOutsideWorkingHoursAskForContacts: ${incoming.body.organizationOutsideWorkingHoursAskForContacts}
+    organizationOutsideWorkingHoursMessage: ${incoming.body.organizationOutsideWorkingHoursMessage}
+
+setOrganizationWorkingTime:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-organization-working-time"
+    body:
+      organizationMondayWorkingTimeStartISO: ${organizationMondayWorkingTimeStartISO}
+      organizationMondayWorkingTimeEndISO: ${organizationMondayWorkingTimeEndISO}
+      organizationTuesdayWorkingTimeStartISO: ${organizationTuesdayWorkingTimeStartISO}
+      organizationTuesdayWorkingTimeEndISO: ${organizationTuesdayWorkingTimeEndISO}
+      organizationWednesdayWorkingTimeStartISO: ${organizationWednesdayWorkingTimeStartISO}
+      organizationWednesdayWorkingTimeEndISO: ${organizationWednesdayWorkingTimeEndISO}
+      organizationThursdayWorkingTimeStartISO: ${organizationThursdayWorkingTimeStartISO}
+      organizationThursdayWorkingTimeEndISO: ${organizationThursdayWorkingTimeEndISO}
+      organizationFridayWorkingTimeStartISO: ${organizationFridayWorkingTimeStartISO}
+      organizationFridayWorkingTimeEndISO: ${organizationFridayWorkingTimeEndISO}
+      organizationSaturdayWorkingTimeStartISO: ${organizationSaturdayWorkingTimeStartISO}
+      organizationSaturdayWorkingTimeEndISO: ${organizationSaturdayWorkingTimeEndISO}
+      organizationSundayWorkingTimeStartISO: ${organizationSundayWorkingTimeStartISO}
+      organizationSundayWorkingTimeEndISO: ${organizationSundayWorkingTimeEndISO}
+      organizationAllWeekdaysTimeStartISO: ${organizationAllWeekdaysTimeStartISO}
+      organizationAllWeekdaysTimeEndISO: ${organizationAllWeekdaysTimeEndISO}
+      organizationWorkingTimeWeekdays: ${organizationWorkingTimeWeekdays}
+      organizationClosedOnWeekEnds: ${organizationClosedOnWeekEnds}
+      organizationTheSameOnAllWorkingDays: ${organizationTheSameOnAllWorkingDays}
+      organizationWorkingTimeNationalHolidays: ${organizationWorkingTimeNationalHolidays}
+      organizationWorkingAllTime: ${organizationWorkingAllTime}
+      organizationNoCsaAskForContacts: ${organizationNoCsaAskForContacts}
+      organizationNoCsaAvailableMessage: ${organizationNoCsaAvailableMessage}
+      organizationOutsideWorkingHoursAskForContacts: ${organizationOutsideWorkingHoursAskForContacts}
+      organizationOutsideWorkingHoursMessage: ${organizationOutsideWorkingHoursMessage}
+      created: ${new Date().toISOString()}
+  result: setOrganizationWorkingTimeResult
+
+mapOrganizationWorkingTimeData:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_HBS]/return_organization_working_time"
+    headers:
+      type: json
+    body:
+      configurationArray: ${setOrganizationWorkingTimeResult.response.body}
+  result: organizationWorkingTimeData
+
+return_result:
+  return: ${organizationWorkingTimeData.response.body}
+  next: end
