@@ -35,6 +35,7 @@ extractRequestData:
     skm_max_tokens: ${incoming.body.maxTokens}
     skm_index_name: ${incoming.body.indexName}
     skm_query_type: ${incoming.body.queryType}
+    skm_semantic_configuration: ${incoming.body.semanticConfiguration}
 
 setSkmConfig:
   call: http.post
@@ -47,6 +48,7 @@ setSkmConfig:
       skm_max_tokens: ${skm_max_tokens}
       skm_index_name: ${skm_index_name}
       skm_query_type: ${skm_query_type}
+      skm_semantic_configuration: ${skm_semantic_configuration}
       created: ${new Date().toISOString()}
   result: return_result
 

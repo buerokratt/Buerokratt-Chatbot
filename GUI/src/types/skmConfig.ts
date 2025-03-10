@@ -5,4 +5,5 @@ export interface SkmConfig {
   maxTokens: string;
   indexName: string;
   queryType: string;
+  semanticConfiguration: string;
 }
