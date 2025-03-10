@@ -1,0 +1,49 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'Back up conversations'"
+  method: get
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: isAuth
+        type: boolean
+        description: "Body field 'isAuth'"
+    headers:
+      - field: x-ruuter-nonce
+        type: string
+        description: "Nonce field"
+
+getNewNonce:
+  call: http.post
+  args:
+    url: "[#TRAINING_RESQL]/get-new-nonce"
+  result: newNonce
+
+getRemovableConversations:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RUUTER_PRIVATE]/chats/chat-to-remove"
+    headers:
+      x-ruuter-nonce: ${newNonce.response.body[0].nonce}
+    body:
+      isAuth: ${incoming.body.isAuth}
+  result: res
+  next: validate_res
+
+validate_res:
+  switch:
+    - condition: ${res.response.body.response.length > 0}
+      next: return_result
+  next: return_not_found
+
+return_result:
+  return: ${res.response.body}
+  wrapper: false
+  next: end
+
+return_not_found:
+  return: "error: not found"
+  next: end
