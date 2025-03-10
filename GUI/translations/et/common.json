@@ -435,7 +435,7 @@
         "maxTokens": "Sea piirang mudeli vastuses kasutatavate tokenite arvule.Võimalikud väärtused: 1 - 2000",
         "indexName": "Azures loodud indeksi nimi.",
         "queryType": "Vali otsingutüüp.",
-        "semanticConfiguration": ""
+        "semanticConfiguration": "Azures loodud indeksi semantiline konfiguratsioon"
       },
       "validation": {
         "range": "Rangus peab olema vahemikus 1 kuni 5",

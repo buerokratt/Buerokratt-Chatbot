@@ -435,7 +435,7 @@
         "maxTokens": "Set a limit on the number of tokens used in a model response.Possible values: 1 - 2000",
         "indexName": "The name of the index created in Azure.",
         "queryType": "Choose a search type.",
-        "semanticConfiguration": ""
+        "semanticConfiguration": "Semantic configuration of an index created in Azure"
       },
       "validation": {
         "range": "Range must be between 1 and 5",
