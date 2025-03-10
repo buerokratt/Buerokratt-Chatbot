@@ -42,6 +42,11 @@ assignBgkConfig:
     index_name: "[#BGK_INDEX_NAME]"
     query_type: "[#BGK_QUERY_TYPE]"
     system_message: "[#BGK_SYSTEM_MESSAGE]"
+    search_endpoint: "[#BGK_SEARCH_ENDPOINT]"
+    chatbot_external_key: "[#BGK_CHATBOT_EXTERNAL_KEY]"
+    embedded_endpoint: "[#BGK_EMBEDDED_ENDPOINT_AZURE]"
+    chatbot_external_api_key: "[#BGK_CHATBOT_EXTERNAL_API_KEY]"
+    chatbot_external_bot_url: "[#BGK_CHATBOT_EXTERNAL_BOT_URL]"
 
 logstepAZURESAADAME:
   log: ${incoming.body.message}
@@ -51,7 +56,7 @@ assign_data_sources:
     data_sources:
       - type: azure_search
         parameters:
-          endpoint: "[#SEARCH_ENDPOINT]"
+          endpoint: ${search_endpoint}
           index_name: ${index_name}
           semantic_configuration: azureml-default
           query_type: ${query_type}
@@ -60,13 +65,13 @@ assign_data_sources:
           top_n_documents: ${parseInt(documents ?? '5')}
           authentication:
             type: api_key
-            key: "[#CHATBOT_EXTERNAL_KEY]"
+            key: ${chatbot_external_key}
           embedding_dependency:
             type: endpoint
-            endpoint: "[#EMBEDDED_ENDPOINT_AZURE]"
+            endpoint: ${embedded_endpoint}
             authentication:
               type: api_key
-              key: "[#CHATBOT_EXTERNAL_API_KEY]"
+              key: ${chatbot_external_api_key}
 
 logstepAZUREDS:
   log: ${data_sources}
@@ -101,10 +106,10 @@ logstepAZUREMSG:
 post_answer:
   call: http.post
   args:
-    url: "[#CHATBOT_EXTERNAL_BOT_URL]"
+    url: "${chatbot_external_bot_url}"
     headers:
       Content-Type: application/json
-      api-key: "[#CHATBOT_EXTERNAL_API_KEY]"
+      api-key: ${chatbot_external_api_key}
     body:
       data_sources: ${data_sources}
       messages: ${messages}
