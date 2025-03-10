@@ -1,0 +1,83 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'EVENT'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: authorTimestamp
+        type: string
+        description: "Body field 'authorTimestamp'"
+      - field: event
+        type: string
+        description: "Body field 'event'"
+      - field: id
+        type: string
+        description: "Body field 'id'"
+
+extractRequestData:
+  assign:
+    id: ${incoming.body.id}
+    event: ${incoming.body.event}
+    authorTimestamp: ${incoming.body.authorTimestamp}
+
+getMessageById:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-message-by-id"
+    body:
+      id: ${id}
+  result: res
+  next: assignMessage
+
+assignMessage:
+  assign:
+    message: ${res.response.body[0]}
+  next: insertMessage
+
+insertMessage:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-message"
+    body:
+      messageId: ${id}
+      chatId: ${message.chatBaseId}
+      authorId: ${message.authorId ?? ""}
+      authorTimestamp: ${authorTimestamp}
+      authorFirstName: ${message.authorFirstName ?? ""}
+      authorLastName: ${message.authorLastName ?? ""}
+      authorRole: "backoffice-user"
+      created: ${message.created ?? ""}
+      content: ${message.content ?? ""}
+      event: ${event}
+      forwardedByUser: ${message.forwardedByUser ?? ""}
+      forwardedFromCsa: ${message.forwardedFromCsa ?? ""}
+      forwardedToCsa: ${message.forwardedToCsa ?? ""}
+      rating: ${message.rating ?? ""}
+  result: insertMessageResult
+  next: notify_chats
+
+notify_chats:
+  template: "[#CHATBOT_PROJECT_LAYER]/chats/notify"
+  requestType: templates
+  body:
+    chatId: ${message.chatBaseId}
+  result: chats_notify_res
+  next: notify_messages
+
+notify_messages:
+  template: "[#CHATBOT_PROJECT_LAYER]/messages/notify"
+  requestType: templates
+  body:
+    chatId: ${message.chatBaseId}
+    type: "message"
+    messageId: ${id}
+  result: messages_notify_res
+  next: return_result
+
+return_result:
+  return: "Message Event Sent Successfully"
+  next: end

@@ -1,0 +1,142 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'STATUS'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: authorFirstName
+        type: string
+        description: "Body field 'authorFirstName'"
+      - field: authorId
+        type: string
+        description: "Body field 'authorId'"
+      - field: authorRole
+        type: string
+        description: "Body field 'authorRole'"
+      - field: authorTimestamp
+        type: string
+        description: "Body field 'authorTimestamp'"
+      - field: chatId
+        type: string
+        description: "Body field 'chatId'"
+      - field: event
+        type: string
+        description: "Body field 'event'"
+
+extractRequestData:
+  assign:
+    chatId: "${incoming.body.chatId}"
+    event: "${incoming.body.event}"
+    authorTimestamp: "${incoming.body.authorTimestamp}"
+    authorFirstName: "${incoming.body.authorFirstName}"
+    authorId: "${incoming.body.authorId}"
+    authorRole: "${incoming.body.authorRole}"
+  next: deleteMessagePreview  
+
+deleteMessagePreview:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/delete-message-preview"
+    body:
+      chatId: ${chatId}
+      content: ""
+  result: res
+  next: getMessageUuid 
+
+getMessageUuid:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_HBS]/return_uuid"
+    headers:
+      type: json
+  result: message_uuid_result
+  next: assignMessageUuid
+
+assignMessageUuid:
+  assign:
+    messageUuid: ${message_uuid_result.response.body.uuid}
+  next: getChatById  
+
+getChatById:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-chat-by-id"
+    body:
+      id: ${chatId}
+  result: chatRes
+  next: checkChatResult 
+
+checkChatResult:
+  switch:
+    - condition: ${chatRes.response.body.length > 0}
+      next: assignChat
+  next: return_chat_found
+
+assignChat:
+  assign:
+    chat: ${chatRes.response.body[0]}
+  next: postMessage  
+
+postMessage:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-message"
+    body:
+      chatId: ${chatId}
+      messageId: ${messageUuid}
+      content: ""
+      authorTimestamp: ${authorTimestamp}
+      authorId: ${authorId}
+      authorFirstName: ${authorFirstName}
+      authorLastName: ""
+      authorRole: "backoffice-user"
+      created: ${new Date().toISOString()}
+      rating: ""
+      event: ${event}
+      forwardedByUser: ""
+      forwardedFromCsa: ""
+      forwardedToCsa: ""
+  result: message_res
+  next: postChat  
+
+postChat:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-chat"
+    body:
+      id: ${chat.id}
+      customerSupportId: ${chat.customerSupportId}
+      customerSupportDisplayName: ${chat.customerSupportDisplayName}
+      csaTitle: ${chat.ended ?? ""}
+      endUserId: ${chat.endUserId}
+      endUserFirstName: ${chat.endUserFirstName}
+      endUserLastName: ${chat.endUserLastName}
+      status: "ENDED"
+      created: ${chat.created}
+      ended: ${new Date().toISOString()}
+      feedbackRating: ${chat.feedbackRating ?? ""}
+      feedbackText: ${chat.feedbackText ?? ""}
+      endUserEmail: ${chat.endUserEmail}
+      endUserPhone: ${chat.endUserPhone}
+      endUserOs: ${chat.endUserOs}
+      endUserUrl: ${chat.endUserUrl}
+      externalId: ${chat.externalId}
+      forwardedTo: ${chat.forwardedTo}
+      forwardedToName: ${chat.forwardedToName}
+      receivedFrom: ${chat.receivedFrom}
+      receivedFromName: ${chat.receivedFromName ?? ""}
+  result: post_chat_res
+  next: return_result    
+
+return_result:
+  return: "Changed Chat Status Successfully"
+  next: end
+
+return_chat_found:
+  return: "Chat Not Found"
+  status: 400
+  next: end  
