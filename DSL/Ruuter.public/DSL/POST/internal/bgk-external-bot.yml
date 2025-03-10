@@ -42,6 +42,7 @@ assignBgkConfig:
     index_name: "[#BGK_INDEX_NAME]"
     query_type: "[#BGK_QUERY_TYPE]"
     system_message: "[#BGK_SYSTEM_MESSAGE]"
+    semantic_configuration: "[#BGK_SEMANTIC_CONFIGURATION]"
 
 logstepAZURESAADAME:
   log: ${incoming.body.message}
@@ -53,7 +54,7 @@ assign_data_sources:
         parameters:
           endpoint: "[#SEARCH_ENDPOINT]"
           index_name: ${index_name}
-          semantic_configuration: azureml-default
+          semantic_configuration: ${semantic_configuration}
           query_type: ${query_type}
           in_scope: true
           strictness: ${parseInt(strictness ?? '3')}

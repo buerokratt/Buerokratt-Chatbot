@@ -54,7 +54,7 @@ assign_data_sources:
         parameters:
           endpoint: "[#SEARCH_ENDPOINT]"
           index_name: ${skm_config.indexName}
-          semantic_configuration: azureml-default
+          semantic_configuration: ${skm_config.semanticConfiguration ?? 'azureml-default'}
           query_type: ${skm_config.queryType}
           in_scope: true
           strictness: ${parseInt(skm_config.range ?? '3')}
