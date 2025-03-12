@@ -48,9 +48,6 @@ const SettingsWorkingTime: FC = () => {
   const [key, setKey] = useState(0);
   const isOrganizationAvailableAllTime = watch('organizationWorkingAllTime');
   const isOrganizationClosedOnWeekEnds = watch('organizationClosedOnWeekEnds');
-  const is_ask_to_forward_to_csa = watch(
-    'organizationBotCannotAnswerAskToForwardToCSA'
-  );
   const isOrganizationTheSameOnAllWorkingDays = watch(
     'organizationTheSameOnAllWorkingDays'
   );
