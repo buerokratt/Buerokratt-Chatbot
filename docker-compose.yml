@@ -113,15 +113,35 @@ services:
     depends_on:
       - users_db
     environment:
-      - sqlms.datasources.[0].name=byk
-      - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://171.22.247.13:5433/byk?sslmode=require
+      - sqlms.datasources.[0].name=auth_users
+      - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://users_db:5432/byk
       - sqlms.datasources.[0].username=byk
-      - sqlms.datasources.[0].password=2nH09n6Gly
+      - sqlms.datasources.[0].password=01234
+      - sqlms.datasources.[1].name=chat
+      - sqlms.datasources.[1].jdbcUrl=jdbc:postgresql://users_db:5432/byk
+      - sqlms.datasources.[1].username=byk
+      - sqlms.datasources.[1].password=01234
+      - sqlms.datasources.[2].name=config
+      - sqlms.datasources.[2].jdbcUrl=jdbc:postgresql://users_db:5432/byk
+      - sqlms.datasources.[2].username=byk
+      - sqlms.datasources.[2].password=01234
+      - sqlms.datasources.[3].name=org
+      - sqlms.datasources.[3].jdbcUrl=jdbc:postgresql://users_db:5432/byk
+      - sqlms.datasources.[3].username=byk
+      - sqlms.datasources.[3].password=01234
+      - sqlms.datasources.[4].name=reference
+      - sqlms.datasources.[4].jdbcUrl=jdbc:postgresql://users_db:5432/byk
+      - sqlms.datasources.[4].username=byk
+      - sqlms.datasources.[4].password=01234
+      - sqlms.datasources.[5].name=security
+      - sqlms.datasources.[5].jdbcUrl=jdbc:postgresql://users_db:5432/byk
+      - sqlms.datasources.[5].username=byk
+      - sqlms.datasources.[5].password=01234
       - logging.level.org.springframework.boot=INFO
     ports:
       - 8082:8082
     volumes:
-      - ./DSL/Resql:/DSL
+      - ./DSL/Resql:/workspace/app/templates
     networks:
       - bykstack
 
