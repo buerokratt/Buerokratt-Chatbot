@@ -82,7 +82,7 @@ get_chat_messages:
 prepare_messages:
   call: http.post
   args:
-    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/prepare-llm-messages"
+    url: "[#CHATBOT_DMAPPER_HBS]/prepare-llm-messages"
     headers:
       type: json
     body:
@@ -194,13 +194,13 @@ assign_back_office_event:
       - recipient_id: ${sender}
         text: ${bot_answer_config.askToForwardToCsaMessage}
         context: ${test.response.body.choices[0].message.context}
-    event: "${bot_answer_config.is_ask_to_forward_to_csa === 'true' ? 'ask_to_forward_to_csa' : ''}"
+    event: "${bot_answer_config.isAskToForwardToCsa === 'true' ? 'ask_to_forward_to_csa' : ''}"
   next: format_messages
 
 format_messages:
   call: http.post
   args:
-    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/llm_responses_to_messages"
+    url: "[#CHATBOT_DMAPPER_HBS]/llm_responses_to_messages"
     headers:
       type: json
     body:
