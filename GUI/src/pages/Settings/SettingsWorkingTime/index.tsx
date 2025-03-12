@@ -20,6 +20,7 @@ import { getOrganizationTimeData, setOrganizationTimeData } from './data';
 import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';
 import {
+  BOT_CANNOT_ANSWER_MESSAGE_LENGTH,
   NO_CSA_MESSAGE_LENGTH,
   OUTSIDE_WORKING_HOURS_MESSAGE_LENGTH,
 } from 'constants/config';
@@ -47,6 +48,9 @@ const SettingsWorkingTime: FC = () => {
   const [key, setKey] = useState(0);
   const isOrganizationAvailableAllTime = watch('organizationWorkingAllTime');
   const isOrganizationClosedOnWeekEnds = watch('organizationClosedOnWeekEnds');
+  const is_ask_to_forward_to_csa = watch(
+    'organizationBotCannotAnswerAskToForwardToCSA'
+  );
   const isOrganizationTheSameOnAllWorkingDays = watch(
     'organizationTheSameOnAllWorkingDays'
   );
@@ -518,6 +522,42 @@ const SettingsWorkingTime: FC = () => {
             )}
           />
         </div>
+        <Controller
+          name="organizationBotCannotAnswerAskToForwardToCSA"
+          control={control}
+          render={({ field }) => (
+            <Switch
+              label={t(
+                'settings.workingTime.showIfBotCannotAnswerAskToForwardToCSA'
+              )}
+              onLabel={t('global.yes').toString()}
+              offLabel={t('global.no').toString()}
+              onCheckedChange={field.onChange}
+              checked={field.value}
+              {...field}
+            />
+          )}
+        />
+        {is_ask_to_forward_to_csa && (
+          <div style={{ paddingRight: '20px' }}>
+            <Controller
+              name="organizationBotCannotAnswerMessage"
+              control={control}
+              render={({ field }) => (
+                <FormTextarea
+                  label={t('settings.workingTime.botCannotAnswerMessage')}
+                  maxLength={BOT_CANNOT_ANSWER_MESSAGE_LENGTH}
+                  showMaxLength
+                  maxLengthBottom
+                  onChange={field.onChange}
+                  defaultValue={field.value}
+                  name="label"
+                  useRichText
+                />
+              )}
+            />
+          </div>
+        )}
       </Card>
     </>
   );
