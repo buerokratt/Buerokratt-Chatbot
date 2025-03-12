@@ -25,6 +25,8 @@ WHERE key IN (
    'organizationNoCsaAskForContacts',
    'organizationNoCsaAvailableMessage',
    'organizationOutsideWorkingHoursAskForContacts',
-   'organizationOutsideWorkingHoursMessage')
+   'organizationOutsideWorkingHoursMessage',
+   'organizationBotCannotAnswerAskToForwardToCSA',
+   'organizationBotCannotAnswerMessage')
   AND id IN (SELECT max(id) from configuration GROUP BY key)
   AND NOT deleted;
