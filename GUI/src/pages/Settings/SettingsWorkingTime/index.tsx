@@ -538,26 +538,24 @@ const SettingsWorkingTime: FC = () => {
             />
           )}
         />
-        {is_ask_to_forward_to_csa && (
-          <div style={{ paddingRight: '20px' }}>
-            <Controller
-              name="organizationBotCannotAnswerMessage"
-              control={control}
-              render={({ field }) => (
-                <FormTextarea
-                  label={t('settings.workingTime.botCannotAnswerMessage')}
-                  maxLength={BOT_CANNOT_ANSWER_MESSAGE_LENGTH}
-                  showMaxLength
-                  maxLengthBottom
-                  onChange={field.onChange}
-                  defaultValue={field.value}
-                  name="label"
-                  useRichText
-                />
-              )}
-            />
-          </div>
-        )}
+        <div style={{ paddingRight: '20px' }}>
+          <Controller
+            name="organizationBotCannotAnswerMessage"
+            control={control}
+            render={({ field }) => (
+              <FormTextarea
+                label={t('settings.workingTime.botCannotAnswerMessage')}
+                maxLength={BOT_CANNOT_ANSWER_MESSAGE_LENGTH}
+                showMaxLength
+                maxLengthBottom
+                onChange={field.onChange}
+                defaultValue={field.value}
+                name="label"
+                useRichText
+              />
+            )}
+          />
+        </div>
       </Card>
     </>
   );
