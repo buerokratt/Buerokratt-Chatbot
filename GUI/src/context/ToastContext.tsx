@@ -11,6 +11,7 @@ import * as RadixToast from '@radix-ui/react-toast';
 
 import { Toast } from 'components';
 import { generateUEID } from 'utils/generateUEID';
+import { POPUP_DURATION } from 'constants/config';
 
 export type ToastType = {
   type: 'info' | 'success' | 'error' | 'warning';
@@ -46,6 +47,7 @@ export const ToastProvider: FC<PropsWithChildren> = ({ children }) => {
       <RadixToast.Provider
         swipeDirection='right'
         label={t('global.notification') ?? 'Notification'}
+        duration={POPUP_DURATION * 1000}
       >
         {children}
         {toasts.map((toast) => (

@@ -23,6 +23,7 @@ export interface Message {
   chatId: string;
   content?: string;
   event?: string;
+  csaTitle?: string;
   authorId?: string;
   authorTimestamp: string;
   authorFirstName: string;
@@ -31,10 +32,14 @@ export interface Message {
   forwardedByUser: string;
   forwardedFromCsa: string;
   forwardedToCsa: string;
+  originalBaseId?: string;
+  originalCreated?: string;
   rating?: string;
   created?: string;
   preview?: string;
   updated?: string;
+  buttons?: string;
+  options?: string;
 }
 
 export interface MessagePreviewSseResponse {
@@ -61,4 +66,9 @@ export enum AttachmentTypes {
   WEBM = 'video/webm',
   OGG = 'video/ogg',
   MOV = 'video/quicktime',
+}
+
+export interface MessageButton {
+  title: string;
+  payload: string;
 }

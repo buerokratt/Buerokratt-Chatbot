@@ -1,80 +1,73 @@
 import { FC, useState } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { AxiosError } from 'axios';
 
-import { Button, Card, Switch, Track } from 'components';
+import { Button, Card, Dialog, Switch, Track } from 'components';
 import { useToast } from 'hooks/useToast';
-import apiDev from 'services/api-dev';
+import { apiDev } from 'services/api';
 import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';
+import { BotConfig } from 'types/botConfig';
 
 const SettingsChatSettings: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
-  const [botActive, setBotActive] = useState<boolean | undefined>(undefined);
+  const [isBotActive, setIsBotActive] = useState<boolean | undefined>(
+    undefined
+  );
+  const [currentIsBurokrattActive, setCurrentIsBurokrattActive] = useState<
+    boolean | undefined
+  >(undefined);
+  const [isBurokrattActive, setIsBurokrattActive] = useState<
+    boolean | undefined
+  >(undefined);
   const [isNameVisible, setIsNameVisible] = useState<boolean | undefined>(
     undefined
   );
   const [isTitleVisible, setIsTitleVisible] = useState<boolean | undefined>(
     undefined
   );
-  const { data: botConfig } = useQuery<{ is_bot_active: boolean }>({
-    queryKey: ['bots/active', 'prod'],
-    onSuccess(res: any) {
-      if(botActive === undefined)
-        setBotActive(res.response === 'true');
-    },
-  });
-  const { data: csaNameVisibility } = useQuery<{ isVisible: boolean }>({
-    queryKey: ['agents/name-visibility', 'prod'],
-    onSuccess(res: any) {
-      if(isNameVisible === undefined)
-        setIsNameVisible(res.response);
-    },
-  });
-  const { data: csaTitleVisibility } = useQuery<{ isVisible: boolean }>({
-    queryKey: ['agents/title-visibility', 'prod'],
-    onSuccess(res: any) {
-      if(isTitleVisible === undefined)
-        setIsTitleVisible(res.response);
+  const [isEditChatVisible, setIsEditChatVisible] = useState<
+    boolean | undefined
+  >(undefined);
+  const queryClient = useQueryClient();
+  const [burokrattConfirmationModal, setBurokrattConfirmationModal] = useState<
+    boolean | null
+  >(null);
+
+  const { data: config } = useQuery<{ config: BotConfig }>({
+    queryKey: ['configs/bot-config', 'prod'],
+    onSuccess(data: any) {
+      const res = data.response;
+      setIsBotActive(res.isBotActive === 'true');
+      setIsBurokrattActive(res.isBurokrattActive === 'true');
+      setCurrentIsBurokrattActive(res.isBurokrattActive === 'true');
+      setIsNameVisible(res.isCsaNameVisible === 'true');
+      setIsTitleVisible(res.isCsaTitleVisible === 'true');
+      setIsEditChatVisible(res.isEditChatVisible === 'true');
     },
   });
 
   const botConfigMutation = useMutation({
-    mutationFn: (data: { is_bot_active: boolean }) => {
-      setBotActive(data.is_bot_active);
-      return apiDev.post(`bots/active`, { isActive: data.is_bot_active });
-    },
-    onError: (error: AxiosError) => {
-      toast.open({
-        type: 'error',
-        title: t('global.notificationError'),
-        message: error.message,
+    mutationFn: (data: {
+      is_bot_active: boolean;
+      is_burokratt_active: boolean;
+      is_csa_name_visible: boolean;
+      is_csa_title_visible: boolean;
+      is_edit_chat_visible: boolean;
+    }) => {
+      return apiDev.post(`configs/bot-config`, {
+        isBotActive: data.is_bot_active.toString(),
+        isBurokrattActive: data.is_burokratt_active.toString(),
+        isCsaNameVisible: data.is_csa_name_visible.toString(),
+        isCsaTitleVisible: data.is_csa_title_visible.toString(),
+        isEditChatVisible: data.is_edit_chat_visible.toString(),
       });
     },
-  });
-
-  const csaNameVisibilityMutation = useMutation({
-    mutationFn: (data: { isVisible: boolean }) => {
-      setIsNameVisible(data.isVisible);
-      return apiDev.post(`agents/name-visibility`, data);
-    },
-    onError: (error: AxiosError) => {
-      toast.open({
-        type: 'error',
-        title: t('global.notificationError'),
-        message: error.message,
-      });
-    },
-  });
-
-  const csaTitleVisibilityMutation = useMutation({
-    mutationFn: (data: { isVisible: boolean }) => {
-      setIsTitleVisible(data.isVisible);
-      return apiDev.post(`agents/title-visibility`, data);
-    },
-    onSuccess: () => {
+    onSuccess: async () => {
+      setBurokrattConfirmationModal(null);
+      await queryClient.invalidateQueries(['configs/bot-config', 'prod']);
       toast.open({
         type: 'success',
         title: t('global.notification'),
@@ -91,16 +84,21 @@ const SettingsChatSettings: FC = () => {
   });
 
   const handleFormSubmit = () => {
-    botConfigMutation.mutate({ is_bot_active: botActive ?? true });
-    csaNameVisibilityMutation.mutate({ isVisible: isNameVisible ?? true });
-    csaTitleVisibilityMutation.mutate({ isVisible: isTitleVisible ?? true });
+    if (isBurokrattActive !== currentIsBurokrattActive) {
+      setBurokrattConfirmationModal(true);
+      return;
+    }
+
+    botConfigMutation.mutate({
+      is_bot_active: isBotActive ?? true,
+      is_burokratt_active: isBurokrattActive ?? true,
+      is_csa_name_visible: isNameVisible ?? true,
+      is_csa_title_visible: isTitleVisible ?? true,
+      is_edit_chat_visible: isEditChatVisible ?? true,
+    });
   };
 
-  if (
-    botActive === undefined &&
-    isNameVisible === undefined &&
-    isTitleVisible === undefined
-  ) {
+  if (!config) {
     return <>Loading...</>;
   }
 
@@ -110,14 +108,24 @@ const SettingsChatSettings: FC = () => {
 
       <Card
         header={
-          botConfig && (
-            <Switch
-              name="is_bot_active"
-              label={t('settings.chat.chatActive')}
-              checked={botActive}
-              onCheckedChange={setBotActive}
-            />
-          )
+          <Track direction="vertical" gap={8}>
+            {isBotActive != undefined && (
+              <Switch
+                name="is_bot_active"
+                label={t('settings.chat.chatActive')}
+                checked={isBotActive}
+                onCheckedChange={setIsBotActive}
+              />
+            )}
+            {isBurokrattActive != undefined && (
+              <Switch
+                name="is_burokratt_active"
+                label={t('settings.chat.burokrattActive')}
+                checked={isBurokrattActive}
+                onCheckedChange={setIsBurokrattActive}
+              />
+            )}
+          </Track>
         }
         footer={
           <Track justify="end">
@@ -126,7 +134,7 @@ const SettingsChatSettings: FC = () => {
         }
       >
         <Track gap={8} direction="vertical" align="left">
-          {csaNameVisibility && (
+          {isNameVisible != undefined && (
             <Switch
               name="is_csa_name_visible"
               label={t('settings.chat.showSupportName')}
@@ -134,7 +142,7 @@ const SettingsChatSettings: FC = () => {
               onCheckedChange={setIsNameVisible}
             />
           )}
-          {csaTitleVisibility && (
+          {isTitleVisible != undefined && (
             <Switch
               name="is_csa_title_visible"
               label={t('settings.chat.showSupportTitle')}
@@ -142,10 +150,60 @@ const SettingsChatSettings: FC = () => {
               onCheckedChange={setIsTitleVisible}
             />
           )}
+          {isEditChatVisible != undefined && (
+            <Switch
+              name="is_edit_chat_visible"
+              label={t('settings.chat.editActiveChat')}
+              checked={isEditChatVisible}
+              onCheckedChange={setIsEditChatVisible}
+            />
+          )}
         </Track>
       </Card>
+      {burokrattConfirmationModal && (
+        <Dialog
+          title={t('global.removeValidation')}
+          onClose={() => setBurokrattConfirmationModal(null)}
+          footer={
+            <>
+              <Button
+                appearance="secondary"
+                onClick={() => {
+                  setBurokrattConfirmationModal(null);
+                }}
+              >
+                {t('global.cancel')}
+              </Button>
+              <Button
+                onClick={() => {
+                  setCurrentIsBurokrattActive(isBurokrattActive);
+                  botConfigMutation.mutate({
+                    is_bot_active: isBotActive ?? true,
+                    is_burokratt_active: isBurokrattActive ?? true,
+                    is_csa_name_visible: isNameVisible ?? true,
+                    is_csa_title_visible: isTitleVisible ?? true,
+                    is_edit_chat_visible: isEditChatVisible ?? true,
+                  });
+                }}
+              >
+                {t('global.yes')}
+              </Button>
+            </>
+          }
+        >
+          {
+            <p>
+              {isBurokrattActive
+                ? t('settings.chat.showBurokrattConfirmation')
+                : t('settings.chat.hideBurokrattConfirmation')}
+            </p>
+          }
+        </Dialog>
+      )}
     </>
   );
 };
 
-export default withAuthorization(SettingsChatSettings, [ROLES.ROLE_ADMINISTRATOR]);
+export default withAuthorization(SettingsChatSettings, [
+  ROLES.ROLE_ADMINISTRATOR,
+]);

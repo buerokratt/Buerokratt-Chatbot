@@ -5,16 +5,15 @@ import { useQuery } from '@tanstack/react-query';
 
 import { Chat, Dialog, Button, FormRadios } from 'components';
 import { CHAT_EVENTS, CHAT_STATUS, Chat as ChatType } from 'types/chat';
-import useHeaderStore from '@buerokratt-ria/header/src/header/store/store';
+import { userStore as useHeaderStore } from '@buerokratt-ria/header';
 import useStore from 'store';
 import { User } from 'types/user';
 import { useToast } from 'hooks/useToast';
-import apiDev from 'services/api-dev';
+import { apiDev } from 'services/api';
 import ChatTrigger from '../ChatActive/ChatTrigger';
 import clsx from 'clsx';
 import ForwardToColleaugeModal from '../ForwardToColleaugeModal';
 import ForwardToEstablishmentModal from '../ForwardToEstablishmentModal';
-import sse from 'services/sse-service';
 import './ChatUnanswered.scss';
 import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';
@@ -51,17 +50,12 @@ const ChatUnanswered: FC = () => {
     useHeaderStore.getState().loadActiveChats();
   }, []);
 
-  useEffect(() => {
-    const events = sse(`/chat-list`, loadActiveChats);
-    return () => events.close();
-  }, []);
-
   const { data: csaNameVisiblity } = useQuery<{ isVisible: boolean }>({
-    queryKey: ['agents/name-visibility', 'prod'],
+    queryKey: ['agents/admin/name-visibility', 'prod'],
   });
 
   const { data: csaTitleVisibility } = useQuery<{ isVisible: boolean }>({
-    queryKey: ['agents/title-visibility', 'prod'],
+    queryKey: ['agents/admin/title-visibility', 'prod'],
   });
 
   const handleCsaForward = async (chat: ChatType, user: User) => {
@@ -80,13 +74,13 @@ const ChatUnanswered: FC = () => {
       toast.open({
         type: 'success',
         title: t('global.notification'),
-        message: `Chat forwarded to ${user.displayName}`,
+        message: `${t('chat.chatForwardedTo')} ${user.displayName}`,
       });
     } catch (error) {
       toast.open({
         type: 'warning',
         title: t('global.notificationError'),
-        message: `Chat ended`,
+        message: t('chat.chatEnded'),
       });
     }
   };
@@ -100,7 +94,7 @@ const ChatUnanswered: FC = () => {
     toast.open({
       type: 'success',
       title: t('global.notification'),
-      message: `Chat forwarded to ${establishment}`,
+      message: `${t('chat.chatForwardedTo')} ${establishment}`,
     });
   };
 
@@ -120,13 +114,13 @@ const ChatUnanswered: FC = () => {
       toast.open({
         type: 'success',
         title: t('global.notification'),
-        message: `Chat ended`,
+        message: t('chat.chatEnded'),
       });
     } catch (error) {
       toast.open({
         type: 'warning',
         title: t('global.notificationError'),
-        message: `Chat ended`,
+        message: t('chat.chatEnded'),
       });
     }
     setEndChatModal(null);

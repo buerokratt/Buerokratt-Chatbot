@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, Card, FormInput, Track } from 'components';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useToast } from 'hooks/useToast';
-import apiDev from 'services/api-dev';
+import { apiDev } from 'services/api';
 import './SettingsSessionLength.scss';
 import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';
@@ -14,13 +14,13 @@ const SettingsSessionLength: FC = () => {
   const toast = useToast();
   const [sessionLength, setSessionLength] = useState<string>('');
   useQuery({
-    queryKey: ['accounts/session-length', 'prod'],
+    queryKey: ['accounts/admin/session-length', 'prod'],
     onSuccess: (res: any) => setSessionLength(res.response ?? ''),
   });
 
   const sessionLengthMutation = useMutation({
     mutationFn: () =>
-      apiDev.post('accounts/session-length', {
+      apiDev.post('accounts/admin/session-length', {
         sessionLength: sessionLength,
       }),
     onSuccess: () => {

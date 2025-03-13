@@ -1,0 +1,31 @@
+[  
+  {{#if (filterControlCharacters prompt_message)}}
+    {
+        "role": "system",
+        "content": "{{filterControlCharacters prompt_message}}"
+    }
+  {{/if}}  
+  {{#if messages}}
+    {{#each messages}}
+     {{#if (filterControlCharacters content)}}
+      {{#if (eq authorRole "end-user")}},
+    {
+        "role": "user",
+        "content": "{{filterControlCharacters content}}"
+    }
+      {{else}},
+    {
+        "role": "assistant",
+        "content": "{{filterControlCharacters content}}"
+    }
+      {{/if}}
+     {{/if}} 
+    {{/each}}
+  {{/if}}
+  {{#if new_message}},
+    {
+        "role": "user",
+        "content": "{{filterControlCharacters new_message}}"
+    }
+  {{/if}}
+]

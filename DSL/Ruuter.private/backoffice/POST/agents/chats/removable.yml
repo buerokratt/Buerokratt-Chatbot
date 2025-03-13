@@ -1,0 +1,50 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'ENDED-CHATS'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: endDate
+        type: string
+        description: "Body field 'endDate'"
+      - field: startDate
+        type: string
+        description: "Body field 'startDate'"
+      - field: page
+        type: number
+        description: "Body field 'page'"
+      - field: page_size
+        type: number
+        description: "Body field 'page_size'"
+      - field: sorting
+        type: string
+        description: "Body field 'sorting'"
+      - field: search
+        type: string
+        description: "Body field 'search'"
+
+extractRequestData:
+  assign:
+    startDate: "${incoming.body.startDate}"
+    endDate: "${incoming.body.endDate}"
+
+getEndedChats:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-chats-to-be-removed"
+    body:
+      auth_date: ${startDate}
+      anon_date: ${endDate}
+      page: ${incoming.body.page}
+      page_size: ${incoming.body.page_size}
+      sorting: ${incoming.body.sorting}
+      search: ${incoming.body.search}
+  result: res
+
+returnSuccess:
+  return: ${res.response.body}
+  next: end

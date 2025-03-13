@@ -9,6 +9,7 @@
   justify-content: flex-end;
   position: relative;
   height: 100%;
+  white-space: pre-wrap;
 
   &__body {
     flex: 1;
@@ -62,15 +63,32 @@
       #{$self} {
         &__group-initials {
           background-color: get-color(sapphire-blue-10);
+          left: 0;
+          top: 0;
         }
 
         &__group-name {
           color: get-color(sapphire-blue-10);
+          text-align: left;
+          margin-left: 0;
+          font-size: $veera-font-size-100;
+        }
+
+        &__messages {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          align-items: flex-start;
         }
 
         &__message-text {
           background-color: get-color(sapphire-blue-10);
           color: get-color(white);
+          margin-left: 0;
+
+          :any-link {
+            color: get-color(white);
+          }
 
           &:hover {
             background-color: get-color(sapphire-blue-13);
@@ -84,11 +102,30 @@
         &__group-initials {
           background-color: get-color(black-coral-10);
           color: get-color(white);
+          left: 0;
+        }
+
+        &__group-name {
+          text-align: left;
+          margin-left: 0;
+          font-size: $veera-font-size-100;
+        }
+
+        &__messages {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          align-items: flex-start;
         }
 
         &__message-text {
           background-color: get-color(black-coral-10);
           color: get-color(white);
+          margin-left: 0;
+
+          :any-link {
+            color: get-color(white);
+          }
 
           &:hover {
             background-color: #535665;
@@ -111,22 +148,26 @@
     font-weight: $veera-font-weight-delta;
     color: get-color(black-coral-6);
     position: absolute;
-    left: 0;
+    right: 0;
     top: 0;
   }
 
   &__group-name {
-    font-size: $veera-font-size-80;
+    font-size: $veera-font-size-100;
     line-height: $veera-line-height-500;
     font-weight: $veera-font-weight-delta;
     text-transform: capitalize;
+    margin-left: 10rem;
+    margin-right: 3rem;
+    text-align: right;
+    padding-top: 7px;
   }
 
   &__messages {
     display: flex;
     flex-direction: column;
     gap: 4px;
-    align-items: flex-start;
+    align-items: flex-end;
   }
 
   &__message {
@@ -146,6 +187,10 @@
     transition: all .25s ease-out;
     cursor: pointer;
 
+    :any-link {
+      text-decoration: underline;
+    }
+
     &:hover {
       background-color: get-color(black-coral-1);
     }
@@ -164,4 +209,17 @@
       color: get-color(black-coral-6);
     }
   }
+}
+
+.header-link {
+  text-decoration: none;
+  padding: 15px 35px;
+  font-family: Roboto , sans-serif;
+  font-weight: 400;
+}
+
+.title {
+  font-size: 14px;
+  color: get-color(black-coral-6);
+  padding-top: 4px;
 }

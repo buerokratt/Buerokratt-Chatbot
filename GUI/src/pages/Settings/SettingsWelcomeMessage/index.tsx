@@ -6,7 +6,7 @@ import { Button, Card, FormTextarea, Switch, Track } from 'components';
 import { WELCOME_MESSAGE_LENGTH } from 'constants/config';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useToast } from 'hooks/useToast';
-import apiDev from 'services/api-dev';
+import { apiDev } from 'services/api';
 import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';
 
@@ -99,10 +99,10 @@ const SettingsWelcomeMessage: FC = () => {
             label={t('settings.welcomeMessage.welcomeMessage')}
             minRows={4}
             maxLength={WELCOME_MESSAGE_LENGTH}
-            showMaxLength
+            showMaxLength={true}
             maxLengthBottom
             onChange={(e) => setWelcomeMessage(e.target.value)}
-            value={welcomeMessage}
+            defaultValue={welcomeMessage}
             name="label"
           />
         </Track>

@@ -12,10 +12,13 @@ import {
   Track,
 } from 'components';
 import { EMERGENCY_NOTICE_LENGTH } from 'constants/config';
-import { EmergencyNotice } from 'types/emergencyNotice';
+import {
+  EmergencyNotice,
+  EmergencyNoticeResponse,
+} from 'types/emergencyNotice';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useToast } from 'hooks/useToast';
-import apiDev from 'services/api-dev';
+import { apiDev } from 'services/api';
 import { format, parse } from 'date-fns';
 import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';
@@ -23,25 +26,43 @@ import { ROLES } from 'utils/constants';
 const SettingsEmergencyNotices: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
-  const { register, control, handleSubmit, reset } = useForm<EmergencyNotice>();
+  const { register, control, handleSubmit, reset, setValue } = useForm<EmergencyNotice>();
   const [isEmergencyNoticeVisible, setIsEmergencyNoticeVisible] =
     useState(false);
   const [emergencyNoticeText, setEmergencyNoticeText] = useState('');
-  const { data: emergencyNotice } = useQuery<EmergencyNotice>({
+  const { data: emergencyNotice } = useQuery<EmergencyNoticeResponse>({
     queryKey: ['configs/emergency-notice', 'prod'],
-    onSuccess: (data: any) => {
-      const res = data.response;
+    onSuccess: (data: EmergencyNoticeResponse) => {
+      const {
+        isEmergencyNoticeVisible,
+        emergencyNoticeStartISO,
+        emergencyNoticeEndISO,
+        emergencyNoticeText,
+      } = data.response;
+
       if (Object.keys(control._formValues).length > 0) return;
-      setIsEmergencyNoticeVisible(res.isEmergencyNoticeVisible ?? false);
-      setEmergencyNoticeText(res.emergencyNoticeText ?? '');
+
+      const isEmergencyNoticeVisibleBoolean =
+        isEmergencyNoticeVisible === 'true';
+      setIsEmergencyNoticeVisible(isEmergencyNoticeVisibleBoolean);
+      setEmergencyNoticeText(emergencyNoticeText ?? '');
       reset({
-        emergencyNoticeStartISO: new Date(res.emergencyNoticeStartISO ?? '0'),
-        emergencyNoticeEndISO: new Date(res.emergencyNoticeEndISO ?? '0'),
-        emergencyNoticeText: res.emergencyNoticeText ?? '',
-        isEmergencyNoticeVisible: res.isEmergencyNoticeVisible ?? false,
+        emergencyNoticeStartISO: isEmergencyNoticeVisibleBoolean
+          ? new Date(emergencyNoticeStartISO)
+          : new Date(),
+        emergencyNoticeEndISO: new Date(emergencyNoticeEndISO ?? '0'),
+        emergencyNoticeText,
+        isEmergencyNoticeVisible,
       });
     },
   });
+
+  const handleSwitchChange = (checked: boolean) => {
+    const today = new Date();
+    setValue('emergencyNoticeStartISO', today);
+    setValue('emergencyNoticeEndISO', today);
+    setIsEmergencyNoticeVisible(checked);
+  };
 
   const emergencyNoticeMutation = useMutation({
     mutationFn: (data: EmergencyNotice) =>
@@ -63,12 +84,24 @@ const SettingsEmergencyNotices: FC = () => {
   });
 
   const handleFormSubmit = handleSubmit((data) => {
+    const formatDate = (date: Date) => new Date(format(date, 'yyyy-MM-dd'));
+    const startDate = formatDate(new Date(data.emergencyNoticeStartISO));
+    const endDate = formatDate(new Date(data.emergencyNoticeEndISO));
+    if (endDate < startDate) {
+      toast.open({
+        type: 'error',
+        title: t('global.notificationError'),
+        message: t('settings.emergencyNotices.endDateError'),
+      });
+      return;
+    }
     emergencyNoticeMutation.mutate({
       ...data,
-      isEmergencyNoticeVisible,
+      isEmergencyNoticeVisible: isEmergencyNoticeVisible.toString(),
       emergencyNoticeText,
     });
   });
+
   if (!emergencyNotice || Object.keys(control._formValues).length === 0)
     return <>Loading...</>;
 
@@ -90,7 +123,7 @@ const SettingsEmergencyNotices: FC = () => {
             render={({ field }) => (
               <Switch
                 checked={isEmergencyNoticeVisible}
-                onCheckedChange={(c) => setIsEmergencyNoticeVisible(c)}
+                onCheckedChange={handleSwitchChange}
                 label={t('settings.emergencyNotices.noticeActive')}
                 {...field}
               />
@@ -118,13 +151,11 @@ const SettingsEmergencyNotices: FC = () => {
                     label={t('global.startDate')}
                     hideLabel
                     {...field}
-                    value={
-                      parse(
-                        format(field.value as Date, 'yyyy-MM-dd'),
-                        'yyyy-MM-dd',
-                        new Date()
-                      ) ?? new Date('0')
-                    }
+                    value={parse(
+                      format(field.value as Date, 'yyyy-MM-dd'),
+                      'yyyy-MM-dd',
+                      new Date()
+                    )}
                   />
                 )}
               />
@@ -155,4 +186,6 @@ const SettingsEmergencyNotices: FC = () => {
   );
 };
 
-export default withAuthorization(SettingsEmergencyNotices, [ROLES.ROLE_ADMINISTRATOR]);
+export default withAuthorization(SettingsEmergencyNotices, [
+  ROLES.ROLE_ADMINISTRATOR,
+]);

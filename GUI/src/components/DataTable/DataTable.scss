@@ -11,9 +11,10 @@
 
   &__scrollWrapper {
     height: 100%;
-    overflow-x: auto;
     white-space: nowrap;
+    overflow-x: auto;
     display: block;
+    max-height: 60vh;
   }
 
   thead, tbody {
@@ -68,18 +69,8 @@
   }
 
   &__filter {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    padding: get-spacing(paldiski);
-    background-color: get-color(white);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.14);
-    border-radius: 0 0 4px 4px;
-    border: 1px solid get-color(black-coral-2);
-
     input {
-      width: 100%;
+      width: 120px;
       display: block;
       appearance: none;
       background-color: get-color(white);
@@ -104,7 +95,7 @@
 
   &__pagination-wrapper {
     display: flex;
-    box-shadow: 0 -1px 0 get-color(black-coral-10);
+    border-top: 1px solid get-color(black-coral-10);
     padding: 6px 16px;
   }
 
@@ -186,4 +177,12 @@
       background-position: top 11px right 10px;
     }
   }
+}
+
+.highlighted {
+  background-color: get-color(sapphire-blue-1);
+}
+
+.default {
+  background-color: white;
 }
