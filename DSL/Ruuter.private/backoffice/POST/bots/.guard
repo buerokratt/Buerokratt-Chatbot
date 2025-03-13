@@ -1,0 +1,28 @@
+check_for_cookie:
+  switch:
+    - condition: ${incoming.headers == null || incoming.headers.cookie == null}
+      next: guard_fail
+  next: authenticate
+
+authenticate:
+  template: "[#CHATBOT_PROJECT_LAYER]/check-admin-authority"
+  requestType: templates
+  headers:
+    cookie: ${incoming.headers.cookie}
+  result: authority_result
+
+check_authority_result:
+  switch:
+    - condition: ${authority_result !== "false"}
+      next: guard_success
+  next: guard_fail
+
+guard_success:
+  return: "success"
+  status: 200
+  next: end
+
+guard_fail:
+  return: "unauthorized"
+  status: 403
+  next: end

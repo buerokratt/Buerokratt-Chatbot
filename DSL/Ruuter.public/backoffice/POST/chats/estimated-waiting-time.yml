@@ -1,0 +1,61 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'ESTIMATED-WAITING-TIME'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: chatId
+        type: string
+        description: "Body field 'chatId'"
+
+assignIncoming:
+  assign:
+    chatId: ${incoming.body.chatId}
+
+getDurationTotalInSeconds:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-ended-chats-total-duration-in-seconds"
+  result: durationTotalInSeconds
+
+getUnassignedChats:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-unassigned-chat-total-with-position-by-chat-id"
+    body:
+      chatId: "${chatId ? chatId : ''}"
+  result: unassignedChats
+
+assignResponseVariables:
+  assign:
+    duration: ${durationTotalInSeconds.response.body[0].durationInSeconds}
+    position: ${unassignedChats.response.body[0].positionInUnassignedChats}
+    unassignedChats: ${unassignedChats.response.body[0].unassignedChatTotal}
+
+calculateAverage:
+  assign:
+    average: ${duration / unassignedChats}
+
+calculateDuration:
+  assign:
+    calculatedDuration: "${position > 0 ? average * position : duration}"
+
+getEstimatedWaitingTime:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_HBS]/reflect_waiting_time"
+    headers:
+      type: json
+    body:
+      durationInSeconds: ${calculatedDuration}
+      positionInUnassignedChats: ${position}
+  result: estimatedWaitingTime
+  next: returnSuccess
+
+returnSuccess:
+  return: ${estimatedWaitingTime.response.body}
+  next: end
