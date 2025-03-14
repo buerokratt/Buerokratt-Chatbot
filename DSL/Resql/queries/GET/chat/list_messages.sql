@@ -17,5 +17,10 @@ SELECT
     forwarded_to_csa,
     updated
 FROM message
-WHERE base_id = ANY(ARRAY [ :messageIds ]) AND
-    id IN (SELECT max(id) FROM message WHERE chat_base_id = :chatId GROUP BY base_id)
+WHERE
+    base_id = ANY(ARRAY[:messageIds])
+    AND id IN (
+        SELECT MAX(id) FROM message
+        WHERE chat_base_id = :chatId
+        GROUP BY base_id
+    )

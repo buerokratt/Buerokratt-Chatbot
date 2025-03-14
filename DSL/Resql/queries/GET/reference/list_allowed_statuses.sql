@@ -1,1 +1,1 @@
-SELECT array_agg(name) AS names FROM allowed_statuses;
+SELECT ARRAY_AGG(name) AS names FROM allowed_statuses;

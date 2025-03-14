@@ -1,1 +1,2 @@
-update request_nonces set used_at = now() where nonce = :updated_nonce and used_at is null returning nonce;
+UPDATE request_nonces SET used_at = NOW()
+WHERE nonce = :updated_nonce AND used_at IS null RETURNING nonce;
