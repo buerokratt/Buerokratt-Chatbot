@@ -1,2 +1,2 @@
 INSERT INTO configuration (key, deleted, created)
-VALUES (:key, :deleted, :created::timestamp with time zone);
+VALUES (:key, :deleted, :created::TIMESTAMP WITH TIME ZONE);

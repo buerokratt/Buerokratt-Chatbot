@@ -1,3 +1,6 @@
-SELECT array_agg(name) AS names
+SELECT ARRAY_AGG(name) AS names
 FROM establishment
-WHERE id IN (SELECT max(id) FROM establishment GROUP BY base_id) AND deleted = false
+WHERE id IN (
+    SELECT MAX(id) FROM establishment
+    GROUP BY base_id
+) AND deleted = false
