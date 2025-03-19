@@ -45,8 +45,8 @@ convertDataToPdf:
     url: "[#CHATBOT_DMAPPER]/js/convert/pdf"
     body:
       messages: ${getMessagesByChatIdResult.response.body}
-      csaTitleVisible: ${csaVisibility.is_csa_title_visible}
-      csaNameVisible: ${csaVisibility.is_csa_name_visible}
+      csaTitleVisible: ${csaVisibility.isCsaTitleVisible}
+      csaNameVisible: ${csaVisibility.isCsaNameVisible}
   result: pdfFile
   next: checkPdfExists
 
