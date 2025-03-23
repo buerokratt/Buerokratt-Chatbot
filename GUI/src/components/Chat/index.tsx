@@ -370,13 +370,14 @@ const Chat: FC<ChatProps> = ({
         forwardedToCsa: userInfo?.idCode ?? '',
       }),
     onSuccess: async () => {
-      if (chat.customerSupportId === '') {
-        navigate('/active', {
-          state: {
-            chatId: chat.id,
-          },
-        });
-      } else {
+      navigate('/active', {
+        state: {
+          chatId: chat.id,
+          customerSupportId: userInfo?.idCode ?? '',
+        },
+      });
+
+      if (chat.customerSupportId != '') {
         chat.customerSupportId = userInfo?.idCode;
       }
       onRefresh();
