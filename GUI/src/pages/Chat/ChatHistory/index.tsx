@@ -16,6 +16,5 @@ const History: FC = () => {
 
 export default withAuthorization(History, [
   ROLES.ROLE_ADMINISTRATOR,
-  ROLES.ROLE_CHATBOT_TRAINER,
-  ROLES.ROLE_SERVICE_MANAGER,
+  ROLES.ROLE_CUSTOMER_SUPPORT_AGENT,
 ]);
