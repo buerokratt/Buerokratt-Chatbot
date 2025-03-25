@@ -4,7 +4,6 @@ import {
   PaginationState,
   SortingState,
 } from '@tanstack/react-table';
-import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { MdOutlineArrowForward } from 'react-icons/md';
 import { apiDev } from 'services/api';
@@ -22,6 +21,7 @@ import { User } from 'types/user';
 import { Chat } from 'types/chat';
 import { useDebouncedCallback } from 'use-debounce';
 import useStore from 'store';
+import { useToast } from 'hooks/useToast';
 
 type ForwardToColleaugeModalProps = {
     chat: Chat;
@@ -45,6 +45,7 @@ const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({
   const [usersList, setUsersList] = useState<User[] | null>(null);
   const [totalPages, setTotalPages] = useState<number>(1);
   const userInfo = useStore((state) => state.userInfo);
+  const toast = useToast();
   const getUsers = (
     pagination: PaginationState,
     filter: string,
@@ -94,15 +95,28 @@ const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({
         );
     };
 
-    const forwardView = (props: any) => (
+    const forwardView = (props: any) => {
+      const status = props.row.original.customerSupportStatus;
+      return status === 'online' || status === 'idle' ? (
         <Button
-            appearance="text"
-            onClick={() => onForward(chat, props.row.original)}
+          appearance="text"
+          onClick={() => {
+            if (status === 'online') {
+              onForward(chat, props.row.original);
+            } else {
+              toast.open({
+                type: 'error',
+                title: t('global.notificationError'),
+                message: t('chat.validations.forwardToOfflineCsa'),
+              });
+            }
+          }}
         >
-            <Icon icon={<MdOutlineArrowForward color="rgba(0, 0, 0, 0.54)"/>}/>
-            {t('global.forward')}
+          <Icon icon={<MdOutlineArrowForward color="rgba(0, 0, 0, 0.54)" />} />
+          {t('global.forward')}
         </Button>
-    );
+      ) : null;
+    };
 
     const usersColumns = useMemo(
         () => [
