@@ -21,7 +21,6 @@ import { User } from 'types/user';
 import { Chat } from 'types/chat';
 import { useDebouncedCallback } from 'use-debounce';
 import useStore from 'store';
-import { useToast } from 'hooks/useToast';
 
 type ForwardToColleaugeModalProps = {
     chat: Chat;
@@ -45,7 +44,6 @@ const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({
   const [usersList, setUsersList] = useState<User[] | null>(null);
   const [totalPages, setTotalPages] = useState<number>(1);
   const userInfo = useStore((state) => state.userInfo);
-  const toast = useToast();
   const getUsers = (
     pagination: PaginationState,
     filter: string,
@@ -97,20 +95,11 @@ const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({
 
     const forwardView = (props: any) => {
       const status = props.row.original.customerSupportStatus;
-      const isOnline = status === 'online' || status === 'idle';
-      return isOnline ? (
+      return status === 'online' || status === 'idle' ? (
         <Button
           appearance="text"
           onClick={() => {
-            if (isOnline) {
-              onForward(chat, props.row.original);
-            } else {
-              toast.open({
-                type: 'error',
-                title: t('global.notificationError'),
-                message: t('chat.validations.forwardToOfflineCsa'),
-              });
-            }
+            onForward(chat, props.row.original);
           }}
         >
           <Icon icon={<MdOutlineArrowForward color="rgba(0, 0, 0, 0.54)" />} />

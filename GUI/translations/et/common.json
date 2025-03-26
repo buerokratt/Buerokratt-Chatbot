@@ -267,7 +267,6 @@
       "messageChanged": "Sõnumi muutmine õnnestus",
       "messageApproved": "Sõnum kinnitati edukalt",
       "messageChangeFailed": "Sõnumi muutmine ebaõnnestus",
-      "forwardToOfflineCsa": "Te ei saa vestlust võrguühenduseta klienditoe agendile edastada",
       "confirmAnswer": "Kinnita vastus",
       "header": {
         "id": "Id",

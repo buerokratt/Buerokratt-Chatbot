@@ -267,7 +267,6 @@
       "messageChanged": "Message changed successfully",
       "messageApproved": "Message approved successfully",
       "messageChangeFailed": "Message change failed",
-      "forwardToOfflineCsa": "You cannot forward the chat to an offline client support agent",
       "confirmAnswer": "Confirm Answer",
       "header": {
         "id": "Id",
