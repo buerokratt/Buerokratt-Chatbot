@@ -97,11 +97,12 @@ const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({
 
     const forwardView = (props: any) => {
       const status = props.row.original.customerSupportStatus;
-      return status === 'online' || status === 'idle' ? (
+      const isOnline = status === 'online' || status === 'idle';
+      return isOnline ? (
         <Button
           appearance="text"
           onClick={() => {
-            if (status === 'online' || status === 'idle') {
+            if (isOnline) {
               onForward(chat, props.row.original);
             } else {
               toast.open({
