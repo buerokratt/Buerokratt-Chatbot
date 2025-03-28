@@ -26,7 +26,7 @@ import { ROLES } from 'utils/constants';
 const SettingsEmergencyNotices: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
-  const { register, control, handleSubmit, reset } = useForm<EmergencyNotice>();
+  const { register, control, handleSubmit, reset, setValue } = useForm<EmergencyNotice>();
   const [isEmergencyNoticeVisible, setIsEmergencyNoticeVisible] =
     useState(false);
   const [emergencyNoticeText, setEmergencyNoticeText] = useState('');
@@ -57,6 +57,13 @@ const SettingsEmergencyNotices: FC = () => {
     },
   });
 
+  const handleSwitchChange = (checked: boolean) => {
+    const today = new Date();
+    setValue('emergencyNoticeStartISO', today);
+    setValue('emergencyNoticeEndISO', today);
+    setIsEmergencyNoticeVisible(checked);
+  };
+
   const emergencyNoticeMutation = useMutation({
     mutationFn: (data: EmergencyNotice) =>
       apiDev.post<EmergencyNotice>('configs/emergency-notice', data),
@@ -77,12 +84,24 @@ const SettingsEmergencyNotices: FC = () => {
   });
 
   const handleFormSubmit = handleSubmit((data) => {
+    const formatDate = (date: Date) => new Date(format(date, 'yyyy-MM-dd'));
+    const startDate = formatDate(new Date(data.emergencyNoticeStartISO));
+    const endDate = formatDate(new Date(data.emergencyNoticeEndISO));
+    if (endDate < startDate) {
+      toast.open({
+        type: 'error',
+        title: t('global.notificationError'),
+        message: t('settings.emergencyNotices.endDateError'),
+      });
+      return;
+    }
     emergencyNoticeMutation.mutate({
       ...data,
       isEmergencyNoticeVisible: isEmergencyNoticeVisible.toString(),
       emergencyNoticeText,
     });
   });
+
   if (!emergencyNotice || Object.keys(control._formValues).length === 0)
     return <>Loading...</>;
 
@@ -104,7 +123,7 @@ const SettingsEmergencyNotices: FC = () => {
             render={({ field }) => (
               <Switch
                 checked={isEmergencyNoticeVisible}
-                onCheckedChange={(c) => setIsEmergencyNoticeVisible(c)}
+                onCheckedChange={handleSwitchChange}
                 label={t('settings.emergencyNotices.noticeActive')}
                 {...field}
               />

@@ -35,6 +35,7 @@ const SettingsUsers: FC = () => {
   );
   const [usersList, setUsersList] = useState<User[] | null>(null);
   const [totalPages, setTotalPages] = useState<number>(1);
+  const [selectedUserIdCode, setSelectedUserIdCode] = useState<string | null>(null);
 
   const getUsers = (pagination: PaginationState, sorting: SortingState, columnFilters: ColumnFiltersState, setTablePagination: boolean = false) => {
       let sort = 'name asc';
@@ -115,6 +116,7 @@ const SettingsUsers: FC = () => {
         user_id: userInfo?.idCode,
         page_name: window.location.pathname,
         page_results: data.page_results,
+        selected_columns: "{}"
       });
     },
   });
@@ -142,6 +144,7 @@ const SettingsUsers: FC = () => {
   const customerSupportActivityMutation = useMutation({
     mutationFn: (data: CustomerSupportActivityDTO) =>
       apiDev.post('accounts/customer-support-activity', {
+        userIdCode: selectedUserIdCode,
         customerSupportActive: data.customerSupportActive,
         customerSupportStatus: data.customerSupportStatus,
       }),
@@ -152,7 +155,6 @@ const SettingsUsers: FC = () => {
         title: t('global.notification'),
         message: t('toast.success.userUpdated'),
       });
-      setChangeStatusDialog(false);
     },
     onError: async (error: AxiosError) => {
       await queryClient.invalidateQueries([
@@ -164,6 +166,10 @@ const SettingsUsers: FC = () => {
         title: t('global.notificationError'),
         message: error.message,
       });
+    },
+    onSettled: () => {
+      setSelectedUserIdCode(null);
+      setChangeStatusDialog(false);
     },
   });
 
@@ -234,6 +240,7 @@ const SettingsUsers: FC = () => {
         appearance="text"
         onClick={() => {
           if (props.getValue() === 'online' || props.getValue() === 'idle')
+            setSelectedUserIdCode(props.row.original.idCode);
             setChangeStatusDialog(true);
         }}
         style={{
@@ -391,12 +398,18 @@ const SettingsUsers: FC = () => {
       {changeStatusDialog && (
         <Dialog
           title={t('settings.users.userChangeStatusMessage')}
-          onClose={() => setChangeStatusDialog(false)}
+          onClose={() => {
+            setSelectedUserIdCode(null);
+            setChangeStatusDialog(false);
+          }}
           footer={
             <>
               <Button
                 appearance="secondary"
-                onClick={() => setChangeStatusDialog(false)}
+                onClick={() => {
+                  setSelectedUserIdCode(null);
+                  setChangeStatusDialog(false);
+                }}
               >
                 {t('global.no')}
               </Button>

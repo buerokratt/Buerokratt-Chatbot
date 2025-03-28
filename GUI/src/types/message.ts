@@ -32,6 +32,8 @@ export interface Message {
   forwardedByUser: string;
   forwardedFromCsa: string;
   forwardedToCsa: string;
+  originalBaseId?: string;
+  originalCreated?: string;
   rating?: string;
   created?: string;
   preview?: string;

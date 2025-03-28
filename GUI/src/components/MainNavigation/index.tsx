@@ -51,7 +51,7 @@ const MainNavigation: FC = () => {
               path: '#',
             },
             {
-              label: t('menu.userStories'),
+              label: t('menu.rules'),
               path: '#',
             },
             {

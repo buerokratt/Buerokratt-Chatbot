@@ -5,14 +5,13 @@ import { MdOutlineModeEditOutline, MdOutlineSave } from 'react-icons/md';
 
 import { Button, FormSelect, FormTextarea, Icon, Track } from 'components';
 import { ReactComponent as BykLogoWhite } from 'assets/logo-white.svg';
-import { CHAT_EVENTS, Chat as ChatType } from 'types/chat';
+import { CHAT_EVENTS, Chat as ChatType, BACKOFFICE_NAME } from 'types/chat';
 import { Message } from 'types/message';
 import ChatMessage from './ChatMessage';
 import './HistoricalChat.scss';
 import { apiDev } from 'services/api';
 import ChatEvent from 'components/ChatEvent';
 import { AUTHOR_ROLES } from 'utils/constants';
-import { BACKOFFICE_NAME } from 'types/chat';
 
 type ChatProps = {
   chat: ChatType;
@@ -102,15 +101,6 @@ const HistoricalChat: FC<ChatProps> = ({
     let groupedMessages: GroupedMessage[] = [];
     messagesList.forEach((message) => {
       const lastGroup = groupedMessages[groupedMessages.length - 1];
-      if (
-        lastGroup &&
-        lastGroup.type === AUTHOR_ROLES.BACKOFFICE_USER &&
-        lastGroup.messages.at(-1) &&
-        message.event === CHAT_EVENTS.READ
-      ) {
-        lastGroup.messages.push(message);
-        return;
-      }
       if (lastGroup?.type === message.authorRole) {
         if (
           !message.event ||

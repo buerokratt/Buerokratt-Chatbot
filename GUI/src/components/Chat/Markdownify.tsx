@@ -8,6 +8,12 @@ interface MarkdownifyProps {
 
 const LinkPreview: React.FC<{ href: string; children: React.ReactNode }> = ({ href, children }) => {
   const [hasError, setHasError] = useState(false);
+  const basicAuthPattern = /^[a-zA-Z][a-zA-Z\d+\-.]*:\/\/[^@]+@/;
+
+  if (basicAuthPattern.test(href)) {
+    return null;
+  }
+
   return !hasError ? (
     <img
       src={href}
@@ -32,9 +38,10 @@ const Markdownify: React.FC<MarkdownifyProps> = ({ message }) => (
             component: LinkPreview,
           },
         },
+        disableParsingRawHTML: true,
       }}
     >
-      {message ?? ''}
+      {message?.replace(/&#x([0-9A-Fa-f]+);/g, (_, hex) => { return String.fromCharCode(parseInt(hex, 16)); }) ?? ""}
     </Markdown>
   </div>
 );

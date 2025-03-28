@@ -61,7 +61,7 @@
     "training": "Training",
     "themes": "Themes",
     "answers": "Answers",
-    "userStories": "User Stories",
+    "rules": "Rules",
     "configuration": "Configuration",
     "forms": "Forms",
     "slots": "Slots",
@@ -147,7 +147,9 @@
       "start": "Start",
       "service": "Service",
       "ContactedUser": "Contacted User",
-      "couldNotReachUser": "Could Not Reach User"
+      "couldNotReachUser": "Could Not Reach User",
+      "messageSendingFailed": "Message sending failed!",
+      "sendAgain": "Send again"
     },
     "history": {
       "title": "History",
@@ -241,6 +243,7 @@
       "requested-chat-forward-accepted": "Requested chat forward accepted {{date}}",
       "requested-chat-forward-rejected": "Requested chat forward rejected {{date}}",
       "message-read": "Read",
+      "read": "Read {{ date }}",
       "contact-information-skipped": "Contact Information Skipped",
       "unavailable-contact-information-fulfilled": "Contact information provided",
       "unavailable_organization": "Organization is unavailable",
@@ -264,6 +267,7 @@
       "messageChanged": "Message changed successfully",
       "messageApproved": "Message approved successfully",
       "messageChangeFailed": "Message change failed",
+      "confirmAnswer": "Confirm Answer",
       "header": {
         "id": "Id",
         "chatId": "Chat Id",
@@ -332,15 +336,20 @@
     },
     "chat": {
       "chatActive": "Chatbot active",
+      "burokrattActive": "Bürokratt active",
       "showSupportName": "Show support name",
-      "showSupportTitle": "Show support title"
+      "showSupportTitle": "Show support title",
+      "editActiveChat": "Editing active chats",
+      "showBurokrattConfirmation": "Do you want to make Bürokrat visible on the website?",
+      "hideBurokrattConfirmation": "Do you want to hide the Bureaucrat on the website?"
     },
     "emergencyNotices": {
       "title": "Emergency notices",
       "noticeActive": "Notice active",
       "notice": "Notice",
       "displayPeriod": "Display period",
-      "noticeChanged": "Emergency notice settings changed successfully"
+      "noticeChanged": "Emergency notice settings changed successfully",
+      "endDateError": "End date must be greater than start date"
     },
     "appearance": {
       "title": "Appearance and behavior",

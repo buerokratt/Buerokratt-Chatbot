@@ -61,7 +61,7 @@
     "training": "Treening",
     "themes": "Teemad",
     "answers": "Vastused",
-    "userStories": "Vestlusvood",
+    "rules": "Vestlusvood",
     "configuration": "Seaded",
     "forms": "Vormid",
     "slots": "Mälukohad",
@@ -147,7 +147,9 @@
       "start": "Alusta",
       "service": "Teenus",
       "ContactedUser": "Kasutajaga ühendust võetud",
-      "couldNotReachUser": "Kasutajaga ei õnnestunud ühendust saada"
+      "couldNotReachUser": "Kasutajaga ei õnnestunud ühendust saada",
+      "messageSendingFailed": "Sõnumi saatmine ebaõnnestus!",
+      "sendAgain": "Saada uuesti"
     },
     "history": {
       "title": "Ajalugu",
@@ -241,6 +243,7 @@
       "requested-chat-forward-accepted": "Vestluse suunamine aktsepteeritud {{date}}",
       "requested-chat-forward-rejected": "Vestluse suunamine tagasi lükatud {{date}}",
       "message-read": "Loetud",
+      "read": "Loetud {{ date }}",
       "contact-information-skipped": "Kontaktandmeid ei saadetud",
       "unavailable-contact-information-fulfilled": "Kontaktandmed on antud",
       "unavailable_organization": "Asutus ei ole kättesaadav",
@@ -264,6 +267,7 @@
       "messageChanged": "Sõnumi muutmine õnnestus",
       "messageApproved": "Sõnum kinnitati edukalt",
       "messageChangeFailed": "Sõnumi muutmine ebaõnnestus",
+      "confirmAnswer": "Kinnita vastus",
       "header": {
         "id": "Id",
         "chatId": "Vestluse ID",
@@ -332,15 +336,20 @@
     },
     "chat": {
       "chatActive": "Vestlusrobot aktiivne",
+      "burokrattActive": "Bürokratt aktiivne",
       "showSupportName": "Kuva nõustaja nimi",
-      "showSupportTitle": "Kuva nõustaja tiitel"
+      "showSupportTitle": "Kuva nõustaja tiitel",
+      "editActiveChat": "Aktiivsete vestluste muutmine",
+      "showBurokrattConfirmation": "Kas soovid Bürokrati veebilehel nähtavaks teha?",
+      "hideBurokrattConfirmation": "Kas soovid Bürokrati veebilehel ära peita?"
     },
     "emergencyNotices": {
       "title": "Erakorralised teated",
       "noticeActive": "Teade aktiivne",
       "notice": "Teade",
       "displayPeriod": "Kuvamisperiood",
-      "noticeChanged": "Teate seadeid muudeti edukalt"
+      "noticeChanged": "Teate seadeid muudeti edukalt",
+      "endDateError": "Lõppkuupäev peab olema alguskuupäevast suurem"
     },
     "appearance": {
       "title": "Välimus ja käitumine",

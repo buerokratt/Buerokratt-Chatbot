@@ -1,0 +1,234 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for the 'FORWARD-TO-BACKOFFICE'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: message
+        type: json
+        description: "Body field 'message'"
+      - field: holidayNames
+        type: string
+        description: "Body field 'holidayNames'"
+      - field: holidays
+        type: string
+        description: "Body field 'holidays'"
+
+extractRequestData:
+  assign:
+    chatId: ${incoming.body.message.chatId}
+    messageId: ${incoming.body.message.id}
+    event: ${incoming.body.message.event ?? ''}
+    authorRole: ${incoming.body.message.authorRole ?? 'buerokratt'}
+    holidays: ${incoming.body.holidays}
+    holidayNames: ${incoming.body.holidayNames}
+  next: check_bot_is_active
+
+check_bot_is_active:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-configuration"
+    body:
+      key: "is_bot_active"
+  result: is_bot_active_result
+  next: check_bot_activity_result
+
+check_bot_activity_result:
+  switch:
+    - condition: ${is_bot_active_result.response.body[0]?.value === 'true'}
+      next: get_bot_name
+  next: return_bot_is_not_active
+
+get_bot_name:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-configuration"
+    body:
+      key: "bot_institution_id"
+  result: get_bot_name_result
+  next: get_organization_base_config
+
+get_organization_base_config:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-organization-base-config"
+  result: org_base_config_res
+  next: assign_organization_base_config
+
+assign_organization_base_config:
+  assign:
+    base_config: ${org_base_config_res.response.body[0]}
+  next: check_if_organization_is_available_all_time
+
+check_if_organization_is_available_all_time:
+  switch:
+    - condition: ${base_config.isAvailableAllTime === 'true'}
+      next: get_all_available_csas
+  next: get_organization_working_details
+
+get_organization_working_details:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-is-organization-available"
+    body:
+      holidays: ${holidays}
+      holiday_names: ${holidayNames}
+      current_timestamp: ${new Date().toISOString()}
+  result: org_res
+  next: assign_organization_details
+
+assign_organization_details:
+  assign:
+    org_details: ${org_res.response.body[0]}
+  next: check_if_organization_is_available
+
+check_if_organization_is_available:
+  switch:
+    - condition: ${org_details.isWithinWorkingTime === true && org_details.isWithinWorkingDays === true && org_details.isAllowedToWorkAtHolidays === true}
+      next: get_all_available_csas
+    - condition: ${org_details.isWithinWorkingTime === true && org_details.isWithinWorkingDays === true && org_details.isAllowedToWorkAtHolidays === false && org_details.isHoliday == true}
+      next: return_is_a_holiday
+    - condition: ${org_details.isWithinWorkingTime === true && org_details.isWithinWorkingDays === true && org_details.isAllowedToWorkAtHolidays === false && org_details.isHoliday == false}
+      next: get_all_available_csas
+  next: return_organization_is_not_available  
+
+return_is_a_holiday:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-bot-message"
+    body:
+      messages:
+        - chatId: ${chatId}
+          content: ${org_details.holidayMessage}
+          authorTimestamp: ${new Date().toISOString()}
+          event: "${base_config.outsideWorkingHoursAskForContacts === 'true' ? 'unavailable_holiday_ask_contacts' : 'unavailable_holiday'}"
+          authorId: ${get_bot_name_result.response.body[0].value}
+          authorFirstName: ""
+          authorLastName: ""
+          created: ${new Date().toISOString()}
+  result: is_a_holiday_result
+  next: notify_chats
+
+return_organization_is_not_available:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-bot-message"
+    body:
+      messages:
+        - chatId: ${chatId}
+          content: ${base_config.outsideWorkingHoursMessage}
+          authorTimestamp: ${new Date().toISOString()}
+          event: "${base_config.outsideWorkingHoursAskForContacts === 'true' ? 'unavailable_organization_ask_contacts' : 'unavailable_organization'}"
+          authorId: ${get_bot_name_result.response.body[0].value}
+          authorFirstName: ""
+          authorLastName: ""
+          created: ${new Date().toISOString()}
+  result: organization_is_not_available_result
+  next: notify_chats
+
+get_all_available_csas:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-all-available-customer-support-agents"
+  result: csas_res
+  next: assign_available_csas
+
+assign_available_csas:
+  assign:
+    available_csas: ${csas_res.response.body.length}
+  next: check_if_csas_are_available
+
+check_if_csas_are_available:
+  switch:
+    - condition: ${available_csas == 0}
+      next: send_csas_not_available_message
+  next: redirect_chat_to_back_office
+
+send_csas_not_available_message:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-bot-message"
+    body:
+      messages:
+        - chatId: ${chatId}
+          content: ${base_config.noCsaMessage}
+          authorTimestamp: ${new Date().toISOString()}
+          event: "${base_config.askForContacts === 'true' ? 'unavailable_csas_ask_contacts' : 'unavailable_csas'}"
+          authorId: ${get_bot_name_result.response.body[0].value}
+          authorFirstName: ""
+          authorLastName: ""
+          created: ${new Date().toISOString()}
+  result: csas_not_available_message_result
+  next: notify_chats
+
+redirect_chat_to_back_office:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/remove_cs_agent_from_chat"
+    body:
+      chatId: ${chatId}
+  result: redirect_chat_to_back_office_result
+  next: add_chat_id_to_queue_notification_node
+
+add_chat_id_to_queue_notification_node:
+  call: http.post
+  args:
+    url: "[#CHATBOT_NOTIFICATIONS]/enqueue"
+    body:
+      id: ${chatId}
+  result: add_chat_id_to_queue_notification_node_res
+  next: insert_chat_to_back_office_message
+
+insert_chat_to_back_office_message:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-message"
+    body:
+      messageId: ${messageId}
+      chatId: ${chatId}
+      authorId: ${get_bot_name_result.response.body[0].value}
+      authorTimestamp: ${new Date().toISOString()}
+      authorFirstName: ""
+      authorLastName: ""
+      authorRole: ${authorRole}
+      created: ${new Date().toISOString()}
+      content: ""
+      event: ${event}
+      forwardedByUser: ""
+      forwardedFromCsa: ""
+      forwardedToCsa: ""
+      rating: ""
+  result: insert_chat_to_back_office_message_result
+  next: notify_chats
+
+notify_chats:
+  template: "[#CHATBOT_PROJECT_LAYER]/chats/notify"
+  requestType: templates
+  body:
+    chatId: ${chatId}
+  result: chats_notify_res
+  next: notify_messages
+
+notify_messages:
+  template: "[#CHATBOT_PROJECT_LAYER]/messages/notify"
+  requestType: templates
+  body:
+    chatId: ${chatId}
+    type: "message"
+    messageId: "${messageId}"
+  result: messages_notify_res
+  next: return_result
+
+return_result:
+  status: 200
+  return: "Chat forwarded to backoffice"
+  next: end
+
+return_bot_is_not_active:
+  status: 400
+  return: "Bot is not active"
+  next: end
