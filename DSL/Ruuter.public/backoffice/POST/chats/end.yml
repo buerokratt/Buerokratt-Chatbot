@@ -173,7 +173,7 @@ remove_chat_id_from_queue_notification_node_if_existed:
   result: remove_chat_id_from_queue_notification_node_if_existed_res
 
 return_result:
-  headers: 
+  headers:
     Set-Cookie: ${chatCookie}
   return: "Ended Chat Successfully"
   next: end
