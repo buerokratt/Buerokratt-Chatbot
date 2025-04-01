@@ -138,33 +138,23 @@ assign_chat_cookie:
   assign:
     chatCookie:
       chatJwt: null
+      userJwt: null
       Domain: "[#DOMAIN]"
       Secure: true
       HttpOnly: true
       SameSite: "Lax"
       Max-Age: 0
-  next: blacklist_client_jwt
+  next: blacklist_user_jwt
 
-blacklist_client_jwt:
+blacklist_user_jwt:
   call: http.post
   args:
     url: "[#CHATBOT_TIM]/jwt/custom-jwt-blacklist"
     contentType: plaintext
     headers:
       cookie: ${incoming.headers.cookie}
-    plaintext: "clientCustomJwtCookie"
+    plaintext: "userJwt"
   result: client_blacklist_res
-  next: assign_client_cookie
-
-assign_client_cookie:
-  assign:
-    clientCookie:
-      clientCustomJwtCookie: null
-      Domain: "[#DOMAIN]"
-      Secure: true
-      HttpOnly: true
-      SameSite: "Lax"
-      Max-Age: 0
   next: notify_chats
 
 notify_chats:
