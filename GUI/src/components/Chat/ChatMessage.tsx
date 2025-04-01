@@ -119,7 +119,12 @@ const ChatMessage: FC<ChatMessageProps> = ({
                       autoFocus
                     />
                   )}
-                {!isEditing && <Markdownify message={content} />}
+                {!isEditing && (
+                  <Markdownify
+                    message={content}
+                    sanitizeLinks={message.authorRole === 'end-user'}
+                  />
+                )}
                 {!message.content && options.length > 0 && 'ok'}
                 {editableMessage && !isEditing && (
                   <MdOutlineCreate className="active-chat__edit-icon" />
