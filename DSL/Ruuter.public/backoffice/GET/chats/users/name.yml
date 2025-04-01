@@ -29,6 +29,7 @@ assignUserInfo:
     id: ${tara_info.response.body.personalCode}
     firstName: ${tara_info.response.body.firstName}
     lastName: ${tara_info.response.body.lastName}
+    authMethod: ${tara_info.response.body.authMethod}
   next: get_chat_info
 
 get_chat_info:
@@ -100,6 +101,49 @@ insertMessage:
       forwardedFromCsa: ""
       forwardedToCsa: ""
   result: insertMessageResult
+  next: check_for_personal_code
+
+check_for_personal_code:
+  switch:
+    - condition: ${id === null}
+      next: notify_chats
+  next: get_session_length
+
+get_session_length:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-configuration"
+    body:
+      key: "session_length"
+  result: session_result
+  next: generate_cookie
+
+generate_cookie:
+  call: http.post
+  args:
+    url: "[#CHATBOT_TIM]/jwt/custom-jwt-generate"
+    body:
+      JWTName: "userJwt"
+      expirationInMinutes: ${session_result.response.body[0]?.value ?? '120'}
+      content: {
+        "personalCode": "${id ?? ''}",
+        "displayName": "${firstName ?? ''}",
+        "firstName": "${firstName ?? ''}",
+        "lastName": "${lastName ?? ''}",
+        "authMethod": "${authMethod ?? ''}",
+        "fullName": "${(firstName ?? '') + ' ' + (lastName ?? '')}"
+      }
+  result: cookie_result
+  next: assign_cookie
+
+assign_cookie:
+  assign:
+    setCookie:
+      userJwt: ${cookie_result.response.body.token}
+      Domain: "[#DOMAIN]"
+      Secure: true
+      HttpOnly: true
+      SameSite: "Lax"
   next: notify_chats
 
 notify_chats:
@@ -118,9 +162,21 @@ notify_messages:
     type: "message"
     messageId: ${uuid}
   result: messages_notify_res  
-  next: return_result
+  next: check_for_id
+
+check_for_id:
+  switch:
+    - condition: ${id === null}
+      next: return_result
+  next: return_result_with_cookie
 
 return_result:
+  return: Updated ${chatId} with ${id} and ${firstName} ${lastName}.
+  next: end
+
+return_result_with_cookie:
+  headers:
+    Set-Cookie: ${setCookie}
   return: Updated ${chatId} with ${id} and ${firstName} ${lastName}.
   next: end
 
