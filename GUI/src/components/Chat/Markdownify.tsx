@@ -4,9 +4,14 @@ import './Chat.scss';
 
 interface MarkdownifyProps {
   message: string | undefined;
+  sanitizeLinks?: boolean;
 }
 
-const LinkPreview: React.FC<{ href: string; children: React.ReactNode }> = ({ href, children }) => {
+const LinkPreview: React.FC<{
+  href: string;
+  children: React.ReactNode;
+  sanitizeLinks: boolean;
+}> = ({ href, children, sanitizeLinks }) => {
   const [hasError, setHasError] = useState(false);
   const basicAuthPattern = /^[a-zA-Z][a-zA-Z\d+\-.]*:\/\/[^@]+@/;
 
@@ -14,11 +19,19 @@ const LinkPreview: React.FC<{ href: string; children: React.ReactNode }> = ({ hr
     return null;
   }
 
+  if (sanitizeLinks) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer">
+        {href}
+      </a>
+    );
+  }
+
   return !hasError ? (
     <img
       src={href}
-      alt={typeof children === "string" ? children : "Preview"}
-      style={{ maxWidth: "100%", height: "auto", borderRadius: "20px" }}
+      alt={typeof children === 'string' ? children : 'Preview'}
+      style={{ maxWidth: '100%', height: 'auto', borderRadius: '20px' }}
       onError={() => setHasError(true)}
     />
   ) : (
@@ -28,7 +41,10 @@ const LinkPreview: React.FC<{ href: string; children: React.ReactNode }> = ({ hr
   );
 };
 
-const Markdownify: React.FC<MarkdownifyProps> = ({ message }) => (
+const Markdownify: React.FC<MarkdownifyProps> = ({
+  message,
+  sanitizeLinks = false,
+}) => (
   <div className={'reset'}>
     <Markdown
       options={{
@@ -36,12 +52,17 @@ const Markdownify: React.FC<MarkdownifyProps> = ({ message }) => (
         overrides: {
           a: {
             component: LinkPreview,
+            props: {
+              sanitizeLinks,
+            },
           },
         },
         disableParsingRawHTML: true,
       }}
     >
-      {message?.replace(/&#x([0-9A-Fa-f]+);/g, (_, hex) => { return String.fromCharCode(parseInt(hex, 16)); }) ?? ""}
+      {message?.replace(/&#x([0-9A-Fa-f]+);/g, (_, hex) => {
+        return String.fromCharCode(parseInt(hex, 16));
+      }) ?? ''}
     </Markdown>
   </div>
 );
