@@ -194,6 +194,11 @@ const ChatEvent: FC<ChatEventProps> = ({ message }) => {
         date: format(new Date(message.authorTimestamp), 'dd.MM.yyyy HH:mm:ss'),
       });
       break;
+    case CHAT_EVENTS.READ:
+      EVENT_PARAMS = t('chat.events.read', {
+        date: format(new Date(authorTimestamp), 'dd.MM.yyyy HH:mm:ss'),
+      });
+      break;
     default:
       EVENT_PARAMS = t(`chat.events.${event?.toLowerCase()}`, {
         date: format(new Date(authorTimestamp), 'dd.MM.yyyy HH:mm:ss'),

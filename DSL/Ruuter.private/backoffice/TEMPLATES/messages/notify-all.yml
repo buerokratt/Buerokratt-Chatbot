@@ -1,0 +1,20 @@
+clear_notifications:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query?conflicts=proceed"
+    body:
+      query:
+        terms:
+          channelId: ${incoming.body.chats.map(chat => chat.channelId)}
+  result: clear_res
+
+notify:
+  call: http.post
+  args:
+    url: "[#CHATBOT_NOTIFICATIONS]/bulk-notifications"
+    body:
+      operations: ${incoming.body.notifications}
+  result: notify_res
+
+return_result:
+  return: "Notification sent"

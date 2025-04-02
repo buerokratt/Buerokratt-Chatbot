@@ -8,8 +8,7 @@ import {
 } from '@tanstack/react-query';
 
 import App from './App';
-import api from 'services/api';
-import apiDev from 'services/api-dev';
+import { api, apiDev, AxiosInterceptor } from 'services/api';
 import { ToastProvider } from 'context/ToastContext';
 import 'styles/main.scss';
 import '../i18n';
@@ -37,11 +36,13 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter basename={import.meta.env.BASE_URL}>
-        <ToastProvider>
-          <CookiesProvider>
-            <App />
-          </CookiesProvider>
-        </ToastProvider>
+        <AxiosInterceptor>
+          <ToastProvider>
+            <CookiesProvider>
+              <App />
+            </CookiesProvider>
+          </ToastProvider>
+        </AxiosInterceptor>
       </BrowserRouter>
     </QueryClientProvider>
   </React.StrictMode>

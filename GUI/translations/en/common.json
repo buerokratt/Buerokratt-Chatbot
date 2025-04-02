@@ -13,6 +13,7 @@
     "search": "Search",
     "notification": "Notification",
     "notificationError": "Error",
+    "notificationErrorMsg": "An error occurred",
     "active": "Active",
     "activate": "Activate",
     "deactivate": "Deactivate",
@@ -60,7 +61,7 @@
     "training": "Training",
     "themes": "Themes",
     "answers": "Answers",
-    "userStories": "User Stories",
+    "rules": "Rules",
     "configuration": "Configuration",
     "forms": "Forms",
     "slots": "Slots",
@@ -91,10 +92,14 @@
     "workingHours": "Working hours"
   },
   "chat": {
+    "userTyping": "User Typing",
+    "chatForwardedTo": "Chat forwarded to",
+    "chatEnded": "Chat ended",
     "reply": "Reply",
     "unansweredChats": "Unanswered chats",
     "unanswered": "Unanswered",
     "forwarded": "Forwarded",
+    "pending": "Pending",
     "endUser": "End user name",
     "endUserId": "End user id",
     "csaName": "Client support name",
@@ -114,6 +119,8 @@
     },
     "chatStatus": "Chat status",
     "changeStatus": "Change status",
+    "waiting_validation": "Waiting for validation",
+    "approved_validation": "Approved Validation",
     "active": {
       "list": "Active chat list",
       "myChats": "My chats",
@@ -140,7 +147,9 @@
       "start": "Start",
       "service": "Service",
       "ContactedUser": "Contacted User",
-      "couldNotReachUser": "Could Not Reach User"
+      "couldNotReachUser": "Could Not Reach User",
+      "messageSendingFailed": "Message sending failed!",
+      "sendAgain": "Send again"
     },
     "history": {
       "title": "History",
@@ -155,7 +164,13 @@
       "forwarded": "Forwarded",
       "addACommentToTheConversation": "Add a comment to the conversation",
       "rating": "Rating",
-      "feedback": "Feedback"
+      "feedback": "Feedback",
+      "commentAuthor": "Commenter",
+      "commentAddedDate": "Comment added date",
+      "statusAdder": "Status adder",
+      "statusAddedDate": "Status added date",
+      "chosenCsa": "Chosen csa(s)",
+      "chosenColumn": "Chosen column(s)"
     },
     "plainEvents": {
       "answered": "Answered",
@@ -187,12 +202,18 @@
       "inactive-chat-ended": "Ended cue to inactivity",
       "contact-information-skipped": "Contact Information Skipped",
       "unavailable-contact-information-fulfilled": "Contact information provided",
-      "unavailable_organization": "Organization Unavailable",
-      "unavailable_csas": "CSA's Unavailable",
+      "unavailable_organization": "Organization is unavailable",
+      "unavailable_organization_ask_contacts": "Organization is unavailable and asked for contacts",
+      "unavailable_csas": "Advisors are not available",
+      "unavailable_csas_ask_contacts": "Advisors are not available and asked for contacts",
       "unavailable_holiday": "Holiday",
+      "unavailable_holiday_ask_contacts": "Holiday and asked for contacts",
       "message-read": "Read",
       "user-reached": "User contacted",
-      "user-not-reached": "User could not be reached"
+      "user-not-reached": "User could not be reached",
+      "ask_to_forward_to_csa": "Asked to forward the conversation to a customer service agent",
+      "forwarded_to_backoffice": "Conversation forwarded to back office",
+      "continue_chatting_with_bot": "Continue conversation with bürokratt"
     },
     "events": {
       "answered": "Answered {{date}}",
@@ -222,16 +243,56 @@
       "requested-chat-forward-accepted": "Requested chat forward accepted {{date}}",
       "requested-chat-forward-rejected": "Requested chat forward rejected {{date}}",
       "message-read": "Read",
+      "read": "Read {{ date }}",
       "contact-information-skipped": "Contact Information Skipped",
       "unavailable-contact-information-fulfilled": "Contact information provided",
-      "unavailable_organization": "Organization Unavailable",
-      "unavailable_csas": "CSA's Unavailable",
+      "unavailable_organization": "Organization is unavailable",
+      "unavailable_organization_ask_contacts": "Organization is unavailable and asked for contacts",
+      "unavailable_csas": "Advisors are not available",
+      "unavailable_csas_ask_contacts": "Advisors are not available and asked for contacts",
       "unavailable_holiday": "Holiday",
+      "unavailable_holiday_ask_contacts": "Holiday and asked for contacts",
       "pending-assigned": "{{name}} assigned to contact user",
       "user-reached": "{{name}} contacted the user",
       "user-not-reached": "{{name}} could not reach the user",
-      "user-authenticated": "{{name}} is authenticated {{date}}"
+      "user-authenticated": "{{name}} is authenticated {{date}}",
+      "taken-over": "A human took the conversation over",
+      "ask_to_forward_to_csa": "Asked to forward the conversation to a customer service agent",
+      "forwarded_to_backoffice": "Conversation forwarded to back office",
+      "continue_chatting_with_bot": "Continue conversation with bürokratt"
+    },
+    "validations": {
+      "title": "Validations",
+      "description": "Responses from the chatbot that require validation before being sent to the end user are displayed here",
+      "messageChanged": "Message changed successfully",
+      "messageApproved": "Message approved successfully",
+      "messageChangeFailed": "Message change failed",
+      "confirmAnswer": "Confirm Answer",
+      "header": {
+        "id": "Id",
+        "chatId": "Chat Id",
+        "message": "Message",
+        "requestedAt": "Requested At",
+        "approve": "Approve"
+      }
     }
+  },
+  "deleteConversation": {
+    "deletionTime": "Deletion time",
+    "deletionNote": "Defines the time after which anonymous messages are automatically deleted.",
+    "conversationDeleting": "Conversation deletion",
+    "generateCsv": "Generate CSV",
+    "periodConversations": "Conversations in period",
+    "expiringConversationsRules": "Automatic expiration and deletion rules",
+    "showExpiring": "Show expiring conversations",
+    "authConversationsRemoval": "Authenticated conversations removal",
+    "anonymConversationsDelete": "Anonymous conversations removal",
+    "period": "Period",
+    "days": "days",
+    "oneDay": "1 day",
+    "sevenDays": "7 days",
+    "thirtyOneDay": "31 day",
+    "ninetyDays": "90 days"
   },
   "roles": {
     "ROLE_ADMINISTRATOR": "Administrator",
@@ -251,6 +312,7 @@
       "displayName": "Display Name",
       "userTitle": "User title",
       "email": "E-mail",
+      "department": "Department",
       "addUser": "Add user",
       "editUser": "Edit user",
       "deleteUser": "Delete user",
@@ -262,25 +324,32 @@
       "popupNotifications": "Popup notifications",
       "newUnansweredChat": "New unanswered chat",
       "newForwardedChat": "New forwarded chat",
+      "newValidationMessage": "New message to validate",
       "useAutocorrect": "Text auto corrector",
       "required": "Required",
       "invalidemail": "Invalid email",
       "invalidIdCode": "Invalid Id Code",
       "idCodePlaceholder": "The personal identification number must start with a country prefix, (eg.EE12345678910)",
       "choose": "Choose",
-      "userExists": "User Exists"
+      "userExists": "User Exists",
+      "userChangeStatusMessage": "Do you want to change the user status to away?"
     },
     "chat": {
       "chatActive": "Chatbot active",
+      "burokrattActive": "Bürokratt active",
       "showSupportName": "Show support name",
-      "showSupportTitle": "Show support title"
+      "showSupportTitle": "Show support title",
+      "editActiveChat": "Editing active chats",
+      "showBurokrattConfirmation": "Do you want to make Bürokrat visible on the website?",
+      "hideBurokrattConfirmation": "Do you want to hide the Bureaucrat on the website?"
     },
     "emergencyNotices": {
       "title": "Emergency notices",
       "noticeActive": "Notice active",
       "notice": "Notice",
       "displayPeriod": "Display period",
-      "noticeChanged": "Emergency notice settings changed successfully"
+      "noticeChanged": "Emergency notice settings changed successfully",
+      "endDateError": "End date must be greater than start date"
     },
     "appearance": {
       "title": "Appearance and behavior",
@@ -304,7 +373,14 @@
       "closed": "Closed",
       "until": "Until",
       "allWeekdaysExceptWeekend": "M-F",
-      "allWeekdays": "M-S"
+      "allWeekdays": "M-S",
+      "availableAllTime": "Working hours are 24/7",
+      "showIfCSAIsNotAvailable": "Send a notification of absence to the client",
+      "showIfCSAIsNotAvailableWithContactsRequest": "Send a notification of absence to the client with a contact request",
+      "noCsaAvailableMessage": "Notification of the absence of a customer service representative",
+      "showIfOrganizationIsOutsideWorkingHours": "Send a notification to the client about the company's outside working hours",
+      "showIfOrganizationIsOutsideWorkingHoursWithContactsRequest": "Send a notification to the client about the company's outside working hours with a contact request",
+      "outsideWorkingHoursMessage": "Outside working hours message"
     },
     "userSession": {
       "title": "User session",
@@ -336,6 +412,35 @@
       "greetingActive": "Greeting Active",
       "messageChanged": "Welcome message changed successfully",
       "emptyMessage": "Welcome message can't be empty"
+    },
+    "skmConfiguration": {
+      "title": "SKM Configuration",
+      "description": "Here it is possible to set SKM parameters.",
+      "range": "Strictness",
+      "documents": "Found Documents",
+      "systemMessage": "System Instruction",
+      "maxTokens": "Maximum Number Of Tokens",
+      "indexName": "Index",
+      "queryType": "Search Type",
+      "semantic": "Semantic",
+      "vector": "Vector",
+      "simple": "Keyword",
+      "vectorSimpleHybrid": "Hybrid (keyword + vector)",
+      "vectorSemanticHybrid": "Hybrid + Semantic",
+      "tooltip": {
+        "range": "Range defines the threshold at which documents are considered relevant to your queries. Increasing the stringency means a higher relevance threshold and filtering out more less relevant documents. However, a very high stringency may cause answers to fail to be generated because there are too few documents available. The default severity level is 3.Possible values: 1 - 5",
+        "documents": "This determines the number of highest-scoring documents to use to build answers from your data index. It's worth increasing this value if you have short documents or want to provide more context. The default value is 5.Possible values: 1 - 20",
+        "systemMessage": "Give the model instructions and context about how it should behave.",
+        "maxTokens": "Set a limit on the number of tokens used in a model response.Possible values: 1 - 2000",
+        "indexName": "The name of the index created in Azure.",
+        "queryType": "Choose a search type."
+      },
+      "validation": {
+        "range": "Range must be between 1 and 5",
+        "documents": "Documents must be between 1 and 20",
+        "maxTokens": "Maxmimum number of tokens must be between 1 and 2000",
+        "systemMessage": "System message can't be empty"
+      }
     }
   },
   "monitoring": {
@@ -346,6 +451,7 @@
     }
   },
   "toast": {
+    "copied": "Copied to clipboard",
     "success": {
       "updateSuccess": "Updated Successfully",
       "messageToUserEmail": "Message sent to user email",
@@ -356,5 +462,9 @@
       "newUserAdded": "New user added",
       "userUpdated": "User updated"
     }
+  },
+  "notification": {
+    "title": "Bürokratt",
+    "newMessage": "New message."
   }
 }

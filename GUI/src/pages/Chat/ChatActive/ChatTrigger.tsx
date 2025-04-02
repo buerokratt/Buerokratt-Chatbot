@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Track } from 'components';
-import { Chat as ChatType } from 'types/chat';
+import { CHAT_EVENTS, Chat as ChatType } from 'types/chat';
 import { format } from 'timeago.js';
 import './ChatActive.scss';
 
@@ -35,6 +35,14 @@ const ChatTrigger: FC<{ chat: ChatType }> = ({ chat }) => {
     chat.endUserFirstName !== '' && chat.endUserLastName !== ''
       ? `${chat.endUserFirstName} ${chat.endUserLastName}`
       : t('global.anonymous');
+  
+  const getLastMessage = () => { 
+    if (chat?.lastMessageEvent === CHAT_EVENTS.WAITING_VALIDATION) {
+      return t('chat.waiting_validation').toString();
+    } else {
+      return chat.lastMessage ?? '';
+    }
+  };    
 
   return (
     <div style={{ fontSize: 14, lineHeight: '1.5', color: '#4D4F5D' }}>
@@ -45,9 +53,7 @@ const ChatTrigger: FC<{ chat: ChatType }> = ({ chat }) => {
         {chat.lastMessageTimestamp && <p>{timeStamp}</p>}
       </Track>
       <div className="wrapper">
-        <p className="last_message">
-          {decodeURIComponent(`${chat.lastMessage ?? ''}.`)}
-        </p>
+        <p className="last_message">{`${getLastMessage()}.`}</p>
       </div>
     </div>
   );

@@ -35,6 +35,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
       csaTitle: user?.csaTitle,
       csaEmail: user?.csaEmail,
       fullName: user?.fullName,
+      department: user?.department,
     },
   });
 
@@ -268,6 +269,11 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
             {errors.csaEmail.message}
           </span>
         )}
+
+        <FormInput
+          {...register('department')}
+          label={t('settings.users.department')}
+        />
       </Track>
     </Dialog>
   );

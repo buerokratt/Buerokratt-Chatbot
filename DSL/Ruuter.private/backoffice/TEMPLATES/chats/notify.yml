@@ -1,0 +1,23 @@
+
+clear_notifications:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query?conflicts=proceed"
+    body:
+      query:
+        term:
+          channelId: "chat-list"
+  result: clear_res
+
+notify:
+  call: http.post
+  args:
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
+    body:
+      channelId: "chat-list"
+      timestamp: ${new Date().toISOString()}
+      payload: { "status": "Chat Status Changed", "chatId": "${incoming.body.chatId}" }
+  result: notify_res
+
+return_result:
+  return: "Notification sent"

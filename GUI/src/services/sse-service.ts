@@ -13,7 +13,7 @@ const sse = <T>(url: string, onMessage: (data: T) => void): EventSource => {
     if (event.data != undefined && event.data != 'undefined') {
       const response = JSON.parse(event.data);
       if (response != undefined) {
-        onMessage(Object.values(response)[0] as T);
+        onMessage(response as T);
       }
     }
   };

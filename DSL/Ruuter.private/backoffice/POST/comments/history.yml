@@ -1,0 +1,40 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'HISTORY'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: chatId
+        type: string
+        description: "Body field 'chatId'"
+      - field: comment
+        type: string
+        description: "Body field 'comment'"
+      - field: authorDisplayName
+        type: string
+        description: "Body field 'authorDisplayName'"
+
+extractRequestData:
+  assign:
+    comment: ${incoming.body.comment}
+    chatId: ${incoming.body.chatId}
+    authorDisplayName: ${incoming.body.authorDisplayName}
+
+setChatComment:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-chat-history-comment"
+    body:
+      comment: ${comment}
+      chatId: ${chatId}
+      created: "${new Date().toISOString()}"
+      authorDisplayName: ${authorDisplayName}
+  result: res
+
+return_result:
+  return: ${res.response.body}
+  next: end

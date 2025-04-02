@@ -11,9 +11,10 @@
     "prettier": "prettier --write \"{,!(node_modules)/**/}*.{ts,tsx,js,json,css,less,scss}\""
   },
   "dependencies": {
-    "@buerokratt-ria/header": "^0.1.6",
-    "@buerokratt-ria/menu": "^0.1.16",
+    "@buerokratt-ria/header": "^0.1.27",
+    "@buerokratt-ria/menu": "^0.2.6",
     "@buerokratt-ria/styles": "^0.0.1",
+    "@buerokratt-ria/common-gui-components": "^0.0.9",
     "@fontsource/roboto": "^4.5.8",
     "@formkit/auto-animate": "^1.0.0-beta.5",
     "@fortaine/fetch-event-source": "^3.0.6",
@@ -41,6 +42,7 @@
     "linkify-react": "^4.1.1",
     "linkifyjs": "^4.1.1",
     "lodash": "^4.17.21",
+    "markdown-to-jsx": "7.7.3",
     "react": "^18.2.0",
     "react-color": "^2.19.3",
     "react-cookie": "^4.1.1",
@@ -58,8 +60,10 @@
     "react-textarea-autosize": "^8.4.0",
     "reactflow": "^11.4.0",
     "regexify-string": "^1.0.19",
+    "rich-textarea": "^0.26.4",
     "rxjs": "^7.8.1",
     "timeago.js": "^4.0.2",
+    "use-debounce": "^10.0.1",
     "usehooks-ts": "^2.9.1",
     "uuid": "^9.0.0",
     "zustand": "^4.4.4"

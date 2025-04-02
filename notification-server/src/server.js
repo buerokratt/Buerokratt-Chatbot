@@ -6,7 +6,7 @@ const {
   buildNotificationSearchInterval,
   buildQueueCounter,
 } = require("./addOns");
-const { enqueueChatId, dequeueChatId } = require("./openSearch");
+const { enqueueChatId, dequeueChatId, sendBulkNotification } = require("./openSearch");
 const { addToTerminationQueue, removeFromTerminationQueue } = require("./terminationQueue");
 const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
@@ -38,6 +38,15 @@ app.get("/sse/queue/:id", (req, res) => {
   });
 });
 
+app.post("/bulk-notifications", async (req, res) => {
+  try {
+    await sendBulkNotification(req.body);
+    res.status(200).json({ response: 'sent successfully' });
+  } catch {
+    res.status(500).json({ response: 'error' });
+  }
+});
+
 app.post("/enqueue", async (req, res) => {
   try{
     await enqueueChatId(req.body.id);
@@ -56,19 +65,21 @@ app.post("/dequeue", async (req, res) => {
   }
 });
 
-app.post("/add-chat-to-termination-queue", (req, res) => {
-  try{
+app.post("/add-chat-to-termination-queue", express.json(), express.text(), (req, res) => {
+  try {
+    const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
+    
     addToTerminationQueue(
-      req.body.chatId,
+      body.chatId,
       () => fetch(`${process.env.RUUTER_URL}/chats/end`, {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
-          'cookie': req.body.cookie || req.headers.cookie,
+          'cookie': body.cookie || req.headers.cookie,
         },
         body: JSON.stringify({
           message: {
-            chatId: req.body.chatId,
+            chatId: body.chatId,
             authorRole: 'end-user',
             event: 'CLIENT_LEFT_FOR_UNKNOWN_REASONS',
             authorTimestamp: new Date().toISOString(),
@@ -78,7 +89,7 @@ app.post("/add-chat-to-termination-queue", (req, res) => {
     );
 
     res.status(200).json({ response: 'Chat will be terminated soon' });
-  } catch {
+  } catch (error) {
     res.status(500).json({ response: 'error' });
   }
 });

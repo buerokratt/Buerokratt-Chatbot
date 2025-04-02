@@ -5,10 +5,10 @@ import { useQuery } from '@tanstack/react-query';
 import { Chat, Dialog, Button, FormRadios, Track } from 'components';
 import { Chat as ChatType, CHAT_EVENTS, CHAT_STATUS } from 'types/chat';
 import useStore from 'store';
-import useHeaderStore from '@buerokratt-ria/header/src/header/store/store';
+import { userStore as useHeaderStore } from '@buerokratt-ria/header';
 import { User } from 'types/user';
 import { useToast } from 'hooks/useToast';
-import apiDev from 'services/api-dev';
+import { apiDev } from 'services/api';
 import ForwardToColleaugeModal from '../ForwardToColleaugeModal';
 import ForwardToEstablishmentModal from '../ForwardToEstablishmentModal';
 import clsx from 'clsx';
@@ -16,7 +16,6 @@ import StartAServiceModal from '../StartAServiceModal';
 import ChatTrigger from './ChatTrigger';
 import { v4 as uuidv4 } from 'uuid';
 import { useLocation } from 'react-router-dom';
-import sse from 'services/sse-service';
 import './ChatActive.scss';
 import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';
@@ -58,17 +57,12 @@ const ChatActive: FC = () => {
     useHeaderStore.getState().loadActiveChats();
   }, []);
 
-  useEffect(() => {
-    const events = sse(`/chat-list`, loadActiveChats);
-    return () => events.close();
-  }, []);
-
   const { data: csaNameVisiblity } = useQuery<{ isVisible: boolean }>({
-    queryKey: ['agents/name-visibility', 'prod'],
+    queryKey: ['agents/admin/name-visibility', 'prod'],
   });
 
   const { data: csaTitleVisibility } = useQuery<{ isVisible: boolean }>({
-    queryKey: ['agents/title-visibility', 'prod'],
+    queryKey: ['agents/admin/title-visibility', 'prod'],
   });
 
 
@@ -88,13 +82,13 @@ const ChatActive: FC = () => {
       toast.open({
         type: 'success',
         title: t('global.notification'),
-        message: `Chat forwarded to ${user.displayName}`,
+        message: `${t('chat.chatForwardedTo')} ${user.displayName}`,
       });
     } catch (error) {
       toast.open({
         type: 'warning',
         title: t('global.notificationError'),
-        message: `Chat ended`,
+        message: t('chat.chatEnded'),
       });
     }
   };
@@ -108,7 +102,7 @@ const ChatActive: FC = () => {
     toast.open({
       type: 'success',
       title: t('global.notification'),
-      message: `Chat forwarded to ${establishment}`,
+      message: `${t('chat.chatForwardedTo')} ${establishment}`,
     });
   };
 
@@ -128,13 +122,13 @@ const ChatActive: FC = () => {
       toast.open({
         type: 'success',
         title: t('global.notification'),
-        message: `Chat ended`,
+        message: t('chat.chatEnded'),
       });
     } catch (error) {
       toast.open({
         type: 'warning',
         title: t('global.notificationError'),
-        message: `Chat ended`,
+        message: t('chat.chatEnded'),
       });
     }
     setEndChatModal(null);
