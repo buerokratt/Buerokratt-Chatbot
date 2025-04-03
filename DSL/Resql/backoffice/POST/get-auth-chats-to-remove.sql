@@ -1,4 +1,4 @@
-SELECT DISTINCT base_id
+SELECT base_id
 FROM chat
 WHERE ended IS NOT NULL
   AND status = 'ENDED'
