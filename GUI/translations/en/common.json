@@ -380,7 +380,9 @@
       "noCsaAvailableMessage": "Notification of the absence of a customer service representative",
       "showIfOrganizationIsOutsideWorkingHours": "Send a notification to the client about the company's outside working hours",
       "showIfOrganizationIsOutsideWorkingHoursWithContactsRequest": "Send a notification to the client about the company's outside working hours with a contact request",
-      "outsideWorkingHoursMessage": "Outside working hours message"
+      "outsideWorkingHoursMessage": "Outside working hours message",
+      "showIfBotCannotAnswerAskToForwardToCSA": "If the Bürokratt cannot answer, ask for a customer service representative",
+      "botCannotAnswerMessage": "Notification if the Bürokratt cannot answer"
     },
     "userSession": {
       "title": "User session",
