@@ -7,7 +7,8 @@ WITH last_configuration AS (
      'skm_system_message',
      'skm_max_tokens',
      'skm_index_name',
-     'skm_query_type')
+     'skm_query_type',
+     'skm_semantic_configuration')
     AND id IN (SELECT max(id) from configuration GROUP BY key)
     AND deleted = FALSE
 ), new_configuration as (
@@ -19,7 +20,8 @@ WITH last_configuration AS (
         ('skm_system_message', :skm_system_message),
         ('skm_max_tokens', :skm_max_tokens),
         ('skm_index_name', :skm_index_name),
-        ('skm_query_type', :skm_query_type)
+        ('skm_query_type', :skm_query_type),
+        ('skm_semantic_configuration', :skm_semantic_configuration)
    ) as new_values (key, value)
 )
 INSERT INTO configuration (key, value, created)

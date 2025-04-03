@@ -196,13 +196,13 @@ services:
     cpus: "0.5"
     mem_limit: "1G"
 
-  # chat-widget:
-  #   container_name: chat-widget
-  #   image: chat-widget
-  #   ports:
-  #     - 3003:3003
-  #   networks:
-  #     - bykstack
+  chat-widget:
+    container_name: chat-widget
+    image: chat-widget
+    ports:
+      - 3003:3003
+    networks:
+      - bykstack
 
   authentication-layer:
     container_name: authentication-layer
