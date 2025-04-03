@@ -2,7 +2,7 @@
 clear_notifications:
   call: http.post
   args:
-    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query?conflicts=proceed"
+    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query?conflicts=proceed&refresh=true"
     body:
       query:
         term:
