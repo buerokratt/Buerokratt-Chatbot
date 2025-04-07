@@ -40,6 +40,20 @@ extractRequestData:
     forwardedFromCsa: "${incoming.body.forwardedFromCsa}"
     forwardedToCsa: "${incoming.body.forwardedToCsa}"
 
+get_csa_activity:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-customer-support-activity-by-id-code"
+    body:
+      customerSupportId: ${customerSupportId}
+  result: activity_res
+
+check_csa_activity_response:
+   switch:
+     - condition: ${activity_res.response.body[0] != null && activity_res.response.body[0].status != 'offline'}
+       next: getActiveChatById
+   next: return_csa_is_offline
+
 getActiveChatById:
   call: http.post
   args:
@@ -163,7 +177,12 @@ return_result:
   return: ${redirectedChatRes.response.body}
   next: end
 
+return_csa_is_offline:
+  return: "Customer support is offline"
+  status: 400
+  next: end       
+
 return_chat_ended:
   return: "Chat Has Ended"
   status: 400
-  next: end 
+  next: end

@@ -28,21 +28,16 @@ getMessagesByChatId:
       chatId: ${chatId}
   result: getMessagesByChatIdResult
 
-getCsaTitleVisibility:
+getCsaDataVisibility:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/get-configuration"
-    body:
-      key: "is_csa_title_visible"
-  result: titleVisibilityResult
+    url: "[#CHATBOT_RESQL]/get-csa-name-title-visibility"
+  result: csaVisibilityData
 
-getCsaNameVisibility:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RESQL]/get-configuration"
-    body:
-      key: "is_csa_name_visible"
-  result: nameVisibilityResult
+assignCsaVisibility:
+  assign:
+    csaVisibility: ${csaVisibilityData.response.body[0]}
+  next: convertDataToPdf
 
 convertDataToPdf:
   call: http.post
@@ -50,8 +45,8 @@ convertDataToPdf:
     url: "[#CHATBOT_DMAPPER]/js/convert/pdf"
     body:
       messages: ${getMessagesByChatIdResult.response.body}
-      csaTitleVisible: ${titleVisibilityResult.response.body[0]?.value}
-      csaNameVisible: ${nameVisibilityResult.response.body[0]?.value}
+      csaTitleVisible: ${csaVisibility.isCsaTitleVisible}
+      csaNameVisible: ${csaVisibility.isCsaNameVisible}
   result: pdfFile
   next: checkPdfExists
 

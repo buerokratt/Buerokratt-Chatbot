@@ -42,6 +42,12 @@ assignBgkConfig:
     index_name: "[#BGK_INDEX_NAME]"
     query_type: "[#BGK_QUERY_TYPE]"
     system_message: "[#BGK_SYSTEM_MESSAGE]"
+    search_endpoint: "[#BGK_SEARCH_ENDPOINT]"
+    chatbot_external_key: "[#BGK_CHATBOT_EXTERNAL_KEY]"
+    embedded_endpoint: "[#BGK_EMBEDDED_ENDPOINT_AZURE]"
+    chatbot_external_api_key: "[#BGK_CHATBOT_EXTERNAL_API_KEY]"
+    chatbot_external_bot_url: "[#BGK_CHATBOT_EXTERNAL_BOT_URL]"
+    semantic_configuration: "[#BGK_SEMANTIC_CONFIGURATION]"
 
 logstepAZURESAADAME:
   log: ${incoming.body.message}
@@ -51,22 +57,22 @@ assign_data_sources:
     data_sources:
       - type: azure_search
         parameters:
-          endpoint: "[#SEARCH_ENDPOINT]"
+          endpoint: ${search_endpoint}
           index_name: ${index_name}
-          semantic_configuration: azureml-default
+          semantic_configuration: ${semantic_configuration}
           query_type: ${query_type}
           in_scope: true
           strictness: ${parseInt(strictness ?? '3')}
           top_n_documents: ${parseInt(documents ?? '5')}
           authentication:
             type: api_key
-            key: "[#CHATBOT_EXTERNAL_KEY]"
+            key: ${chatbot_external_key}
           embedding_dependency:
             type: endpoint
-            endpoint: "[#EMBEDDED_ENDPOINT_AZURE]"
+            endpoint: ${embedded_endpoint}
             authentication:
               type: api_key
-              key: "[#CHATBOT_EXTERNAL_API_KEY]"
+              key: ${chatbot_external_api_key}
 
 logstepAZUREDS:
   log: ${data_sources}
@@ -82,7 +88,7 @@ get_chat_messages:
 prepare_messages:
   call: http.post
   args:
-    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/prepare-llm-messages"
+    url: "[#CHATBOT_DMAPPER_HBS]/prepare-llm-messages"
     headers:
       type: json
     body:
@@ -101,10 +107,10 @@ logstepAZUREMSG:
 post_answer:
   call: http.post
   args:
-    url: "[#CHATBOT_EXTERNAL_BOT_URL]"
+    url: "${chatbot_external_bot_url}"
     headers:
       Content-Type: application/json
-      api-key: "[#CHATBOT_EXTERNAL_API_KEY]"
+      api-key: ${chatbot_external_api_key}
     body:
       data_sources: ${data_sources}
       messages: ${messages}
@@ -131,7 +137,7 @@ check_value:
     - condition: ${correct_value === 'ERROR'}
       next: return_value
     - condition: ${correct_value.map((item) => item.text)[0] === '$backoffice' || correct_value.map((item) => item.text)[0].startsWith('$backoffice')}
-      next: assign_back_office_event  
+      next: get_organization_bot_answer_config  
     - condition: ${correct_value.map((item) => item.text)[0].startsWith('$validate_')}
       next: assign_validation_event  
   next: format_messages
@@ -176,19 +182,31 @@ assign_unavailable_message:
     event: ""
   next: format_messages
 
+get_organization_bot_answer_config:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-organization-bot-answer-config"
+  result: bot_answer_config_res
+  next: assign_organization_bot_answer_config
+
+assign_organization_bot_answer_config:
+  assign:
+    bot_answer_config: ${bot_answer_config_res.response.body[0]}
+  next: assign_back_office_event
+
 assign_back_office_event:
   assign:
     correct_value:
       - recipient_id: ${sender}
-        text: "Kahjuks ei oska ma hetkel teie küsimusele vastata. Kas soovite, et suunan küsimuse nõustajale?"
+        text: ${bot_answer_config.askToForwardToCsaMessage}
         context: ${test.response.body.choices[0].message.context}
-    event: "ask_to_forward_to_csa"
+    event: "${bot_answer_config.isAskToForwardToCsa === 'true' ? 'ask_to_forward_to_csa' : ''}"
   next: format_messages
 
 format_messages:
   call: http.post
   args:
-    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/llm_responses_to_messages"
+    url: "[#CHATBOT_DMAPPER_HBS]/llm_responses_to_messages"
     headers:
       type: json
     body:

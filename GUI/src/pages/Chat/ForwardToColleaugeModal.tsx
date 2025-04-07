@@ -4,7 +4,6 @@ import {
   PaginationState,
   SortingState,
 } from '@tanstack/react-table';
-import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { MdOutlineArrowForward } from 'react-icons/md';
 import { apiDev } from 'services/api';
@@ -94,15 +93,20 @@ const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({
         );
     };
 
-    const forwardView = (props: any) => (
+    const forwardView = (props: any) => {
+      const status = props.row.original.customerSupportStatus;
+      return status === 'online' || status === 'idle' ? (
         <Button
-            appearance="text"
-            onClick={() => onForward(chat, props.row.original)}
+          appearance="text"
+          onClick={() => {
+            onForward(chat, props.row.original);
+          }}
         >
-            <Icon icon={<MdOutlineArrowForward color="rgba(0, 0, 0, 0.54)"/>}/>
-            {t('global.forward')}
+          <Icon icon={<MdOutlineArrowForward color="rgba(0, 0, 0, 0.54)" />} />
+          {t('global.forward')}
         </Button>
-    );
+      ) : null;
+    };
 
     const usersColumns = useMemo(
         () => [

@@ -111,6 +111,8 @@ extractRequestData:
     organizationNoCsaAvailableMessage: ${incoming.body.organizationNoCsaAvailableMessage}
     organizationOutsideWorkingHoursAskForContacts: ${incoming.body.organizationOutsideWorkingHoursAskForContacts}
     organizationOutsideWorkingHoursMessage: ${incoming.body.organizationOutsideWorkingHoursMessage}
+    organizationBotCannotAnswerAskToForwardToCSA: ${incoming.body.organizationBotCannotAnswerAskToForwardToCSA}
+    organizationBotCannotAnswerMessage: ${incoming.body.organizationBotCannotAnswerMessage}
 
 setOrganizationWorkingTime:
   call: http.post
@@ -142,6 +144,8 @@ setOrganizationWorkingTime:
       organizationNoCsaAvailableMessage: ${organizationNoCsaAvailableMessage}
       organizationOutsideWorkingHoursAskForContacts: ${organizationOutsideWorkingHoursAskForContacts}
       organizationOutsideWorkingHoursMessage: ${organizationOutsideWorkingHoursMessage}
+      organizationBotCannotAnswerAskToForwardToCSA: ${organizationBotCannotAnswerAskToForwardToCSA}
+      organizationBotCannotAnswerMessage: ${organizationBotCannotAnswerMessage}
       created: ${new Date().toISOString()}
   result: setOrganizationWorkingTimeResult
 

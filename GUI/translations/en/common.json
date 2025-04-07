@@ -380,7 +380,9 @@
       "noCsaAvailableMessage": "Notification of the absence of a customer service representative",
       "showIfOrganizationIsOutsideWorkingHours": "Send a notification to the client about the company's outside working hours",
       "showIfOrganizationIsOutsideWorkingHoursWithContactsRequest": "Send a notification to the client about the company's outside working hours with a contact request",
-      "outsideWorkingHoursMessage": "Outside working hours message"
+      "outsideWorkingHoursMessage": "Outside working hours message",
+      "showIfBotCannotAnswerAskToForwardToCSA": "If the Bürokratt cannot answer, ask for a customer service representative",
+      "botCannotAnswerMessage": "Notification if the Bürokratt cannot answer"
     },
     "userSession": {
       "title": "User session",
@@ -427,13 +429,15 @@
       "simple": "Keyword",
       "vectorSimpleHybrid": "Hybrid (keyword + vector)",
       "vectorSemanticHybrid": "Hybrid + Semantic",
+      "semanticConfiguration": "Semantic Configuration",
       "tooltip": {
         "range": "Range defines the threshold at which documents are considered relevant to your queries. Increasing the stringency means a higher relevance threshold and filtering out more less relevant documents. However, a very high stringency may cause answers to fail to be generated because there are too few documents available. The default severity level is 3.Possible values: 1 - 5",
         "documents": "This determines the number of highest-scoring documents to use to build answers from your data index. It's worth increasing this value if you have short documents or want to provide more context. The default value is 5.Possible values: 1 - 20",
         "systemMessage": "Give the model instructions and context about how it should behave.",
         "maxTokens": "Set a limit on the number of tokens used in a model response.Possible values: 1 - 2000",
         "indexName": "The name of the index created in Azure.",
-        "queryType": "Choose a search type."
+        "queryType": "Choose a search type.",
+        "semanticConfiguration": "Semantic configuration of an index created in Azure"
       },
       "validation": {
         "range": "Range must be between 1 and 5",
