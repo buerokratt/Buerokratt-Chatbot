@@ -80,6 +80,7 @@ const Chat: FC<ChatProps> = ({
   const { t } = useTranslation();
   const userInfo = useStore((state) => state.userInfo);
   const chatRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const [messageGroups, setMessageGroups] = useState<GroupedMessage[]>([]);
   const messageGroupsRef = useRef(messageGroups);
@@ -103,6 +104,9 @@ const Chat: FC<ChatProps> = ({
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [isChatEditingAllowed, setIsChatEditingAllowed] =
     useState<boolean>(false);
+  const [isNewMessageNotificationVisible, setIsNewMessageNotificationVisible] =
+    useState<boolean>(false);
+  const [isCsaAtEnd, setIsCsaAtEnd] = useState<boolean>(true);
 
   const [newMessageEffect] = useNewMessageSound();
   const navigate = useNavigate();
@@ -177,6 +181,50 @@ const Chat: FC<ChatProps> = ({
     messageListRef.current = messagesList;
   }, [messagesList]);
 
+  const options = {
+    root: null,
+    rootMargin: '70px',
+    threshold: 0.2,
+  };
+
+  const checkLastMessageVisibility = (entries: IntersectionObserverEntry[]) => {
+    const [entry] = entries;
+    setIsCsaAtEnd(entry.isIntersecting);
+    if (isCsaAtEnd) {
+      setIsNewMessageNotificationVisible(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!chatRef.current) return;
+
+    const observer = new IntersectionObserver(
+      checkLastMessageVisibility,
+      options
+    );
+    if (chatRef.current) observer.observe(chatRef.current);
+
+    return () => {
+      if (chatRef.current) observer.unobserve(chatRef.current);
+    };
+
+  }, [chatRef, options, isNewMessageNotificationVisible]);
+
+  const handleLastUserMessage = (newMessages: Message[]) => {
+    if (
+      newMessages[0].event === '' &&
+      newMessages[0].authorRole === 'end-user' &&
+      chat.customerSupportId === userInfo?.idCode
+    ) {
+      setIsNewMessageNotificationVisible(!isCsaAtEnd);
+    }
+  };
+
+  const scrollDown = () => {
+    if (!chatRef.current || !messageGroups) return;
+    chatRef.current.scrollIntoView({ block: 'end', inline: 'end' });
+  };
+
   useEffect(() => {
     const onMessage = async (res: any) => {
       if (res.type === 'preview') {
@@ -202,6 +250,9 @@ const Chat: FC<ChatProps> = ({
         );
 
         if (newDisplayableMessages?.length > 0) {
+          setTimeout(() => {
+            handleLastUserMessage(newDisplayableMessages);
+          }, 500)
           setMessagesList((oldMessages) => [
             ...oldMessages,
             ...newDisplayableMessages,
@@ -522,7 +573,9 @@ const Chat: FC<ChatProps> = ({
 
   useEffect(() => {
     if (!chatRef.current || !messageGroups) return;
-    chatRef.current.scrollIntoView({ block: 'end', inline: 'end' });
+    if(isCsaAtEnd) {
+      chatRef.current.scrollIntoView({ block: 'end', inline: 'end' });
+    }
   }, [messageGroups, previewTypingMessage]);
 
   const handleResponseTextSend = async (editMessage: boolean) => {
@@ -716,7 +769,7 @@ const Chat: FC<ChatProps> = ({
                     )}
                   </div>
 
-                  <div className="active-chat__messages">
+                  <div ref={containerRef} className="active-chat__messages">
                     {group.messages.map((message, i) => (
                       <div key={`${message.authorTimestamp}-${i}`}>
                         <ChatMessage
@@ -784,6 +837,14 @@ const Chat: FC<ChatProps> = ({
 
           <div id="anchor" ref={chatRef}></div>
         </div>
+
+        {!isCsaAtEnd && isNewMessageNotificationVisible && (
+          <div className="newMessageContainer">
+            <span onClick={scrollDown} className="newMessage">
+              {t('chat.newMessage')}
+            </span>
+          </div>
+        )}
 
         {chat.customerSupportId == userInfo?.idCode &&
           chat.status != CHAT_STATUS.IDLE && (
