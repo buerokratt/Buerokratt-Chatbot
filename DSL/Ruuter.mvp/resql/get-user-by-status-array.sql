@@ -1,8 +1,10 @@
-SELECT u.id_code
-FROM "user" u
-         INNER JOIN customer_support_agent_activity csaa on u.id_code = csaa.id_code
-WHERE u.id_code = :userIdCode
-  AND u.status <> 'deleted'
-  AND u.id IN (SELECT MAX(id) FROM "user" WHERE id_code = :userIdCode)
-  AND csaa.active = 'true'
-  AND csaa.id IN (SELECT MAX(id) FROM customer_support_agent_activity WHERE id_code = :userIdCode);
+SELECT id_code
+FROM denorm_user_csa_authority_profile_settings
+WHERE
+    id_code = :userIdCode
+    AND user_status <> 'deleted'
+    AND active = 'true'
+    AND id IN (
+        SELECT MAX(id) FROM denorm_user_csa_authority_profile_settings
+        WHERE id_code = :userIdCode
+    );

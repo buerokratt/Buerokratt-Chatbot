@@ -1,3 +1,5 @@
+-- This file will most probably be deleted
+
 SELECT
     chat.*,
     message.*

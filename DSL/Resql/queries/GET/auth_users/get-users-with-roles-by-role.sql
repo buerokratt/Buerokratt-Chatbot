@@ -1,103 +1,77 @@
 SELECT
-    u.login,
-    u.first_name,
-    u.last_name,
-    u.id_code,
-    u.display_name,
-    u.csa_title,
-    u.csa_email,
-    u.department,
-    ua.authority_name AS authorities,
-    csa.status AS customer_support_status,
+    login,
+    first_name,
+    last_name,
+    id_code,
+    display_name,
+    csa_title,
+    csa_email,
+    department,
+    authority_name AS authorities,
+    status AS customer_support_status,
     CEIL(COUNT(*) OVER () / :page_size::DECIMAL) AS total_pages
-FROM "user" AS u
-    LEFT JOIN (
-        SELECT
-            ua.authority_name,
-            ua.user_id,
-            ROW_NUMBER() OVER (
-                PARTITION BY ua.user_id
-                ORDER BY ua.id DESC
-            ) AS rn
-        FROM user_authority AS ua
-        WHERE
-            ua.authority_name && ARRAY[:roles]::CHARACTER VARYING ARRAY
-            AND ua.id IN (
-                SELECT MAX(id)
-                FROM user_authority
-                GROUP BY user_id
-            )
-    ) AS ua ON u.id_code = ua.user_id
-    INNER JOIN (
-        SELECT
-            id_code,
-            status,
-            ROW_NUMBER() OVER (
-                PARTITION BY id_code
-                ORDER BY id DESC
-            ) AS rn
-        FROM customer_support_agent_activity
-    ) AS csa ON u.id_code = csa.id_code AND csa.rn = 1
+FROM denorm_user_csa_authority_profile_settings
 WHERE
-    u.status <> 'deleted'
+    user_status <> 'deleted'
     AND ARRAY_LENGTH(authority_name, 1) > 0
-    AND u.id IN (
+    AND id IN (
         SELECT MAX(id)
-        FROM "user"
+        FROM denorm_user_csa_authority_profile_settings
         GROUP BY id_code
     )
+    AND authority_name && ARRAY[:roles]::CHARACTER VARYING ARRAY
     AND (
         :search_display_name_and_csa_title IS NULL
-        OR LOWER(u.display_name) LIKE LOWER(
+        OR LOWER(display_name) LIKE LOWER(
             '%' || :search_display_name_and_csa_title || '%'
         )
-        OR LOWER(u.csa_title) LIKE LOWER(
+        OR LOWER(csa_title) LIKE LOWER(
             '%' || :search_display_name_and_csa_title || '%'
         )
     )
     AND (
         :search_full_name_and_csa_title IS NULL
-        OR LOWER(u.first_name || ' ' || u.last_name) LIKE LOWER(
+        OR LOWER(first_name || ' ' || last_name) LIKE LOWER(
             '%' || :search_full_name_and_csa_title || '%'
         )
-        OR LOWER(u.csa_title) LIKE LOWER('%' || :search_full_name_and_csa_title || '%')
+        OR LOWER(csa_title) LIKE LOWER('%' || :search_full_name_and_csa_title || '%')
     )
-    AND (:show_active_only <> TRUE OR csa.status <> 'offline')
+    AND (:show_active_only <> TRUE OR status <> 'offline')
     AND (:search_full_name IS NULL OR (
-        (u.first_name || ' ' || u.last_name) ILIKE '%' || :search_full_name || '%'
+        (first_name || ' ' || last_name) ILIKE '%' || :search_full_name || '%'
     ))
-    AND (:search_id_code IS NULL OR u.id_code ILIKE '%' || :search_id_code || '%')
+    AND (:search_id_code IS NULL OR id_code ILIKE '%' || :search_id_code || '%')
     AND (
         :search_display_name IS NULL
-        OR u.display_name ILIKE '%' || :search_display_name || '%'
+        OR display_name ILIKE '%' || :search_display_name || '%'
     )
-    AND (:search_csa_title IS NULL OR u.csa_title ILIKE '%' || :search_csa_title || '%')
-    AND (:search_csa_email IS NULL OR u.csa_email ILIKE '%' || :search_csa_email || '%')
+    AND (:search_csa_title IS NULL OR csa_title ILIKE '%' || :search_csa_title || '%')
+    AND (:search_csa_email IS NULL OR csa_email ILIKE '%' || :search_csa_email || '%')
     AND (:search_authority IS NULL OR EXISTS (
         SELECT 1
-        FROM UNNEST(ua.authority_name) AS authority
+        FROM UNNEST(authority_name) AS authority
         WHERE authority ILIKE '%' || :search_authority || '%'
     ))
     AND (
         :search_department IS NULL
-        OR u.department ILIKE '%' || :search_department || '%'
+        OR department ILIKE '%' || :search_department || '%'
     )
-    AND u.id_code NOT IN (:excluded_users)
+    AND id_code NOT IN (:excluded_users)
 ORDER BY
-    CASE WHEN :sorting = 'name asc' THEN u.first_name END ASC,
-    CASE WHEN :sorting = 'name desc' THEN u.first_name END DESC,
-    CASE WHEN :sorting = 'idCode asc' THEN u.id_code END ASC,
-    CASE WHEN :sorting = 'idCode desc' THEN u.id_code END DESC,
-    CASE WHEN :sorting = 'Role asc' THEN ua.authority_name END ASC,
-    CASE WHEN :sorting = 'Role desc' THEN ua.authority_name END DESC,
-    CASE WHEN :sorting = 'displayName asc' THEN u.display_name END ASC,
-    CASE WHEN :sorting = 'displayName desc' THEN u.display_name END DESC,
-    CASE WHEN :sorting = 'csaTitle asc' THEN u.csa_title END ASC,
-    CASE WHEN :sorting = 'csaTitle desc' THEN u.csa_title END DESC,
-    CASE WHEN :sorting = 'csaEmail asc' THEN u.csa_email END ASC,
-    CASE WHEN :sorting = 'csaEmail desc' THEN u.csa_email END DESC,
-    CASE WHEN :sorting = 'department asc' THEN u.department END ASC,
-    CASE WHEN :sorting = 'department desc' THEN u.department END DESC,
-    CASE WHEN :sorting = 'customerSupportStatus asc' THEN csa.status END ASC,
-    CASE WHEN :sorting = 'customerSupportStatus desc' THEN csa.status END DESC
+    CASE WHEN :sorting = 'name asc' THEN first_name END ASC,
+    CASE WHEN :sorting = 'name desc' THEN first_name END DESC,
+    CASE WHEN :sorting = 'idCode asc' THEN id_code END ASC,
+    CASE WHEN :sorting = 'idCode desc' THEN id_code END DESC,
+    CASE WHEN :sorting = 'Role asc' THEN authority_name END ASC,
+    CASE WHEN :sorting = 'Role desc' THEN authority_name END DESC,
+    CASE WHEN :sorting = 'displayName asc' THEN display_name END ASC,
+    CASE WHEN :sorting = 'displayName desc' THEN display_name END DESC,
+    CASE WHEN :sorting = 'csaTitle asc' THEN csa_title END ASC,
+    CASE WHEN :sorting = 'csaTitle desc' THEN csa_title END DESC,
+    CASE WHEN :sorting = 'csaEmail asc' THEN csa_email END ASC,
+    CASE WHEN :sorting = 'csaEmail desc' THEN csa_email END DESC,
+    CASE WHEN :sorting = 'department asc' THEN department END ASC,
+    CASE WHEN :sorting = 'department desc' THEN department END DESC,
+    CASE WHEN :sorting = 'customerSupportStatus asc' THEN status END ASC,
+    CASE WHEN :sorting = 'customerSupportStatus desc' THEN status END DESC
 OFFSET ((GREATEST(:page, 1) - 1) * :page_size) LIMIT :page_size;

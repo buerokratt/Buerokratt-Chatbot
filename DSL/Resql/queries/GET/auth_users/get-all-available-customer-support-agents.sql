@@ -2,10 +2,10 @@ SELECT
     id_code,
     active,
     status
-FROM customer_support_agent_activity
+FROM denorm_user_csa_authority_profile_settings
 WHERE
     (status = 'online')
     AND id IN (
-        SELECT MAX(id) FROM customer_support_agent_activity
+        SELECT MAX(id) FROM denorm_user_csa_authority_profile_settings
         GROUP BY id_code
     );

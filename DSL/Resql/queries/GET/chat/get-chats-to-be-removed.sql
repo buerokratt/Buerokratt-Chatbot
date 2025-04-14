@@ -1,252 +1,121 @@
-WITH
-    max_chat_history_comments AS (
-        SELECT MAX(id) AS max_id
-        FROM chat_history_comments
-        GROUP BY chat_id
-    ),
-
-    chat_history_comments AS (
-        SELECT
-            comment,
-            chat_id
-        FROM chat_history_comments
-            INNER JOIN max_chat_history_comments ON id = max_id
-    ),
-
-    message_with_content AS (
-        SELECT
-            MAX(id) AS max_id,
-            MIN(id) AS min_id
-        FROM message
-        WHERE
-            content <> ''
-            AND content <> 'message-read'
-        GROUP BY chat_base_id
-    ),
-
-    first_content_message AS (
-        SELECT
-            created,
-            chat_base_id
-        FROM message
-            INNER JOIN message_with_content ON message.id = message_with_content.min_id
-    ),
-
-    last_content_message AS (
-        SELECT
-            content,
-            chat_base_id
-        FROM message
-            INNER JOIN message_with_content ON message.id = message_with_content.max_id
-    ),
-
-    title_visibility AS (
-        SELECT value
-        FROM configuration
-        WHERE
-            key = 'is_csa_title_visible'
-            AND NOT deleted
-        ORDER BY id DESC
-        LIMIT 1
-    ),
-
-    fulfilled_messages AS (
-        SELECT MAX(id) AS max_id
-        FROM message
-        WHERE event = 'contact-information-fulfilled'
-        GROUP BY chat_base_id
-    ),
-
-    contacts_message AS (
-        SELECT
-            chat_base_id,
-            content
-        FROM message
-            INNER JOIN fulfilled_messages ON id = max_id
-    ),
-
-    max_messages AS (
-        SELECT MAX(id) AS max_id
-        FROM message
-        GROUP BY chat_base_id
-    ),
-
-    messages AS (
-        SELECT
-            event,
-            updated,
-            chat_base_id
-        FROM message
-            INNER JOIN max_messages ON id = max_id
-    ),
-
-    max_chats AS (
-        SELECT MAX(id) AS max_id
-        FROM chat
-        WHERE
-            ended IS NOT NULL
-            AND status <> 'IDLE'
-            AND (
-                (
-                    end_user_id IS NOT NULL
-                    AND end_user_id <> ''
-                    AND ended::DATE <= :auth_date::DATE
+WITH latest_chat_records AS (
+    SELECT DISTINCT ON (chat_id)
+        chat_id,
+        customer_support_id,
+        customer_support_display_name,
+        end_user_id,
+        end_user_first_name,
+        end_user_last_name,
+        end_user_email,
+        end_user_phone,
+        end_user_os,
+        end_user_url,
+        status,
+        first_message_timestamp,
+        updated,
+        ended,
+        forwarded_to_name,
+        received_from,
+        labels,
+        comment,
+        last_message,
+        contacts_message,
+        last_message_timestamp,
+        feedback_text,
+        feedback_rating,
+        nps,
+        csa_title,
+        last_message_event,
+        all_messages
+    FROM denormalized_chat
+    WHERE (
+            (
+                ended IS NOT NULL
+                AND status <> 'IDLE'
+                AND (
+                    (
+                        end_user_id IS NOT NULL
+                        AND end_user_id <> ''
+                        AND ended::DATE <= :auth_date::DATE
+                    )
+                    OR
+                    (
+                        end_user_id IS NULL
+                        OR end_user_id = '' AND ended::DATE <= :anon_date::DATE
+                    )
                 )
-                OR
-                (
-                    end_user_id IS NULL
-                    OR end_user_id = '' AND ended::DATE <= :anon_date::DATE
-                )
+                AND first_message <> ''
+                AND first_message <> 'message-read'
+                AND last_message <> ''
+                AND last_message <> 'message-read'
             )
-        GROUP BY base_id
-    ),
-
-    ended_chat_messages AS (
-        SELECT
-            base_id,
-            customer_support_id,
-            customer_support_display_name,
-            csa_title,
-            end_user_id,
-            end_user_first_name,
-            end_user_last_name,
-            end_user_email,
-            end_user_phone,
-            end_user_os,
-            end_user_url,
-            status,
-            updated,
-            ended,
-            forwarded_to_name,
-            received_from,
-            labels,
-            created,
-            feedback_text,
-            feedback_rating
-        FROM chat
-            RIGHT JOIN max_chats ON id = max_id
-    ),
-
-    rated_chats AS (
-        SELECT MAX(feedback_rating) AS rating
-        FROM chat
-        WHERE feedback_rating IS NOT NULL
-        GROUP BY base_id
-    ),
-
-    rated_chats_count AS (
-        SELECT COUNT(rating) AS total FROM rated_chats
-    ),
-
-    promoters AS (
-        SELECT COUNT(rating) AS p FROM rated_chats
-        WHERE rating >= 9
-    ),
-
-    detractors AS (
-        SELECT COUNT(rating) AS d FROM rated_chats
-        WHERE rating <= 6
-    ),
-
-    nps AS (
-        SELECT
-            ROUND(
-                ((p / (GREATEST(total, 1) * 1.0)) - (d / (GREATEST(total, 1) * 1.0)))
-                * 100.0,
-                2
-            ) AS nps
-        FROM rated_chats_count
-            CROSS JOIN promoters
-            CROSS JOIN detractors
     )
+    ORDER BY chat_id, id DESC
+)
 
 SELECT
-    c.base_id AS id,
-    c.customer_support_id,
-    c.customer_support_display_name,
-    c.end_user_id,
-    c.end_user_first_name,
-    c.end_user_last_name,
-    c.end_user_email,
-    c.end_user_phone,
-    c.end_user_os,
-    c.end_user_url,
-    c.status,
-    first_content_message.created,
-    c.updated,
-    c.ended,
-    c.forwarded_to_name,
-    c.received_from,
-    c.labels,
-    s.comment,
-    last_content_message.content AS last_message,
-    contacts_message.content AS contacts_message,
-    m.updated AS last_message_timestamp,
-    c.feedback_text,
-    c.feedback_rating,
+    chat_id AS id,
+    customer_support_id,
+    customer_support_display_name,
+    end_user_id,
+    end_user_first_name,
+    end_user_last_name,
+    end_user_email,
+    end_user_phone,
+    end_user_os,
+    end_user_url,
+    status,
+    first_message_timestamp AS created,
+    updated,
+    ended,
+    forwarded_to_name,
+    received_from,
+    labels,
+    comment,
+    last_message,
+    contacts_message,
+    last_message_timestamp,
+    feedback_text,
+    feedback_rating,
     nps,
-    (
-        CASE WHEN title_visibility.value = 'true' THEN c.csa_title ELSE '' END
-    ) AS csa_title,
-    (CASE WHEN m.event = '' THEN NULL ELSE LOWER(m.event) END) AS last_message_event,
-    CEIL(COUNT(*) OVER () / :page_size::DECIMAL) AS total_pages
-FROM ended_chat_messages AS c
-    INNER JOIN messages AS m ON c.base_id = m.chat_base_id
-    LEFT JOIN chat_history_comments AS s ON m.chat_base_id = s.chat_id
-    INNER JOIN last_content_message ON c.base_id = last_content_message.chat_base_id
-    INNER JOIN first_content_message ON c.base_id = first_content_message.chat_base_id
-    LEFT JOIN contacts_message ON c.base_id = contacts_message.chat_base_id
-    CROSS JOIN title_visibility
-    CROSS JOIN nps
-WHERE (
-    :search IS NULL
-    OR :search = ''
-    OR LOWER(c.customer_support_display_name) LIKE LOWER('%' || :search || '%')
-    OR LOWER(c.end_user_first_name) LIKE LOWER('%' || :search || '%')
-    OR LOWER(contacts_message.content) LIKE LOWER('%' || :search || '%')
-    OR LOWER(s.comment) LIKE LOWER('%' || :search || '%')
-    OR LOWER(c.status) LIKE LOWER('%' || :search || '%')
-    OR LOWER(m.event) LIKE LOWER('%' || :search || '%')
-    OR LOWER(c.base_id) LIKE LOWER('%' || :search || '%')
-    OR TO_CHAR(first_content_message.created, 'DD.MM.YYYY HH24:MI:SS') LIKE '%'
-    || :search
-    || '%'
-    OR TO_CHAR(c.ended, 'DD.MM.YYYY HH24:MI:SS') LIKE '%' || :search || '%'
-    OR EXISTS (
-        SELECT 1
-        FROM message AS msg
-        WHERE
-            msg.chat_base_id = c.base_id
-            AND LOWER(msg.content) LIKE LOWER('%' || :search || '%')
-    )
-)
+    csa_title,
+    last_message_event,
+    CEIL(COUNT(*) OVER () / 10::DECIMAL) AS total_pages
+FROM latest_chat_records
+Where (
+            :search IS NULL
+            OR :search = ''
+            OR LOWER(customer_support_display_name) LIKE LOWER('%' || :search || '%')
+            OR LOWER(end_user_first_name) LIKE LOWER('%' || :search || '%')
+            OR LOWER(contacts_message) LIKE LOWER('%' || :search || '%')
+            OR LOWER(comment) LIKE LOWER('%' || :search || '%')
+            OR LOWER(status) LIKE LOWER('%' || :search || '%')
+            OR LOWER(last_message_event) LIKE LOWER('%' || :search || '%')
+            OR LOWER(chat_id) LIKE LOWER('%' || :search || '%')
+            OR TO_CHAR(first_message_timestamp, 'DD.MM.YYYY HH24:MI:SS') LIKE LOWER('%' || :search || '%')
+            OR TO_CHAR(ended, 'DD.MM.YYYY HH24:MI:SS') LIKE LOWER('%' || :search || '%')
+            OR LOWER(last_message) LIKE LOWER('%' || :search || '%')
+            OR LOWER(all_messages) LIKE LOWER('%' || :search || '%')
+        )
 ORDER BY
-    CASE WHEN :sorting = 'created asc' THEN first_content_message.created END ASC,
-    CASE WHEN :sorting = 'created desc' THEN first_content_message.created END DESC,
-    CASE WHEN :sorting = 'ended asc' THEN c.ended END ASC,
-    CASE WHEN :sorting = 'ended desc' THEN c.ended END DESC,
-    CASE
-        WHEN
-            :sorting = 'customerSupportDisplayName asc'
-            THEN c.customer_support_display_name
-    END ASC,
-    CASE
-        WHEN
-            :sorting = 'customerSupportDisplayName desc'
-            THEN c.customer_support_display_name
-    END DESC,
-    CASE WHEN :sorting = 'endUserName asc' THEN c.end_user_first_name END ASC,
-    CASE WHEN :sorting = 'endUserName desc' THEN c.end_user_first_name END DESC,
-    CASE WHEN :sorting = 'endUserId asc' THEN c.end_user_id END ASC,
-    CASE WHEN :sorting = 'endUserId desc' THEN c.end_user_id END DESC,
-    CASE WHEN :sorting = 'contactsMessage asc' THEN contacts_message.content END ASC,
-    CASE WHEN :sorting = 'contactsMessage desc' THEN contacts_message.content END DESC,
-    CASE WHEN :sorting = 'comment asc' THEN s.comment END ASC,
-    CASE WHEN :sorting = 'comment desc' THEN s.comment END DESC,
-    CASE WHEN :sorting = 'labels asc' THEN c.labels END ASC,
-    CASE WHEN :sorting = 'labels desc' THEN c.labels END DESC,
-    CASE WHEN :sorting = 'status asc' THEN c.status END ASC,
-    CASE WHEN :sorting = 'status desc' THEN c.status END DESC,
-    CASE WHEN :sorting = 'id asc' THEN c.base_id END ASC,
-    CASE WHEN :sorting = 'id desc' THEN c.base_id END DESC
+    CASE WHEN :sorting = 'created asc' THEN first_message_timestamp END ASC,
+    CASE WHEN :sorting = 'created desc' THEN first_message_timestamp END DESC,
+    CASE WHEN :sorting = 'ended asc' THEN ended END ASC,
+    CASE WHEN :sorting = 'ended desc' THEN ended END DESC,
+    CASE WHEN :sorting = 'customerSupportDisplayName asc' THEN customer_support_display_name END ASC,
+    CASE WHEN :sorting = 'customerSupportDisplayName desc' THEN customer_support_display_name END DESC,
+    CASE WHEN :sorting = 'endUserName asc' THEN end_user_first_name END ASC,
+    CASE WHEN :sorting = 'endUserName desc' THEN end_user_first_name END DESC,
+    CASE WHEN :sorting = 'endUserId asc' THEN end_user_id END ASC,
+    CASE WHEN :sorting = 'endUserId desc' THEN end_user_id END DESC,
+    CASE WHEN :sorting = 'contactsMessage asc' THEN contacts_message END ASC,
+    CASE WHEN :sorting = 'contactsMessage desc' THEN contacts_message END DESC,
+    CASE WHEN :sorting = 'comment asc' THEN comment END ASC,
+    CASE WHEN :sorting = 'comment desc' THEN comment END DESC,
+    CASE WHEN :sorting = 'labels asc' THEN labels END ASC,
+    CASE WHEN :sorting = 'labels desc' THEN labels END DESC,
+    CASE WHEN :sorting = 'status asc' THEN status END ASC,
+    CASE WHEN :sorting = 'status desc' THEN status END DESC,
+    CASE WHEN :sorting = 'id asc' THEN chat_id END ASC,
+    CASE WHEN :sorting = 'id desc' THEN chat_id END DESC
 LIMIT :page_size OFFSET ((GREATEST(:page, 1) - 1) * :page_size);

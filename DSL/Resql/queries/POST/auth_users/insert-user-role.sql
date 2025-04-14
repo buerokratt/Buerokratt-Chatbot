@@ -1,2 +1,71 @@
-INSERT INTO user_authority (user_id, authority_name, created)
-VALUES (:userIdCode, ARRAY[:roles], :created::TIMESTAMP WITH TIME ZONE);
+WITH
+    latest_user_record AS (
+        SELECT
+            login,
+            first_name,
+            last_name,
+            id_code,
+            display_name,
+            csa_title,
+            csa_email,
+            department,
+            user_status,
+            status,
+            active,
+            forwarded_chat_popup_notifications,
+            forwarded_chat_sound_notifications,
+            forwarded_chat_email_notifications,
+            new_chat_popup_notifications,
+            new_chat_sound_notifications,
+            new_chat_email_notifications,
+            use_autocorrect
+        FROM denorm_user_csa_authority_profile_settings
+        WHERE id_code = :userIdCode
+        ORDER BY id DESC
+        LIMIT 1
+    )
+
+INSERT INTO denorm_user_csa_authority_profile_settings (
+    login,
+    first_name,
+    last_name,
+    id_code,
+    display_name,
+    csa_title,
+    csa_email,
+    department,
+    authority_name,
+    user_status,
+    status,
+    active,
+    forwarded_chat_popup_notifications,
+    forwarded_chat_sound_notifications,
+    forwarded_chat_email_notifications,
+    new_chat_popup_notifications,
+    new_chat_sound_notifications,
+    new_chat_email_notifications,
+    use_autocorrect,
+    created
+)
+SELECT
+    login,
+    first_name,
+    last_name,
+    id_code,
+    display_name,
+    csa_title,
+    csa_email,
+    department,
+    ARRAY[:roles],
+    user_status,
+    status,
+    active,
+    forwarded_chat_popup_notifications,
+    forwarded_chat_sound_notifications,
+    forwarded_chat_email_notifications,
+    new_chat_popup_notifications,
+    new_chat_sound_notifications,
+    new_chat_email_notifications,
+    use_autocorrect,
+    :created::TIMESTAMP WITH TIME ZONE
+FROM latest_user_record;

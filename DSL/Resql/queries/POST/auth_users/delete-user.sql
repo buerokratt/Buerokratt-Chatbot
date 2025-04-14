@@ -1,36 +1,77 @@
 WITH
     active_administrators AS (
-        SELECT user_id
-        FROM user_authority
+        SELECT id_code
+        FROM denorm_user_csa_authority_profile_settings
         WHERE
             'ROLE_ADMINISTRATOR' = ANY(authority_name)
             AND id IN (
                 SELECT MAX(id)
-                FROM user_authority
-                GROUP BY user_id
+                FROM denorm_user_csa_authority_profile_settings
+                GROUP BY id_code
             )
     ),
 
-    delete_from_customer_support_activity AS (
-        INSERT
-        INTO customer_support_agent_activity (id_code, active, created, status)
-        SELECT
-            :userIdCode,
-            'false',
-            :created::TIMESTAMP WITH TIME ZONE,
-            'offline'
-        WHERE (
-            1 < (SELECT COUNT(user_id) FROM active_administrators)
-            OR (
-                1 = (SELECT COUNT(user_id) FROM active_administrators)
-                AND :userIdCode NOT IN (SELECT user_id FROM active_administrators)
-            )
+    delete_from_denorm_table AS (
+        INSERT INTO denorm_user_csa_authority_profile_settings (
+            login,
+            first_name,
+            last_name,
+            id_code,
+            display_name,
+            user_status,
+            created,
+            csa_title,
+            csa_email,
+            department,
+            authority_name,
+            status,
+            active,
+            forwarded_chat_popup_notifications,
+            forwarded_chat_sound_notifications,
+            forwarded_chat_email_notifications,
+            new_chat_popup_notifications,
+            new_chat_sound_notifications,
+            new_chat_email_notifications,
+            use_autocorrect
         )
+        SELECT
+            login,
+            first_name,
+            last_name,
+            id_code,
+            display_name,
+            'deleted',                           -- Set user_status to 'deleted'
+            :created::TIMESTAMP WITH TIME ZONE,
+            csa_title,
+            csa_email,
+            department,
+            ARRAY[]::VARCHAR[],                  -- Empty authority_name array
+            'offline',                           -- Set status to 'offline'
+            false,                               -- Set active to false
+            false,                               -- Reset all notification settings
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+        FROM denorm_user_csa_authority_profile_settings
+        WHERE
+            id_code = :userIdCode
+            AND user_status <> 'deleted'
+            AND (
+                1 < (SELECT COUNT(id_code) FROM active_administrators)
+                OR (
+                    1 = (SELECT COUNT(id_code) FROM active_administrators)
+                    AND :userIdCode NOT IN (SELECT id_code FROM active_administrators)
+                )
+            )
+        ORDER BY id DESC
+        LIMIT 1
     ),
 
     delete_user AS (
-        INSERT
-        INTO "user" (
+        INSERT INTO "user" (
             login,
             password_hash,
             first_name,
@@ -59,63 +100,15 @@ WITH
         WHERE
             id_code = :userIdCode
             AND status <> 'deleted'
-            AND id IN (
-                SELECT MAX(id) FROM "user"
-                WHERE id_code = :userIdCode
-            )
             AND (
-                1 < (SELECT COUNT(user_id) FROM active_administrators)
+                1 < (SELECT COUNT(id_code) FROM active_administrators)
                 OR (
-                    1 = (SELECT COUNT(user_id) FROM active_administrators)
-                    AND :userIdCode NOT IN (SELECT user_id FROM active_administrators)
+                    1 = (SELECT COUNT(id_code) FROM active_administrators)
+                    AND :userIdCode NOT IN (SELECT id_code FROM active_administrators)
                 )
             )
-    ),
-
-    delete_authority AS (
-        INSERT
-        INTO user_authority (user_id, authority_name, created)
-        SELECT
-            :userIdCode AS users,
-            ARRAY[]::VARCHAR [],
-            :created::TIMESTAMP WITH TIME ZONE
-        FROM user_authority
-        WHERE
-            1 < (SELECT COUNT(user_id) FROM active_administrators)
-            OR (
-                1 = (SELECT COUNT(user_id) FROM active_administrators)
-                AND :userIdCode NOT IN (SELECT user_id FROM active_administrators)
-            )
-        GROUP BY users
-    ),
-
-    delete_settings AS (
-        INSERT
-        INTO user_profile_settings (
-            user_id,
-            forwarded_chat_popup_notifications,
-            forwarded_chat_sound_notifications,
-            forwarded_chat_email_notifications,
-            new_chat_popup_notifications,
-            new_chat_sound_notifications,
-            new_chat_email_notifications,
-            use_autocorrect
-        )
-        SELECT
-            :userIdCode,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false
-        WHERE
-            1 < (SELECT COUNT(user_id) FROM active_administrators)
-            OR (
-                1 = (SELECT COUNT(user_id) FROM active_administrators)
-                AND :userIdCode NOT IN (SELECT user_id FROM active_administrators)
-            )
+        ORDER BY id DESC
+        LIMIT 1
     )
 
 SELECT MAX(status) FROM "user"

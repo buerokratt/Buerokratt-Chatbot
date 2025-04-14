@@ -1,31 +1,22 @@
-WITH
-    chats_to_delete AS (
-        SELECT COUNT(*) AS total_count
-        FROM chat AS c
-        WHERE
-            c.ended IS NOT NULL
-            AND c.status = 'ENDED'
-            AND (
-                (
-                    c.end_user_id IS NOT NULL
-                    AND c.end_user_id <> ''
-                    AND c.ended::DATE <= :auth_date::DATE
-                )
-                OR
-                (
-                    c.end_user_id IS NULL
-                    OR c.end_user_id = '' AND c.ended::DATE <= :anon_date::DATE
-                )
-            )
-            AND EXISTS (
-                SELECT 1
-                FROM message AS m
-                WHERE
-                    m.chat_base_id = c.base_id
-                    AND m.content IS NOT NULL
-                    AND m.content <> ''
-            )
+SELECT COUNT(*) AS total_count
+FROM (
+    SELECT DISTINCT ON (chat_id) *
+    FROM denormalized_chat
+    ORDER BY chat_id, denormalized_record_created DESC
+) AS latest_chats
+WHERE
+    latest_chats.ended IS NOT NULL
+    AND latest_chats.status = 'ENDED'
+    AND (
+        (
+            latest_chats.end_user_id IS NOT NULL
+            AND latest_chats.end_user_id <> ''
+            AND latest_chats.ended::DATE <= :auth_date::DATE
+        )
+        OR
+        (
+            latest_chats.end_user_id IS NULL
+            OR latest_chats.end_user_id = '' AND latest_chats.ended::DATE <= :anon_date::DATE
+        )
     )
-
-SELECT total_count
-FROM chats_to_delete;
+    AND latest_chats.all_messages IS NOT NULL;

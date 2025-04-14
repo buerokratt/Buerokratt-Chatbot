@@ -1,8 +1,8 @@
 SELECT COUNT(id) AS count
-FROM customer_support_agent_activity
+FROM denorm_user_csa_authority_profile_settings
 WHERE
     (status = 'online' OR status = 'idle')
     AND id IN (
-        SELECT MAX(c_2.id) FROM customer_support_agent_activity AS c_2
-        GROUP BY c_2.id_code
+        SELECT MAX(d.id) FROM denorm_user_csa_authority_profile_settings AS d
+        GROUP BY d.id_code
     );

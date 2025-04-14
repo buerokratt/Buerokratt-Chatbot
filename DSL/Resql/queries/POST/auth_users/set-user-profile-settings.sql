@@ -1,12 +1,37 @@
-INSERT INTO user_profile_settings (
-    user_id, forwarded_chat_popup_notifications,
-    forwarded_chat_sound_notifications, forwarded_chat_email_notifications,
-    new_chat_popup_notifications, new_chat_sound_notifications,
-    new_chat_email_notifications, use_autocorrect
+INSERT INTO denorm_user_csa_authority_profile_settings (
+    login,
+    first_name,
+    last_name,
+    id_code,
+    display_name,
+    csa_title,
+    csa_email,
+    department,
+    authority_name,
+    user_status,
+    status,
+    active,
+    forwarded_chat_popup_notifications,
+    forwarded_chat_sound_notifications,
+    forwarded_chat_email_notifications,
+    new_chat_popup_notifications,
+    new_chat_sound_notifications,
+    new_chat_email_notifications,
+    use_autocorrect
 )
-VALUES
-(
-    :userId,
+SELECT
+    login,
+    first_name,
+    last_name,
+    id_code,
+    display_name,
+    csa_title,
+    csa_email,
+    department,
+    authority_name,
+    user_status,
+    status,
+    active,
     :forwardedChatPopupNotifications,
     :forwardedChatSoundNotifications,
     :forwardedChatEmailNotifications,
@@ -14,12 +39,7 @@ VALUES
     :newChatSoundNotifications,
     :newChatEmailNotifications,
     :useAutocorrect
-)
-ON CONFLICT (user_id) DO UPDATE SET forwarded_chat_popup_notifications
-= :forwardedChatPopupNotifications,
-forwarded_chat_sound_notifications = :forwardedChatSoundNotifications,
-forwarded_chat_email_notifications = :forwardedChatEmailNotifications,
-new_chat_popup_notifications = :newChatPopupNotifications,
-new_chat_sound_notifications = :newChatSoundNotifications,
-new_chat_email_notifications = :newChatEmailNotifications,
-use_autocorrect = :useAutocorrect;
+FROM denorm_user_csa_authority_profile_settings
+WHERE id_code = :userId
+ORDER BY id DESC
+LIMIT 1;

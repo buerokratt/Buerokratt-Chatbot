@@ -9,8 +9,6 @@ SELECT
     authority_name AS authorities
 FROM denorm_user_csa_authority_profile_settings
 WHERE
-    user_status <> 'deleted'
-    AND id_code = :userIdCode
-    AND ARRAY_LENGTH(authority_name, 1) > 0
+    login = :login
 ORDER BY id DESC
 LIMIT 1;
