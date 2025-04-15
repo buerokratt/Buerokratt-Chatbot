@@ -8,9 +8,9 @@ declaration:
   namespace: backoffice
 
 getWidgetConfig:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-widget-config"
+    url: "[#CHATBOT_RESQL]/config/get_widget_configuration"
   result: res
   next: validate_response
 

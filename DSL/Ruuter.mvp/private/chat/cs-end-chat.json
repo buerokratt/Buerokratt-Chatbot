@@ -33,9 +33,9 @@
           }
         },
         "proceed": {
-          "method": "post",
-          "endpoint": "{resql_url}/get-active-chat-by-id",
-          "post_body_struct": {
+          "method": "get",
+          "endpoint": "{resql_url}/chat/get_chat_active_by_id",
+          "query_params": {
             "id": "{#.reflect_input#.chatId}"
           }
         },
@@ -121,7 +121,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/delete-message-preview",
+          "endpoint": "{resql_url}/chat/delete_message_preview",
           "post_body_struct": {
             "chatId": "{#.reflect_input#.chatId}"
           }
@@ -141,9 +141,8 @@
           }
         },
         "proceed": {
-          "method": "post",
-          "endpoint": "{resql_url}/get-allowed-statuses",
-          "post_body_struct": {}
+          "method": "get",
+          "endpoint": "{resql_url}/reference/list_allowed_statuses"
         },
         "response": {
           "ok": "proceed",
@@ -224,7 +223,7 @@
             }
           },
           "method": "post",
-          "endpoint": "{resql_url}/insert-message",
+          "endpoint": "{resql_url}/chat/create_message",
           "post_body_struct": {
             "chatId": "{#.reflect_input#.chatId}",
             "messageId": "{#.get_message_uuid#.output}",
@@ -258,7 +257,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/insert-chat",
+          "endpoint": "{resql_url}/chat/create_chat",
           "post_body_struct": {
             "id": "{#.get_not_ended_chat[0]#.id}",
             "customerSupportId": "{#.get_not_ended_chat[0]#.customerSupportId}",
@@ -353,9 +352,9 @@
           "endpoint": "{dmapper_url}/json/v2/return_first_chat_from_array",
           "post_body_parameters": {
             "get_chat_by_id": {
-              "method": "post",
-              "endpoint": "{resql_url}/get-chat-by-id",
-              "post_body_struct": {
+              "method": "get",
+              "endpoint": "{resql_url}/chat/get_chat_by_id",
+              "query_params": {
                 "id": "{#.reflect_input#.chatId}"
               },
               "response": {

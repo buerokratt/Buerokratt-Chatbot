@@ -33,10 +33,10 @@ extractRequestData:
     endDate: "${incoming.body.endDate}"
 
 getEndedChats:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-chats-to-be-removed"
-    body:
+    url: "[#CHATBOT_RESQL]/chat/list_chats_to_be_removed"
+    query:
       auth_date: ${startDate}
       anon_date: ${endDate}
       page: ${incoming.body.page}

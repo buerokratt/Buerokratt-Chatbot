@@ -8,9 +8,9 @@ declaration:
   namespace: backoffice
 
 getAvailableCustomerSupportAgents:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-all-available-customer-support-agents"
+    url: "[#CHATBOT_RESQL]/auth_users/list_customer_support_agent_activities_online_agents"
   result: res
 
 return_result:

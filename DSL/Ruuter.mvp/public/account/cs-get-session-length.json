@@ -10,10 +10,9 @@
           }
         },
         "proceed": {
-          "method": "post",
-          "endpoint": "{resql_url}/get-configuration",
-          "post_body_parameters": {},
-          "post_body_struct": {
+          "method": "get",
+          "endpoint": "{resql_url}/config/get_configuration",
+          "query_params": {
             "key": "session_length"
           },
           "response": {

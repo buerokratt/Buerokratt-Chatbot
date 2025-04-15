@@ -31,7 +31,7 @@ validate_input:
 emptyMessages:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/empty-message-contents"
+    url: "[#CHATBOT_RESQL]/chat/update_message_content"
     body:
       chats: ${convertedIds.response.body}
   result: emptyMessages

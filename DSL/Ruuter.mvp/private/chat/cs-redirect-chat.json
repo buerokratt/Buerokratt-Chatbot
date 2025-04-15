@@ -37,9 +37,9 @@
           }
         },
         "proceed": {
-          "method": "post",
-          "endpoint": "{resql_url}/get-active-chat-by-id",
-          "post_body_struct": {
+          "method": "get",
+          "endpoint": "{resql_url}/chat/get_chat_active_by_id",
+          "query_params": {
             "id": "{#.reflect_input#.id}"
           }
         },
@@ -86,7 +86,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/insert-chat",
+          "endpoint": "{resql_url}/chat/create_chat",
           "post_body_parameters": {
             "check_csa_status": {
               "post_body_parameters": {
@@ -126,9 +126,9 @@
                       }
                     }
                   },
-                  "method": "post",
-                  "endpoint": "{resql_url}/get-user-by-status-array",
-                  "post_body_struct": {
+                  "method": "get",
+                  "endpoint": "{resql_url}/auth_user/get_user_active_by_id_code",
+                  "query_params": {
                     "userIdCode": "{#.reflect_input#.customerSupportId}",
                     "statuses": "{idle,online,offline}"
                   }
@@ -210,7 +210,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/insert-message",
+          "endpoint": "{resql_url}/chat/create_message",
           "post_body_parameters": {},
           "post_body_struct": {
             "chatId": "{#.get_not_ended_chat[0]#.id}",
@@ -244,9 +244,9 @@
           }
         },
         "proceed": {
-          "method": "post",
-          "endpoint": "{resql_url}/get-user-email-by-id-code",
-          "post_body_struct": {
+          "method": "get",
+          "endpoint": "{resql_url}/auth_users/get_user_email_by_id_code",
+          "query_params": {
             "userIdCode": "{#.reflect_input#.customerSupportId}"
           }
         },
@@ -271,9 +271,9 @@
                 "get_is_customer_support_agent_forwarded_chat_email_notification_enabled": {
                   "post_body_parameters": {
                     "get_user_profile_settings": {
-                      "method": "post",
-                      "endpoint": "{resql_url}/get-user-profile-settings",
-                      "post_body_struct": {
+                      "method": "get",
+                      "endpoint": "{resql_url}/auth_users/get_user_profile_settings",
+                      "query_params": {
                         "userId": "{#.reflect_input#.customerSupportId}"
                       }
                     }
@@ -428,9 +428,9 @@
           "endpoint": "{dmapper_url}/json/v2/return_first_chat_from_array",
           "post_body_parameters": {
             "get_active_chat_by_id": {
-              "method": "post",
-              "endpoint": "{resql_url}/get-active-chat-by-id",
-              "post_body_struct": {
+              "method": "get",
+              "endpoint": "{resql_url}/chat/get_chat_active_by_id",
+              "query_params": {
                 "id": "{#.reflect_input#.id}"
               },
               "response": {

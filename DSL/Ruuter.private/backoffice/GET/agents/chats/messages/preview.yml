@@ -17,10 +17,10 @@ extractRequestData:
     chatId: ${incoming.params.chatId}
 
 getMessagePreview:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-message-preview"
-    body:
+    url: "[#CHATBOT_RESQL]/chat/get_message_preview"
+    query:
       chatId: ${chatId}
   result: res
 

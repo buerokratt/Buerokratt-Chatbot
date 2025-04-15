@@ -19,7 +19,7 @@ declaration:
 getNewNonce:
   call: http.post
   args:
-    url: "[#TRAINING_RESQL]/get-new-nonce"
+    url: "[#TRAINING_RESQL]/security/create_request_nonces"
   result: newNonce
 
 getConfigurations:
@@ -45,10 +45,10 @@ convertAuthTime:
   result: dateTime
 
 getAuthRemovableConversations:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-auth-chats-to-remove"
-    body:
+    url: "[#CHATBOT_RESQL]/chat/list_chats_authenticated_ended"
+    query:
       fromDate: ${dateTime.response.body.data}
   result: res
   next: validate_res
@@ -62,10 +62,10 @@ convertAnonTime:
   result: dateTime
 
 getAnonymRemovableConversations:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-anonym-chats-to-remove"
-    body:
+    url: "[#CHATBOT_RESQL]/chat/list_chats_anonymous_ended"
+    query:
       fromDate: ${dateTime.response.body.data}
   result: res
   next: validate_res

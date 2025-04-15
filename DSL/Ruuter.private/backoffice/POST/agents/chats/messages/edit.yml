@@ -97,10 +97,10 @@ check_is_edited_message:
   next: return_bad_request
 
 getOriginalMessageById:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-message-by-id"
-    body:
+    url: "[#CHATBOT_RESQL]/chat/get_message"
+    query:
       id: ${originalBaseId}
   result: original_message
 
@@ -111,9 +111,9 @@ check_message_belongs_to_author:
   next: return_bad_request
 
 getBotConfig:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-bot-config"
+    url: "[#CHATBOT_RESQL]/config/get_configuration_bot"
   result: configRes
 
 check_is_editing_Allowed:
@@ -125,7 +125,7 @@ check_is_editing_Allowed:
 insertEditedMessage:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/insert-edited-message"
+    url: "[#CHATBOT_RESQL]/chat/create_message_edited"
     body:
       chatId: ${chatId}
       messageId: ${uuid}
@@ -146,10 +146,10 @@ insertEditedMessage:
   next: getMessageById
 
 getMessageById:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-message-by-id"
-    body:
+    url: "[#CHATBOT_RESQL]/chat/get_message"
+    query:
       id: ${uuid}
   result: message_res
 

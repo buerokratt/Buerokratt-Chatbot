@@ -8,9 +8,9 @@ declaration:
   namespace: backoffice
 
 getEstablishments:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-all-establishments"
+    url: "[#CHATBOT_RESQL]/org/list_establishments"
   result: res
 
 return_result:

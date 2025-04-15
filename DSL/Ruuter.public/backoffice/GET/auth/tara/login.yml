@@ -25,19 +25,19 @@ get_tara_user_info:
   next: get_session_length
 
 get_session_length:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-configuration"
-    body:
+    url: "[#CHATBOT_RESQL]/config/get_configuration"
+    query:
       key: "session_length"
   result: session_result
   next: getUser
 
 getUser:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-user-with-roles-by-id-code"
-    body:
+    url: "[#CHATBOT_RESQL]/auth_users/get_user_with_roles_by_id_code"
+    query:
       userIdCode: ${tara_info.response.body.personalCode}
   result: user_info
   next: checkIfUserExists
@@ -88,7 +88,7 @@ assign_cookie:
 setCustomerSupportAgentAway:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/set-customer-support-status"
+    url: "[#CHATBOT_RESQL]/auth_users/create_customer_support_agent_activity"
     body:
       active: false
       userIdCode: ${tara_info.response.body.personalCode}

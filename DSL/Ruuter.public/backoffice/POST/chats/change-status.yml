@@ -29,9 +29,9 @@ extractRequestData:
     holidayNames: ${incoming.body.holidayNames}
 
 get_organization_base_config:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-organization-base-config"
+    url: "[#CHATBOT_RESQL]/config/get_configuration_organization"
   result: org_base_config_res
   next: assign_organization_base_config
 
@@ -47,10 +47,10 @@ check_if_organization_is_available_all_time:
   next: get_organization_working_details
 
 get_organization_working_details:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-is-organization-available"
-    body:
+    url: "[#CHATBOT_RESQL]/config/get_organization_availability"
+    query:
       holidays: ${holidays}
       holiday_names: ${holidayNames}
       current_timestamp: ${new Date().toISOString()}
@@ -73,9 +73,9 @@ check_if_organization_is_available:
   next: return_organization_is_not_available
 
 get_all_available_csas:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-all-available-customer-support-agents"
+    url: "[#CHATBOT_RESQL]/auth_users/list_customer_support_agent_activities_online_agents"
   result: csas_res
   next: assign_available_csas
 
@@ -91,10 +91,10 @@ check_if_csas_are_available:
   next: getActiveChatById
 
 getActiveChatById:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-active-chat-by-id"
-    body:
+    url: "[#CHATBOT_RESQL]/chat/get_chat_active_by_id"
+    query:
       id: ${chatId}
   result: activeChatRes
   next: checkActiveChatResult 
@@ -113,7 +113,7 @@ assignChat:
 changeStatus:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/insert-chat"
+    url: "[#CHATBOT_RESQL]/chat/create_chat"
     body:
       id: ${chatId}
       customerSupportId: ''

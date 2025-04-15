@@ -26,10 +26,10 @@ extractRequestData:
   next: getMessageById
 
 getMessageById:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-message-by-id"
-    body:
+    url: "[#CHATBOT_RESQL]/chat/get_message"
+    query:
       id: ${messageId}
   result: message_res
   next: assignMessage  
@@ -42,7 +42,7 @@ assignMessage:
 insertMessage:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/insert-message"
+    url: "[#CHATBOT_RESQL]/chat/create_message"
     body:
       messageId: ${messageId}
       chatId: ${chatId}

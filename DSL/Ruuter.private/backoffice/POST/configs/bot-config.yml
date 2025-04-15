@@ -35,7 +35,7 @@ extractRequestData:
 setBotConfig:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/set-bot-config"
+    url: "[#CHATBOT_RESQL]/config/update_configuration_bot"
     body:
       is_bot_active: ${is_bot_active}
       is_burokratt_active: ${is_burokratt_active}

@@ -45,10 +45,10 @@ extractRequestData:
     current_user_id: ${incoming.body.current_user_id ?? ""}
 
 getCustomerSupportAgents:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-users-with-roles-by-role"
-    body:
+    url: "[#CHATBOT_RESQL]/auth_users/list_users_by_role"
+    query:
       page: ${page}
       page_size: ${page_size}
       sorting: ${sorting}

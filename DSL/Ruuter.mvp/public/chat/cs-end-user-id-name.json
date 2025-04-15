@@ -59,7 +59,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/update-chat-with-end-user-id-and-name",
+          "endpoint": "{resql_url}/chat/update_chat_with_end_user_id_and_name",
           "post_body_struct": {
             "chatId": "{#.chat_info#.chatId}",
             "endUserId": "{#.tara_user_info#.personalCode}",

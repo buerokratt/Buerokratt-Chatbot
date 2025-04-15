@@ -8,9 +8,9 @@ declaration:
   namespace: backoffice
 
 getConfig:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-conversation-delete-settings"
+    url: "[#CHATBOT_RESQL]/config/list_configuration_configuration_delete_settings"
   result: res
   next: validate_response
 

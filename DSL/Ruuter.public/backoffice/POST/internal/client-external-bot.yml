@@ -35,9 +35,9 @@ extract_data:
     event: ""
 
 getSkmConfig:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-skm-config"
+    url: "[#CHATBOT_RESQL]/config/get_configuration_skm"
   result: skm_res
 
 assignSkmConfig:
@@ -73,10 +73,10 @@ logstepAZUREDS:
   log: ${data_sources}
 
 get_chat_messages:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-llm-chat-messages"
-    body:
+    url: "[#CHATBOT_RESQL]/chat/list_chat_messages_llm"
+    query:
       chatId: ${sender}
   result: chat_messages_res
 

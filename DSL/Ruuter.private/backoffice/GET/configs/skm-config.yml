@@ -8,9 +8,9 @@ declaration:
   namespace: backoffice
 
 getSkmConfig:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-skm-config"
+    url: "[#CHATBOT_RESQL]/config/get_configuration_skm"
   result: res
 
 return_result:

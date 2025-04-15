@@ -38,10 +38,10 @@ check_for_service_type:
   next: get_service_trigger_for_service
 
 get_service_trigger_for_service:
-  call: http.post
+  call: http.get
   args:
-    url: "[#TRAINING_RESQL]/check-if-service-trigger-exists"
-    body:
+    url: "[#TRAINING_RESQL]/service_management/get_services_trigger_by_trigger_approved_and_service_name"
+    query:
       serviceName: ${servicePath.split('/')[servicePath.split('/').length - 1]}
   result: trigger_res
   next: check_service_is_approved

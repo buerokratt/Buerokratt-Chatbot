@@ -8,9 +8,9 @@ declaration:
   namespace: backoffice
 
 getOrganizationWorkingTime:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-organization-working-time"
+    url: "[#CHATBOT_RESQL]/config/get_configuration_organization_working_time"
   result: getOrganizationWorkingTimeValueResult
 
 validateOrganizationWorkingTimeExists:

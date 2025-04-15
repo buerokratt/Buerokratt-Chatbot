@@ -8,10 +8,10 @@ declaration:
   namespace: backoffice
 
 getMessagesWaitingValidations:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-cs-all-validation-chats"
-    body:
+    url: "[#CHATBOT_RESQL]/chat/list_chats_validation"
+    query:
       limit: 1000
   result: res
 

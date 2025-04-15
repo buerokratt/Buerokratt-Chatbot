@@ -21,10 +21,10 @@ extractRequestData:
     lastRead: ${incoming.params.lastRead}
 
 getNewMessages:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-chat-messages-updated-after-time"
-    body:
+    url: "[#CHATBOT_RESQL]/chat/list_messages_updated_after_time"
+    query:
       chatId: ${chatId}
       timeRangeBegin: ${lastRead}
   result: res

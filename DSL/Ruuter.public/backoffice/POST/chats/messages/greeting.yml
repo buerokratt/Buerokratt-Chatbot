@@ -21,9 +21,9 @@ extractRequestData:
     clientTimestamp: "${incoming.body.clientTimestamp}"
 
 getGreetingMessage:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-greeting-message"
+    url: "[#CHATBOT_RESQL]/config/get_message_greeting"
   result: greeting_result
 
 getUuid:
@@ -44,7 +44,7 @@ assignUuidAndGreetingMessage:
 insertGreetingMessage:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/insert-message"
+    url: "[#CHATBOT_RESQL]/chat/create_message"
     body:
       chatId: ${chatId}
       messageId: ${uuid}

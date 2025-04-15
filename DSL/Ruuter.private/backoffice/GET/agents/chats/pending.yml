@@ -8,10 +8,10 @@ declaration:
   namespace: backoffice
 
 getPendingChats:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-cs-all-pending-chats"
-    body:
+    url: "[#CHATBOT_RESQL]/chat/list_chats_pending"
+    query:
       limit: 1000
   result: res
 

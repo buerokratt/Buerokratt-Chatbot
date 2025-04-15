@@ -24,7 +24,7 @@ extractRequestData:
 insertMessagePreview:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/insert-message-preview"
+    url: "[#CHATBOT_RESQL]/chat/create_message_preview"
     body:
       chatId: ${chatId}
       content: ${content}

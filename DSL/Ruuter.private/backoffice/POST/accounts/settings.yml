@@ -70,7 +70,7 @@ assignIdCode:
 setUserSettingValue:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/set-user-profile-settings"
+    url: "[#CHATBOT_RESQL]/auth_users/update_user_profile_settings"
     body:
       userId: ${idCode}
       forwardedChatPopupNotifications: ${forwardedChatPopupNotifications}

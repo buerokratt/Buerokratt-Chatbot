@@ -81,7 +81,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/insert-message",
+          "endpoint": "{resql_url}/chat/create_message",
           "post_body_parameters": {
             "check_roles": {
               "method": "post",
@@ -239,9 +239,9 @@
           }
         },
         "proceed": {
-          "method": "post",
-          "endpoint": "{resql_url}/get-active-chat-by-id",
-          "post_body_struct": {
+          "method": "get",
+          "endpoint": "{resql_url}/chat/get_chat_active_by_id",
+          "query_params": {
             "id": "{#.reflect_input#.chatId}"
           }
         },
