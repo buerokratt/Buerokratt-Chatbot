@@ -22,10 +22,10 @@ extractRequestData:
   next: getBotName
 
 getBotName:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-configuration"
-    body:
+    url: "[#CHATBOT_RESQL]/config/get_configuration"
+    query:
       key: "bot_institution_id"
   result: bot_name_res
   next: assignBotName
@@ -36,10 +36,10 @@ assignBotName:
   next: getChatById  
 
 getChatById:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-chat-by-id"
-    body:
+    url: "[#CHATBOT_RESQL]/chat/get_chat_by_id"
+    query:
       id: ${chatId}
   result: chat_res
   next: checkChatResult 
@@ -58,7 +58,7 @@ assignChat:
 changeStatus:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/insert-chat"
+    url: "[#CHATBOT_RESQL]/chat/create_chat"
     body:
       id: ${chatId}
       customerSupportId: ${botName}
@@ -85,10 +85,10 @@ changeStatus:
   next: getMessageById
 
 getMessageById:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-message-by-id"
-    body:
+    url: "[#CHATBOT_RESQL]/chat/get_message"
+    query:
       id: ${messageId}
   result: message_res
   next: assignMessage  
@@ -101,7 +101,7 @@ assignMessage:
 insertMessage:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/insert-message"
+    url: "[#CHATBOT_RESQL]/chat/create_message"
     body:
       messageId: ${messageId}
       chatId: ${chatId}

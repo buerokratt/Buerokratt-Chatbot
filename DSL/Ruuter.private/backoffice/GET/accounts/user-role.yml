@@ -36,10 +36,10 @@ assignIdCode:
   next: getUserRole
 
 getUserRole:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-user-role"
-    body:
+    url: "[#CHATBOT_RESQL]/auth_users/list_user_authorities"
+    query:
       userIdCode: ${idCode}
   result: roles_res
   next: returnSuccess

@@ -17,10 +17,10 @@ extractRequestData:
     userId: ${incoming.body.userIdCode}
 
 getUser:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-user"
-    body:
+    url: "[#CHATBOT_RESQL]/auth_users/get_user"
+    query:
       userIdCode: ${userId}
   result: res
   next: checkIfUserExists

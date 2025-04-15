@@ -58,7 +58,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/delete-message-preview",
+          "endpoint": "{resql_url}/chat/delete_message_preview",
           "post_body_struct": {
             "chatId": "{#.reflect_input#.chatId}"
           }

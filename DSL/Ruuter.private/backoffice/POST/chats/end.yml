@@ -28,7 +28,7 @@ extractRequestData:
 deleteMessagePreview:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/delete-message-preview"
+    url: "[#CHATBOT_RESQL]/chat/delete_message_preview"
     body:
       chatId: ${chatId}
       content: ""
@@ -50,10 +50,10 @@ assignMessageUuid:
   next: getActiveChatById
 
 getActiveChatById:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-chat-by-id"
-    body:
+    url: "[#CHATBOT_RESQL]/chat/get_chat_by_id"
+    query:
       id: ${chatId}
   result: activeChatRes
   next: checkActiveChatResult
@@ -72,7 +72,7 @@ assignChat:
 postMessage:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/insert-message"
+    url: "[#CHATBOT_RESQL]/chat/create_message"
     body:
       chatId: ${chatId}
       messageId: ${messageUuid}
@@ -94,7 +94,7 @@ postMessage:
 endChat:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/insert-chat"
+    url: "[#CHATBOT_RESQL]/chat/create_chat"
     body:
       id: ${activeChat.id}
       customerSupportId: ${activeChat.customerSupportId ?? ""}

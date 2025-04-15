@@ -8,10 +8,10 @@ declaration:
   namespace: backoffice
 
 getEstimatedWaitingTime:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-estimated-waiting-time"
-    body:
+    url: "[#CHATBOT_RESQL]/config/get_configuration_estimated_waiting_time"
+    query:
       key: "estimated_waiting_time"
   result: res
 

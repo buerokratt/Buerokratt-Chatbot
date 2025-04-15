@@ -17,16 +17,16 @@ assignIncoming:
     chatId: ${incoming.body.chatId}
 
 getDurationTotalInSeconds:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-ended-chats-total-duration-in-seconds"
+    url: "[#CHATBOT_RESQL]/chat/list_chats_ended_duration"
   result: durationTotalInSeconds
 
 getUnassignedChats:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-unassigned-chat-total-with-position-by-chat-id"
-    body:
+    url: "[#CHATBOT_RESQL]/chat/get_chat_unassigned_with_position_count_by_chat_id"
+    query:
       chatId: "${chatId ? chatId : ''}"
   result: unassignedChats
 

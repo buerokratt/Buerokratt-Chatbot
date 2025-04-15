@@ -17,10 +17,10 @@ extractRequestData:
     searchKey: ${incoming.body.searchKey}
 
 getChatById:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-chat-ids-matching-message-search"
-    body:
+    url: "[#CHATBOT_RESQL]/chat/list_chat_ids_matching_message_search"
+    query:
       searchKey: ${searchKey}
   result: res
 

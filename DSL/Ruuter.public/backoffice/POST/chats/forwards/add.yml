@@ -33,10 +33,10 @@ assignChatIdInfo:
   next: getActiveChatById
 
 getActiveChatById:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-active-chat-by-id"
-    body:
+    url: "[#CHATBOT_RESQL]/chat/get_chat_active_by_id"
+    query:
       id: ${chatId}
   result: activeChatRes
   next: checkActiveChatResult 
@@ -53,10 +53,10 @@ assignChat:
   next: getMessagesToRedirect  
 
 getMessagesToRedirect:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-redirection-messages-by-chatId"
-    body:
+    url: "[#CHATBOT_RESQL]/chat/list_messages_redirection_by_chat_id"
+    query:
       chatId: ${chatId}
   result: messagesToRedirectRes
   next: forwardChat
@@ -104,7 +104,7 @@ assign_cookie:
 redirectChat:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/insert-chat"
+    url: "[#CHATBOT_RESQL]/chat/create_chat"
     body:
       id: ${chatId}
       customerSupportId: ${activeChat.customerSupportId}
@@ -130,9 +130,9 @@ redirectChat:
   result: redirectChatRes
 
 getAvailableCSACount:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-available-csa-count"
+    url: "[#CHATBOT_RESQL]/auth_users/get_customer_support_agent_available_count"
   result: countRes
 
 check_available_csa_count:
@@ -150,10 +150,10 @@ add_chat_id_to_queue_notification_node:
   result: add_chat_id_to_queue_notification_node_res
 
 getChatById:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-chat-by-id"
-    body:
+    url: "[#CHATBOT_RESQL]/chat/get_chat_by_id"
+    query:
       id: ${chatId}
   result: chat_result
   next: return_result

@@ -21,26 +21,26 @@ extractRequestData:
     email: ${incoming.body.email}
 
 getMessagesByChatId:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-chat-messages-to-print"
-    body:
+    url: "[#CHATBOT_RESQL]/chat/list_messages_by_latest_active_user"
+    query:
       chatId: ${chatId}
   result: getMessagesByChatIdResult
 
 getCsaTitleVisibility:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-configuration"
-    body:
+    url: "[#CHATBOT_RESQL]/config/get_configuration"
+    query:
       key: "is_csa_title_visible"
   result: titleVisibilityResult
 
 getCsaNameVisibility:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-configuration"
-    body:
+    url: "[#CHATBOT_RESQL]/config/get_configuration"
+    query:
       key: "is_csa_name_visible"
   result: nameVisibilityResult
 

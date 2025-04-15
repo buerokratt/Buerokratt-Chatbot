@@ -60,7 +60,7 @@ assignIdCode:
 setCustomerSupportActivity:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/set-customer-support-status"
+    url: "[#CHATBOT_RESQL]/auth_users/create_customer_support_agent_activity"
     body:
       active: ${active}
       userIdCode: ${idCode}

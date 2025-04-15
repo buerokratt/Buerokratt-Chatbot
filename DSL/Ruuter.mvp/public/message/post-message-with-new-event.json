@@ -35,9 +35,9 @@
           }
         },
         "proceed": {
-          "method": "post",
-          "endpoint": "{resql_url}/get-message-by-id",
-          "post_body_struct": {
+          "method": "get",
+          "endpoint": "{resql_url}/chat/get_message",
+          "query_params": {
             "id": "{#.reflect_input#.id}"
           },
           "response": {
@@ -193,7 +193,7 @@
         "local_request": {
           "method": "post",
           "cookies": ["chatJwt"],
-          "endpoint": "{resql_url}/insert-message",
+          "endpoint": "{resql_url}/chat/create_message",
           "post_body_struct": {
             "messageId": "{#.get_message_by_id[0]#.baseId}",
             "chatId": "{#.get_message_by_id[0]#.chatBaseId}",

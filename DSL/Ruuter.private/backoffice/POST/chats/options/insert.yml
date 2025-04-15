@@ -21,10 +21,10 @@ extractRequestData:
     options: ${incoming.body.options}
 
 getActiveChatById:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-active-chat-by-id"
-    body:
+    url: "[#CHATBOT_RESQL]/chat/get_chat_active_by_id"
+    query:
       id: ${chatId}
   result: activeChatRes
 
@@ -49,7 +49,7 @@ assignMessageUuid:
 add_message_to_db:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/insert-message-with-options"
+    url: "[#CHATBOT_RESQL]/chat/create_message_with_options"
     body:
       chatId: ${chatId}
       messageId: ${messageUuid}

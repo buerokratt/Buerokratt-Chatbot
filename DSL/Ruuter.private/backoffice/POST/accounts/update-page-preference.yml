@@ -32,7 +32,7 @@ extractRequestData:
 setUserPagePreferences:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/update-user-page-preferences"
+    url: "[#CHATBOT_RESQL]/auth_users/create_user_page_preferences"
     body:
       user_id: ${user_id}
       page_name: ${page_name}

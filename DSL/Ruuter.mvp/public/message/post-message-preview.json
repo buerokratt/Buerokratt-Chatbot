@@ -79,7 +79,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/insert-message-preview",
+          "endpoint": "{resql_url}/chat/create_message_preview",
           "post_body_struct": {
             "chatId": "{#.reflect_input#.chatId}",
             "content": "{#.reflect_input#.content}"

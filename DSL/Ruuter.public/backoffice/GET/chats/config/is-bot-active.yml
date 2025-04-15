@@ -8,10 +8,10 @@ declaration:
   namespace: backoffice
 
 getConfigurationValue:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-configuration"
-    body:
+    url: "[#CHATBOT_RESQL]/config/get_configuration"
+    query:
       key: "is_bot_active"
   result: res
 

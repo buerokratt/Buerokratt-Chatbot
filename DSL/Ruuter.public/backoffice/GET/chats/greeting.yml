@@ -8,9 +8,9 @@ declaration:
   namespace: backoffice
 
 getGreetingMessage:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-greeting-message"
+    url: "[#CHATBOT_RESQL]/config/get_message_greeting"
   result: res
 
 return_result:

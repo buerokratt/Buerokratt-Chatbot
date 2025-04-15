@@ -35,7 +35,7 @@ extractRequestData:
 setConfig:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/update-conversation-delete-settings"
+    url: "[#CHATBOT_RESQL]/config/create_configuration_conversation_deletion_settings"
     body:
       isAuthConversations: ${isAuthConversations}
       isAnonymConversations: ${isAnonymConversations}

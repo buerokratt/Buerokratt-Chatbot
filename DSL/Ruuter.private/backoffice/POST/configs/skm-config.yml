@@ -39,7 +39,7 @@ extractRequestData:
 setSkmConfig:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/set-skm-config"
+    url: "[#CHATBOT_RESQL]/config/update_configuration_skm"
     body:
       skm_range: ${skm_range}
       skm_documents: ${skm_documents}

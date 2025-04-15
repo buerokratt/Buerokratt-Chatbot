@@ -8,9 +8,9 @@ declaration:
   namespace: backoffice
 
 getEmergencyNotice:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-emergency-notice"
+    url: "[#CHATBOT_RESQL]/config/get_configuration_emergency_notice"
   result: res
   next: validate_res
 

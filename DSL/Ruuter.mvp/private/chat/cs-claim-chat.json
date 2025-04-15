@@ -37,9 +37,9 @@
           }
         },
         "proceed": {
-          "method": "post",
-          "endpoint": "{resql_url}/get-active-chat-by-id",
-          "post_body_struct": {
+          "method": "get",
+          "endpoint": "{resql_url}/chat/get_chat_active_by_id",
+          "query_params": {
             "id": "{#.reflect_input#.id}"
           }
         },
@@ -86,7 +86,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/insert-chat",
+          "endpoint": "{resql_url}/chat/create_chat",
           "post_body_parameters": {
             "check_roles": {
               "method": "post",
@@ -218,9 +218,9 @@
           "endpoint": "{dmapper_url}/json/v2/return_first_chat_from_array",
           "post_body_parameters": {
             "get_active_chat_by_id": {
-              "method": "post",
-              "endpoint": "{resql_url}/get-active-chat-by-id",
-              "post_body_struct": {
+              "method": "get",
+              "endpoint": "{resql_url}/chat/get_chat_active_by_id",
+              "query_params": {
                 "id": "{#.reflect_input#.id}"
               },
               "response": {

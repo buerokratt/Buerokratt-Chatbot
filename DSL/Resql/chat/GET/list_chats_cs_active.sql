@@ -56,4 +56,4 @@ WHERE
     AND is_bot = FALSE
     AND status <> 'VALIDATING'
 ORDER BY created ASC
-LIMIT :limit;
+LIMIT :limit::INTEGER;

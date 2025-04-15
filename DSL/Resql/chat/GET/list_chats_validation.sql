@@ -79,5 +79,5 @@ FROM (
 WHERE rn = 1
   AND ended IS NULL
   AND last_message_event = 'waiting_validation'
-ORDER BY created ASC 
-LIMIT :limit;
+ORDER BY created ASC
+LIMIT :limit::INTEGER;

@@ -8,9 +8,9 @@ declaration:
   namespace: backoffice
 
 getAdmins:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-users-with-roles"
+    url: "[#CHATBOT_RESQL]/auth_users/list_users_with_roles"
   result: res
 
 return_result:

@@ -78,4 +78,4 @@ SELECT
 FROM latest_idle_chats AS c
 WHERE status = 'IDLE'
 ORDER BY c.created ASC
-LIMIT :limit;
+LIMIT :limit::INTEGER;

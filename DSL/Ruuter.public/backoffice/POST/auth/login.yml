@@ -32,10 +32,10 @@ extractRequestData:
   next: getUserWithRole
 
 getUserWithRole:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-user-with-roles"
-    body:
+    url: "[#CHATBOT_RESQL]/auth_users/get_user_id_code"
+    query:
       login: ${login}
       password: ${password}
   result: user_result
@@ -48,10 +48,10 @@ check_user_result:
   next: return_user_not_found 
 
 get_session_length:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-configuration"
-    body:
+    url: "[#CHATBOT_RESQL]/config/get_configuration"
+    query:
       key: "session_length"
   result: session_result
   next: generate_cookie
@@ -80,7 +80,7 @@ assign_cookie:
 setCustomerSupportAgentAway:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/set-customer-support-status"
+    url: "[#CHATBOT_RESQL]/auth_users/create_customer_support_agent_activity"
     body:
       active: false
       userIdCode: ${login}

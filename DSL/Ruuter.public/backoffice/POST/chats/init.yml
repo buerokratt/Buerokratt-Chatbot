@@ -67,10 +67,10 @@ assignMessageUuid:
   next: get_session_length
 
 get_session_length:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-configuration"
-    body:
+    url: "[#CHATBOT_RESQL]/config/get_configuration"
+    query:
       key: "session_length"
   result: session_result
   next: generate_cookie
@@ -109,7 +109,7 @@ postGreetingMessage:
 postClientMessage:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/insert-message"
+    url: "[#CHATBOT_RESQL]/chat/create_message"
     body:
       chatId: ${chatUuid}
       messageId: ${messageUuid}
@@ -131,7 +131,7 @@ postClientMessage:
 insertChat:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/init-chat"
+    url: "[#CHATBOT_RESQL]/chat/create_chat_and_init"
     body:
       id: ${chatUuid}
       endUserId: ${endUserId}
@@ -174,10 +174,10 @@ check_for_post_message_to_bot_result:
   next: getChat
 
 getChat:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-chat-by-id"
-    body:
+    url: "[#CHATBOT_RESQL]/chat/get_chat_by_id"
+    query:
       id: ${chatUuid}
   result: chat_result
   next: notify_chats

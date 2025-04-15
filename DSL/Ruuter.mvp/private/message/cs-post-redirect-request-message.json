@@ -88,9 +88,9 @@
           }
         },
         "proceed": {
-          "method": "post",
-          "endpoint": "{resql_url}/get-active-chat-by-id",
-          "post_body_struct": {
+          "method": "get",
+          "endpoint": "{resql_url}/chat/get_chat_active_by_id",
+          "query_params": {
             "id": "{#.reflect_input#.chatId}"
           }
         },
@@ -129,7 +129,7 @@
         },
         "proceed": {
           "method": "post",
-          "endpoint": "{resql_url}/insert-message-with-array-content",
+          "endpoint": "{resql_url}/chat/create_message_with_content",
           "post_body_struct": {
             "chatId": "{#.reflect_input#.chatId}",
             "messageId": "{#.get_message_uuid#.output}",

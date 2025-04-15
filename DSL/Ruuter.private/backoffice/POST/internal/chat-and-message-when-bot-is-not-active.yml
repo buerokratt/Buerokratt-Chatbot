@@ -8,10 +8,10 @@ declaration:
   namespace: backoffice
 
 getBotName:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-configuration"
-    body:
+    url: "[#CHATBOT_RESQL]/config/get_configuration"
+    query:
       key: "bot_institution_id"
   result: bot_name_res
 
@@ -20,9 +20,9 @@ assignBotName:
     botName: ${bot_name_res.response.body[0].value}
 
 get_organization_base_config:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-organization-base-config"
+    url: "[#CHATBOT_RESQL]/config/get_configuration_organization"
   result: org_base_config_res
   next: assign_organization_base_config
 
@@ -33,7 +33,7 @@ assign_organization_base_config:
 notify_chats_and_return_chats_and_messages:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/insert-message-content-by-customer-support-id"
+    url: "[#CHATBOT_RESQL]/chat/create_message_by_customer_support_id"
     body:
       customerSupportId: ${botName}
       authorId: ${botName}
