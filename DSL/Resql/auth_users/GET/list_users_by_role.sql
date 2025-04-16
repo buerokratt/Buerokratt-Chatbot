@@ -19,7 +19,12 @@ WHERE
         FROM denorm_user_csa_authority_profile_settings
         GROUP BY id_code
     )
-    AND authority_name && ARRAY[:roles]::CHARACTER VARYING ARRAY
+    AND authority_name && 
+        (SELECT array_agg(trim(e)) FROM 
+          unnest(string_to_array(
+            btrim(:roles, '[]'), 
+            ','
+          )) AS e)::CHARACTER VARYING ARRAY
     AND (
         :search_display_name_and_csa_title IS NULL
         OR LOWER(display_name) LIKE LOWER(
@@ -36,7 +41,7 @@ WHERE
         )
         OR LOWER(csa_title) LIKE LOWER('%' || :search_full_name_and_csa_title || '%')
     )
-    AND (:show_active_only <> TRUE OR status <> 'offline')
+    AND ((:show_active_only)::boolean <> TRUE OR status <> 'offline')
     AND (:search_full_name IS NULL OR (
         (first_name || ' ' || last_name) ILIKE '%' || :search_full_name || '%'
     ))
@@ -74,4 +79,4 @@ ORDER BY
     CASE WHEN :sorting = 'department desc' THEN department END DESC,
     CASE WHEN :sorting = 'customerSupportStatus asc' THEN status END ASC,
     CASE WHEN :sorting = 'customerSupportStatus desc' THEN status END DESC
-OFFSET ((GREATEST(:page, 1) - 1) * :page_size) LIMIT :page_size;
+OFFSET ((GREATEST((:page)::integer, 1) - 1) * (:page_size)::integer) LIMIT (:page_size)::integer;

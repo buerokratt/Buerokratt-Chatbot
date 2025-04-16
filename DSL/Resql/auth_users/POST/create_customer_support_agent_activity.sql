@@ -1,32 +1,52 @@
+WITH
+    latest_record AS (
+        SELECT
+            *
+        FROM denorm_user_csa_authority_profile_settings
+        WHERE id_code = :userIdCode
+        ORDER BY id DESC
+        LIMIT 1
+    )
+
 INSERT INTO denorm_user_csa_authority_profile_settings (
-    id_code,
-    active,
-    created,
-    status,
     login,
     first_name,
     last_name,
+    id_code,
     display_name,
     csa_title,
     csa_email,
     department,
     authority_name,
     user_status,
-    new_chat_email_notifications
+    status,
+    active,
+    forwarded_chat_popup_notifications,
+    forwarded_chat_sound_notifications,
+    forwarded_chat_email_notifications,
+    new_chat_popup_notifications,
+    new_chat_sound_notifications,
+    new_chat_email_notifications,
+    use_autocorrect
 )
-VALUES (
-    :userIdCode,
+SELECT
+    login,
+    first_name,
+    last_name,
+    id_code,
+    display_name,
+    csa_title,
+    csa_email,
+    department,
+    authority_name,
+    user_status,
+    :status::status,
     :active,
-    :created::TIMESTAMP WITH TIME ZONE,
-    :status::STATUS,
-    :login,
-    :firstName,
-    :lastName,
-    :displayName,
-    :csaTitle,
-    :csaEmail,
-    :department,
-    :authorityName,
-    :userStatus,
-    :newChatEmailNotifications
-)
+    forwarded_chat_popup_notifications,
+    forwarded_chat_sound_notifications,
+    forwarded_chat_email_notifications,
+    new_chat_popup_notifications,
+    new_chat_sound_notifications,
+    new_chat_email_notifications,
+    use_autocorrect
+FROM latest_record;

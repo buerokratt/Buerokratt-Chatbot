@@ -34,7 +34,7 @@ extractRequestData:
 getUserWithRole:
   call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/auth_users/get_user_id_code"
+    url: "[#CHATBOT_RESQL]/auth_users/get_user_with_roles"
     query:
       login: ${login}
       password: ${password}
@@ -45,7 +45,7 @@ check_user_result:
   switch:
     - condition: "${user_result.response.body.length > 0}"
       next: get_session_length
-  next: return_user_not_found 
+  next: return_user_not_found
 
 get_session_length:
   call: http.get
@@ -93,7 +93,7 @@ return_value:
   headers:
     Set-Cookie: ${setCookie}
   return: ${cookie_result.response.body.token}
-  next: end 
+  next: end
 
 return_user_not_found:
   status: 400

@@ -24,8 +24,8 @@ CREATE TABLE denorm_user_csa_authority_profile_settings (
 
 ALTER TABLE denorm_user_csa_authority_profile_settings ADD PRIMARY KEY (id);
 
-Now insert the data ordering by created timestamp to ensure IDs align with timestamps
-Insert data into the denormalized table
+-- Now insert the data ordering by created timestamp to ensure IDs align with timestamps
+-- Insert data into the denormalized table
 INSERT INTO denorm_user_csa_authority_profile_settings (
     login,
     first_name,

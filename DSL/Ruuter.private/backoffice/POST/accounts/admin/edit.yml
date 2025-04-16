@@ -43,7 +43,7 @@ extractRequestData:
     csa_email: ${incoming.body.csa_email}
     roles: ${incoming.body.roles}
     department: ${incoming.body.department}
- 
+
 getUser:
   call: http.get
   args:
@@ -84,6 +84,13 @@ updateRoles:
       userIdCode: ${userIdCode}
       roles: ${roles}
       created: ${new Date().toISOString()}
+      userStatus: "active"
+      firstName: ${firstName}
+      lastName: ${lastName}
+      displayName: ${displayName}
+      csaTitle: ${csaTitle}
+      csaEmail: ${csa_email}
+      department: ${department}
   result: add_roles_res
   next: return_result
 
@@ -96,4 +103,3 @@ return_not_exists:
   return: "error: user does not exist"
   status: 400
   next: end
-

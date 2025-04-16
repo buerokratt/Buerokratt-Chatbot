@@ -2,14 +2,7 @@ WITH
     latest_user_record AS (
         SELECT
             login,
-            first_name,
-            last_name,
             id_code,
-            display_name,
-            csa_title,
-            csa_email,
-            department,
-            user_status,
             status,
             active,
             forwarded_chat_popup_notifications,
@@ -44,20 +37,19 @@ INSERT INTO denorm_user_csa_authority_profile_settings (
     new_chat_popup_notifications,
     new_chat_sound_notifications,
     new_chat_email_notifications,
-    use_autocorrect,
-    created
+    use_autocorrect
 )
 SELECT
     login,
-    first_name,
-    last_name,
+    :firstName,
+    :lastName,
     id_code,
-    display_name,
-    csa_title,
-    csa_email,
-    department,
+    :displayName,
+    :csaTitle,
+    :csaEmail,
+    :department,
     ARRAY[:roles],
-    user_status,
+    :userStatus::user_status,
     status,
     active,
     forwarded_chat_popup_notifications,
@@ -66,6 +58,5 @@ SELECT
     new_chat_popup_notifications,
     new_chat_sound_notifications,
     new_chat_email_notifications,
-    use_autocorrect,
-    :created::TIMESTAMP WITH TIME ZONE
+    use_autocorrect
 FROM latest_user_record;

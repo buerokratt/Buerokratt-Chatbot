@@ -79,15 +79,22 @@ addUser:
 addRoles:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/auth_users/create_user_authority"
+    url: "[#CHATBOT_RESQL]/auth_users/create_denorm_user_csa_authority_profile_settings"
     body:
       userIdCode: ${userIdCode}
       roles: ${roles}
       created: ${new Date().toISOString()}
+      userStatus: "active"
+      firstName: ${firstName}
+      lastName: ${lastName}
+      displayName: ${displayName}
+      csaTitle: ${csaTitle}
+      csaEmail: ${csa_email}
+      department: ${department}
   result: add_roles_res
   next: setDefaultActivity
 
-setDefaultActivity: 
+setDefaultActivity:
   call: http.post
   args:
     url: "[#CHATBOT_RESQL]/auth_users/create_customer_support_agent_activity"

@@ -19,7 +19,7 @@ extractRequestData:
 getCustomerSupportActivity:
   call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/auth_users/get_customer_support_activity_by_id_code"
+    url: "[#CHATBOT_RESQL]/auth_users/get_customer_support_agent_activity_by_id_code"
     query:
       customerSupportId: ${customerSupportId}
   result: res
