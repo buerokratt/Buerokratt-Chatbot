@@ -31,7 +31,6 @@ setChatComment:
     body:
       comment: ${comment}
       chatId: ${chatId}
-      created: "${new Date().toISOString()}"
       authorDisplayName: ${authorDisplayName}
   result: res
 

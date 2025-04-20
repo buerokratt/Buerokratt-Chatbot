@@ -47,7 +47,7 @@ getActiveChatById:
     query:
       id: ${id}
   result: activeChatRes
-  next: checkActiveChatResult 
+  next: checkActiveChatResult
 
 checkActiveChatResult:
   switch:
@@ -80,7 +80,7 @@ redirectChat:
       feedbackText: ""
       feedbackRating: ""
       externalId: ${activeChat.externalId ?? ""}
-      created: ${activeChat.created ?? new Date().toISOString()}
+      created: ${activeChat.created ?? "CURRENT_TIMESTAMP"}
       ended: ${activeChat.ended ?? ""}
       forwardedTo: ${activeChat.forwardedTo ?? ""}
       forwardedToName: ${activeChat.forwardedToName ?? ""}
@@ -101,7 +101,7 @@ getUuid:
 assignUuid:
   assign:
     uuid: ${uuid_result.response.body.uuid}
-  next: insertMessage  
+  next: insertMessage
 
 insertMessage:
   call: http.post
@@ -111,11 +111,11 @@ insertMessage:
       chatId: ${activeChat.id ?? uuid}
       messageId: ${uuid}
       content: ""
-      authorTimestamp: ${new Date().toISOString()}
+      authorTimestamp: "CURRENT_TIMESTAMP"
+      created: "CURRENT_TIMESTAMP"
       authorId: ""
       authorFirstName: ""
       authorRole: "buerokratt"
-      created: ${new Date().toISOString()}
       authorLastName: ""
       rating: ""
       event: "redirected"
@@ -157,7 +157,7 @@ remove_chat_id_from_queue_notification_node_if_existed:
     url: "[#CHATBOT_NOTIFICATIONS]/dequeue"
     body:
       id: ${id}
-  result: remove_chat_id_from_queue_notification_node_if_existed_res  
+  result: remove_chat_id_from_queue_notification_node_if_existed_res
 
 return_result:
   return: ${redirectedChatRes.response.body}
@@ -166,4 +166,4 @@ return_result:
 return_chat_ended:
   return: "Chat Has Ended"
   status: 400
-  next: end 
+  next: end

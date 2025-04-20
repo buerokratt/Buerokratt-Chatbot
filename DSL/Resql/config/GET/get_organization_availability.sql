@@ -172,7 +172,7 @@ WITH
                     is_the_same_on_all_working_days
                     THEN
                         TO_CHAR(
-                            :current_timestamp::TIMESTAMP,
+                            now(),
                             (SELECT time_format FROM consts)
                         )::TIME
                 WHEN current_day.current_day = 'monday'
@@ -188,7 +188,7 @@ WITH
                             )
                             THEN
                                 TO_CHAR(
-                                    :current_timestamp::TIMESTAMP,
+                                    now(),
                                     (SELECT time_format FROM consts)
                                 )::TIME BETWEEN
                                 (
@@ -197,7 +197,7 @@ WITH
                                 ) AND (SELECT max_time FROM consts
                                 )::TIME
                                 OR TO_CHAR(
-                                    :current_timestamp::TIMESTAMP,
+                                    now(),
                                     (SELECT time_format FROM consts)
                                 )::TIME BETWEEN (SELECT min_time FROM consts
                                 )::TIME AND
@@ -207,7 +207,7 @@ WITH
                                 )
                         ELSE
                             TO_CHAR(
-                                :current_timestamp::TIMESTAMP,
+                                now(),
                                 (SELECT time_format FROM consts)
                             )::TIME BETWEEN
                             (
@@ -232,7 +232,7 @@ WITH
                             )
                             THEN
                                 TO_CHAR(
-                                    :current_timestamp::TIMESTAMP,
+                                    now(),
                                     (SELECT time_format FROM consts)
                                 )::TIME BETWEEN
                                 (
@@ -241,7 +241,7 @@ WITH
                                 ) AND (SELECT max_time FROM consts
                                 )::TIME
                                 OR TO_CHAR(
-                                    :current_timestamp::TIMESTAMP,
+                                    now(),
                                     (SELECT time_format FROM consts)
                                 )::TIME BETWEEN (SELECT min_time FROM consts
                                 )::TIME AND
@@ -251,7 +251,7 @@ WITH
                                 )
                         ELSE
                             TO_CHAR(
-                                :current_timestamp::TIMESTAMP,
+                                now(),
                                 (SELECT time_format FROM consts)
                             )::TIME BETWEEN
                             (
@@ -276,7 +276,7 @@ WITH
                             )
                             THEN
                                 TO_CHAR(
-                                    :current_timestamp::TIMESTAMP,
+                                    now(),
                                     (SELECT time_format FROM consts)
                                 )::TIME BETWEEN
                                 (
@@ -285,7 +285,7 @@ WITH
                                 ) AND (SELECT max_time FROM consts
                                 )::TIME
                                 OR TO_CHAR(
-                                    :current_timestamp::TIMESTAMP,
+                                    now(),
                                     (SELECT time_format FROM consts)
                                 )::TIME BETWEEN (SELECT min_time FROM consts
                                 )::TIME AND
@@ -295,7 +295,7 @@ WITH
                                 )
                         ELSE
                             TO_CHAR(
-                                :current_timestamp::TIMESTAMP,
+                                now(),
                                 (SELECT time_format FROM consts)
                             )::TIME BETWEEN
                             (
@@ -320,7 +320,7 @@ WITH
                             )
                             THEN
                                 TO_CHAR(
-                                    :current_timestamp::TIMESTAMP,
+                                    now(),
                                     (SELECT time_format FROM consts)
                                 )::TIME BETWEEN
                                 (
@@ -329,7 +329,7 @@ WITH
                                 ) AND (SELECT max_time FROM consts
                                 )::TIME
                                 OR TO_CHAR(
-                                    :current_timestamp::TIMESTAMP,
+                                    now(),
                                     (SELECT time_format FROM consts)
                                 )::TIME BETWEEN (SELECT min_time FROM consts
                                 )::TIME AND
@@ -339,7 +339,7 @@ WITH
                                 )
                         ELSE
                             TO_CHAR(
-                                :current_timestamp::TIMESTAMP,
+                                now(),
                                 (SELECT time_format FROM consts)
                             )::TIME BETWEEN
                             (
@@ -364,7 +364,7 @@ WITH
                             )
                             THEN
                                 TO_CHAR(
-                                    :current_timestamp::TIMESTAMP,
+                                    now(),
                                     (SELECT time_format FROM consts)
                                 )::TIME BETWEEN
                                 (
@@ -373,7 +373,7 @@ WITH
                                 ) AND (SELECT max_time FROM consts
                                 )::TIME
                                 OR TO_CHAR(
-                                    :current_timestamp::TIMESTAMP,
+                                    now(),
                                     (SELECT time_format FROM consts)
                                 )::TIME BETWEEN (SELECT min_time FROM consts
                                 )::TIME AND
@@ -383,7 +383,7 @@ WITH
                                 )
                         ELSE
                             TO_CHAR(
-                                :current_timestamp::TIMESTAMP,
+                                now(),
                                 (SELECT time_format FROM consts)
                             )::TIME BETWEEN
                             (
@@ -408,7 +408,7 @@ WITH
                             )
                             THEN
                                 TO_CHAR(
-                                    :current_timestamp::TIMESTAMP,
+                                    now(),
                                     (SELECT time_format FROM consts)
                                 )::TIME BETWEEN
                                 (
@@ -417,7 +417,7 @@ WITH
                                 ) AND (SELECT max_time FROM consts
                                 )::TIME
                                 OR TO_CHAR(
-                                    :current_timestamp::TIMESTAMP,
+                                    now(),
                                     (SELECT time_format FROM consts)
                                 )::TIME BETWEEN (SELECT min_time FROM consts
                                 )::TIME AND
@@ -427,7 +427,7 @@ WITH
                                 )
                         ELSE
                             TO_CHAR(
-                                :current_timestamp::TIMESTAMP,
+                                now(),
                                 (SELECT time_format FROM consts)
                             )::TIME BETWEEN
                             (
@@ -451,7 +451,7 @@ WITH
                         )
                         THEN
                             TO_CHAR(
-                                :current_timestamp::TIMESTAMP,
+                                now(),
                                 (SELECT time_format FROM consts)
                             )::TIME BETWEEN
                             (
@@ -460,7 +460,7 @@ WITH
                             ) AND (SELECT max_time FROM consts
                             )::TIME
                             OR TO_CHAR(
-                                :current_timestamp::TIMESTAMP,
+                                now(),
                                 (SELECT time_format FROM consts)
                             )::TIME BETWEEN (SELECT min_time FROM consts
                             )::TIME AND
@@ -470,7 +470,7 @@ WITH
                             )
                     ELSE
                         TO_CHAR(
-                            :current_timestamp::TIMESTAMP,
+                            now(),
                             (SELECT time_format FROM consts)
                         )::TIME BETWEEN
                         (

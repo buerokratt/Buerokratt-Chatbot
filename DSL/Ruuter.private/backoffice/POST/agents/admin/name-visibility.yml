@@ -21,7 +21,6 @@ setConfigurationValue:
   args:
     url: "[#CHATBOT_RESQL]/config/create_configuration"
     body:
-      created: ${new Date().toISOString()}
       key: "is_csa_name_visible"
       value: ${isVisible}
   result: res

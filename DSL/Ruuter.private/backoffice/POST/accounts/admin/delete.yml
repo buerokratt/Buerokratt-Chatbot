@@ -22,7 +22,6 @@ setConfigurationValue:
     url: "[#CHATBOT_RESQL]/auth_users/delete_user"
     body:
       userIdCode: ${userId}
-      created: ${new Date().toISOString()}
   result: res
 
 return_result:

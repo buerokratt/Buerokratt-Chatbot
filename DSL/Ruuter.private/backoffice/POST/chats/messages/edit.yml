@@ -16,7 +16,7 @@ declaration:
         description: "Body field 'messageId'"
       - field: content
         type: string
-        description: "Body field 'content'"  
+        description: "Body field 'content'"
 
 extractRequestData:
   assign:
@@ -32,7 +32,7 @@ getMessageById:
     query:
       id: ${messageId}
   result: message_res
-  next: assignMessage  
+  next: assignMessage
 
 assignMessage:
   assign:
@@ -47,11 +47,11 @@ insertMessage:
       messageId: ${messageId}
       chatId: ${chatId}
       authorId: ${message.authorId ?? ""}
-      authorTimestamp: ${message.authorTimestamp ?? new Date().toISOString()}
+      authorTimestamp: ${message.authorTimestamp ?? "CURRENT_TIMESTAMP"}
+      created: "CURRENT_TIMESTAMP"
       authorFirstName: ${message.authorFirstName ?? ""}
       authorLastName: ${message.authorLastName ?? ""}
       authorRole: ${message.authorRole ?? ""}
-      created: ${new Date().toISOString()}
       content: ${content ?? ""}
       event: ${message.event ?? ""}
       forwardedByUser: ${message.forwardedByUser ?? ""}
@@ -81,4 +81,4 @@ notify_messages:
 
 return_result:
   return: "Message Edited Successfully"
-  next: end          
+  next: end

@@ -15,12 +15,11 @@ declaration:
 get_tara_user_info:
   call: http.get
   args:
-   url: "[#CHATBOT_TIM]/jwt/userinfo"
-   contentType: plaintext
-   headers:
-    cookie: ${incoming.headers.cookie}
-   plaintext: 
-      "JWTTOKEN"
+    url: "[#CHATBOT_TIM]/jwt/userinfo"
+    contentType: plaintext
+    headers:
+      cookie: ${incoming.headers.cookie}
+    plaintext: "JWTTOKEN"
   result: tara_info
   next: get_session_length
 
@@ -51,7 +50,7 @@ checkIfUserExists:
 assignUser:
   assign:
     user: ${user_info.response.body[0]}
-  next: generate_cookie  
+  next: generate_cookie
 
 generate_cookie:
   call: http.post
@@ -60,18 +59,19 @@ generate_cookie:
     body:
       JWTName: "customJwtCookie"
       expirationInMinutes: ${session_result.response.body[0]?.value ?? '120'}
-      content: {
-        "idCode": "${user.idCode}",
-        "login": "${user.idCode}",
-        "displayName": "${user.displayName}",
-        "firstName": "${user.firstName}",
-        "lastName": "${user.lastName}",
-        "csaEmail": "${user.csaEmail}",
-        "csaTitle": "${user.csaTitle}",
-        "authorities": "${user.authorities}",
-        "authMethod": "${tara_info.response.body.authMethod}",
-        "fullName": "${tara_info.response.body.fullName}"
-      }
+      content:
+        {
+          "idCode": "${user.idCode}",
+          "login": "${user.idCode}",
+          "displayName": "${user.displayName}",
+          "firstName": "${user.firstName}",
+          "lastName": "${user.lastName}",
+          "csaEmail": "${user.csaEmail}",
+          "csaTitle": "${user.csaTitle}",
+          "authorities": "${user.authorities}",
+          "authMethod": "${tara_info.response.body.authMethod}",
+          "fullName": "${tara_info.response.body.fullName}",
+        }
   result: cookie_result
   next: assign_cookie
 
@@ -92,16 +92,15 @@ setCustomerSupportAgentAway:
     body:
       active: false
       userIdCode: ${tara_info.response.body.personalCode}
-      created: ${new Date().toISOString()}
       status: "offline"
   result: setCustomerSupportAgentAwayResult
-  next: return_value  
+  next: return_value
 
 return_value:
   headers:
     Set-Cookie: ${setCookie}
   return: ${cookie_result.response.body.token}
-  next: end 
+  next: end
 
 return_not_exists:
   return: "User does not exist"

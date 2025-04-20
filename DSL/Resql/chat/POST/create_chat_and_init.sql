@@ -71,8 +71,12 @@ VALUES (
     :endUserFirstName,
     :endUserLastName,
     :status,
-    :created::TIMESTAMP WITH TIME ZONE,
+    CASE 
+        WHEN :created::TEXT = 'CURRENT_TIMESTAMP' THEN now()
+        ELSE COALESCE(:created::TIMESTAMP WITH TIME ZONE, now())
+    END,
     (CASE
+        WHEN :ended::TEXT = 'CURRENT_TIMESTAMP' THEN now()
         WHEN (:ended = '') THEN NULL
         WHEN (:ended = 'null') THEN NULL
         ELSE :ended

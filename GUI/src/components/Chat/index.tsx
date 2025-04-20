@@ -538,8 +538,8 @@ const Chat: FC<ChatProps> = ({
       forwardedFromCsa: chat.forwardedFromCsa ?? '',
       forwardedToCsa: chat.forwardedToCsa ?? '',
       ...(editMessage && {
-        originalBaseId: selectedMessage?.id,
-        originalCreated: selectedMessage?.created,
+        id: selectedMessage?.id,
+        created: selectedMessage?.created,
       }),
     };
 

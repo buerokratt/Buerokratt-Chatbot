@@ -1,71 +1,48 @@
-WITH
-    max_previews AS (
-        SELECT MAX(id) AS max_id
-        FROM message_preview
-        GROUP BY chat_base_id
-    ),
-
-    message_previews AS (
-        SELECT
-            content,
-            chat_base_id
-        FROM message_preview
-            INNER JOIN max_previews ON id = max_id
-    ),
-
-    max_messages AS (
-        SELECT MAX(id) AS max_id
-        FROM message
-        WHERE chat_base_id = :chatId
-        GROUP BY base_id
-    ),
-
-    latest_active_user AS (
-        SELECT
-            u.id_code,
-            u.created,
-            u.csa_title
-        FROM
-            "user" AS u INNER JOIN (
-            SELECT
-                iu.id_code,
-                MAX(iu.created) AS max_created
-            FROM "user" AS iu
-            WHERE iu.status = 'active'
-            GROUP BY iu.id_code
-        ) AS iju ON u.id_code = iju.id_code AND u.created = iju.max_created
-    )
-
-SELECT
-    m.base_id AS id,
-    m.chat_base_id AS chat_id,
-    m.content,
-    m.buttons,
-    m.options,
-    m.event,
-    m.author_id,
-    m.author_timestamp,
-    m.author_first_name,
-    m.author_last_name,
-    m.author_role,
-    m.forwarded_by_user,
-    m.forwarded_from_csa,
-    m.forwarded_to_csa,
-    m.original_base_id,
-    mp.content AS preview,
-    rating,
-    m.created,
-    updated,
-    u.csa_title
-FROM message AS m
-    LEFT JOIN message_previews AS mp ON m.chat_base_id = mp.chat_base_id
-    LEFT JOIN latest_active_user AS u ON m.author_id = u.id_code
-    INNER JOIN max_messages ON m.id = max_id
-WHERE
-    :timeRangeBegin::TIMESTAMP WITH TIME ZONE < m.updated
-    AND m.base_id NOT IN (
-        SELECT DISTINCT original_base_id
-        FROM message
-        WHERE original_base_id IS NOT NULL
-    )
-ORDER BY m.created ASC;
+WITH MessagePreviews AS (
+  SELECT DISTINCT ON (chat_base_id) content, chat_base_id 
+  FROM message_preview
+  ORDER BY chat_base_id, id DESC
+),
+LatestActiveUser AS (
+  SELECT DISTINCT ON (id_code) 
+    id_code, created, csa_title
+  FROM "user"
+  WHERE status = 'active'
+  ORDER BY id_code, created DESC
+),
+LatestMessages AS (
+  SELECT DISTINCT ON (base_id)
+    m.id, m.base_id, m.chat_base_id, m.content, m.buttons, m.options, 
+    m.event, m.author_id, m.author_timestamp, m.author_first_name, 
+    m.author_last_name, m.author_role, m.forwarded_by_user, 
+    m.forwarded_from_csa, m.forwarded_to_csa, m.rating, 
+    m.created, m.updated
+  FROM message m
+  WHERE m.chat_base_id = :chatId
+  ORDER BY m.base_id, m.updated DESC
+)
+SELECT 
+  lm.base_id AS id,
+  lm.chat_base_id AS chatId,
+  lm.content,
+  lm.buttons,
+  lm.options,
+  lm.event,
+  lm.author_id,
+  lm.author_timestamp,
+  lm.author_first_name,
+  lm.author_last_name,
+  lm.author_role,
+  lm.forwarded_by_user,
+  lm.forwarded_from_csa,
+  lm.forwarded_to_csa,
+  mp.content AS preview,
+  lm.rating,
+  lm.created,
+  lm.updated,
+  u.csa_title 
+FROM LatestMessages lm
+LEFT JOIN MessagePreviews mp ON lm.chat_base_id = mp.chat_base_id
+LEFT JOIN LatestActiveUser u ON lm.author_id = u.id_code
+WHERE :timeRangeBegin::timestamp with time zone < lm.updated
+ORDER BY lm.created ASC;

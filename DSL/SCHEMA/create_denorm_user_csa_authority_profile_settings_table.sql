@@ -19,7 +19,7 @@ CREATE TABLE denorm_user_csa_authority_profile_settings (
     new_chat_sound_notifications BOOLEAN DEFAULT false,
     use_autocorrect BOOLEAN DEFAULT false,
     new_chat_email_notifications BOOLEAN DEFAULT false,
-    created TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    created TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
 ALTER TABLE denorm_user_csa_authority_profile_settings ADD PRIMARY KEY (id);

@@ -27,7 +27,6 @@ extractRequestData:
     page_name: ${incoming.body.page_name}
     page_results: ${incoming.body.page_results}
     selected_columns: ${incoming.body.selected_columns}
-    created: ${new Date().toISOString()}
 
 setUserPagePreferences:
   call: http.post
@@ -38,7 +37,6 @@ setUserPagePreferences:
       page_name: ${page_name}
       page_results: ${page_results}
       selected_columns: ${selected_columns}
-      created: ${created}
   result: returnSuccess
 
 returnSuccess:

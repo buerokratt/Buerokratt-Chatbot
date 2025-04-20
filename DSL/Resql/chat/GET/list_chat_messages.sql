@@ -1,21 +1,10 @@
-WITH RECURSIVE
-    message_chain AS (
-        SELECT m.*
-        FROM message AS m
-        WHERE m.chat_base_id = :chatId
-        UNION ALL
-        SELECT m.*
-        FROM message AS m
-            INNER JOIN message_chain AS mc ON m.original_base_id = mc.base_id
-    ),
-
-    filtered_messages AS (
-        SELECT DISTINCT ON (mc.base_id) mc.*
-        FROM message_chain AS mc
-            LEFT JOIN message_chain AS mc_2 ON mc.base_id = mc_2.original_base_id
-        WHERE mc_2.base_id IS NULL
-    ),
-
+WITH filtered_messages AS (
+    SELECT DISTINCT ON (m.base_id)
+    *
+    FROM message m
+    WHERE m.chat_base_id = :chatId
+    ORDER BY m.base_id, m.updated DESC
+),
     latest_active_user AS (
         SELECT
             u.id_code,
@@ -47,7 +36,6 @@ SELECT
     fm.forwarded_by_user,
     fm.forwarded_from_csa,
     fm.forwarded_to_csa,
-    fm.original_base_id,
     fm.rating,
     fm.created,
     fm.updated,

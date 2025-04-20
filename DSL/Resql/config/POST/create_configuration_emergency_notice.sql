@@ -1,15 +1,13 @@
-INSERT INTO configuration (key, value, created)
+INSERT INTO configuration (key, value)
 VALUES
-('emergencyNoticeText', :emergencyNoticeText, :created::TIMESTAMP WITH TIME ZONE),
+('emergencyNoticeText', :emergencyNoticeText),
 (
     'emergencyNoticeStartISO',
-    :emergencyNoticeStartISO,
-    :created::TIMESTAMP WITH TIME ZONE
+    :emergencyNoticeStartISO
 ),
-('emergencyNoticeEndISO', :emergencyNoticeEndISO, :created::TIMESTAMP WITH TIME ZONE),
+('emergencyNoticeEndISO', :emergencyNoticeEndISO),
 (
     'isEmergencyNoticeVisible',
-    :isEmergencyNoticeVisible,
-    :created::TIMESTAMP WITH TIME ZONE
+    :isEmergencyNoticeVisible
 )
 RETURNING key, value;

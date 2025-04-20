@@ -6,7 +6,6 @@ INSERT INTO "user" (
     password_hash,
     id_code,
     status,
-    created,
     csa_title,
     csa_email,
     department
@@ -19,7 +18,6 @@ VALUES (
     :displayName,
     :userIdCode,
     (:status)::USER_STATUS,
-    :created::TIMESTAMP WITH TIME ZONE,
     :csaTitle,
     :csaEmail,
     :department

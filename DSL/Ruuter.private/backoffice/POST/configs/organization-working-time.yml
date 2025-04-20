@@ -142,7 +142,6 @@ setOrganizationWorkingTime:
       organizationNoCsaAvailableMessage: ${organizationNoCsaAvailableMessage}
       organizationOutsideWorkingHoursAskForContacts: ${organizationOutsideWorkingHoursAskForContacts}
       organizationOutsideWorkingHoursMessage: ${organizationOutsideWorkingHoursMessage}
-      created: ${new Date().toISOString()}
   result: setOrganizationWorkingTimeResult
 
 mapOrganizationWorkingTimeData:

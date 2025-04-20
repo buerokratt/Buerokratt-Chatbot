@@ -55,9 +55,7 @@ add_message_to_db:
       messageId: ${messageUuid}
       content: ""
       options: ${options ?? "[]"}
-      authorTimestamp: ${new Date().toISOString()}
       authorRole: "buerokratt"
-      created: ${new Date().toISOString()}
       rating: ""
       event: ""
       forwardedByUser: ""
@@ -93,4 +91,4 @@ return_message_sent:
 return_chat_ended:
   return: "Chat Has Ended"
   status: 400
-  next: end  
+  next: end

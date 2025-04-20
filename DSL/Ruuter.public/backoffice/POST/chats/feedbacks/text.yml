@@ -32,7 +32,6 @@ addFeedbackText:
     url: "[#CHATBOT_RESQL]/chat/update_chat_with_feedback_text"
     body:
       id: ${chatId}
-      created: ${new Date().toISOString()}
       feedbackText: ${text}
   result: res
   next: return_result

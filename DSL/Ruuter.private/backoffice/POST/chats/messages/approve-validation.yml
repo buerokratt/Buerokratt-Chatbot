@@ -33,7 +33,7 @@ getBotName:
 assignBotName:
   assign:
     botName: ${bot_name_res.response.body[0].value}
-  next: getChatById  
+  next: getChatById
 
 getChatById:
   call: http.get
@@ -42,7 +42,7 @@ getChatById:
     query:
       id: ${chatId}
   result: chat_res
-  next: checkChatResult 
+  next: checkChatResult
 
 checkChatResult:
   switch:
@@ -62,21 +62,21 @@ changeStatus:
     body:
       id: ${chatId}
       customerSupportId: ${botName}
-      customerSupportDisplayName: 'Bürokratt'
+      customerSupportDisplayName: "Bürokratt"
       csaTitle: ${chat.csaTitle}
       endUserId: ${chat.endUserId}
       endUserFirstName: ${chat.endUserFirstName}
       endUserLastName: ${chat.endUserLastName}
-      status: 'OPEN'
+      status: "OPEN"
       endUserEmail: ${chat.endUserEmail}
       endUserPhone: ${chat.endUserPhone}
       endUserOs: ${chat.endUserOs}
       endUserUrl: ${chat.endUserUrl}
       feedbackText: ""
       feedbackRating: ""
-      externalId: ''
+      externalId: ""
       created: ${chat.created}
-      ended: ''
+      ended: ""
       forwardedTo: ${chat.forwardedTo}
       forwardedToName: ${chat.forwardedToName}
       receivedFrom: ${chat.receivedFrom}
@@ -91,7 +91,7 @@ getMessageById:
     query:
       id: ${messageId}
   result: message_res
-  next: assignMessage  
+  next: assignMessage
 
 assignMessage:
   assign:
@@ -106,11 +106,11 @@ insertMessage:
       messageId: ${messageId}
       chatId: ${chatId}
       authorId: ${message.authorId ?? ""}
-      authorTimestamp: ${message.authorTimestamp ?? new Date().toISOString()}
+      authorTimestamp: ${message.authorTimestamp ?? "CURRENT_TIMESTAMP"}
+      created: "CURRENT_TIMESTAMP"
       authorFirstName: ${message.authorFirstName ?? ""}
       authorLastName: ${message.authorLastName ?? ""}
       authorRole: ${message.authorRole ?? ""}
-      created: ${new Date().toISOString()}
       content: ${message.content ?? ""}
       event: "approved_validation"
       forwardedByUser: ${message.forwardedByUser ?? ""}
@@ -140,9 +140,9 @@ notify_messages:
 
 return_result:
   return: "Message Approved Successfully"
-  next: end  
+  next: end
 
 return_chat_ended:
   return: "Chat Has Ended"
   status: 400
-  next: end 
+  next: end

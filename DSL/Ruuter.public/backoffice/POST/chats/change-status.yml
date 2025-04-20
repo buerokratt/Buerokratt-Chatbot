@@ -19,7 +19,7 @@ declaration:
         description: "Body field 'holidayNames'"
       - field: holidays
         type: string
-        description: "Body field 'holidays'"  
+        description: "Body field 'holidays'"
 
 extractRequestData:
   assign:
@@ -53,7 +53,6 @@ get_organization_working_details:
     query:
       holidays: ${holidays}
       holiday_names: ${holidayNames}
-      current_timestamp: ${new Date().toISOString()}
   result: org_res
   next: assign_organization_details
 
@@ -97,7 +96,7 @@ getActiveChatById:
     query:
       id: ${chatId}
   result: activeChatRes
-  next: checkActiveChatResult 
+  next: checkActiveChatResult
 
 checkActiveChatResult:
   switch:
@@ -108,7 +107,7 @@ checkActiveChatResult:
 assignChat:
   assign:
     activeChat: ${activeChatRes.response.body[0]}
-  next: changeStatus  
+  next: changeStatus
 
 changeStatus:
   call: http.post
@@ -116,8 +115,8 @@ changeStatus:
     url: "[#CHATBOT_RESQL]/chat/create_chat"
     body:
       id: ${chatId}
-      customerSupportId: ''
-      customerSupportDisplayName: ''
+      customerSupportId: ""
+      customerSupportDisplayName: ""
       csaTitle: ${activeChat.csaTitle ?? ''}
       endUserId: ${activeChat.endUserId ?? ''}
       endUserFirstName: ${activeChat.endUserFirstName ?? ''}
@@ -130,8 +129,8 @@ changeStatus:
       feedbackText: ${activeChat.feedbackText ?? ''}
       feedbackRating: ${activeChat.feedbackRating ?? ''}
       externalId: ${activeChat.externalId ?? ''}
-      created: ${new Date().toISOString()}
-      ended: ''
+      created: "CURRENT_TIMESTAMP"
+      ended: ""
       forwardedTo: ${activeChat.forwardedTo ?? ''}
       forwardedToName: ${activeChat.forwardedToName ?? ''}
       receivedFrom: ${activeChat.receivedFrom ?? ''}

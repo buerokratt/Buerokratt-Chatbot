@@ -44,7 +44,6 @@ setEmergencyNotice:
       emergencyNoticeStartISO: ${emergencyNoticeStartISO}
       emergencyNoticeEndISO: ${emergencyNoticeEndISO}
       isEmergencyNoticeVisible: ${isEmergencyNoticeVisible}
-      created: ${new Date().toISOString()}
   result: res
   next: return_result
 

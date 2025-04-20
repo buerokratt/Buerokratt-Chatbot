@@ -19,7 +19,6 @@ WITH
             id_code,
             display_name,
             user_status,
-            created,
             csa_title,
             csa_email,
             department,
@@ -41,7 +40,6 @@ WITH
             id_code,
             display_name,
             'deleted',                           -- Set user_status to 'deleted'
-            :created::TIMESTAMP WITH TIME ZONE,
             csa_title,
             csa_email,
             department,
@@ -79,7 +77,6 @@ WITH
             id_code,
             display_name,
             status,
-            created,
             csa_title,
             csa_email,
             department
@@ -92,7 +89,6 @@ WITH
             id_code,
             display_name,
             'deleted',
-            :created::TIMESTAMP WITH TIME ZONE,
             csa_title,
             csa_email,
             department

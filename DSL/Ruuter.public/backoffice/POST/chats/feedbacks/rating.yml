@@ -32,7 +32,6 @@ addFeedbackRating:
     url: "[#CHATBOT_RESQL]/chat/update_chat_with_feedback_rating"
     body:
       id: ${chatId}
-      created: ${new Date().toISOString()}
       feedback_rating: ${rating}
   result: res
   next: return_result

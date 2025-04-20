@@ -10,12 +10,11 @@ declaration:
 get_chat_info:
   call: http.post
   args:
-   url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
-   contentType: plaintext
-   headers:
-    cookie: ${cookie}
-   plaintext:
-      "chatJwt"
+    url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
+    contentType: plaintext
+    headers:
+      cookie: ${cookie}
+    plaintext: "chatJwt"
   result: infoRes
   next: check_chat_info_response
 
@@ -39,7 +38,7 @@ getActiveChatById:
     query:
       id: ${chatId}
   result: activeChatRes
-  next: checkActiveChatResult 
+  next: checkActiveChatResult
 
 checkActiveChatResult:
   switch:
@@ -50,7 +49,7 @@ checkActiveChatResult:
 assignChat:
   assign:
     activeChat: ${activeChatRes.response.body[0]}
-  next: getMessagesToRedirect  
+  next: getMessagesToRedirect
 
 getMessagesToRedirect:
   call: http.get
@@ -122,7 +121,7 @@ redirectChat:
       feedbackRating: ""
       externalId: ${forwardChatRes.response.body.data.format_forward_destination_response.generatedChatId}
       created: ${activeChat.created}
-      ended: ${new Date().toISOString()}
+      ended: "CURRENT_TIMESTAMP"
       forwardedTo: ${activeChat.forwardedTo}
       forwardedToName: ${activeChat.forwardedToName}
       receivedFrom: ${activeChat.receivedFrom}
@@ -167,9 +166,9 @@ return_result:
 return_bad_request:
   status: 400
   return: "Bad Request"
-  next: end 
+  next: end
 
 return_chat_ended:
   return: "Chat Has Ended"
   status: 400
-  next: end  
+  next: end

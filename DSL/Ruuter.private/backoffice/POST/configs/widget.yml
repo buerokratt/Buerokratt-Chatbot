@@ -47,7 +47,6 @@ setWidgetConfig:
       widgetColor: ${widgetColor}
       isWidgetActive: ${isWidgetActive}
       widgetAnimation: ${widgetAnimation}
-      created: ${new Date().toISOString()}
   result: res
 
 return_result:

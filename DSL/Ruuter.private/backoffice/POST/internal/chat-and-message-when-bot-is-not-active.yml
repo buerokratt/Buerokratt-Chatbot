@@ -40,7 +40,6 @@ notify_chats_and_return_chats_and_messages:
       authorRole: "buerokratt"
       content: ${base_config.outsideWorkingHoursMessage}
       event: "${base_config.outsideWorkingHoursAskForContacts === 'true' ? 'unavailable_organization_ask_contacts' : 'unavailable_organization'}"
-      created: ${new Date().toISOString()}
   result: res
 
 map_open_chats_messages:

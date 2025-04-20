@@ -12,14 +12,11 @@ INSERT INTO message (
     created,
     forwarded_by_user,
     forwarded_from_csa,
-    forwarded_to_csa, original_base_id
+    forwarded_to_csa
 )
 VALUES (
     :chatId,
-    (CASE
-        WHEN :messageId IS NOT NULL AND :messageId <> '' THEN :messageId
-        ELSE (GEN_RANDOM_UUID()::VARCHAR)
-    END),
+    :id,
     :content,
     :event,
     :authorTimestamp::TIMESTAMP WITH TIME ZONE,
@@ -31,6 +28,5 @@ VALUES (
     :created::TIMESTAMP WITH TIME ZONE,
     :forwardedByUser,
     :forwardedFromCsa,
-    :forwardedToCsa,
-    :originalBaseId
+    :forwardedToCsa
 );

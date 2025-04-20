@@ -44,7 +44,7 @@ getMessageById:
     query:
       id: ${messageId}
   result: res
-  next: assignMessage  
+  next: assignMessage
 
 assignMessage:
   assign:
@@ -59,11 +59,11 @@ insertMessage:
       messageId: ${messageId}
       chatId: ${message.chatBaseId}
       authorId: ${message.authorId ?? "end-user"}
-      authorTimestamp: ${authorTimestamp ?? new Date().toISOString()}
+      authorTimestamp: ${authorTimestamp ?? "CURRENT_TIMESTAMP"}
       authorFirstName: ${message.authorFirstName ?? ""}
       authorLastName: ${message.authorLastName ?? ""}
       authorRole: "end-user"
-      created: ${message.created ?? new Date().toISOString()}
+      created: ${message.created ?? "CURRENT_TIMESTAMP"}
       content: ${content ?? ""}
       event: ${event ?? ""}
       forwardedByUser: ${message.forwardedByUser ?? ""}

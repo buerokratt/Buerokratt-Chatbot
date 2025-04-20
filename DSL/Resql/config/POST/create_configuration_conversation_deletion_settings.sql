@@ -1,9 +1,9 @@
-INSERT INTO configuration (key, value, created)
+INSERT INTO configuration (key, value)
 VALUES (
-    'isAuthConversations', :isAuthConversations, :created::TIMESTAMP WITH TIME ZONE
+    'isAuthConversations', :isAuthConversations
 ),
-('authPeriod', :authPeriod, :created::TIMESTAMP WITH TIME ZONE),
-('isAnonymConversations', :isAnonymConversations, :created::TIMESTAMP WITH TIME ZONE),
-('anonymPeriod', :anonymPeriod, :created::TIMESTAMP WITH TIME ZONE),
-('deletionTimeISO', :deletionTimeISO, :created::TIMESTAMP WITH TIME ZONE)
+('authPeriod', :authPeriod),
+('isAnonymConversations', :isAnonymConversations),
+('anonymPeriod', :anonymPeriod),
+('deletionTimeISO', :deletionTimeISO)
 RETURNING key, value;

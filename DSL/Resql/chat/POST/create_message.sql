@@ -4,12 +4,12 @@ INSERT INTO message (
     content,
     event,
     author_timestamp,
+    created,
     author_id,
     author_first_name,
     author_last_name,
     author_role,
     rating,
-    created,
     forwarded_by_user,
     forwarded_from_csa,
     forwarded_to_csa
@@ -22,13 +22,19 @@ VALUES (
     END),
     :content,
     :event,
-    :authorTimestamp::TIMESTAMP WITH TIME ZONE,
+    CASE 
+        WHEN :authorTimestamp::TEXT = 'CURRENT_TIMESTAMP' THEN now()
+        ELSE COALESCE(:authorTimestamp::TIMESTAMP WITH TIME ZONE, now())
+    END,
+    CASE 
+        WHEN :created::TEXT = 'CURRENT_TIMESTAMP' THEN now()
+        ELSE COALESCE(:created::TIMESTAMP WITH TIME ZONE, now())
+    END,
     :authorId,
     :authorFirstName,
     :authorLastName,
     :authorRole,
     (NULLIF(:rating, '')::INTEGER),
-    :created::TIMESTAMP WITH TIME ZONE,
     :forwardedByUser,
     :forwardedFromCsa,
     :forwardedToCsa

@@ -216,7 +216,6 @@ get_organization_working_details:
     query:
       holidays: ${holidays}
       holiday_names: ${holidayNames}
-      current_timestamp: ${new Date().toISOString()}
   result: org_res
   next: assign_organization_details
 
@@ -243,12 +242,10 @@ return_is_a_holiday:
       messages:
         - chatId: ${chatId}
           content: ${org_details.holidayMessage}
-          authorTimestamp: ${new Date().toISOString()}
           event: "${base_config.outsideWorkingHoursAskForContacts === 'true' ? 'unavailable_holiday_ask_contacts' : 'unavailable_holiday'}"
           authorId: ${get_bot_name_result.response.body[0].value}
           authorFirstName: ""
           authorLastName: ""
-          created: ${new Date().toISOString()}
   result: is_a_holiday_result
   next: return_is_holiday
 
@@ -260,12 +257,10 @@ return_organization_is_not_available:
       messages:
         - chatId: ${chatId}
           content: ${base_config.outsideWorkingHoursMessage}
-          authorTimestamp: ${new Date().toISOString()}
           event: "${base_config.outsideWorkingHoursAskForContacts === 'true' ? 'unavailable_organization_ask_contacts' : 'unavailable_organization'}"
           authorId: ${get_bot_name_result.response.body[0].value}
           authorFirstName: ""
           authorLastName: ""
-          created: ${new Date().toISOString()}
   result: organization_is_not_available_result
   next: return_organization_is_not_available_res
 
@@ -295,12 +290,10 @@ send_csas_not_available_message:
       messages:
         - chatId: ${chatId}
           content: ${base_config.noCsaMessage}
-          authorTimestamp: ${new Date().toISOString()}
           event: "${base_config.askForContacts === 'true' ? 'unavailable_csas_ask_contacts' : 'unavailable_csas'}"
           authorId: ${get_bot_name_result.response.body[0].value}
           authorFirstName: ""
           authorLastName: ""
-          created: ${new Date().toISOString()}
   result: csas_not_available_message_result
   next: return_csa_is_not_available
 

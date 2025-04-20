@@ -35,7 +35,7 @@ getActiveChatById:
     query:
       id: ${id}
   result: activeChatRes
-  next: checkActiveChatResult 
+  next: checkActiveChatResult
 
 checkActiveChatResult:
   switch:
@@ -68,7 +68,7 @@ assignPendingChat:
       feedbackText: ""
       feedbackRating: ""
       externalId: ${activeChat.externalId ?? ""}
-      created: ${activeChat.created ?? new Date().toISOString()}
+      created: ${activeChat.created ?? "CURRENT_TIMESTAMP"}
       ended: ${activeChat.ended ?? ""}
       forwardedTo: ${activeChat.forwardedTo ?? ""}
       forwardedToName: ${activeChat.forwardedToName ?? ""}
@@ -89,7 +89,7 @@ getUuid:
 assignUuid:
   assign:
     uuid: ${uuid_result.response.body.uuid}
-  next: insertMessage  
+  next: insertMessage
 
 insertMessage:
   call: http.post
@@ -99,11 +99,11 @@ insertMessage:
       chatId: ${activeChat.id ?? uuid}
       messageId: ${uuid}
       content: ""
-      authorTimestamp: ${new Date().toISOString()}
+      authorTimestamp: "CURRENT_TIMESTAMP"
+      created: "CURRENT_TIMESTAMP"
       authorId: ${customerSupportId}
       authorFirstName: ${customerSupportDisplayName}
       authorRole: "buerokratt"
-      created: ${new Date().toISOString()}
       authorLastName: ""
       rating: ""
       event: "pending-assigned"
@@ -154,4 +154,4 @@ return_result:
 return_chat_ended:
   return: "Chat Has Ended"
   status: 400
-  next: end 
+  next: end

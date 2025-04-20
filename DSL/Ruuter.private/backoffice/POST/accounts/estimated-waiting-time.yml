@@ -21,7 +21,6 @@ setConfigurationValue:
   args:
     url: "[#CHATBOT_RESQL]/config/create_configuration"
     body:
-      created: ${new Date().toISOString()}
       key: "estimated_waiting_time"
       value: ${waitingTime}
   result: res

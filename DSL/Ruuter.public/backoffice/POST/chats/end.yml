@@ -81,11 +81,11 @@ postMessage:
       messageId: ${messageUuid}
       content: ""
       authorTimestamp: ${authorTimestamp}
+      created: "CURRENT_TIMESTAMP"
       authorId: ""
       authorFirstName: ""
       authorLastName: ""
       authorRole: ${authorRole ?? "buerokratt"}
-      created: ${new Date().toISOString()}
       rating: ""
       event: ${event}
       forwardedByUser: ""
@@ -107,8 +107,8 @@ endChat:
       endUserFirstName: ${activeChat.endUserFirstName ?? ""}
       endUserLastName: ${activeChat.endUserLastName ?? ""}
       status: ${status ?? "ENDED"}
-      created: ${activeChat.created ?? new Date().toISOString()}
-      ended: ${new Date().toISOString()}
+      created: ${activeChat.created ?? "CURRENT_TIMESTAMP"}
+      ended: "CURRENT_TIMESTAMP"
       feedbackRating: ${activeChat.feedbackRating ?? ""}
       feedbackText: ${activeChat.feedbackText ?? ""}
       endUserEmail: ${activeChat.endUserEmail ?? ""}

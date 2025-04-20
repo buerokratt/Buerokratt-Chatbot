@@ -6,7 +6,6 @@ INSERT INTO "user" (
     last_name,
     display_name,
     status,
-    created,
     csa_title,
     csa_email,
     department
@@ -19,7 +18,6 @@ SELECT
     :lastName,
     :displayName,
     :status::USER_STATUS,
-    :created::TIMESTAMP WITH TIME ZONE,
     :csaTitle,
     :csaEmail,
     :department

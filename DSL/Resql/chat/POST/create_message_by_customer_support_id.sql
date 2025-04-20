@@ -3,23 +3,20 @@ INSERT INTO message (
     base_id,
     content,
     event,
-    author_timestamp,
     author_id,
     author_first_name,
-    author_last_name, author_role, rating, created
+    author_last_name, author_role, rating
 )
 SELECT
     chat_base_id,
     (SELECT UUID_IN(MD5(RANDOM()::TEXT)::CSTRING)),
     :content,
     :event,
-    :created::TIMESTAMP WITH TIME ZONE,
     :authorId,
     author_first_name,
     author_last_name,
     :authorRole,
-    rating,
-    :created::TIMESTAMP WITH TIME ZONE
+    rating
 FROM message
 WHERE
     chat_base_id IN (

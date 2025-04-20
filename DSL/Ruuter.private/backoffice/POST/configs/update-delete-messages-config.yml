@@ -42,7 +42,6 @@ setConfig:
       authPeriod: ${authPeriod}
       anonymPeriod: ${anonymPeriod}
       deletionTimeISO: ${deletionTimeISO}
-      created: ${new Date().toISOString()}
   result: res
 
 return_result:

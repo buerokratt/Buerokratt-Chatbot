@@ -23,10 +23,16 @@ INSERT INTO chat (
 )
 VALUES (
     :id, :customerSupportId, :customerSupportDisplayName, :endUserId, :endUserFirstName,
-    :endUserLastName, :status, :created::TIMESTAMP WITH TIME ZONE,
+    :endUserLastName, :status, 
+    CASE 
+        WHEN :created::TEXT = 'CURRENT_TIMESTAMP' THEN now()
+        ELSE COALESCE(:created::TIMESTAMP WITH TIME ZONE, now())
+    END,
     (
         CASE
-            WHEN (:ended = '') THEN null WHEN (:ended = 'null') THEN null ELSE :ended
+            WHEN :ended::TEXT = 'CURRENT_TIMESTAMP' THEN now()
+            WHEN (:ended = '') THEN null WHEN (:ended = 'null') THEN now() 
+            ELSE :ended
         END
     )::TIMESTAMP WITH TIME ZONE,
     :endUserEmail,

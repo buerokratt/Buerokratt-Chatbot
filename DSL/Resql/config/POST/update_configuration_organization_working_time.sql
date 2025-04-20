@@ -41,8 +41,7 @@ WITH
 new_configuration AS (
         SELECT
             new_values.key,
-            new_values.value,
-            :created::TIMESTAMP WITH TIME ZONE AS created
+            new_values.value
         FROM (
             VALUES
             (
@@ -130,11 +129,10 @@ new_configuration AS (
         ) AS new_values (key, value)
     )
 
-INSERT INTO configuration (key, value, created)
+INSERT INTO configuration (key, value)
 SELECT
     new_configuration.key,
-    new_configuration.value,
-    created
+    new_configuration.value
 FROM new_configuration
     INNER JOIN last_configuration ON new_configuration.key = last_configuration.key
 WHERE new_configuration.value IS DISTINCT FROM last_configuration.value

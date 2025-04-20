@@ -115,11 +115,11 @@ postClientMessage:
       messageId: ${messageUuid}
       content: ${content}
       event: ""
-      authorTimestamp: ${authorTimestamp}
+      authorTimestamp: "CURRENT_TIMESTAMP"
       authorId: ${endUserId}
       authorFirstName: ""
       authorRole: ${authorRole}
-      created: ${new Date().toISOString()}
+      created: "CURRENT_TIMESTAMP"
       authorLastName: ""
       rating: ""
       forwardedByUser: ${forwardedByUser}

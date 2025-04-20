@@ -49,12 +49,11 @@ extractRequestData:
 get_user_info:
   call: http.post
   args:
-   url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
-   contentType: plaintext
-   headers:
-    cookie: ${cookie}
-   plaintext: 
-      "customJwtCookie"
+    url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
+    contentType: plaintext
+    headers:
+      cookie: ${cookie}
+    plaintext: "customJwtCookie"
   result: res
   next: check_user_info_response
 
@@ -91,17 +90,17 @@ insertMessage:
       chatId: ${chatId}
       messageId: ${uuid}
       content: ${content ?? ""}
-      authorTimestamp: ${authorTimestamp ?? new Date().toISOString()}
+      authorTimestamp: ${authorTimestamp ?? "CURRENT_TIMESTAMP"}
       authorId: ${idCode}
       authorFirstName: ${authorFirstName ?? ""}
       authorRole: ${authorRole ?? "backoffice-user"}
-      created: ${new Date().toISOString()}
       authorLastName: ""
       rating: ""
       event: ${event ?? ""}
       forwardedByUser: ""
       forwardedFromCsa: ""
       forwardedToCsa: ""
+      created: "CURRENT_TIMESTAMP"
   result: insertMessageResult
 
 getMessageById:
@@ -137,5 +136,4 @@ return_result:
 return_bad_request:
   status: 400
   return: false
-  next: end  
-
+  next: end

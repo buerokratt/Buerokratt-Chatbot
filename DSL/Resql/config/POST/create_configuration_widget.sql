@@ -1,20 +1,17 @@
-INSERT INTO configuration (key, value, created)
+INSERT INTO configuration (key, value)
 VALUES (
     'widgetProactiveSeconds',
-    :widgetProactiveSeconds,
-    :created::TIMESTAMP WITH TIME ZONE
+    :widgetProactiveSeconds
 ),
 (
     'widgetDisplayBubbleMessageSeconds',
-    :widgetDisplayBubbleMessageSeconds,
-    :created::TIMESTAMP WITH TIME ZONE
+    :widgetDisplayBubbleMessageSeconds
 ),
 (
     'widgetBubbleMessageText',
-    :widgetBubbleMessageText,
-    :created::TIMESTAMP WITH TIME ZONE
+    :widgetBubbleMessageText
 ),
-('widgetColor', :widgetColor, :created::TIMESTAMP WITH TIME ZONE),
-('isWidgetActive', :isWidgetActive, :created::TIMESTAMP WITH TIME ZONE),
-('widgetAnimation', :widgetAnimation, :created::TIMESTAMP WITH TIME ZONE)
+('widgetColor', :widgetColor),
+('isWidgetActive', :isWidgetActive),
+('widgetAnimation', :widgetAnimation)
 RETURNING key, value;

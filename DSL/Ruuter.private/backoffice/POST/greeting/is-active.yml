@@ -21,7 +21,6 @@ setConfigurationValue:
   args:
     url: "[#CHATBOT_RESQL]/config/create_configuration"
     body:
-      created: ${new Date().toISOString()}
       key: "is_greeting_message_active"
       value: ${isActive}
   result: res

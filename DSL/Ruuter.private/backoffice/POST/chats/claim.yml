@@ -35,7 +35,7 @@ getActiveChatById:
     query:
       id: ${id}
   result: activeChatRes
-  next: checkActiveChatResult 
+  next: checkActiveChatResult
 
 checkActiveChatResult:
   switch:
@@ -68,7 +68,7 @@ claimChat:
       feedbackText: ""
       feedbackRating: ""
       externalId: ${activeChat.externalId ?? ""}
-      created: ${activeChat.created ?? new Date().toISOString()}
+      created: ${activeChat.created ?? "CURRENT_TIMESTAMP"}
       ended: ${activeChat.ended ?? ""}
       forwardedTo: ${activeChat.forwardedTo ?? ""}
       forwardedToName: ${activeChat.forwardedToName ?? ""}
@@ -99,11 +99,11 @@ insertMessage:
       chatId: ${activeChat.id}
       messageId: ${messageUuid}
       content: ""
-      authorTimestamp: ${new Date().toISOString()}
+      authorTimestamp: "CURRENT_TIMESTAMP"
+      created: "CURRENT_TIMESTAMP"
       authorId: ""
       authorFirstName: ""
       authorRole: "buerokratt"
-      created: ${new Date().toISOString()}
       authorLastName: ""
       rating: ""
       event: "taken-over"
@@ -153,4 +153,4 @@ return_result:
 return_chat_ended:
   return: "Chat Has Ended"
   status: 400
-  next: end  
+  next: end

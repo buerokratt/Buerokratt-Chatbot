@@ -42,7 +42,6 @@ setBotConfig:
       is_csa_name_visible: ${is_csa_name_visible}
       is_csa_title_visible: ${is_csa_title_visible}
       is_edit_chat_visible: ${is_edit_chat_visible}
-      created: ${new Date().toISOString()}
   result: set_bot_config_res
 
 return_result:

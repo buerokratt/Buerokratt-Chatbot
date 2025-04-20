@@ -16,7 +16,7 @@ CREATE TABLE denormalized_chat (
     first_message_timestamp timestamp with time zone,
     created timestamp with time zone,
     updated timestamp with time zone,
-    denormalized_record_created timestamp with time zone,
+    denormalized_record_created timestamp with time zone NOT NULL DEFAULT now(),
     ended timestamp with time zone,
     forwarded_to character varying, 
     forwarded_to_name character varying,

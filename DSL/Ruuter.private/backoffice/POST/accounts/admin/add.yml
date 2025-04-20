@@ -64,7 +64,6 @@ addUser:
   args:
     url: "[#CHATBOT_RESQL]/auth_users/create_user"
     body:
-      created: ${new Date().toISOString()}
       status: "active"
       firstName: ${firstName}
       lastName: ${lastName}
@@ -83,7 +82,6 @@ addRoles:
     body:
       userIdCode: ${userIdCode}
       roles: ${roles}
-      created: ${new Date().toISOString()}
       userStatus: "active"
       firstName: ${firstName}
       lastName: ${lastName}
@@ -102,7 +100,6 @@ setDefaultActivity:
       userIdCode: ${userIdCode}
       active: false
       status: "offline"
-      created: ${new Date().toISOString()}
   result: set_default_activity_res
   next: setUserProfileSettings
 

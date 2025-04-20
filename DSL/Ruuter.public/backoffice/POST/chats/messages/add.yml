@@ -46,12 +46,11 @@ checkContentLength:
 get_chat_info:
   call: http.post
   args:
-   url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
-   contentType: plaintext
-   headers:
-    cookie: ${cookie}
-   plaintext:
-      "chatJwt"
+    url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
+    contentType: plaintext
+    headers:
+      cookie: ${cookie}
+    plaintext: "chatJwt"
   result: res
   next: check_chat_info_response
 
@@ -73,7 +72,7 @@ getActiveChatById:
     query:
       id: ${chatId}
   result: activeChatRes
-  next: checkActiveChatResult    
+  next: checkActiveChatResult
 
 checkActiveChatResult:
   switch:
@@ -93,7 +92,7 @@ getUuid:
 assignUuid:
   assign:
     uuid: ${uuid_result.response.body.uuid}
-  next: insertMessage  
+  next: insertMessage
 
 insertMessage:
   call: http.post
@@ -104,10 +103,10 @@ insertMessage:
       messageId: ${uuid}
       content: ${content}
       authorTimestamp: ${authorTimestamp}
+      created: "CURRENT_TIMESTAMP"
       authorId: ""
       authorFirstName: ""
       authorRole: ${authorRole}
-      created: ${new Date().toISOString()}
       authorLastName: ""
       rating: ""
       event: ${event ?? ""}
@@ -166,12 +165,12 @@ return_result:
 return_chat_ended:
   return: "Chat Has Ended"
   status: 400
-  next: end  
+  next: end
 
 return_bad_request:
   status: 400
   return: "Error: Bad Request"
-  next: end  
+  next: end
 
 return_content_length_exceeded:
   status: 400
@@ -181,4 +180,4 @@ return_content_length_exceeded:
 return_bot_error:
   status: 420
   return: "Bot error"
-  next: end  
+  next: end
