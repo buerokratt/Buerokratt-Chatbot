@@ -839,9 +839,9 @@ const Chat: FC<ChatProps> = ({
 
         {!isCsaAtEnd && isNewMessageNotificationVisible && (
           <div className="newMessageContainer">
-            <span onClick={scrollDown} className="newMessage">
+            <button onClick={scrollDown} className="newMessage">
               {t('chat.newMessage')}
-            </span>
+            </button>
           </div>
         )}
 
