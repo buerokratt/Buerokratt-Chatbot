@@ -27,6 +27,7 @@ extractRequestData:
     active: ${incoming.body.customerSupportActive}
     status: ${incoming.body.customerSupportStatus}  
     idCode: ${incoming.body.userIdCode}
+    statusComment: ${incoming.body.statusComment}
 
 check_body_user_id_code:
   switch:
@@ -65,6 +66,7 @@ setCustomerSupportActivity:
       active: ${active}
       userIdCode: ${idCode}
       status: ${status}
+      statusComment: ${statusComment}
       created: ${new Date().toISOString()}
   result: res
   next: return_result

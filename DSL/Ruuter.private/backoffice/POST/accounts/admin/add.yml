@@ -95,6 +95,7 @@ setDefaultActivity:
       userIdCode: ${userIdCode}
       active: false
       status: "offline"
+      statusComment: ""
       created: ${new Date().toISOString()}
   result: set_default_activity_res
   next: setUserProfileSettings

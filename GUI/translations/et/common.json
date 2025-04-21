@@ -44,7 +44,8 @@
     "today": "Täna",
     "forward": "Suuna",
     "chosen": "Valitud",
-    "read": "Loetud"
+    "read": "Loetud",
+    "statusClarification": "Staatuse täpsustus"
   },
   "mainMenu": {
     "menuLabel": "Põhinavigatsioon",
@@ -332,7 +333,8 @@
       "idCodePlaceholder": "Isikukood peab algama riigi eesliitega, (eg.EE12345678910)",
       "choose": "Vali",
       "userExists": "Kasutaja on olemas",
-      "userChangeStatusMessage": "Kas sa soovid kasutaja staatuseks muuta eemal?"
+      "userChangeStatusMessage": "Kas sa soovid kasutaja staatuseks muuta eemal?",
+      "statusCommentUpdated": "Staatuse täpsustus uuendatud"
     },
     "chat": {
       "chatActive": "Vestlusrobot aktiivne",

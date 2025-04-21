@@ -51,6 +51,7 @@ setCustomerSupportAgentAway:
       userIdCode: ${idCode}
       active: false
       status: "offline"
+      statusComment: ""
       created: ${new Date().toISOString()}
   result: set_status_res
   next: blacklistCustomJwt

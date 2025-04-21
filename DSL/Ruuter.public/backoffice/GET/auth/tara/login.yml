@@ -94,6 +94,7 @@ setCustomerSupportAgentAway:
       userIdCode: ${tara_info.response.body.personalCode}
       created: ${new Date().toISOString()}
       status: "offline"
+      statusComment: ""
   result: setCustomerSupportAgentAwayResult
   next: return_value  
 

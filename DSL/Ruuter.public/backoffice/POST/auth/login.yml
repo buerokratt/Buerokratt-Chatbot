@@ -86,6 +86,7 @@ setCustomerSupportAgentAway:
       userIdCode: ${login}
       created: ${new Date().toISOString()}
       status: "offline"
+      statusComment: ""
   result: setCustomerSupportAgentAwayResult
   next: return_value
 
