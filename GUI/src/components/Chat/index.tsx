@@ -351,11 +351,8 @@ const Chat: FC<ChatProps> = ({
       message: Message;
       editing: boolean;
     }) => {
-      if (editing) {
-        return apiDev.post('agents/chats/messages/edit', message);
-      } else {
-        return apiDev.post('agents/chats/messages/insert', message);
-      }
+      const endpoint = editing ? 'edit' : 'insert';
+      return apiDev.post(`agents/chats/messages/${endpoint}`, message);
     },
     onSuccess: (res: any) => {
       return res.data.response;
