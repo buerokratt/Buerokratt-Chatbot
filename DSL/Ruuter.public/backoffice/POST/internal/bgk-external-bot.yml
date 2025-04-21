@@ -33,6 +33,7 @@ extract_data:
     holidays: ${incoming.body.holidays}
     holidayNames: ${incoming.body.holidayNames}
     event: ""
+    context: []
 
 assignBgkConfig:
   assign:
@@ -51,6 +52,12 @@ assignBgkConfig:
 
 logstepAZURESAADAME:
   log: ${incoming.body.message}
+
+check_if_client_bot_is_active:
+  switch:
+    - condition: ${[#BGK_ACTIVE] === true}
+      next: assign_data_sources
+  next: get_organization_bot_answer_config
 
 assign_data_sources:
   assign:
@@ -124,12 +131,16 @@ post_answer:
 logstepAZUREBOT:
   log: ${test}
 
+assign_context:
+  assign:
+    context: ${test.response.body.choices[0].message.context}
+
 assign_value:
   assign:
     correct_value:
       - recipient_id: ${sender}
         text: ${test.response.body.choices[0].message.content.replace(/\n/g,"\\n").replace(" \. ", ". ")}
-        context: ${test.response.body.choices[0].message.context}
+        context: ${context}
   next: check_value
 
 check_value:
@@ -151,7 +162,7 @@ assign_validation_event:
     correct_value:
       - recipient_id: ${sender}
         text: ${correct_value.map((item) => item.text)[0].replace('$validate_', '')}
-        context: ${test.response.body.choices[0].message.context}
+        context: ${context}
     event: "waiting_validation"
   next: change_chat_status 
 
@@ -178,7 +189,7 @@ assign_unavailable_message:
     correct_value:
       - recipient_id: ${sender}
         text: "Edasine lahendamine toimub vastavalt pöördumiste protsessile väljaspool AI-assistendi lahendust."
-        context: ${test.response.body.choices[0].message.context}
+        context: ${context}
     event: ""
   next: format_messages
 
@@ -199,7 +210,7 @@ assign_back_office_event:
     correct_value:
       - recipient_id: ${sender}
         text: ${bot_answer_config.askToForwardToCsaMessage}
-        context: ${test.response.body.choices[0].message.context}
+        context: ${context}
     event: "${bot_answer_config.isAskToForwardToCsa === 'true' ? 'ask_to_forward_to_csa' : ''}"
   next: format_messages
 
