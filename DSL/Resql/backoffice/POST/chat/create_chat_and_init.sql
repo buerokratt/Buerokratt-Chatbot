@@ -79,7 +79,7 @@ VALUES (
         WHEN :ended::TEXT = 'CURRENT_TIMESTAMP' THEN now()
         WHEN (:ended = '') THEN NULL
         WHEN (:ended = 'null') THEN NULL
-        ELSE :ended
+        ELSE :ended::TIMESTAMP WITH TIME ZONE
     END)::TIMESTAMP WITH TIME ZONE,
     :endUserEmail,
     :endUserPhone,
