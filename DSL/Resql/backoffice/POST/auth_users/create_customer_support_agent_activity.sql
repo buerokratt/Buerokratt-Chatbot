@@ -37,7 +37,7 @@ INSERT INTO denorm_user_csa_authority_profile_settings (
     user_status,
     status,
     status_comment,
-    sca_created,
+    csa_created,
     active,
     forwarded_chat_popup_notifications,
     forwarded_chat_sound_notifications,

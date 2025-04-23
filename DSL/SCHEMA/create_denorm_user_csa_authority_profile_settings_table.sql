@@ -67,9 +67,9 @@ WITH combined_records AS (
         COALESCE(ua.authority_name, '{}') AS authority_name,
         u.status AS user_status,
         csa.status,
+        COALESCE(csa.active, false) AS active,
         csa.status_comment,
         csa.created AS csa_created,
-        COALESCE(csa.active, false) AS active,
         COALESCE(ups.forwarded_chat_popup_notifications, false) AS forwarded_chat_popup_notifications,
         COALESCE(ups.forwarded_chat_sound_notifications, true) AS forwarded_chat_sound_notifications,
         COALESCE(ups.forwarded_chat_email_notifications, false) AS forwarded_chat_email_notifications,
@@ -113,9 +113,9 @@ WITH combined_records AS (
         COALESCE(ua.authority_name, '{}') AS authority_name,
         u.status AS user_status,
         csa.status,  -- Use CSA status from LATERAL join
+        COALESCE(csa.active, false) AS active,  -- Use CSA active from LATERAL join
         csa.status_comment,
         csa.created AS csa_created,
-        COALESCE(csa.active, false) AS active,  -- Use CSA active from LATERAL join
         COALESCE(ups.forwarded_chat_popup_notifications, false) AS forwarded_chat_popup_notifications,
         COALESCE(ups.forwarded_chat_sound_notifications, true) AS forwarded_chat_sound_notifications,
         COALESCE(ups.forwarded_chat_email_notifications, false) AS forwarded_chat_email_notifications,
@@ -165,9 +165,9 @@ WITH combined_records AS (
         ua.authority_name,
         u.status AS user_status,
         csa.status,  -- Use CSA status from LATERAL join
+        COALESCE(csa.active, false) AS active,  -- Use CSA active from LATERAL join
         csa.status_comment,
         csa.created AS csa_created,
-        COALESCE(csa.active, false) AS active,  -- Use CSA active from LATERAL join
         COALESCE(ups.forwarded_chat_popup_notifications, false) AS forwarded_chat_popup_notifications,
         COALESCE(ups.forwarded_chat_sound_notifications, true) AS forwarded_chat_sound_notifications,
         COALESCE(ups.forwarded_chat_email_notifications, false) AS forwarded_chat_email_notifications,
