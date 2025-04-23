@@ -20,8 +20,32 @@ get_user_info:
    headers:
     cookie: ${incoming.headers.cookie}
    plaintext: 
-      "clientCustomJwtCookie"
+      "userJwt"
   result: res
+
+check_info_response:
+  switch:
+    - condition: ${res.response.body === null}
+      next: assign_user_cookie
+  next: return_result
+
+assign_user_cookie:
+  assign:
+    userCookie:
+      userJwt: null
+      Domain: "[#DOMAIN]"
+      Secure: true
+      HttpOnly: true
+      SameSite: "Lax"
+      Max-Age: 0
+  next: remove_cookie
+
+remove_cookie:
+  headers: 
+    Set-Cookie: ${userCookie}
+  return: ${res.response.body}
+  next: end
 
 return_result:
   return: ${res.response.body}
+  next: end

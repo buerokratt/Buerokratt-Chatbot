@@ -54,7 +54,7 @@ assign_data_sources:
         parameters:
           endpoint: "[#SEARCH_ENDPOINT]"
           index_name: ${skm_config.indexName}
-          semantic_configuration: azureml-default
+          semantic_configuration: ${skm_config.semanticConfiguration ?? 'azureml-default'}
           query_type: ${skm_config.queryType}
           in_scope: true
           strictness: ${parseInt(skm_config.range ?? '3')}
@@ -134,7 +134,7 @@ check_value:
     - condition: ${correct_value.map((item) => item.text)[0] === 'ERROR'}
       next: return_bot_error
     - condition: ${correct_value.map((item) => item.text)[0] === '$backoffice' || correct_value.map((item) => item.text)[0].startsWith('$backoffice')}
-      next: assign_back_office_event  
+      next: get_organization_bot_answer_config  
     - condition: ${correct_value.map((item) => item.text)[0].startsWith('$validate_')}
       next: assign_validation_event  
   next: format_messages
@@ -183,13 +183,25 @@ assign_unavailable_message:
     event: ""
   next: format_messages
 
+get_organization_bot_answer_config:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-organization-bot-answer-config"
+  result: bot_answer_config_res
+  next: assign_organization_bot_answer_config
+
+assign_organization_bot_answer_config:
+  assign:
+    bot_answer_config: ${bot_answer_config_res.response.body[0]}
+  next: assign_back_office_event
+
 assign_back_office_event:
   assign:
     correct_value:
       - recipient_id: ${sender}
-        text: "Kahjuks ei oska ma hetkel teie küsimusele vastata. Kas soovite, et suunan küsimuse nõustajale?"
+        text: ${bot_answer_config.askToForwardToCsaMessage}
         context: ${test.response.body.choices[0].message.context}
-    event: "ask_to_forward_to_csa"
+    event: "${bot_answer_config.isAskToForwardToCsa === 'true' ? 'ask_to_forward_to_csa' : ''}"
   next: format_messages
 
 format_messages:

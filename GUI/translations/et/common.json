@@ -380,7 +380,9 @@
       "noCsaAvailableMessage": "Klienditeenindaja eemaloleku teavitus",
       "showIfOrganizationIsOutsideWorkingHours": "Saada kliendile töövälise aja teavitus",
       "showIfOrganizationIsOutsideWorkingHoursWithContactsRequest": "Saada kliendile töövälise aja teavitus koos kontakti päringuga",
-      "outsideWorkingHoursMessage": "Töövälise aja teavitus"
+      "outsideWorkingHoursMessage": "Töövälise aja teavitus",
+      "showIfBotCannotAnswerAskToForwardToCSA": "Kui Bürokratt ei oska vasta, kas küsida suunamist",
+      "botCannotAnswerMessage": "Teavitus, kui Bürokratt ei oska vastata"
     },
     "userSession": {
       "title": "Kasutaja sessioon",
@@ -427,13 +429,15 @@
       "simple": "Märksõna",
       "vectorSimpleHybrid": "Hübriid (märksõna + vektor)",
       "vectorSemanticHybrid": "Hübriid + semantiline",
+      "semanticConfiguration": "Semantiline Konfiguratsioon",
       "tooltip": {
-        "range": "Rangus määrab künnise, mille alusel dokumente peetakse teie päringutele asjakohasteks. Ranguse tõstmine tähendab kõrgemat asjakohasuse künnist ja rohkemate vähem asjakohaste dokumentide filtreerimist. Väga kõrge rangus võib aga põhjustada vastuste genereerimise ebaõnnestumise, kuna kättesaadavaid dokumente on liiga vähe. Vaikimisi on ranguse tase 3.Võimalikud väärtused: 1 - 5",
+        "range": "Rangus määrab künnise, mille alusel xdokumente peetakse teie päringutele asjakohasteks. Ranguse tõstmine tähendab kõrgemat asjakohasuse künnist ja rohkemate vähem asjakohaste dokumentide filtreerimist. Väga kõrge rangus võib aga põhjustada vastuste genereerimise ebaõnnestumise, kuna kättesaadavaid dokumente on liiga vähe. Vaikimisi on ranguse tase 3.Võimalikud väärtused: 1 - 5",
         "documents": "See määrab teie andmeindeksist vastuste koostamiseks kasutatavate kõrgeima skooriga dokumentide arvu. Seda väärtust tasub suurendada, kui teil on lühikesed dokumendid või soovite pakkuda rohkem konteksti. Vaikeväärtus on 5.Võimalikud väärtused: 1 - 20",
         "systemMessage": "Anna mudelile juhised ja kontekst selle kohta, kuidas see peaks käituma.",
         "maxTokens": "Sea piirang mudeli vastuses kasutatavate tokenite arvule.Võimalikud väärtused: 1 - 2000",
         "indexName": "Azures loodud indeksi nimi.",
-        "queryType": "Vali otsingutüüp."
+        "queryType": "Vali otsingutüüp.",
+        "semanticConfiguration": "Azures loodud indeksi semantiline konfiguratsioon"
       },
       "validation": {
         "range": "Rangus peab olema vahemikus 1 kuni 5",
