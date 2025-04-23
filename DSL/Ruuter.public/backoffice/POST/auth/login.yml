@@ -85,6 +85,7 @@ setCustomerSupportAgentAway:
       active: false
       userIdCode: ${login}
       status: "offline"
+      statusComment: ""
   result: setCustomerSupportAgentAwayResult
   next: return_value
 

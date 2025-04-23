@@ -9,6 +9,8 @@ SELECT
     department,
     authority_name AS authorities,
     status AS customer_support_status,
+    status_comment,
+    csa_created AS status_comment_time_stamp,
     CEIL(COUNT(*) OVER () / :page_size::DECIMAL) AS total_pages
 FROM denorm_user_csa_authority_profile_settings
 WHERE

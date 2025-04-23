@@ -1,7 +1,8 @@
 SELECT
     id_code,
     active,
-    status
+    status,
+    status_comment
 FROM denorm_user_csa_authority_profile_settings
 WHERE
     (status = 'online')

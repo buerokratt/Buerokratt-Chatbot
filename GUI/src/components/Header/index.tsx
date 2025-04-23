@@ -221,6 +221,7 @@ const Header: FC = () => {
       apiDev.post('accounts/customer-support-activity', {
         customerSupportActive: data.customerSupportActive,
         customerSupportStatus: data.customerSupportStatus,
+        statusComment: data.statusComment,
       }),
     onSuccess: () => {
       if (csaStatus === 'online') extendUserSessionMutation.mutate();
@@ -277,6 +278,7 @@ const Header: FC = () => {
       customerSupportActive: chatCsaActive,
       customerSupportId: customerSupportActivity.idCode,
       customerSupportStatus: 'idle',
+      statusComment: ''
     });
   };
 
@@ -292,6 +294,7 @@ const Header: FC = () => {
       customerSupportActive: chatCsaActive,
       customerSupportId: customerSupportActivity.idCode,
       customerSupportStatus: 'online',
+      statusComment: ''
     });
   };
 
@@ -320,6 +323,7 @@ const Header: FC = () => {
       customerSupportActive: checked,
       customerSupportStatus: checked === true ? 'online' : 'offline',
       customerSupportId: '',
+      statusComment: ''
     });
 
     if (!checked) showStatusChangePopup();
@@ -403,6 +407,7 @@ const Header: FC = () => {
                     customerSupportActive: false,
                     customerSupportStatus: 'offline',
                     customerSupportId: userInfo.idCode,
+                    statusComment: ''
                   });
                   localStorage.removeItem('exp');
                   logoutMutation.mutate();

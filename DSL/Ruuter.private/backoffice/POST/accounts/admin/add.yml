@@ -100,6 +100,7 @@ setDefaultActivity:
       userIdCode: ${userIdCode}
       active: false
       status: "offline"
+      statusComment: ""
   result: set_default_activity_res
   next: setUserProfileSettings
 

@@ -24,6 +24,8 @@ WITH
             department,
             authority_name,
             status,
+            status_comment,
+            csa_created,
             active,
             forwarded_chat_popup_notifications,
             forwarded_chat_sound_notifications,
@@ -45,6 +47,8 @@ WITH
             department,
             ARRAY[]::VARCHAR[],                  -- Empty authority_name array
             'offline',                           -- Set status to 'offline'
+            status_comment,
+            csa_created,
             false,                               -- Set active to false
             false,                               -- Reset all notification settings
             false,

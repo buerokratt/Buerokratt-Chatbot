@@ -39,7 +39,7 @@ extractRequestData:
 
 checkContentLength:
   switch:
-    - condition: ${content.length > 1000}
+    - condition: ${content.length > 3000}
       next: return_content_length_exceeded
   next: get_chat_info
 

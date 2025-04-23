@@ -12,6 +12,7 @@ export interface User {
   authorities: ROLES[];
   customerSupportStatus: 'online' | 'idle' | 'offline';
   department: string;
+  statusComment: string;
 }
 
 export interface UserDTO

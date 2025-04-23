@@ -12,6 +12,8 @@ CREATE TABLE denorm_user_csa_authority_profile_settings (
     user_status USER_STATUS,
     status STATUS,
     active BOOLEAN DEFAULT false,
+    status_comment TEXT DEFAULT '',
+    csa_created TIMESTAMP WITH TIME ZONE,
     forwarded_chat_popup_notifications BOOLEAN DEFAULT false,
     forwarded_chat_sound_notifications BOOLEAN DEFAULT true,
     forwarded_chat_email_notifications BOOLEAN DEFAULT false,
@@ -39,6 +41,8 @@ INSERT INTO denorm_user_csa_authority_profile_settings (
     user_status,
     status,
     active,
+    status_comment,
+    csa_created,
     forwarded_chat_popup_notifications,
     forwarded_chat_sound_notifications,
     forwarded_chat_email_notifications,
@@ -63,6 +67,8 @@ WITH combined_records AS (
         COALESCE(ua.authority_name, '{}') AS authority_name,
         u.status AS user_status,
         csa.status,
+        csa.status_comment,
+        csa.created AS csa_created,
         COALESCE(csa.active, false) AS active,
         COALESCE(ups.forwarded_chat_popup_notifications, false) AS forwarded_chat_popup_notifications,
         COALESCE(ups.forwarded_chat_sound_notifications, true) AS forwarded_chat_sound_notifications,
@@ -107,6 +113,8 @@ WITH combined_records AS (
         COALESCE(ua.authority_name, '{}') AS authority_name,
         u.status AS user_status,
         csa.status,  -- Use CSA status from LATERAL join
+        csa.status_comment,
+        csa.created AS csa_created,
         COALESCE(csa.active, false) AS active,  -- Use CSA active from LATERAL join
         COALESCE(ups.forwarded_chat_popup_notifications, false) AS forwarded_chat_popup_notifications,
         COALESCE(ups.forwarded_chat_sound_notifications, true) AS forwarded_chat_sound_notifications,
@@ -157,6 +165,8 @@ WITH combined_records AS (
         ua.authority_name,
         u.status AS user_status,
         csa.status,  -- Use CSA status from LATERAL join
+        csa.status_comment,
+        csa.created AS csa_created,
         COALESCE(csa.active, false) AS active,  -- Use CSA active from LATERAL join
         COALESCE(ups.forwarded_chat_popup_notifications, false) AS forwarded_chat_popup_notifications,
         COALESCE(ups.forwarded_chat_sound_notifications, true) AS forwarded_chat_sound_notifications,

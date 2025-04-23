@@ -30,6 +30,7 @@ jobs:
 
       - name: Generate Changelog
         run: npm run changelog
+        if: ${{ env.BRANCH == 'main' }}
 
       - name: Push changes to repo
         run: |

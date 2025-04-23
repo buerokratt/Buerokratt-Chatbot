@@ -44,7 +44,8 @@
     "today": "Today",
     "forward": "Forward",
     "chosen": "Chosen",
-    "read": "Read"
+    "read": "Read",
+    "statusClarification": "Status clarification"
   },
   "mainMenu": {
     "menuLabel": "Main navigation",
@@ -332,7 +333,8 @@
       "idCodePlaceholder": "The personal identification number must start with a country prefix, (eg.EE12345678910)",
       "choose": "Choose",
       "userExists": "User Exists",
-      "userChangeStatusMessage": "Do you want to change the user status to away?"
+      "userChangeStatusMessage": "Do you want to change the user status to away?",
+      "statusCommentUpdated": "Status clarification updated"
     },
     "chat": {
       "chatActive": "Chatbot active",

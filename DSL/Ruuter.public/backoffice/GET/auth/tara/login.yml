@@ -93,6 +93,7 @@ setCustomerSupportAgentAway:
       active: false
       userIdCode: ${tara_info.response.body.personalCode}
       status: "offline"
+      statusComment: ""
   result: setCustomerSupportAgentAwayResult
   next: return_value
 
