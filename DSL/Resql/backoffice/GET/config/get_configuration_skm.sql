@@ -11,7 +11,8 @@ WITH
             'skm_system_message',
             'skm_max_tokens',
             'skm_index_name',
-            'skm_query_type'
+            'skm_query_type',
+            'skm_semantic_configuration'
         )
         AND id IN (
             SELECT MAX(id) FROM configuration
@@ -26,5 +27,6 @@ SELECT
     MAX(CASE WHEN key = 'skm_system_message' THEN value END) AS system_message,
     MAX(CASE WHEN key = 'skm_max_tokens' THEN value END) AS max_tokens,
     MAX(CASE WHEN key = 'skm_index_name' THEN value END) AS index_name,
-    MAX(CASE WHEN key = 'skm_query_type' THEN value END) AS query_type
+    MAX(CASE WHEN key = 'skm_query_type' THEN value END) AS query_type,
+    MAX(CASE WHEN KEY = 'skm_semantic_configuration' THEN value END) AS semantic_configuration
 FROM configuration_values;

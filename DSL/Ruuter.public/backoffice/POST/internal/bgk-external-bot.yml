@@ -183,9 +183,9 @@ assign_unavailable_message:
   next: format_messages
 
 get_organization_bot_answer_config:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-organization-bot-answer-config"
+    url: "[#CHATBOT_RESQL]/config/get_configuration_organization_bot_answer"
   result: bot_answer_config_res
   next: assign_organization_bot_answer_config
 

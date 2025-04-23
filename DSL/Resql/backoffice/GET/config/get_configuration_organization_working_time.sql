@@ -29,7 +29,9 @@ WHERE key IN (
     'organizationNoCsaAskForContacts',
     'organizationNoCsaAvailableMessage',
     'organizationOutsideWorkingHoursAskForContacts',
-    'organizationOutsideWorkingHoursMessage'
+    'organizationOutsideWorkingHoursMessage',
+    'organizationBotCannotAnswerAskToForwardToCSA',
+    'organizationBotCannotAnswerMessage'
 )
 AND id IN (
     SELECT MAX(id) FROM configuration

@@ -29,9 +29,9 @@ getMessagesByChatId:
   result: getMessagesByChatIdResult
 
 getCsaDataVisibility:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-csa-name-title-visibility"
+    url: "[#CHATBOT_RESQL]/config/get_configuration_name_title_visibility"
   result: csaVisibilityData
 
 assignCsaVisibility:

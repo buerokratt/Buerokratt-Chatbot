@@ -30,6 +30,8 @@ WITH
             'organizationNoCsaAvailableMessage',
             'organizationOutsideWorkingHoursAskForContacts',
             'organizationOutsideWorkingHoursMessage'
+            'organizationBotCannotAnswerAskToForwardToCSA',
+            'organizationBotCannotAnswerMessage'
         )
         AND id IN (
             SELECT MAX(id) FROM configuration
@@ -125,6 +127,14 @@ new_configuration AS (
             (
                 'organizationOutsideWorkingHoursMessage',
                 :organizationOutsideWorkingHoursMessage
+            ),
+            (
+                'organizationBotCannotAnswerAskToForwardToCSA',
+                :organizationBotCannotAnswerAskToForwardToCSA
+            ),
+            (
+                'organizationBotCannotAnswerMessage',
+                :organizationBotCannotAnswerMessage
             )
         ) AS new_values (key, value)
     )
