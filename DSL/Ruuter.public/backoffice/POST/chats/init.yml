@@ -94,6 +94,33 @@ assign_cookie:
       Secure: true
       HttpOnly: true
       SameSite: "Lax"
+  next: insertChat
+
+insertChat:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/create_chat_and_init"
+    body:
+      id: ${chatUuid}
+      endUserId: ${endUserId}
+      endUserFirstName: ""
+      endUserLastName: ""
+      status: "OPEN"
+      lastMessage: ${content}
+      created: "CURRENT_TIMESTAMP"
+      ended: ""
+      feedbackRating: ""
+      feedbackText: ""
+      endUserEmail: ${endUserEmail}
+      endUserPhone: ${endUserPhone}
+      endUserOs: ${endUserOs}
+      endUserUrl: ${endUserUrl}
+      externalId: ""
+      forwardedTo: ""
+      forwardedToName: ""
+      receivedFrom: ""
+      receivedFromName: ""
+  result: insertMessageResult
   next: postGreetingMessage
 
 postGreetingMessage:
@@ -125,33 +152,6 @@ postClientMessage:
       forwardedByUser: ${forwardedByUser}
       forwardedFromCsa: ${forwardedFromCsa}
       forwardedToCsa: ${forwardedToCsa}
-  result: insertMessageResult
-  next: insertChat
-
-insertChat:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RESQL]/chat/create_chat_and_init"
-    body:
-      id: ${chatUuid}
-      endUserId: ${endUserId}
-      endUserFirstName: ""
-      endUserLastName: ""
-      status: "OPEN"
-      lastMessage: ${content}
-      created: ${new Date().toISOString()}
-      ended: ""
-      feedbackRating: ""
-      feedbackText: ""
-      endUserEmail: ${endUserEmail}
-      endUserPhone: ${endUserPhone}
-      endUserOs: ${endUserOs}
-      endUserUrl: ${endUserUrl}
-      externalId: ""
-      forwardedTo: ""
-      forwardedToName: ""
-      receivedFrom: ""
-      receivedFromName: ""
   result: insertMessageResult
   next: postMessageToBot
 

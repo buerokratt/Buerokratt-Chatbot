@@ -371,8 +371,7 @@ BEGIN
                     feedback_rating,
                     nps,
                     csa_title,
-                    last_message_event,
-                    all_messages
+                    last_message_event
                 FROM denormalized_chat
                 WHERE (
                         (
@@ -444,7 +443,10 @@ BEGIN
                     OR TO_CHAR(first_message_timestamp, ''DD.MM.YYYY HH24:MI:SS'') LIKE LOWER(''%'' || $3 || ''%'')
                     OR TO_CHAR(ended, ''DD.MM.YYYY HH24:MI:SS'') LIKE LOWER(''%'' || $3 || ''%'')
                     OR LOWER(last_message) LIKE LOWER(''%'' || $3 || ''%'')
-                    OR LOWER(all_messages) LIKE LOWER(''%'' || $3 || ''%'')
+                    OR EXISTS (SELECT 1
+                        FROM denormalized_chat AS dc
+                        WHERE dc.chat_id = latest_chat_records.chat_id
+                            AND (LOWER(dc.last_message) LIKE LOWER(''%'' || $3 || ''%'') OR LOWER(dc.first_message) LIKE LOWER(''%'' || $3 || ''%'')))
                 )
                 ORDER BY
                     CASE WHEN $4 = ''created asc'' THEN first_message_timestamp END ASC,

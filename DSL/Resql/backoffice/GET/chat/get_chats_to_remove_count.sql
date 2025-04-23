@@ -19,4 +19,7 @@ WHERE
             OR latest_chats.end_user_id = '' AND latest_chats.ended::DATE <= :anon_date::DATE
         )
     )
-    AND latest_chats.all_messages IS NOT NULL;
+    AND EXISTS (SELECT 1
+                    FROM denormalized_chat AS dc
+                    WHERE dc.chat_id = latest_chats.chat_id
+                        AND (dc.last_message IS NOT NULL and dc.last_message <> '' ));

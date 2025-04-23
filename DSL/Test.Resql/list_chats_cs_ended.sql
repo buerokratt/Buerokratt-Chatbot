@@ -362,10 +362,9 @@ BEGIN
                     feedback_rating,
                     nps,
                     csa_title,
-                    last_message_event,
-                    all_messages
+                    last_message_event
                 FROM denormalized_chat
-                WHERE (
+                WHERE
                     (
                         ended IS NOT NULL
                         AND status <> ''IDLE''
@@ -373,25 +372,7 @@ BEGIN
                         AND first_message <> ''message-read'' 
                         AND last_message <> ''''
                         AND last_message <> ''message-read''
-                    ) 
-                    AND (LENGTH((SELECT customer_support_ids FROM params)) = 0
-                        OR customer_support_id = ANY(STRING_TO_ARRAY((SELECT customer_support_ids FROM params), '','')))
-                    AND (
-                        (SELECT search FROM params) IS NULL
-                        OR (SELECT search FROM params) = ''''
-                        OR LOWER(customer_support_display_name) LIKE LOWER(''%'' || (SELECT search FROM params) || ''%'')
-                        OR LOWER(end_user_first_name) LIKE LOWER(''%'' || (SELECT search FROM params) || ''%'')
-                        OR LOWER(contacts_message) LIKE LOWER(''%'' || (SELECT search FROM params) || ''%'')
-                        OR LOWER(comment) LIKE LOWER(''%'' || (SELECT search FROM params) || ''%'')
-                        OR LOWER(status) LIKE LOWER(''%'' || (SELECT search FROM params) || ''%'')
-                        OR LOWER(last_message_event) LIKE LOWER(''%'' || (SELECT search FROM params) || ''%'')
-                        OR LOWER(chat_id) LIKE LOWER(''%'' || (SELECT search FROM params) || ''%'')
-                        OR TO_CHAR(first_message_timestamp, ''DD.MM.YYYY HH24:MI:SS'') LIKE LOWER(''%'' || (SELECT search FROM params) || ''%'')
-                        OR TO_CHAR(ended, ''DD.MM.YYYY HH24:MI:SS'') LIKE LOWER(''%'' || (SELECT search FROM params) || ''%'')
-                        OR LOWER(last_message) LIKE LOWER(''%'' || (SELECT search FROM params) || ''%'')
-                        OR LOWER(all_messages) LIKE LOWER(''%'' || (SELECT search FROM params) || ''%'')
                     )
-                )
                 ORDER BY chat_id, id DESC
             ),
             final_results AS (
@@ -431,6 +412,26 @@ BEGIN
                         ''total_pages'', CEIL(COUNT(*) OVER() / (SELECT page_size FROM params)::DECIMAL)
                     ) AS result_data
                 FROM latest_chat_records
+                WHERE (LENGTH((SELECT customer_support_ids FROM params)) = 0
+                        OR customer_support_id = ANY(STRING_TO_ARRAY((SELECT customer_support_ids FROM params), '','')))
+                    AND (
+                        (SELECT search FROM params) IS NULL
+                        OR (SELECT search FROM params) = ''''
+                        OR LOWER(customer_support_display_name) LIKE LOWER(''%'' || (SELECT search FROM params) || ''%'')
+                        OR LOWER(end_user_first_name) LIKE LOWER(''%'' || (SELECT search FROM params) || ''%'')
+                        OR LOWER(contacts_message) LIKE LOWER(''%'' || (SELECT search FROM params) || ''%'')
+                        OR LOWER(comment) LIKE LOWER(''%'' || (SELECT search FROM params) || ''%'')
+                        OR LOWER(status) LIKE LOWER(''%'' || (SELECT search FROM params) || ''%'')
+                        OR LOWER(last_message_event) LIKE LOWER(''%'' || (SELECT search FROM params) || ''%'')
+                        OR LOWER(chat_id) LIKE LOWER(''%'' || (SELECT search FROM params) || ''%'')
+                        OR TO_CHAR(first_message_timestamp, ''DD.MM.YYYY HH24:MI:SS'') LIKE LOWER(''%'' || (SELECT search FROM params) || ''%'')
+                        OR TO_CHAR(ended, ''DD.MM.YYYY HH24:MI:SS'') LIKE LOWER(''%'' || (SELECT search FROM params) || ''%'')
+                        OR LOWER(last_message) LIKE LOWER(''%'' || (SELECT search FROM params) || ''%'')
+                        OR EXISTS (SELECT 1
+                            FROM denormalized_chat AS dc
+                            WHERE dc.chat_id = latest_chat_records.chat_id
+                                AND LOWER(dc.last_message) LIKE LOWER(''%'' || (SELECT search FROM params) || ''%''))
+                    )
                 ORDER BY
                     CASE WHEN (SELECT sorting FROM params) = ''created asc'' THEN first_message_timestamp END ASC,
                     CASE WHEN (SELECT sorting FROM params) = ''created desc'' THEN first_message_timestamp END DESC,

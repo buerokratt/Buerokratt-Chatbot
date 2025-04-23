@@ -18,7 +18,8 @@ INSERT INTO chat (
     forwarded_to_name,
     received_from,
     received_from_name,
-    csa_title
+    csa_title,
+    created
 )
 SELECT
     base_id,
@@ -40,7 +41,8 @@ SELECT
     forwarded_to_name,
     received_from,
     received_from_name,
-    csa_title
+    csa_title,
+    created
 FROM chat
 WHERE base_id = :id
 ORDER BY updated DESC

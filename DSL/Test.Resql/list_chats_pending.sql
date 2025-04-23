@@ -241,7 +241,7 @@ BEGIN
                     ORDER BY id DESC
                     LIMIT 1
                 ),
-                ''csa_title'', COALESCE(csa_title, '''')
+                ''csa_title'', csa_title
             )
         FROM idle_chats
         WHERE status = ''IDLE''

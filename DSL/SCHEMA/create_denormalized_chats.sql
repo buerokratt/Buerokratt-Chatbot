@@ -34,7 +34,6 @@ CREATE TABLE denormalized_chat (
     first_message text,
     last_message text,
     last_message_including_empty_content text,
-    all_messages text,
     contacts_message text,
     last_message_timestamp timestamp with time zone,
     feedback_text text,
@@ -88,7 +87,6 @@ INSERT INTO denormalized_chat (
     first_message,
     last_message,
     last_message_including_empty_content,
-    all_messages,
     contacts_message,
     last_message_timestamp,
     feedback_text,
@@ -121,7 +119,6 @@ WITH combined_records AS (
         m.last_message_including_empty_content,
         m.customer_messages_count,
         cm.contact_message_content,
-        m_all.all_events,
         c.customer_support_id,
         m.max_msg_author_id AS author_id,
         c.customer_support_display_name,
@@ -236,15 +233,6 @@ WITH combined_records AS (
         LIMIT 1
     ) cm ON TRUE
     LEFT JOIN LATERAL (
-        SELECT
-            string_agg(m_all.content, ', ' ORDER BY m_all.created) AS all_events
-        FROM message m_all
-        WHERE 
-            m_all.chat_base_id = chc.chat_id
-            AND m_all.created <= chc.created
-            AND m_all.content <> ''
-    ) m_all ON TRUE
-    LEFT JOIN LATERAL (
         SELECT value AS is_csa_title_visible
         FROM configuration
         WHERE
@@ -333,7 +321,6 @@ WITH combined_records AS (
         m.last_message_including_empty_content,
         m.customer_messages_count,
         cm.contact_message_content,
-        m_all.all_events,
         c.customer_support_id,
         m.max_msg_author_id AS author_id,
         c.customer_support_display_name,
@@ -448,15 +435,6 @@ WITH combined_records AS (
         LIMIT 1
     ) cm ON TRUE
     LEFT JOIN LATERAL (
-        SELECT
-            string_agg(m_all.content, ', ' ORDER BY m_all.created) AS all_events
-        FROM message m_all
-        WHERE 
-            m_all.chat_base_id = c.base_id
-            AND m_all.created <= c.updated
-            AND m_all.content <> ''
-    ) m_all ON TRUE
-    LEFT JOIN LATERAL (
         SELECT value AS is_csa_title_visible
         FROM configuration
         WHERE
@@ -542,18 +520,20 @@ WITH combined_records AS (
             WHEN m.content <> '' AND m.content <> 'message-read' THEN m.event
             ELSE NULL
         END AS last_message_event_with_content,
-        (SELECT content 
-            FROM message 
-            WHERE chat_base_id = m.chat_base_id
-            AND content <> '' 
-            AND content <> 'message-read'
-            AND updated <= m.updated
-            ORDER BY id DESC
-            LIMIT 1) AS last_message_content,
+        CASE 
+            WHEN m.content <> '' AND m.content <> 'message-read' THEN m.content
+            ELSE (SELECT content 
+                FROM message 
+                WHERE chat_base_id = m.chat_base_id
+                AND content <> '' 
+                AND content <> 'message-read'
+                AND updated <= m.updated
+                ORDER BY id DESC
+                LIMIT 1) 
+        END AS last_message_content,
         m.content AS last_message_including_empty_content,
         cmc.customer_messages_count,
         cm.contact_message_content,
-        m_all.all_events,
         c.customer_support_id,
         m.author_id,
         c.customer_support_display_name,
@@ -652,15 +632,6 @@ WITH combined_records AS (
         LIMIT 1
     ) cm ON TRUE
     LEFT JOIN LATERAL (
-        SELECT
-            string_agg(m_all.content, ', ' ORDER BY m_all.updated) AS all_events
-        FROM message m_all
-        WHERE 
-            m_all.chat_base_id = m.chat_base_id
-            AND m_all.created <= m.updated
-            AND m_all.content <> ''
-    ) m_all ON TRUE
-    LEFT JOIN LATERAL (
         SELECT value AS is_csa_title_visible
         FROM configuration
         WHERE
@@ -754,7 +725,6 @@ WITH combined_records AS (
         m.last_message_including_empty_content,
         m.customer_messages_count,
         cm.contact_message_content,
-        m_all.all_events,
         c.customer_support_id,
         m.max_msg_author_id AS author_id,
         c.customer_support_display_name,
@@ -896,15 +866,6 @@ WITH combined_records AS (
         LIMIT 1
     ) cm ON TRUE
     LEFT JOIN LATERAL (
-        SELECT
-            string_agg(m_all.content, ', ' ORDER BY m_all.created) AS all_events
-        FROM message m_all
-        WHERE 
-            m_all.chat_base_id = c.base_id
-            AND m_all.created <= u.created
-            AND m_all.content <> ''
-    ) m_all ON TRUE
-    LEFT JOIN LATERAL (
         SELECT value AS is_csa_title_visible
         FROM configuration
         WHERE
@@ -1019,7 +980,6 @@ config_records AS (
         m.last_message_including_empty_content,
         m.customer_messages_count,
         cm.contact_message_content,
-        m_all.all_events,
         c.customer_support_id,
         m.max_msg_author_id AS author_id,
         c.customer_support_display_name,
@@ -1149,15 +1109,6 @@ config_records AS (
         ORDER BY m.id DESC
         LIMIT 1
     ) cm ON TRUE
-    LEFT JOIN LATERAL (
-        SELECT
-            string_agg(m_all.content, ', ' ORDER BY m_all.created) AS all_events
-        FROM message m_all
-        WHERE 
-            m_all.chat_base_id = acc.chat_id
-            AND m_all.created <= acc.config_timestamp
-            AND m_all.content <> ''
-    ) m_all ON TRUE
     LEFT JOIN LATERAL (
         SELECT 
             first_name,
@@ -1308,7 +1259,6 @@ SELECT
     first_message_content AS first_message,
     last_message_content AS last_message,
     last_message_including_empty_content,
-    all_events AS all_messages,
     contact_message_content AS contacts_message,
     last_message_timestamp,
     feedback_text,
