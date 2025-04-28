@@ -101,7 +101,7 @@ const SettingsUsers: FC = () => {
         getUsers(pagination, sorting, columnFilters);
       }
     } catch (err) {
-      console.error('Failed to fetch data');
+      console.error('Failed to fetch data', err);
     }
   };
 
