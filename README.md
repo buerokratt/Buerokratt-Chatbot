@@ -43,7 +43,15 @@ This repo will primarily contain:
 - For setting up the database initially, run
   `docker run --platform linux/amd64 --network=bykstack riaee/byk-users-db:liquibase20220615 --url=jdbc:postgresql://users_db:5432/byk --username=byk --password=01234 --changelog-file=./master.yml update`
 - Run migrations added in this repository by running the helper script `./migrate.sh`
-- When creating new migrations, use the helper `./create-migration.sh name-of-migration` which will create a timestamped file in the correct directory and add the required headers
+- When creating new migrations, use the helper `./create-migration.sh name-of-migration` which will create 
+  timestamped XML Liquibase file, timestamped SQL migration file and timestamped rollback SQL file 
+  in the correct directory with the required headers. 
+  The SQL file should contain schema migrations, the rollback SQL file should contain rollback logic 
+  (see [VC-002](https://github.com/buerokratt/Buerokratt-onboarding/blob/main/Architectural-Decision-Records-ADR/data-storage/relational-databases/1.%20version-control.md#vc-002-enforcing-sql-only-for-all-database-schema-changes)
+  for more details). In case rollback is not needed, the relevant SQL file and the `<rollback>...</rollback>` tag in XML 
+  file can be deleted. The XML file is required to track changes and manage migrations 
+  (see [VC-003](https://github.com/buerokratt/Buerokratt-onboarding/blob/main/Architectural-Decision-Records-ADR/data-storage/relational-databases/1.%20version-control.md#vc-003-enforcing-liquibase-xml-for-change-tracking-and-validations)
+  for more details).
 
 ### TIM Cookies
 
