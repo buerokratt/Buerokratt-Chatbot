@@ -1,22 +1,14 @@
-INSERT INTO message (
-    chat_base_id,
-    base_id,
-    content,
-    event,
-    author_id,
-    author_first_name,
-    author_last_name, author_role, rating
-)
-SELECT
-    chat_base_id,
-    (SELECT UUID_IN(MD5(RANDOM()::TEXT)::CSTRING)),
-    :content,
-    :event,
-    :authorId,
-    author_first_name,
-    author_last_name,
-    :authorRole,
-    rating
+SELECT copy_row_with_modifications(
+    'message',
+    'id', '::INTEGER', id,
+    'content', '', :content,
+    'event', '', :event,
+    'author_id', '', :authorId,
+    'author_role', '', :authorRole,
+    'base_id', '', gen_random_uuid(),
+    'created', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR,
+    'updated', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR
+)::INTEGER as id, chat_base_id, base_id
 FROM message
 WHERE
     chat_base_id IN (
@@ -34,4 +26,3 @@ WHERE
         SELECT MAX(id) FROM message
         GROUP BY chat_base_id
     )
-RETURNING id, chat_base_id, base_id;

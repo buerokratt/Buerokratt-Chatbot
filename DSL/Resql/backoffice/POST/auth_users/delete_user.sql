@@ -1,3 +1,4 @@
+-- TODO rewrite with copy_row_with_modifiers
 WITH
     active_administrators AS (
         SELECT id_code

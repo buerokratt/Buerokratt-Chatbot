@@ -1,3 +1,4 @@
+-- TODO rewrite it with copy_row_with_modifiers
 WITH
     active_chats AS (
         SELECT

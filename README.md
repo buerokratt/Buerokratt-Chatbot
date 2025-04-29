@@ -93,3 +93,58 @@ like this:
 - name: REACT_APP_MENU_JSON
   value: "[{\"id\":\"conversations\",\"label\":{\"et\":\"Vestlused\",\"en\":\"Conversations\"},\"path\":\"/chat\",\"children\":[{\"label\":{\"et\":\"Vastamata\",\"en\":\"Unanswered\"},\"path\":\"/unanswered\"},{\"label\":{\"et\":\"Aktiivsed\",\"en\":\"Active\"},\"path\":\"/active\"},{\"label\":{\"et\":\"Ootel\",\"en\":\"Pending\"},\"path\":\"/pending\"},{\"label\":{\"et\":\"Ajalugu\",\"en\":\"History\"},\"path\":\"/history\"}]},{\"id\":\"training\",\"label\":{\"et\":\"Treening\",\"en\":\"Training\"},\"path\":\"/training\",\"children\":[{\"label\":{\"et\":\"Treening\",\"en\":\"Training\"},\"path\":\"/training\",\"children\":[{\"label\":{\"et\":\"Teemad\",\"en\":\"Themes\"},\"path\":\"/training/intents\"},{\"hidden\":true,\"label\":{\"et\":\"Avalikud teemad\",\"en\":\"Public themes\"},\"path\":\"/training/common-intents\"},{\"label\":{\"et\":\"Teemade järeltreenimine\",\"en\":\"Post training themes\"},\"path\":\"/training/intents-followup-training\"},{\"label\":{\"et\":\"Vastused\",\"en\":\"Answers\"},\"path\":\"/training/responses\"},{\"label\":{\"et\":\"Reeglid\",\"en\":\"Rules\"},\"path\":\"/training/rules\"},{\"hidden\":true,\"label\":{\"et\":\"Konfiguratsioon\",\"en\":\"Configuration\"},\"path\":\"/training/configuration\"},{\"label\":{\"et\":\"Vormid\",\"en\":\"Forms\"},\"path\":\"/training/forms\"},{\"label\":{\"et\":\"Mälukohad\",\"en\":\"Slots\"},\"path\":\"/training/slots\"},{\"hidden\":true,\"label\":{\"et\":\"Automatic Teenused\",\"en\":\"Automatic Services\"},\"path\":\"/auto-services\"}]},{\"label\":{\"et\":\"Ajaloolised vestlused\",\"en\":\"Historical conversations\"},\"path\":\"/history\",\"children\":[{\"label\":{\"et\":\"Ajalugu\",\"en\":\"History\"},\"path\":\"/history/history\"},{\"hidden\":true,\"label\":{\"et\":\"Pöördumised\",\"en\":\"Appeals\"},\"path\":\"/history/appeal\"}]},{\"label\":{\"et\":\"Mudelipank ja analüütika\",\"en\":\"Modelbank and analytics\"},\"path\":\"/analytics\",\"children\":[{\"label\":{\"et\":\"Teemade ülevaade\",\"en\":\"Overview of topics\"},\"path\":\"/analytics/overview\"},{\"label\":{\"et\":\"Mudelite võrdlus\",\"en\":\"Comparison of models\"},\"path\":\"/analytics/models\"},{\"hidden\":true,\"label\":{\"et\":\"Testlood\",\"en\":\"testTracks\"},\"path\":\"/analytics/testcases\"}]},{\"label\":{\"et\":\"Treeni uus mudel\",\"en\":\"Train new model\"},\"path\":\"/train-new-model\"}]},{\"id\":\"analytics\",\"label\":{\"et\":\"Analüütika\",\"en\":\"Analytics\"},\"path\":\"/analytics\",\"children\":[{\"label\":{\"et\":\"Ülevaade\",\"en\":\"Overview\"},\"path\":\"/overview\"},{\"label\":{\"et\":\"Vestlused\",\"en\":\"Chats\"},\"path\":\"/chats\"},{\"label\":{\"et\":\"Tagasiside\",\"en\":\"Feedback\"},\"path\":\"/feedback\"},{\"label\":{\"et\":\"Nõustajad\",\"en\":\"Advisors\"},\"path\":\"/advisors\"},{\"label\":{\"et\":\"Avaandmed\",\"en\":\"Reports\"},\"path\":\"/reports\"}]},{\"id\":\"services\",\"hidden\":true,\"label\":{\"et\":\"Teenused\",\"en\":\"Services\"},\"path\":\"/services\",\"children\":[{\"label\":{\"et\":\"Ülevaade\",\"en\":\"Overview\"},\"path\":\"/overview\"},{\"label\":{\"et\":\"Uus teenus\",\"en\":\"New Service\"},\"path\":\"/newService\"},{\"label\":{\"et\":\"Automatic Teenused\",\"en\":\"Automatic Services\"},\"path\":\"/auto-services\"},{\"label\":{\"et\":\"Probleemsed teenused\",\"en\":\"Faulty Services\"},\"path\":\"/faultyServices\"}]},{\"id\":\"settings\",\"label\":{\"et\":\"Haldus\",\"en\":\"Administration\"},\"path\":\"/settings\",\"children\":[{\"label\":{\"et\":\"Kasutajad\",\"en\":\"Users\"},\"path\":\"/users\"},{\"label\":{\"et\":\"Vestlusbot\",\"en\":\"Chatbot\"},\"path\":\"/chatbot\",\"children\":[{\"label\":{\"et\":\"Seaded\",\"en\":\"Settings\"},\"path\":\"/chatbot/settings\"},{\"label\":{\"et\":\"Tervitussõnum\",\"en\":\"Welcome message\"},\"path\":\"/chatbot/welcome-message\"},{\"label\":{\"et\":\"Välimus ja käitumine\",\"en\":\"Appearance and behavior\"},\"path\":\"/chatbot/appearance\"},{\"label\":{\"et\":\"Erakorralised teated\",\"en\":\"Emergency notices\"},\"path\":\"/chatbot/emergency-notices\"}]},{\"label\":{\"et\":\"Asutuse tööaeg\",\"en\":\"Office opening hours\"},\"path\":\"/working-time\"},{\"label\":{\"et\":\"Sessiooni pikkus\",\"en\":\"Session length\"},\"path\":\"/session-length\"}]},{\"id\":\"monitoring\",\"hidden\":true,\"label\":{\"et\":\"Seire\",\"en\":\"Monitoring\"},\"path\":\"/monitoring\",\"children\":[{\"label\":{\"et\":\"Aktiivaeg\",\"en\":\"Working hours\"},\"path\":\"/uptime\"}]}]"
 ```
+
+### copy_row_with_modifications postgres function
+function `copy_row_with_modifications` has next signature:
+```SQL
+CREATE OR REPLACE FUNCTION copy_row_with_modifications(
+    table_name_to_copy_from VARCHAR,
+    id_column_name VARCHAR,
+    id_column_conversion_expression VARCHAR,
+    id_to_copy VARCHAR,
+    VARIADIC modifications  VARCHAR[]
+) RETURNS VARCHAR LANGUAGE
+```
+The function copies a row from the specified table by given primary key column with applying modifications.
+So that maintainability of next SQL query is improved:
+```SQL
+INSERT INTO some_table(
+    base_id, column1, column2, column3, column4, column5, column6, column7, column8, updated
+)
+SELECT base_id, column1, :column2, column3, :column4, column5, column6, column7, column8, NOW()
+FROM some_table
+WHERE base_id = :base_id
+ORDER BY updated DESC
+LIMIT 1;
+```
+Each time an additional column is added to `some_table`, all sql queries should be updated to add this column.
+The function automatically forms sql query with all column and modifies only given columns:
+```SQL
+SELECT copy_row_with_modifications(
+    'some_table',
+    'id', '::INTEGER', id::VARCHAR,
+    'column2', '::INTEGER', :column2::VARCHAR,
+    'column4', '', :column4,
+    'updated', '::TIMESTAMP', NOW()::VARCHAR
+) FROM some_table
+WHERE base_id = :base_id
+ORDER BY updated DESC
+LIMIT 1;
+```
+It accepts next arguments:
+* `table_name_to_copy_from` - table name as string where copy row. Type: `VARCHAR`
+* `id_column_name` - name of id column. Type: `VARCHAR`
+* `id_column_conversion_expression` - how to convert `VARCHAR` to id column type. If column type is `VARCHAR` already, 
+  than empty string `''` should be provided. Type: `VARCHAR`.
+* `id_to_copy` - The id value of row to copy. Type: `VARCHAR`.
+* `VARIADIC modifications VARCHAR[]` - each modification comes in set of 3 arguments 
+  with idea similar to `(id_column_name, id_column_conversion_expression, id_column_conversion_expression)`:
+  * first comes column name to modify (to update). Type: `VARCHAR`.
+  * second comes how to convert `VARCHAR` to actual column type. 
+    If column type is already `VARCHAR` than empty string `''` should be provided. Type: `VARCHAR`.
+  * third comes column value. It has to be `VARCHAR`. Type: `VARCHAR`.
+
+The function returns value of argument `id_to_copy`. Type: `VARCHAR`.
+
+Current limitation:
+All arguments should be of type `VARCHAR`.

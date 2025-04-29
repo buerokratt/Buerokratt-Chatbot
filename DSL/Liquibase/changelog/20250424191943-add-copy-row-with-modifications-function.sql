@@ -6,7 +6,7 @@ CREATE OR REPLACE FUNCTION copy_row_with_modifications(
     id_column_conversion_expression varchar,
     id_to_copy VARCHAR,
     VARIADIC modifications  VARCHAR[]
-) RETURNS VOID LANGUAGE plpgsql AS '
+) RETURNS VARCHAR LANGUAGE plpgsql AS '
 DECLARE
     columns VARCHAR [];
     to_select VARCHAR [] := (ARRAY [])::VARCHAR[];
@@ -59,6 +59,8 @@ BEGIN
     );
 
     EXECUTE sql_query;
+
+    RETURN id_to_copy;
 END;
 ';
 
