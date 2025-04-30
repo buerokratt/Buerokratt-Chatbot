@@ -198,6 +198,8 @@ ORDER BY
     CASE WHEN :sorting = 'customerSupportDisplayName desc' THEN c.customer_support_display_name END DESC,
     CASE WHEN :sorting = 'endUserName asc' THEN c.end_user_first_name END ASC,
     CASE WHEN :sorting = 'endUserName desc' THEN c.end_user_first_name END DESC,
+    CASE WHEN :sorting = 'endUserEmail asc' THEN c.end_user_email END ASC,
+    CASE WHEN :sorting = 'endUserEmail desc' THEN c.end_user_email END DESC,
     CASE WHEN :sorting = 'endUserId asc' THEN c.end_user_id END ASC,
     CASE WHEN :sorting = 'endUserId desc' THEN c.end_user_id END desc,
     CASE WHEN :sorting = 'contactsMessage asc' THEN ContactsMessage.content END ASC,

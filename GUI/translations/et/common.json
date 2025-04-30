@@ -1,5 +1,6 @@
 {
   "global": {
+    "email": "Email",
     "save": "Salvesta",
     "add": "Lisa",
     "edit": "Muuda",
@@ -46,6 +47,11 @@
     "chosen": "Valitud",
     "read": "Loetud",
     "statusClarification": "Staatuse täpsustus"
+  },
+  "sorting": {
+    "desc": "kahanevalt",
+    "asc": "kasvavalt",
+    "sorting": "Sorteerimine"
   },
   "mainMenu": {
     "menuLabel": "Põhinavigatsioon",
