@@ -1,5 +1,5 @@
 SELECT copy_row_with_modifications(
-    '"user"',
+    'user',
     'id', '::INTEGER', id::VARCHAR,
     'first_name', '', :firstName,
     'last_name', '', :lastName,

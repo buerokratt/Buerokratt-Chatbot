@@ -11,6 +11,7 @@ DECLARE
     columns VARCHAR [];
     to_select VARCHAR [] := (ARRAY [])::VARCHAR[];
     sql_query VARCHAR;
+    inserted_id VARCHAR;
 BEGIN
     SELECT ARRAY_AGG(column_name)
     INTO columns
@@ -51,16 +52,18 @@ BEGIN
         ''INSERT INTO %I(%s) ''
         ''SELECT %s ''
         ''FROM %I ''
-        ''WHERE %s = %L%s '',
+        ''WHERE %s = %L%s ''
+        ''RETURNING %s::VARCHAR'',
         table_name_to_copy_from, array_to_string(columns, '', ''),
         array_to_string(to_select, '', ''),
         table_name_to_copy_from,
-        id_column_name, id_to_copy, id_column_conversion_expression
+        id_column_name, id_to_copy, id_column_conversion_expression,
+        id_column_name
     );
 
-    EXECUTE sql_query;
+    EXECUTE sql_query INTO inserted_id;
 
-    RETURN id_to_copy;
+    RETURN inserted_id;
 END;
 ';
 
