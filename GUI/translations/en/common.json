@@ -366,7 +366,7 @@
       "description": "After the end of the working hours, if the chatbot cannot answer the customer's questions by itself, it will ask for the customer's contact details.",
       "openFrom": "Open from",
       "openUntil": "Open until",
-      "publicHolidays": "Consider public holidays",
+      "publicHolidays": "Available on national holidays",
       "consider": "Consider",
       "dontConsider": "Don't Consider",
       "closedOnWeekends": "Closed on weekends",

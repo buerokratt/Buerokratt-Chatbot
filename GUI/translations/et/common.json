@@ -366,7 +366,7 @@
       "description": "Peale tööaja lõppemist, juhul kui juturobot ise kliendi küsimustele vastata ei oska, küsib ta kliendi kontaktandmeid.",
       "openFrom": "Avatud alates",
       "openUntil": "Avatud kuni",
-      "publicHolidays": "Arvesta riigipühadega",
+      "publicHolidays": "Saadaval riigipühadel",
       "consider": "Arvesta",
       "dontConsider": "Ära arvesta",
       "closedOnWeekends": "Nädalavahetustel suletud",
