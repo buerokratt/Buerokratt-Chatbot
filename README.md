@@ -2,6 +2,7 @@
 
 # Scope
 
+
 This repo will primarily contain:
 
 1. Architectural and other documentation;

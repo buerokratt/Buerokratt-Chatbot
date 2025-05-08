@@ -41,6 +41,8 @@ const LinkPreview: React.FC<{
   );
 };
 
+const hasSpecialFormat = (m: string) => m.includes("\n\n") && m.indexOf(".") > 0 && m.indexOf(":") > m.indexOf(".");
+
 const Markdownify: React.FC<MarkdownifyProps> = ({
   message,
   sanitizeLinks = false,
@@ -60,7 +62,9 @@ const Markdownify: React.FC<MarkdownifyProps> = ({
         disableParsingRawHTML: true,
       }}
     >
-      {message?.replace(/&#x([0-9A-Fa-f]+);/g, (_, hex) => { return String.fromCharCode(parseInt(hex, 16)); }).replace(/(?<=\n)\d+\.\s/g, "\n\n$&") ?? ""}
+      {message
+        ?.replace(/&#x([0-9A-Fa-f]+);/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
+        ?.replace(/(?<=\n)\d+\.\s/g, hasSpecialFormat(message) ? "\n\n$&" : "$&") ?? ""}
     </Markdown>
   </div>
 );
