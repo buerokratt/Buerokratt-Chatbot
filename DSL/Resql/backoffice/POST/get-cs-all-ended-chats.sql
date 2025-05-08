@@ -123,25 +123,37 @@ FROM RatedChatsCount
     CROSS JOIN Promoters
     CROSS JOIN Detractors
     ),
+    LatestOpenChat AS (
+SELECT DISTINCT ON (base_id)
+    base_id,
+    customer_support_id AS latest_open_csa
+FROM chat
+WHERE status = 'OPEN'
+ORDER BY base_id, id DESC
+    ),
     CSAFullNames AS (
 SELECT
     c2.base_id,
     ARRAY_AGG(DISTINCT TRIM(
     CASE
-    WHEN c2.customer_support_id = 'chatbot' THEN
-    COALESCE(NULLIF(TRIM(c2.customer_support_display_name), ''), 'Bürokratt')
-    ELSE
-    COALESCE(
-    NULLIF(TRIM(cu.first_name || ' ' || cu.last_name), ''),
-    NULLIF(TRIM(cu.display_name), ''),
-    NULLIF(TRIM(c2.customer_support_display_name), ''),
-    c2.customer_support_id
-    )
+    WHEN c2.customer_support_id = 'chatbot' THEN c2.customer_support_display_name
+    ELSE COALESCE(NULLIF(TRIM(cu.first_name || ' ' || cu.last_name), ''), cu.display_name)
     END
-    )) AS all_csa_names,
-    ARRAY_AGG(DISTINCT c2.customer_support_id) AS all_csa_ids
+    )) FILTER (
+    WHERE NOT (
+    c2.customer_support_id = 'chatbot'
+    AND (lo.latest_open_csa IS NULL OR lo.latest_open_csa <> 'chatbot')
+    )
+    ) AS all_csa_names,
+    ARRAY_AGG(DISTINCT c2.customer_support_id) FILTER (
+    WHERE NOT (
+    c2.customer_support_id = 'chatbot'
+    AND (lo.latest_open_csa IS NULL OR lo.latest_open_csa <> 'chatbot')
+    )
+    ) AS all_csa_ids
 FROM chat c2
     LEFT JOIN ChatUser cu ON cu.id_code = c2.customer_support_id
+    LEFT JOIN LatestOpenChat lo ON lo.base_id = c2.base_id
 GROUP BY c2.base_id
     )
 SELECT c.base_id AS id,
@@ -190,10 +202,10 @@ FROM EndedChatMessages AS c
          CROSS JOIN NPS
 WHERE (
           (
-              LENGTH(:customerSupportIds) = 0 OR
-              EXISTS (
+              COALESCE(:customerSupportIds, '') = ''
+                  OR EXISTS (
                   SELECT 1
-                  FROM unnest(CSAFullNames.all_csa_ids) AS id
+                  FROM unnest(COALESCE(CSAFullNames.all_csa_ids, ARRAY[]::text[])) AS id
                   WHERE id = ANY(string_to_array(:customerSupportIds, ','))
               )
               ) AND (
