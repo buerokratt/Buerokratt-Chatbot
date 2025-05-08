@@ -101,7 +101,7 @@ const SettingsUsers: FC = () => {
         getUsers(pagination, sorting, columnFilters);
       }
     } catch (err) {
-      console.error('Failed to fetch data');
+      console.error('Failed to fetch data', err);
     }
   };
 
@@ -375,47 +375,49 @@ const SettingsUsers: FC = () => {
         </Button>
       </Track>
 
-      <Card>
-        <DataTable
-          data={usersList}
-          columns={usersColumns}
-          sortable
-          filterable
-          pagination={pagination}
-          columnFilters={columnFilters}
-          setPagination={(state: PaginationState) => {
-            if (
-              state.pageIndex === pagination.pageIndex &&
-              state.pageSize === pagination.pageSize
-            )
-              return;
-            setPagination(state);
-            updatePageSize.mutate({ page_results: state.pageSize });
-            getUsers(state, sorting, columnFilters);
-          }}
-          sorting={sorting}
-          setSorting={(state: SortingState) => {
-            setSorting(state);
-            getUsers(pagination, state, columnFilters);
-          }}
-          setFiltering={(state: ColumnFiltersState) => {
-            setColumnFilters(state);
-            const searchfilters = checkFilters(state);
-            const hasData = Object.values(searchfilters).some(
-              (value) => value !== ''
-            );
+      <div style={{ height: 'auto', overflow: 'auto' }}>
+        <Card>
+          <DataTable
+            data={usersList}
+            columns={usersColumns}
+            sortable
+            filterable
+            pagination={pagination}
+            columnFilters={columnFilters}
+            setPagination={(state: PaginationState) => {
+              if (
+                state.pageIndex === pagination.pageIndex &&
+                state.pageSize === pagination.pageSize
+              )
+                return;
+              setPagination(state);
+              updatePageSize.mutate({ page_results: state.pageSize });
+              getUsers(state, sorting, columnFilters);
+            }}
+            sorting={sorting}
+            setSorting={(state: SortingState) => {
+              setSorting(state);
+              getUsers(pagination, state, columnFilters);
+            }}
+            setFiltering={(state: ColumnFiltersState) => {
+              setColumnFilters(state);
+              const searchfilters = checkFilters(state);
+              const hasData = Object.values(searchfilters).some(
+                (value) => value !== ''
+              );
 
-            if (hasData) {
-              const intialPagination = { pageIndex: 0, pageSize: 10 };
-              getUsers(intialPagination, sorting, state, true);
-            } else {
-              getUsers(pagination, sorting, state);
-            }
-          }}
-          pagesCount={totalPages}
-          isClientSide={false}
-        />
-      </Card>
+              if (hasData) {
+                const intialPagination = { pageIndex: 0, pageSize: 10 };
+                getUsers(intialPagination, sorting, state, true);
+              } else {
+                getUsers(pagination, sorting, state);
+              }
+            }}
+            pagesCount={totalPages}
+            isClientSide={false}
+          />
+        </Card>
+      </div>
 
       {newUserModal && (
         <UserModal
