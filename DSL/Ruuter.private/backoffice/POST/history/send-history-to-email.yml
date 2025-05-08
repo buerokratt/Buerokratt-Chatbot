@@ -24,12 +24,11 @@ getUserEmailByChatId:
       chatId: ${chatId}
   result: getUserEmailByChatIdResult
 
-getMessagesByChatId:
-  call: http.get
-  args:
-    url: "[#CHATBOT_RESQL]/chat/list_chat_messages"
-    query:
-      chatId: ${chatId}
+getChatMessagesByChatIdAndActiveUser:
+  template: "[#CHATBOT_PROJECT_LAYER]/chats/get-chat-messages-by-chat-id-and-active-user"
+  requestType: templates
+  body:
+    chatId: ${chatId}
   result: getMessagesByChatIdResult
 
 sendDataToEmail:
@@ -39,7 +38,7 @@ sendDataToEmail:
     body:
       to: ${getUserEmailByChatIdResult.response.body[0].csaEmail}
       subject: "Chat history"
-      text: ${getMessagesByChatIdResult.response.body}
+      text: ${getMessagesByChatIdResult}
   result: emailResponseData
 
 registerEmailSentEvent:

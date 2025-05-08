@@ -172,21 +172,6 @@ BEGIN
             max_chats AS (
                 SELECT MAX(id) AS max_id
                 FROM chat
-                WHERE
-                    ended IS NOT NULL
-                    AND status <> ''IDLE''
-                    AND (
-                        (
-                            end_user_id IS NOT NULL
-                            AND end_user_id <> ''''
-                            AND ended::DATE <= $1::DATE
-                        )
-                        OR
-                        (
-                            end_user_id IS NULL
-                            OR end_user_id = '''' AND ended::DATE <= $2::DATE
-                        )
-                    )
                 GROUP BY base_id
             ),
 
@@ -214,6 +199,20 @@ BEGIN
                     feedback_rating
                 FROM chat
                     RIGHT JOIN max_chats ON id = max_id
+                Where ended IS NOT NULL
+                    AND status <> ''IDLE''
+                    AND (
+                        (
+                            end_user_id IS NOT NULL
+                            AND end_user_id <> ''''
+                            AND ended::DATE <= $1::DATE
+                        )
+                        OR
+                        (
+                            end_user_id IS NULL
+                            OR end_user_id = '''' AND ended::DATE <= $2::DATE
+                        )
+                    )
             ),
 
             rated_chats AS (
@@ -364,6 +363,7 @@ BEGIN
                     received_from,
                     labels,
                     comment,
+                    first_message,
                     last_message,
                     contacts_message,
                     last_message_timestamp,
@@ -371,30 +371,9 @@ BEGIN
                     feedback_rating,
                     nps,
                     csa_title,
-                    last_message_event
+                    last_message_event,
+                    all_messages
                 FROM denormalized_chat
-                WHERE (
-                        (
-                            ended IS NOT NULL
-                            AND status <> ''IDLE''
-                            AND (
-                                (
-                                    end_user_id IS NOT NULL
-                                    AND end_user_id <> ''''
-                                    AND ended::DATE <= $1::DATE
-                                )
-                                OR
-                                (
-                                    end_user_id IS NULL
-                                    OR end_user_id = '''' AND ended::DATE <= $2::DATE
-                                )
-                            )
-                            AND first_message <> ''''
-                            AND first_message <> ''message-read''
-                            AND last_message <> ''''
-                            AND last_message <> ''message-read''
-                        )
-                )
                 ORDER BY chat_id, id DESC
             ),
             
@@ -431,6 +410,27 @@ BEGIN
                     ) AS result_data
                 FROM latest_chat_records
                 WHERE (
+                (
+                            ended IS NOT NULL
+                            AND status <> ''IDLE''
+                            AND (
+                                (
+                                    end_user_id IS NOT NULL
+                                    AND end_user_id <> ''''
+                                    AND ended::DATE <= $1::DATE
+                                )
+                                OR
+                                (
+                                    end_user_id IS NULL
+                                    OR end_user_id = '''' AND ended::DATE <= $2::DATE
+                                )
+                            )
+                            AND first_message <> ''''
+                            AND first_message <> ''message-read''
+                            AND last_message <> ''''
+                            AND last_message <> ''message-read''
+                        )
+                        AND (
                     $3 IS NULL
                     OR $3 = ''''
                     OR LOWER(customer_support_display_name) LIKE LOWER(''%'' || $3 || ''%'')
@@ -444,9 +444,10 @@ BEGIN
                     OR TO_CHAR(ended, ''DD.MM.YYYY HH24:MI:SS'') LIKE LOWER(''%'' || $3 || ''%'')
                     OR LOWER(last_message) LIKE LOWER(''%'' || $3 || ''%'')
                     OR EXISTS (SELECT 1
-                        FROM denormalized_chat AS dc
-                        WHERE dc.chat_id = latest_chat_records.chat_id
-                            AND (LOWER(dc.last_message) LIKE LOWER(''%'' || $3 || ''%'') OR LOWER(dc.first_message) LIKE LOWER(''%'' || $3 || ''%'')))
+                        FROM unnest(all_messages) AS message_content
+                        WHERE LOWER(message_content) LIKE LOWER(''%'' || $3 || ''%''))
+                    )
+                    
                 )
                 ORDER BY
                     CASE WHEN $4 = ''created asc'' THEN first_message_timestamp END ASC,

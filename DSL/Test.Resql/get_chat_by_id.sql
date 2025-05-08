@@ -6,13 +6,16 @@ CREATE TEMPORARY TABLE test_ids (
 
 -- Insert test cases - select a variety of real chat IDs from the database
 INSERT INTO test_ids (chat_id)
-SELECT DISTINCT base_id AS chat_id
-FROM chat
-WHERE 
-    base_id IS NOT NULL 
-    AND ended IS NOT NULL
+SELECT chat_id FROM (
+    SELECT DISTINCT base_id AS chat_id
+    FROM chat
+    WHERE 
+        base_id IS NOT NULL 
+        AND ended IS NOT NULL
+) sub
 ORDER BY RANDOM()
 LIMIT 20;
+
 
 -- Add some edge cases if they exist
 INSERT INTO test_ids (chat_id)

@@ -58,19 +58,22 @@ FROM chat AS c
 
 CREATE TEMPORARY TABLE new_query_result AS
 SELECT
-    COALESCE(SUM(chat_duration_in_seconds), 0) AS duration_in_seconds
+    SUM(chat_duration_in_seconds) AS duration_in_seconds
 FROM (
     SELECT DISTINCT ON (chat_id)
         chat_id,
-        chat_duration_in_seconds
+        chat_duration_in_seconds,
+        ended,
+        customer_support_id,
+        is_bot
     FROM denormalized_chat
-    WHERE
-        ended IS NOT NULL
-        AND ended > (NOW() - '1 month'::INTERVAL)
-        AND customer_support_id <> ''
-        AND is_bot = FALSE
     ORDER BY chat_id, id DESC
-) latest_chats;
+) latest_chats
+WHERE
+    ended IS NOT NULL
+    AND ended > (NOW() - '1 month'::INTERVAL)
+    AND customer_support_id <> ''
+    AND is_bot = FALSE;
 
 -- Now compare the results and report PASS/FAIL
 DO $$

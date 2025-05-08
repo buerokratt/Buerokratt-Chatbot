@@ -26,17 +26,14 @@ WITH
         FROM consts
     )
 
-SELECT DISTINCT chat_id
-FROM denormalized_chat
+SELECT DISTINCT base_id as chat_id
+FROM chat
 WHERE 
-    LOWER(first_message) LIKE (SELECT search_key FROM regx)
-    OR LOWER(last_message) LIKE (SELECT search_key FROM regx)
-    OR LOWER(chat_id) LIKE (SELECT search_key FROM regx)
+    LOWER(base_id) LIKE (SELECT search_key FROM regx)
     OR LOWER(customer_support_display_name) LIKE (SELECT search_key FROM regx)
     OR LOWER(end_user_first_name) LIKE (SELECT search_key FROM regx)
     OR LOWER(end_user_last_name) LIKE (SELECT search_key FROM regx)
     OR LOWER(end_user_id) LIKE (SELECT search_key FROM regx)
     OR LOWER(end_user_email) LIKE (SELECT search_key FROM regx)
     OR LOWER(end_user_phone) LIKE (SELECT search_key FROM regx)
-    OR LOWER(end_user_url) LIKE (SELECT search_key FROM regx)
-    OR LOWER(comment) LIKE (SELECT search_key FROM regx);
+    OR LOWER(end_user_url) LIKE (SELECT search_key FROM regx);

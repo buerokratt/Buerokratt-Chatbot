@@ -241,27 +241,9 @@ BEGIN
                 ''received_from'', received_from,
                 ''received_from_name'', received_from_name,
                 ''customer_messages'', customer_messages_count,
-                ''last_message'', (
-                    SELECT last_message
-                    FROM denormalized_chat
-                    WHERE chat_id = latest_chat_versions.chat_id
-                    AND last_message_event_with_content <> ''rating''
-                    AND last_message_event_with_content <> ''requested-chat-forward''
-                    AND last_message <> ''''
-                    AND last_message <> ''message-read''
-                    ORDER BY id DESC
-                    LIMIT 1
-                ),
+                ''last_message'', last_message_with_content_and_not_rating_or_forward,
                 ''contacts_message'', contacts_message,
-                ''last_message_timestamp'', (
-                    SELECT last_message_timestamp
-                    FROM denormalized_chat
-                    WHERE chat_id = latest_chat_versions.chat_id
-                    AND last_message_event <> ''rating''
-                    AND last_message_event <> ''requested-chat-forward''
-                    ORDER BY id DESC
-                    LIMIT 1
-                ),
+                ''last_message_timestamp'', last_message_with_not_rating_or_forward_events_timestamp,
                 ''last_message_event'', last_message_event_with_content,
                 ''csa_title'', csa_title
             ) AS row_data

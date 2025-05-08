@@ -163,9 +163,6 @@ BEGIN
             max_chats AS (
                 SELECT MAX(id) AS max_id
                 FROM chat
-                WHERE
-                    ended IS NOT NULL
-                    AND status <> ''IDLE''
                 GROUP BY base_id
             ),
             ended_chat_messages AS (
@@ -192,6 +189,8 @@ BEGIN
                     feedback_rating
                 FROM chat
                     RIGHT JOIN max_chats ON id = max_id
+                Where ended IS NOT NULL
+                    AND status <> ''IDLE''
             ),
             rated_chats AS (
                 SELECT MAX(feedback_rating) AS rating
@@ -355,6 +354,7 @@ BEGIN
                     user_display_name,
                     customer_support_first_name,
                     customer_support_last_name,
+                    first_message,
                     last_message,
                     contacts_message,
                     last_message_timestamp,
@@ -362,17 +362,9 @@ BEGIN
                     feedback_rating,
                     nps,
                     csa_title,
-                    last_message_event
+                    last_message_event,
+                    all_messages
                 FROM denormalized_chat
-                WHERE
-                    (
-                        ended IS NOT NULL
-                        AND status <> ''IDLE''
-                        AND first_message <> '''' 
-                        AND first_message <> ''message-read'' 
-                        AND last_message <> ''''
-                        AND last_message <> ''message-read''
-                    )
                 ORDER BY chat_id, id DESC
             ),
             final_results AS (
@@ -412,7 +404,16 @@ BEGIN
                         ''total_pages'', CEIL(COUNT(*) OVER() / (SELECT page_size FROM params)::DECIMAL)
                     ) AS result_data
                 FROM latest_chat_records
-                WHERE (LENGTH((SELECT customer_support_ids FROM params)) = 0
+                WHERE 
+                    (
+                        ended IS NOT NULL
+                        AND status <> ''IDLE''
+                        AND first_message <> '''' 
+                        AND first_message <> ''message-read'' 
+                        AND last_message <> ''''
+                        AND last_message <> ''message-read''
+                    ) AND
+                (LENGTH((SELECT customer_support_ids FROM params)) = 0
                         OR customer_support_id = ANY(STRING_TO_ARRAY((SELECT customer_support_ids FROM params), '','')))
                     AND (
                         (SELECT search FROM params) IS NULL
@@ -428,9 +429,8 @@ BEGIN
                         OR TO_CHAR(ended, ''DD.MM.YYYY HH24:MI:SS'') LIKE LOWER(''%'' || (SELECT search FROM params) || ''%'')
                         OR LOWER(last_message) LIKE LOWER(''%'' || (SELECT search FROM params) || ''%'')
                         OR EXISTS (SELECT 1
-                            FROM denormalized_chat AS dc
-                            WHERE dc.chat_id = latest_chat_records.chat_id
-                                AND LOWER(dc.last_message) LIKE LOWER(''%'' || (SELECT search FROM params) || ''%''))
+                            FROM unnest(all_messages) AS message_content
+                            WHERE LOWER(message_content) LIKE LOWER(''%'' || (SELECT search FROM params) || ''%''))
                     )
                 ORDER BY
                     CASE WHEN (SELECT sorting FROM params) = ''created asc'' THEN first_message_timestamp END ASC,

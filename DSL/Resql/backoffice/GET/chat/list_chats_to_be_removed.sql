@@ -18,6 +18,7 @@ WITH latest_chat_records AS (
         received_from,
         labels,
         comment,
+        first_message,
         last_message,
         contacts_message,
         last_message_timestamp,
@@ -25,30 +26,9 @@ WITH latest_chat_records AS (
         feedback_rating,
         nps,
         csa_title,
-        last_message_event
+        last_message_event,
+        all_messages
     FROM denormalized_chat
-    WHERE (
-            (
-                ended IS NOT NULL
-                AND status <> 'IDLE'
-                AND (
-                    (
-                        end_user_id IS NOT NULL
-                        AND end_user_id <> ''
-                        AND ended::DATE <= :auth_date::DATE
-                    )
-                    OR
-                    (
-                        end_user_id IS NULL
-                        OR end_user_id = '' AND ended::DATE <= :anon_date::DATE
-                    )
-                )
-                AND first_message <> ''
-                AND first_message <> 'message-read'
-                AND last_message <> ''
-                AND last_message <> 'message-read'
-            )
-    )
     ORDER BY chat_id, id DESC
 )
 
@@ -82,22 +62,45 @@ SELECT
     CEIL(COUNT(*) OVER () / 10::DECIMAL) AS total_pages
 FROM latest_chat_records
 Where (
-            :search IS NULL
-            OR :search = ''
-            OR LOWER(customer_support_display_name) LIKE LOWER('%' || :search || '%')
-            OR LOWER(end_user_first_name) LIKE LOWER('%' || :search || '%')
-            OR LOWER(contacts_message) LIKE LOWER('%' || :search || '%')
-            OR LOWER(comment) LIKE LOWER('%' || :search || '%')
-            OR LOWER(status) LIKE LOWER('%' || :search || '%')
-            OR LOWER(last_message_event) LIKE LOWER('%' || :search || '%')
-            OR LOWER(chat_id) LIKE LOWER('%' || :search || '%')
-            OR TO_CHAR(first_message_timestamp, 'DD.MM.YYYY HH24:MI:SS') LIKE LOWER('%' || :search || '%')
-            OR TO_CHAR(ended, 'DD.MM.YYYY HH24:MI:SS') LIKE LOWER('%' || :search || '%')
-            OR LOWER(last_message) LIKE LOWER('%' || :search || '%')
-            OR EXISTS (SELECT 1
-                        FROM denormalized_chat AS dc
-                        WHERE dc.chat_id = latest_chat_records.chat_id
-                            AND LOWER(dc.last_message) LIKE LOWER('%' || :search || '%'))
+    (
+                ended IS NOT NULL
+                AND status <> 'IDLE'
+                AND (
+                    (
+                        end_user_id IS NOT NULL
+                        AND end_user_id <> ''
+                        AND ended::DATE <= :auth_date::DATE
+                    )
+                    OR
+                    (
+                        end_user_id IS NULL
+                        OR end_user_id = '' AND ended::DATE <= :anon_date::DATE
+                    )
+                )
+                AND first_message <> ''
+                AND first_message <> 'message-read'
+                AND last_message <> ''
+                AND last_message <> 'message-read'
+            ) AND
+            (
+                :search IS NULL
+                OR :search = ''
+                OR LOWER(customer_support_display_name) LIKE LOWER('%' || :search || '%')
+                OR LOWER(end_user_first_name) LIKE LOWER('%' || :search || '%')
+                OR LOWER(contacts_message) LIKE LOWER('%' || :search || '%')
+                OR LOWER(comment) LIKE LOWER('%' || :search || '%')
+                OR LOWER(status) LIKE LOWER('%' || :search || '%')
+                OR LOWER(last_message_event) LIKE LOWER('%' || :search || '%')
+                OR LOWER(chat_id) LIKE LOWER('%' || :search || '%')
+                OR TO_CHAR(first_message_timestamp, 'DD.MM.YYYY HH24:MI:SS') LIKE LOWER('%' || :search || '%')
+                OR TO_CHAR(ended, 'DD.MM.YYYY HH24:MI:SS') LIKE LOWER('%' || :search || '%')
+                OR LOWER(last_message) LIKE LOWER('%' || :search || '%')
+                OR EXISTS (
+                    SELECT 1
+                    FROM unnest(all_messages) AS message_content
+                    WHERE LOWER(message_content) LIKE LOWER('%' || :search || '%')
+                )
+            )
         )
 ORDER BY
     CASE WHEN :sorting = 'created asc' THEN first_message_timestamp END ASC,
