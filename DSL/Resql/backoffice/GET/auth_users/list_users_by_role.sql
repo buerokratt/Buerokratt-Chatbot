@@ -4,7 +4,10 @@ SELECT
     last_name,
     id_code,
     display_name,
-    csa_title,
+    CASE
+        WHEN :is_csa_title_visible = 'true' THEN csa_title
+        ELSE ''
+    END AS csa_title,
     csa_email,
     department,
     authority_name AS authorities,

@@ -45,7 +45,6 @@ CREATE TABLE denormalized_chat (
     last_message_event character varying,
     last_message_event_with_content character varying,
     chat_duration_in_seconds numeric,
-    is_bot boolean,
     created_at timestamp with time zone NOT NULL DEFAULT now(),
     customer_messages_count integer,
     -- New columns
@@ -103,7 +102,6 @@ INSERT INTO denormalized_chat (
     last_message_event,
     last_message_event_with_content,
     chat_duration_in_seconds,
-    is_bot,
     customer_messages_count,
     -- New columns
     last_message_with_content_and_not_rating_or_forward,
@@ -185,7 +183,6 @@ combined_records AS (
         c.created AS chat_created,
         c.feedback_text,
         c.feedback_rating,
-        config.is_csa_title_visible,
         chc.created,
         mu.display_name AS user_display_name,
         mu.status AS user_status,
@@ -197,11 +194,6 @@ combined_records AS (
             THEN ABS(EXTRACT(EPOCH FROM (fsm.first_support_timestamp - lm.last_timestamp)))
             ELSE NULL
         END AS duration_seconds,
-        CASE
-            WHEN c.customer_support_id = bot_config.bot_institution_id THEN TRUE
-            ELSE FALSE
-        END AS is_bot,
-        bot_config.bot_institution_id,
         -- New columns data
         m.last_message_content_no_rating_forward,
         m.last_message_timestamp_no_rating_forward,
@@ -319,15 +311,6 @@ combined_records AS (
         LIMIT 1
     ) AS cm ON TRUE
     LEFT JOIN LATERAL (
-        SELECT value AS is_csa_title_visible
-        FROM configuration
-        WHERE
-            key = 'is_csa_title_visible'
-            AND NOT deleted
-        ORDER BY id DESC
-        LIMIT 1
-    ) AS config ON TRUE
-    LEFT JOIN LATERAL (
         SELECT
             first_name,
             last_name
@@ -363,15 +346,6 @@ combined_records AS (
             chat_base_id = chc.chat_id
         GROUP BY chat_base_id
     ) AS lm ON TRUE
-    LEFT JOIN LATERAL (
-        SELECT value AS bot_institution_id
-        FROM configuration
-        WHERE
-            key = 'bot_institution_id'
-            AND NOT deleted
-        ORDER BY id DESC
-        LIMIT 1
-    ) AS bot_config ON TRUE
     WHERE c.base_id IS NOT NULL
     AND NOT EXISTS (
         SELECT 1
@@ -432,7 +406,6 @@ combined_records AS (
         c.created AS chat_created,
         c.feedback_text,
         c.feedback_rating,
-        config.is_csa_title_visible,
         c.created,
         mu.display_name AS user_display_name,
         mu.status AS user_status,
@@ -444,11 +417,6 @@ combined_records AS (
             THEN ABS(EXTRACT(EPOCH FROM (fsm.first_support_timestamp - lm.last_timestamp)))
             ELSE NULL
         END AS duration_seconds,
-        CASE
-            WHEN c.customer_support_id = bot_config.bot_institution_id THEN TRUE
-            ELSE FALSE
-        END AS is_bot,
-        bot_config.bot_institution_id,
         -- New columns data
         m.last_message_content_no_rating_forward,
         m.last_message_timestamp_no_rating_forward,
@@ -566,15 +534,6 @@ combined_records AS (
         LIMIT 1
     ) AS cm ON TRUE
     LEFT JOIN LATERAL (
-        SELECT value AS is_csa_title_visible
-        FROM configuration
-        WHERE
-            key = 'is_csa_title_visible'
-            AND NOT deleted
-        ORDER BY id DESC
-        LIMIT 1
-    ) AS config ON TRUE
-    LEFT JOIN LATERAL (
         SELECT
             first_name,
             last_name
@@ -610,15 +569,6 @@ combined_records AS (
             chat_base_id = c.base_id
         GROUP BY chat_base_id
     ) AS lm ON TRUE
-    LEFT JOIN LATERAL (
-        SELECT value AS bot_institution_id
-        FROM configuration
-        WHERE
-            key = 'bot_institution_id'
-            AND NOT deleted
-        ORDER BY id DESC
-        LIMIT 1
-    ) AS bot_config ON TRUE
     WHERE NOT EXISTS (
         SELECT 1
         FROM chat_history_comments AS chc
@@ -687,7 +637,6 @@ combined_records AS (
         c.created AS chat_created,
         c.feedback_text,
         c.feedback_rating,
-        config.is_csa_title_visible,
         m.created,
         mu.display_name AS user_display_name,
         mu.status AS user_status,
@@ -699,11 +648,6 @@ combined_records AS (
             THEN ABS(EXTRACT(EPOCH FROM (fsm.first_support_timestamp - lm.last_timestamp)))
             ELSE NULL
         END AS duration_seconds,
-        CASE
-            WHEN c.customer_support_id = bot_config.bot_institution_id THEN TRUE
-            ELSE FALSE
-        END AS is_bot,
-        bot_config.bot_institution_id,
         -- New columns data
         (SELECT content
          FROM message
@@ -784,15 +728,6 @@ combined_records AS (
         LIMIT 1
     ) AS cm ON TRUE
     LEFT JOIN LATERAL (
-        SELECT value AS is_csa_title_visible
-        FROM configuration
-        WHERE
-            key = 'is_csa_title_visible'
-            AND NOT deleted
-        ORDER BY id DESC
-        LIMIT 1
-    ) AS config ON TRUE
-    LEFT JOIN LATERAL (
         SELECT
             first_name,
             last_name
@@ -828,15 +763,6 @@ combined_records AS (
             chat_base_id = m.chat_base_id
         GROUP BY chat_base_id
     ) AS lm ON TRUE
-    LEFT JOIN LATERAL (
-        SELECT value AS bot_institution_id
-        FROM configuration
-        WHERE
-            key = 'bot_institution_id'
-            AND NOT deleted
-        ORDER BY id DESC
-        LIMIT 1
-    ) AS bot_config ON TRUE
     WHERE c.base_id IS NOT NULL
     AND NOT EXISTS (
         SELECT 1
@@ -881,7 +807,6 @@ nps_calc AS (
     CROSS JOIN promoters
     CROSS JOIN detractors
 )
-
 SELECT
     chat_id,
     customer_support_id,
@@ -922,10 +847,7 @@ SELECT
     feedback_text,
     feedback_rating,
     (SELECT nps_value FROM nps_calc) AS nps,
-    CASE
-        WHEN is_csa_title_visible = 'true' THEN csa_title
-        ELSE ''
-    END AS csa_title,
+    csa_title,
     CASE
         WHEN last_message_event IS NULL THEN NULL
         ELSE LOWER(last_message_event)
@@ -935,7 +857,6 @@ SELECT
         ELSE LOWER(last_message_event_with_content)
     END AS last_message_event_with_content,
     duration_seconds AS chat_duration_in_seconds,
-    is_bot,
     customer_messages_count,
     -- New columns
     last_message_content_no_rating_forward AS last_message_with_content_and_not_rating_or_forward,

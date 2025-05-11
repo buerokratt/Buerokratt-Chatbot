@@ -44,7 +44,10 @@ FROM (
         received_from_name,
         external_id,
         contacts_message,
-        csa_title,
+        CASE
+            WHEN :is_csa_title_visible = 'true' THEN csa_title
+            ELSE ''
+        END AS csa_title,
         CASE WHEN last_message_event IS NULL OR last_message_event = '' THEN NULL 
         ELSE last_message_event END AS last_message_event,
         created,

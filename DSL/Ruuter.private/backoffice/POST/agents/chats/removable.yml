@@ -32,6 +32,15 @@ extractRequestData:
     startDate: "${incoming.body.startDate}"
     endDate: "${incoming.body.endDate}"
 
+getTitleVisibility:
+  call: http.get
+  args:
+    url: "[#CHATBOT_RESQL]/config/get_configuration"
+    query:
+      key: "is_csa_title_visible"
+  result: title_res
+  next: getEndedChats
+
 getEndedChats:
   call: http.get
   args:
@@ -43,6 +52,7 @@ getEndedChats:
       page_size: ${incoming.body.page_size}
       sorting: ${incoming.body.sorting}
       search: ${incoming.body.search}
+      is_csa_title_visible: "${title_res.response.body[0].value}"
   result: res
 
 returnSuccess:

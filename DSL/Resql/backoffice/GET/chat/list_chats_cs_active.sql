@@ -30,12 +30,15 @@ SELECT
     contacts_message,
     last_message_with_not_rating_or_forward_events_timestamp AS last_message_timestamp,
     last_message_event_with_content,
-    csa_title
-    
+    CASE
+        WHEN :is_csa_title_visible = 'true' THEN csa_title
+        ELSE ''
+    END AS csa_title
+
 FROM latest_chat_versions
 WHERE 
     ended IS NULL 
-    AND is_bot = FALSE
+    AND customer_support_id <> :bot_institution_id
     AND status <> 'VALIDATING'
 ORDER BY created ASC
 LIMIT :limit::INTEGER;

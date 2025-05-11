@@ -29,6 +29,15 @@ extractRequestData:
   assign:
     login: ${incoming.body.login}
     password: ${incoming.body.password}
+  next: getTitleVisibility
+
+getTitleVisibility:
+  call: http.get
+  args:
+    url: "[#CHATBOT_RESQL]/config/get_configuration"
+    query:
+      key: "is_csa_title_visible"
+  result: title_res
   next: getUserWithRole
 
 getUserWithRole:
@@ -38,6 +47,7 @@ getUserWithRole:
     query:
       login: ${login}
       password: ${password}
+      is_csa_title_visible: ${title_res.response.body[0]?.value}
   result: user_result
   next: check_user_result
 

@@ -30,7 +30,10 @@ WITH latest_chat_records AS (
         feedback_text,
         feedback_rating,
         nps,
-        csa_title,
+        CASE
+            WHEN :is_csa_title_visible = 'true' THEN csa_title
+            ELSE ''
+        END AS csa_title,
         last_message_event,
         all_messages
     FROM denormalized_chat

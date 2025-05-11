@@ -23,7 +23,10 @@ WITH latest_chat AS (
         c.received_from_name,
         c.last_message_including_empty_content,
         c.last_message_timestamp,
-        c.csa_title
+        CASE
+            WHEN :is_csa_title_visible = 'true' THEN c.csa_title
+            ELSE ''
+        END AS csa_title
     FROM denormalized_chat c
     WHERE chat_id = :id
     ORDER BY denormalized_record_created DESC

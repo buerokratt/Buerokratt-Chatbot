@@ -59,6 +59,15 @@ getMessageUuid:
 assignMessageUuid:
   assign:
     messageUuid: ${message_uuid_result.response.body.uuid}
+  next: getTitleVisibility
+
+getTitleVisibility:
+  call: http.get
+  args:
+    url: "[#CHATBOT_RESQL]/config/get_configuration"
+    query:
+      key: "is_csa_title_visible"
+  result: title_res
   next: getChatById
 
 getChatById:
@@ -67,6 +76,7 @@ getChatById:
     url: "[#CHATBOT_RESQL]/chat/get_chat_by_id"
     query:
       id: ${chatId}
+      is_csa_title_visible: ${title_res.response.body[0]?.value}
   result: chatRes
   next: checkChatResult
 

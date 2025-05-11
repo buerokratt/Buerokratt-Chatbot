@@ -171,6 +171,15 @@ check_for_post_message_to_bot_result:
   switch:
     - condition: ${message_to_bot_result.response.body.response === 'Bot error'}
       next: return_bot_error
+  next: getTitleVisibility
+
+getTitleVisibility:
+  call: http.get
+  args:
+    url: "[#CHATBOT_RESQL]/config/get_configuration"
+    query:
+      key: "is_csa_title_visible"
+  result: title_res
   next: getChat
 
 getChat:
@@ -179,6 +188,7 @@ getChat:
     url: "[#CHATBOT_RESQL]/chat/get_chat_by_id"
     query:
       id: ${chatUuid}
+      is_csa_title_visible: ${title_res.response.body[0]?.value}
   result: chat_result
   next: notify_chats
 
