@@ -1,6 +1,6 @@
 SELECT copy_row_with_modifications(
     'chat',
-    'id', '::INTEGER', id,
+    'id', '::INTEGER', id::VARCHAR,
     ARRAY[
         'customer_support_id', '', '',
         'customer_support_display_name', '', '',

@@ -1,6 +1,6 @@
 SELECT copy_row_with_modifications(
     'message',
-    'id', '::INTEGER', id,
+    'id', '::INTEGER', id::VARCHAR,
     ARRAY[
         'content', '', :content,
         'event', '', :event,

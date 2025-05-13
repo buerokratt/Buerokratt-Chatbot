@@ -1,6 +1,6 @@
 SELECT copy_row_with_modifications(
     'denorm_user_csa_authority_profile_settings',
-    'id', '::INTEGER', id,
+    'id', '::INTEGER', id::VARCHAR,
     ARRAY[
          'first_name', '', :firstName,
         'last_name', '', :lastName,
