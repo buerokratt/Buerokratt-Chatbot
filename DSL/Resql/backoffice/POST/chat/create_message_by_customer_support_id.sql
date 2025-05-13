@@ -1,13 +1,15 @@
 SELECT copy_row_with_modifications(
     'message',
     'id', '::INTEGER', id,
-    'content', '', :content,
-    'event', '', :event,
-    'author_id', '', :authorId,
-    'author_role', '', :authorRole,
-    'base_id', '', gen_random_uuid(),
-    'created', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR,
-    'updated', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR
+    ARRAY[
+        'content', '', :content,
+        'event', '', :event,
+        'author_id', '', :authorId,
+        'author_role', '', :authorRole,
+        'base_id', '', gen_random_uuid(),
+        'created', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR,
+        'updated', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR
+    ]::VARCHAR[]
 )::INTEGER as id, chat_base_id, base_id
 FROM message
 WHERE
