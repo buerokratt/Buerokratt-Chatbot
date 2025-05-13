@@ -1,0 +1,6 @@
+name,url,base_id,deleted,created
+deleted,url,1,FALSE,2025-05-13 11:31:34
+deleted,some,1,TRUE,2025-05-13 12:31:34
+some name before,url,2,FALSE,2025-05-13 11:31:34
+some name,url,2,FALSE,2025-05-13 12:31:34
+establishement,url,3,FALSE,2025-05-13 12:31:34

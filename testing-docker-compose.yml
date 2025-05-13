@@ -1,0 +1,67 @@
+version: "3.9"
+
+services:
+  users_db_test:
+    image: postgres:14.1
+    environment:
+      - POSTGRES_USER=byk
+      - POSTGRES_PASSWORD=01234
+      - POSTGRES_DB=byk
+    ports:
+      - 5434:5432
+    networks:
+      - bykstack
+
+  resql-test:
+    image: resql
+    depends_on:
+      - users_db_test
+    environment:
+      - sqlms.datasources.[0].name=byk
+      - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://users_db_test:5432/byk
+      - sqlms.datasources.[0].username=byk
+      - sqlms.datasources.[0].password=01234
+      - logging.level.org.springframework.boot=INFO
+    volumes:
+      - ./DSL/Resql:/workspace/app/templates
+    networks:
+      - bykstack
+
+  resql-training-test:
+    image: resql
+    environment:
+      - sqlms.datasources.[0].name=training
+      - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://users_db_test:5432/byk
+      - sqlms.datasources.[0].username=byk
+      - sqlms.datasources.[0].password=01234
+      - logging.level.org.springframework.boot=INFO
+      - server.port=8083
+    depends_on:
+      - users_db_test
+    volumes:
+      - ./DSL/Resql:/DSL
+    networks:
+      - bykstack
+
+  tests:
+    build:
+      context: ./testing
+    volumes:
+      - ./testing:/app
+    command: pytest
+    environment:
+      RESQL_URL: 'http://resql-test:8082/backoffice'
+      RESQL_TRAINING_URL: 'http://resql-training-test:8082/training'
+    depends_on:
+      - users_db_test
+      - resql-test
+      - resql-training-test
+    networks:
+      - bykstack
+
+networks:
+  bykstack:
+    name: bykstack
+    driver: bridge
+    driver_opts:
+      com.docker.network.driver.mtu: 1400
