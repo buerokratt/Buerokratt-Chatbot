@@ -3,9 +3,9 @@
 CREATE OR REPLACE FUNCTION copy_row_with_modifications(
     table_name_to_copy_from VARCHAR,
     id_column_name VARCHAR,
-    id_column_conversion_expression varchar,
+    id_column_conversion_expression VARCHAR,
     id_to_copy VARCHAR,
-    VARIADIC modifications  VARCHAR[]
+    modifications VARCHAR[]
 ) RETURNS VARCHAR LANGUAGE plpgsql AS '
 DECLARE
     columns VARCHAR [];
@@ -66,4 +66,3 @@ BEGIN
     RETURN inserted_id;
 END;
 ';
-
