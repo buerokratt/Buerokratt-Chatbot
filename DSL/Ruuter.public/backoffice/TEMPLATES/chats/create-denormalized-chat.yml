@@ -1,0 +1,56 @@
+create_denormalized_chat:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/create_denormalized_chat"
+    headers:
+      content-type: application/json
+    body:
+      chatId: ${incoming.body.chatId}
+      customerSupportId: ${incoming.body.customerSupportId ?? "null"}
+      customerSupportDisplayName: ${incoming.body.customerSupportDisplayName ?? "null" }
+      customerSupportFirstName: ${incoming.body.customerSupportFirstName ?? "null"}
+      customerSupportLastName: ${incoming.body.customerSupportLastName ?? "null"}
+      endUserId: ${incoming.body.endUserId ?? "null"}
+      endUserFirstName: ${incoming.body.endUserFirstName ?? "null"}
+      endUserLastName: ${incoming.body.endUserLastName ?? "null"}
+      endUserEmail: ${incoming.body.endUserEmail ?? ""}
+      endUserPhone: ${incoming.body.endUserPhone ?? ""}
+      endUserOs: ${incoming.body.endUserOs ?? "null"}
+      endUserUrl: ${incoming.body.endUserUrl ?? "null"}
+      status: ${incoming.body.status ?? "null"}
+      created: ${incoming.body.created || "CURRENT_TIMESTAMP"}
+      updated: ${incoming.body.updated || "CURRENT_TIMESTAMP"}
+      ended: ${incoming.body.ended ?? "null"}
+      forwardedTo: ${incoming.body.forwardedTo ?? "null"}
+      forwardedToName: ${incoming.body.forwardedToName ?? "null"}
+      receivedFrom: ${incoming.body.receivedFrom ?? "null"}
+      receivedFromName: ${incoming.body.receivedFromName ?? "null"}
+      externalId: ${incoming.body.externalId ?? "null"}
+      feedbackText: ${incoming.body.feedbackText ?? "null"}
+      feedbackRating: ${incoming.body.feedbackRating ?? "null"}
+      csaTitle: ${incoming.body.csaTitle ?? "null"}
+      firstMessageTimestamp: ${incoming.body.firstMessageTimestamp ?? "null"}
+      lastMessageTimestamp: ${incoming.body.lastMessageTimestamp ?? "null"}
+      firstSupportTimestamp: ${incoming.body.firstSupportTimestamp ?? "null"}
+      comment: ${incoming.body.comment ?? "null"}
+      commentAddedDate: ${incoming.body.commentAddedDate ?? "null"}
+      commentAuthor: ${incoming.body.commentAuthor ?? "null"}
+      firstMessage: ${incoming.body.firstMessage ?? "null"}
+      lastMessage: ${incoming.body.lastMessage ?? "null"}
+      lastMessageIncludingEmptyContent: ${incoming.body.lastMessageIncludingEmptyContent ?? "null"}
+      contactsMessage: ${incoming.body.contactsMessage ?? "null"}
+      lastMessageEvent: ${incoming.body.lastMessageEvent ?? "null"}
+      lastMessageEventWithContent: ${incoming.body.lastMessageEventWithContent ?? "null"}
+      chatDurationInSeconds: ${incoming.body.chatDurationInSeconds ?? "null"}
+      isBot: ${incoming.body.isBot || false}
+      customerMessagesCount: ${incoming.body.customerMessagesCount ?? 0}
+      labels: ${incoming.body.labels ?? "null"}
+      lastMessageWithContentAndNotRatingOrForward: ${incoming.body.lastMessageWithContentAndNotRatingOrForward ?? "null"}
+      lastMessageWithNotRatingOrForwardEventsTimestamp: ${incoming.body.lastMessageWithNotRatingOrForwardEventsTimestamp ?? "null"}
+      lastNonEmptyMessageEvent: ${incoming.body.lastNonEmptyMessageEvent ?? "null"}
+      allMessages: ${incoming.body.allMessages ?? "null"}
+  result: denormalizedChatResult
+
+return_result:
+  return: ${denormalizedChatResult.response.body}
+  next: end

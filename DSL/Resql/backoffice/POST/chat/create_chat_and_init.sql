@@ -104,4 +104,5 @@ VALUES (
         ) = 'true') THEN ''
         ELSE ''
     END)
-);
+)
+RETURNING customer_support_id, customer_support_display_name, csa_title, updated::TEXT;
