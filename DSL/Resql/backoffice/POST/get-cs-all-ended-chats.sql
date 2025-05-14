@@ -208,6 +208,11 @@ WHERE (
                   FROM unnest(COALESCE(CSAFullNames.all_csa_ids, ARRAY[]::text[])) AS id
                   WHERE id = ANY(string_to_array(:customerSupportIds, ','))
               )
+                  OR (
+                  '-' = ANY(string_to_array(:customerSupportIds, ','))
+                      AND array_length(CSAFullNames.all_csa_ids, 1) = 1
+                      and CSAFullNames.all_csa_ids[1] = ''
+                  )
               ) AND (
               :search IS NULL OR
               :search = '' OR
