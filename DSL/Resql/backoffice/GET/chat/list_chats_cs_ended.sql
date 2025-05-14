@@ -12,6 +12,7 @@ WITH latest_chat_records AS (
         end_user_url,
         status,
         first_message_timestamp,
+        last_message_author_id,
         updated,
         ended,
         forwarded_to_name,
@@ -20,7 +21,6 @@ WITH latest_chat_records AS (
         comment,
         comment_added_date,
         comment_author,
-        user_display_name,
         customer_support_first_name,
         customer_support_last_name,
         first_message,
@@ -29,7 +29,6 @@ WITH latest_chat_records AS (
         last_message_timestamp,
         feedback_text,
         feedback_rating,
-        nps,
         CASE
             WHEN :is_csa_title_visible = 'true' THEN csa_title
             ELSE ''
@@ -53,6 +52,7 @@ SELECT
     end_user_url,
     status,
     first_message_timestamp AS created,
+    last_message_author_id,
     updated,
     ended,
     forwarded_to_name,
@@ -61,7 +61,6 @@ SELECT
     comment,
     comment_added_date,
     comment_author,
-    user_display_name,
     customer_support_first_name,
     customer_support_last_name,
     last_message,
@@ -69,7 +68,6 @@ SELECT
     last_message_timestamp,
     feedback_text,
     feedback_rating,
-    nps,
     csa_title,
     last_message_event,
     CEIL(COUNT(*) OVER() / :page_size::DECIMAL) AS total_pages
@@ -77,6 +75,7 @@ FROM latest_chat_records
 WHERE 
                 (ended IS NOT NULL
                 AND status <> 'IDLE'
+                AND ended::date BETWEEN :start::date AND :end::date
                 AND first_message <> ''
                 AND first_message <> 'message-read'
                 AND last_message <> ''

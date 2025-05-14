@@ -24,7 +24,6 @@ WITH latest_chat_records AS (
         last_message_timestamp,
         feedback_text,
         feedback_rating,
-        nps,
         CASE
             WHEN :is_csa_title_visible = 'true' THEN csa_title
             ELSE ''
@@ -59,7 +58,6 @@ SELECT
     last_message_timestamp,
     feedback_text,
     feedback_rating,
-    nps,
     csa_title,
     last_message_event,
     CEIL(COUNT(*) OVER () / 10::DECIMAL) AS total_pages

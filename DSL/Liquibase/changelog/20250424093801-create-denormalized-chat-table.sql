@@ -16,6 +16,7 @@ CREATE TABLE denormalized_chat (
     end_user_url character varying,
     status character varying,
     first_message_timestamp timestamp with time zone,
+    last_message_author_id character varying,
     created timestamp with time zone,
     updated timestamp with time zone,
     denormalized_record_created timestamp with time zone NOT NULL DEFAULT now(),
@@ -29,10 +30,6 @@ CREATE TABLE denormalized_chat (
     comment text,
     comment_added_date timestamp with time zone,
     comment_author character varying,
-    user_display_name character varying,
-    user_status character varying,
-    author_first_name character varying,
-    author_last_name character varying,
     first_message text,
     last_message text,
     last_message_including_empty_content text,
@@ -40,11 +37,11 @@ CREATE TABLE denormalized_chat (
     last_message_timestamp timestamp with time zone,
     feedback_text text,
     feedback_rating integer,
-    nps numeric,
     csa_title character varying,
     last_message_event character varying,
     last_message_event_with_content character varying,
     chat_duration_in_seconds numeric,
+    first_support_timestamp timestamp with time zone,
     created_at timestamp with time zone NOT NULL DEFAULT now(),
     customer_messages_count integer,
     -- New columns
@@ -73,6 +70,7 @@ INSERT INTO denormalized_chat (
     end_user_url,
     status,
     first_message_timestamp,
+    last_message_author_id,
     created,
     updated,
     denormalized_record_created,
@@ -86,10 +84,6 @@ INSERT INTO denormalized_chat (
     comment,
     comment_added_date,
     comment_author,
-    user_display_name,
-    user_status,
-    author_first_name,
-    author_last_name,
     first_message,
     last_message,
     last_message_including_empty_content,
@@ -97,11 +91,11 @@ INSERT INTO denormalized_chat (
     last_message_timestamp,
     feedback_text,
     feedback_rating,
-    nps,
     csa_title,
     last_message_event,
     last_message_event_with_content,
     chat_duration_in_seconds,
+    first_support_timestamp,
     customer_messages_count,
     -- New columns
     last_message_with_content_and_not_rating_or_forward,
@@ -184,10 +178,6 @@ combined_records AS (
         c.feedback_text,
         c.feedback_rating,
         chc.created,
-        mu.display_name AS user_display_name,
-        mu.status AS user_status,
-        COALESCE(m.author_first_name, mu.first_name, mu.display_name) AS author_first_name,
-        COALESCE(m.author_last_name, mu.last_name) AS author_last_name,
         fsm.first_support_timestamp,
         CASE
             WHEN fsm.first_support_timestamp IS NOT NULL AND lm.last_timestamp IS NOT NULL
@@ -280,8 +270,6 @@ combined_records AS (
             max_msg.event AS max_msg_event,
             max_content_msg.event AS max_msg_event_with_content,
             max_msg.author_id AS max_msg_author_id,
-            max_msg.author_first_name AS author_first_name,
-            max_msg.author_last_name AS author_last_name,
             cmc.customer_messages_count,
             -- Get data for new columns
             content_not_rating_msg.content AS last_message_content_no_rating_forward,
@@ -321,14 +309,6 @@ combined_records AS (
     ) AS cu ON TRUE
     LEFT JOIN LATERAL (
         SELECT
-            first_name, last_name, display_name, status
-        FROM "user" AS u
-        WHERE u.id_code = m.max_msg_author_id
-        ORDER BY u.created DESC
-        LIMIT 1
-    ) AS mu ON TRUE
-    LEFT JOIN LATERAL (
-        SELECT
             chat_base_id,
             MIN(author_timestamp) AS first_support_timestamp
         FROM message
@@ -336,7 +316,7 @@ combined_records AS (
             chat_base_id = chc.chat_id
             AND author_role = 'backoffice-user'
         GROUP BY chat_base_id
-    ) AS fsm ON TRUE
+    ) AS fsm ON TRUE    
     LEFT JOIN LATERAL (
         SELECT
             chat_base_id,
@@ -407,10 +387,6 @@ combined_records AS (
         c.feedback_text,
         c.feedback_rating,
         c.created,
-        mu.display_name AS user_display_name,
-        mu.status AS user_status,
-        COALESCE(m.author_first_name, mu.first_name, mu.display_name) AS author_first_name,
-        COALESCE(m.author_last_name, mu.last_name) AS author_last_name,
         fsm.first_support_timestamp,
         CASE
             WHEN fsm.first_support_timestamp IS NOT NULL AND lm.last_timestamp IS NOT NULL
@@ -503,8 +479,6 @@ combined_records AS (
             max_msg.event AS max_msg_event,
             max_content_msg.event AS max_msg_event_with_content,
             max_msg.author_id AS max_msg_author_id,
-            max_msg.author_first_name AS author_first_name,
-            max_msg.author_last_name AS author_last_name,
             cmc.customer_messages_count,
             -- Get data for new columns
             content_not_rating_msg.content AS last_message_content_no_rating_forward,
@@ -542,14 +516,6 @@ combined_records AS (
         ORDER BY u.created DESC
         LIMIT 1
     ) AS cu ON TRUE
-    LEFT JOIN LATERAL (
-        SELECT
-            first_name, last_name, display_name, status
-        FROM "user" AS u
-        WHERE u.id_code = m.max_msg_author_id
-        ORDER BY u.created DESC
-        LIMIT 1
-    ) AS mu ON TRUE
     LEFT JOIN LATERAL (
         SELECT
             chat_base_id,
@@ -638,10 +604,6 @@ combined_records AS (
         c.feedback_text,
         c.feedback_rating,
         m.created,
-        mu.display_name AS user_display_name,
-        mu.status AS user_status,
-        COALESCE(m.author_first_name, mu.first_name, mu.display_name) AS author_first_name,
-        COALESCE(m.author_last_name, mu.last_name) AS author_last_name,
         fsm.first_support_timestamp,
         CASE
             WHEN fsm.first_support_timestamp IS NOT NULL AND lm.last_timestamp IS NOT NULL
@@ -738,14 +700,6 @@ combined_records AS (
     ) AS cu ON TRUE
     LEFT JOIN LATERAL (
         SELECT
-            first_name, last_name, display_name, status
-        FROM "user" AS u
-        WHERE u.id_code = m.author_id
-        ORDER BY u.created DESC
-        LIMIT 1
-    ) AS mu ON TRUE
-    LEFT JOIN LATERAL (
-        SELECT
             chat_base_id,
             MIN(author_timestamp) AS first_support_timestamp
         FROM message
@@ -780,32 +734,6 @@ combined_records AS (
     AND (
         m.updated > COALESCE((SELECT MAX(updated) FROM latest_chats WHERE base_id = m.chat_base_id), '1900-01-01'::timestamp)
     )
-),
-rated_chats AS (
-    SELECT MAX(feedback_rating) AS rating
-    FROM chat
-    WHERE feedback_rating IS NOT NULL
-    GROUP BY base_id
-),
-rated_chats_count AS (
-    SELECT COUNT(rating) AS total FROM rated_chats
-),
-promoters AS (
-    SELECT COUNT(rating) AS p FROM rated_chats
-    WHERE rating >= 9
-),
-detractors AS (
-    SELECT COUNT(rating) AS d FROM rated_chats
-    WHERE rating <= 6
-),
-nps_calc AS (
-    SELECT ROUND(
-        ((p / (GREATEST(total, 1) * 1.0)) - (d / (GREATEST(total, 1) * 1.0))) * 100.0,
-        2
-    ) AS nps_value
-    FROM rated_chats_count
-    CROSS JOIN promoters
-    CROSS JOIN detractors
 )
 SELECT
     chat_id,
@@ -822,6 +750,7 @@ SELECT
     end_user_url,
     status,
     first_message_timestamp,
+    author_id,
     chat_created AS created,
     chat_updated AS updated,
     record_date AS denormalized_record_created,
@@ -835,10 +764,6 @@ SELECT
     comment,
     comment_added_date,
     comment_author,
-    user_display_name,
-    user_status,
-    author_first_name,
-    author_last_name,
     first_message_content AS first_message,
     last_message_content AS last_message,
     last_message_including_empty_content,
@@ -846,7 +771,6 @@ SELECT
     last_message_timestamp,
     feedback_text,
     feedback_rating,
-    (SELECT nps_value FROM nps_calc) AS nps,
     csa_title,
     CASE
         WHEN last_message_event IS NULL THEN NULL
@@ -857,6 +781,7 @@ SELECT
         ELSE LOWER(last_message_event_with_content)
     END AS last_message_event_with_content,
     duration_seconds AS chat_duration_in_seconds,
+    first_support_timestamp,
     customer_messages_count,
     -- New columns
     last_message_content_no_rating_forward AS last_message_with_content_and_not_rating_or_forward,
@@ -867,6 +792,5 @@ SELECT
     END AS last_non_empty_message_event,
     all_messages
 FROM combined_records
-CROSS JOIN nps_calc
 WHERE chat_id IN (SELECT base_id FROM chat)
 ORDER BY denormalized_record_created;
