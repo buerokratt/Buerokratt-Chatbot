@@ -60,6 +60,22 @@ registerEmailSentEvent:
       forwardedByUser: ""
       forwardedFromCsa: ""
       forwardedToCsa: ""
+  result: insert_message_res
+
+updateDenormalizedChatMessage:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_message_fields_only"
+    body:
+      chatId: ${chatId}
+      lastMessageTimestamp: ${insert_message_res.response.body[0].updated}
+      isSupportMessage: true
+      isCustomerMessage: false
+      authorTimestamp: ${insert_message_res.response.body[0].updated}
+      content: ""
+      lastMessageAuthorId: ""
+      lastMessageEvent: "chat_sent_to_csa_email"
+  result: updateDenormalizedChatRes
 
 returnSuccess:
   return: "OK"

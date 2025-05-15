@@ -196,6 +196,22 @@ insert_chat_to_back_office_message:
       forwardedToCsa: ""
       rating: ""
   result: insert_chat_to_back_office_message_result
+  next: updateDenormalizedChatMessage
+
+updateDenormalizedChatMessage:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_message_fields_only"
+    body:
+      chatId: ${chatId}
+      lastMessageTimestamp: ${insert_chat_to_back_office_message_result.response.body[0].updated}
+      isSupportMessage: ${authorRole == 'backoffice-user'}
+      isCustomerMessage: ${authorRole == 'end-user'}
+      authorTimestamp: ${insert_chat_to_back_office_message_result.response.body[0].updated}
+      content: ""
+      lastMessageAuthorId: ${get_bot_name_result.response.body[0].value}
+      lastMessageEvent: ${event}
+  result: updateDenormalizedChatRes
   next: notify_chats
 
 notify_chats:

@@ -99,6 +99,22 @@ insertMessage:
       forwardedFromCsa: ""
       forwardedToCsa: ""
   result: insertMessageResult
+  next: updateDenormalizedChatMessage
+
+updateDenormalizedChatMessage:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_message_fields_only"
+    body:
+      chatId: ${chatId}
+      lastMessageTimestamp: ${insertMessageResult.response.body[0].updated}
+      isSupportMessage: false
+      isCustomerMessage: true
+      authorTimestamp: ${insertMessageResult.response.body[0].updated}
+      content: ""
+      lastMessageAuthorId: ${id ?? ""}
+      lastMessageEvent: "user-authenticated"
+  result: updateDenormalizedChatRes
   next: check_for_personal_code
 
 check_for_personal_code:
@@ -123,14 +139,15 @@ generate_cookie:
     body:
       JWTName: "userJwt"
       expirationInMinutes: ${session_result.response.body[0]?.value ?? '120'}
-      content: {
-        "personalCode": "${id ?? ''}",
-        "displayName": "${firstName ?? ''}",
-        "firstName": "${firstName ?? ''}",
-        "lastName": "${lastName ?? ''}",
-        "authMethod": "${authMethod ?? ''}",
-        "fullName": "${(firstName ?? '') + ' ' + (lastName ?? '')}"
-      }
+      content:
+        {
+          "personalCode": "${id ?? ''}",
+          "displayName": "${firstName ?? ''}",
+          "firstName": "${firstName ?? ''}",
+          "lastName": "${lastName ?? ''}",
+          "authMethod": "${authMethod ?? ''}",
+          "fullName": "${(firstName ?? '') + ' ' + (lastName ?? '')}",
+        }
   result: cookie_result
   next: assign_cookie
 
@@ -159,7 +176,7 @@ notify_messages:
     chatId: ${chatId}
     type: "message"
     messageId: ${uuid}
-  result: messages_notify_res  
+  result: messages_notify_res
   next: check_for_id
 
 check_for_id:

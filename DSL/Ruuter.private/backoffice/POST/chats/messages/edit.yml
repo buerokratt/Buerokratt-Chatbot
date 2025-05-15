@@ -45,10 +45,10 @@ insertMessage:
     url: "[#CHATBOT_RESQL]/chat/create_message"
     body:
       messageId: ${messageId}
-      chatId: ${chatId}
+      chatId: ${message.chatBaseId}
       authorId: ${message.authorId ?? ""}
       authorTimestamp: ${message.authorTimestamp ?? "CURRENT_TIMESTAMP"}
-      created: "CURRENT_TIMESTAMP"
+      created: ${message.created ?? "CURRENT_TIMESTAMP"}
       authorFirstName: ${message.authorFirstName ?? ""}
       authorLastName: ${message.authorLastName ?? ""}
       authorRole: ${message.authorRole ?? ""}
@@ -59,6 +59,22 @@ insertMessage:
       forwardedToCsa: ${message.forwardedToCsa ?? ""}
       rating: ${message.rating ?? ""}
   result: insert_message_res
+  next: updateDenormalizedChatMessage
+
+updateDenormalizedChatMessage:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_message_fields_only"
+    body:
+      chatId: ${message.chatBaseId}
+      lastMessageTimestamp: ${insert_message_res.response.body[0].updated}
+      isSupportMessage: ${message.authorRole == "backoffice-user"}
+      isCustomerMessage: false
+      authorTimestamp: ${message.authorTimestamp ?? insert_message_res.response.body[0].updated}
+      content: ${content ?? ""}
+      lastMessageAuthorId: ${message.authorId ?? ""}
+      lastMessageEvent: ${message.event ?? ""}
+  result: updateDenormalizedChatRes
   next: notify_chats
 
 notify_chats:
