@@ -39,7 +39,6 @@ getTitleVisibility:
     query:
       key: "is_csa_title_visible"
   result: title_res
-  next: getEndedChats
 
 getChatNps:
   call: http.get
