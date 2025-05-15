@@ -106,7 +106,7 @@ updateDenormalizedChat:
       forwardedToName: ""
       receivedFrom: ${activeChat.receivedFrom}
       receivedFromName: ""
-      updated: ${redirectChatRes.response.body[0].updated}
+      updated: ${insert_chat_res.response.body[0].updated}
   result: return_result
 
 return_result:

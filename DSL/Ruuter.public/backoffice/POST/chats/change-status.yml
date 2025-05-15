@@ -160,7 +160,7 @@ updateDenormalizedChat:
       endUserOs: ${activeChat.endUserOs ?? ""}
       endUserUrl: ${activeChat.endUserUrl ?? ""}
       externalId: ${activeChat.externalId ?? ""}
-      created: ${activeChat.created ?? "CURRENT_TIMESTAMP"}
+      created: ${activeChat.created ?? change_status_res.response.body[0].updated}
       ended: ""
       forwardedTo: ${activeChat.forwardedTo ?? ""}
       forwardedToName: ${activeChat.forwardedToName ?? ""}

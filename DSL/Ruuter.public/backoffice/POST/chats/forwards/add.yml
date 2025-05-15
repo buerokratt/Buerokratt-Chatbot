@@ -151,7 +151,7 @@ updateDenormalizedChat:
       feedbackRating: ""
       externalId: ${forwardChatRes.response.body.data.format_forward_destination_response.generatedChatId}
       created: ${activeChat.created}
-      ended: "CURRENT_TIMESTAMP"
+      ended: ${redirectChatRes.response.body[0].updated}
       forwardedTo: ${activeChat.forwardedTo}
       forwardedToName: ${activeChat.forwardedToName}
       receivedFrom: ${activeChat.receivedFrom}
