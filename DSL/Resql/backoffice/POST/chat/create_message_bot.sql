@@ -7,7 +7,7 @@ INSERT INTO message (
     author_timestamp,
     author_id,
     author_first_name,
-    author_last_name, author_role, rating, created
+    author_last_name, author_role, rating, created, updated
 )
 SELECT
     (SELECT value) ->> 'chatId' AS chat_base_id,
@@ -28,5 +28,7 @@ SELECT
     (SELECT value) ->> 'authorLastName' AS author_last_name,
     'buerokratt',
     null,
+    NOW() + ordinality * INTERVAL '1 microsecond',
     NOW() + ordinality * INTERVAL '1 microsecond'
-FROM JSON_ARRAY_ELEMENTS(ARRAY_TO_JSON(ARRAY[:messages])) WITH ORDINALITY;
+FROM JSON_ARRAY_ELEMENTS(ARRAY_TO_JSON(ARRAY[:messages])) WITH ORDINALITY
+RETURNING updated::TEXT;
