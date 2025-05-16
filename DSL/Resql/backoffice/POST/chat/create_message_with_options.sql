@@ -29,4 +29,4 @@ VALUES (
     :forwardedFromCsa,
     :forwardedToCsa,
     :options
-);
+) RETURNING updated;
