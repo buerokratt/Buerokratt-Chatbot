@@ -16,7 +16,10 @@ INSERT INTO message (
 )
 VALUES (
     :chatId,
-    :id,
+    (CASE
+        WHEN :messageId IS NOT NULL AND :messageId <> '' THEN :messageId
+        ELSE (GEN_RANDOM_UUID()::VARCHAR)
+    END),
     :content,
     :event,
     :authorTimestamp::TIMESTAMP WITH TIME ZONE,
@@ -29,4 +32,4 @@ VALUES (
     :forwardedByUser,
     :forwardedFromCsa,
     :forwardedToCsa
-);
+) RETURNING updated;

@@ -69,7 +69,7 @@ updateDenormalizedChatMessage:
       chatId: ${message.chatBaseId}
       lastMessageTimestamp: ${insert_message_res.response.body[0].updated}
       isSupportMessage: ${message.authorRole == "backoffice-user"}
-      isCustomerMessage: false
+      isCustomerMessage: ${message.authorRole == "end-user"}
       authorTimestamp: ${message.authorTimestamp ?? insert_message_res.response.body[0].updated}
       content: ${content ?? ""}
       lastMessageAuthorId: ${message.authorId ?? ""}
