@@ -40,6 +40,17 @@ insertEmailAndPhone:
       endUserPhone: "${phone ? phone : ''}"
   result: notify_messages
 
+insertDenormalizedChatEmailAndPhone:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_end_user_email_and_phone"
+    body:
+      chatId: ${chatId}
+      endUserEmail: "${email ? email : ''}"
+      endUserPhone: "${phone ? phone : ''}"
+      updated: ${notify_messages.response.body[0].updated}
+  result: insertIdAndNameDenormalizedResult
+
 notify_messages:
   template: "[#CHATBOT_PROJECT_LAYER]/messages/notify"
   requestType: templates

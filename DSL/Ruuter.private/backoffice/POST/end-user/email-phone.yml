@@ -40,6 +40,17 @@ insertEmailAndPhone:
       endUserPhone: "${phone ? phone : ''}"
   result: insertEmailAndPhoneResult
 
+insertDenormalizedChatEmailAndPhone:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_end_user_email_and_phone"
+    body:
+      chatId: ${chatId}
+      endUserEmail: "${email ? email : ''}"
+      endUserPhone: "${phone ? phone : ''}"
+      updated: ${insertEmailAndPhoneResult.response.body[0].updated}
+  result: insertIdAndNameDenormalizedResult
+
 returnSuccess:
   return: Updated ${chatId} with ${email} and ${phone}.
   next: end
