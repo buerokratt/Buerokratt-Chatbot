@@ -49,7 +49,7 @@ insertDenormalizedChatEmailAndPhone:
       endUserEmail: "${email ? email : ''}"
       endUserPhone: "${phone ? phone : ''}"
       updated: ${insertEmailAndPhoneResult.response.body[0].updated}
-  result: insertIdAndNameDenormalizedResult
+  result: insertDenormalizedChatEmailAndPhoneResult
 
 returnSuccess:
   return: Updated ${chatId} with ${email} and ${phone}.
