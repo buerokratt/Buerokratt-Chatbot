@@ -213,6 +213,16 @@ redirect_chat_to_back_office:
     body:
       chatId: ${chatId}
   result: redirect_chat_to_back_office_result
+  next: redirect_denormalized_chat_to_back_office
+
+redirect_denormalized_chat_to_back_office:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_remove_agent"
+    body:
+      chatId: ${chatId}
+      updated: ${redirect_chat_to_back_office_result.response.body[0].updated}
+  result: redirect_denormalized_chat_to_back_office_result
   next: add_chat_id_to_queue_notification_node
 
 add_chat_id_to_queue_notification_node:

@@ -7,10 +7,11 @@ SELECT copy_row_with_modifications(
         'csa_title', '', '',
         'updated', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR
     ]::VARCHAR[]
-) FROM chat
+), NOW()::TEXT as updated FROM chat
 WHERE
     id IN (
         SELECT MAX(id) FROM chat
+        WHERE base_id = :chatId
         GROUP BY base_id
     )
     AND base_id = :chatId
