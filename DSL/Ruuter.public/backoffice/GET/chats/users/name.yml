@@ -68,7 +68,7 @@ insertIdAndName:
 insertDenormalizedChatIdAndName:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_end_user_fields"
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_end_user_id_and_name"
     body:
       chatId: ${chatId}
       endUserId: "${id ? id : ''}"
