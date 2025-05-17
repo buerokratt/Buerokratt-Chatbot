@@ -63,7 +63,19 @@ insertIdAndName:
       endUserFirstName: "${firstName ? firstName : ''}"
       endUserLastName: "${lastName ? lastName : ''}"
   result: insertIdAndNameResult
-  next: getUuid
+  next: insertDenormalizedChatIdAndName
+
+insertDenormalizedChatIdAndName:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_end_user_fields"
+    body:
+      chatId: ${chatId}
+      endUserId: "${id ? id : ''}"
+      endUserFirstName: "${firstName ? firstName : ''}"
+      endUserLastName: "${lastName ? lastName : ''}"
+      updated: ${insertIdAndNameResult.response.body[0].updated}
+  result: getUuid
 
 getUuid:
   call: http.post

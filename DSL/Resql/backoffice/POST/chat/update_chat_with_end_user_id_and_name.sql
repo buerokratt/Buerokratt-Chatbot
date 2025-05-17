@@ -7,7 +7,7 @@ SELECT copy_row_with_modifications(
         'end_user_last_name', '', :endUserLastName,
         'updated', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR
     ]::VARCHAR[]
-) FROM chat
+), NOW()::TEXT as updated FROM chat
 WHERE base_id = :chatId
 ORDER BY updated DESC
 LIMIT 1;

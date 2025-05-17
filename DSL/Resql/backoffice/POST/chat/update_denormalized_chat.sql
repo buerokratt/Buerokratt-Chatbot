@@ -44,6 +44,13 @@ SELECT copy_row_with_modifications(
         'forwarded_to_name', '', :forwardedToName,
         'received_from', '', :receivedFrom,
         'received_from_name', '', :receivedFromName,
+        'end_user_id', '', :endUserId,
+        'end_user_first_name', '', :endUserFirstName,
+        'end_user_last_name', '', :endUserLastName,
+        'end_user_email', '', :endUserEmail,
+        'end_user_phone', '', :endUserPhone,
+        'end_user_os', '', :endUserOs,
+        'end_user_url', '', :endUserUrl,
         'csa_title', '', 
             CASE
                 WHEN :csaTitle::TEXT = 'null' THEN NULL
