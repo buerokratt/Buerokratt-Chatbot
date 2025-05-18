@@ -5,5 +5,5 @@ SELECT copy_row_with_modifications(
         'content', '', '',
         'updated', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR
     ]::VARCHAR[]
-) FROM message
-WHERE chat_base_id IN (:chats);
+), NOW()::TEXT as updated FROM message AS m1
+WHERE chat_base_id IN (:chats) AND id in (select max(id) from message AS m2 where m1.chat_base_id = m2.chat_base_id and m1.base_id = m2.base_id);
