@@ -85,20 +85,20 @@ WHERE
             AND (
             :search IS NULL
             OR :search = ''
-            OR LOWER(customer_support_display_name) LIKE LOWER('%' || :search || '%')
-            OR LOWER(end_user_first_name) LIKE LOWER('%' || :search || '%')
-            OR LOWER(contacts_message) LIKE LOWER('%' || :search || '%')
-            OR LOWER(comment) LIKE LOWER('%' || :search || '%')
-            OR LOWER(status) LIKE LOWER('%' || :search || '%')
-            OR LOWER(last_message_event) LIKE LOWER('%' || :search || '%')
-            OR LOWER(chat_id) LIKE LOWER('%' || :search || '%')
-            OR TO_CHAR(first_message_timestamp, 'DD.MM.YYYY HH24:MI:SS') LIKE LOWER('%' || :search || '%')
-            OR TO_CHAR(ended, 'DD.MM.YYYY HH24:MI:SS') LIKE LOWER('%' || :search || '%')
-            OR LOWER(last_message) LIKE LOWER('%' || :search || '%')
+            OR customer_support_display_name ILIKE '%' || :search || '%'
+            OR end_user_first_name ILIKE '%' || :search || '%'
+            OR contacts_message ILIKE '%' || :search || '%'
+            OR comment ILIKE '%' || :search || '%'
+            OR status ILIKE '%' || :search || '%'
+            OR last_message_event ILIKE '%' || :search || '%'
+            OR chat_id ILIKE '%' || :search || '%'
+            OR TO_CHAR(first_message_timestamp, 'DD.MM.YYYY HH24:MI:SS') ILIKE '%' || :search || '%'
+            OR TO_CHAR(ended, 'DD.MM.YYYY HH24:MI:SS') ILIKE '%' || :search || '%'
+            OR last_message ILIKE '%' || :search || '%'
             OR EXISTS (
                 SELECT 1
                 FROM unnest(all_messages) AS message_content
-                WHERE LOWER(message_content) LIKE LOWER('%' || :search || '%')
+                WHERE message_content ILIKE '%' || :search || '%'
             )
         )
 ORDER BY

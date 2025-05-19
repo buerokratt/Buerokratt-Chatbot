@@ -10,4 +10,4 @@ WITH consts AS (
 )
 SELECT DISTINCT chat_id
 FROM chat_history_comments
-WHERE lower(comment) LIKE (SELECT search_key FROM regx);
+WHERE comment ILIKE (SELECT search_key FROM regx);
