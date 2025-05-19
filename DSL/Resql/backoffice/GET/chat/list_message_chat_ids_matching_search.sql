@@ -10,4 +10,4 @@ WITH consts AS (
 )
 SELECT DISTINCT chat_base_id AS chat_id
 FROM message
-WHERE lower(content) LIKE (SELECT search_key FROM regx);
+WHERE content ILIKE (SELECT search_key FROM regx);

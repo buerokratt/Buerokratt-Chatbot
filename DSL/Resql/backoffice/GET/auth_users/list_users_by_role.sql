@@ -32,19 +32,13 @@ WHERE
           )) AS e)::CHARACTER VARYING ARRAY
     AND (
         :search_display_name_and_csa_title IS NULL
-        OR LOWER(display_name) LIKE LOWER(
-            '%' || :search_display_name_and_csa_title || '%'
-        )
-        OR LOWER(csa_title) LIKE LOWER(
-            '%' || :search_display_name_and_csa_title || '%'
-        )
+        OR display_name ILIKE '%' || :search_display_name_and_csa_title || '%'
+        OR csa_title ILIKE '%' || :search_display_name_and_csa_title || '%'
     )
     AND (
         :search_full_name_and_csa_title IS NULL
-        OR LOWER(first_name || ' ' || last_name) LIKE LOWER(
-            '%' || :search_full_name_and_csa_title || '%'
-        )
-        OR LOWER(csa_title) LIKE LOWER('%' || :search_full_name_and_csa_title || '%')
+        OR (first_name || ' ' || last_name) ILIKE '%' || :search_full_name_and_csa_title || '%'
+        OR csa_title ILIKE '%' || :search_full_name_and_csa_title || '%'
     )
     AND ((:show_active_only)::boolean <> TRUE OR status <> 'offline')
     AND (:search_full_name IS NULL OR (

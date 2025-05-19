@@ -29,11 +29,11 @@ WITH
 SELECT DISTINCT base_id as chat_id
 FROM chat
 WHERE 
-    LOWER(base_id) LIKE (SELECT search_key FROM regx)
-    OR LOWER(customer_support_display_name) LIKE (SELECT search_key FROM regx)
-    OR LOWER(end_user_first_name) LIKE (SELECT search_key FROM regx)
-    OR LOWER(end_user_last_name) LIKE (SELECT search_key FROM regx)
-    OR LOWER(end_user_id) LIKE (SELECT search_key FROM regx)
-    OR LOWER(end_user_email) LIKE (SELECT search_key FROM regx)
-    OR LOWER(end_user_phone) LIKE (SELECT search_key FROM regx)
-    OR LOWER(end_user_url) LIKE (SELECT search_key FROM regx);
+    base_id ILIKE (SELECT search_key FROM regx)
+    OR customer_support_display_name ILIKE (SELECT search_key FROM regx)
+    OR end_user_first_name ILIKE (SELECT search_key FROM regx)
+    OR end_user_last_name ILIKE (SELECT search_key FROM regx)
+    OR end_user_id ILIKE (SELECT search_key FROM regx)
+    OR end_user_email ILIKE (SELECT search_key FROM regx)
+    OR end_user_phone ILIKE (SELECT search_key FROM regx)
+    OR end_user_url ILIKE (SELECT search_key FROM regx);
