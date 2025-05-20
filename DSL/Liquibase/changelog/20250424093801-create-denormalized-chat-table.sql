@@ -52,7 +52,100 @@ CREATE TABLE denormalized_chat (
     CONSTRAINT denormalized_chat_pkey PRIMARY KEY (id)
 );
 
-CREATE INDEX idx_denorm_chat_id_updated ON public.denormalized_chat USING btree (chat_id, updated);
+-- Index #1: For DISTINCT ON and ROW_NUMBER operations with denormalized_record_created
+-- (Used in nearly all queries to find latest records per chat_id)
+CREATE INDEX idx_denormalized_chat_chatid_record_created 
+ON denormalized_chat(chat_id, denormalized_record_created DESC);
+
+-- Index #2: For filtering on status, ended, and end_user_id
+-- (Complex filtering conditions in multiple queries)
+CREATE INDEX idx_denormalized_chat_status_ended_enduser 
+ON denormalized_chat(status, ended, end_user_id);
+
+-- Index #3: For filtering on ended, status, customer_support_id and sorting by created
+-- (Added for query #4)
+CREATE INDEX idx_denormalized_chat_ended_status_support_created 
+ON denormalized_chat(ended, status, customer_support_id, created);
+
+-- Index #4: For status filtering (appears in multiple queries)
+CREATE INDEX idx_denormalized_chat_status 
+ON denormalized_chat(status);
+
+-- Index #5: For ended filtering (appears in multiple queries)
+CREATE INDEX idx_denormalized_chat_ended 
+ON denormalized_chat(ended);
+
+-- Index #6: For customer_support_id filtering (appears in multiple queries)
+CREATE INDEX idx_denormalized_chat_customer_support_id 
+ON denormalized_chat(customer_support_id);
+
+-- Index #7: For first_message filtering (query #5)
+CREATE INDEX idx_denormalized_chat_first_message 
+ON denormalized_chat(first_message);
+
+-- Index #8: For last_message filtering (query #5)
+CREATE INDEX idx_denormalized_chat_last_message 
+ON denormalized_chat(last_message);
+
+-- Index #9: For first_message_timestamp sorting and filtering (query #5)
+CREATE INDEX idx_denormalized_chat_first_message_timestamp 
+ON denormalized_chat(first_message_timestamp);
+
+-- Index #10: For customer_support_display_name sorting and filtering (query #5)
+CREATE INDEX idx_denormalized_chat_customer_support_display_name 
+ON denormalized_chat(customer_support_display_name);
+
+-- Index #11: For end_user_first_name sorting and filtering (query #5)
+CREATE INDEX idx_denormalized_chat_end_user_first_name 
+ON denormalized_chat(end_user_first_name);
+
+-- Index #12: For end_user_id sorting (query #5)
+CREATE INDEX idx_denormalized_chat_end_user_id 
+ON denormalized_chat(end_user_id);
+
+-- Index #13: For contacts_message sorting and filtering (query #5)
+CREATE INDEX idx_denormalized_chat_contacts_message 
+ON denormalized_chat(contacts_message);
+
+-- Index #14: For comment sorting and filtering (query #5)
+CREATE INDEX idx_denormalized_chat_comment 
+ON denormalized_chat(comment);
+
+-- Index #15: For labels sorting (query #5)
+CREATE INDEX idx_denormalized_chat_labels 
+ON denormalized_chat(labels);
+
+-- Index #16: For last_message_event filtering and sorting (query #5 and #10)
+CREATE INDEX idx_denormalized_chat_last_message_event 
+ON denormalized_chat(last_message_event);
+
+-- Index #17: For feedback_rating sorting (query #5)
+CREATE INDEX idx_denormalized_chat_feedback_rating 
+ON denormalized_chat(feedback_rating);
+
+-- Index #18: For customer_support_first_name and customer_support_last_name (query #5)
+CREATE INDEX idx_denormalized_chat_cs_first_last_name 
+ON denormalized_chat(customer_support_first_name, customer_support_last_name);
+
+-- Index #19: For created sorting (queries #4, #9, #10)
+CREATE INDEX idx_denormalized_chat_created 
+ON denormalized_chat(created);
+
+-- Index #20: For the array operations (query #5)
+CREATE INDEX idx_denormalized_chat_all_messages 
+ON denormalized_chat USING gin(all_messages);
+
+-- Index #21: For chat_duration_in_seconds (query #6)
+CREATE INDEX idx_denormalized_chat_duration 
+ON denormalized_chat(chat_duration_in_seconds);
+
+-- Index #22: For filtering on last_message_with_content_and_not_rating_or_forward
+CREATE INDEX idx_denormalized_chat_last_message_no_rating 
+ON denormalized_chat(last_message_with_content_and_not_rating_or_forward);
+
+-- Index #23: For filtering on last_message_with_not_rating_or_forward_events_timestamp
+CREATE INDEX idx_denormalized_chat_last_message_timestamp_no_rating 
+ON denormalized_chat(last_message_with_not_rating_or_forward_events_timestamp);
 
 -- Updated INSERT script to include both IDLE and non-IDLE chats
 INSERT INTO denormalized_chat (
