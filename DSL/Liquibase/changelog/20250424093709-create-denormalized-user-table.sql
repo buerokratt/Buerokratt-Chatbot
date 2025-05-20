@@ -29,6 +29,33 @@ CREATE TABLE denormalized_user_data (
 
 ALTER TABLE denormalized_user_data ADD PRIMARY KEY (id);
 
+-- For simpler queries that filter by id_code and order by created
+CREATE INDEX idx_denormalized_user_data_id_code_created ON denormalized_user_data (id_code, created DESC);
+
+-- For queries that filter by status
+CREATE INDEX idx_denormalized_user_data_status ON denormalized_user_data (status);
+
+-- For queries that filter by user_status
+CREATE INDEX idx_denormalized_user_data_user_status ON denormalized_user_data (user_status);
+
+-- For the complex search/sort query
+CREATE INDEX idx_complex_search_sort ON denormalized_user_data (
+    user_status,
+    id_code,
+    created DESC,
+    first_name,
+    last_name,
+    display_name,
+    csa_title,
+    csa_email,
+    department,
+    status
+);
+
+-- For array operations
+CREATE INDEX idx_denormalized_user_data_authority_name ON denormalized_user_data USING gin (authority_name);
+
+
 -- Now insert the data ordering by created timestamp to ensure IDs align with timestamps
 -- Insert data into the denormalized table
 INSERT INTO denormalized_user_data (
