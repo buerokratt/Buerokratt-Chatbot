@@ -5,9 +5,9 @@ FROM (
         chat_id,
         chat_duration_in_seconds,
         ended,
-        customer_support_id,
+        customer_support_id
     FROM denormalized_chat
-    ORDER BY chat_id, id DESC
+    ORDER BY chat_id, denormalized_record_created DESC
 ) latest_chats
 WHERE
     ended IS NOT NULL

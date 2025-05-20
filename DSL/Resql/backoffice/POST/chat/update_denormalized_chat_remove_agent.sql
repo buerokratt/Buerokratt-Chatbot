@@ -27,10 +27,10 @@ SELECT copy_row_with_modifications(
 )
 FROM denormalized_chat
 WHERE
-    id IN (
-        SELECT MAX(id) FROM denormalized_chat
+    denormalized_record_created = (
+        SELECT MAX(denormalized_record_created)
+        FROM denormalized_chat dc_inner
         WHERE chat_id = :chatId
-        GROUP BY chat_id
     )
     AND chat_id = :chatId
     AND ended IS null;

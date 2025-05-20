@@ -25,7 +25,8 @@ SELECT copy_row_with_modifications(
     ]::VARCHAR[]
 )
 FROM denormalized_chat
-WHERE chat_id IN (:chats) AND id IN (
-    SELECT MAX(id) FROM denormalized_chat
-    GROUP BY chat_id
+WHERE chat_id IN (:chats) AND denormalized_record_created = (
+    SELECT MAX(denormalized_record_created)
+    FROM denormalized_chat dc_inner
+    WHERE dc_inner.chat_id = dc.chat_id
 );

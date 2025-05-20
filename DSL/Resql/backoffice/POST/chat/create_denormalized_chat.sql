@@ -36,7 +36,6 @@ INSERT INTO denormalized_chat (
     last_message_event,
     last_message_event_with_content,
     chat_duration_in_seconds,
-    is_bot,
     customer_messages_count,
     labels,
     last_message_with_content_and_not_rating_or_forward,
@@ -99,7 +98,6 @@ VALUES (
     CASE WHEN :lastMessageEvent = 'null' THEN NULL ELSE :lastMessageEvent END,
     CASE WHEN :lastMessageEventWithContent = 'null' THEN NULL ELSE :lastMessageEventWithContent END,
     CASE WHEN (:chatDurationInSeconds::TEXT) = 'null' THEN NULL ELSE NULLIF(:chatDurationInSeconds::TEXT, '')::NUMERIC END,
-    COALESCE(:isBot::BOOLEAN, false),
     NULLIF(:customerMessagesCount::TEXT, '')::INTEGER,
     CASE WHEN :labels = 'null' THEN NULL ELSE :labels::VARCHAR[] END,
     CASE 

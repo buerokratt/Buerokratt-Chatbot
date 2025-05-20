@@ -31,7 +31,7 @@ WITH latest_chat_records AS (
         last_message_event,
         all_messages
     FROM denormalized_chat
-    ORDER BY chat_id, id DESC
+    ORDER BY chat_id, denormalized_record_created DESC
 )
 
 SELECT

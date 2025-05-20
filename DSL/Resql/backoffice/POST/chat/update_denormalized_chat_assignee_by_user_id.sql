@@ -29,12 +29,12 @@ WHERE
     dc.ended IS NULL
     AND dc.customer_support_id = :userId
     -- Get only the latest record for each chat
-    AND dc.id IN (
-        SELECT MAX(id)
+    AND dc.denormalized_record_created = (
+        SELECT MAX(dc_inner.denormalized_record_created)
         FROM denormalized_chat dc_inner
-        WHERE dc_inner.ended IS NULL
+        WHERE dc_inner.chat_id = dc.chat_id
+        AND dc_inner.ended IS NULL
         AND dc_inner.customer_support_id = :userId
-        GROUP BY chat_id
     )
     AND dc.last_message_with_content_and_not_rating_or_forward IS NOT NULL
     AND dc.last_message_with_not_rating_or_forward_events_timestamp IS NOT NULL;

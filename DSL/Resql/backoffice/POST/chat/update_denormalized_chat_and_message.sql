@@ -159,5 +159,5 @@ SELECT copy_row_with_modifications(
 )
 FROM denormalized_chat
 WHERE chat_id = :chatId
-ORDER BY id DESC
+ORDER BY denormalized_record_created DESC
 LIMIT 1;
