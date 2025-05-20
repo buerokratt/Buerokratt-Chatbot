@@ -59,8 +59,17 @@ get_csa_activity:
 check_csa_activity_response:
   switch:
     - condition: ${activity_res.response.body[0] != null && activity_res.response.body[0].status != 'offline'}
-      next: getActiveChatById
+      next: get_title_visibility
   next: return_csa_is_offline
+
+get_title_visibility:
+  call: http.get
+  args:
+    url: "[#CHATBOT_RESQL]/config/get_configuration"
+    query:
+      key: "is_csa_title_visible"
+  result: title_res
+  next: getActiveChatById
 
 getActiveChatById:
   call: http.get
@@ -68,6 +77,7 @@ getActiveChatById:
     url: "[#CHATBOT_RESQL]/chat/get_chat_active_by_id"
     query:
       id: ${id}
+      is_csa_title_visible: ${title_res.response.body[0]?.value}
   result: activeChatRes
   next: checkActiveChatResult
 
@@ -200,6 +210,7 @@ getRedirectedChat:
     url: "[#CHATBOT_RESQL]/chat/get_chat_active_by_id"
     query:
       id: ${id}
+      is_csa_title_visible: ${title_res.response.body[0]?.value}
   result: redirectedChatRes
   next: notify_messages
 

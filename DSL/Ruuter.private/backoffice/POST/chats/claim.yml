@@ -184,6 +184,7 @@ getClaimedChat:
     url: "[#CHATBOT_RESQL]/chat/get_chat_active_by_id"
     query:
       id: ${id}
+      is_csa_title_visible: ${title_res.response.body[0]?.value}
   result: claimedChatRes
 
 notify_messages:

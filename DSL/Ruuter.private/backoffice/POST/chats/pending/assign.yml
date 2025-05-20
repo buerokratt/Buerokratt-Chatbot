@@ -176,6 +176,15 @@ notify_chats:
   body:
     chatId: ${id}
   result: chats_notify_res
+  next: get_title_visibility
+
+get_title_visibility:
+  call: http.get
+  args:
+    url: "[#CHATBOT_RESQL]/config/get_configuration"
+    query:
+      key: "is_csa_title_visible"
+  result: title_res
   next: getRedirectedChat
 
 getRedirectedChat:
@@ -184,6 +193,7 @@ getRedirectedChat:
     url: "[#CHATBOT_RESQL]/chat/get_chat_active_by_id"
     query:
       id: ${id}
+      is_csa_title_visible: ${title_res.response.body[0]?.value}
   result: redirectedChatRes
   next: notify_messages
 
