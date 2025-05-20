@@ -2,13 +2,13 @@
 WITH
     active_administrators AS (
         SELECT id_code
-        FROM denormalized_user_data
+        FROM denormalized_user_data AS d_1
         WHERE
             'ROLE_ADMINISTRATOR' = ANY(authority_name)
-            AND id IN (
-                SELECT MAX(id)
-                FROM denormalized_user_data
-                GROUP BY id_code
+            AND created = (
+                SELECT MAX(d_2.created)
+                FROM denormalized_user_data AS d_2
+                WHERE d_1.id_code = d_2.id_code
             )
     ),
 
@@ -69,7 +69,7 @@ WITH
                     AND :userIdCode NOT IN (SELECT id_code FROM active_administrators)
                 )
             )
-        ORDER BY id DESC
+        ORDER BY created DESC
         LIMIT 1
     ),
 

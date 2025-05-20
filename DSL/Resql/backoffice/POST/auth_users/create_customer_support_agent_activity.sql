@@ -11,5 +11,5 @@ SELECT copy_row_with_modifications(
 )
 FROM denormalized_user_data
 WHERE id_code = :userIdCode
-ORDER BY id DESC
+ORDER BY created DESC
 LIMIT 1;

@@ -5,5 +5,5 @@ SELECT
 FROM denormalized_user_data
 WHERE
     id_code = :customerSupportId
-ORDER BY id DESC
+ORDER BY created DESC
 LIMIT 1;

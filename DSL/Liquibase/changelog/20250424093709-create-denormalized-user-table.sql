@@ -213,3 +213,6 @@ WITH combined_records AS (
 )
 SELECT * FROM combined_records
 ORDER BY created;
+
+DROP TABLE customer_support_agent_activity;
+DROP TABLE user_authority;

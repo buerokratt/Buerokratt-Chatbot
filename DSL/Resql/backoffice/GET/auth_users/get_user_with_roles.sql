@@ -12,6 +12,6 @@ SELECT
     authority_name AS authorities
 FROM denormalized_user_data
 WHERE
-    login = :login
-ORDER BY id DESC
+    id_code = :login
+ORDER BY created DESC
 LIMIT 1;

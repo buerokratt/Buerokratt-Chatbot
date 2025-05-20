@@ -15,5 +15,5 @@ WHERE
     user_status <> 'deleted'
     AND id_code = :userIdCode
     AND ARRAY_LENGTH(authority_name, 1) > 0
-ORDER BY id DESC
+ORDER BY created DESC
 LIMIT 1;
