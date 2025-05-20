@@ -6,14 +6,8 @@ CREATE INDEX idx_message_base_id_updated ON message (base_id, updated DESC);
 -- Index for filtering by chat_base_id with DISTINCT ON base_id and ordering
 CREATE INDEX idx_message_chat_id_base_id_updated ON message (chat_base_id, base_id, updated DESC);
 
--- Index for event filtering
-CREATE INDEX idx_message_event ON message (event);
-
 -- Index for ordering by created
 CREATE INDEX idx_message_created ON message (created);
-
--- Index for DISTINCT on chat_base_id operations
-CREATE INDEX idx_message_chat_base_id ON message (chat_base_id);
 
 -- Trigram index for ILIKE text searches on content field
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
