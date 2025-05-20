@@ -108,7 +108,7 @@ WITH
                     AND :userIdCode NOT IN (SELECT id_code FROM active_administrators)
                 )
             )
-        ORDER BY id DESC
+        ORDER BY created DESC
         LIMIT 1
     )
 
