@@ -2,18 +2,18 @@
 WITH
     active_administrators AS (
         SELECT id_code
-        FROM denorm_user_csa_authority_profile_settings
+        FROM denormalized_user_data
         WHERE
             'ROLE_ADMINISTRATOR' = ANY(authority_name)
             AND id IN (
                 SELECT MAX(id)
-                FROM denorm_user_csa_authority_profile_settings
+                FROM denormalized_user_data
                 GROUP BY id_code
             )
     ),
 
     delete_from_denorm_table AS (
-        INSERT INTO denorm_user_csa_authority_profile_settings (
+        INSERT INTO denormalized_user_data (
             login,
             first_name,
             last_name,
@@ -58,7 +58,7 @@ WITH
             false,
             false,
             false
-        FROM denorm_user_csa_authority_profile_settings
+        FROM denormalized_user_data
         WHERE
             id_code = :userIdCode
             AND user_status <> 'deleted'

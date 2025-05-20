@@ -15,13 +15,13 @@ SELECT
     status_comment,
     csa_created AS status_comment_time_stamp,
     CEIL(COUNT(*) OVER () / :page_size::DECIMAL) AS total_pages
-FROM denorm_user_csa_authority_profile_settings
+FROM denormalized_user_data
 WHERE
     user_status <> 'deleted'
     AND ARRAY_LENGTH(authority_name, 1) > 0
     AND id IN (
         SELECT MAX(id)
-        FROM denorm_user_csa_authority_profile_settings
+        FROM denormalized_user_data
         GROUP BY id_code
     )
     AND authority_name && 

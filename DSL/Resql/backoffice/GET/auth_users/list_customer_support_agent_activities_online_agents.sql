@@ -3,10 +3,10 @@ SELECT
     active,
     status,
     status_comment
-FROM denorm_user_csa_authority_profile_settings
+FROM denormalized_user_data
 WHERE
     (status = 'online')
     AND id IN (
-        SELECT MAX(id) FROM denorm_user_csa_authority_profile_settings
+        SELECT MAX(id) FROM denormalized_user_data
         GROUP BY id_code
     );
