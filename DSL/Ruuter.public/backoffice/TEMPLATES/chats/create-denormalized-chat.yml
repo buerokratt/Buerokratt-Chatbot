@@ -42,7 +42,6 @@ create_denormalized_chat:
       lastMessageEvent: ${incoming.body.lastMessageEvent ?? "null"}
       lastMessageEventWithContent: ${incoming.body.lastMessageEventWithContent ?? "null"}
       chatDurationInSeconds: ${incoming.body.chatDurationInSeconds ?? "null"}
-      isBot: ${incoming.body.isBot || false}
       customerMessagesCount: ${incoming.body.customerMessagesCount ?? 0}
       labels: ${incoming.body.labels ?? "null"}
       lastMessageWithContentAndNotRatingOrForward: ${incoming.body.lastMessageWithContentAndNotRatingOrForward ?? "null"}
