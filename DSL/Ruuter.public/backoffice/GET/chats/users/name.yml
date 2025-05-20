@@ -15,12 +15,11 @@ declaration:
 get_tara_user_info:
   call: http.get
   args:
-   url: "[#CHATBOT_TIM]/jwt/userinfo"
-   contentType: plaintext
-   headers:
-    cookie: ${incoming.headers.cookie}
-   plaintext: 
-      "JWTTOKEN"
+    url: "[#CHATBOT_TIM]/jwt/userinfo"
+    contentType: plaintext
+    headers:
+      cookie: ${incoming.headers.cookie}
+    plaintext: "JWTTOKEN"
   result: tara_info
   next: assignUserInfo
 
@@ -35,12 +34,11 @@ assignUserInfo:
 get_chat_info:
   call: http.post
   args:
-   url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
-   contentType: plaintext
-   headers:
-    cookie: ${incoming.headers.cookie}
-   plaintext:
-      "chatJwt"
+    url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
+    contentType: plaintext
+    headers:
+      cookie: ${incoming.headers.cookie}
+    plaintext: "chatJwt"
   result: infoRes
   next: check_chat_info_response
 
@@ -58,7 +56,7 @@ assignChatId:
 insertIdAndName:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/update-chat-with-end-user-id-and-name"
+    url: "[#CHATBOT_RESQL]/chat/update_chat_with_end_user_id_and_name"
     body:
       chatId: ${chatId}
       endUserId: "${id ? id : ''}"
@@ -79,21 +77,21 @@ getUuid:
 assignUuid:
   assign:
     uuid: ${uuid_result.response.body.uuid}
-  next: insertMessage  
+  next: insertMessage
 
 insertMessage:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/insert-message"
+    url: "[#CHATBOT_RESQL]/chat/create_message"
     body:
       chatId: ${chatId}
       messageId: ${uuid}
       content: ""
-      authorTimestamp: ${new Date().toISOString()}
+      authorTimestamp: "CURRENT_TIMESTAMP"
+      created: "CURRENT_TIMESTAMP"
       authorId: ${id ?? ""}
       authorFirstName: ${firstName ?? ""}
       authorRole: "end-user"
-      created: ${new Date().toISOString()}
       authorLastName: ${lastName ?? ""}
       rating: ""
       event: "user-authenticated"
@@ -143,7 +141,7 @@ assign_cookie:
       Domain: "[#DOMAIN]"
       Secure: true
       HttpOnly: true
-      SameSite: "Lax"
+      SameSite: "[#COOKIE_SAME_SITE]"
   next: notify_chats
 
 notify_chats:

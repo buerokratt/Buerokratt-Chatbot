@@ -38,7 +38,7 @@ assignIdCode:
 unclaimAllAssignedChats:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/update-chats-assignee-by-user-id"
+    url: "[#CHATBOT_RESQL]/chat/update_chat_assignee_by_user_id"
     body:
       userId: ${idCode}
   result: unclaim_res

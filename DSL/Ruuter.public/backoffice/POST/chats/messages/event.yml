@@ -38,13 +38,13 @@ extractRequestData:
   next: getMessageById
 
 getMessageById:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-message-by-id"
-    body:
+    url: "[#CHATBOT_RESQL]/chat/get_message"
+    query:
       id: ${messageId}
   result: res
-  next: assignMessage  
+  next: assignMessage
 
 assignMessage:
   assign:
@@ -54,16 +54,16 @@ assignMessage:
 insertMessage:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/insert-message"
+    url: "[#CHATBOT_RESQL]/chat/create_message"
     body:
       messageId: ${messageId}
       chatId: ${message.chatBaseId}
       authorId: ${message.authorId ?? "end-user"}
-      authorTimestamp: ${authorTimestamp ?? new Date().toISOString()}
+      authorTimestamp: ${authorTimestamp ?? "CURRENT_TIMESTAMP"}
       authorFirstName: ${message.authorFirstName ?? ""}
       authorLastName: ${message.authorLastName ?? ""}
       authorRole: "end-user"
-      created: ${message.created ?? new Date().toISOString()}
+      created: ${message.created ?? "CURRENT_TIMESTAMP"}
       content: ${content ?? ""}
       event: ${event ?? ""}
       forwardedByUser: ${message.forwardedByUser ?? ""}

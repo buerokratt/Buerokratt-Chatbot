@@ -19,9 +19,8 @@ extractRequestData:
 setConfigurationValue:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/set-configuration-value"
+    url: "[#CHATBOT_RESQL]/config/create_configuration"
     body:
-      created: ${new Date().toISOString()}
       key: "end_user_session_length"
       value: ${sessionLength}
   result: setConfigurationResult

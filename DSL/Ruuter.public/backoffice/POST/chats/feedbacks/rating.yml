@@ -29,10 +29,9 @@ check_rating_limit:
 addFeedbackRating:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/update-chat-with-feedback-rating"
+    url: "[#CHATBOT_RESQL]/chat/update_chat_with_feedback_rating"
     body:
       id: ${chatId}
-      created: ${new Date().toISOString()}
       feedback_rating: ${rating}
   result: res
   next: return_result

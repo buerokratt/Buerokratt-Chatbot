@@ -28,7 +28,7 @@ extractRequestData:
 deleteMessagePreview:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/delete-message-preview"
+    url: "[#CHATBOT_RESQL]/chat/delete_message_preview"
     body:
       chatId: ${chatId}
       content: ""
@@ -47,14 +47,24 @@ getMessageUuid:
 assignMessageUuid:
   assign:
     messageUuid: ${message_uuid_result.response.body.uuid}
+  next: getTitleVisibility
+
+getTitleVisibility:
+  call: http.get
+  args:
+    url: "[#CHATBOT_RESQL]/config/get_configuration"
+    query:
+      key: "is_csa_title_visible"
+  result: title_res
   next: getActiveChatById
 
 getActiveChatById:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-chat-by-id"
-    body:
+    url: "[#CHATBOT_RESQL]/chat/get_chat_by_id"
+    query:
       id: ${chatId}
+      is_csa_title_visible: ${title_res.response.body[0]?.value}
   result: activeChatRes
   next: checkActiveChatResult
 
@@ -72,17 +82,17 @@ assignChat:
 postMessage:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/insert-message"
+    url: "[#CHATBOT_RESQL]/chat/create_message"
     body:
       chatId: ${chatId}
       messageId: ${messageUuid}
       content: ""
       authorTimestamp: ${authorTimestamp}
+      created: "CURRENT_TIMESTAMP"
       authorId: ${activeChat.customerSupportId ?? ""}
       authorFirstName: ${activeChat.customerSupportDisplayName ?? ""}
       authorLastName: ""
       authorRole: "backoffice-user"
-      created: ${new Date().toISOString()}
       rating: ""
       event: ${event}
       forwardedByUser: ""
@@ -94,7 +104,7 @@ postMessage:
 endChat:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/insert-chat"
+    url: "[#CHATBOT_RESQL]/chat/create_chat"
     body:
       id: ${activeChat.id}
       customerSupportId: ${activeChat.customerSupportId ?? ""}
@@ -104,8 +114,8 @@ endChat:
       endUserFirstName: ${activeChat.endUserFirstName ?? ""}
       endUserLastName: ${activeChat.endUserLastName ?? ""}
       status: "ENDED"
-      created: ${activeChat.created ?? new Date().toISOString()}
-      ended: ${new Date().toISOString()}
+      created: ${activeChat.created ?? "CURRENT_TIMESTAMP"}
+      ended: "CURRENT_TIMESTAMP"
       feedbackRating: ${activeChat.feedbackRating ?? ""}
       feedbackText: ${activeChat.feedbackText ?? ""}
       endUserEmail: ${activeChat.endUserEmail ?? ""}

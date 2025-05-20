@@ -8,9 +8,9 @@ declaration:
   namespace: backoffice
 
 getBotConfig:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-bot-config"
+    url: "[#CHATBOT_RESQL]/config/get_configuration_bot"
   result: res
 
 return_result:

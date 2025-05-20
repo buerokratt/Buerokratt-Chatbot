@@ -15,30 +15,39 @@ declaration:
 get_tara_user_info:
   call: http.get
   args:
-   url: "[#CHATBOT_TIM]/jwt/userinfo"
-   contentType: plaintext
-   headers:
-    cookie: ${incoming.headers.cookie}
-   plaintext: 
-      "JWTTOKEN"
+    url: "[#CHATBOT_TIM]/jwt/userinfo"
+    contentType: plaintext
+    headers:
+      cookie: ${incoming.headers.cookie}
+    plaintext: "JWTTOKEN"
   result: tara_info
   next: get_session_length
 
 get_session_length:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-configuration"
-    body:
+    url: "[#CHATBOT_RESQL]/config/get_configuration"
+    query:
       key: "session_length"
   result: session_result
+  next: getTitleVisibility
+
+getTitleVisibility:
+  call: http.get
+  args:
+    url: "[#CHATBOT_RESQL]/config/get_configuration"
+    query:
+      key: "is_csa_title_visible"
+  result: title_res
   next: getUser
 
 getUser:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-user-with-roles-by-id-code"
-    body:
+    url: "[#CHATBOT_RESQL]/auth_users/get_user_with_roles_by_id_code"
+    query:
       userIdCode: ${tara_info.response.body.personalCode}
+      is_csa_title_visible: ${title_res.response.body[0]?.value}
   result: user_info
   next: checkIfUserExists
 
@@ -51,7 +60,7 @@ checkIfUserExists:
 assignUser:
   assign:
     user: ${user_info.response.body[0]}
-  next: generate_cookie  
+  next: generate_cookie
 
 generate_cookie:
   call: http.post
@@ -60,18 +69,19 @@ generate_cookie:
     body:
       JWTName: "customJwtCookie"
       expirationInMinutes: ${session_result.response.body[0]?.value ?? '120'}
-      content: {
-        "idCode": "${user.idCode}",
-        "login": "${user.idCode}",
-        "displayName": "${user.displayName}",
-        "firstName": "${user.firstName}",
-        "lastName": "${user.lastName}",
-        "csaEmail": "${user.csaEmail}",
-        "csaTitle": "${user.csaTitle}",
-        "authorities": "${user.authorities}",
-        "authMethod": "${tara_info.response.body.authMethod}",
-        "fullName": "${tara_info.response.body.fullName}"
-      }
+      content:
+        {
+          "idCode": "${user.idCode}",
+          "login": "${user.idCode}",
+          "displayName": "${user.displayName}",
+          "firstName": "${user.firstName}",
+          "lastName": "${user.lastName}",
+          "csaEmail": "${user.csaEmail}",
+          "csaTitle": "${user.csaTitle}",
+          "authorities": "${user.authorities}",
+          "authMethod": "${tara_info.response.body.authMethod}",
+          "fullName": "${tara_info.response.body.fullName}",
+        }
   result: cookie_result
   next: assign_cookie
 
@@ -82,27 +92,26 @@ assign_cookie:
       Domain: "[#DOMAIN]"
       Secure: true
       HttpOnly: true
-      SameSite: "Lax"
+      SameSite: "[#COOKIE_SAME_SITE]"
   next: setCustomerSupportAgentAway
 
 setCustomerSupportAgentAway:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/set-customer-support-status"
+    url: "[#CHATBOT_RESQL]/auth_users/create_customer_support_agent_activity"
     body:
       active: false
       userIdCode: ${tara_info.response.body.personalCode}
-      created: ${new Date().toISOString()}
       status: "offline"
       statusComment: ""
   result: setCustomerSupportAgentAwayResult
-  next: return_value  
+  next: return_value
 
 return_value:
   headers:
     Set-Cookie: ${setCookie}
   return: ${cookie_result.response.body.token}
-  next: end 
+  next: end
 
 return_not_exists:
   return: "User does not exist"

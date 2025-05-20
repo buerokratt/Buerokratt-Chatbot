@@ -20,12 +20,21 @@ extractRequestData:
     chatId: ${incoming.body.chatId}
     options: ${incoming.body.options}
 
-getActiveChatById:
-  call: http.post
+get_title_visibility:
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-active-chat-by-id"
-    body:
+    url: "[#CHATBOT_RESQL]/config/get_configuration"
+    query:
+      key: "is_csa_title_visible"
+  result: title_res
+
+getActiveChatById:
+  call: http.get
+  args:
+    url: "[#CHATBOT_RESQL]/chat/get_chat_active_by_id"
+    query:
       id: ${chatId}
+      is_csa_title_visible: ${title_res.response.body[0]?.value}
   result: activeChatRes
 
 checkActiveChatResult:
@@ -49,15 +58,13 @@ assignMessageUuid:
 add_message_to_db:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/insert-message-with-options"
+    url: "[#CHATBOT_RESQL]/chat/create_message_with_options"
     body:
       chatId: ${chatId}
       messageId: ${messageUuid}
       content: ""
       options: ${options ?? "[]"}
-      authorTimestamp: ${new Date().toISOString()}
       authorRole: "buerokratt"
-      created: ${new Date().toISOString()}
       rating: ""
       event: ""
       forwardedByUser: ""
@@ -93,4 +100,4 @@ return_message_sent:
 return_chat_ended:
   return: "Chat Has Ended"
   status: 400
-  next: end  
+  next: end

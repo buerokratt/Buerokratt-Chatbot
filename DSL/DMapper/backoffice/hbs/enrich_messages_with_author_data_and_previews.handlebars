@@ -1,0 +1,22 @@
+[
+  {{#each messages}}
+    {
+      {{#each this}}
+        "{{@key}}": {{{toJSON this}}},
+      {{/each}}
+
+      {{#if (eq (getObjectKeyFromObjectArray ../activeUsers "idCode" this.authorId "csaTitle") null) }}
+        "csaTitle": null,
+        {{else}}
+        "csaTitle": "{{getObjectKeyFromObjectArray ../activeUsers "idCode" this.authorId "csaTitle"}}",
+      {{/if}}
+
+      {{#if (eq (getObjectKeyFromObjectArray ../messagePreviews "chatBaseId" this.chatId "content") null) }}
+        "preview": null
+        {{else}}
+        "preview": "{{getObjectKeyFromObjectArray ../messagePreviews "chatBaseId" this.chatId "content"}}"
+      {{/if}}
+
+    }{{#unless @last}},{{/unless}}
+  {{/each}}
+]

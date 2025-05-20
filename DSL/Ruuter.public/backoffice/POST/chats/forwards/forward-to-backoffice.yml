@@ -29,10 +29,10 @@ extractRequestData:
   next: check_bot_is_active
 
 check_bot_is_active:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-configuration"
-    body:
+    url: "[#CHATBOT_RESQL]/config/get_configuration"
+    query:
       key: "is_bot_active"
   result: is_bot_active_result
   next: check_bot_activity_result
@@ -44,18 +44,18 @@ check_bot_activity_result:
   next: return_bot_is_not_active
 
 get_bot_name:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-configuration"
-    body:
+    url: "[#CHATBOT_RESQL]/config/get_configuration"
+    query:
       key: "bot_institution_id"
   result: get_bot_name_result
   next: get_organization_base_config
 
 get_organization_base_config:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-organization-base-config"
+    url: "[#CHATBOT_RESQL]/config/get_configuration_organization"
   result: org_base_config_res
   next: assign_organization_base_config
 
@@ -71,13 +71,12 @@ check_if_organization_is_available_all_time:
   next: get_organization_working_details
 
 get_organization_working_details:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-is-organization-available"
-    body:
+    url: "[#CHATBOT_RESQL]/config/get_organization_availability"
+    query:
       holidays: ${holidays}
       holiday_names: ${holidayNames}
-      current_timestamp: ${new Date().toISOString()}
   result: org_res
   next: assign_organization_details
 
@@ -94,46 +93,42 @@ check_if_organization_is_available:
       next: return_is_a_holiday
     - condition: ${org_details.isWithinWorkingTime === true && org_details.isWithinWorkingDays === true && org_details.isAllowedToWorkAtHolidays === false && org_details.isHoliday == false}
       next: get_all_available_csas
-  next: return_organization_is_not_available  
+  next: return_organization_is_not_available
 
 return_is_a_holiday:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/insert-bot-message"
+    url: "[#CHATBOT_RESQL]/chat/create_message_bot"
     body:
       messages:
         - chatId: ${chatId}
           content: ${org_details.holidayMessage}
-          authorTimestamp: ${new Date().toISOString()}
           event: "${base_config.outsideWorkingHoursAskForContacts === 'true' ? 'unavailable_holiday_ask_contacts' : 'unavailable_holiday'}"
           authorId: ${get_bot_name_result.response.body[0].value}
           authorFirstName: ""
           authorLastName: ""
-          created: ${new Date().toISOString()}
   result: is_a_holiday_result
   next: notify_chats
 
 return_organization_is_not_available:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/insert-bot-message"
+    url: "[#CHATBOT_RESQL]/chat/create_message_bot"
     body:
       messages:
         - chatId: ${chatId}
           content: ${base_config.outsideWorkingHoursMessage}
-          authorTimestamp: ${new Date().toISOString()}
           event: "${base_config.outsideWorkingHoursAskForContacts === 'true' ? 'unavailable_organization_ask_contacts' : 'unavailable_organization'}"
           authorId: ${get_bot_name_result.response.body[0].value}
           authorFirstName: ""
           authorLastName: ""
-          created: ${new Date().toISOString()}
   result: organization_is_not_available_result
   next: notify_chats
 
 get_all_available_csas:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-all-available-customer-support-agents"
+    url: "[#CHATBOT_RESQL]/auth_users/list_customer_support_agent_activities_online_agents"
   result: csas_res
   next: assign_available_csas
 
@@ -151,24 +146,22 @@ check_if_csas_are_available:
 send_csas_not_available_message:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/insert-bot-message"
+    url: "[#CHATBOT_RESQL]/chat/create_message_bot"
     body:
       messages:
         - chatId: ${chatId}
           content: ${base_config.noCsaMessage}
-          authorTimestamp: ${new Date().toISOString()}
           event: "${base_config.askForContacts === 'true' ? 'unavailable_csas_ask_contacts' : 'unavailable_csas'}"
           authorId: ${get_bot_name_result.response.body[0].value}
           authorFirstName: ""
           authorLastName: ""
-          created: ${new Date().toISOString()}
   result: csas_not_available_message_result
   next: notify_chats
 
 redirect_chat_to_back_office:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/remove_cs_agent_from_chat"
+    url: "[#CHATBOT_RESQL]/chat/update_chat_remove_agent"
     body:
       chatId: ${chatId}
   result: redirect_chat_to_back_office_result
@@ -186,16 +179,16 @@ add_chat_id_to_queue_notification_node:
 insert_chat_to_back_office_message:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/insert-message"
+    url: "[#CHATBOT_RESQL]/chat/create_message"
     body:
       messageId: ${messageId}
       chatId: ${chatId}
       authorId: ${get_bot_name_result.response.body[0].value}
-      authorTimestamp: ${new Date().toISOString()}
+      authorTimestamp: "CURRENT_TIMESTAMP"
+      created: "CURRENT_TIMESTAMP"
       authorFirstName: ""
       authorLastName: ""
       authorRole: ${authorRole}
-      created: ${new Date().toISOString()}
       content: ""
       event: ${event}
       forwardedByUser: ""

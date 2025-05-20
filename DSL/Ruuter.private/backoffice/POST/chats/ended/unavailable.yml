@@ -21,10 +21,10 @@ extractRequestData:
     endDate: "${incoming.body.endDate}"
 
 getUnavailableEndedChats:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-cs-all-unavailable-ended-chats"
-    body:
+    url: "[#CHATBOT_RESQL]/chat/list_chats_unavailable_ended"
+    query:
       start: ${startDate}
       end: ${endDate}  
       limit: 1000

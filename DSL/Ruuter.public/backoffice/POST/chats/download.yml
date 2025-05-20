@@ -20,18 +20,37 @@ extractRequestData:
     chatId: ${incoming.body.chatId}
     email: ${incoming.body.email}
 
-getMessagesByChatId:
-  call: http.post
+get_users_having_active_status:
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-chat-messages-to-print"
-    body:
+    url: "[#CHATBOT_RESQL]/auth_users/list_users_having_status_active"
+  result: activeUsers
+
+getMessagesByChatId:
+  call: http.get
+  args:
+    url: "[#CHATBOT_RESQL]/chat/list_messages_by_latest_active_user"
+    query:
       chatId: ${chatId}
   result: getMessagesByChatIdResult
 
-getCsaDataVisibility:
+enrich_chats_with_author_data:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/get-csa-name-title-visibility"
+    url: "[#CHATBOT_DMAPPER_HBS]/enrich_chats_with_author_data"
+    headers:
+      type: json
+    body:
+      chatMessagesRes: ${getMessagesByChatIdResult.response.body}
+      activeUsers: ${activeUsers.response.body}
+      enrichAuthorFirstName: true
+      enrichAuthorLastName: true
+  result: getMessagesByChatIdResult
+
+getCsaDataVisibility:
+  call: http.get
+  args:
+    url: "[#CHATBOT_RESQL]/config/get_configuration_name_title_visibility"
   result: csaVisibilityData
 
 assignCsaVisibility:

@@ -45,10 +45,10 @@ extractRequestData:
     department: ${incoming.body.department}
 
 getUser:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-user"
-    body:
+    url: "[#CHATBOT_RESQL]/auth_users/get_user"
+    query:
       userIdCode: ${userIdCode}
   result: res
   next: checkIfUserExists
@@ -62,9 +62,8 @@ checkIfUserExists:
 addUser:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/insert-user"
+    url: "[#CHATBOT_RESQL]/auth_users/create_user"
     body:
-      created: ${new Date().toISOString()}
       status: "active"
       firstName: ${firstName}
       lastName: ${lastName}
@@ -79,31 +78,36 @@ addUser:
 addRoles:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/insert-user-role"
+    url: "[#CHATBOT_RESQL]/auth_users/create_denorm_user_csa_authority_profile_settings"
     body:
       userIdCode: ${userIdCode}
       roles: ${roles}
-      created: ${new Date().toISOString()}
+      userStatus: "active"
+      firstName: ${firstName}
+      lastName: ${lastName}
+      displayName: ${displayName}
+      csaTitle: ${csaTitle}
+      csaEmail: ${csa_email}
+      department: ${department}
   result: add_roles_res
   next: setDefaultActivity
 
-setDefaultActivity: 
+setDefaultActivity:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/set-customer-support-status"
+    url: "[#CHATBOT_RESQL]/auth_users/create_customer_support_agent_activity"
     body:
       userIdCode: ${userIdCode}
       active: false
       status: "offline"
       statusComment: ""
-      created: ${new Date().toISOString()}
   result: set_default_activity_res
   next: setUserProfileSettings
 
 setUserProfileSettings:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/set-user-profile-settings"
+    url: "[#CHATBOT_RESQL]/auth_users/update_user_profile_settings"
     body:
       userId: ${userIdCode}
       forwardedChatPopupNotifications: false

@@ -17,19 +17,18 @@ extractRequestData:
     chatId: ${incoming.body.chatId}
 
 getUserEmailByChatId:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-user-email-by-chat-id"
-    body:
+    url: "[#CHATBOT_RESQL]/auth_users/get_user_email_by_chat_id"
+    query:
       chatId: ${chatId}
   result: getUserEmailByChatIdResult
 
-getMessagesByChatId:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RESQL]/get-chat-messages"
-    body:
-      chatId: ${chatId}
+getChatMessagesByChatIdAndActiveUser:
+  template: "[#CHATBOT_PROJECT_LAYER]/chats/get-chat-messages-by-chat-id-and-active-user"
+  requestType: templates
+  body:
+    chatId: ${chatId}
   result: getMessagesByChatIdResult
 
 sendDataToEmail:
@@ -39,19 +38,20 @@ sendDataToEmail:
     body:
       to: ${getUserEmailByChatIdResult.response.body[0].csaEmail}
       subject: "Chat history"
-      text: ${getMessagesByChatIdResult.response.body}
+      text: ${getMessagesByChatIdResult}
   result: emailResponseData
 
 registerEmailSentEvent:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/insert-message"
+    url: "[#CHATBOT_RESQL]/chat/create_message"
     body:
       chatId: ${chatId}
       messageId: ""
       content: ""
       event: "chat_sent_to_csa_email"
-      authorTimestamp: ${new Date().toISOString()}
+      authorTimestamp: "CURRENT_TIMESTAMP"
+      created: "CURRENT_TIMESTAMP"
       authorId: ""
       authorFirstName: ""
       authorLastName: ""
@@ -60,7 +60,6 @@ registerEmailSentEvent:
       forwardedByUser: ""
       forwardedFromCsa: ""
       forwardedToCsa: ""
-      created: ${new Date().toISOString()}
 
 returnSuccess:
   return: "OK"

@@ -10,12 +10,11 @@ declaration:
 get_chat_info:
   call: http.post
   args:
-   url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
-   contentType: plaintext
-   headers:
-    cookie: ${cookie}
-   plaintext:
-      "chatJwt"
+    url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
+    contentType: plaintext
+    headers:
+      cookie: ${cookie}
+    plaintext: "chatJwt"
   result: infoRes
   next: check_chat_info_response
 
@@ -33,13 +32,13 @@ assignChatIdInfo:
   next: getActiveChatById
 
 getActiveChatById:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-active-chat-by-id"
-    body:
+    url: "[#CHATBOT_RESQL]/chat/get_chat_active_by_id"
+    query:
       id: ${chatId}
   result: activeChatRes
-  next: checkActiveChatResult 
+  next: checkActiveChatResult
 
 checkActiveChatResult:
   switch:
@@ -50,13 +49,13 @@ checkActiveChatResult:
 assignChat:
   assign:
     activeChat: ${activeChatRes.response.body[0]}
-  next: getMessagesToRedirect  
+  next: getMessagesToRedirect
 
 getMessagesToRedirect:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-redirection-messages-by-chatId"
-    body:
+    url: "[#CHATBOT_RESQL]/chat/list_messages_redirection_by_chat_id"
+    query:
       chatId: ${chatId}
   result: messagesToRedirectRes
   next: forwardChat
@@ -98,13 +97,13 @@ assign_cookie:
       Domain: "[#DOMAIN]"
       Secure: true
       HttpOnly: true
-      SameSite: "Lax"
+      SameSite: "[#COOKIE_SAME_SITE]"
   next: redirectChat
 
 redirectChat:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/insert-chat"
+    url: "[#CHATBOT_RESQL]/chat/create_chat"
     body:
       id: ${chatId}
       customerSupportId: ${activeChat.customerSupportId}
@@ -122,7 +121,7 @@ redirectChat:
       feedbackRating: ""
       externalId: ${forwardChatRes.response.body.data.format_forward_destination_response.generatedChatId}
       created: ${activeChat.created}
-      ended: ${new Date().toISOString()}
+      ended: "CURRENT_TIMESTAMP"
       forwardedTo: ${activeChat.forwardedTo}
       forwardedToName: ${activeChat.forwardedToName}
       receivedFrom: ${activeChat.receivedFrom}
@@ -130,16 +129,16 @@ redirectChat:
   result: redirectChatRes
 
 getAvailableCSACount:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-available-csa-count"
+    url: "[#CHATBOT_RESQL]/auth_users/get_customer_support_agent_available_count"
   result: countRes
 
 check_available_csa_count:
   switch:
     - condition: ${countRes.response.body.count > 0}
       next: add_chat_id_to_queue_notification_node
-  next: getChatById
+  next: getTitleVisibility
 
 add_chat_id_to_queue_notification_node:
   call: http.post
@@ -149,12 +148,22 @@ add_chat_id_to_queue_notification_node:
       id: ${chatId}
   result: add_chat_id_to_queue_notification_node_res
 
-getChatById:
-  call: http.post
+getTitleVisibility:
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-chat-by-id"
-    body:
+    url: "[#CHATBOT_RESQL]/config/get_configuration"
+    query:
+      key: "is_csa_title_visible"
+  result: title_res
+  next: getChatById
+
+getChatById:
+  call: http.get
+  args:
+    url: "[#CHATBOT_RESQL]/chat/get_chat_by_id"
+    query:
       id: ${chatId}
+      is_csa_title_visible: ${title_res.response.body[0]?.value}
   result: chat_result
   next: return_result
 
@@ -167,9 +176,9 @@ return_result:
 return_bad_request:
   status: 400
   return: "Bad Request"
-  next: end 
+  next: end
 
 return_chat_ended:
   return: "Chat Has Ended"
   status: 400
-  next: end  
+  next: end

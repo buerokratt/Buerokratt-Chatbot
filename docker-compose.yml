@@ -114,14 +114,14 @@ services:
       - users_db
     environment:
       - sqlms.datasources.[0].name=byk
-      - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://171.22.247.13:5433/byk?sslmode=require
+      - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://users_db:5432/byk
       - sqlms.datasources.[0].username=byk
-      - sqlms.datasources.[0].password=2nH09n6Gly
+      - sqlms.datasources.[0].password=01234
       - logging.level.org.springframework.boot=INFO
     ports:
       - 8082:8082
     volumes:
-      - ./DSL/Resql:/DSL
+      - ./DSL/Resql:/workspace/app/templates
     networks:
       - bykstack
 

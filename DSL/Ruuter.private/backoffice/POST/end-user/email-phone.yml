@@ -33,7 +33,7 @@ checkChatId:
 insertEmailAndPhone:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/update-chat-with-end-user-email-and-phone"
+    url: "[#CHATBOT_RESQL]/chat/update_chat_email_and_phone"
     body:
       chatId: ${chatId}
       endUserEmail: "${email ? email : ''}"

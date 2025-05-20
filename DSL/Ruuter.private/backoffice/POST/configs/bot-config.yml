@@ -35,14 +35,13 @@ extractRequestData:
 setBotConfig:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/set-bot-config"
+    url: "[#CHATBOT_RESQL]/config/update_configuration_bot"
     body:
       is_bot_active: ${is_bot_active}
       is_burokratt_active: ${is_burokratt_active}
       is_csa_name_visible: ${is_csa_name_visible}
       is_csa_title_visible: ${is_csa_title_visible}
       is_edit_chat_visible: ${is_edit_chat_visible}
-      created: ${new Date().toISOString()}
   result: set_bot_config_res
 
 return_result:

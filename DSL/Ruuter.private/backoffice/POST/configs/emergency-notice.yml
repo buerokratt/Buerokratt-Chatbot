@@ -38,13 +38,12 @@ validateBody:
 setEmergencyNotice:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/set-emergency-notice"
+    url: "[#CHATBOT_RESQL]/config/create_configuration_emergency_notice"
     body:
       emergencyNoticeText: ${emergencyNoticeText}
       emergencyNoticeStartISO: ${emergencyNoticeStartISO}
       emergencyNoticeEndISO: ${emergencyNoticeEndISO}
       isEmergencyNoticeVisible: ${isEmergencyNoticeVisible}
-      created: ${new Date().toISOString()}
   result: res
   next: return_result
 

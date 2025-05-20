@@ -31,10 +31,10 @@ assignChatId:
   next: getActiveChatById
 
 getActiveChatById:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-active-chat-by-id"
-    body:
+    url: "[#CHATBOT_RESQL]/chat/get_chat_active_by_id"
+    query:
       id: ${chatId}
   result: activeChatRes
   next: checkActiveChatResult 
@@ -53,7 +53,7 @@ assignChat:
 insertChat:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/insert-chat"
+    url: "[#CHATBOT_RESQL]/chat/create_chat"
     body:
       id: ${chatId}
       customerSupportId: ${activeChat.customerSupportId}

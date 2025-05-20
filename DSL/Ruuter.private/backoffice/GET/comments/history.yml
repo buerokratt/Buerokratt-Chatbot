@@ -17,10 +17,10 @@ extractRequestData:
     chatId: ${incoming.params.chatId}    
 
 getChatHistoryComment:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-chat-history-comment-by-id"
-    body:
+    url: "[#CHATBOT_RESQL]/chat/get_chat_history_comments"
+    query:
       chatId: ${chatId}
   result: res
 

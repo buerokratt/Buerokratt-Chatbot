@@ -17,10 +17,10 @@ extractRequestData:
     customerSupportId: "${incoming.body.customerSupportId}"
 
 getCustomerSupportActivity:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-customer-support-activity-by-id-code"
-    body:
+    url: "[#CHATBOT_RESQL]/auth_users/get_customer_support_agent_activity_by_id_code"
+    query:
       customerSupportId: ${customerSupportId}
   result: res
 

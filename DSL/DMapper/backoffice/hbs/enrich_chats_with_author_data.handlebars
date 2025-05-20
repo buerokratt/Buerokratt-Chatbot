@@ -1,0 +1,36 @@
+[
+  {{#each chatMessagesRes}}
+    {
+      {{#each this}}
+        "{{@key}}": {{{toJSON this}}},
+      {{/each}}
+      
+      {{#if ../enrichAuthorFirstName}}
+        {{#if (eq this.authorFirstName null) }}
+          {{#if (eq (getObjectKeyFromObjectArray ../activeUsers "idCode" this.authorId "firstName")  null) }}
+            {{#if (eq (getObjectKeyFromObjectArray ../activeUsers "idCode" this.authorId "displayName")  null) }}
+              "authorFirstName": null,
+              {{else}}
+              "authorFirstName": "{{choose (getObjectKeyFromObjectArray ../activeUsers "idCode" this.authorId "firstName") (getObjectKeyFromObjectArray ../activeUsers "idCode" this.authorId "displayName")}}",
+            {{/if}}
+          {{/if}}
+        {{/if}}
+      {{/if}}
+
+      {{#if ../enrichAuthorLastName}}
+        {{#if (eq this.authorLastName null) }}
+          {{#if (eq (getObjectKeyFromObjectArray ../activeUsers "idCode" this.authorId "lastName")  null) }}
+              "authorLastName": null,
+              {{else}}
+              "authorLastName": "{{getObjectKeyFromObjectArray ../activeUsers "idCode" this.authorId "lastName"}}",
+            {{/if}}
+        {{/if}}
+      {{/if}}
+      {{#if (eq (getObjectKeyFromObjectArray ../activeUsers "idCode" this.authorId "csaTitle") null) }}
+        "csaTitle": null
+        {{else}}
+        "csaTitle": "{{getObjectKeyFromObjectArray ../activeUsers "idCode" this.authorId "csaTitle"}}"
+      {{/if}}
+    }{{#unless @last}},{{/unless}}
+  {{/each}}
+]

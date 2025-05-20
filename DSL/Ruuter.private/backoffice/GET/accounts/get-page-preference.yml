@@ -21,10 +21,10 @@ extractRequestData:
     page_name: ${incoming.params.page_name}
 
 getUserPagePreferences:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-user-page-preferences"
-    body:
+    url: "[#CHATBOT_RESQL]/auth_users/get_user_page_preferences"
+    query:
       user_id: ${user_id}
       page_name: ${page_name}
   result: getUserPagePreferencesResult

@@ -7,10 +7,21 @@ declaration:
   returns: json
   namespace: backoffice
 
-getAdmins:
-  call: http.post
+getTitleVisibility:
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-users-with-roles"
+    url: "[#CHATBOT_RESQL]/config/get_configuration"
+    query:
+      key: "is_csa_title_visible"
+  result: title_res
+  next: getAdmins
+
+getAdmins:
+  call: http.get
+  args:
+    url: "[#CHATBOT_RESQL]/auth_users/list_users_with_roles"
+    query:
+      is_csa_title_visible: ${title_res.response.body[0]?.value}
   result: res
 
 return_result:

@@ -35,17 +35,17 @@ extractRequestData:
     authorFirstName: "${incoming.body.authorFirstName}"
     authorId: "${incoming.body.authorId}"
     authorRole: "${incoming.body.authorRole}"
-  next: deleteMessagePreview  
+  next: deleteMessagePreview
 
 deleteMessagePreview:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/delete-message-preview"
+    url: "[#CHATBOT_RESQL]/chat/delete_message_preview"
     body:
       chatId: ${chatId}
       content: ""
   result: res
-  next: getMessageUuid 
+  next: getMessageUuid
 
 getMessageUuid:
   call: http.post
@@ -59,16 +59,26 @@ getMessageUuid:
 assignMessageUuid:
   assign:
     messageUuid: ${message_uuid_result.response.body.uuid}
-  next: getChatById  
+  next: getTitleVisibility
+
+getTitleVisibility:
+  call: http.get
+  args:
+    url: "[#CHATBOT_RESQL]/config/get_configuration"
+    query:
+      key: "is_csa_title_visible"
+  result: title_res
+  next: getChatById
 
 getChatById:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-chat-by-id"
-    body:
+    url: "[#CHATBOT_RESQL]/chat/get_chat_by_id"
+    query:
       id: ${chatId}
+      is_csa_title_visible: ${title_res.response.body[0]?.value}
   result: chatRes
-  next: checkChatResult 
+  next: checkChatResult
 
 checkChatResult:
   switch:
@@ -79,45 +89,45 @@ checkChatResult:
 assignChat:
   assign:
     chat: ${chatRes.response.body[0]}
-  next: postMessage  
+  next: postMessage
 
 postMessage:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/insert-message"
+    url: "[#CHATBOT_RESQL]/chat/create_message"
     body:
       chatId: ${chatId}
       messageId: ${messageUuid}
       content: ""
       authorTimestamp: ${authorTimestamp}
+      created: "CURRENT_TIMESTAMP"
       authorId: ${authorId}
       authorFirstName: ${authorFirstName}
       authorLastName: ""
       authorRole: "backoffice-user"
-      created: ${new Date().toISOString()}
       rating: ""
       event: ${event}
       forwardedByUser: ""
       forwardedFromCsa: ""
       forwardedToCsa: ""
   result: message_res
-  next: postChat  
+  next: postChat
 
 postChat:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/insert-chat"
+    url: "[#CHATBOT_RESQL]/chat/create_chat"
     body:
       id: ${chat.id}
       customerSupportId: ${chat.customerSupportId}
       customerSupportDisplayName: ${chat.customerSupportDisplayName}
-      csaTitle: ${chat.ended ?? ""}
+      csaTitle: ${chat.csaTitle ?? ""}
       endUserId: ${chat.endUserId}
       endUserFirstName: ${chat.endUserFirstName}
       endUserLastName: ${chat.endUserLastName}
       status: "ENDED"
       created: ${chat.created}
-      ended: ${new Date().toISOString()}
+      ended: "CURRENT_TIMESTAMP"
       feedbackRating: ${chat.feedbackRating ?? ""}
       feedbackText: ${chat.feedbackText ?? ""}
       endUserEmail: ${chat.endUserEmail}
@@ -130,7 +140,7 @@ postChat:
       receivedFrom: ${chat.receivedFrom}
       receivedFromName: ${chat.receivedFromName ?? ""}
   result: post_chat_res
-  next: return_result    
+  next: return_result
 
 return_result:
   return: "Changed Chat Status Successfully"
@@ -139,4 +149,4 @@ return_result:
 return_chat_found:
   return: "Chat Not Found"
   status: 400
-  next: end  
+  next: end

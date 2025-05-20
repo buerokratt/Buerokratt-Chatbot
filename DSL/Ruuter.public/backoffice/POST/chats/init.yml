@@ -67,10 +67,10 @@ assignMessageUuid:
   next: get_session_length
 
 get_session_length:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-configuration"
-    body:
+    url: "[#CHATBOT_RESQL]/config/get_configuration"
+    query:
       key: "session_length"
   result: session_result
   next: generate_cookie
@@ -93,7 +93,34 @@ assign_cookie:
       Domain: "[#DOMAIN]"
       Secure: true
       HttpOnly: true
-      SameSite: "Lax"
+      SameSite: "[#COOKIE_SAME_SITE]"
+  next: insertChat
+
+insertChat:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/create_chat_and_init"
+    body:
+      id: ${chatUuid}
+      endUserId: ${endUserId}
+      endUserFirstName: ""
+      endUserLastName: ""
+      status: "OPEN"
+      lastMessage: ${content}
+      created: "CURRENT_TIMESTAMP"
+      ended: ""
+      feedbackRating: ""
+      feedbackText: ""
+      endUserEmail: ${endUserEmail}
+      endUserPhone: ${endUserPhone}
+      endUserOs: ${endUserOs}
+      endUserUrl: ${endUserUrl}
+      externalId: ""
+      forwardedTo: ""
+      forwardedToName: ""
+      receivedFrom: ""
+      receivedFromName: ""
+  result: insertMessageResult
   next: postGreetingMessage
 
 postGreetingMessage:
@@ -109,49 +136,22 @@ postGreetingMessage:
 postClientMessage:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/insert-message"
+    url: "[#CHATBOT_RESQL]/chat/create_message"
     body:
       chatId: ${chatUuid}
       messageId: ${messageUuid}
       content: ${content}
       event: ""
-      authorTimestamp: ${authorTimestamp}
+      authorTimestamp: "CURRENT_TIMESTAMP"
       authorId: ${endUserId}
       authorFirstName: ""
       authorRole: ${authorRole}
-      created: ${new Date().toISOString()}
+      created: "CURRENT_TIMESTAMP"
       authorLastName: ""
       rating: ""
       forwardedByUser: ${forwardedByUser}
       forwardedFromCsa: ${forwardedFromCsa}
       forwardedToCsa: ${forwardedToCsa}
-  result: insertMessageResult
-  next: insertChat
-
-insertChat:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RESQL]/init-chat"
-    body:
-      id: ${chatUuid}
-      endUserId: ${endUserId}
-      endUserFirstName: ""
-      endUserLastName: ""
-      status: "OPEN"
-      lastMessage: ${content}
-      created: ${new Date().toISOString()}
-      ended: ""
-      feedbackRating: ""
-      feedbackText: ""
-      endUserEmail: ${endUserEmail}
-      endUserPhone: ${endUserPhone}
-      endUserOs: ${endUserOs}
-      endUserUrl: ${endUserUrl}
-      externalId: ""
-      forwardedTo: ""
-      forwardedToName: ""
-      receivedFrom: ""
-      receivedFromName: ""
   result: insertMessageResult
   next: postMessageToBot
 
@@ -171,14 +171,24 @@ check_for_post_message_to_bot_result:
   switch:
     - condition: ${message_to_bot_result.response.body.response === 'Bot error'}
       next: return_bot_error
+  next: getTitleVisibility
+
+getTitleVisibility:
+  call: http.get
+  args:
+    url: "[#CHATBOT_RESQL]/config/get_configuration"
+    query:
+      key: "is_csa_title_visible"
+  result: title_res
   next: getChat
 
 getChat:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-chat-by-id"
-    body:
+    url: "[#CHATBOT_RESQL]/chat/get_chat_by_id"
+    query:
       id: ${chatUuid}
+      is_csa_title_visible: ${title_res.response.body[0]?.value}
   result: chat_result
   next: notify_chats
 

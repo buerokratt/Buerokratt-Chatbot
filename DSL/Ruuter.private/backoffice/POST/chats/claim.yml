@@ -28,14 +28,24 @@ extractRequestData:
     customerSupportDisplayName: ${incoming.body.customerSupportDisplayName}
     csaTitle: ${incoming.body.csaTitle}
 
-getActiveChatById:
-  call: http.post
+get_title_visibility:
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-active-chat-by-id"
-    body:
+    url: "[#CHATBOT_RESQL]/config/get_configuration"
+    query:
+      key: "is_csa_title_visible"
+  result: title_res
+  next: getActiveChatById
+
+getActiveChatById:
+  call: http.get
+  args:
+    url: "[#CHATBOT_RESQL]/chat/get_chat_active_by_id"
+    query:
       id: ${id}
+      is_csa_title_visible: ${title_res.response.body[0]?.value}
   result: activeChatRes
-  next: checkActiveChatResult 
+  next: checkActiveChatResult
 
 checkActiveChatResult:
   switch:
@@ -51,7 +61,7 @@ assignChat:
 claimChat:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/insert-chat"
+    url: "[#CHATBOT_RESQL]/chat/create_chat"
     body:
       id: ${id}
       customerSupportId: ${customerSupportId}
@@ -68,7 +78,7 @@ claimChat:
       feedbackText: ""
       feedbackRating: ""
       externalId: ${activeChat.externalId ?? ""}
-      created: ${activeChat.created ?? new Date().toISOString()}
+      created: ${activeChat.created ?? "CURRENT_TIMESTAMP"}
       ended: ${activeChat.ended ?? ""}
       forwardedTo: ${activeChat.forwardedTo ?? ""}
       forwardedToName: ${activeChat.forwardedToName ?? ""}
@@ -94,16 +104,16 @@ assignMessageUuid:
 insertMessage:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/insert-message"
+    url: "[#CHATBOT_RESQL]/chat/create_message"
     body:
       chatId: ${activeChat.id}
       messageId: ${messageUuid}
       content: ""
-      authorTimestamp: ${new Date().toISOString()}
+      authorTimestamp: "CURRENT_TIMESTAMP"
+      created: "CURRENT_TIMESTAMP"
       authorId: ""
       authorFirstName: ""
       authorRole: "buerokratt"
-      created: ${new Date().toISOString()}
       authorLastName: ""
       rating: ""
       event: "taken-over"
@@ -122,11 +132,12 @@ notify_chats:
   next: getClaimedChat
 
 getClaimedChat:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-active-chat-by-id"
-    body:
+    url: "[#CHATBOT_RESQL]/chat/get_chat_active_by_id"
+    query:
       id: ${id}
+      is_csa_title_visible: ${title_res.response.body[0]?.value}
   result: claimedChatRes
 
 notify_messages:
@@ -153,4 +164,4 @@ return_result:
 return_chat_ended:
   return: "Chat Has Ended"
   status: 400
-  next: end  
+  next: end

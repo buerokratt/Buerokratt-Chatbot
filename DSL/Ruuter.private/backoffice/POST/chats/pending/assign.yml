@@ -28,14 +28,24 @@ extractRequestData:
     customerSupportDisplayName: "${incoming.body.customerSupportDisplayName}"
     csaTitle: "${incoming.body.csaTitle}"
 
-getActiveChatById:
-  call: http.post
+getTitleVisibility:
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-chat-by-id"
-    body:
+    url: "[#CHATBOT_RESQL]/config/get_configuration"
+    query:
+      key: "is_csa_title_visible"
+  result: title_res
+  next: getActiveChatById
+
+getActiveChatById:
+  call: http.get
+  args:
+    url: "[#CHATBOT_RESQL]/chat/get_chat_by_id"
+    query:
       id: ${id}
+      is_csa_title_visible: ${title_res.response.body[0]?.value}
   result: activeChatRes
-  next: checkActiveChatResult 
+  next: checkActiveChatResult
 
 checkActiveChatResult:
   switch:
@@ -51,7 +61,7 @@ assignChat:
 assignPendingChat:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/insert-chat"
+    url: "[#CHATBOT_RESQL]/chat/create_chat"
     body:
       id: ${id}
       customerSupportId: ${customerSupportId}
@@ -68,7 +78,7 @@ assignPendingChat:
       feedbackText: ""
       feedbackRating: ""
       externalId: ${activeChat.externalId ?? ""}
-      created: ${activeChat.created ?? new Date().toISOString()}
+      created: ${activeChat.created ?? "CURRENT_TIMESTAMP"}
       ended: ${activeChat.ended ?? ""}
       forwardedTo: ${activeChat.forwardedTo ?? ""}
       forwardedToName: ${activeChat.forwardedToName ?? ""}
@@ -89,21 +99,21 @@ getUuid:
 assignUuid:
   assign:
     uuid: ${uuid_result.response.body.uuid}
-  next: insertMessage  
+  next: insertMessage
 
 insertMessage:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/insert-message"
+    url: "[#CHATBOT_RESQL]/chat/create_message"
     body:
       chatId: ${activeChat.id ?? uuid}
       messageId: ${uuid}
       content: ""
-      authorTimestamp: ${new Date().toISOString()}
+      authorTimestamp: "CURRENT_TIMESTAMP"
+      created: "CURRENT_TIMESTAMP"
       authorId: ${customerSupportId}
       authorFirstName: ${customerSupportDisplayName}
       authorRole: "buerokratt"
-      created: ${new Date().toISOString()}
       authorLastName: ""
       rating: ""
       event: "pending-assigned"
@@ -119,14 +129,24 @@ notify_chats:
   body:
     chatId: ${id}
   result: chats_notify_res
+  next: get_title_visibility
+
+get_title_visibility:
+  call: http.get
+  args:
+    url: "[#CHATBOT_RESQL]/config/get_configuration"
+    query:
+      key: "is_csa_title_visible"
+  result: title_res
   next: getRedirectedChat
 
 getRedirectedChat:
-  call: http.post
+  call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/get-active-chat-by-id"
-    body:
+    url: "[#CHATBOT_RESQL]/chat/get_chat_active_by_id"
+    query:
       id: ${id}
+      is_csa_title_visible: ${title_res.response.body[0]?.value}
   result: redirectedChatRes
   next: notify_messages
 
@@ -154,4 +174,4 @@ return_result:
 return_chat_ended:
   return: "Chat Has Ended"
   status: 400
-  next: end 
+  next: end
