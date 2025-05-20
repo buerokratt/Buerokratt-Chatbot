@@ -16,13 +16,31 @@ extractRequestData:
   assign:
     chatId: ${incoming.body.chatId}
 
-getUserEmailByChatId:
+getCustomerSupportIdsByChatId:
   call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/auth_users/get_user_email_by_chat_id"
+    url: "[#CHATBOT_RESQL]/chat/list_chat_customer_support_ids"
     query:
       chatId: ${chatId}
-  result: getUserEmailByChatIdResult
+  result: getCustomerSupportIdsByChatIdResult
+
+mapChatIds:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_HBS]/map_customer_support_ids"
+    headers:
+      type: json
+    body:
+      chats: ${getCustomerSupportIdsByChatIdResult.response.body}
+  result: customerSupportIdsResult
+
+getUserEmailByCustomerSupportIds:
+  call: http.get
+  args:
+    url: "[#CHATBOT_RESQL]/auth_users/get_user_email_by_customer_support_id"
+    query:
+      customerSupportIds: ${customerSupportIdsResult.response.body?.join(',') ?? ''}
+  result: getUserEmailByCustomerSupportIdsResult
 
 getChatMessagesByChatIdAndActiveUser:
   template: "[#CHATBOT_PROJECT_LAYER]/chats/get-chat-messages-by-chat-id-and-active-user"
@@ -36,7 +54,7 @@ sendDataToEmail:
   args:
     url: "[#CHATBOT_DMAPPER]/js/email/sendMockEmail"
     body:
-      to: ${getUserEmailByChatIdResult.response.body[0].csaEmail}
+      to: ${getUserEmailByCustomerSupportIdsResult.response.body[0].csaEmail}
       subject: "Chat history"
       text: ${getMessagesByChatIdResult}
   result: emailResponseData
