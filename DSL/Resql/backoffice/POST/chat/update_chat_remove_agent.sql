@@ -9,10 +9,9 @@ SELECT copy_row_with_modifications(
     ]::VARCHAR[]
 ), NOW()::TEXT as updated FROM chat
 WHERE
-    id IN (
-        SELECT MAX(id) FROM chat
+    updated = (
+        SELECT MAX(updated) FROM chat
         WHERE base_id = :chatId
-        GROUP BY base_id
     )
     AND base_id = :chatId
     AND ended IS null;

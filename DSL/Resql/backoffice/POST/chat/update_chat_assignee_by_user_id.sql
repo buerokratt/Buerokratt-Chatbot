@@ -1,7 +1,7 @@
 SELECT copy_row_with_modifications(
     'chat',                                   -- Table name
     'id', '::INTEGER',                        -- ID column name and type
-    (SELECT MAX(id) FROM chat WHERE base_id = dc.chat_id)::VARCHAR,
+    (SELECT id FROM chat WHERE base_id = dc.chat_id ORDER BY updated DESC LIMIT 1)::VARCHAR,
     ARRAY[                                    -- Direct array of modifications
         'customer_support_id', '', '',        -- Reset customer_support_id
         'customer_support_display_name', '', '',  -- Reset customer_support_display_name

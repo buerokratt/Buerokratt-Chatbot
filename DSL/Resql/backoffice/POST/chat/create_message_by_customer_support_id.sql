@@ -15,11 +15,11 @@ FROM message
 WHERE
     chat_base_id IN (
         SELECT base_id
-        FROM chat
+        FROM chat AS c1
         WHERE
-            id IN (
-                SELECT MAX(id) FROM chat
-                GROUP BY base_id
+            updated = (
+                SELECT MAX(c2.updated) FROM chat AS c2
+                WHERE c2.base_id = c1.base_id
             )
             AND customer_support_id = :customerSupportId
             AND ended IS null
