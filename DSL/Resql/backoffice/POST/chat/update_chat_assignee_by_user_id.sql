@@ -1,6 +1,6 @@
 SELECT copy_row_with_modifications(
     'chat',                                   -- Table name
-    'id', '::INTEGER',                        -- ID column name and type
+    'id', '::UUID',                        -- ID column name and type
     (SELECT id FROM chat WHERE base_id = dc.chat_id ORDER BY updated DESC LIMIT 1)::VARCHAR,
     ARRAY[                                    -- Direct array of modifications
         'customer_support_id', '', '',        -- Reset customer_support_id

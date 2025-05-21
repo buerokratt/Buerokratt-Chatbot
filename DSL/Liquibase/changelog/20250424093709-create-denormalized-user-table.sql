@@ -243,3 +243,4 @@ ORDER BY created;
 
 DROP TABLE customer_support_agent_activity;
 DROP TABLE user_authority;
+DROP TABLE user_profile_settings;

@@ -1,6 +1,6 @@
 SELECT copy_row_with_modifications(
     'denormalized_user_data',
-    'id', '::INTEGER', id::VARCHAR,
+    'id', '::UUID', id::VARCHAR,
     ARRAY[
          'first_name', '', :firstName,
         'last_name', '', :lastName,
