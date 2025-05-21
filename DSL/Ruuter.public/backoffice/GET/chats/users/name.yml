@@ -143,7 +143,7 @@ assign_cookie:
       Domain: "[#DOMAIN]"
       Secure: true
       HttpOnly: true
-      SameSite: "Lax"
+      SameSite: "[#COOKIE_SAME_SITE]"
   next: notify_chats
 
 notify_chats:

@@ -142,7 +142,7 @@ assign_chat_cookie:
       Domain: "[#DOMAIN]"
       Secure: true
       HttpOnly: true
-      SameSite: "Lax"
+      SameSite: "[#COOKIE_SAME_SITE]"
       Max-Age: 0
   next: blacklist_user_jwt
 

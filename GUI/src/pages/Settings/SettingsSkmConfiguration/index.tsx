@@ -135,6 +135,7 @@ const SettingsSkmConfiguration: FC = () => {
                   onChange={field.onChange}
                   defaultValue={field.value}
                   name="label"
+                  height={320}
                   useRichText
                 />
                 {getTooltip('systemMessage')}
