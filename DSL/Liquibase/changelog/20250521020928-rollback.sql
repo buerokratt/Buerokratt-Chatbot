@@ -1,5 +1,6 @@
 -- liquibase formatted sql
 -- changeset ahmer-mt:20250521020928 ignore:true
+-- Rollback indexes for messsage table
 DROP INDEX IF EXISTS idx_message_base_id_updated;
 DROP INDEX IF EXISTS idx_message_chat_id_base_id_updated;
 DROP INDEX IF EXISTS idx_message_event;
