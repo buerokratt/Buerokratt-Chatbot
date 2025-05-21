@@ -1,5 +1,6 @@
 {
   "global": {
+    "email": "Email",
     "save": "Salvesta",
     "add": "Lisa",
     "edit": "Muuda",
@@ -46,6 +47,11 @@
     "chosen": "Valitud",
     "read": "Loetud",
     "statusClarification": "Staatuse täpsustus"
+  },
+  "sorting": {
+    "desc": "kahanevalt",
+    "asc": "kasvavalt",
+    "sorting": "Sorteerimine"
   },
   "mainMenu": {
     "menuLabel": "Põhinavigatsioon",
@@ -324,6 +330,8 @@
       "soundNotifications": "Häälmärguanded",
       "popupNotifications": "Pop-up märguanded",
       "newUnansweredChat": "Uus vastamata vestlus",
+      "newForwardedChatTitle": "Suunatud vestlus",
+      "newForwardedChatMessage": "Sulle suunati uus vestlus!",
       "newForwardedChat": "Uus suunatud vestlus",
       "newValidationMessage": "Uus teade kinnitamiseks",
       "useAutocorrect": "Teksti autokorrektor",
@@ -366,7 +374,7 @@
       "description": "Peale tööaja lõppemist, juhul kui juturobot ise kliendi küsimustele vastata ei oska, küsib ta kliendi kontaktandmeid.",
       "openFrom": "Avatud alates",
       "openUntil": "Avatud kuni",
-      "publicHolidays": "Arvesta riigipühadega",
+      "publicHolidays": "Saadaval riigipühadel",
       "consider": "Arvesta",
       "dontConsider": "Ära arvesta",
       "closedOnWeekends": "Nädalavahetustel suletud",

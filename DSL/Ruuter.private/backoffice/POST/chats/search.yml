@@ -16,13 +16,47 @@ extractRequestData:
   assign:
     searchKey: ${incoming.body.searchKey}
 
-getChatById:
+getChatIdsFromChatTable:
   call: http.get
   args:
-    url: "[#CHATBOT_RESQL]/chat/list_chat_ids_matching_message_search"
+    url: "[#CHATBOT_RESQL]/chat/list_chat_ids_matching_search"
     query:
       searchKey: ${searchKey}
-  result: res
+  result: res_chats
+
+getChatIdsFromMessageTable:
+  call: http.get
+  args:
+    url: "[#CHATBOT_RESQL]/chat/list_message_chat_ids_matching_search"
+    query:
+      searchKey: ${searchKey}
+  result: res_messages
+
+getChatIdsFromCommentsTable:
+  call: http.get
+  args:
+    url: "[#CHATBOT_RESQL]/chat/list_chat_history_comments_chat_ids_matching_search"
+    query:
+      searchKey: ${searchKey}
+  result: res_comments
+
+mergeChatIdResultsStepOne:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/file-manager/merge"
+    body:
+      array1: ${res_chats.response.body}
+      array2: ${res_messages.response.body}
+  result: merged_chats
+
+mergeChatIdResultsStepTwo:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/file-manager/merge"
+    body:
+      array1: ${merged_chats.response.body.array}
+      array2: ${res_comments.response.body}
+  result: merged_chats
 
 return_result:
-   return: ${res.response.body}  
+  return: ${merged_chats.response.body.array}

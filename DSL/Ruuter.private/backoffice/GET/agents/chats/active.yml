@@ -7,12 +7,32 @@ declaration:
   returns: json
   namespace: backoffice
 
+getTitleVisibility:
+  call: http.get
+  args:
+    url: "[#CHATBOT_RESQL]/config/get_configuration"
+    query:
+      key: "is_csa_title_visible"
+  result: title_res
+  next: getBotInstitutionId
+
+getBotInstitutionId:
+  call: http.get
+  args:
+    url: "[#CHATBOT_RESQL]/config/get_configuration"
+    query:
+      key: "bot_institution_id"
+  result: bot_res
+  next: getActiveChats
+
 getActiveChats:
   call: http.get
   args:
     url: "[#CHATBOT_RESQL]/chat/list_chats_cs_active"
     query:
       limit: 1000
+      is_csa_title_visible: ${title_res.response.body[0]?.value}
+      bot_institution_id: ${bot_res.response.body[0]?.value}
   result: res
 
 return_result:

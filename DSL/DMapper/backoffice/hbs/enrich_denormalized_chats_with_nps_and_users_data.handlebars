@@ -1,0 +1,22 @@
+[
+  {{#each chatMessagesRes}}
+    {
+      {{#each this}}
+        "{{@key}}": {{{toJSON this}}},
+      {{/each}}
+      
+      "nps": {{../nps}},
+      {{#if ../users}}
+        {{#if (eq this.lastMessageAuthorId null)}}
+          "userDisplayName": null
+        {{else}}
+        {{#if (eq (getObjectKeyFromObjectArray ../users "idCode" this.lastMessageAuthorId "displayName") null) }}
+          "userDisplayName": null
+          {{else}}
+          "userDisplayName": "{{getObjectKeyFromObjectArray ../users "idCode" this.lastMessageAuthorId "displayName"}}"
+        {{/if}}
+        {{/if}}
+      {{/if}}
+    }{{#unless @last}},{{/unless}}
+  {{/each}}
+]

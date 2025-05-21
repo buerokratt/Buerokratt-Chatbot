@@ -74,7 +74,7 @@ assign_cookie:
       Max-Age: 0
       Secure: true
       HttpOnly: true
-      SameSite: "Lax"
+      SameSite: "[#COOKIE_SAME_SITE]"
   next: return_result
 
 return_result:

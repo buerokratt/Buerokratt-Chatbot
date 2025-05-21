@@ -18,35 +18,10 @@ SELECT
     forwarded_to_name,
     received_from,
     received_from,
-    (
-        SELECT last_message
-        FROM denormalized_chat
-        WHERE chat_id = c.chat_id
-        AND last_message_event_with_content <> 'rating'
-        AND last_message_event_with_content <> 'requested-chat-forward'
-        AND last_message <> ''
-        AND last_message <> 'message-read'
-        ORDER BY id DESC
-        LIMIT 1
-    ) AS last_message,
+    last_message_with_content_and_not_rating_or_forward AS last_message,
     contacts_message,
-    (
-        SELECT last_message_timestamp
-        FROM denormalized_chat
-        WHERE chat_id = c.chat_id
-        AND last_message_event <> 'rating'
-        AND last_message_event <> 'requested-chat-forward'
-        ORDER BY id DESC
-        LIMIT 1
-    ) AS last_message_timestamp,
-    (
-        SELECT last_message_event
-        FROM denormalized_chat
-        WHERE chat_id = c.chat_id
-        AND last_message_event <> ''
-        ORDER BY id DESC
-        LIMIT 1
-    ) AS last_message_event,
+    last_message_with_not_rating_or_forward_events_timestamp AS last_message_timestamp,
+    last_non_empty_message_event AS last_message_event,
     csa_title
 FROM (
     SELECT
@@ -69,10 +44,16 @@ FROM (
         received_from_name,
         external_id,
         contacts_message,
-        csa_title,
+        CASE
+            WHEN :is_csa_title_visible = 'true' THEN csa_title
+            ELSE ''
+        END AS csa_title,
         CASE WHEN last_message_event IS NULL OR last_message_event = '' THEN NULL 
         ELSE last_message_event END AS last_message_event,
         created,
+        last_message_with_content_and_not_rating_or_forward,
+        last_message_with_not_rating_or_forward_events_timestamp,
+        last_non_empty_message_event,
         ROW_NUMBER() OVER (PARTITION BY chat_id ORDER BY id DESC) as rn
     FROM denormalized_chat
 ) AS c

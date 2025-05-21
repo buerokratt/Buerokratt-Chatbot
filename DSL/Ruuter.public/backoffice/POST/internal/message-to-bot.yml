@@ -57,8 +57,17 @@ get_bot_name:
 check_if_bot_name_exists:
   switch:
     - condition: ${get_bot_name_result.response.body[0]?.value != null}
-      next: get_chat
+      next: get_title_visibility
   next: return_bot_name_does_not_exist
+
+get_title_visibility:
+  call: http.get
+  args:
+    url: "[#CHATBOT_RESQL]/config/get_configuration"
+    query:
+      key: "is_csa_title_visible"
+  result: title_res
+  next: get_chat
 
 get_chat:
   call: http.get
@@ -66,6 +75,7 @@ get_chat:
     url: "[#CHATBOT_RESQL]/chat/get_chat_by_id"
     query:
       id: ${chatId}
+      is_csa_title_visible: ${title_res.response.body[0]?.value}
   result: get_chat_result
   error: return_bad_request
   next: check_chat_belongs_to_bot
@@ -103,6 +113,12 @@ check_if_bot_is_unable_to_reply:
     - condition: ${post_message_to_bot_result.response.body?.[0]?.text == 'UNKNOWN'}
       next: check_if_client_bot_is_active
     - condition: ${post_message_to_bot_result.response.body?.[0]?.text == 'Suunan teid klienditeenindajale. Varuge natukene kannatust.'}
+      next: get_organization_base_config
+    - condition: ${post_message_to_bot_result.response.body?.[0]?.text == 'Suunan vestluse nõustajale. Palun oodake.'}
+      next: get_organization_base_config
+    - condition: ${post_message_to_bot_result.response.body?.[0]?.text == 'Suunan teid klienditeenindajale. Palun oodake.'}
+      next: get_organization_base_config
+    - condition: ${post_message_to_bot_result.response.body?.[0]?.text == 'Suunan teid riigiinfo konsultandile. Varuge natukene kannatust.'}
       next: get_organization_base_config
     - condition: ${post_message_to_bot_result.response.body?.[0]?.text.startsWith("#common_service") || post_message_to_bot_result.response.body?.[0]?.text.startsWith("#service")}
       next: assign_service_content_from_bot_response

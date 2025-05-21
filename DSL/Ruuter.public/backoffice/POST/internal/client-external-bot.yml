@@ -23,7 +23,7 @@ declaration:
         description: "Body field 'holidayNames'"
       - field: holidays
         type: string
-        description: "Body field 'holidays'"  
+        description: "Body field 'holidays'"
 
 extract_data:
   assign:
@@ -72,12 +72,29 @@ assign_data_sources:
 logstepAZUREDS:
   log: ${data_sources}
 
+get_users_having_active_status:
+  call: http.get
+  args:
+    url: "[#CHATBOT_RESQL]/auth_users/list_users_having_status_active"
+  result: active_users
+
 get_chat_messages:
   call: http.get
   args:
     url: "[#CHATBOT_RESQL]/chat/list_chat_messages_llm"
     query:
       chatId: ${sender}
+  result: chat_messages_res
+
+enrich_messages_with_csa_titles:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_HBS]/enrich_chats_with_author_data"
+    headers:
+      type: json
+    body:
+      chatMessagesRes: ${chat_messages_res.response.body}
+      activeUsers: ${active_users.response.body}
   result: chat_messages_res
 
 prepare_messages:
@@ -115,7 +132,7 @@ post_answer:
       frequency_penalty: 0
       presence_penalty: 0
   result: test
-  
+
 logstepAZUREBOT:
   log: ${test}
 
@@ -134,11 +151,11 @@ check_value:
     - condition: ${correct_value.map((item) => item.text)[0] === 'ERROR'}
       next: return_bot_error
     - condition: ${correct_value.map((item) => item.text)[0] === '$backoffice' || correct_value.map((item) => item.text)[0].startsWith('$backoffice')}
-      next: get_organization_bot_answer_config  
+      next: get_organization_bot_answer_config
     - condition: ${correct_value.map((item) => item.text)[0].startsWith('$validate_')}
-      next: assign_validation_event  
+      next: assign_validation_event
   next: format_messages
-  
+
 return_value:
   return: ${correct_value}
   next: end
@@ -154,7 +171,7 @@ assign_validation_event:
         text: ${correct_value.map((item) => item.text)[0].replace('$validate_', '')}
         context: ${test.response.body.choices[0].message.context}
     event: "waiting_validation"
-  next: change_chat_status 
+  next: change_chat_status
 
 change_chat_status:
   call: http.post
@@ -227,4 +244,4 @@ format_messages:
 
 return_formatted_value:
   return: ${converted_messages_res.response.body}
-  next: end 
+  next: end

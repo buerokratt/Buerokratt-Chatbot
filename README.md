@@ -2,6 +2,7 @@
 
 # Scope
 
+
 This repo will primarily contain:
 
 1. Architectural and other documentation;
@@ -123,9 +124,11 @@ The function automatically forms sql query with all column and modifies only giv
 SELECT copy_row_with_modifications(
     'some_table',
     'id', '::INTEGER', id::VARCHAR,
-    'column2', '::INTEGER', :column2::VARCHAR,
-    'column4', '', :column4,
-    'updated', '::TIMESTAMP', NOW()::VARCHAR
+    ARRAY[
+        'column2', '::INTEGER', :column2::VARCHAR,
+        'column4', '', :column4,
+        'updated', '::TIMESTAMP', NOW()::VARCHAR
+    ]::VARCHAR[]
 ) FROM some_table
 WHERE base_id = :base_id
 ORDER BY updated DESC
@@ -137,7 +140,7 @@ It accepts next arguments:
 * `id_column_conversion_expression` - how to convert `VARCHAR` to id column type. If column type is `VARCHAR` already, 
   than empty string `''` should be provided. Type: `VARCHAR`.
 * `id_to_copy` - The id value of row to copy. Type: `VARCHAR`.
-* `VARIADIC modifications VARCHAR[]` - each modification comes in set of 3 arguments 
+* `modifications VARCHAR[]` - each modification comes in set of 3 arguments 
   with idea similar to `(id_column_name, id_column_conversion_expression, id_column_conversion_expression)`:
   * first comes column name to modify (to update). Type: `VARCHAR`.
   * second comes how to convert `VARCHAR` to actual column type. 

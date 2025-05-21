@@ -189,8 +189,8 @@ const SettingsWorkingTime: FC = () => {
                 render={({ field }) => (
                   <Switch
                     label={t('settings.workingTime.publicHolidays')}
-                    onLabel={t('settings.workingTime.consider').toString()}
-                    offLabel={t('settings.workingTime.dontConsider').toString()}
+                    onLabel={t('global.yes').toString()}
+                    offLabel={t('global.no').toString()}
                     onCheckedChange={field.onChange}
                     checked={field.value}
                     {...field}

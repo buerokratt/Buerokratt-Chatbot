@@ -24,12 +24,11 @@ extractRequestData:
 get_chat_info:
   call: http.post
   args:
-   url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
-   contentType: plaintext
-   headers:
-    cookie: ${incoming.headers.cookie}
-   plaintext:
-      "chatJwt"
+    url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
+    contentType: plaintext
+    headers:
+      cookie: ${incoming.headers.cookie}
+    plaintext: "chatJwt"
   result: infoRes
   next: check_chat_info_response
 
@@ -42,7 +41,20 @@ check_chat_info_response:
 assignChatId:
   assign:
     chatId: ${infoRes.response.body.chatId}
-  next: getNewMessages
+
+get_users_having_active_status:
+  call: http.get
+  args:
+    url: "[#CHATBOT_RESQL]/auth_users/list_users_having_status_active"
+  result: activeUsers
+
+get_message_previews:
+  call: http.get
+  args:
+    url: "[#CHATBOT_RESQL]/chat/list_message_previews_by_chat_base_id"
+    query:
+      chatId: ${chatId}
+  result: messagePreviewsRes
 
 getNewMessages:
   call: http.get
@@ -52,7 +64,18 @@ getNewMessages:
       chatId: ${chatId}
       timeRangeBegin: ${timeRangeBegin}
   result: res
-  next: returnSuccess
+
+enrich_messages_with_author_data:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_HBS]/enrich_messages_with_author_data_and_previews"
+    headers:
+      type: json
+    body:
+      messages: ${res.response.body}
+      activeUsers: ${activeUsers.response.body}
+      messagePreviews: ${messagePreviewsRes.response.body}
+  result: res
 
 returnSuccess:
   return: ${res.response.body}
@@ -61,4 +84,4 @@ returnSuccess:
 return_bad_request:
   status: 400
   return: false
-  next: end  
+  next: end

@@ -44,6 +44,15 @@ extractRequestData:
     search_department: ${incoming.body.search_department ?? ""}
     current_user_id: ${incoming.body.current_user_id ?? ""}
 
+getTitleVisibility:
+  call: http.get
+  args:
+    url: "[#CHATBOT_RESQL]/config/get_configuration"
+    query:
+      key: "is_csa_title_visible"
+  result: title_res
+  next: getCustomerSupportAgents
+
 getCustomerSupportAgents:
   call: http.get
   args:
@@ -71,6 +80,7 @@ getCustomerSupportAgents:
           "ROLE_CHATBOT_TRAINER",
           "ROLE_ANALYST",
         ]
+      is_csa_title_visible: ${title_res.response.body[0]?.value}
   result: res
 
 return_result:

@@ -26,34 +26,19 @@ SELECT
     received_from,
     received_from_name,
     customer_messages_count AS customer_messages,
-    (
-        SELECT last_message
-        FROM denormalized_chat
-        WHERE chat_id = latest_chat_versions.chat_id
-        AND last_message_event_with_content <> 'rating'
-        AND last_message_event_with_content <> 'requested-chat-forward'
-        AND last_message <> ''
-        AND last_message <> 'message-read'
-        ORDER BY id DESC
-        LIMIT 1
-    ) AS last_message,
+    last_message_with_content_and_not_rating_or_forward AS last_message,
     contacts_message,
-    (
-        SELECT last_message_timestamp
-        FROM denormalized_chat
-        WHERE chat_id = latest_chat_versions.chat_id
-        AND last_message_event <> 'rating'
-        AND last_message_event <> 'requested-chat-forward'
-        ORDER BY id DESC
-        LIMIT 1
-    ) AS last_message_timestamp,
+    last_message_with_not_rating_or_forward_events_timestamp AS last_message_timestamp,
     last_message_event_with_content,
-    csa_title
-    
+    CASE
+        WHEN :is_csa_title_visible = 'true' THEN csa_title
+        ELSE ''
+    END AS csa_title
+
 FROM latest_chat_versions
 WHERE 
     ended IS NULL 
-    AND is_bot = FALSE
+    AND customer_support_id <> :bot_institution_id
     AND status <> 'VALIDATING'
 ORDER BY created ASC
 LIMIT :limit::INTEGER;

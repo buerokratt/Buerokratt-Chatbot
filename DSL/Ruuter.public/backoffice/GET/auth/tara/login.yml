@@ -30,6 +30,15 @@ get_session_length:
     query:
       key: "session_length"
   result: session_result
+  next: getTitleVisibility
+
+getTitleVisibility:
+  call: http.get
+  args:
+    url: "[#CHATBOT_RESQL]/config/get_configuration"
+    query:
+      key: "is_csa_title_visible"
+  result: title_res
   next: getUser
 
 getUser:
@@ -38,6 +47,7 @@ getUser:
     url: "[#CHATBOT_RESQL]/auth_users/get_user_with_roles_by_id_code"
     query:
       userIdCode: ${tara_info.response.body.personalCode}
+      is_csa_title_visible: ${title_res.response.body[0]?.value}
   result: user_info
   next: checkIfUserExists
 
@@ -82,7 +92,7 @@ assign_cookie:
       Domain: "[#DOMAIN]"
       Secure: true
       HttpOnly: true
-      SameSite: "Lax"
+      SameSite: "[#COOKIE_SAME_SITE]"
   next: setCustomerSupportAgentAway
 
 setCustomerSupportAgentAway:
