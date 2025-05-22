@@ -29,7 +29,7 @@ SELECT copy_row_with_modifications(
                     THEN NULL
                 ELSE :customerSupportLastName
             END,
-        'status', '', :status,
+        'status', '::chat_status_type', :status,
         'ended', '::TIMESTAMP WITH TIME ZONE', 
             CASE
                 WHEN :ended::TEXT = 'CURRENT_TIMESTAMP' THEN NOW()::VARCHAR
@@ -45,17 +45,17 @@ SELECT copy_row_with_modifications(
         'received_from', '', :receivedFrom,
         'received_from_name', '', :receivedFromName,
         'last_message_author_id', '', :lastMessageAuthorId,
-        'last_message_event', '', :lastMessageEvent,
+        'last_message_event', '::event_type', LOWER(:lastMessageEvent),
         'last_message_including_empty_content', '', :content,
-        'last_non_empty_message_event', '', 
+        'last_non_empty_message_event', '::event_type', 
             CASE
-                WHEN :lastMessageEvent::TEXT = '' THEN last_non_empty_message_event
-                ELSE :lastMessageEvent::VARCHAR
+                WHEN :lastMessageEvent::TEXT = '' THEN last_non_empty_message_event::VARCHAR
+                ELSE LOWER(:lastMessageEvent)
             END,
-        'last_message_event_with_content', '', 
+        'last_message_event_with_content', '::event_type', 
             CASE
-                WHEN :content::TEXT = '' THEN last_message_event_with_content
-                ELSE :lastMessageEvent::VARCHAR
+                WHEN :content::TEXT = '' THEN last_message_event_with_content::VARCHAR
+                ELSE LOWER(:lastMessageEvent)
             END,
         'contacts_message', '', 
             CASE

@@ -49,8 +49,7 @@ FROM (
             WHEN :is_csa_title_visible = 'true' THEN csa_title
             ELSE ''
         END AS csa_title,
-        CASE WHEN last_message_event IS NULL OR last_message_event = '' THEN NULL 
-        ELSE last_message_event END AS last_message_event,
+        last_message_event AS last_message_event,
         created,
         ROW_NUMBER() OVER (PARTITION BY chat_id ORDER BY denormalized_record_created DESC) as rn
     FROM denormalized_chat

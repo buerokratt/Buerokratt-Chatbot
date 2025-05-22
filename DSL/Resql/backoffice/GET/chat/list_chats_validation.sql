@@ -48,8 +48,7 @@ FROM (
             WHEN :is_csa_title_visible = 'true' THEN csa_title
             ELSE ''
         END AS csa_title,
-        CASE WHEN last_message_event IS NULL OR last_message_event = '' THEN NULL 
-        ELSE last_message_event END AS last_message_event,
+        last_message_event AS last_message_event,
         created,
         last_message_with_content_and_not_rating_or_forward,
         last_message_with_not_rating_or_forward_events_timestamp,

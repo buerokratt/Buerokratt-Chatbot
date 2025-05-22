@@ -3,9 +3,9 @@ SELECT copy_row_with_modifications(
     'id', '::UUID', id::VARCHAR,
     ARRAY[
         'content', '', :content,
-        'event', '', :event,
+        'event', '::event_type', :event,
         'author_id', '', :authorId,
-        'author_role', '', :authorRole,
+        'author_role', '::author_role_type', :authorRole,
         'base_id', '', gen_random_uuid(),
         'created', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR,
         'updated', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR

@@ -25,6 +25,7 @@ CREATE TYPE authority_role_type AS ENUM (
 
 -- Event type ENUM with lowercase values (as per the original schema)
 CREATE TYPE event_type AS ENUM (
+    '',
     'inactive-chat-ended',
     'taken-over',
     'unavailable_organization_ask_contacts',
@@ -158,7 +159,7 @@ ADD COLUMN event_enum event_type;
 
 UPDATE message 
 SET event_enum = convert_to_lowercase_event_enum(event)
-WHERE event IS NOT NULL AND event != '';
+WHERE event IS NOT NULL;
 
 ALTER TABLE message 
 DROP COLUMN event;
@@ -172,7 +173,7 @@ ADD COLUMN last_message_event_enum event_type;
 
 UPDATE denormalized_chat 
 SET last_message_event_enum = convert_to_lowercase_event_enum(last_message_event)
-WHERE last_message_event IS NOT NULL AND last_message_event != '';
+WHERE last_message_event IS NOT NULL;
 
 ALTER TABLE denormalized_chat 
 DROP COLUMN last_message_event;
@@ -200,7 +201,7 @@ ADD COLUMN last_non_empty_message_event_enum event_type;
 
 UPDATE denormalized_chat 
 SET last_non_empty_message_event_enum = convert_to_lowercase_event_enum(last_non_empty_message_event)
-WHERE last_non_empty_message_event IS NOT NULL AND last_non_empty_message_event != '';
+WHERE last_non_empty_message_event IS NOT NULL;
 
 ALTER TABLE denormalized_chat 
 DROP COLUMN last_non_empty_message_event;
