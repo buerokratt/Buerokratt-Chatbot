@@ -8,14 +8,32 @@ import { apiDev } from 'services/api';
 import './SettingsSessionLength.scss';
 import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';
+import { Controller, useForm } from 'react-hook-form';
+
+type FormValues = {
+  sessionLength: string;
+  chatDuration: string;
+};
 
 const SettingsSessionLength: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
-  const [sessionLength, setSessionLength] = useState<string>('');
+
+  const { control, handleSubmit, setValue, watch } = useForm<FormValues>({
+    defaultValues: {
+      sessionLength: '',
+      chatDuration: '',
+    },
+  });
+
+  const sessionLength = watch('sessionLength');
+  const chatDuration = watch('chatDuration');
+
   useQuery({
     queryKey: ['accounts/admin/session-length', 'prod'],
-    onSuccess: (res: any) => setSessionLength(res.response ?? ''),
+    onSuccess: (res: any) => {
+      setValue('sessionLength', res.response ?? '');
+    },
   });
 
   const sessionLengthMutation = useMutation({
@@ -39,14 +57,15 @@ const SettingsSessionLength: FC = () => {
     },
   });
 
-  const handleFormSubmit = () => {
-    if (sessionLength.length === 0) {
+  const onSubmit = (data: FormValues) => {
+    const value = parseInt(data.sessionLength);
+    if (!data.sessionLength) {
       toast.open({
         type: 'error',
         title: t('global.notificationError'),
         message: t('settings.userSession.emptySession'),
       });
-    } else if (parseInt(sessionLength) < 30 || parseInt(sessionLength) > 480) {
+    } else if (value < 30 || value > 480) {
       toast.open({
         type: 'error',
         title: t('global.notificationError'),
@@ -60,28 +79,54 @@ const SettingsSessionLength: FC = () => {
   return (
     <>
       <h1>{t('settings.userSession.sessionLength')}</h1>
-      <p>{t('settings.userSession.description')}</p>
       <Card
+        isBodyDivided={true}
         footer={
           <Track justify="end">
-            <Button onClick={handleFormSubmit}>{t('global.save')}</Button>
+            <Button onClick={handleSubmit(onSubmit)}>{t('global.save')}</Button>
           </Track>
         }
       >
         <Track gap={16} direction="vertical" align="left">
+          <p>{t('settings.userSession.description')}</p>
           <Track>
-            <FormInput
-              name="session-length"
-              label={t('settings.userSession.sessionLength')}
-              type="number"
-              onChange={(e) => setSessionLength(e.target.value)}
-              value={sessionLength}
+            <Controller
+              name="sessionLength"
+              control={control}
+              render={({ field }) => (
+                <FormInput
+                  {...field}
+                  labelWidth={130}
+                  name="session-length"
+                  label={t('settings.userSession.sessionLength')}
+                  type="number"
+                />
+              )}
             />
-            <label className="minute">
-              {t('settings.userSession.minutes')}
-            </label>
+            <label className="minute">{t('settings.userSession.minutes')}</label>
           </Track>
           <label className="rule">{t('settings.userSession.rule')}</label>
+        </Track>
+
+        <Track gap={16} direction="vertical" align="left">
+          <p>{t('settings.chatDuration.description')}</p>
+          <Track>
+            <Controller
+              name="chatDuration"
+              control={control}
+              render={({ field }) => (
+                <FormInput
+                  {...field}
+                  labelWidth={130}
+                  name="chatDuration"
+                  label={t('settings.chatDuration.duration')}
+                  type="number"
+                />
+              )}
+            />
+            <label className="minute">{t('settings.chatDuration.minutes')}</label>
+          </Track>
+          <label className="rule">{t('settings.chatDuration.rule')}</label>
         </Track>
       </Card>
     </>

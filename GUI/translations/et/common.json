@@ -404,6 +404,12 @@
       "emptySession": "Sessiooni pikkuse väli ei tohi olla tühi",
       "invalidSession": "Sessiooni pikkus peab olema vahemikus 30 - 480 minutit"
     },
+    "chatDuration": {
+      "description": "Aja möödumisel lõpetakse vestlus automaatselt.",
+      "duration": "Kasutaja poolse vastuse ooteaja pikkus",
+      "minutes": "minutit",
+      "rule": "Sessiooni pikkus on lubatud vahemikus 5 min - 480 min (8h)"
+    },
     "greeting": {
       "title": "Tervitussõnum"
     },

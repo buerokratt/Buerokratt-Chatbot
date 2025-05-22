@@ -404,6 +404,12 @@
       "emptySession": "Session length can't be empty",
       "invalidSession": "Session length must be between 30 and 480 minuites"
     },
+    "chatDuration": {
+      "description": "When the time expires, the conversation will end automatically.",
+      "duration": "Time for user to respond",
+      "minutes": "minutes",
+      "rule": "Session length is allowed between 5 min - 480 min (8h)"
+    },
     "greeting": {
       "title": "Greeting message"
     },
