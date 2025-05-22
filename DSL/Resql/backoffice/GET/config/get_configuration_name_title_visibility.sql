@@ -2,10 +2,13 @@ WITH configuration_values AS (
     SELECT id,
     KEY,
     value
-FROM configuration
+FROM configuration AS c1
 WHERE KEY IN ('is_csa_title_visible',
     'is_csa_name_visible')
-  AND id IN (SELECT max(id) FROM configuration GROUP BY KEY)
+  AND created = (
+    SELECT MAX(c2.created) FROM configuration as c2
+    WHERE c2.key = c1.key
+    )
   AND NOT deleted
     )
 SELECT

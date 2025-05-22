@@ -29,6 +29,15 @@ assignChatIdInfo:
     chatId: ${infoRes.response.body.chatId}
     JWTCreated: ${infoRes.response.body.JWTCreated}
     JWTExpirationTimestamp: ${infoRes.response.body.JWTExpirationTimestamp}
+  next: getTitleVisibility
+
+getTitleVisibility:
+  call: http.get
+  args:
+    url: "[#CHATBOT_RESQL]/config/get_configuration"
+    query:
+      key: "is_csa_title_visible"
+  result: title_res
   next: getActiveChatById
 
 getActiveChatById:
@@ -37,6 +46,7 @@ getActiveChatById:
     url: "[#CHATBOT_RESQL]/chat/get_chat_active_by_id"
     query:
       id: ${chatId}
+      is_csa_title_visible: ${title_res.response.body[0]?.value}
   result: activeChatRes
   next: checkActiveChatResult
 
@@ -128,6 +138,37 @@ redirectChat:
       receivedFromName: ${activeChat.receivedFromName}
   result: redirectChatRes
 
+updateDenormalizedChat:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat"
+    body:
+      chatId: ${chatId}
+      customerSupportId: ${activeChat.customerSupportId}
+      customerSupportDisplayName: ${activeChat.customerSupportDisplayName}
+      customerSupportFirstName: "null"
+      customerSupportLastName: "null"
+      csaTitle: ${activeChat.csaTitle}
+      endUserId: ${activeChat.endUserId}
+      endUserFirstName: ${activeChat.endUserFirstName}
+      endUserLastName: ${activeChat.endUserLastName}
+      status: "REDIRECTED"
+      endUserEmail: ${activeChat.endUserEmail}
+      endUserPhone: ${activeChat.endUserPhone}
+      endUserOs: ${activeChat.endUserOs}
+      endUserUrl: ${activeChat.endUserUrl}
+      feedbackText: ""
+      feedbackRating: ""
+      externalId: ${forwardChatRes.response.body.data.format_forward_destination_response.generatedChatId}
+      created: ${activeChat.created}
+      ended: ${redirectChatRes.response.body[0].updated}
+      forwardedTo: ${activeChat.forwardedTo}
+      forwardedToName: ${activeChat.forwardedToName}
+      receivedFrom: ${activeChat.receivedFrom}
+      receivedFromName: ${activeChat.receivedFromName}
+      updated: ${redirectChatRes.response.body[0].updated}
+  result: updateDenormalizedChatRes
+
 getAvailableCSACount:
   call: http.get
   args:
@@ -138,7 +179,7 @@ check_available_csa_count:
   switch:
     - condition: ${countRes.response.body.count > 0}
       next: add_chat_id_to_queue_notification_node
-  next: getTitleVisibility
+  next: getChatById
 
 add_chat_id_to_queue_notification_node:
   call: http.post
@@ -147,15 +188,6 @@ add_chat_id_to_queue_notification_node:
     body:
       id: ${chatId}
   result: add_chat_id_to_queue_notification_node_res
-
-getTitleVisibility:
-  call: http.get
-  args:
-    url: "[#CHATBOT_RESQL]/config/get_configuration"
-    query:
-      key: "is_csa_title_visible"
-  result: title_res
-  next: getChatById
 
 getChatById:
   call: http.get

@@ -12,16 +12,22 @@ DECLARE
     to_select VARCHAR [] := (ARRAY [])::VARCHAR[];
     sql_query VARCHAR;
     inserted_id VARCHAR;
+    modification_columns VARCHAR[] := (ARRAY [])::VARCHAR[];
 BEGIN
     SELECT ARRAY_AGG(column_name)
     INTO columns
     FROM information_schema.columns
     WHERE table_name = table_name_to_copy_from AND column_name <> id_column_name;
 
+    FOR i IN 1..array_length(modifications, 1) BY 3
+    LOOP
+        modification_columns := array_append(modification_columns, modifications[i]);
+    END LOOP;
+
     FOR i IN 1..array_length(columns, 1)
     LOOP
 
-        IF columns[i] = ANY(modifications)
+        IF columns[i] = ANY(modification_columns)
         THEN
 
             FOR j IN 1..array_length(modifications, 1) BY 3

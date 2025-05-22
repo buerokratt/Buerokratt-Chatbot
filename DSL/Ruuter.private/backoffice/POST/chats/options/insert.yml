@@ -75,6 +75,21 @@ add_message_to_db:
       authorLastName: ""
   result: insertMessageResult
 
+updateDenormalizedChatMessage:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_message_fields_only"
+    body:
+      chatId: ${chatId}
+      lastMessageTimestamp: ${insertMessageResult.response.body[0].updated}
+      isSupportMessage: false
+      isCustomerMessage: false
+      authorTimestamp: ${insertMessageResult.response.body[0].updated}
+      content: ""
+      lastMessageAuthorId: ""
+      lastMessageEvent: ""
+  result: updateDenormalizedChatRes
+
 notify_chats:
   template: "[#CHATBOT_PROJECT_LAYER]/chats/notify"
   requestType: templates

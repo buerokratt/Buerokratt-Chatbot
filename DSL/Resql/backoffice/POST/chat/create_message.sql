@@ -21,7 +21,7 @@ VALUES (
         ELSE (GEN_RANDOM_UUID()::VARCHAR)
     END),
     :content,
-    :event,
+    LOWER(:event)::event_type,
     CASE 
         WHEN :authorTimestamp::TEXT = 'CURRENT_TIMESTAMP' THEN now()
         ELSE COALESCE(:authorTimestamp::TIMESTAMP WITH TIME ZONE, now())
@@ -33,9 +33,9 @@ VALUES (
     :authorId,
     :authorFirstName,
     :authorLastName,
-    :authorRole,
+    :authorRole::author_role_type,
     (NULLIF(:rating, '')::INTEGER),
     :forwardedByUser,
     :forwardedFromCsa,
     :forwardedToCsa
-);
+) RETURNING updated::TEXT;

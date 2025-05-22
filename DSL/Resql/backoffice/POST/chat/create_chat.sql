@@ -23,7 +23,7 @@ INSERT INTO chat (
 )
 VALUES (
     :id, :customerSupportId, :customerSupportDisplayName, :endUserId, :endUserFirstName,
-    :endUserLastName, :status, 
+    :endUserLastName, :status::chat_status_type, 
     CASE 
         WHEN :created::TEXT = 'CURRENT_TIMESTAMP' THEN now()
         ELSE COALESCE(:created::TIMESTAMP WITH TIME ZONE, now())
@@ -31,7 +31,7 @@ VALUES (
     (
         CASE
             WHEN :ended::TEXT = 'CURRENT_TIMESTAMP' THEN now()
-            WHEN (:ended = '') THEN null WHEN (:ended = 'null') THEN now() 
+            WHEN (:ended = '') THEN null WHEN (:ended = 'null') THEN now()
             ELSE :ended::TIMESTAMP WITH TIME ZONE
         END
     )::TIMESTAMP WITH TIME ZONE,
@@ -52,4 +52,4 @@ VALUES (
                 :csaTitle
         END
     )
-);
+) RETURNING updated::TEXT;

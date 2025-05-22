@@ -364,6 +364,8 @@ const Chat: FC<ChatProps> = ({
         id: chat.id ?? '',
         customerSupportId: userInfo?.idCode ?? '',
         customerSupportDisplayName: userInfo?.displayName ?? '',
+        customerSupportFirstName: userInfo?.firstName ?? '',
+        customerSupportLastName: userInfo?.lastName ?? '',
         csaTitle: userInfo?.csaTitle ?? '',
         forwardedByUser: userInfo?.idCode ?? '',
         forwardedFromCsa: userInfo?.idCode ?? '',
@@ -397,6 +399,8 @@ const Chat: FC<ChatProps> = ({
         id: chat.id ?? '',
         customerSupportId: userInfo?.idCode ?? '',
         customerSupportDisplayName: userInfo?.displayName ?? '',
+        customerSupportFirstName: userInfo?.firstName ?? '',
+        customerSupportLastName: userInfo?.lastName ?? '',
         csaTitle: userInfo?.csaTitle ?? '',
       }),
     onSuccess: async () => {

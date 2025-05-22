@@ -2,8 +2,8 @@ SELECT id_code
 FROM "user"
 WHERE
     id_code = :userIdCode
-    AND status <> 'deleted'
-    AND id IN (
-        SELECT MAX(id) FROM "user"
+    AND created = (
+        SELECT MAX(created) FROM "user"
         WHERE id_code = :userIdCode
-    )
+    ) 
+    AND status <> 'deleted'

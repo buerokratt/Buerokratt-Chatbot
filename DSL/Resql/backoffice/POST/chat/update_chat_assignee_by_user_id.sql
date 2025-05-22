@@ -1,209 +1,25 @@
--- TODO rewrite it with copy_row_with_modifiers
-WITH
-    active_chats AS (
-        SELECT
-            c.base_id AS id,
-            last_content_message.chat_base_id AS base_id,
-            c.feedback_text,
-            c.feedback_rating,
-            c.customer_support_id,
-            c.customer_support_display_name,
-            c.end_user_id,
-            c.end_user_first_name,
-            c.end_user_last_name,
-            c.status,
-            c.created,
-            c.updated,
-            c.ended,
-            c.end_user_email,
-            c.end_user_phone,
-            c.end_user_os,
-            c.end_user_url,
-            c.external_id,
-            c.forwarded_to,
-            c.forwarded_to_name,
-            c.received_from,
-            c.received_from_name,
-            last_content_message.content AS last_message,
-            m.updated AS last_message_timestamp,
-
-            (CASE
-                WHEN
-                    (
-                        SELECT value
-                        FROM configuration
-                        WHERE
-                            key = 'is_csa_title_visible'
-                            AND configuration.id IN
-                            (
-                                SELECT MAX(id)
-                                FROM configuration
-                                GROUP BY key
-                            )
-                            AND deleted = FALSE
-                    ) = 'true' THEN c.csa_title
-                ELSE ''
-            END) AS csa_title,
-            (
-                SELECT content
-                FROM message
-                WHERE id IN (
-                    (
-                        SELECT MAX(id)
-                        FROM message
-                        WHERE
-                            event = 'contact-information-fulfilled'
-                            AND chat_base_id = c.base_id
-                    )
-                )
-            ) AS contacts_message,
-
-            (
-                SELECT event
-                FROM message
-                WHERE id IN (
-                    (
-                        SELECT MAX(id)
-                        FROM message
-                        WHERE
-                            event <> ''
-                            AND chat_base_id = c.base_id
-                    )
-                )
-            ) AS last_message_event
-        FROM
-            (
-                SELECT
-                    base_id,
-                    feedback_text,
-                    feedback_rating,
-                    customer_support_id,
-                    customer_support_display_name,
-                    csa_title,
-                    end_user_id,
-                    end_user_first_name,
-                    end_user_last_name,
-                    status,
-                    created,
-                    updated,
-                    ended,
-                    end_user_email,
-                    end_user_phone,
-                    end_user_os,
-                    end_user_url,
-                    external_id,
-                    forwarded_to,
-                    forwarded_to_name,
-                    received_from,
-                    received_from_name
-                FROM chat
-                WHERE
-                    id IN
-                    (
-                        SELECT MAX(id)
-                        FROM chat
-                        GROUP BY base_id
-                    )
-                    AND ended IS NULL
-                    AND customer_support_id
-                    <> (
-                        SELECT value
-                        FROM configuration
-                        WHERE
-                            key = 'bot_institution_id'
-                            AND id IN
-                            (
-                                SELECT MAX(id)
-                                FROM configuration
-                                GROUP BY key
-                            )
-                            AND deleted = FALSE
-                    )
-            ) AS c
-            INNER JOIN
-                (
-                    SELECT
-                        chat_base_id,
-                        updated
-                    FROM message
-                    WHERE
-                        id IN
-                        (
-                            SELECT MAX(id)
-                            FROM message
-                            WHERE
-                                event <> 'rating'
-                                AND event <> 'requested-chat-forward'
-                            GROUP BY chat_base_id
-                        )
-                ) AS m ON c.base_id = m.chat_base_id
-            INNER JOIN
-                (
-                    SELECT
-                        chat_base_id,
-                        content
-                    FROM message
-                    WHERE
-                        id IN
-                        (
-                            SELECT MAX(id)
-                            FROM message
-                            WHERE
-                                event <> 'rating'
-                                AND event <> 'requested-chat-forward'
-                                AND content <> ''
-                                AND content <> 'message-read'
-                            GROUP BY chat_base_id
-                        )
-                ) AS last_content_message
-                ON c.base_id = last_content_message.chat_base_id
-        ORDER BY created
+SELECT copy_row_with_modifications(
+    'chat',                                   -- Table name
+    'id', '::UUID',                        -- ID column name and type
+    (SELECT id FROM chat WHERE base_id = dc.chat_id ORDER BY updated DESC LIMIT 1)::VARCHAR,
+    ARRAY[                                    -- Direct array of modifications
+        'customer_support_id', '', '',        -- Reset customer_support_id
+        'customer_support_display_name', '', '',  -- Reset customer_support_display_name
+        'csa_title', '', '', -- Reset csa_title
+        'updated', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR
+    ]::VARCHAR[]
+), NOW()::TEXT as updated
+FROM denormalized_chat dc
+WHERE
+    dc.ended IS NULL
+    AND dc.customer_support_id = :userId
+    -- Get only the latest record for each chat
+    AND dc.denormalized_record_created = (
+        SELECT MAX(dc_inner.denormalized_record_created)
+        FROM denormalized_chat dc_inner
+        WHERE dc_inner.chat_id = dc.chat_id
+        AND dc_inner.ended IS NULL
+        AND dc_inner.customer_support_id = :userId
     )
-
-INSERT INTO chat (
-    base_id,
-    customer_support_id,
-    customer_support_display_name,
-    end_user_id,
-    end_user_first_name,
-    end_user_last_name,
-    status,
-    created,
-    ended,
-    end_user_email,
-    end_user_phone,
-    end_user_os,
-    end_user_url,
-    feedback_text,
-    feedback_rating,
-    external_id,
-    forwarded_to,
-    forwarded_to_name,
-    received_from,
-    received_from_name,
-    csa_title
-)
-SELECT
-    base_id,
-    '',
-    '',
-    end_user_id,
-    end_user_first_name,
-    end_user_last_name,
-    status,
-    created,
-    ended,
-    end_user_email,
-    end_user_phone,
-    end_user_os,
-    end_user_url,
-    feedback_text,
-    feedback_rating,
-    external_id,
-    forwarded_to,
-    forwarded_to_name,
-    received_from,
-    received_from_name,
-    ''
-FROM active_chats
-WHERE customer_support_id = :userId;
+    AND dc.last_message_with_content_and_not_rating_or_forward IS NOT NULL
+    AND dc.last_message_with_not_rating_or_forward_events_timestamp IS NOT NULL;

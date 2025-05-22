@@ -50,6 +50,8 @@ ALTER TABLE message DROP COLUMN original_base_id;
 
 ALTER TABLE chat ALTER COLUMN created SET DEFAULT now();
 
+ALTER TABLE chat_history_comments ALTER COLUMN created SET DEFAULT now();
+
 ALTER TABLE message ALTER COLUMN created SET DEFAULT now();
 
 ALTER TABLE message ALTER COLUMN author_timestamp SET DEFAULT now();

@@ -36,7 +36,7 @@ WITH latest_chat_records AS (
         last_message_event,
         all_messages
     FROM denormalized_chat
-    ORDER BY chat_id, id DESC
+    ORDER BY chat_id, denormalized_record_created DESC
 )
 
 SELECT
@@ -89,17 +89,13 @@ WHERE
             OR end_user_first_name ILIKE '%' || :search || '%'
             OR contacts_message ILIKE '%' || :search || '%'
             OR comment ILIKE '%' || :search || '%'
-            OR status ILIKE '%' || :search || '%'
-            OR last_message_event ILIKE '%' || :search || '%'
+            OR status::text ILIKE '%' || :search || '%'
+            OR last_message_event::text ILIKE '%' || :search || '%'
             OR chat_id ILIKE '%' || :search || '%'
             OR TO_CHAR(first_message_timestamp, 'DD.MM.YYYY HH24:MI:SS') ILIKE '%' || :search || '%'
             OR TO_CHAR(ended, 'DD.MM.YYYY HH24:MI:SS') ILIKE '%' || :search || '%'
             OR last_message ILIKE '%' || :search || '%'
-            OR EXISTS (
-                SELECT 1
-                FROM unnest(all_messages) AS message_content
-                WHERE message_content ILIKE '%' || :search || '%'
-            )
+            OR immutable_array_to_string(all_messages, ' ') ILIKE '%' || :search || '%'
         )
 ORDER BY
     CASE WHEN :sorting = 'created asc' THEN first_message_timestamp END ASC,

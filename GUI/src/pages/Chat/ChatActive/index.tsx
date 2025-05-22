@@ -65,17 +65,18 @@ const ChatActive: FC = () => {
     queryKey: ['agents/admin/title-visibility', 'prod'],
   });
 
-
   const handleCsaForward = async (chat: ChatType, user: User) => {
     try {
       await apiDev.post('chats/redirect', {
         id: chat.id ?? '',
         customerSupportId: user?.idCode ?? '',
         customerSupportDisplayName: user?.displayName ?? '',
+        customerSupportFirstName: user?.firstName ?? '',
+        customerSupportLastName: user?.lastName ?? '',
         csaTitle: user?.csaTitle ?? '',
         forwardedByUser: userInfo?.displayName ?? '',
         forwardedFromCsa: userInfo?.displayName ?? '',
-        forwardedToCsa: user?.displayName ?? ''
+        forwardedToCsa: user?.displayName ?? '',
       });
       setForwardToColleaugeModal(null);
       loadActiveChats();
