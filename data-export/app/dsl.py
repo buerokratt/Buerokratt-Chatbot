@@ -52,8 +52,6 @@ def perform_export(export_task: ExportTask):
     with gzip.open(str_path, 'w') as export_file:
         conn = get_connection()
         with conn.cursor() as cursor:
-            # possible issue: some new row added, between select query and delete query
-            # solution is to set transaction "SERIALIZABLE" but it will block table
             cursor.copy_expert(export_task.select_query, export_file)
             cursor.execute(export_task.delete_query)
             cursor.execute('COMMIT;')
