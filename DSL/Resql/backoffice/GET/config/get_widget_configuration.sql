@@ -2,7 +2,7 @@ SELECT
     id,
     key,
     value
-FROM configuration
+FROM configuration AS c1
 WHERE key IN (
     'widgetProactiveSeconds',
     'widgetDisplayBubbleMessageSeconds',
@@ -12,8 +12,8 @@ WHERE key IN (
     'widgetAnimation',
     'is_burokratt_active'
 )
-AND id IN (
-    SELECT MAX(id) FROM configuration
-    GROUP BY key
+AND created = (
+    SELECT MAX(c2.created) FROM configuration as c2
+    WHERE c2.key = c1.key
 )
 AND NOT deleted;

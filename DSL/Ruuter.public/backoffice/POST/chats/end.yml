@@ -131,6 +131,45 @@ endChat:
       receivedFrom: ${activeChat.receivedFrom ?? ""}
       receivedFromName: ${activeChat.receivedFromName ?? ""}
   result: end_chat_res
+  next: updateDenormalizedChat
+
+updateDenormalizedChat:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_and_message"
+    body:
+      chatId: ${activeChat.id}
+      customerSupportId: ${activeChat.customerSupportId ?? ""}
+      customerSupportDisplayName: ${activeChat.customerSupportDisplayName ?? ""}
+      customerSupportFirstName: "null"
+      customerSupportLastName: "null"
+      csaTitle: ${activeChat.csaTitle ?? ""}
+      endUserId: ${activeChat.endUserId ?? ""}
+      endUserFirstName: ${activeChat.endUserFirstName ?? ""}
+      endUserLastName: ${activeChat.endUserLastName ?? ""}
+      status: ${status ?? "ENDED"}
+      feedbackRating: ${activeChat.feedbackRating ?? ""}
+      feedbackText: ${activeChat.feedbackText ?? ""}
+      endUserEmail: ${activeChat.endUserEmail ?? ""}
+      endUserPhone: ${activeChat.endUserPhone ?? ""}
+      endUserOs: ${activeChat.endUserOs ?? ""}
+      endUserUrl: ${activeChat.endUserUrl ?? ""}
+      externalId: ${activeChat.externalId ?? ""}
+      created: ${activeChat.created ?? end_chat_res.response.body[0].updated}
+      ended: ${change_status_res.response.body[0].updated}
+      forwardedTo: ${activeChat.forwardedTo ?? ""}
+      forwardedToName: ${activeChat.forwardedToName ?? ""}
+      receivedFrom: ${activeChat.receivedFrom ?? ""}
+      receivedFromName: ${activeChat.receivedFromName ?? ""}
+      updated: ${end_chat_res.response.body[0].updated}
+      lastMessageTimestamp: ${message_res.response.body[0].updated}
+      isSupportMessage: ${authorRole == "backoffice-user"}
+      isCustomerMessage: ${authorRole == "end-user"}
+      authorTimestamp: ${authorTimestamp}
+      content: ""
+      lastMessageAuthorId: ""
+      lastMessageEvent: ${event}
+  result: updateDenormalizedChatRes
   next: blacklist_chat_jwt
 
 blacklist_chat_jwt:

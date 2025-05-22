@@ -31,23 +31,23 @@ VALUES (
     (CASE
         WHEN ((
             SELECT value
-            FROM configuration
+            FROM configuration AS c1
             WHERE
                 key = (SELECT is_bot_active FROM consts)
-                AND id IN (
-                    SELECT MAX(id) FROM configuration
-                    GROUP BY key
+                AND created = (
+                    SELECT MAX(c2.created) FROM configuration AS c2
+                    WHERE c1.key = c2.key
                 )
                 AND deleted = FALSE
         ) = 'true')
             THEN (
                 SELECT value
-                FROM configuration
+                FROM configuration AS c1
                 WHERE
                     key = 'bot_institution_id'
-                    AND id IN (
-                        SELECT MAX(id) FROM configuration
-                        GROUP BY key
+                    AND created = (
+                        SELECT MAX(c2.created) FROM configuration AS c2
+                        WHERE c1.key = c2.key
                     )
                     AND deleted = FALSE
             )
@@ -56,12 +56,12 @@ VALUES (
     (CASE
         WHEN ((
             SELECT value
-            FROM configuration
+            FROM configuration AS c1
             WHERE
                 key = (SELECT is_bot_active FROM consts)
-                AND id IN (
-                    SELECT MAX(id) FROM configuration
-                    GROUP BY key
+                AND created = (
+                    SELECT MAX(c2.created) FROM configuration AS c2
+                    WHERE c1.key = c2.key
                 )
                 AND deleted = FALSE
         ) = 'true') THEN 'Bürokratt'
@@ -70,7 +70,7 @@ VALUES (
     :endUserId,
     :endUserFirstName,
     :endUserLastName,
-    :status,
+    :status::chat_status_type,
     CASE 
         WHEN :created::TEXT = 'CURRENT_TIMESTAMP' THEN now()
         ELSE COALESCE(:created::TIMESTAMP WITH TIME ZONE, now())
@@ -93,15 +93,16 @@ VALUES (
     :receivedFrom, :receivedFromName, (CASE
         WHEN ((
             SELECT value
-            FROM configuration
+            FROM configuration AS c1
             WHERE
                 key = (SELECT is_bot_active FROM consts)
-                AND id IN (
-                    SELECT MAX(id) FROM configuration
-                    GROUP BY key
+                AND created = (
+                    SELECT MAX(c2.created) FROM configuration AS c2
+                    WHERE c1.key = c2.key
                 )
                 AND deleted = FALSE
         ) = 'true') THEN ''
         ELSE ''
     END)
-);
+)
+RETURNING customer_support_id, customer_support_display_name, csa_title, updated::TEXT;

@@ -11,7 +11,7 @@ WITH
         SELECT
             key,
             value
-        FROM configuration
+        FROM configuration AS c1
         WHERE key IN (
             'organizationMondayWorkingTimeStartISO',
             'organizationMondayWorkingTimeEndISO',
@@ -34,11 +34,9 @@ WITH
             'organizationTheSameOnAllWorkingDays',
             'organizationWorkingTimeNationalHolidays'
         )
-        AND id IN
-        (
-            SELECT MAX(id)
-            FROM configuration
-            GROUP BY key
+        AND created = (
+            SELECT MAX(c2.created) FROM configuration as c2
+            WHERE c2.key = c1.key
         )
         AND deleted = FALSE
     ),

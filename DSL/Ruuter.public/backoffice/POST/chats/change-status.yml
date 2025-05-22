@@ -139,13 +139,45 @@ changeStatus:
       feedbackText: ${activeChat.feedbackText ?? ''}
       feedbackRating: ${activeChat.feedbackRating ?? ''}
       externalId: ${activeChat.externalId ?? ''}
-      created: "CURRENT_TIMESTAMP"
+      created: ${activeChat.created ?? "CURRENT_TIMESTAMP"}
       ended: ""
       forwardedTo: ${activeChat.forwardedTo ?? ''}
       forwardedToName: ${activeChat.forwardedToName ?? ''}
       receivedFrom: ${activeChat.receivedFrom ?? ''}
       receivedFromName: ${activeChat.receivedFromName ?? ''}
   result: change_status_res
+  next: updateDenormalizedChat
+
+updateDenormalizedChat:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat"
+    body:
+      chatId: ${chatId}
+      customerSupportId: ""
+      customerSupportDisplayName: ""
+      customerSupportFirstName: ""
+      customerSupportLastName: ""
+      csaTitle: ${activeChat.csaTitle ?? ""}
+      endUserId: ${activeChat.endUserId ?? ""}
+      endUserFirstName: ${activeChat.endUserFirstName ?? ""}
+      endUserLastName: ${activeChat.endUserLastName ?? ""}
+      status: ${status}
+      feedbackRating: ${activeChat.feedbackRating ?? ""}
+      feedbackText: ${activeChat.feedbackText ?? ""}
+      endUserEmail: ${activeChat.endUserEmail ?? ""}
+      endUserPhone: ${activeChat.endUserPhone ?? ""}
+      endUserOs: ${activeChat.endUserOs ?? ""}
+      endUserUrl: ${activeChat.endUserUrl ?? ""}
+      externalId: ${activeChat.externalId ?? ""}
+      created: ${activeChat.created ?? change_status_res.response.body[0].updated}
+      ended: ""
+      forwardedTo: ${activeChat.forwardedTo ?? ""}
+      forwardedToName: ${activeChat.forwardedToName ?? ""}
+      receivedFrom: ${activeChat.receivedFrom ?? ""}
+      receivedFromName: ${activeChat.receivedFromName ?? ""}
+      updated: ${change_status_res.response.body[0].updated}
+  result: updateDenormalizedChatRes
   next: return_result
 
 return_result:

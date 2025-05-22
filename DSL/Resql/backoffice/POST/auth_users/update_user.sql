@@ -1,6 +1,6 @@
 SELECT copy_row_with_modifications(
     'user',
-    'id', '::INTEGER', id::VARCHAR,
+    'id', '::UUID', id::VARCHAR,
     ARRAY[
         'first_name', '', :firstName,
         'last_name', '', :lastName,
@@ -12,7 +12,7 @@ SELECT copy_row_with_modifications(
         'created', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR
     ]::VARCHAR[]
 ) FROM "user"
-WHERE id = (
-    SELECT MAX(id) FROM "user"
+WHERE created = (
+    SELECT MAX(created) FROM "user"
     WHERE id_code = :userIdCode
 );

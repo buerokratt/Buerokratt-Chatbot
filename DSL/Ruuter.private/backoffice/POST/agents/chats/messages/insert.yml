@@ -103,6 +103,21 @@ insertMessage:
       created: "CURRENT_TIMESTAMP"
   result: insertMessageResult
 
+updateDenormalizedChatMessage:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_message_fields_only"
+    body:
+      chatId: ${chatId}
+      lastMessageTimestamp: ${insertMessageResult.response.body[0].updated}
+      isSupportMessage: ${authorRole == "backoffice-user"}
+      isCustomerMessage: ${authorRole == "end-user"}
+      authorTimestamp: ${authorTimestamp ?? insertMessageResult.response.body[0].updated}
+      content: ${content ?? ""}
+      lastMessageAuthorId: ${idCode}
+      lastMessageEvent: ${event ?? ""}
+  result: updateDenormalizedChatRes
+
 getMessageById:
   call: http.get
   args:

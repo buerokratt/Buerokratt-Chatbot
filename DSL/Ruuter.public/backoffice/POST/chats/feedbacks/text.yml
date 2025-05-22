@@ -34,6 +34,17 @@ addFeedbackText:
       id: ${chatId}
       feedbackText: ${text}
   result: res
+  next: addDenormalizedChatFeedbackText
+
+addDenormalizedChatFeedbackText:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_feedback_text"
+    body:
+      chatId: ${chatId}
+      feedbackText: ${text}
+      updated: ${res.response.body[0].updated}
+  result: denormalized_res
   next: return_result
 
 return_result:

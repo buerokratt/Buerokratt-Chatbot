@@ -1,0 +1,5 @@
+trigger_export:
+  trigger: 0 0 * * 6 ?  # saturday 00:00
+  type: http
+  method: POST
+  url: http://data-export:8888/export

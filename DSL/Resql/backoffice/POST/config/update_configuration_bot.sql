@@ -3,7 +3,7 @@ WITH
         SELECT
             key,
             value
-        FROM configuration
+        FROM configuration AS c1
         WHERE key IN (
             'is_bot_active',
             'is_burokratt_active',
@@ -11,9 +11,9 @@ WITH
             'is_csa_title_visible',
             'is_edit_chat_visible'
         )
-        AND id IN (
-            SELECT MAX(id) FROM configuration
-            GROUP BY key
+        AND created = (
+            SELECT MAX(c2.created) FROM configuration AS c2
+            WHERE c1.key = c2.key
         )
         AND deleted = FALSE
     ),

@@ -31,10 +31,19 @@ validate_input:
 emptyMessages:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/chat/update_message_content"
+    url: "[#CHATBOT_RESQL]/chat/update_message_to_empty_content"
     body:
       chats: ${convertedIds.response.body}
   result: emptyMessages
+
+emptyDenormalizedChatMessages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_message_to_empty_content"
+    body:
+      chats: ${convertedIds.response.body}
+      updated: ${emptyMessages.response.body[0].updated}
+  result: emptyDenormalizedMessages
 
 return_result:
   return: ${emptyMessages.response.body}

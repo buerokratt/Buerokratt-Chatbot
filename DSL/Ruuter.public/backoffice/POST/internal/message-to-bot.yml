@@ -265,6 +265,22 @@ return_is_a_holiday:
   result: is_a_holiday_result
   next: return_is_holiday
 
+updateDenormalizedChatMessageHolidayBot:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_message_fields_only"
+    body:
+      chatId: ${chatId}
+      lastMessageTimestamp: ${is_a_holiday_result.response.body[0].updated}
+      isSupportMessage: false
+      isCustomerMessage: false
+      authorTimestamp: ${is_a_holiday_result.response.body[0].updated}
+      content: ${org_details.holidayMessage}
+      lastMessageAuthorId: ${get_bot_name_result.response.body[0].value}
+      lastMessageEvent: "${base_config.outsideWorkingHoursAskForContacts === 'true' ? 'unavailable_holiday_ask_contacts' : 'unavailable_holiday'}"
+  result: updateDenormalizedChatMessageCsasNotAvailableBotRes
+  next: return_is_holiday
+
 return_organization_is_not_available:
   call: http.post
   args:
@@ -278,6 +294,22 @@ return_organization_is_not_available:
           authorFirstName: ""
           authorLastName: ""
   result: organization_is_not_available_result
+  next: updateDenormalizedChatOrganizationNotAvailableBot
+
+updateDenormalizedChatOrganizationNotAvailableBot:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_message_fields_only"
+    body:
+      chatId: ${chatId}
+      lastMessageTimestamp: ${organization_is_not_available_result.response.body[0].updated}
+      isSupportMessage: false
+      isCustomerMessage: false
+      authorTimestamp: ${organization_is_not_available_result.response.body[0].updated}
+      content: ${base_config.outsideWorkingHoursMessage}
+      lastMessageAuthorId: ${get_bot_name_result.response.body[0].value}
+      lastMessageEvent: "${base_config.outsideWorkingHoursAskForContacts === 'true' ? 'unavailable_organization_ask_contacts' : 'unavailable_organization'}"
+  result: updateDenormalizedChatMessageCsasNotAvailableBotRes
   next: return_organization_is_not_available_res
 
 get_all_available_csas:
@@ -311,6 +343,22 @@ send_csas_not_available_message:
           authorFirstName: ""
           authorLastName: ""
   result: csas_not_available_message_result
+  next: updateDenormalizedChatCsasNotAvailableBot
+
+updateDenormalizedChatCsasNotAvailableBot:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_message_fields_only"
+    body:
+      chatId: ${chatId}
+      lastMessageTimestamp: ${csas_not_available_message_result.response.body[0].updated}
+      isSupportMessage: false
+      isCustomerMessage: false
+      authorTimestamp: ${csas_not_available_message_result.response.body[0].updated}
+      content: ${base_config.noCsaMessage}
+      lastMessageAuthorId: ${get_bot_name_result.response.body[0].value}
+      lastMessageEvent: "${base_config.askForContacts === 'true' ? 'unavailable_csas_ask_contacts' : 'unavailable_csas'}"
+  result: updateDenormalizedChatMessageCsasNotAvailableBotRes
   next: return_csa_is_not_available
 
 redirect_chat_to_back_office:
@@ -378,6 +426,34 @@ do_add_bot_message_to_db:
     body:
       messages: ${converted_messages_res}
   result: add_bot_message_to_bot_result
+  next: format_bot_messages_text
+
+format_bot_messages_text:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_HBS]/parse_all_messages_text"
+    headers:
+      type: json
+    body:
+      data: ${botMsg}
+  result: all_msgs_result
+  next: updateDenormalizedChatDoAddMessagesToDb
+
+updateDenormalizedChatDoAddMessagesToDb:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_messages_fields_only_with_all_messages"
+    body:
+      chatId: ${chatId}
+      lastMessageTimestamp: ${add_bot_message_to_bot_result.response.body[0].updated}
+      isSupportMessage: false
+      isCustomerMessage: false
+      authorTimestamp: ${add_bot_message_to_bot_result.response.body[0].updated}
+      content: ${all_msgs_result.response.body[all_msgs_result.response.body.length - 1]}
+      lastMessageAuthorId: ${get_bot_name_result.response.body[0].value}
+      lastMessageEvent: ""
+      messages: ${all_msgs_result.response.body}
+  result: updateDenormalizedChatMessageCsasNotAvailableBotRes
   next: return_message_sent
 
 return_ok:

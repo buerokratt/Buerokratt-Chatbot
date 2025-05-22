@@ -71,6 +71,22 @@ insertMessage:
       forwardedToCsa: ${message.forwardedToCsa ?? ""}
       rating: ${rating ?? ""}
   result: insertMessageResult
+  next: updateDenormalizedChatMessage
+
+updateDenormalizedChatMessage:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_message_fields_only"
+    body:
+      chatId: ${message.chatBaseId}
+      lastMessageTimestamp: ${insertMessageResult.response.body[0].updated}
+      isSupportMessage: false
+      isCustomerMessage: true
+      authorTimestamp: ${authorTimestamp ?? insertMessageResult.response.body[0].updated}
+      content: ${content ?? ""}
+      lastMessageAuthorId: ${message.authorId ?? "end-user"}
+      lastMessageEvent: ${event ?? ""}
+  result: updateDenormalizedChatRes
   next: notify_chats
 
 notify_chats:
