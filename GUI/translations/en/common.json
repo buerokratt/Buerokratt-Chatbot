@@ -402,13 +402,14 @@
       "minutes": "Minutes",
       "sessionChanged": "Session length changed successfully",
       "emptySession": "Session length can't be empty",
-      "invalidSession": "Session length must be between 30 and 480 minuites"
+      "invalidSession": "Session length must be between 30 and 480 minutes"
     },
     "chatDuration": {
       "description": "When the time expires, the conversation will end automatically.",
       "duration": "Time for user to respond",
       "minutes": "minutes",
-      "rule": "Session length is allowed between 5 min - 480 min (8h)"
+      "rule": "Session length is allowed between 5 min - 480 min (8h)",
+      "invalidSession": "Conversation timeout duration must be between 5 and 480 minutes"
     },
     "greeting": {
       "title": "Greeting message"

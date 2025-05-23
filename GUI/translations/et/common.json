@@ -408,7 +408,8 @@
       "description": "Aja möödumisel lõpetakse vestlus automaatselt.",
       "duration": "Kasutaja poolse vastuse ooteaja pikkus",
       "minutes": "minutit",
-      "rule": "Sessiooni pikkus on lubatud vahemikus 5 min - 480 min (8h)"
+      "rule": "Sessiooni pikkus on lubatud vahemikus 5 min - 480 min (8h)",
+      "invalidSession": "Sessiooni pikkus peab olema vahemikus 5 - 480 minutit"
     },
     "greeting": {
       "title": "Tervitussõnum"

@@ -11,19 +11,25 @@ declaration:
       - field: sessionLength
         type: string
         description: "Body field 'sessionLength'"
+      - field: chatActiveDuration
+        type: string
+        description: "Body field 'chatActiveDuration'"
 
 extractRequestData:
   assign:
     sessionLength: ${incoming.body.sessionLength}
+    chatActiveDuration: ${incoming.body.chatActiveDuration}
 
 setConfigurationValue:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/set-configuration-value"
+    url: "[#CHATBOT_RESQL]/set-2-configuration-values"
     body:
       created: ${new Date().toISOString()}
       key: "session_length"
+      key2: "chat_active_duration"
       value: ${sessionLength}
+      value2: ${chatActiveDuration}
   result: res
 
 return_result:

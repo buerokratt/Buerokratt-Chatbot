@@ -12,7 +12,13 @@ import { Controller, useForm } from 'react-hook-form';
 
 type FormValues = {
   sessionLength: string;
-  chatDuration: string;
+  chatActiveDuration: string;
+};
+
+type ConfigItem = {
+  id: number;
+  key: string;
+  value: string;
 };
 
 const SettingsSessionLength: FC = () => {
@@ -22,17 +28,26 @@ const SettingsSessionLength: FC = () => {
   const { control, handleSubmit, setValue, watch } = useForm<FormValues>({
     defaultValues: {
       sessionLength: '',
-      chatDuration: '',
+      chatActiveDuration: '',
     },
   });
 
+  const extractConfigMap = (response: ConfigItem[]): Record<string, string> => {
+    return response.reduce((acc, item) => {
+      acc[item.key] = item.value;
+      return acc;
+    }, {} as Record<string, string>);
+  }
+
   const sessionLength = watch('sessionLength');
-  const chatDuration = watch('chatDuration');
+  const chatActiveDuration = watch('chatActiveDuration');
 
   useQuery({
     queryKey: ['accounts/admin/session-length', 'prod'],
     onSuccess: (res: any) => {
-      setValue('sessionLength', res.response ?? '');
+      const data = extractConfigMap(res.response);
+      setValue('sessionLength', data.session_length ?? '');
+      setValue('chatActiveDuration', data.chat_active_duration ?? '');
     },
   });
 
@@ -40,6 +55,7 @@ const SettingsSessionLength: FC = () => {
     mutationFn: () =>
       apiDev.post('accounts/admin/session-length', {
         sessionLength: sessionLength,
+        chatActiveDuration: chatActiveDuration
       }),
     onSuccess: () => {
       toast.open({
@@ -57,21 +73,35 @@ const SettingsSessionLength: FC = () => {
     },
   });
 
+  const valueInRange = (inputValue: string, minValue: number, maxValue: number) => {
+    const value = parseInt(inputValue);
+    if(!value) {
+      return false;
+    } else {
+      return value < minValue || value > maxValue;
+    }
+  }
+
   const onSubmit = (data: FormValues) => {
-    const value = parseInt(data.sessionLength);
     if (!data.sessionLength) {
       toast.open({
         type: 'error',
         title: t('global.notificationError'),
         message: t('settings.userSession.emptySession'),
       });
-    } else if (value < 30 || value > 480) {
+    } else if (valueInRange(data.sessionLength, 30, 480)) {
       toast.open({
         type: 'error',
         title: t('global.notificationError'),
         message: t('settings.userSession.invalidSession'),
       });
-    } else {
+    } else if (valueInRange(data.chatActiveDuration, 5, 480)) {
+    toast.open({
+      type: 'error',
+      title: t('global.notificationError'),
+      message: t('settings.chatDuration.invalidSession'),
+    });
+  } else {
       sessionLengthMutation.mutate();
     }
   };
@@ -112,13 +142,13 @@ const SettingsSessionLength: FC = () => {
           <p>{t('settings.chatDuration.description')}</p>
           <Track>
             <Controller
-              name="chatDuration"
+              name="chatActiveDuration"
               control={control}
               render={({ field }) => (
                 <FormInput
                   {...field}
                   labelWidth={130}
-                  name="chatDuration"
+                  name="chatActiveDuration"
                   label={t('settings.chatDuration.duration')}
                   type="number"
                 />
