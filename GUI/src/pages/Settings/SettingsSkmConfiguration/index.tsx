@@ -115,6 +115,7 @@ const SettingsSkmConfiguration: FC = () => {
       <p>{t('settings.skmConfiguration.description')}</p>
       <Card
         key={key}
+        isScrollable
         footer={
           <Track justify="end">
             <Button onClick={handleFormSubmit}>{t('global.save')}</Button>
