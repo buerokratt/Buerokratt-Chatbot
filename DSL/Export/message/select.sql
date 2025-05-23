@@ -5,5 +5,5 @@ COPY (
         SELECT base_id, max(updated)
         FROM message
         GROUP BY base_id
-    ) AND updated < CURRENT_DATE - INTERVAL '1 day'
+    ) AND updated < %(export_boundary)s
 ) TO stdout WITH csv HEADER;

@@ -5,5 +5,5 @@ COPY (
         SELECT chat_id, max(created)
         FROM chat_history_comments
         GROUP BY chat_id
-    ) AND created < CURRENT_DATE - INTERVAL '1 day'
+    ) AND created < %(export_boundary)s
 ) TO stdout WITH csv HEADER;

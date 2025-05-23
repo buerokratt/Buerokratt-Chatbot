@@ -3,4 +3,4 @@ WHERE (dataset_id, updated) NOT IN (
     SELECT dataset_id, max(updated)
     FROM scheduled_reports
     GROUP BY dataset_id
-) AND updated < CURRENT_DATE - INTERVAL '2 days';
+) AND updated < %(export_boundary)s;

@@ -3,4 +3,4 @@ WHERE (base_id, updated) NOT IN (
     SELECT base_id, max(updated)
     FROM chat
     GROUP BY base_id
-) AND updated < CURRENT_DATE - INTERVAL '2 days';
+) AND updated < %(export_boundary)s;

@@ -5,5 +5,5 @@ COPY (
         SELECT user_id, page_name, max(created)
         FROM user_page_preferences
         GROUP BY user_id, page_name
-    ) AND created < CURRENT_DATE - INTERVAL '1 day'
+    ) AND created < %(export_boundary)s
 ) TO stdout WITH csv HEADER;

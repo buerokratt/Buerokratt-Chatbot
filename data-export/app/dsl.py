@@ -46,16 +46,19 @@ def get_export_tasks() -> list[ExportTask]:
 
 
 def perform_export(export_task: ExportTask):
-    current_timestamp = datetime.now().strftime("%Y_%m_%d-%I_%M_%S_%p")
-    export_path = settings.export_path / f'{export_task.name}-{current_timestamp}.csv.gz'
+    export_boundary = datetime.now().replace(microsecond=0, second=0, minute=0, hour=0)
+    export_boundary_str = export_boundary.strftime("%Y_%m_%d-%I_%M_%S_%p")
+    export_path = settings.export_path / f'{export_task.name}-{export_boundary_str}.csv.gz'
     str_path = export_path.as_posix()
     with gzip.open(str_path, 'w') as export_file:
         conn = get_connection()
         with conn.cursor() as cursor:
-            cursor.copy_expert(export_task.select_query, export_file)
-            cursor.execute(export_task.delete_query)
+            cursor.copy_expert(
+                cursor.mogrify(export_task.select_query, {'export_boundary': export_boundary}),
+                export_file
+            )
+            cursor.execute(export_task.delete_query, {'export_boundary': export_boundary})
             cursor.execute('COMMIT;')
-
 
 
 def perform_exports():

@@ -5,5 +5,5 @@ COPY (
         SELECT dataset_id, max(updated)
         FROM scheduled_reports
         GROUP BY dataset_id
-    ) AND updated < CURRENT_DATE - INTERVAL '1 day'
+    ) AND updated < %(export_boundary)s
 ) TO stdout WITH csv HEADER;

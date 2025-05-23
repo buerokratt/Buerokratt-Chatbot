@@ -5,5 +5,5 @@ COPY (
         SELECT id_code, max(created)
         FROM denormalized_user_data
         GROUP BY id_code
-    ) AND created < CURRENT_DATE - INTERVAL '1 day'
+    ) AND created < %(export_boundary)s
 ) TO stdout WITH csv HEADER;

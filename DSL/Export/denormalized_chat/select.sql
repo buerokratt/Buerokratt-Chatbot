@@ -5,5 +5,5 @@ COPY (
         SELECT chat_id, max(denormalized_record_created)
         FROM denormalized_chat
         GROUP BY chat_id
-    ) AND denormalized_record_created < CURRENT_DATE - INTERVAL '1 day'
+    ) AND denormalized_record_created < %(export_boundary)s
 ) TO stdout WITH csv HEADER;
