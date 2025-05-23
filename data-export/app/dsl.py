@@ -37,8 +37,6 @@ def get_export_task(task_folder: Path) -> ExportTask:
     )
 
 
-
-
 def get_export_tasks() -> list[ExportTask]:
     return [
         get_export_task(task) for task in settings.dsl_path.iterdir()
