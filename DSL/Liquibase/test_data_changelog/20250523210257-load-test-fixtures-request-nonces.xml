@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+    <changeSet id="20250523210257" author="Artsiom Beida" context="@test">
+        <loadData
+                file="data/test-fixtures/request_nonces.csv"
+                tableName="request_nonces"
+        >
+            <column name="created_at" type="COMPUTED"/>
+            <column name="valid_until" type="COMPUTED"/>
+            <column name="used_at" type="COMPUTED"/>
+        </loadData>
+    </changeSet>
+</databaseChangeLog>
