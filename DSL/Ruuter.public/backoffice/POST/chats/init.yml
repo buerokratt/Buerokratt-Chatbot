@@ -94,6 +94,24 @@ assign_cookie:
       Secure: true
       HttpOnly: true
       SameSite: "[#COOKIE_SAME_SITE]"
+  next: get_is_bot_active
+
+get_is_bot_active:
+  call: http.get
+  args:
+    url: "[#CHATBOT_RESQL]/config/get_configuration"
+    query:
+      key: "is_bot_active"
+  result: is_bot_active_result
+  next: get_bot_institution_id
+
+get_bot_institution_id:
+  call: http.get
+  args:
+    url: "[#CHATBOT_RESQL]/config/get_configuration"
+    query:
+      key: "bot_institution_id"
+  result: bot_institution_id_result
   next: insertChat
 
 insertChat:
@@ -101,6 +119,8 @@ insertChat:
   args:
     url: "[#CHATBOT_RESQL]/chat/create_chat_and_init"
     body:
+      is_bot_active: ${is_bot_active_result.response.body[0]?.value}
+      bot_institution_id: ${bot_institution_id_result.response.body[0]?.value}
       id: ${chatUuid}
       endUserId: ${endUserId}
       endUserFirstName: ""
