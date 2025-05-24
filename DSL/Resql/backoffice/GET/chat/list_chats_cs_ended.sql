@@ -35,7 +35,7 @@ WITH latest_chat_records AS (
         END AS csa_title,
         last_message_event,
         all_messages
-    FROM denormalized_chat
+    FROM chat.denormalized_chat
     ORDER BY chat_id, denormalized_record_created DESC
 )
 

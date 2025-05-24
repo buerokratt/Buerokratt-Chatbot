@@ -1,7 +1,7 @@
 WITH latest_chat_versions AS (
     -- First get the latest version of each chat
     SELECT DISTINCT ON (chat_id) *
-    FROM denormalized_chat
+    FROM chat.denormalized_chat
     ORDER BY chat_id, denormalized_record_created DESC
 )
 

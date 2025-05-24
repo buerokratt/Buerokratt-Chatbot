@@ -3,7 +3,7 @@ WITH
         SELECT 'is_bot_active' AS is_bot_active
     )
 
-INSERT INTO chat (
+INSERT INTO chat.chat (
     base_id,
     customer_support_id,
     customer_support_display_name,
@@ -31,22 +31,22 @@ VALUES (
     (CASE
         WHEN ((
             SELECT value
-            FROM configuration AS c1
+            FROM config.configuration AS c1
             WHERE
                 key = (SELECT is_bot_active FROM consts)
                 AND created = (
-                    SELECT MAX(c2.created) FROM configuration AS c2
+                    SELECT MAX(c2.created) FROM config.configuration AS c2
                     WHERE c1.key = c2.key
                 )
                 AND deleted = FALSE
         ) = 'true')
             THEN (
                 SELECT value
-                FROM configuration AS c1
+                FROM config.configuration AS c1
                 WHERE
                     key = 'bot_institution_id'
                     AND created = (
-                        SELECT MAX(c2.created) FROM configuration AS c2
+                        SELECT MAX(c2.created) FROM config.configuration AS c2
                         WHERE c1.key = c2.key
                     )
                     AND deleted = FALSE
@@ -56,11 +56,11 @@ VALUES (
     (CASE
         WHEN ((
             SELECT value
-            FROM configuration AS c1
+            FROM config.configuration AS c1
             WHERE
                 key = (SELECT is_bot_active FROM consts)
                 AND created = (
-                    SELECT MAX(c2.created) FROM configuration AS c2
+                    SELECT MAX(c2.created) FROM config.configuration AS c2
                     WHERE c1.key = c2.key
                 )
                 AND deleted = FALSE
@@ -93,11 +93,11 @@ VALUES (
     :receivedFrom, :receivedFromName, (CASE
         WHEN ((
             SELECT value
-            FROM configuration AS c1
+            FROM config.configuration AS c1
             WHERE
                 key = (SELECT is_bot_active FROM consts)
                 AND created = (
-                    SELECT MAX(c2.created) FROM configuration AS c2
+                    SELECT MAX(c2.created) FROM config.configuration AS c2
                     WHERE c1.key = c2.key
                 )
                 AND deleted = FALSE

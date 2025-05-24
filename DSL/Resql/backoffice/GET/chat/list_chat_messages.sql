@@ -1,7 +1,7 @@
 WITH filtered_messages AS (
     SELECT DISTINCT ON (m.base_id)
     *
-    FROM message m
+    FROM chat.message m
     WHERE m.chat_base_id = :chatId
     ORDER BY m.base_id, m.updated DESC
 )

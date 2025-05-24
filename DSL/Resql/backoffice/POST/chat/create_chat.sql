@@ -1,4 +1,4 @@
-INSERT INTO chat (
+INSERT INTO chat.chat (
     base_id,
     customer_support_id,
     customer_support_display_name,

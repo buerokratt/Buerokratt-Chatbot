@@ -1,6 +1,6 @@
 -- Using array approach directly
 SELECT copy_row_with_modifications(
-    'denormalized_chat',                              -- Table name for denormalized_chat
+    'chat.denormalized_chat',                              -- Table name for denormalized_chat
     'id', '::UUID', id::VARCHAR,                   -- ID column handling
     ARRAY[                                            -- Direct array of modifications
         'chat_id', '', :chatId,
@@ -22,7 +22,7 @@ SELECT copy_row_with_modifications(
             END
     ]::VARCHAR[]
 )
-FROM denormalized_chat
+FROM chat.denormalized_chat
 WHERE chat_id = :chatId
 ORDER BY denormalized_record_created DESC
 LIMIT 1;

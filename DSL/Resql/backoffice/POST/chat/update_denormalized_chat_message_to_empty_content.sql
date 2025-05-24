@@ -1,6 +1,6 @@
 -- Using array approach directly
 SELECT copy_row_with_modifications(
-    'denormalized_chat',                              -- Table name for denormalized_chat
+    'chat.denormalized_chat',                              -- Table name for denormalized_chat
     'id', '::UUID', id::VARCHAR,                   -- ID column handling
     ARRAY[                                            -- Direct array of modifications
         'last_message_including_empty_content', '', '',
@@ -24,9 +24,9 @@ SELECT copy_row_with_modifications(
         'all_messages', '::TEXT[]', '{}'
     ]::VARCHAR[]
 )
-FROM denormalized_chat
+FROM chat.denormalized_chat
 WHERE chat_id IN (:chats) AND denormalized_record_created = (
     SELECT MAX(denormalized_record_created)
-    FROM denormalized_chat dc_inner
+    FROM chat.denormalized_chat dc_inner
     WHERE dc_inner.chat_id = dc.chat_id
 );

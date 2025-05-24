@@ -2,11 +2,11 @@ WITH configuration_values AS (
     SELECT id,
            KEY,
            value
-    FROM configuration AS c1
+    FROM config.configuration AS c1
     WHERE KEY IN ('organizationBotCannotAnswerAskToForwardToCSA', 
                   'organizationBotCannotAnswerMessage')
       AND created = (
-        SELECT MAX(c2.created) FROM configuration as c2
+        SELECT MAX(c2.created) FROM config.configuration as c2
         WHERE c2.key = c1.key
         )
       AND NOT deleted

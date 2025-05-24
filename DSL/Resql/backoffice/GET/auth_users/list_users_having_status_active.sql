@@ -6,7 +6,7 @@ SELECT DISTINCT ON (u.id_code)
     u.last_name,
     u.display_name
 FROM
-    "user" AS u
+    auth_users."user" AS u
 WHERE
     u.status = 'active'
 ORDER BY

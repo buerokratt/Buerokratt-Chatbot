@@ -6,7 +6,7 @@ FROM (
         chat_duration_in_seconds,
         ended,
         customer_support_id
-    FROM denormalized_chat
+    FROM chat.denormalized_chat
     ORDER BY chat_id, denormalized_record_created DESC
 ) latest_chats
 WHERE

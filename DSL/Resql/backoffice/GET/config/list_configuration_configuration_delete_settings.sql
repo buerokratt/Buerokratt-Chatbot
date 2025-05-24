@@ -1,11 +1,11 @@
 SELECT
     key,
     value
-FROM configuration
+FROM config.configuration
 WHERE
     created IN (
         SELECT MAX(created)
-        FROM configuration
+        FROM config.configuration
         WHERE
             key IN (
                 'isAuthConversations',

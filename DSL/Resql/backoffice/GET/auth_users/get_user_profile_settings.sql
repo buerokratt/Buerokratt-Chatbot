@@ -7,7 +7,7 @@ SELECT
     new_chat_sound_notifications,
     new_chat_email_notifications,
     use_autocorrect
-FROM denormalized_user_data
+FROM auth_users.denormalized_user_data
 WHERE id_code = :userId
 ORDER BY created DESC
 LIMIT 1;

@@ -1,4 +1,4 @@
-INSERT INTO "user" (
+INSERT INTO auth_users."user" (
     login,
     first_name,
     last_name,

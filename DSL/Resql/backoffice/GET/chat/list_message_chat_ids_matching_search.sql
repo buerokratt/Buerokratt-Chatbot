@@ -9,5 +9,5 @@ WITH consts AS (
   FROM consts
 )
 SELECT DISTINCT chat_base_id AS chat_id
-FROM message
+FROM chat.message
 WHERE content ILIKE (SELECT search_key FROM regx);

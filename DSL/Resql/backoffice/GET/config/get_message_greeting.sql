@@ -1,7 +1,7 @@
 WITH
     grouped_configurations AS (
         SELECT DISTINCT ON (key) id, key, created
-        FROM configuration
+        FROM config.configuration
         ORDER BY key, created DESC
     )
 
@@ -18,7 +18,7 @@ FROM (
         key,
         value,
         deleted
-    FROM configuration
+    FROM config.configuration
     WHERE
         key = 'greeting_message_est'
         AND id IN (SELECT id FROM grouped_configurations)
@@ -36,7 +36,7 @@ FROM (
             key,
             value,
             deleted
-        FROM configuration
+        FROM config.configuration
         WHERE
             key = 'is_greeting_message_active'
             AND id IN (SELECT id FROM grouped_configurations)

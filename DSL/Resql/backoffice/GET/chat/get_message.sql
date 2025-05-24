@@ -15,7 +15,7 @@ SELECT
     created,
     event,
     rating
-FROM message
+FROM chat.message
 WHERE base_id = :id
 ORDER BY updated DESC
 LIMIT 1

@@ -1,4 +1,4 @@
-INSERT INTO denormalized_user_data (
+INSERT INTO auth_users.denormalized_user_data (
     login,
     id_code,
     first_name,

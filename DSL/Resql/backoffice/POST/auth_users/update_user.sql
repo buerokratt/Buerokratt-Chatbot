@@ -1,5 +1,5 @@
 SELECT copy_row_with_modifications(
-    'user',
+    'auth_users."user"',
     'id', '::UUID', id::VARCHAR,
     ARRAY[
         'first_name', '', :firstName,
@@ -11,8 +11,8 @@ SELECT copy_row_with_modifications(
         'department', '', :department,
         'created', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR
     ]::VARCHAR[]
-) FROM "user"
+) FROM auth_users."user"
 WHERE created = (
-    SELECT MAX(created) FROM "user"
+    SELECT MAX(created) FROM auth_users."user"
     WHERE id_code = :userIdCode
 );

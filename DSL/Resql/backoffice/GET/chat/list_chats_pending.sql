@@ -27,7 +27,7 @@ WITH latest_idle_chats AS (
         last_message_with_content_and_not_rating_or_forward,
         last_message_with_not_rating_or_forward_events_timestamp,
         last_non_empty_message_event
-    FROM denormalized_chat
+    FROM chat.denormalized_chat
     ORDER BY chat_id, denormalized_record_created DESC
 )
 

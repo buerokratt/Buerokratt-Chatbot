@@ -52,7 +52,7 @@ FROM (
         last_message_event AS last_message_event,
         created,
         ROW_NUMBER() OVER (PARTITION BY chat_id ORDER BY denormalized_record_created DESC) as rn
-    FROM denormalized_chat
+    FROM chat.denormalized_chat
 ) AS subquery
 WHERE rn = 1
   AND created::DATE BETWEEN :start::date AND :end::date

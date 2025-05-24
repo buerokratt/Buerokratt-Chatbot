@@ -4,7 +4,7 @@ WITH
             id,
             key,
             value
-        FROM configuration AS c1
+        FROM config.configuration AS c1
         WHERE key IN (
             'skm_range',
             'skm_documents',
@@ -15,7 +15,7 @@ WITH
             'skm_semantic_configuration'
         )
         AND created = (
-            SELECT MAX(c2.created) FROM configuration as c2
+            SELECT MAX(c2.created) FROM config.configuration as c2
             WHERE c2.key = c1.key
         )
         AND NOT deleted

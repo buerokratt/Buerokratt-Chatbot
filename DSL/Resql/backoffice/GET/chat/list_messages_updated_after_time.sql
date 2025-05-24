@@ -5,7 +5,7 @@ WITH LatestMessages AS (
     m.author_last_name, m.author_role, m.forwarded_by_user, 
     m.forwarded_from_csa, m.forwarded_to_csa, m.rating, 
     m.created, m.updated
-  FROM message m
+  FROM chat.message m
   WHERE m.chat_base_id = :chatId
   ORDER BY m.base_id, m.updated DESC
 )

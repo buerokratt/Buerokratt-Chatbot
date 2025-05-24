@@ -1,2 +1,2 @@
-INSERT INTO configuration (key, value)
+INSERT INTO config.configuration (key, value)
 VALUES (:key, :value);

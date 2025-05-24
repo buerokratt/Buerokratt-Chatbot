@@ -1,5 +1,5 @@
 SELECT base_id
-FROM chat
+FROM chat.chat
 WHERE
     ended IS NOT NULL
     AND status = 'ENDED'

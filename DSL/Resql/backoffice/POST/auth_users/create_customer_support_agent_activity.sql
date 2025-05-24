@@ -1,5 +1,5 @@
 SELECT copy_row_with_modifications(
-    'denormalized_user_data',
+    'auth_users.denormalized_user_data',
    'id', '::UUID', id::VARCHAR,
     ARRAY[
         'status', '::status', :status,
@@ -9,7 +9,7 @@ SELECT copy_row_with_modifications(
         'created', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR
     ]::VARCHAR[]
 )
-FROM denormalized_user_data
+FROM auth_users.denormalized_user_data
 WHERE id_code = :userIdCode
 ORDER BY created DESC
 LIMIT 1;

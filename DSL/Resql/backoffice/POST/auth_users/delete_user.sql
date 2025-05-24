@@ -2,18 +2,18 @@
 WITH
     active_administrators AS (
         SELECT id_code
-        FROM denormalized_user_data AS d_1
+        FROM auth_users.denormalized_user_data AS d_1
         WHERE
             'ROLE_ADMINISTRATOR' = ANY(authority_name)
             AND created = (
                 SELECT MAX(d_2.created)
-                FROM denormalized_user_data AS d_2
+                FROM auth_users.denormalized_user_data AS d_2
                 WHERE d_1.id_code = d_2.id_code
             )
     ),
 
     delete_from_denorm_table AS (
-        INSERT INTO denormalized_user_data (
+        INSERT INTO auth_users.denormalized_user_data (
             login,
             first_name,
             last_name,
@@ -58,7 +58,7 @@ WITH
             false,
             false,
             false
-        FROM denormalized_user_data
+        FROM auth_users.denormalized_user_data
         WHERE
             id_code = :userIdCode
             AND user_status <> 'deleted'
@@ -74,7 +74,7 @@ WITH
     ),
 
     delete_user AS (
-        INSERT INTO "user" (
+        INSERT INTO auth_users."user" (
             login,
             password_hash,
             first_name,
@@ -97,7 +97,7 @@ WITH
             csa_title,
             csa_email,
             department
-        FROM "user"
+        FROM auth_users."user"
         WHERE
             id_code = :userIdCode
             AND status <> 'deleted'
@@ -112,5 +112,5 @@ WITH
         LIMIT 1
     )
 
-SELECT MAX(status) FROM "user"
+SELECT MAX(status) FROM auth_users."user"
 WHERE id_code = :userIdCode;
