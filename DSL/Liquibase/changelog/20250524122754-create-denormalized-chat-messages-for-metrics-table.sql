@@ -26,9 +26,6 @@ CREATE TABLE denormalized_chat_messages_for_metrics (
     message_event VARCHAR(128),
     message_author_role VARCHAR(128),
     message_author_id VARCHAR(555),
-    message_author_display_name VARCHAR(50),
-    message_author_user_first_name VARCHAR(50),
-    message_author_user_last_name VARCHAR(50),
     message_forwarded_from_csa VARCHAR,
     message_forwarded_to_csa VARCHAR,
     external_id VARCHAR,
@@ -65,9 +62,6 @@ INSERT INTO denormalized_chat_messages_for_metrics (
     message_event,
     message_author_role,
     message_author_id,
-    message_author_display_name,
-    message_author_user_first_name,
-    message_author_user_last_name,
     external_id,
     received_from,
     timestamp,
@@ -100,9 +94,6 @@ WITH combined_records AS (
         m.event AS message_event,
         m.author_role AS message_author_role,
         m.author_id AS message_author_id,
-        u.display_name AS message_author_display_name,
-        u.first_name AS message_author_user_first_name,
-        u.last_name AS message_author_user_last_name,
         c.external_id,
         c.received_from,
         m.updated AS timestamp,
@@ -120,14 +111,6 @@ WITH combined_records AS (
         ORDER BY c.updated DESC
         LIMIT 1
     ) c ON true
-    LEFT JOIN LATERAL (
-        SELECT *
-        FROM "user" u
-        WHERE u.login = m.author_id
-        AND u.created <= m.updated
-        ORDER BY u.created DESC
-        LIMIT 1
-    ) u ON true
     LEFT JOIN LATERAL (
         SELECT *
         FROM "user" csa
@@ -162,9 +145,6 @@ WITH combined_records AS (
         m.event AS message_event,
         m.author_role AS message_author_role,
         m.author_id AS message_author_id,
-        u.display_name AS message_author_display_name,
-        u.first_name AS message_author_user_first_name,
-        u.last_name AS message_author_user_last_name,
         c.external_id,
         c.received_from,
         c.updated AS timestamp,
@@ -182,14 +162,6 @@ WITH combined_records AS (
         ORDER BY m.updated DESC
         LIMIT 1
     ) m ON true
-    LEFT JOIN LATERAL (
-        SELECT *
-        FROM "user" u
-        WHERE u.login = m.author_id
-        AND u.created <= c.updated
-        ORDER BY u.created DESC
-        LIMIT 1
-    ) u ON true
     LEFT JOIN LATERAL (
         SELECT *
         FROM "user" csa
@@ -227,9 +199,6 @@ SELECT
     message_event,
     message_author_role,
     message_author_id,
-    message_author_display_name,
-    message_author_user_first_name,
-    message_author_user_last_name,
     external_id,
     received_from,
     timestamp,
