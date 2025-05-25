@@ -1,3 +1,23 @@
+/*
+declaration:
+  version: 0.1
+  description: "Count the number of ended chats with valid messages, using different date thresholds for authenticated and anonymous users"
+  method: get
+  namespace: chat
+  allowlist:
+    query:
+      - field: auth_date
+        type: date
+        description: "Date threshold for authenticated users (inclusive)"
+      - field: anon_date
+        type: date
+        description: "Date threshold for anonymous users (inclusive)"
+  response:
+    fields:
+      - field: total_count
+        type: integer
+        description: "Total number of ended chats with at least one non-empty message"
+*/
 SELECT COUNT(*) AS total_count
 FROM (
     SELECT DISTINCT ON (chat_id) *

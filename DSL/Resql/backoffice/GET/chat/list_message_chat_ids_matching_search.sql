@@ -1,3 +1,20 @@
+/*
+declaration:
+  version: 0.1
+  description: "Search messages by content and return matching chat IDs"
+  method: get
+  namespace: chat
+  allowlist:
+    query:
+      - field: searchKey
+        type: string
+        description: "Keyword or phrase to search within message content"
+  response:
+    fields:
+      - field: chat_id
+        type: string
+        description: "Unique identifier of the chat that contains the matching message"
+*/
 WITH consts AS (
   SELECT E' ' AS regxE1,
          E'%' AS regxE2,

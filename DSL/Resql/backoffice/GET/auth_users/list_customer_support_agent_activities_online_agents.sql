@@ -14,6 +14,7 @@ declaration:
         description: "Flag indicating if user is active"
       - field: status
         type: string
+        enum: ['backoffice-user', 'end-user', 'Bürokratt', 'buerokratt']
         description: "User's current status"
       - field: status_comment
         type: string
