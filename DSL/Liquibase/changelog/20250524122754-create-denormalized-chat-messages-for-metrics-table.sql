@@ -30,7 +30,7 @@ CREATE TABLE denormalized_chat_messages_for_metrics (
     message_forwarded_to_csa VARCHAR,
     external_id VARCHAR,
     received_from VARCHAR,
-    timestamp TIMESTAMP WITH TIME ZONE
+    timestamp TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 
 -- Add indexes for better performance
@@ -89,8 +89,8 @@ WITH combined_records AS (
         c.created,
         c.updated,
         c.ended,
-        (SELECT MIN(created) FROM message WHERE chat_base_id = c.base_id) AS first_message_timestamp,
-        (SELECT MAX(created) FROM message WHERE chat_base_id = c.base_id) AS last_message_timestamp,
+        (SELECT MIN(created) FROM message WHERE chat_base_id = c.base_id AND created <= m.updated) AS first_message_timestamp,
+        (SELECT MAX(created) FROM message WHERE chat_base_id = c.base_id AND created <= m.updated) AS last_message_timestamp,
         m.event AS message_event,
         m.author_role AS message_author_role,
         m.author_id AS message_author_id,
@@ -140,8 +140,8 @@ WITH combined_records AS (
         c.created,
         c.updated,
         c.ended,
-        (SELECT MIN(created) FROM message WHERE chat_base_id = c.base_id) AS first_message_timestamp,
-        (SELECT MAX(created) FROM message WHERE chat_base_id = c.base_id) AS last_message_timestamp,
+        (SELECT MIN(created) FROM message WHERE chat_base_id = c.base_id AND created <= c.updated) AS first_message_timestamp,
+        (SELECT MAX(created) FROM message WHERE chat_base_id = c.base_id AND created <= c.updated) AS last_message_timestamp,
         m.event AS message_event,
         m.author_role AS message_author_role,
         m.author_id AS message_author_id,

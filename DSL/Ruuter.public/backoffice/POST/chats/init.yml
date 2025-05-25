@@ -1,7 +1,7 @@
 declaration:
   call: declare
   version: 0.1
-  description: "Decription placeholder for 'INIT'"
+  description: "Description placeholder for 'INIT'"
   method: post
   accepts: json
   returns: json
@@ -193,6 +193,110 @@ insertDenormalizedChat:
     firstSupportTimestamp: "${authorRole == 'backoffice-user' ? authorTimestamp : 'null'}"
     chatDurationInSeconds: "${authorRole == 'backoffice-user' ? 0 : 'null'}"
   result: denormalized-chat-result
+  next: prepareBulkMetricsInsert
+
+prepareBulkMetricsInsert:
+  assign:
+    # Prepare array of records for bulk insert
+    metricsRecords:
+      - # Record 1: Base chat record (no message data)
+        chat_id: ${insertChatResult.response.body[0].id}
+        chat_base_id: ${chatUuid}
+        message_id: "null"
+        message_base_id: "null"
+        status: "OPEN"
+        end_user_email: ${endUserEmail}
+        end_user_phone: ${endUserPhone}
+        feedback_rating: ""
+        feedback_text: ""
+        customer_support_display_name: ${insertChatResult.response.body[0].customerSupportDisplayName}
+        customer_support_id: ${insertChatResult.response.body[0].customerSupportId}
+        customer_support_first_name: "null"
+        customer_support_last_name: "null"
+        created: ${insertChatResult.response.body[0].updated}
+        updated: ${insertChatResult.response.body[0].updated}
+        ended: ""
+        first_message_timestamp: "null"
+        last_message_timestamp: "null"
+        message_created: "null"
+        message_updated: "null"
+        message_event: "null"
+        message_author_role: "null"
+        message_author_id: "null"
+        message_forwarded_from_csa: "null"
+        message_forwarded_to_csa: "null"
+        external_id: ""
+        received_from: ""
+        timestamp: ${insertChatResult.response.body[0].updated}
+      - # Record 2: Greeting message from bot
+        chat_id: ${insertChatResult.response.body[0].id}
+        chat_base_id: ${chatUuid}
+        message_id: ${greetingMessageResponse.response.body.response.messageId}
+        message_base_id: ${greetingMessageResponse.response.body.response.messageBaseId}
+        status: "OPEN"
+        end_user_email: ${endUserEmail}
+        end_user_phone: ${endUserPhone}
+        feedback_rating: ""
+        feedback_text: ""
+        customer_support_display_name: ${insertChatResult.response.body[0].customerSupportDisplayName}
+        customer_support_id: ${insertChatResult.response.body[0].customerSupportId}
+        customer_support_first_name: "null"
+        customer_support_last_name: "null"
+        created: ${insertChatResult.response.body[0].updated}
+        updated: ${insertChatResult.response.body[0].updated}
+        ended: ""
+        first_message_timestamp: ${greetingMessageResponse.response.body.response.updated}
+        last_message_timestamp: ${greetingMessageResponse.response.body.response.updated}
+        message_created: ${greetingMessageResponse.response.body.response.updated}
+        message_updated: ${greetingMessageResponse.response.body.response.updated}
+        message_event: "null"
+        message_author_role: "buerokratt"
+        message_author_id: ""
+        message_forwarded_from_csa: ""
+        message_forwarded_to_csa: ""
+        external_id: ""
+        received_from: ""
+        timestamp: ${greetingMessageResponse.response.body.response.updated}
+      - # Record 3: User message
+        chat_id: ${insertChatResult.response.body[0].id}
+        chat_base_id: ${chatUuid}
+        message_id: ${insertMessageResult.response.body[0].id}
+        message_base_id: ${insertMessageResult.response.body[0].baseId}
+        status: "OPEN"
+        end_user_email: ${endUserEmail}
+        end_user_phone: ${endUserPhone}
+        feedback_rating: ""
+        feedback_text: ""
+        customer_support_display_name: ${insertChatResult.response.body[0].customerSupportDisplayName}
+        customer_support_id: ${insertChatResult.response.body[0].customerSupportId}
+        customer_support_first_name: "null"
+        customer_support_last_name: "null"
+        created: ${insertChatResult.response.body[0].updated}
+        updated: ${insertChatResult.response.body[0].updated}
+        ended: ""
+        first_message_timestamp: ${greetingMessageResponse.response.body.response.updated}
+        last_message_timestamp: ${insertMessageResult.response.body[0].updated}
+        message_created: ${insertMessageResult.response.body[0].updated}
+        message_updated: ${insertMessageResult.response.body[0].updated}
+        message_event: "null"
+        message_author_role: ${authorRole}
+        message_author_id: ${endUserId}
+        message_forwarded_from_csa: ${forwardedFromCsa}
+        message_forwarded_to_csa: ${forwardedToCsa}
+        external_id: ""
+        received_from: ""
+        timestamp: ${insertMessageResult.response.body[0].updated}
+  next: bulkInsertMetrics
+
+bulkInsertMetrics:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/create_denormalized_chat_messages_for_metrics"
+    headers:
+      content-type: application/json
+    body:
+      records: ${metricsRecords}
+  result: bulkMetricsResult
   next: postMessageToBot
 
 postMessageToBot:

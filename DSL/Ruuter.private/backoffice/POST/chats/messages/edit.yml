@@ -75,6 +75,27 @@ updateDenormalizedChatMessage:
       lastMessageAuthorId: ${message.authorId ?? ""}
       lastMessageEvent: ${message.event ?? ""}
   result: updateDenormalizedChatRes
+  next: updateDenormalizedChatMetricsMessageFields
+
+updateDenormalizedChatMetricsMessageFields:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_messages_for_metrics_message_fields_only"
+    body:
+      chatBaseId: ${message.chatBaseId}
+      messageId: ${insert_message_res.response.body[0].id}
+      messageBaseId: ${insert_message_res.response.body[0].baseId}
+      content: ${content ?? ""}
+      lastMessageTimestamp: ${message.created ?? insert_message_res.response.body[0].updated}
+      timestamp: ${message.created ?? insert_message_res.response.body[0].updated}
+      messageCreated: ${message.created ?? insert_message_res.response.body[0].updated}
+      messageUpdated: ${insert_message_res.response.body[0].updated}
+      messageEvent: ${message.event ?? ""}
+      messageAuthorRole: ${message.authorRole ?? ""}
+      messageAuthorId: ${message.authorId ?? ""}
+      messageForwardedFromCsa: ${message.forwardedFromCsa ?? ""}
+      messageForwardedToCsa: ${message.forwardedToCsa ?? ""}
+  result: updateDenormalizedChatMetricsMessageRes
   next: notify_chats
 
 notify_chats:

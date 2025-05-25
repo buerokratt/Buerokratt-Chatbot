@@ -140,6 +140,27 @@ updateDenormalizedChatMessage:
       lastMessageAuthorId: ""
       lastMessageEvent: ${event ?? ""}
   result: updateDenormalizedChatRes
+  next: updateDenormalizedChatMetricsMessageFields
+
+updateDenormalizedChatMetricsMessageFields:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_messages_for_metrics_message_fields_only"
+    body:
+      chatBaseId: ${chatId}
+      messageId: ${insertMessageResult.response.body[0].id}
+      messageBaseId: ${insertMessageResult.response.body[0].baseId}
+      content: ${content}
+      lastMessageTimestamp: ${insertMessageResult.response.body[0].updated}
+      timestamp: ${insertMessageResult.response.body[0].updated}
+      messageCreated: ${insertMessageResult.response.body[0].updated}
+      messageUpdated: ${insertMessageResult.response.body[0].updated}
+      messageEvent: ${event ?? ""}
+      messageAuthorRole: ${authorRole}
+      messageAuthorId: ""
+      messageForwardedFromCsa: ""
+      messageForwardedToCsa: ""
+  result: updateDenormalizedChatMetricsMessageRes
   next: check_skip_bot
 
 check_skip_bot:
