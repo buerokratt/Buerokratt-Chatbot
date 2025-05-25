@@ -89,6 +89,26 @@ ALTER TABLE user_page_preferences DROP COLUMN id;
 ALTER TABLE user_page_preferences RENAME COLUMN uuid_id TO id;
 ALTER TABLE user_page_preferences ADD PRIMARY KEY (id);
 
+
+-- Modify message_preview table
+ALTER TABLE message_preview
+  ADD COLUMN uuid_id UUID DEFAULT gen_random_uuid();
+UPDATE message_preview SET uuid_id = gen_random_uuid();
+ALTER TABLE message_preview DROP CONSTRAINT IF EXISTS message_preview_pkey;
+
+ALTER TABLE message_preview ADD COLUMN created TIMESTAMP WITH TIME ZONE DEFAULT NOW();
+
+UPDATE message_preview
+SET created = NOW() - make_interval(secs => (SELECT MAX(id) FROM message_preview) - id);
+
+CREATE INDEX idx_message_preview_chat_base_id_created
+ON message_preview(chat_base_id, created DESC);
+
+ALTER TABLE message_preview DROP COLUMN id;
+ALTER TABLE message_preview RENAME COLUMN uuid_id TO id;
+ALTER TABLE message_preview ADD PRIMARY KEY (id);
+
+
 -- Drop sequences no longer needed
 DROP SEQUENCE IF EXISTS chat_id_seq;
 DROP SEQUENCE IF EXISTS message_id_seq;
@@ -99,6 +119,7 @@ DROP SEQUENCE IF EXISTS user_id_seq;
 DROP SEQUENCE IF EXISTS configuration_id_seq;
 DROP SEQUENCE IF EXISTS establishment_id_seq;
 DROP SEQUENCE IF EXISTS user_page_preferences_id_seq;
+DROP SEQUENCE IF EXISTS message_preview_id_seq;
 
 -- Commit all changes
 COMMIT;
