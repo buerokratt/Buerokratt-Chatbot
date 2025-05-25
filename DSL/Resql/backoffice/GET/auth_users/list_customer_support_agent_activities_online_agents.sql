@@ -1,3 +1,24 @@
+/*
+declaration:
+  version: 0.1
+  description: "Fetch all currently online users with their latest status information"
+  method: get
+  namespace: auth_users
+  response:
+    fields:
+      - field: id_code
+        type: string
+        description: "User's unique identifier"
+      - field: active
+        type: boolean
+        description: "Flag indicating if user is active"
+      - field: status
+        type: string
+        description: "User's current status"
+      - field: status_comment
+        type: string
+        description: "Additional comment about user's status"
+*/
 SELECT
     id_code,
     active,

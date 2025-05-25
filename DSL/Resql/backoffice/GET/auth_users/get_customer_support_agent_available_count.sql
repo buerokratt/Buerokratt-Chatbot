@@ -1,3 +1,15 @@
+/*
+declaration:
+  version: 0.1
+  description: "Fetch amount of available users "
+  method: get
+  namespace: auth_users
+  response:
+    fields:
+      - field: count
+        type: integer
+        description: "Amount of online users"
+*/
 SELECT COUNT(id) AS count
 FROM denormalized_user_data AS d_1
 WHERE
