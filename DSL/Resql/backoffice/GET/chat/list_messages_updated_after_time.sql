@@ -4,6 +4,7 @@ declaration:
   description: "Fetch messages in a chat updated after a given timestamp, returning only the latest version per message"
   method: get
   namespace: chat
+  returns: json
   allowlist:
     query:
       - field: chatId

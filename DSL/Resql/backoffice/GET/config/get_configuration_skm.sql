@@ -4,6 +4,7 @@ declaration:
   description: "Fetch the latest SKM configuration values"
   method: get
   namespace: config
+  returns: json
   allowlist:
     query: []
   response:

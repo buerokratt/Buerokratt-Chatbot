@@ -4,6 +4,7 @@ declaration:
   description: "Fetch the latest active chat by chat ID, optionally including the CSA title"
   method: get
   namespace: chat
+  returns: json
   allowlist:
     query:
       - field: id

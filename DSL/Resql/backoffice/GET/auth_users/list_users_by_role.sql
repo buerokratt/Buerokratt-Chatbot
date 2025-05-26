@@ -4,6 +4,7 @@ declaration:
   description: "Search and paginate through active users with authorities using multiple filter criteria and sorting options"
   method: get
   namespace: auth_users
+  returns: json
   allowlist:
     query:
       - field: is_csa_title_visible

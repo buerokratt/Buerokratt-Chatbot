@@ -4,6 +4,7 @@ declaration:
   description: "Fetch the most recent forwarded messages referenced by a 'requested-chat-forward' event in a given chat"
   method: get
   namespace: chat
+  returns: json
   allowlist:
     query:
       - field: chatId

@@ -4,6 +4,7 @@ declaration:
   description: "Fetch configuration values for bot fallback behavior when it cannot answer"
   method: get
   namespace: config
+  returns: json
   allowlist:
     query: []
   response:

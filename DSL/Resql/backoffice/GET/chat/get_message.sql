@@ -4,6 +4,7 @@ declaration:
   description: "Fetch the most recent message by base ID"
   method: get
   namespace: chat
+  returns: json
   allowlist:
     query:
       - field: id

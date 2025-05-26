@@ -4,6 +4,7 @@ declaration:
   description: "Count the number of ended chats with valid messages, using different date thresholds for authenticated and anonymous users"
   method: get
   namespace: chat
+  returns: json
   allowlist:
     query:
       - field: auth_date

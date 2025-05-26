@@ -4,6 +4,7 @@ declaration:
   description: "Fetch the 2nd through 11th most recent non-greeting messages for a given chat"
   method: get
   namespace: chat
+  returns: json
   allowlist:
     query:
       - field: chatId

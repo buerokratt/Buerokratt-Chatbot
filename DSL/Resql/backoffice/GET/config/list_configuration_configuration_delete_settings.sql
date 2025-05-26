@@ -4,6 +4,7 @@ declaration:
   description: "Fetch the latest non-deleted configuration entry for auth"
   method: get
   namespace: config
+  returns: json
   allowlist:
     query: []
   response:

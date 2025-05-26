@@ -4,6 +4,7 @@ declaration:
   description: "Fetch active chats waiting for validation, optionally including CSA title"
   method: get
   namespace: chat
+  returns: json
   allowlist:
     query:
       - field: is_csa_title_visible

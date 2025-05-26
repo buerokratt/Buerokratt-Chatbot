@@ -4,6 +4,7 @@ declaration:
   description: "Determine a chat’s position in the unassigned chat queue and the total number of unassigned chats"
   method: get
   namespace: chat
+  returns: json
   allowlist:
     query:
       - field: chatId

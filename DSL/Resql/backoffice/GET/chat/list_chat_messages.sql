@@ -4,6 +4,7 @@ declaration:
   description: "Fetch the first occurrence of each message for a given chat, ordered by creation time"
   method: get
   namespace: chat
+  returns: json
   allowlist:
     query:
       - field: chatId

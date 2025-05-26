@@ -4,6 +4,7 @@ declaration:
   description: "Fetch the latest message preview content for a given chat"
   method: get
   namespace: chat
+  returns: json
   allowlist:
     query:
       - field: chatId

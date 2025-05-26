@@ -4,6 +4,7 @@ declaration:
   description: "Fetch active user profile information with authorities by user ID code and optional CSA title visibility"
   method: get
   namespace: auth_users
+  returns: json
   allowlist:
     query:
       - field: userIdCode

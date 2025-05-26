@@ -4,6 +4,7 @@ declaration:
   description: "Fetch the latest comment from chat history for a given chat ID"
   method: get
   namespace: chat
+  returns: json
   allowlist:
     query:
       - field: chatId

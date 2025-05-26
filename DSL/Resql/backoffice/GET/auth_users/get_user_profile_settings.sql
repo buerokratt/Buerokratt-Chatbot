@@ -4,6 +4,7 @@ declaration:
   description: "Fetch user's page preferences by user_id and page name"
   method: get
   namespace: auth_users
+  returns: json
   allowlist:
     query:
       - field: user_id

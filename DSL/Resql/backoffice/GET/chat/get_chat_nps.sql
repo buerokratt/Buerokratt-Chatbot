@@ -4,6 +4,9 @@ declaration:
   description: "Calculate the Net Promoter Score (NPS) across all chats based on feedback ratings"
   method: get
   namespace: chat
+  returns: json
+  allowlist:
+    query: []
   response:
     fields:
       - field: nps

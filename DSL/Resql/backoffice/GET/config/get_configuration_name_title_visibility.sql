@@ -4,6 +4,7 @@ declaration:
   description: "Fetch the latest values for CSA visibility configuration flags"
   method: get
   namespace: config
+  returns: json
   allowlist:
     query: []
   response:

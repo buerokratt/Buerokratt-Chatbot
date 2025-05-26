@@ -4,6 +4,7 @@ declaration:
   description: "Fetch all active users with authorities and their latest profile information with optional CSA title visibility"
   method: get
   namespace: auth_users
+  returns: json
   allowlist:
     query:
       - field: is_csa_title_visible

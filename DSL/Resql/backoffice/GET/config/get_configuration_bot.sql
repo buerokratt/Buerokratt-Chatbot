@@ -4,6 +4,7 @@ declaration:
   description: "Fetch the latest values for specific UI-related configuration flags"
   method: get
   namespace: config
+  returns: json
   allowlist:
     query: []
   response:

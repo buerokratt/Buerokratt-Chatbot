@@ -4,6 +4,7 @@ declaration:
   description: "Fetch the latest non-deleted configuration entry for widget"
   method: get
   namespace: config
+  returns: json
   allowlist:
     query: []
   response:

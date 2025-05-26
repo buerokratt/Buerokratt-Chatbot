@@ -4,6 +4,7 @@ declaration:
   description: "Search messages by content and return matching chat IDs"
   method: get
   namespace: chat
+  returns: json
   allowlist:
     query:
       - field: searchKey

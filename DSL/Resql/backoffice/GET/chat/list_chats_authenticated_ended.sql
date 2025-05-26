@@ -4,6 +4,7 @@ declaration:
   description: "Fetch base IDs of authenticated chats that ended before a specified timestamp"
   method: get
   namespace: chat
+  returns: json
   allowlist:
     query:
       - field: fromDate

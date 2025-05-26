@@ -4,6 +4,9 @@ declaration:
   description: "Fetch all users with their latest display names, ordered by ID code"
   method: get
   namespace: auth_users
+  returns: json
+  allowlist:
+    query: []
   response:
     fields:
       - field: id_code

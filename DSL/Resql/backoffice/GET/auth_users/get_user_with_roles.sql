@@ -4,6 +4,7 @@ declaration:
   description: "Fetch user profile information by login/id_code with optional CSA title visibility"
   method: get
   namespace: auth_users
+  returns: json
   allowlist:
     query:
       - field: login

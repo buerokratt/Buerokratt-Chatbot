@@ -4,6 +4,9 @@ declaration:
   description: "Fetch array of all active establishment names"
   method: get
   namespace: org
+  returns: json
+  allowlist:
+    query: []
   response:
     fields:
       - field: names

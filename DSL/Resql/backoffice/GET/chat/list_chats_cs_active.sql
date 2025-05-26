@@ -4,6 +4,7 @@ declaration:
   description: "Fetch active chats excluding bot institution, returning the earliest created chats up to a specified limit, optionally including the CSA title"
   method: get
   namespace: chat
+  returns: json
   allowlist:
     query:
       - field: is_csa_title_visible

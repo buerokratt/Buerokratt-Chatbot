@@ -4,6 +4,9 @@ declaration:
   description: "Fetch all currently online users with their latest status information"
   method: get
   namespace: auth_users
+  returns: json
+  allowlist:
+    query: []
   response:
     fields:
       - field: id_code

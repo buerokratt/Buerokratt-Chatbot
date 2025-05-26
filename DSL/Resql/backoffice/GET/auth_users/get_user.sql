@@ -4,6 +4,7 @@ declaration:
   description: "get not-deleted user by id_code"
   method: get
   namespace: auth_users
+  returns: json
   allowlist:
     query:
       - field: id_code

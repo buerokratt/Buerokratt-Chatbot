@@ -4,6 +4,7 @@ declaration:
   description: "Calculate the total chat duration (in seconds) for non-bot chats ended within the last month"
   method: get
   namespace: chat
+  returns: json
   allowlist:
     query:
       - field: bot_institution_id

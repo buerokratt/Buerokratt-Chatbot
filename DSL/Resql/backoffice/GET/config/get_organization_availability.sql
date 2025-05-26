@@ -5,6 +5,7 @@ declaration:
   description: "Check current working time status including working days, holidays, and availability configuration"
   method: get
   namespace: config
+  returns: json
   allowlist:
     query:
       - field: holidays

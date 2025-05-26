@@ -4,6 +4,7 @@ declaration:
   description: "Count the number of chats ended within a specified date range"
   method: get
   namespace: chat
+  returns: json
   allowlist:
     query:
       - field: start

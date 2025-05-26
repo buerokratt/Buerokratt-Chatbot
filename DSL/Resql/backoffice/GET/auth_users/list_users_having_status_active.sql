@@ -4,6 +4,9 @@ declaration:
   description: "Fetch all active users with their latest profile information, ordered by ID code"
   method: get
   namespace: auth_users
+  returns: json
+  allowlist:
+    query: []
   response:
     fields:
       - field: id_code

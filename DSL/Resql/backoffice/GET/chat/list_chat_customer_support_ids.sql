@@ -4,6 +4,7 @@ declaration:
   description: "Fetch distinct customer support agent IDs for a given chat"
   method: get
   namespace: chat
+  returns: json
   allowlist:
     query:
       - field: chatId

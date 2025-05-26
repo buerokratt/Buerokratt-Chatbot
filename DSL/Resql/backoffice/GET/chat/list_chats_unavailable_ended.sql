@@ -4,6 +4,7 @@ declaration:
   description: "Fetch chats with specific last message events indicating unavailability, within a date range, optionally including the CSA title"
   method: get
   namespace: chat
+  returns: json
   allowlist:
     query:
       - field: is_csa_title_visible

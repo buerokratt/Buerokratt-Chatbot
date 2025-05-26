@@ -4,6 +4,7 @@ declaration:
   description: "Fetch organization availability and fallback message configurations"
   method: get
   namespace: config
+  returns: json
   allowlist:
     query: []
   response:

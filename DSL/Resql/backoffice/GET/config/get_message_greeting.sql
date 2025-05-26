@@ -4,6 +4,9 @@ declaration:
   description: "Fetch greeting message configuration in Estonian and its active status"
   method: get
   namespace: config
+  returns: json
+  allowlist:
+    query: []
   response:
     fields:
       - field: est

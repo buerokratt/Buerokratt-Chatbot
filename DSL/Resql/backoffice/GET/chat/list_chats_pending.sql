@@ -4,6 +4,7 @@ declaration:
   description: "Fetch idle chats with metadata, ordered by creation time, optionally including the CSA title"
   method: get
   namespace: chat
+  returns: json
   allowlist:
     query:
       - field: is_csa_title_visible

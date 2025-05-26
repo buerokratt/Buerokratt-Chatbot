@@ -4,6 +4,7 @@ declaration:
   description: "Fetch active user emails by users' id_code"
   method: get
   namespace: auth_users
+  returns: json
   allowlist:
     query:
       - field: customerSupportIds

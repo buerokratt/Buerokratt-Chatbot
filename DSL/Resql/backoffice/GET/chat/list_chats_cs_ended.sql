@@ -4,6 +4,7 @@ declaration:
   description: "Fetch paginated ended chats with detailed metadata, filtering, sorting, and optional CSA title visibility"
   method: get
   namespace: chat
+  returns: json
   allowlist:
     query:
       - field: is_csa_title_visible

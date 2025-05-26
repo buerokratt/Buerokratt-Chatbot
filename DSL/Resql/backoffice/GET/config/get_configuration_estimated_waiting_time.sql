@@ -4,6 +4,7 @@ declaration:
   description: "Fetch the estimated waiting time value and whether it is currently active"
   method: get
   namespace: config
+  returns: json
   allowlist:
     query: []
   response:

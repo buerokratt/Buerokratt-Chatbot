@@ -4,6 +4,7 @@ declaration:
   description: "Fetch all messages for a given chat excluding 'message-read' content"
   method: get
   namespace: chat
+  returns: json
   allowlist:
     query:
       - field: chatId

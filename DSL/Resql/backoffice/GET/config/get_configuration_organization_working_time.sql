@@ -4,6 +4,7 @@ declaration:
   description: "Fetch the latest non-deleted configuration entry for organization working time"
   method: get
   namespace: config
+  returns: json
   allowlist:
     query:
       - field: key

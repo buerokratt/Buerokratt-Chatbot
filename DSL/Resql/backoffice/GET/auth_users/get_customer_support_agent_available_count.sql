@@ -4,6 +4,9 @@ declaration:
   description: "Fetch amount of available users "
   method: get
   namespace: auth_users
+  returns: json
+  allowlist:
+    query: []
   response:
     fields:
       - field: count

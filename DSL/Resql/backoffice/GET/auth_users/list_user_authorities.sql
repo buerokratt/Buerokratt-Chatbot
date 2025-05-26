@@ -4,6 +4,7 @@ declaration:
   description: "Fetch user authorities/permissions by user ID code for active users"
   method: get
   namespace: auth_users
+  returns: json
   allowlist:
     query:
       - field: userIdCode

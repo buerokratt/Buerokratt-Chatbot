@@ -4,6 +4,7 @@ declaration:
   description: "Fetch user status by user's id_code"
   method: get
   namespace: auth_users
+  returns: json
   allowlist:
     query:
       - field: id_code
