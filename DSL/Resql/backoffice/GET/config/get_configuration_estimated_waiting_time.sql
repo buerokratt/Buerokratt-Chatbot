@@ -1,3 +1,20 @@
+/*
+declaration:
+  version: 0.1
+  description: "Fetch the estimated waiting time value and whether it is currently active"
+  method: get
+  namespace: config
+  allowlist:
+    query: []
+  response:
+    fields:
+      - field: time
+        type: string
+        description: "Value of the estimated waiting time configuration (empty string if not set or deleted)"
+      - field: is_active
+        type: boolean
+        description: "Whether the estimated waiting time feature is currently active"
+*/
 WITH
     grouped_configurations AS (
         SELECT DISTINCT ON (key) id, key, created

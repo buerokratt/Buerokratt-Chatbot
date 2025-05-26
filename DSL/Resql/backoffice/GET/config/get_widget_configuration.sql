@@ -1,3 +1,23 @@
+/*
+declaration:
+  version: 0.1
+  description: "Fetch the latest non-deleted configuration entry for widget"
+  method: get
+  namespace: config
+  allowlist:
+    query: []
+  response:
+    fields:
+      - field: id
+        type: string
+        description: "Unique identifier for the configuration entry"
+      - field: key
+        type: string
+        description: "Key of the configuration setting"
+      - field: value
+        type: string
+        description: "Value associated with the configuration key"
+*/
 SELECT
     id,
     key,

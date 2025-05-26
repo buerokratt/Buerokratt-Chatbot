@@ -1,3 +1,36 @@
+
+/*
+declaration:
+  version: 0.1
+  description: "Check current working time status including working days, holidays, and availability configuration"
+  method: get
+  namespace: config
+  allowlist:
+    query:
+      - field: holidays
+        type: string
+        description: "Comma-separated list of holiday dates"
+      - field: holiday_names
+        type: string
+        description: "Comma-separated list of holiday names with date prefixes"
+  response:
+    fields:
+      - field: is_within_working_time
+        type: boolean
+        description: "Flag indicating if current time is within working hours"
+      - field: is_within_working_days
+        type: boolean
+        description: "Flag indicating if current day is a working day"
+      - field: is_holiday
+        type: boolean
+        description: "Flag indicating if today is a national holiday"
+      - field: holiday_message
+        type: string
+        description: "Holiday message in Estonian or default message if not a holiday"
+      - field: is_allowed_to_work_at_holidays
+        type: boolean
+        description: "Flag indicating if organization is allowed to work on national holidays"
+*/
 WITH
     consts AS (
         SELECT

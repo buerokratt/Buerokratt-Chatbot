@@ -1,3 +1,17 @@
+/*
+declaration:
+  version: 0.1
+  description: "Fetch array of all active establishment names"
+  method: get
+  namespace: org
+  response:
+    fields:
+      - field: names
+        type: array
+        items:
+          type: string
+        description: "Array of establishment names"
+*/
 SELECT ARRAY_AGG(name) AS names
 FROM establishment AS e1
 WHERE created = (
