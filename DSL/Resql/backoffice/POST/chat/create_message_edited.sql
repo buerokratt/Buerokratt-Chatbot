@@ -32,4 +32,4 @@ VALUES (
     :forwardedByUser,
     :forwardedFromCsa,
     :forwardedToCsa
-) RETURNING updated;
+) RETURNING id::TEXT, base_id, updated::TEXT

@@ -162,11 +162,55 @@ updateDenormalizedChat:
       lastMessageTimestamp: ${insert_message_res.response.body[0].updated}
       isSupportMessage: ${message.authorRole == "backoffice-user"}
       isCustomerMessage: ${message.authorRole == "end-user"}
-      authorTimestamp: ${authorTimestamp}
-      content: ""
+      authorTimestamp: ${message.authorTimestamp ?? "CURRENT_TIMESTAMP"}
+      content: ${message.content ?? ""}
       lastMessageAuthorId: ${message.authorId ?? ""}
-      lastMessageEvent: ${event}
+      lastMessageEvent: "approved_validation"
   result: updateDenormalizedChatRes
+  next: updateDenormalizedChatMetricsChatFields
+
+updateDenormalizedChatMetricsChatFields:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_messages_for_metrics_chat_fields_only"
+    body:
+      chatBaseId: ${chatId}
+      chatId: ${change_status_res.response.body[0].id}
+      status: "OPEN"
+      endUserEmail: ${chat.endUserEmail ?? ""}
+      endUserPhone: ${chat.endUserPhone ?? ""}
+      feedbackText: ""
+      feedbackRating: ""
+      customerSupportDisplayName: "Bürokratt"
+      customerSupportId: ${botName}
+      customerSupportFirstName: ""
+      customerSupportLastName: ""
+      externalId: ""
+      receivedFrom: ${chat.receivedFrom ?? ""}
+      updated: ${change_status_res.response.body[0].updated}
+      ended: ""
+  result: updateDenormalizedChatMetricsRes
+  next: updateDenormalizedChatMetricsMessageFields
+
+updateDenormalizedChatMetricsMessageFields:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_messages_for_metrics_message_fields_only"
+    body:
+      chatBaseId: ${chatId}
+      messageId: ${insert_message_res.response.body[0].id}
+      messageBaseId: ${insert_message_res.response.body[0].baseId}
+      content: ${message.content ?? ""}
+      lastMessageTimestamp: ${insert_message_res.response.body[0].updated}
+      timestamp: ${insert_message_res.response.body[0].updated}
+      messageCreated: ${insert_message_res.response.body[0].updated}
+      messageUpdated: ${insert_message_res.response.body[0].updated}
+      messageEvent: "approved_validation"
+      messageAuthorRole: ${message.authorRole ?? ""}
+      messageAuthorId: ${message.authorId ?? ""}
+      messageForwardedFromCsa: ${message.forwardedFromCsa ?? ""}
+      messageForwardedToCsa: ${message.forwardedToCsa ?? ""}
+  result: updateDenormalizedChatMetricsMessageRes
   next: notify_chats
 
 notify_chats:

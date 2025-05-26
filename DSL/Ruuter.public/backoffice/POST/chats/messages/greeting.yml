@@ -68,6 +68,8 @@ assignResult:
     data:
       {
         "updated": "${insertMessageResult.response.body[0].updated}",
+        "messageId": "${insertMessageResult.response.body[0].id}",
+        "messageBaseId": "${insertMessageResult.response.body[0].baseId}",
         "greetingMessage": "${greetingMessage}",
       }
   next: returnSuccess

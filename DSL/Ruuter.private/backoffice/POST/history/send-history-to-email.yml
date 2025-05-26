@@ -24,7 +24,7 @@ getCustomerSupportIdsByChatId:
       chatId: ${chatId}
   result: getCustomerSupportIdsByChatIdResult
 
-mapChatIds:
+mapCustomerSupportIds:
   call: http.post
   args:
     url: "[#CHATBOT_DMAPPER_HBS]/map_customer_support_ids"
@@ -94,6 +94,26 @@ updateDenormalizedChatMessage:
       lastMessageAuthorId: ""
       lastMessageEvent: "chat_sent_to_csa_email"
   result: updateDenormalizedChatRes
+
+updateDenormalizedChatMetricsMessageFields:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_messages_for_metrics_message_fields_only"
+    body:
+      chatBaseId: ${chatId}
+      messageId: ${insert_message_res.response.body[0].id}
+      messageBaseId: ${insert_message_res.response.body[0].baseId}
+      content: ""
+      lastMessageTimestamp: ${insert_message_res.response.body[0].updated}
+      timestamp: ${insert_message_res.response.body[0].updated}
+      messageCreated: ${insert_message_res.response.body[0].updated}
+      messageUpdated: ${insert_message_res.response.body[0].updated}
+      messageEvent: "chat_sent_to_csa_email"
+      messageAuthorRole: "backoffice-user"
+      messageAuthorId: ""
+      messageForwardedFromCsa: ""
+      messageForwardedToCsa: ""
+  result: updateDenormalizedChatMetricsMessageRes
 
 returnSuccess:
   return: "OK"
