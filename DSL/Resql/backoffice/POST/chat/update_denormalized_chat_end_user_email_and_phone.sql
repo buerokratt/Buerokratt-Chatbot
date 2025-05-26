@@ -1,3 +1,31 @@
+/*
+declaration:
+  version: 0.1
+  description: "Update end-user contact information in the latest denormalized chat record"
+  method: post
+  accepts: json
+  returns: json
+  namespace: chat
+  allowlist:
+    body:
+      - field: chatId
+        type: string
+        description: "Base ID of the chat to update"
+      - field: endUserEmail
+        type: string
+        description: "New email address of the end user"
+      - field: endUserPhone
+        type: string
+        description: "New phone number of the end user"
+      - field: updated
+        type: timestamp
+        description: "Timestamp of the update"
+  response:
+    fields:
+      - field: updated
+        type: string
+        description: "Timestamp indicating when the update was applied"
+*/
 -- Using array approach directly
 SELECT copy_row_with_modifications(
     'denormalized_chat',                              -- Table name for denormalized_chat

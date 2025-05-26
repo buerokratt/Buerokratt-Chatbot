@@ -1,3 +1,28 @@
+/*
+declaration:
+  version: 0.1
+  description: "Clear specific message-related fields in the latest denormalized chat records for given chats"
+  method: post
+  accepts: json
+  returns: json
+  namespace: chat
+  allowlist:
+    body:
+      - field: chats
+        type: array
+        items:
+          type: string
+        description: "List of chat IDs to update"
+      - field: updated
+        type: timestamp
+        description: "Timestamp to assign to the denormalized record creation field"
+  response:
+    fields:
+      - field: updated
+        type: string
+        description: "Timestamp indicating when message-related fields were cleared"
+*/
+
 -- Using array approach directly
 SELECT copy_row_with_modifications(
     'denormalized_chat',                              -- Table name for denormalized_chat
