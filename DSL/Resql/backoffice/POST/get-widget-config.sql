@@ -7,6 +7,7 @@ WHERE key IN (
    'widgetColor',
    'isWidgetActive',
    'widgetAnimation',
+   'chat_active_duration',
    'is_burokratt_active')
   AND id IN (SELECT max(id) from configuration GROUP BY key)
   AND NOT deleted;
