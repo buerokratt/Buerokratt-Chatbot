@@ -87,7 +87,7 @@ CREATE TYPE chat_status_type AS ENUM (
 
 -- Function to convert text arrays to authority role arrays
 CREATE OR REPLACE FUNCTION convert_text_array_to_authority_role_array(text_array varchar[])
-RETURNS authority_role_type[] AS $$
+RETURNS authority_role_type[] AS '
 DECLARE
     result authority_role_type[];
     item varchar;
@@ -98,18 +98,18 @@ BEGIN
     
     FOREACH item IN ARRAY text_array
     LOOP
-        IF item IS NOT NULL AND item != '' THEN
+        IF item IS NOT NULL AND item != '''' THEN
             result := array_append(result, item::authority_role_type);
         END IF;
     END LOOP;
     
     RETURN result;
 END;
-$$ LANGUAGE plpgsql;
+' LANGUAGE plpgsql;
 
 -- Function for case-insensitive event conversion
 CREATE OR REPLACE FUNCTION convert_to_lowercase_event_enum(input_text VARCHAR) 
-RETURNS event_type AS $$
+RETURNS event_type AS '
 DECLARE
     lowercase_input VARCHAR := lower(input_text);
 BEGIN
@@ -121,7 +121,7 @@ BEGIN
         RETURN NULL;
     END;
 END;
-$$ LANGUAGE plpgsql;
+' LANGUAGE plpgsql;
 
 -- 3. Update tables to use the new types
 
