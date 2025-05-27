@@ -265,6 +265,25 @@ services:
     networks:
       - bykstack
 
+  data-export:
+    container_name: data-export
+    build:
+      context: ./data-export
+      dockerfile: Dockerfile
+    ports:
+      - 8888:8888
+    depends_on:
+      - users_db
+    environment:
+      - DB_URI=postgresql://byk:01234@users_db:5432/byk
+    command: python debug.py
+    volumes:
+      - ./DSL/Export:/DSL
+      - ./data-export:/app
+      - ./exported-data:/exported-data
+    networks:
+      - bykstack
+
 volumes:
   opensearch-data:
 networks:

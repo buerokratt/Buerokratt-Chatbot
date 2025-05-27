@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+    <changeSet id="20250524195819" author="Artsiom Beida" context="@test">
+        <loadData
+                file="data/test-fixtures/denormalized_user_data.csv"
+                tableName="denormalized_user_data"
+        >
+            <column name="user_status" type="other"/>
+            <column name="status" type="other"/>
+            <column name="csa_created" type="COMPUTED"/>
+            <column name="created" type="COMPUTED"/>
+            <column name="authority_name" type="COMPUTED"/>
+        </loadData>
+    </changeSet>
+</databaseChangeLog>

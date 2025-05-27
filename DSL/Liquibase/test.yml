@@ -1,0 +1,4 @@
+databaseChangeLog:
+  - includeAll:
+      path: test_data_changelog/
+      errorIfMissingOrEmpty: true
