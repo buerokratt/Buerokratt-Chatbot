@@ -1,6 +1,6 @@
 SELECT copy_row_with_modifications(
     'chat',
-    'id', '::INTEGER', id::VARCHAR,
+    'id', '::UUID', id::VARCHAR,
     ARRAY[
         'feedback_text', '', :feedbackText,
         'updated', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR

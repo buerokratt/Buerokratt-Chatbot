@@ -1,6 +1,6 @@
 SELECT copy_row_with_modifications(
     'denormalized_chat',                                   -- Table name
-    'id', '::INTEGER',                        -- ID column name and type
+    'id', '::UUID',                        -- ID column name and type
     id::VARCHAR,
     ARRAY[                                    -- Direct array of modifications
         'customer_support_id', '', '',        -- Reset customer_support_id

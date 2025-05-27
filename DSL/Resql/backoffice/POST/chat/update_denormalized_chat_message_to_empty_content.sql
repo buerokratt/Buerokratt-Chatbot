@@ -1,7 +1,7 @@
 -- Using array approach directly
 SELECT copy_row_with_modifications(
     'denormalized_chat',                              -- Table name for denormalized_chat
-    'id', '::INTEGER', id::VARCHAR,                   -- ID column handling
+    'id', '::UUID', id::VARCHAR,                   -- ID column handling
     ARRAY[                                            -- Direct array of modifications
         'last_message_including_empty_content', '', '',
         'last_message_event_with_content', '', NULL,

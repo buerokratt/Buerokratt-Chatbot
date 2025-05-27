@@ -162,9 +162,9 @@ ON denormalized_chat USING gin (
 -- First, create a custom immutable function
 CREATE OR REPLACE FUNCTION immutable_array_to_string(text[], text) RETURNS text
     LANGUAGE sql IMMUTABLE
-    AS $_$
+    AS '
     SELECT array_to_string($1, $2);
-$_$;
+';
 
 -- Then create the index using this function
 CREATE INDEX idx_denormalized_chat_all_messages_text_search
