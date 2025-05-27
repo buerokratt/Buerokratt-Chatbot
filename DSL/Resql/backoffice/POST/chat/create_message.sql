@@ -38,4 +38,4 @@ VALUES (
     :forwardedByUser,
     :forwardedFromCsa,
     :forwardedToCsa
-) RETURNING updated::TEXT;
+) RETURNING id::TEXT, base_id, updated::TEXT;

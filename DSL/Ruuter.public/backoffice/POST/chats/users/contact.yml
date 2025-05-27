@@ -38,7 +38,7 @@ insertEmailAndPhone:
       chatId: ${chatId}
       endUserEmail: "${email ? email : ''}"
       endUserPhone: "${phone ? phone : ''}"
-  result: notify_messages
+  result: insertEmailAndPhoneResult
 
 insertDenormalizedChatEmailAndPhone:
   call: http.post
@@ -48,8 +48,31 @@ insertDenormalizedChatEmailAndPhone:
       chatId: ${chatId}
       endUserEmail: "${email ? email : ''}"
       endUserPhone: "${phone ? phone : ''}"
-      updated: ${notify_messages.response.body[0].updated}
+      updated: ${insertEmailAndPhoneResult.response.body[0].updated}
   result: insertDenormalizedChatEmailAndPhoneResult
+
+updateDenormalizedChatMetricsChatFields:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_messages_for_metrics_chat_fields_only"
+    body:
+      chatBaseId: ${chatId}
+      chatId: ${insertEmailAndPhoneResult.response.body[0].id}
+      status: "null"
+      endUserEmail: "${email ? email : ''}"
+      endUserPhone: "${phone ? phone : ''}"
+      feedbackText: "null"
+      feedbackRating: "null"
+      customerSupportDisplayName: "null"
+      customerSupportId: "null"
+      customerSupportFirstName: "null"
+      customerSupportLastName: "null"
+      externalId: "null"
+      receivedFrom: "null"
+      updated: ${insertEmailAndPhoneResult.response.body[0].updated}
+      ended: "null"
+  result: updateDenormalizedChatMetricsRes
+  next: returnSuccess
 
 notify_messages:
   template: "[#CHATBOT_PROJECT_LAYER]/messages/notify"
