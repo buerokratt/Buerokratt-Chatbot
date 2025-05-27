@@ -1,3 +1,21 @@
+/*
+declaration:
+  version: 0.1
+  description: "Fetch greeting message configuration in Estonian and its active status"
+  method: get
+  namespace: config
+  returns: json
+  allowlist:
+    query: []
+  response:
+    fields:
+      - field: est
+        type: string
+        description: "Estonian greeting message text (empty if null or deleted)"
+      - field: is_active
+        type: boolean
+        description: "Flag indicating if greeting message is active"
+*/
 WITH
     grouped_configurations AS (
         SELECT DISTINCT ON (key) id, key, created

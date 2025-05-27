@@ -1,3 +1,21 @@
+/*
+declaration:
+  version: 0.1
+  description: "Search chats by matching various fields against a keyword and return matching chat IDs"
+  method: get
+  namespace: chat
+  returns: json
+  allowlist:
+    query:
+      - field: searchKey
+        type: string
+        description: "Keyword or phrase to search across chat fields"
+  response:
+    fields:
+      - field: chat_id
+        type: string
+        description: "Unique identifier of chats matching the search criteria"
+*/
 WITH
     consts AS (
         SELECT

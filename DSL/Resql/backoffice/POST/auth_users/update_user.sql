@@ -1,3 +1,39 @@
+/*
+declaration:
+  version: 0.1
+  description: "Update a user"
+  method: post
+  accepts: json
+  returns: json
+  namespace: auth_users
+  allowlist:
+    body:
+      - field: userIdCode
+        type: string
+        description: "User's unique identifier code (used for both login and id_code)"
+      - field: firstName
+        type: string
+        description: "User's first name"
+      - field: lastName
+        type: string
+        description: "User's last name"
+      - field: displayName
+        type: string
+        description: "User's display name"
+      - field: status
+        type: string
+        enum: ['active', 'deleted']
+        description: "User's status (will be cast to user_status enum)"
+      - field: csaTitle
+        type: string
+        description: "Customer Support Agent title"
+      - field: csaEmail
+        type: string
+        description: "Customer Support Agent email address"
+      - field: department
+        type: string
+        description: "User's department"
+*/
 SELECT copy_row_with_modifications(
     'user',
     'id', '::UUID', id::VARCHAR,

@@ -1,3 +1,29 @@
+/*
+declaration:
+  version: 0.1
+  description: "Insert updated configuration values only if they differ from the most recent non-deleted values"
+  method: post
+  accepts: json
+  returns: json
+  namespace: config
+  allowlist:
+    body:
+      - field: is_bot_active
+        type: string
+        description: "Enable or disable bot functionality"
+      - field: is_burokratt_active
+        type: string
+        description: "Enable or disable Bürokratt functionality"
+      - field: is_csa_name_visible
+        type: string
+        description: "Toggle visibility of customer support agent's name"
+      - field: is_csa_title_visible
+        type: string
+        description: "Toggle visibility of customer support agent's title"
+      - field: is_edit_chat_visible
+        type: string
+        description: "Toggle visibility of the chat edit button"
+*/
 WITH
     last_configuration AS (
         SELECT

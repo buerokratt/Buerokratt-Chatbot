@@ -1,3 +1,49 @@
+/*
+declaration:
+  version: 0.1
+  description: "Fetch user profile information by login/id_code with optional CSA title visibility"
+  method: get
+  namespace: auth_users
+  returns: json
+  allowlist:
+    query:
+      - field: login
+        type: string
+        description: "User's login identifier (id_code)"
+      - field: is_csa_title_visible
+        type: string
+        enum: ['true', 'false']
+        description: "Flag to control CSA title visibility"
+  response:
+    fields:
+      - field: login
+        type: string
+        description: "User's login identifier"
+      - field: first_name
+        type: string
+        description: "User's first name"
+      - field: last_name
+        type: string
+        description: "User's last name"
+      - field: id_code
+        type: string
+        description: "User's unique identifier"
+      - field: display_name
+        type: string
+        description: "User's display name"
+      - field: csa_title
+        type: string
+        description: "Customer Support Agent title (conditionally visible)"
+      - field: csa_email
+        type: string
+        description: "Customer Support Agent email address"
+      - field: authorities
+        type: array
+        items:
+          type: string
+          enum: ['backoffice-user', 'end-user', 'Bürokratt', 'buerokratt']
+        description: "User's authority/permission level"
+*/
 SELECT
     login,
     first_name,

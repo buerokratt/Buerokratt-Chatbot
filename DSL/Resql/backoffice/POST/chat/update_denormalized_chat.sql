@@ -1,3 +1,89 @@
+/*
+declaration:
+  version: 0.1
+  description: "Update the latest denormalized chat record with updated CSA, end-user, status, and metadata values"
+  method: post
+  accepts: json
+  returns: json
+  namespace: chat
+  allowlist:
+    body:
+      - field: chatId
+        type: string
+        description: "Unique identifier of the chat"
+      - field: customerSupportId
+        type: string
+        description: "ID of the assigned customer support agent"
+      - field: customerSupportDisplayName
+        type: string
+        description: "Display name of the customer support agent (nullable)"
+      - field: customerSupportFirstName
+        type: string
+        description: "First name of the customer support agent (nullable)"
+      - field: customerSupportLastName
+        type: string
+        description: "Last name of the customer support agent (nullable)"
+      - field: status
+        type: string
+        enum: ['ENDED', 'OPEN', 'REDIRECTED', 'IDLE', 'VALIDATING']
+        description: "Updated status of the chat"
+      - field: ended
+        type: timestamp
+        description: "Time the chat was ended"
+      - field: feedbackText
+        type: string
+        description: "Feedback text left by the user"
+      - field: feedbackRating
+        type: integer
+        description: "Feedback rating left by the user"
+      - field: externalId
+        type: string
+        description: "External system identifier for the chat"
+      - field: forwardedTo
+        type: string
+        description: "ID of the agent the chat was forwarded to"
+      - field: forwardedToName
+        type: string
+        description: "Name of the agent the chat was forwarded to"
+      - field: receivedFrom
+        type: string
+        description: "ID from which the chat was received"
+      - field: receivedFromName
+        type: string
+        description: "Name from which the chat was received"
+      - field: endUserId
+        type: string
+        description: "ID of the end user"
+      - field: endUserFirstName
+        type: string
+        description: "First name of the end user"
+      - field: endUserLastName
+        type: string
+        description: "Last name of the end user"
+      - field: endUserEmail
+        type: string
+        description: "Email address of the end user"
+      - field: endUserPhone
+        type: string
+        description: "Phone number of the end user"
+      - field: endUserOs
+        type: string
+        description: "Operating system of the end user"
+      - field: endUserUrl
+        type: string
+        description: "Visited URL by the end user"
+      - field: csaTitle
+        type: string
+        description: "Title of the customer support agent (nullable)"
+      - field: updated
+        type: timestamp
+        description: "Timestamp when the chat was last updated"
+  response:
+    fields:
+      - field: updated
+        type: string
+        description: "Timestamp indicating when the new denormalized chat row was created"
+*/
 -- Using array approach directly
 SELECT copy_row_with_modifications(
     'denormalized_chat',                              -- Table name for denormalized_chat

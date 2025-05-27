@@ -1,3 +1,30 @@
+/*
+declaration:
+  version: 0.1
+  description: "Update labels in the latest denormalized chat record"
+  method: post
+  accepts: json
+  returns: json
+  namespace: chat
+  allowlist:
+    body:
+      - field: chatId
+        type: string
+        description: "Base ID of the chat to update"
+      - field: labels
+        type: array
+        items:
+          type: string
+        description: "List of labels to assign to the chat"
+      - field: updated
+        type: timestamp
+        description: "Timestamp of the update"
+  response:
+    fields:
+      - field: updated
+        type: string
+        description: "Timestamp indicating when the label update was applied"
+*/
 -- Using array approach directly
 SELECT copy_row_with_modifications(
     'denormalized_chat',                              -- Table name for denormalized_chat

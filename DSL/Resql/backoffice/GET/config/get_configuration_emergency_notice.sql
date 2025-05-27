@@ -1,3 +1,24 @@
+/*
+declaration:
+  version: 0.1
+  description: "Fetch the latest non-deleted emergency configuration entries"
+  method: get
+  namespace: config
+  returns: json
+  allowlist:
+    query: []
+  response:
+    fields:
+      - field: id
+        type: string
+        description: "Unique identifier for the configuration entry"
+      - field: key
+        type: string
+        description: "Key of the configuration setting"
+      - field: value
+        type: string
+        description: "Value associated with the configuration key"
+*/
 SELECT
     id,
     key,

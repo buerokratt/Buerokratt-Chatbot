@@ -1,3 +1,22 @@
+/*
+declaration:
+  version: 0.1
+  description: "Release a chat by clearing CSA assignment and creating a new chat version with updated timestamp"
+  method: post
+  accepts: json
+  returns: json
+  namespace: chat
+  allowlist:
+    body:
+      - field: userId
+        type: string
+        description: "ID of the customer support agent whose active chats should be released"
+  response:
+    fields:
+      - field: updated
+        type: string
+        description: "Timestamp when the chat record was duplicated and CSA cleared"
+*/
 SELECT copy_row_with_modifications(
     'chat',                                   -- Table name
     'id', '::UUID',                        -- ID column name and type

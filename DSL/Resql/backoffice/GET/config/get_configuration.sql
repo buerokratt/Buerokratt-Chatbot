@@ -1,3 +1,27 @@
+/*
+declaration:
+  version: 0.1
+  description: "Fetch the latest non-deleted configuration entry for a given key"
+  method: get
+  namespace: config
+  returns: json
+  allowlist:
+    query:
+      - field: key
+        type: string
+        description: "Configuration key to retrieve"
+  response:
+    fields:
+      - field: id
+        type: string
+        description: "Unique identifier for the configuration entry"
+      - field: key
+        type: string
+        description: "Key of the configuration setting"
+      - field: value
+        type: string
+        description: "Value associated with the configuration key"
+*/
 SELECT
     id,
     key,
