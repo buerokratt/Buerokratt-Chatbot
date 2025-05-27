@@ -74,4 +74,4 @@ SELECT
     NOW() + ordinality * INTERVAL '1 microsecond',
     NOW() + ordinality * INTERVAL '1 microsecond'
 FROM JSON_ARRAY_ELEMENTS(ARRAY_TO_JSON(ARRAY[:messages])) WITH ORDINALITY
-RETURNING updated::TEXT;
+RETURNING id::TEXT, base_id::TEXT, updated::TEXT;

@@ -86,4 +86,4 @@ VALUES (
     :forwardedFromCsa,
     :forwardedToCsa,
     :options
-) RETURNING updated;
+) RETURNING id::TEXT, base_id, updated::TEXT;

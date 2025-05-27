@@ -78,10 +78,6 @@ declaration:
         type: string
         description: "Confirmation text indicating the chat creation result"
 */
-WITH
-    consts AS (
-        SELECT 'is_bot_active' AS is_bot_active
-    )
 
 INSERT INTO chat (
     base_id,
@@ -108,45 +104,14 @@ INSERT INTO chat (
 )
 VALUES (
     :id,
-    (CASE
-        WHEN ((
-            SELECT value
-            FROM configuration AS c1
-            WHERE
-                key = (SELECT is_bot_active FROM consts)
-                AND created = (
-                    SELECT MAX(c2.created) FROM configuration AS c2
-                    WHERE c1.key = c2.key
-                )
-                AND deleted = FALSE
-        ) = 'true')
-            THEN (
-                SELECT value
-                FROM configuration AS c1
-                WHERE
-                    key = 'bot_institution_id'
-                    AND created = (
-                        SELECT MAX(c2.created) FROM configuration AS c2
-                        WHERE c1.key = c2.key
-                    )
-                    AND deleted = FALSE
-            )
+    CASE
+        WHEN :is_bot_active = 'true' THEN :bot_institution_id
         ELSE ''
-    END),
-    (CASE
-        WHEN ((
-            SELECT value
-            FROM configuration AS c1
-            WHERE
-                key = (SELECT is_bot_active FROM consts)
-                AND created = (
-                    SELECT MAX(c2.created) FROM configuration AS c2
-                    WHERE c1.key = c2.key
-                )
-                AND deleted = FALSE
-        ) = 'true') THEN 'Bürokratt'
+    END,
+    CASE
+        WHEN :is_bot_active = 'true' THEN 'Bürokratt'
         ELSE ''
-    END),
+    END,
     :endUserId,
     :endUserFirstName,
     :endUserLastName,
@@ -170,19 +135,10 @@ VALUES (
     :externalId,
     :forwardedTo,
     :forwardedToName,
-    :receivedFrom, :receivedFromName, (CASE
-        WHEN ((
-            SELECT value
-            FROM configuration AS c1
-            WHERE
-                key = (SELECT is_bot_active FROM consts)
-                AND created = (
-                    SELECT MAX(c2.created) FROM configuration AS c2
-                    WHERE c1.key = c2.key
-                )
-                AND deleted = FALSE
-        ) = 'true') THEN ''
-        ELSE ''
-    END)
+    :receivedFrom,
+    :receivedFromName,
+    CASE
+        WHEN :is_bot_active = 'true' THEN ''
+    ELSE ''
 )
-RETURNING customer_support_id, customer_support_display_name, csa_title, updated::TEXT;
+RETURNING id, customer_support_id, customer_support_display_name, csa_title, updated::TEXT;

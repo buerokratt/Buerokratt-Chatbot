@@ -75,7 +75,30 @@ insertDenormalizedChatIdAndName:
       endUserFirstName: "${firstName ? firstName : ''}"
       endUserLastName: "${lastName ? lastName : ''}"
       updated: ${insertIdAndNameResult.response.body[0].updated}
-  result: getUuid
+  result: updateDenormalizedChatMetricsChatFields
+
+updateDenormalizedChatMetricsChatFields:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_messages_for_metrics_chat_fields_only"
+    body:
+      chatBaseId: ${chatId}
+      chatId: ${insertIdAndNameResult.response.body[0].id}
+      status: "null"
+      endUserEmail: "null"
+      endUserPhone: "null"
+      feedbackText: "null"
+      feedbackRating: "null"
+      customerSupportDisplayName: "null"
+      customerSupportId: "null"
+      customerSupportFirstName: "null"
+      customerSupportLastName: "null"
+      externalId: "null"
+      receivedFrom: "null"
+      updated: ${insertIdAndNameResult.response.body[0].updated}
+      ended: "null"
+  result: updateDenormalizedChatMetricsRes
+  next: getUuid
 
 getUuid:
   call: http.post
@@ -127,6 +150,27 @@ updateDenormalizedChatMessage:
       lastMessageAuthorId: ${id ?? ""}
       lastMessageEvent: "user-authenticated"
   result: updateDenormalizedChatRes
+  next: updateDenormalizedChatMetricsMessageFields
+
+updateDenormalizedChatMetricsMessageFields:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_messages_for_metrics_message_fields_only"
+    body:
+      chatBaseId: ${chatId}
+      messageId: ${insertMessageResult.response.body[0].id}
+      messageBaseId: ${insertMessageResult.response.body[0].baseId}
+      content: ""
+      lastMessageTimestamp: ${insertMessageResult.response.body[0].updated}
+      timestamp: ${insertMessageResult.response.body[0].updated}
+      messageCreated: ${insertMessageResult.response.body[0].updated}
+      messageUpdated: ${insertMessageResult.response.body[0].updated}
+      messageEvent: "user-authenticated"
+      messageAuthorRole: "end-user"
+      messageAuthorId: ${id ?? ""}
+      messageForwardedFromCsa: ""
+      messageForwardedToCsa: ""
+  result: updateDenormalizedChatMetricsMessageRes
   next: check_for_personal_code
 
 check_for_personal_code:

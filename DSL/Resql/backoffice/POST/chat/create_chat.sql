@@ -132,4 +132,4 @@ VALUES (
                 :csaTitle
         END
     )
-) RETURNING updated::TEXT;
+) RETURNING id, updated::TEXT;
