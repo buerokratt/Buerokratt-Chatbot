@@ -1,11 +1,32 @@
+/*
+declaration:
+  version: 0.1
+  description: "Fetch configuration values for bot fallback behavior when it cannot answer"
+  method: get
+  namespace: config
+  returns: json
+  allowlist:
+    query: []
+  response:
+    fields:
+      - field: is_ask_to_forward_to_csa
+        type: string
+        description: "Flag indicating whether to ask to forward to CSA when bot cannot answer"
+      - field: ask_to_forward_to_csa_message
+        type: string
+        description: "Message displayed when bot cannot answer and forwarding is enabled"
+*/
 WITH configuration_values AS (
     SELECT id,
            KEY,
            value
-    FROM configuration
+    FROM configuration AS c1
     WHERE KEY IN ('organizationBotCannotAnswerAskToForwardToCSA', 
                   'organizationBotCannotAnswerMessage')
-      AND id IN (SELECT max(id) FROM configuration GROUP BY KEY)
+      AND created = (
+        SELECT MAX(c2.created) FROM configuration as c2
+        WHERE c2.key = c1.key
+        )
       AND NOT deleted
 )
 SELECT

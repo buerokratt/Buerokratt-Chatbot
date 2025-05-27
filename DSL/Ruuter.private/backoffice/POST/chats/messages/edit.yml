@@ -45,10 +45,10 @@ insertMessage:
     url: "[#CHATBOT_RESQL]/chat/create_message"
     body:
       messageId: ${messageId}
-      chatId: ${chatId}
+      chatId: ${message.chatBaseId}
       authorId: ${message.authorId ?? ""}
       authorTimestamp: ${message.authorTimestamp ?? "CURRENT_TIMESTAMP"}
-      created: "CURRENT_TIMESTAMP"
+      created: ${message.created ?? "CURRENT_TIMESTAMP"}
       authorFirstName: ${message.authorFirstName ?? ""}
       authorLastName: ${message.authorLastName ?? ""}
       authorRole: ${message.authorRole ?? ""}
@@ -59,6 +59,43 @@ insertMessage:
       forwardedToCsa: ${message.forwardedToCsa ?? ""}
       rating: ${message.rating ?? ""}
   result: insert_message_res
+  next: updateDenormalizedChatMessage
+
+updateDenormalizedChatMessage:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_message_fields_only"
+    body:
+      chatId: ${message.chatBaseId}
+      lastMessageTimestamp: ${insert_message_res.response.body[0].updated}
+      isSupportMessage: ${message.authorRole == "backoffice-user"}
+      isCustomerMessage: ${message.authorRole == "end-user"}
+      authorTimestamp: ${message.authorTimestamp ?? insert_message_res.response.body[0].updated}
+      content: ${content ?? ""}
+      lastMessageAuthorId: ${message.authorId ?? ""}
+      lastMessageEvent: ${message.event ?? ""}
+  result: updateDenormalizedChatRes
+  next: updateDenormalizedChatMetricsMessageFields
+
+updateDenormalizedChatMetricsMessageFields:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_messages_for_metrics_message_fields_only"
+    body:
+      chatBaseId: ${message.chatBaseId}
+      messageId: ${insert_message_res.response.body[0].id}
+      messageBaseId: ${insert_message_res.response.body[0].baseId}
+      content: ${content ?? ""}
+      lastMessageTimestamp: ${message.created ?? insert_message_res.response.body[0].updated}
+      timestamp: ${message.created ?? insert_message_res.response.body[0].updated}
+      messageCreated: ${message.created ?? insert_message_res.response.body[0].updated}
+      messageUpdated: ${insert_message_res.response.body[0].updated}
+      messageEvent: ${message.event ?? ""}
+      messageAuthorRole: ${message.authorRole ?? ""}
+      messageAuthorId: ${message.authorId ?? ""}
+      messageForwardedFromCsa: ${message.forwardedFromCsa ?? ""}
+      messageForwardedToCsa: ${message.forwardedToCsa ?? ""}
+  result: updateDenormalizedChatMetricsMessageRes
   next: notify_chats
 
 notify_chats:

@@ -52,7 +52,125 @@ CREATE TABLE denormalized_chat (
     CONSTRAINT denormalized_chat_pkey PRIMARY KEY (id)
 );
 
-CREATE INDEX idx_denorm_chat_id_updated ON public.denormalized_chat USING btree (chat_id, updated);
+-- Index #1
+CREATE INDEX idx_denormalized_chat_chatid_record_created 
+ON denormalized_chat(chat_id, denormalized_record_created DESC);
+
+-- Index #2
+CREATE INDEX idx_denormalized_chat_status_ended_enduser 
+ON denormalized_chat(status, ended, end_user_id);
+
+-- Index #3
+CREATE INDEX idx_denormalized_chat_ended_status_support_created 
+ON denormalized_chat(ended, status, customer_support_id, created);
+
+-- Index #4
+CREATE INDEX idx_denormalized_chat_status 
+ON denormalized_chat(status);
+
+-- Index #5
+CREATE INDEX idx_denormalized_chat_ended 
+ON denormalized_chat(ended);
+
+-- Index #6
+CREATE INDEX idx_denormalized_chat_customer_support_id 
+ON denormalized_chat(customer_support_id);
+
+-- Index #7
+CREATE INDEX idx_denormalized_chat_first_message 
+ON denormalized_chat(first_message);
+
+-- Index #8
+CREATE INDEX idx_denormalized_chat_last_message 
+ON denormalized_chat(last_message);
+
+-- Index #9
+CREATE INDEX idx_denormalized_chat_first_message_timestamp 
+ON denormalized_chat(first_message_timestamp);
+
+-- Index #10
+CREATE INDEX idx_denormalized_chat_customer_support_display_name 
+ON denormalized_chat(customer_support_display_name);
+
+-- Index #11
+CREATE INDEX idx_denormalized_chat_end_user_first_name 
+ON denormalized_chat(end_user_first_name);
+
+-- Index #12
+CREATE INDEX idx_denormalized_chat_end_user_id 
+ON denormalized_chat(end_user_id);
+
+-- Index #13
+CREATE INDEX idx_denormalized_chat_contacts_message 
+ON denormalized_chat(contacts_message);
+
+-- Index #14
+CREATE INDEX idx_denormalized_chat_comment 
+ON denormalized_chat(comment);
+
+-- Index #15
+CREATE INDEX idx_denormalized_chat_labels 
+ON denormalized_chat(labels);
+
+-- Index #16
+CREATE INDEX idx_denormalized_chat_last_message_event 
+ON denormalized_chat(last_message_event);
+
+-- Index #17
+CREATE INDEX idx_denormalized_chat_feedback_rating 
+ON denormalized_chat(feedback_rating);
+
+-- Index #18
+CREATE INDEX idx_denormalized_chat_cs_first_last_name 
+ON denormalized_chat(customer_support_first_name, customer_support_last_name);
+
+-- Index #19
+CREATE INDEX idx_denormalized_chat_created 
+ON denormalized_chat(created);
+
+-- Index #20
+CREATE INDEX idx_denormalized_chat_all_messages 
+ON denormalized_chat USING gin(all_messages);
+
+-- Index #21
+CREATE INDEX idx_denormalized_chat_duration 
+ON denormalized_chat(chat_duration_in_seconds);
+
+-- Index #22
+CREATE INDEX idx_denormalized_chat_last_message_no_rating 
+ON denormalized_chat(last_message_with_content_and_not_rating_or_forward);
+
+-- Index #23
+CREATE INDEX idx_denormalized_chat_last_message_timestamp_no_rating 
+ON denormalized_chat(last_message_with_not_rating_or_forward_events_timestamp);
+
+-- Index #24
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+CREATE INDEX idx_denormalized_chat_text_search
+ON denormalized_chat USING gin (
+    customer_support_display_name gin_trgm_ops, 
+    end_user_first_name gin_trgm_ops,
+    contacts_message gin_trgm_ops,
+    comment gin_trgm_ops,
+    status gin_trgm_ops,
+    last_message_event gin_trgm_ops,
+    chat_id gin_trgm_ops,
+    last_message gin_trgm_ops
+);
+
+-- Index #25
+-- First, create a custom immutable function
+CREATE OR REPLACE FUNCTION immutable_array_to_string(text[], text) RETURNS text
+    LANGUAGE sql IMMUTABLE
+    AS '
+    SELECT array_to_string($1, $2);
+';
+
+-- Then create the index using this function
+CREATE INDEX idx_denormalized_chat_all_messages_text_search
+ON denormalized_chat USING gin (
+    immutable_array_to_string(all_messages, ' ') gin_trgm_ops
+);
 
 -- Updated INSERT script to include both IDLE and non-IDLE chats
 INSERT INTO denormalized_chat (

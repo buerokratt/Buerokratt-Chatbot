@@ -1,3 +1,105 @@
+/*
+declaration:
+  version: 0.1
+  description: "Search and paginate through active users with authorities using multiple filter criteria and sorting options"
+  method: get
+  namespace: auth_users
+  returns: json
+  allowlist:
+    query:
+      - field: is_csa_title_visible
+        type: string
+        enum: ['true', 'false']
+        description: "Flag to control CSA title visibility"
+      - field: page_size
+        type: integer
+        description: "Number of records per page"
+      - field: roles
+        type: string
+        description: "Comma-separated list of roles to filter by (in array format)"
+      - field: search_display_name_and_csa_title
+        type: string
+        description: "Search term for display name and CSA title (optional)"
+      - field: search_full_name_and_csa_title
+        type: string
+        description: "Search term for full name and CSA title (optional)"
+      - field: show_active_only
+        type: string
+        enum: ['true', 'false']
+        description: "Flag to show only active (non-offline) users"
+      - field: search_full_name
+        type: string
+        description: "Search term for full name (optional)"
+      - field: search_id_code
+        type: string
+        description: "Search term for ID code (optional)"
+      - field: search_display_name
+        type: string
+        description: "Search term for display name (optional)"
+      - field: search_csa_title
+        type: string
+        description: "Search term for CSA title (optional)"
+      - field: search_csa_email
+        type: string
+        description: "Search term for CSA email (optional)"
+      - field: search_authority
+        type: string
+        description: "Search term for authority/role (optional)"
+      - field: search_department
+        type: string
+        description: "Search term for department (optional)"
+      - field: excluded_users
+        type: string
+        description: "Comma-separated list of user ID codes to exclude"
+      - field: sorting
+        type: string
+        enum: ['name asc', 'name desc', 'idCode asc', 'idCode desc', 'Role asc', 'Role desc', 'displayName asc', 'displayName desc', 'csaTitle asc', 'csaTitle desc', 'csaEmail asc', 'csaEmail desc', 'department asc', 'department desc', 'customerSupportStatus asc', 'customerSupportStatus desc']
+        description: "Sorting criteria and direction"
+      - field: page
+        type: integer
+        description: "Page number (1-based)"
+  response:
+    fields:
+      - field: login
+        type: string
+        description: "User's login identifier"
+      - field: first_name
+        type: string
+        description: "User's first name"
+      - field: last_name
+        type: string
+        description: "User's last name"
+      - field: id_code
+        type: string
+        description: "User's unique identifier"
+      - field: display_name
+        type: string
+        description: "User's display name"
+      - field: csa_title
+        type: string
+        description: "Customer Support Agent title (conditionally visible)"
+      - field: csa_email
+        type: string
+        description: "Customer Support Agent email address"
+      - field: department
+        type: string
+        description: "User's department"
+      - field: authorities
+        type: string
+        description: "User's authority/permission level"
+      - field: customer_support_status
+        type: string
+        description: "User's current support status"
+      - field: status_comment
+        type: string
+        description: "Additional comment about user's status"
+      - field: status_comment_time_stamp
+        type: timestamp
+        description: "Timestamp when status comment was created"
+      - field: total_pages
+        type: integer
+        description: "Total number of pages available"
+*/
 SELECT
     login,
     first_name,
@@ -15,21 +117,21 @@ SELECT
     status_comment,
     csa_created AS status_comment_time_stamp,
     CEIL(COUNT(*) OVER () / :page_size::DECIMAL) AS total_pages
-FROM denorm_user_csa_authority_profile_settings
+FROM denormalized_user_data AS d_1
 WHERE
     user_status <> 'deleted'
     AND ARRAY_LENGTH(authority_name, 1) > 0
-    AND id IN (
-        SELECT MAX(id)
-        FROM denorm_user_csa_authority_profile_settings
-        GROUP BY id_code
+    AND created = (
+        SELECT MAX(d_2.created)
+        FROM denormalized_user_data AS d_2
+        WHERE d_1.id_code = d_2.id_code
     )
-    AND authority_name && 
+    AND (authority_name)::TEXT[] && 
         (SELECT array_agg(trim(e)) FROM 
-          unnest(string_to_array(
+            unnest(string_to_array(
             btrim(:roles, '[]'), 
             ','
-          )) AS e)::CHARACTER VARYING ARRAY
+            )) AS e)::TEXT ARRAY
     AND (
         :search_display_name_and_csa_title IS NULL
         OR display_name ILIKE '%' || :search_display_name_and_csa_title || '%'
@@ -54,7 +156,7 @@ WHERE
     AND (:search_authority IS NULL OR EXISTS (
         SELECT 1
         FROM UNNEST(authority_name) AS authority
-        WHERE authority ILIKE '%' || :search_authority || '%'
+        WHERE authority::TEXT ILIKE '%' || :search_authority || '%'
     ))
     AND (
         :search_department IS NULL

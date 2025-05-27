@@ -64,6 +64,8 @@ const ChatUnanswered: FC = () => {
         id: chat.id ?? '',
         customerSupportId: user?.idCode ?? '',
         customerSupportDisplayName: user?.displayName ?? '',
+        customerSupportFirstName: user?.firstName ?? '',
+        customerSupportLastName: user?.lastName ?? '',
         csaTitle: user?.csaTitle ?? '',
         forwardedByUser: userInfo?.displayName ?? '',
         forwardedFromCsa: userInfo?.displayName ?? '',

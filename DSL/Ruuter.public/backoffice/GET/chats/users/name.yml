@@ -63,6 +63,41 @@ insertIdAndName:
       endUserFirstName: "${firstName ? firstName : ''}"
       endUserLastName: "${lastName ? lastName : ''}"
   result: insertIdAndNameResult
+  next: insertDenormalizedChatIdAndName
+
+insertDenormalizedChatIdAndName:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_end_user_id_and_name"
+    body:
+      chatId: ${chatId}
+      endUserId: "${id ? id : ''}"
+      endUserFirstName: "${firstName ? firstName : ''}"
+      endUserLastName: "${lastName ? lastName : ''}"
+      updated: ${insertIdAndNameResult.response.body[0].updated}
+  result: updateDenormalizedChatMetricsChatFields
+
+updateDenormalizedChatMetricsChatFields:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_messages_for_metrics_chat_fields_only"
+    body:
+      chatBaseId: ${chatId}
+      chatId: ${insertIdAndNameResult.response.body[0].id}
+      status: "null"
+      endUserEmail: "null"
+      endUserPhone: "null"
+      feedbackText: "null"
+      feedbackRating: "null"
+      customerSupportDisplayName: "null"
+      customerSupportId: "null"
+      customerSupportFirstName: "null"
+      customerSupportLastName: "null"
+      externalId: "null"
+      receivedFrom: "null"
+      updated: ${insertIdAndNameResult.response.body[0].updated}
+      ended: "null"
+  result: updateDenormalizedChatMetricsRes
   next: getUuid
 
 getUuid:
@@ -99,6 +134,43 @@ insertMessage:
       forwardedFromCsa: ""
       forwardedToCsa: ""
   result: insertMessageResult
+  next: updateDenormalizedChatMessage
+
+updateDenormalizedChatMessage:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_message_fields_only"
+    body:
+      chatId: ${chatId}
+      lastMessageTimestamp: ${insertMessageResult.response.body[0].updated}
+      isSupportMessage: false
+      isCustomerMessage: true
+      authorTimestamp: ${insertMessageResult.response.body[0].updated}
+      content: ""
+      lastMessageAuthorId: ${id ?? ""}
+      lastMessageEvent: "user-authenticated"
+  result: updateDenormalizedChatRes
+  next: updateDenormalizedChatMetricsMessageFields
+
+updateDenormalizedChatMetricsMessageFields:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_messages_for_metrics_message_fields_only"
+    body:
+      chatBaseId: ${chatId}
+      messageId: ${insertMessageResult.response.body[0].id}
+      messageBaseId: ${insertMessageResult.response.body[0].baseId}
+      content: ""
+      lastMessageTimestamp: ${insertMessageResult.response.body[0].updated}
+      timestamp: ${insertMessageResult.response.body[0].updated}
+      messageCreated: ${insertMessageResult.response.body[0].updated}
+      messageUpdated: ${insertMessageResult.response.body[0].updated}
+      messageEvent: "user-authenticated"
+      messageAuthorRole: "end-user"
+      messageAuthorId: ${id ?? ""}
+      messageForwardedFromCsa: ""
+      messageForwardedToCsa: ""
+  result: updateDenormalizedChatMetricsMessageRes
   next: check_for_personal_code
 
 check_for_personal_code:
@@ -123,14 +195,15 @@ generate_cookie:
     body:
       JWTName: "userJwt"
       expirationInMinutes: ${session_result.response.body[0]?.value ?? '120'}
-      content: {
-        "personalCode": "${id ?? ''}",
-        "displayName": "${firstName ?? ''}",
-        "firstName": "${firstName ?? ''}",
-        "lastName": "${lastName ?? ''}",
-        "authMethod": "${authMethod ?? ''}",
-        "fullName": "${(firstName ?? '') + ' ' + (lastName ?? '')}"
-      }
+      content:
+        {
+          "personalCode": "${id ?? ''}",
+          "displayName": "${firstName ?? ''}",
+          "firstName": "${firstName ?? ''}",
+          "lastName": "${lastName ?? ''}",
+          "authMethod": "${authMethod ?? ''}",
+          "fullName": "${(firstName ?? '') + ' ' + (lastName ?? '')}",
+        }
   result: cookie_result
   next: assign_cookie
 
@@ -159,7 +232,7 @@ notify_messages:
     chatId: ${chatId}
     type: "message"
     messageId: ${uuid}
-  result: messages_notify_res  
+  result: messages_notify_res
   next: check_for_id
 
 check_for_id:

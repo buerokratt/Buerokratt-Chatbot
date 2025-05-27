@@ -1,17 +1,36 @@
+/*
+declaration:
+  version: 0.1
+  description: "Unassign the customer support agent from the latest active chat version by clearing CSA fields"
+  method: post
+  accepts: json
+  returns: json
+  namespace: chat
+  allowlist:
+    body:
+      - field: chatId
+        type: string
+        description: "Base ID of the chat from which the CSA should be unassigned"
+  response:
+    fields:
+      - field: updated
+        type: string
+        description: "Timestamp when the CSA was unassigned and chat record updated"
+*/
 SELECT copy_row_with_modifications(
     'chat',
-    'id', '::INTEGER', id::VARCHAR,
+    'id', '::UUID', id::VARCHAR,
     ARRAY[
         'customer_support_id', '', '',
         'customer_support_display_name', '', '',
         'csa_title', '', '',
         'updated', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR
     ]::VARCHAR[]
-) FROM chat
+), NOW()::TEXT as updated FROM chat
 WHERE
-    id IN (
-        SELECT MAX(id) FROM chat
-        GROUP BY base_id
+    updated = (
+        SELECT MAX(updated) FROM chat
+        WHERE base_id = :chatId
     )
     AND base_id = :chatId
     AND ended IS null;

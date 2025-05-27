@@ -41,6 +41,16 @@ unassignAllClaimedChats:
     body:
       userId: ${idCode}
   result: unclaim_res
+  next: unassignAllClaimedDenormalizedChats
+
+unassignAllClaimedDenormalizedChats:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_assignee_by_user_id"
+    body:
+      userId: ${idCode}
+      updated: ${unclaim_res.response.body[0].updated}
+  result: unclaim_denormalized_res
   next: setCustomerSupportAgentAway
 
 setCustomerSupportAgentAway:

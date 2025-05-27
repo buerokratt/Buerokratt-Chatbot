@@ -1,0 +1,13 @@
+# trigger all export tasks
+trigger_all_exports:
+  trigger: 0 0 * * 6 ?  # saturday 00:00
+  type: http
+  method: POST
+  url: http://data-export:8888/exports
+
+# trigger export of specified task (table)
+trigger_chat_exports:
+  trigger: 0 0 * * 6 ?  # saturday 00:00
+  type: http
+  method: POST
+  url: http://data-export:8888/exports/chat

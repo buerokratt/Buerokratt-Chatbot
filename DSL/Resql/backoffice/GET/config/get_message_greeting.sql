@@ -1,8 +1,26 @@
+/*
+declaration:
+  version: 0.1
+  description: "Fetch greeting message configuration in Estonian and its active status"
+  method: get
+  namespace: config
+  returns: json
+  allowlist:
+    query: []
+  response:
+    fields:
+      - field: est
+        type: string
+        description: "Estonian greeting message text (empty if null or deleted)"
+      - field: is_active
+        type: boolean
+        description: "Flag indicating if greeting message is active"
+*/
 WITH
     grouped_configurations AS (
-        SELECT MAX(id) AS max_id
+        SELECT DISTINCT ON (key) id, key, created
         FROM configuration
-        GROUP BY key
+        ORDER BY key, created DESC
     )
 
 SELECT
@@ -21,7 +39,7 @@ FROM (
     FROM configuration
     WHERE
         key = 'greeting_message_est'
-        AND id IN (SELECT max_id FROM grouped_configurations)
+        AND id IN (SELECT id FROM grouped_configurations)
     UNION ALL
     SELECT
         NULL,
@@ -39,7 +57,7 @@ FROM (
         FROM configuration
         WHERE
             key = 'is_greeting_message_active'
-            AND id IN (SELECT max_id FROM grouped_configurations)
+            AND id IN (SELECT id FROM grouped_configurations)
         UNION ALL
         SELECT
             NULL,

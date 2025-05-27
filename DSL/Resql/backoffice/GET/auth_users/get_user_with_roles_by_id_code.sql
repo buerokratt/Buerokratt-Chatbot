@@ -1,3 +1,49 @@
+/*
+declaration:
+  version: 0.1
+  description: "Fetch active user profile information with authorities by user ID code and optional CSA title visibility"
+  method: get
+  namespace: auth_users
+  returns: json
+  allowlist:
+    query:
+      - field: userIdCode
+        type: string
+        description: "User's unique identifier code"
+      - field: is_csa_title_visible
+        type: string
+        enum: ['true', 'false']
+        description: "Flag to control CSA title visibility"
+  response:
+    fields:
+      - field: login
+        type: string
+        description: "User's login identifier"
+      - field: first_name
+        type: string
+        description: "User's first name"
+      - field: last_name
+        type: string
+        description: "User's last name"
+      - field: id_code
+        type: string
+        description: "User's unique identifier"
+      - field: display_name
+        type: string
+        description: "User's display name"
+      - field: csa_title
+        type: string
+        description: "Customer Support Agent title (conditionally visible)"
+      - field: csa_email
+        type: string
+        description: "Customer Support Agent email address"
+      - field: authorities
+        type: array
+        items:
+          type: string
+          enum: ['backoffice-user', 'end-user', 'Bürokratt', 'buerokratt']
+        description: "User's authority/permission level"
+*/
 SELECT
     login,
     first_name,
@@ -10,10 +56,10 @@ SELECT
     END AS csa_title,
     csa_email,
     authority_name AS authorities
-FROM denorm_user_csa_authority_profile_settings
+FROM denormalized_user_data
 WHERE
     user_status <> 'deleted'
     AND id_code = :userIdCode
     AND ARRAY_LENGTH(authority_name, 1) > 0
-ORDER BY id DESC
+ORDER BY created DESC
 LIMIT 1;

@@ -58,6 +58,43 @@ insertMessage:
       forwardedToCsa: ${message.forwardedToCsa ?? ""}
       rating: ${message.rating ?? ""}
   result: insertMessageResult
+  next: updateDenormalizedChatMessage
+
+updateDenormalizedChatMessage:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_message_fields_only"
+    body:
+      chatId: ${message.chatBaseId}
+      lastMessageTimestamp: ${insertMessageResult.response.body[0].updated}
+      isSupportMessage: true
+      isCustomerMessage: false
+      authorTimestamp: ${authorTimestamp}
+      content: ${message.content ?? ""}
+      lastMessageAuthorId: ${message.authorId ?? ""}
+      lastMessageEvent: ${event}
+  result: updateDenormalizedChatRes
+  next: updateDenormalizedChatMetricsMessageFields
+
+updateDenormalizedChatMetricsMessageFields:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_messages_for_metrics_message_fields_only"
+    body:
+      chatBaseId: ${message.chatBaseId}
+      messageId: ${insertMessageResult.response.body[0].id}
+      messageBaseId: ${insertMessageResult.response.body[0].baseId}
+      content: ${message.content ?? ""}
+      lastMessageTimestamp: ${insertMessageResult.response.body[0].updated}
+      timestamp: ${insertMessageResult.response.body[0].updated}
+      messageCreated: ${message.created ?? ""}
+      messageUpdated: ${insertMessageResult.response.body[0].updated}
+      messageEvent: ${event}
+      messageAuthorRole: "backoffice-user"
+      messageAuthorId: ${message.authorId ?? ""}
+      messageForwardedFromCsa: ${message.forwardedFromCsa ?? ""}
+      messageForwardedToCsa: ${message.forwardedToCsa ?? ""}
+  result: updateDenormalizedChatMetricsMessageRes
   next: notify_chats
 
 notify_chats:

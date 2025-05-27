@@ -1,9 +1,101 @@
+/*
+declaration:
+  version: 0.1
+  description: "Insert updated organization schedule and messaging configuration only if values have changed from the most recent entries"
+  method: post
+  accepts: json
+  returns: json
+  namespace: config
+  allowlist:
+    body:
+      - field: organizationMondayWorkingTimeStartISO
+        type: string
+        description: "Start time on Monday in ISO format"
+      - field: organizationMondayWorkingTimeEndISO
+        type: string
+        description: "End time on Monday in ISO format"
+      - field: organizationTuesdayWorkingTimeStartISO
+        type: string
+        description: "Start time on Tuesday in ISO format"
+      - field: organizationTuesdayWorkingTimeEndISO
+        type: string
+        description: "End time on Tuesday in ISO format"
+      - field: organizationWednesdayWorkingTimeStartISO
+        type: string
+        description: "Start time on Wednesday in ISO format"
+      - field: organizationWednesdayWorkingTimeEndISO
+        type: string
+        description: "End time on Wednesday in ISO format"
+      - field: organizationThursdayWorkingTimeStartISO
+        type: string
+        description: "Start time on Thursday in ISO format"
+      - field: organizationThursdayWorkingTimeEndISO
+        type: string
+        description: "End time on Thursday in ISO format"
+      - field: organizationFridayWorkingTimeStartISO
+        type: string
+        description: "Start time on Friday in ISO format"
+      - field: organizationFridayWorkingTimeEndISO
+        type: string
+        description: "End time on Friday in ISO format"
+      - field: organizationSaturdayWorkingTimeStartISO
+        type: string
+        description: "Start time on Saturday in ISO format"
+      - field: organizationSaturdayWorkingTimeEndISO
+        type: string
+        description: "End time on Saturday in ISO format"
+      - field: organizationSundayWorkingTimeStartISO
+        type: string
+        description: "Start time on Sunday in ISO format"
+      - field: organizationSundayWorkingTimeEndISO
+        type: string
+        description: "End time on Sunday in ISO format"
+      - field: organizationAllWeekdaysTimeStartISO
+        type: string
+        description: "General start time for all weekdays"
+      - field: organizationAllWeekdaysTimeEndISO
+        type: string
+        description: "General end time for all weekdays"
+      - field: organizationWorkingTimeWeekdays
+        type: string
+        description: "List of weekdays the organization is open"
+      - field: organizationClosedOnWeekEnds
+        type: string
+        description: "Boolean indicating if weekends are closed"
+      - field: organizationTheSameOnAllWorkingDays
+        type: string
+        description: "Boolean for applying the same schedule to all weekdays"
+      - field: organizationWorkingTimeNationalHolidays
+        type: string
+        description: "Boolean or list for national holiday closures"
+      - field: organizationWorkingAllTime
+        type: string
+        description: "Boolean for 24/7 operation"
+      - field: organizationNoCsaAskForContacts
+        type: string
+        description: "Prompt message when no CSA is available, requesting contact info"
+      - field: organizationNoCsaAvailableMessage
+        type: string
+        description: "Message displayed when no CSA is available"
+      - field: organizationOutsideWorkingHoursAskForContacts
+        type: string
+        description: "Prompt for contact info outside working hours"
+      - field: organizationOutsideWorkingHoursMessage
+        type: string
+        description: "Message shown when outside working hours"
+      - field: organizationBotCannotAnswerAskToForwardToCSA
+        type: string
+        description: "Prompt when bot can't answer, suggesting forward to CSA"
+      - field: organizationBotCannotAnswerMessage
+        type: string
+        description: "Message when bot cannot provide an answer"
+*/
 WITH
     last_configuration AS (
         SELECT
             key,
             value
-        FROM configuration
+        FROM configuration AS c1
         WHERE key IN (
             'organizationMondayWorkingTimeStartISO',
             'organizationMondayWorkingTimeEndISO',
@@ -33,9 +125,9 @@ WITH
             'organizationBotCannotAnswerAskToForwardToCSA',
             'organizationBotCannotAnswerMessage'
         )
-        AND id IN (
-            SELECT MAX(id) FROM configuration
-            GROUP BY key
+        AND created = (
+            SELECT MAX(c2.created) FROM configuration AS c2
+            WHERE c1.key = c2.key
         )
         AND deleted = FALSE
     ),

@@ -140,6 +140,45 @@ postChat:
       receivedFrom: ${chat.receivedFrom}
       receivedFromName: ${chat.receivedFromName ?? ""}
   result: post_chat_res
+  next: updateDenormalizedChat
+
+updateDenormalizedChat:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_and_message"
+    body:
+      chatId: ${chat.id}
+      customerSupportId: ${chat.customerSupportId}
+      customerSupportDisplayName: ${chat.customerSupportDisplayName}
+      customerSupportFirstName: "null"
+      customerSupportLastName: "null"
+      csaTitle: ${chat.csaTitle ?? ""}
+      endUserId: ${chat.endUserId}
+      endUserFirstName: ${chat.endUserFirstName}
+      endUserLastName: ${chat.endUserLastName}
+      status: "ENDED"
+      endUserEmail: ${chat.endUserEmail}
+      endUserPhone: ${chat.endUserPhone}
+      endUserOs: ${chat.endUserOs}
+      endUserUrl: ${chat.endUserUrl}
+      feedbackRating: ${chat.feedbackRating ?? ""}
+      feedbackText: ${chat.feedbackText ?? ""}
+      externalId: ${chat.externalId}
+      created: ${chat.created}
+      ended: ${post_chat_res.response.body[0].updated}
+      forwardedTo: ${chat.forwardedTo}
+      forwardedToName: ${chat.forwardedToName}
+      receivedFrom: ${chat.receivedFrom}
+      receivedFromName: ${chat.receivedFromName}
+      updated: ${post_chat_res.response.body[0].updated}
+      lastMessageTimestamp: ${message_res.response.body[0].updated}
+      isSupportMessage: true
+      isCustomerMessage: false
+      authorTimestamp: ${authorTimestamp}
+      content: ""
+      lastMessageAuthorId: ""
+      lastMessageEvent: ${event}
+  result: updateDenormalizedChatRes
   next: return_result
 
 return_result:

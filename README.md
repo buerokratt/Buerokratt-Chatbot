@@ -151,3 +151,6 @@ The function returns value of argument `id_to_copy`. Type: `VARCHAR`.
 
 Current limitation:
 All arguments should be of type `VARCHAR`.
+
+### Tests
+To run tests use `perform-tests.sh` script. It will create test database, load fixtures and run tests

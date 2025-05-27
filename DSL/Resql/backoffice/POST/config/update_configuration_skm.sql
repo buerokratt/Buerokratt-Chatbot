@@ -1,9 +1,41 @@
+/*
+declaration:
+  version: 0.1
+  description: "Insert or update SKM configuration parameters only if values have changed from the latest non-deleted settings"
+  method: post
+  accepts: json
+  returns: json
+  namespace: config
+  allowlist:
+    body:
+      - field: skm_range
+        type: string
+        description: "Time range or context scope for SKM query"
+      - field: skm_documents
+        type: string
+        description: "Document sources or identifiers used in SKM context"
+      - field: skm_system_message
+        type: string
+        description: "System prompt or context message for SKM"
+      - field: skm_max_tokens
+        type: string
+        description: "Maximum token count for SKM response generation"
+      - field: skm_index_name
+        type: string
+        description: "Index name used for SKM search"
+      - field: skm_query_type
+        type: string
+        description: "Type of query (e.g., semantic, keyword) used in SKM"
+      - field: skm_semantic_configuration
+        type: string
+        description: "Additional configuration for semantic search behavior"
+*/
 WITH
     last_configuration AS (
         SELECT
             key,
             value
-        FROM configuration
+        FROM configuration AS c1
         WHERE key IN (
             'skm_range',
             'skm_documents',
@@ -13,9 +45,9 @@ WITH
             'skm_query_type',
             'skm_semantic_configuration'
         )
-        AND id IN (
-            SELECT MAX(id) FROM configuration
-            GROUP BY key
+        AND created = (
+            SELECT MAX(c2.created) FROM configuration AS c2
+            WHERE c1.key = c2.key
         )
         AND deleted = FALSE
     ),
