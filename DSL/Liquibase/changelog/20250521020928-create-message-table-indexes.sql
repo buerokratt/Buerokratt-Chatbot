@@ -18,3 +18,21 @@ CREATE INDEX idx_message_updated_asc ON message (updated ASC);
 
 -- Index for the frequently used query with combined filtering and ordering
 CREATE INDEX idx_message_chat_id_updated_created ON message (chat_base_id, updated, created ASC);
+
+-- Index for message queries filtering by author role and date with chat grouping
+CREATE INDEX idx_message_chat_author_created 
+ON message (chat_base_id, author_role, created DESC);
+
+-- Partial index for non-chatbot messages to optimize subquery performance
+CREATE INDEX idx_message_chat_non_chatbot_created 
+ON message (chat_base_id, created DESC) 
+WHERE author_role <> 'buerokratt';
+
+-- Index for message queries filtering by intent
+CREATE INDEX idx_message_created_chat_base_id_intent 
+ON message (created, chat_base_id, intent);
+
+
+-- Index for chatbot message analysis queries
+CREATE INDEX idx_message_chatbot_created_event 
+ON message (author_role, created, event);

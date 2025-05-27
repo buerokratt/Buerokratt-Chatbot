@@ -33,11 +33,119 @@ CREATE TABLE denormalized_chat_messages_for_metrics (
     timestamp TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 
--- Add indexes for better performance
-CREATE INDEX idx_denorm_chat_base_id ON denormalized_chat_messages_for_metrics(chat_base_id);
-CREATE INDEX idx_denorm_timestamp ON denormalized_chat_messages_for_metrics(timestamp);
-CREATE INDEX idx_denorm_message_id ON denormalized_chat_messages_for_metrics(message_id);
-CREATE INDEX idx_denorm_chat_id ON denormalized_chat_messages_for_metrics(chat_id);
+
+-- Index #1: Chat status + chat grouping + timestamp ordering
+CREATE INDEX idx_denorm_metrics_chat_status_base_id_timestamp 
+ON denormalized_chat_messages_for_metrics(chat_status, chat_base_id, timestamp DESC);
+
+-- Index #2: Chat base ID + message author role filtering
+CREATE INDEX idx_denorm_metrics_base_id_message_author_role 
+ON denormalized_chat_messages_for_metrics(chat_base_id, message_author_role);
+
+-- Index #3: Chat base ID + message event filtering
+CREATE INDEX idx_denorm_metrics_base_id_message_event 
+ON denormalized_chat_messages_for_metrics(chat_base_id, message_event);
+
+-- Index #4: Created date sorting and filtering
+CREATE INDEX idx_denorm_metrics_created 
+ON denormalized_chat_messages_for_metrics(created);
+
+-- Index #5: Chat base ID sorting and grouping
+CREATE INDEX idx_denorm_metrics_chat_base_id
+ON denormalized_chat_messages_for_metrics(chat_base_id);
+
+-- Index #6: Message event + author role composite filtering
+CREATE INDEX idx_denorm_metrics_message_event_author_role 
+ON denormalized_chat_messages_for_metrics(message_event, message_author_role);
+
+-- Index #7: Ended date sorting and filtering
+CREATE INDEX idx_denorm_metrics_ended
+ON denormalized_chat_messages_for_metrics(ended);
+
+-- Index #8: Ended date + chat status + chat grouping + timestamp ordering
+CREATE INDEX idx_denorm_metrics_ended_chat_status_base_id_timestamp 
+ON denormalized_chat_messages_for_metrics(ended, chat_status, chat_base_id, timestamp DESC);
+
+-- Index #9: Partial index for contact info fulfilled events
+CREATE INDEX idx_denorm_metrics_message_event_contact_info 
+ON denormalized_chat_messages_for_metrics(message_event) 
+WHERE (end_user_email IS NOT NULL AND end_user_email <> '') 
+  OR (end_user_phone IS NOT NULL AND end_user_phone <> '');
+
+-- Index #10: Created date + chat grouping + timestamp ordering
+CREATE INDEX idx_denorm_metrics_created_base_id_timestamp 
+ON denormalized_chat_messages_for_metrics(created, chat_base_id, timestamp DESC);
+
+-- Index #11: Feedback rating sorting and filtering
+CREATE INDEX idx_denorm_metrics_feedback_rating
+ON denormalized_chat_messages_for_metrics(feedback_rating);
+
+-- Index #12: Message author role + created date composite filtering
+CREATE INDEX idx_denorm_metrics_message_author_role_created 
+ON denormalized_chat_messages_for_metrics(message_author_role, message_created);
+
+-- Index #13: Chat base ID + message author ID filtering and grouping
+CREATE INDEX idx_denorm_metrics_base_id_message_author_id 
+ON denormalized_chat_messages_for_metrics(chat_base_id, message_author_id);
+
+-- =============================================================================
+-- UNUSED INDEXES - According to SCHEMA-004, these indexes were initially added
+-- but after running EXPLAIN ANALYZE on all production queries, they showed 
+-- 0 scans consistently and are not being utilized by the query planner.
+-- They are commented out to reduce storage overhead and improve write performance.
+-- =============================================================================
+
+-- -- Index: Message ID + timestamp for distinct operations
+-- CREATE INDEX idx_denorm_metrics_message_id_timestamp 
+-- ON denormalized_chat_messages_for_metrics(message_id, timestamp DESC);
+
+-- -- Index: Chat base ID + message ID + timestamp for distinct operations
+-- CREATE INDEX idx_denorm_metrics_base_id_message_id_timestamp 
+-- ON denormalized_chat_messages_for_metrics(chat_base_id, message_id, timestamp DESC);
+
+-- -- Index: Created date + chat status composite filtering
+-- CREATE INDEX idx_denorm_metrics_created_chat_status 
+-- ON denormalized_chat_messages_for_metrics(created, chat_status);
+
+-- -- Index: Chat base ID + chat status filtering
+-- CREATE INDEX idx_denorm_metrics_base_id_chat_status 
+-- ON denormalized_chat_messages_for_metrics(chat_base_id, chat_status);
+
+-- -- Index: Chat base ID + feedback rating + timestamp for distinct operations
+-- CREATE INDEX idx_denorm_metrics_base_id_feedback_rating_timestamp
+-- ON denormalized_chat_messages_for_metrics(chat_base_id, feedback_rating, timestamp DESC);
+
+-- -- Index: Chat base ID + customer support ID filtering
+-- CREATE INDEX idx_denorm_metrics_base_id_customer_support_id 
+-- ON denormalized_chat_messages_for_metrics(chat_base_id, customer_support_id);
+
+-- -- Index: Chat base ID + message created date filtering
+-- CREATE INDEX idx_denorm_metrics_base_id_message_created 
+-- ON denormalized_chat_messages_for_metrics(chat_base_id, message_created);
+
+-- -- Index: Chat base ID + message author ID + timestamp for distinct operations
+-- CREATE INDEX idx_denorm_metrics_base_id_author_id_timestamp 
+-- ON denormalized_chat_messages_for_metrics(chat_base_id, message_author_id, timestamp DESC);
+
+-- -- Index: Feedback text sorting and filtering
+-- CREATE INDEX idx_denorm_metrics_feedback_text
+-- ON denormalized_chat_messages_for_metrics(feedback_text);
+
+-- -- Index: Chat base ID + message base ID filtering
+-- CREATE INDEX idx_denorm_metrics_base_id_message_base_id 
+-- ON denormalized_chat_messages_for_metrics(chat_base_id, message_base_id);
+
+-- -- Index: Received from filtering
+-- CREATE INDEX idx_denorm_metrics_received_from 
+-- ON denormalized_chat_messages_for_metrics(received_from);
+
+-- -- Index: End user email filtering
+-- CREATE INDEX idx_denorm_metrics_end_user_email 
+-- ON denormalized_chat_messages_for_metrics(end_user_email);
+
+-- -- Index: End user phone filtering
+-- CREATE INDEX idx_denorm_metrics_end_user_phone 
+-- ON denormalized_chat_messages_for_metrics(end_user_phone);
 
 -- One-time population script for the denormalized table
 INSERT INTO denormalized_chat_messages_for_metrics (
