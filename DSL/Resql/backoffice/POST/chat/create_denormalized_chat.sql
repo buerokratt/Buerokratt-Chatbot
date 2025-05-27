@@ -57,7 +57,7 @@ VALUES (
     CASE WHEN :endUserPhone = 'null' THEN NULL ELSE :endUserPhone END,
     CASE WHEN :endUserOs = 'null' THEN NULL ELSE :endUserOs END,
     CASE WHEN :endUserUrl = 'null' THEN NULL ELSE :endUserUrl END,
-    CASE WHEN :status = 'null' THEN NULL ELSE :status END,
+    CASE WHEN :status = 'null' THEN NULL ELSE :status::chat_status_type END,
     CASE 
         WHEN :created::TEXT = 'CURRENT_TIMESTAMP' THEN now()
         ELSE COALESCE(:created::TIMESTAMP WITH TIME ZONE, now())
@@ -95,8 +95,8 @@ VALUES (
     CASE WHEN :lastMessage IN ('null', '', 'message-read') THEN NULL ELSE :lastMessage END,
     CASE WHEN :lastMessageIncludingEmptyContent = 'null' THEN NULL ELSE :lastMessageIncludingEmptyContent END,
     CASE WHEN :contactsMessage = 'null' THEN NULL ELSE :contactsMessage END,
-    CASE WHEN :lastMessageEvent = 'null' THEN NULL ELSE :lastMessageEvent END,
-    CASE WHEN :lastMessageEventWithContent = 'null' THEN NULL ELSE :lastMessageEventWithContent END,
+    CASE WHEN :lastMessageEvent = 'null' THEN NULL ELSE LOWER(:lastMessageEvent)::event_type END,
+    CASE WHEN :lastMessageEventWithContent = 'null' THEN NULL ELSE LOWER(:lastMessageEventWithContent)::event_type END,
     CASE WHEN (:chatDurationInSeconds::TEXT) = 'null' THEN NULL ELSE NULLIF(:chatDurationInSeconds::TEXT, '')::NUMERIC END,
     NULLIF(:customerMessagesCount::TEXT, '')::INTEGER,
     CASE WHEN :labels = 'null' THEN NULL ELSE :labels::VARCHAR[] END,
@@ -110,7 +110,7 @@ VALUES (
         THEN :updated::TIMESTAMP WITH TIME ZONE
         ELSE null
     END)::TIMESTAMP WITH TIME ZONE,
-    CASE WHEN :lastNonEmptyMessageEvent = 'null' THEN NULL ELSE :lastNonEmptyMessageEvent END,
+    CASE WHEN :lastNonEmptyMessageEvent = 'null' THEN NULL ELSE LOWER(:lastNonEmptyMessageEvent)::event_type END,
     ARRAY[:allMessages]::TEXT[],
     (
         CASE

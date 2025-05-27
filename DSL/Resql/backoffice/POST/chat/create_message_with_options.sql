@@ -19,11 +19,11 @@ VALUES (
         ELSE (GEN_RANDOM_UUID()::VARCHAR)
     END),
     :content,
-    :event,
+    LOWER(:event)::event_type,
     :authorId,
     :authorFirstName,
     :authorLastName,
-    :authorRole,
+    :authorRole::author_role_type,
     (NULLIF(:rating, '')::INTEGER),
     :forwardedByUser,
     :forwardedFromCsa,

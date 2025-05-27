@@ -46,7 +46,7 @@ WITH
             csa_title,
             csa_email,
             department,
-            ARRAY[]::VARCHAR[],                  -- Empty authority_name array
+            ARRAY[]::authority_role_type[],                  -- Empty authority_name array
             'offline',                           -- Set status to 'offline'
             status_comment,
             csa_created,

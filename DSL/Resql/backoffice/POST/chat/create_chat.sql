@@ -23,7 +23,7 @@ INSERT INTO chat (
 )
 VALUES (
     :id, :customerSupportId, :customerSupportDisplayName, :endUserId, :endUserFirstName,
-    :endUserLastName, :status, 
+    :endUserLastName, :status::chat_status_type, 
     CASE 
         WHEN :created::TEXT = 'CURRENT_TIMESTAMP' THEN now()
         ELSE COALESCE(:created::TIMESTAMP WITH TIME ZONE, now())

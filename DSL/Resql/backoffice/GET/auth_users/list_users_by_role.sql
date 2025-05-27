@@ -24,12 +24,12 @@ WHERE
         FROM denormalized_user_data AS d_2
         WHERE d_1.id_code = d_2.id_code
     )
-    AND authority_name && 
+    AND (authority_name)::TEXT[] && 
         (SELECT array_agg(trim(e)) FROM 
-          unnest(string_to_array(
+            unnest(string_to_array(
             btrim(:roles, '[]'), 
             ','
-          )) AS e)::CHARACTER VARYING ARRAY
+            )) AS e)::TEXT ARRAY
     AND (
         :search_display_name_and_csa_title IS NULL
         OR display_name ILIKE '%' || :search_display_name_and_csa_title || '%'
@@ -54,7 +54,7 @@ WHERE
     AND (:search_authority IS NULL OR EXISTS (
         SELECT 1
         FROM UNNEST(authority_name) AS authority
-        WHERE authority ILIKE '%' || :search_authority || '%'
+        WHERE authority::TEXT ILIKE '%' || :search_authority || '%'
     ))
     AND (
         :search_department IS NULL

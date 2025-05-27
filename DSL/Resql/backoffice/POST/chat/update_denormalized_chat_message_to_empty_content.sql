@@ -4,7 +4,7 @@ SELECT copy_row_with_modifications(
     'id', '::UUID', id::VARCHAR,                   -- ID column handling
     ARRAY[                                            -- Direct array of modifications
         'last_message_including_empty_content', '', '',
-        'last_message_event_with_content', '', NULL,
+        'last_message_event_with_content', '::event_type', NULL,
         'contacts_message', '', 
             CASE
                 WHEN contacts_message IS NOT NULL THEN ''

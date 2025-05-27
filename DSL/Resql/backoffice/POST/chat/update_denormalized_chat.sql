@@ -29,7 +29,7 @@ SELECT copy_row_with_modifications(
                     THEN NULL
                 ELSE :customerSupportLastName
             END,
-        'status', '', :status,
+        'status', '::chat_status_type', :status,
         'ended', '::TIMESTAMP WITH TIME ZONE', 
             CASE
                 WHEN :ended::TEXT = 'CURRENT_TIMESTAMP' THEN NOW()::VARCHAR

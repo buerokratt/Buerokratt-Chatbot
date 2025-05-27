@@ -9,7 +9,7 @@ SELECT copy_row_with_modifications(
         'csa_email', '', :csaEmail,
         'department', '', :department,
         'user_status', '::user_status', :userStatus,
-        'authority_name', '::VARCHAR[]', (ARRAY[:roles])::VARCHAR,
+        'authority_name', '::authority_role_type[]', (ARRAY[:roles])::VARCHAR,
         'created', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR
     ]::VARCHAR[]
 ) FROM denormalized_user_data

@@ -34,7 +34,7 @@ VALUES (
     :endUserId,
     :endUserFirstName,
     :endUserLastName,
-    :status,
+    :status::chat_status_type,
     CASE 
         WHEN :created::TEXT = 'CURRENT_TIMESTAMP' THEN now()
         ELSE COALESCE(:created::TIMESTAMP WITH TIME ZONE, now())
