@@ -52,7 +52,7 @@ FROM (
         CASE WHEN last_message_event IS NULL OR last_message_event = '' THEN NULL 
         ELSE last_message_event END AS last_message_event,
         created,
-        ROW_NUMBER() OVER (PARTITION BY chat_id ORDER BY id DESC) as rn
+        ROW_NUMBER() OVER (PARTITION BY chat_id ORDER BY denormalized_record_created DESC) as rn
     FROM denormalized_chat
 ) AS subquery
 WHERE rn = 1

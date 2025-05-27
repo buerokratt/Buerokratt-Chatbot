@@ -114,6 +114,22 @@ insertMessage:
       forwardedFromCsa: ""
       forwardedToCsa: ""
   result: insertMessageResult
+  next: updateDenormalizedChatMessage
+
+updateDenormalizedChatMessage:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_message_fields_only"
+    body:
+      chatId: ${chatId}
+      lastMessageTimestamp: ${insertMessageResult.response.body[0].updated}
+      isSupportMessage: ${authorRole == 'backoffice-user'}
+      isCustomerMessage: ${authorRole == 'end-user'}
+      authorTimestamp: ${authorTimestamp}
+      content: ${content}
+      lastMessageAuthorId: ""
+      lastMessageEvent: ${event ?? ""}
+  result: updateDenormalizedChatRes
   next: check_skip_bot
 
 check_skip_bot:

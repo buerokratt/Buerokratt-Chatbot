@@ -140,7 +140,7 @@ insertChat:
       forwardedToName: ""
       receivedFrom: ""
       receivedFromName: ""
-  result: insertMessageResult
+  result: insertChatResult
   next: postGreetingMessage
 
 postGreetingMessage:
@@ -149,8 +149,7 @@ postGreetingMessage:
     url: "[#CHATBOT_RUUTER_PUBLIC]/chats/messages/greeting"
     body:
       chatId: ${chatUuid}
-      authorTimestamp: ${authorTimestamp}
-  result: greeting_result
+  result: greetingMessageResponse
   next: postClientMessage
 
 postClientMessage:
@@ -162,7 +161,7 @@ postClientMessage:
       messageId: ${messageUuid}
       content: ${content}
       event: ""
-      authorTimestamp: "CURRENT_TIMESTAMP"
+      authorTimestamp: ${authorTimestamp}
       authorId: ${endUserId}
       authorFirstName: ""
       authorRole: ${authorRole}
@@ -173,6 +172,47 @@ postClientMessage:
       forwardedFromCsa: ${forwardedFromCsa}
       forwardedToCsa: ${forwardedToCsa}
   result: insertMessageResult
+  next: insertDenormalizedChat
+
+insertDenormalizedChat:
+  template: "[#CHATBOT_PROJECT_LAYER]/chats/create-denormalized-chat"
+  requestType: templates
+  body:
+    chatId: ${chatUuid}
+    endUserId: ${endUserId}
+    endUserFirstName: ""
+    endUserLastName: ""
+    status: "OPEN"
+    customerSupportId: ${insertChatResult.response.body[0].customerSupportId}
+    customerSupportDisplayName: ${insertChatResult.response.body[0].customerSupportDisplayName}
+    csaTitle: ${insertChatResult.response.body[0].csaTitle}
+    created: ${insertChatResult.response.body[0].updated}
+    updated: ${insertChatResult.response.body[0].updated}
+    ended: ""
+    feedbackRating: ""
+    feedbackText: ""
+    endUserEmail: ${endUserEmail}
+    endUserPhone: ${endUserPhone}
+    endUserOs: ${endUserOs}
+    endUserUrl: ${endUserUrl}
+    externalId: ""
+    forwardedTo: ""
+    forwardedToName: ""
+    receivedFrom: ""
+    receivedFromName: ""
+    firstMessageTimestamp: ${greetingMessageResponse.response.body.response.updated}
+    lastMessageTimestamp: ${insertMessageResult.response.body[0].updated}
+    firstMessage: ${greetingMessageResponse.response.body.response.greetingMessage}
+    lastMessage: ${content}
+    lastMessageEvent: ""
+    lastMessageIncludingEmptyContent: ${content}
+    lastMessageEventWithContent: "greeting"
+    lastNonEmptyMessageEvent: "greeting"
+    allMessages: ${[greetingMessageResponse.response.body.response.greetingMessage , content]}
+    customerMessagesCount: "${authorRole == 'end-user' ? 1 : 0}"
+    firstSupportTimestamp: "${authorRole == 'backoffice-user' ? authorTimestamp : 'null'}"
+    chatDurationInSeconds: "${authorRole == 'backoffice-user' ? 0 : 'null'}"
+  result: denormalized-chat-result
   next: postMessageToBot
 
 postMessageToBot:

@@ -128,6 +128,37 @@ redirectChat:
       receivedFromName: ${activeChat.receivedFromName}
   result: redirectChatRes
 
+updateDenormalizedChat:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat"
+    body:
+      chatId: ${chatId}
+      customerSupportId: ${activeChat.customerSupportId}
+      customerSupportDisplayName: ${activeChat.customerSupportDisplayName}
+      customerSupportFirstName: "null"
+      customerSupportLastName: "null"
+      csaTitle: ${activeChat.csaTitle}
+      endUserId: ${activeChat.endUserId}
+      endUserFirstName: ${activeChat.endUserFirstName}
+      endUserLastName: ${activeChat.endUserLastName}
+      status: "REDIRECTED"
+      endUserEmail: ${activeChat.endUserEmail}
+      endUserPhone: ${activeChat.endUserPhone}
+      endUserOs: ${activeChat.endUserOs}
+      endUserUrl: ${activeChat.endUserUrl}
+      feedbackText: ""
+      feedbackRating: ""
+      externalId: ${forwardChatRes.response.body.data.format_forward_destination_response.generatedChatId}
+      created: ${activeChat.created}
+      ended: ${redirectChatRes.response.body[0].updated}
+      forwardedTo: ${activeChat.forwardedTo}
+      forwardedToName: ${activeChat.forwardedToName}
+      receivedFrom: ${activeChat.receivedFrom}
+      receivedFromName: ${activeChat.receivedFromName}
+      updated: ${redirectChatRes.response.body[0].updated}
+  result: updateDenormalizedChatRes
+
 getAvailableCSACount:
   call: http.get
   args:

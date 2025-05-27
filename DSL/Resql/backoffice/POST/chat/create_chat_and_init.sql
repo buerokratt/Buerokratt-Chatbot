@@ -56,5 +56,7 @@ VALUES (
     :forwardedToName,
     :receivedFrom,
     :receivedFromName,
-    ''
+    CASE
+        WHEN :is_bot_active = 'true' THEN ''
+    ELSE ''
 );

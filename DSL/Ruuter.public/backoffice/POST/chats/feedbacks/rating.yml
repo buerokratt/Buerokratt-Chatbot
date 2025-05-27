@@ -34,6 +34,17 @@ addFeedbackRating:
       id: ${chatId}
       feedback_rating: ${rating}
   result: res
+  next: addDenormalizedChatFeedbackRating
+
+addDenormalizedChatFeedbackRating:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_feedback_rating"
+    body:
+      chatId: ${chatId}
+      feedback_rating: ${rating}
+      updated: ${res.response.body[0].updated}
+  result: denormalized_res
   next: return_result
 
 return_result:

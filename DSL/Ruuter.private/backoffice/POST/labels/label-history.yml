@@ -29,6 +29,16 @@ setChatLabels:
       chatId: ${chatId}
   result: setLabelsResult
 
+insertDenormalizedLabels:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_labels"
+    body:
+      chatId: ${chatId}
+      labels: ${labels}
+      updated: ${setLabelsResult.response.body[0].updated}
+  result: insertDenormalizedLabelsResult
+
 return_result:
   return: "success"
   next: end

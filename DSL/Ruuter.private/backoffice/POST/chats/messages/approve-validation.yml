@@ -128,6 +128,45 @@ insertMessage:
       forwardedToCsa: ${message.forwardedToCsa ?? ""}
       rating: ${message.rating ?? ""}
   result: insert_message_res
+  next: updateDenormalizedChat
+
+updateDenormalizedChat:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_and_message"
+    body:
+      chatId: ${chatId}
+      customerSupportId: ${botName}
+      customerSupportDisplayName: "Bürokratt"
+      customerSupportFirstName: ""
+      customerSupportLastName: ""
+      csaTitle: ${chat.csaTitle}
+      endUserId: ${chat.endUserId}
+      endUserFirstName: ${chat.endUserFirstName}
+      endUserLastName: ${chat.endUserLastName}
+      status: "OPEN"
+      endUserEmail: ${chat.endUserEmail}
+      endUserPhone: ${chat.endUserPhone}
+      endUserOs: ${chat.endUserOs}
+      endUserUrl: ${chat.endUserUrl}
+      feedbackText: ""
+      feedbackRating: ""
+      externalId: ""
+      created: ${chat.created}
+      ended: ""
+      forwardedTo: ${chat.forwardedTo}
+      forwardedToName: ${chat.forwardedToName}
+      receivedFrom: ${chat.receivedFrom}
+      receivedFromName: ${chat.receivedFromName}
+      updated: ${change_status_res.response.body[0].updated}
+      lastMessageTimestamp: ${insert_message_res.response.body[0].updated}
+      isSupportMessage: ${message.authorRole == "backoffice-user"}
+      isCustomerMessage: ${message.authorRole == "end-user"}
+      authorTimestamp: ${authorTimestamp}
+      content: ""
+      lastMessageAuthorId: ${message.authorId ?? ""}
+      lastMessageEvent: ${event}
+  result: updateDenormalizedChatRes
   next: notify_chats
 
 notify_chats:

@@ -38,4 +38,4 @@ VALUES (
     :forwardedByUser,
     :forwardedFromCsa,
     :forwardedToCsa
-);
+) RETURNING updated::TEXT;

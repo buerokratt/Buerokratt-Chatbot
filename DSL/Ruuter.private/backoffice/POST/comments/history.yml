@@ -34,6 +34,17 @@ setChatComment:
       authorDisplayName: ${authorDisplayName}
   result: res
 
+updateDenormalizedChat:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_comment_fields_only"
+    body:
+      comment: ${comment}
+      chatId: ${chatId}
+      commentAuthor: ${authorDisplayName}
+      commentAddedDate: ${res.response.body[0].created}
+  result: denormalized_res
+
 return_result:
   return: ${res.response.body}
   next: end

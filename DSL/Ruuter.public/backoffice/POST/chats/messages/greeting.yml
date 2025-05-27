@@ -61,8 +61,17 @@ insertGreetingMessage:
       forwardedFromCsa: ""
       forwardedToCsa: ""
   result: insertMessageResult
+  next: assignResult
+
+assignResult:
+  assign:
+    data:
+      {
+        "updated": "${insertMessageResult.response.body[0].updated}",
+        "greetingMessage": "${greetingMessage}",
+      }
   next: returnSuccess
 
 returnSuccess:
-  return: "Greeting Message Sent Successfully"
+  return: ${data}
   next: end
