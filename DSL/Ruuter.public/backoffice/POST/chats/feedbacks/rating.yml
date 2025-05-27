@@ -45,6 +45,29 @@ addDenormalizedChatFeedbackRating:
       feedback_rating: ${rating}
       updated: ${res.response.body[0].updated}
   result: denormalized_res
+  next: updateDenormalizedChatMetricsChatFields
+
+updateDenormalizedChatMetricsChatFields:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_messages_for_metrics_chat_fields_only"
+    body:
+      chatBaseId: ${chatId}
+      chatId: ${res.response.body[0].id}
+      status: "null"
+      endUserEmail: "null"
+      endUserPhone: "null"
+      feedbackText: "null"
+      feedbackRating: ${rating}
+      customerSupportDisplayName: "null"
+      customerSupportId: "null"
+      customerSupportFirstName: "null"
+      customerSupportLastName: "null"
+      externalId: "null"
+      receivedFrom: "null"
+      updated: ${res.response.body[0].updated}
+      ended: "null"
+  result: updateDenormalizedChatMetricsRes
   next: return_result
 
 return_result:

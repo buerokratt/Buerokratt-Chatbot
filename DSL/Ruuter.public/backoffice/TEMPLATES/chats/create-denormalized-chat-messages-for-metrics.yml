@@ -1,0 +1,39 @@
+create_denormalized_chat_messages_for_metrics:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/create_denormalized_chat_messages_for_metrics"
+    headers:
+      content-type: application/json
+    body:
+      chatId: ${incoming.body.chatId}
+      chatBaseId: ${incoming.body.chatBaseId}
+      messageId: ${incoming.body.messageId ?? "null"}
+      messageBaseId: ${incoming.body.messageBaseId ?? "null"}
+      status: ${incoming.body.status ?? "null"}
+      endUserEmail: ${incoming.body.endUserEmail ?? "null"}
+      endUserPhone: ${incoming.body.endUserPhone ?? "null"}
+      feedbackRating: ${incoming.body.feedbackRating ?? "null"}
+      feedbackText: ${incoming.body.feedbackText ?? "null"}
+      customerSupportDisplayName: ${incoming.body.customerSupportDisplayName ?? "null"}
+      customerSupportId: ${incoming.body.customerSupportId ?? "null"}
+      customerSupportFirstName: ${incoming.body.customerSupportFirstName ?? "null"}
+      customerSupportLastName: ${incoming.body.customerSupportLastName ?? "null"}
+      created: ${incoming.body.created || "CURRENT_TIMESTAMP"}
+      updated: ${incoming.body.updated || "CURRENT_TIMESTAMP"}
+      ended: ${incoming.body.ended ?? "null"}
+      firstMessageTimestamp: ${incoming.body.firstMessageTimestamp ?? "null"}
+      lastMessageTimestamp: ${incoming.body.lastMessageTimestamp ?? "null"}
+      messageCreated: ${incoming.body.messageCreated ?? "null"}
+      messageUpdated: ${incoming.body.messageUpdated ?? "null"}
+      messageEvent: ${incoming.body.messageEvent ?? "null"}
+      messageAuthorRole: ${incoming.body.messageAuthorRole ?? "null"}
+      messageAuthorId: ${incoming.body.messageAuthorId ?? "null"}
+      messageForwardedFromCsa: ${incoming.body.messageForwardedFromCsa ?? "null"}
+      messageForwardedToCsa: ${incoming.body.messageForwardedToCsa ?? "null"}
+      externalId: ${incoming.body.externalId ?? "null"}
+      receivedFrom: ${incoming.body.receivedFrom ?? "null"}
+  result: denormalizedChatMessagesResult
+
+return_result:
+  return: ${denormalizedChatMessagesResult.response.body}
+  next: end

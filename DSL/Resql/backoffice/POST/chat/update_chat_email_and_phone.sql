@@ -1,4 +1,4 @@
-SELECT copy_row_with_modifications(
+SELECT (copy_row_with_modifications(
     'chat',
     'id', '::UUID', id::VARCHAR,
     ARRAY[
@@ -6,7 +6,7 @@ SELECT copy_row_with_modifications(
         'end_user_phone', '', :endUserPhone,
         'updated', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR
     ]::VARCHAR[]
-), NOW()::TEXT as updated FROM chat
+)) AS id, NOW()::TEXT as updated FROM chat
 WHERE base_id = :chatId
 ORDER BY id DESC
 LIMIT 1;
