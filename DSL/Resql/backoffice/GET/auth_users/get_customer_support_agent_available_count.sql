@@ -1,8 +1,8 @@
 SELECT COUNT(id) AS count
-FROM denorm_user_csa_authority_profile_settings
+FROM denormalized_user_data AS d_1
 WHERE
     (status = 'online' OR status = 'idle')
-    AND id IN (
-        SELECT MAX(d.id) FROM denorm_user_csa_authority_profile_settings AS d
-        GROUP BY d.id_code
+    AND created = (
+        SELECT MAX(d_1.created) FROM denormalized_user_data AS d_2
+        where d_1.id_code = d_2.id_code
     );

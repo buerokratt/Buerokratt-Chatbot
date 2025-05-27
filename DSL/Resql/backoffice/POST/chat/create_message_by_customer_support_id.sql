@@ -11,20 +11,21 @@ SELECT copy_row_with_modifications(
         'updated', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR
     ]::VARCHAR[]
 )::INTEGER as id, chat_base_id, base_id
-FROM message
+FROM message AS m1
 WHERE
     chat_base_id IN (
         SELECT base_id
-        FROM chat
+        FROM chat AS c1
         WHERE
-            id IN (
-                SELECT MAX(id) FROM chat
-                GROUP BY base_id
+            updated = (
+                SELECT MAX(c2.updated) FROM chat c2
+                WHERE c2.base_id = c1.base_id
             )
             AND customer_support_id = :customerSupportId
             AND ended IS null
     )
-    AND id IN (
-        SELECT MAX(id) FROM message
-        GROUP BY chat_base_id
-    )
+    AND id = (
+        SELECT id FROM message AS m2
+        WHERE m1.chat_base_id = m2.chat_base_id
+        ORDER BY updated DESC LIMIT 1
+    );

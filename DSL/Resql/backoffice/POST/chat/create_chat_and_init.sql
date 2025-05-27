@@ -59,4 +59,5 @@ VALUES (
     CASE
         WHEN :is_bot_active = 'true' THEN ''
     ELSE ''
-);
+)
+RETURNING customer_support_id, customer_support_display_name, csa_title, updated::TEXT;;

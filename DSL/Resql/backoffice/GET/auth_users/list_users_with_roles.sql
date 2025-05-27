@@ -10,11 +10,11 @@ SELECT
     END AS csa_title,
     csa_email,
     authority_name AS authorities
-FROM denorm_user_csa_authority_profile_settings
+FROM denormalized_user_data AS d_1
 WHERE
     user_status <> 'deleted'
     AND ARRAY_LENGTH(authority_name, 1) > 0
-    AND id IN (
-        SELECT MAX(id) FROM denorm_user_csa_authority_profile_settings
-        GROUP BY id_code
+    AND created = (
+        SELECT MAX(d_2.created) FROM denormalized_user_data AS d_2
+        WHERE d_1.id_code = d_2.id_code
     );

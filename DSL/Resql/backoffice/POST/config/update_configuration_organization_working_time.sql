@@ -3,7 +3,7 @@ WITH
         SELECT
             key,
             value
-        FROM configuration
+        FROM configuration AS c1
         WHERE key IN (
             'organizationMondayWorkingTimeStartISO',
             'organizationMondayWorkingTimeEndISO',
@@ -33,9 +33,9 @@ WITH
             'organizationBotCannotAnswerAskToForwardToCSA',
             'organizationBotCannotAnswerMessage'
         )
-        AND id IN (
-            SELECT MAX(id) FROM configuration
-            GROUP BY key
+        AND created = (
+            SELECT MAX(c2.created) FROM configuration AS c2
+            WHERE c1.key = c2.key
         )
         AND deleted = FALSE
     ),

@@ -10,10 +10,10 @@ SELECT
     END AS csa_title,
     csa_email,
     authority_name AS authorities
-FROM denorm_user_csa_authority_profile_settings
+FROM denormalized_user_data
 WHERE
     user_status <> 'deleted'
     AND id_code = :userIdCode
     AND ARRAY_LENGTH(authority_name, 1) > 0
-ORDER BY id DESC
+ORDER BY created DESC
 LIMIT 1;

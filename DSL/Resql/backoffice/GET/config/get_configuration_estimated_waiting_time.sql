@@ -1,8 +1,8 @@
 WITH
     grouped_configurations AS (
-        SELECT MAX(id) AS max_id
+        SELECT DISTINCT ON (key) id, key, created
         FROM configuration
-        GROUP BY key
+        ORDER BY key, created DESC
     )
 
 SELECT
@@ -23,7 +23,7 @@ FROM (
     FROM configuration
     WHERE
         key = 'estimated_waiting_time'
-        AND id IN (SELECT max_id FROM grouped_configurations)
+        AND id IN (SELECT id FROM grouped_configurations)
     UNION ALL
     SELECT
         NULL,
@@ -41,7 +41,7 @@ FROM (
         FROM configuration
         WHERE
             key = 'is_estimated_waiting_time_active'
-            AND id IN (SELECT max_id FROM grouped_configurations)
+            AND id IN (SELECT id FROM grouped_configurations)
         UNION ALL
         SELECT
             NULL,

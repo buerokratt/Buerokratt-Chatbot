@@ -1,5 +1,5 @@
 SELECT copy_row_with_modifications(
-    'denorm_user_csa_authority_profile_settings',
+    'denormalized_user_data',
     'id', '::INTEGER', id::VARCHAR,
     ARRAY[
          'first_name', '', :firstName,
@@ -12,7 +12,7 @@ SELECT copy_row_with_modifications(
         'authority_name', '::VARCHAR[]', (ARRAY[:roles])::VARCHAR,
         'created', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR
     ]::VARCHAR[]
-) FROM denorm_user_csa_authority_profile_settings
+) FROM denormalized_user_data
 WHERE id_code = :userIdCode
-ORDER BY id DESC
+ORDER BY created DESC
 LIMIT 1;

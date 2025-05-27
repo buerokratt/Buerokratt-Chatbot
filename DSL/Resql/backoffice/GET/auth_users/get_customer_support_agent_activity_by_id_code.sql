@@ -2,8 +2,8 @@ SELECT
     id_code,
     active,
     status
-FROM denorm_user_csa_authority_profile_settings
+FROM denormalized_user_data
 WHERE
     id_code = :customerSupportId
-ORDER BY id DESC
+ORDER BY created DESC
 LIMIT 1;

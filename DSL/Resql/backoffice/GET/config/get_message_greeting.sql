@@ -1,8 +1,8 @@
 WITH
     grouped_configurations AS (
-        SELECT MAX(id) AS max_id
+        SELECT DISTINCT ON (key) id, key, created
         FROM configuration
-        GROUP BY key
+        ORDER BY key, created DESC
     )
 
 SELECT
@@ -21,7 +21,7 @@ FROM (
     FROM configuration
     WHERE
         key = 'greeting_message_est'
-        AND id IN (SELECT max_id FROM grouped_configurations)
+        AND id IN (SELECT id FROM grouped_configurations)
     UNION ALL
     SELECT
         NULL,
@@ -39,7 +39,7 @@ FROM (
         FROM configuration
         WHERE
             key = 'is_greeting_message_active'
-            AND id IN (SELECT max_id FROM grouped_configurations)
+            AND id IN (SELECT id FROM grouped_configurations)
         UNION ALL
         SELECT
             NULL,

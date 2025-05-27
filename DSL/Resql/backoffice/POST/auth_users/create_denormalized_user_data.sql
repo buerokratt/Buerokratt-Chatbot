@@ -1,4 +1,4 @@
-INSERT INTO denorm_user_csa_authority_profile_settings (
+INSERT INTO denormalized_user_data (
     login,
     id_code,
     first_name,

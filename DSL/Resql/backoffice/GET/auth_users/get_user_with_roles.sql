@@ -10,8 +10,8 @@ SELECT
     END AS csa_title,
     csa_email,
     authority_name AS authorities
-FROM denorm_user_csa_authority_profile_settings
+FROM denormalized_user_data
 WHERE
-    login = :login
-ORDER BY id DESC
+    id_code = :login
+ORDER BY created DESC
 LIMIT 1;

@@ -78,7 +78,7 @@ addUser:
 addRoles:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/auth_users/create_denorm_user_csa_authority_profile_settings"
+    url: "[#CHATBOT_RESQL]/auth_users/create_denormalized_user_data"
     body:
       userIdCode: ${userIdCode}
       roles: ${roles}
