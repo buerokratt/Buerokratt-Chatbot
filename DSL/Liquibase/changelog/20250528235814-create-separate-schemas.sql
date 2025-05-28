@@ -8,6 +8,7 @@ CREATE SCHEMA IF NOT EXISTS config;
 CREATE SCHEMA IF NOT EXISTS org;
 CREATE SCHEMA IF NOT EXISTS security;
 CREATE SCHEMA IF NOT EXISTS analytics;
+CREATE SCHEMA IF NOT EXISTS service_management;
 
 -- 2. Move tables to their respective schemas
 -- auth_users schema
