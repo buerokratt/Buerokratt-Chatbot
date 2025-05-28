@@ -1,3 +1,36 @@
+/*
+declaration:
+  version: 0.1
+  description: "Fetch the latest SKM configuration values"
+  method: get
+  namespace: config
+  returns: json
+  allowlist:
+    query: []
+  response:
+    fields:
+      - field: range
+        type: string
+        description: "Range setting for SKM retrieval"
+      - field: documents
+        type: string
+        description: "Document source or filter for SKM"
+      - field: system_message
+        type: string
+        description: "System message used in SKM context"
+      - field: max_tokens
+        type: string
+        description: "Maximum token limit for SKM responses"
+      - field: index_name
+        type: string
+        description: "Index name used for SKM retrieval"
+      - field: query_type
+        type: string
+        description: "Query type for SKM (e.g., keyword, semantic)"
+      - field: semantic_configuration
+        type: string
+        description: "Semantic configuration parameters for SKM"
+*/
 WITH
     configuration_values AS (
         SELECT

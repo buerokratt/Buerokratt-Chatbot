@@ -1,3 +1,22 @@
+/*
+declaration:
+  version: 0.1
+  description: "Unassign the customer support agent from the latest active chat version by clearing CSA fields"
+  method: post
+  accepts: json
+  returns: json
+  namespace: chat
+  allowlist:
+    body:
+      - field: chatId
+        type: string
+        description: "Base ID of the chat from which the CSA should be unassigned"
+  response:
+    fields:
+      - field: updated
+        type: string
+        description: "Timestamp when the CSA was unassigned and chat record updated"
+*/
 SELECT copy_row_with_modifications(
     'chat',
     'id', '::UUID', id::VARCHAR,

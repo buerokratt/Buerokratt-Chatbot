@@ -1,3 +1,30 @@
+/*
+declaration:
+  version: 0.1
+  description: "Fetch organization availability and fallback message configurations"
+  method: get
+  namespace: config
+  returns: json
+  allowlist:
+    query: []
+  response:
+    fields:
+      - field: is_available_all_time
+        type: string
+        description: "Flag indicating whether the organization is available at all times"
+      - field: ask_for_contacts
+        type: string
+        description: "Flag indicating whether to ask for contacts when no CSA is available"
+      - field: no_csa_message
+        type: string
+        description: "Message shown when no CSA is available"
+      - field: outside_working_hours_ask_for_contacts
+        type: string
+        description: "Flag indicating whether to ask for contacts outside working hours"
+      - field: outside_working_hours_message
+        type: string
+        description: "Message shown when outside working hours"
+*/
 WITH
     configuration_values AS (
         SELECT

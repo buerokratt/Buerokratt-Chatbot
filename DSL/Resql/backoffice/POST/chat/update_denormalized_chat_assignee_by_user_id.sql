@@ -1,3 +1,26 @@
+/*
+declaration:
+  version: 0.1
+  description: "Clear CSA assignment from the latest active denormalized chat records assigned to the specified user"
+  method: post
+  accepts: json
+  returns: json
+  namespace: chat
+  allowlist:
+    body:
+      - field: userId
+        type: string
+        description: "ID of the customer support agent whose chat assignments should be cleared"
+      - field: updated
+        type: timestamp
+        description: "Timestamp to use for the update and denormalized record creation"
+  response:
+    fields:
+      - field: updated
+        type: string
+        description: "Timestamp when the CSA fields were cleared and chat records were updated"
+*/
+
 SELECT copy_row_with_modifications(
     'denormalized_chat',                                   -- Table name
     'id', '::UUID',                        -- ID column name and type

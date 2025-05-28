@@ -39,6 +39,9 @@ CREATE INDEX idx_denormalized_user_data_status ON denormalized_user_data (status
 -- For queries that filter by user_status
 CREATE INDEX idx_denormalized_user_data_user_status ON denormalized_user_data (user_status);
 
+-- For queries that filter by csa_created date ranges and require user identification
+CREATE INDEX idx_denormalized_user_data_csa_created_id_code ON denormalized_user_data (csa_created, id_code);
+
 -- For the complex search/sort query
 CREATE INDEX idx_complex_search_sort ON denormalized_user_data (
     user_status,

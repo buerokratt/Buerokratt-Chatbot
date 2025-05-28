@@ -1,3 +1,30 @@
+/*
+declaration:
+  version: 0.1
+  description: "Fetch the latest non-deleted configuration entry for organization working time"
+  method: get
+  namespace: config
+  returns: json
+  allowlist:
+    query:
+      - field: key
+        type: string
+        description: "Configuration key to retrieve"
+  response:
+    fields:
+      - field: id
+        type: string
+        description: "Unique identifier for the configuration entry"
+      - field: key
+        type: string
+        description: "Key of the configuration setting"
+      - field: value
+        type: string
+        description: "Value associated with the configuration key"
+      - field: created
+        type: timestamp
+        description: "Timestamp of configuration record creation"
+*/
 SELECT
     id,
     key,

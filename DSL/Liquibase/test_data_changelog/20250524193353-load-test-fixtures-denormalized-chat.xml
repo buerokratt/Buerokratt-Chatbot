@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+    <changeSet id="20250524193353" author="Artsiom Beida" context="@test">
+        <loadData
+                file="data/test-fixtures/denormalized_chat.csv"
+                tableName="denormalized_chat"
+        >
+            <column name="first_message_timestamp" type="COMPUTED"/>
+            <column name="created" type="COMPUTED"/>
+            <column name="updated" type="COMPUTED"/>
+            <column name="denormalized_record_created" type="COMPUTED"/>
+            <column name="ended" type="COMPUTED"/>
+            <column name="labels" type="COMPUTED"/>
+            <column name="comment_added_date" type="COMPUTED"/>
+            <column name="last_message_timestamp" type="COMPUTED"/>
+            <column name="first_support_timestamp" type="COMPUTED"/>
+            <column name="created_at" type="COMPUTED"/>
+            <column name="last_message_with_not_rating_or_forward_events_timestamp" type="COMPUTED"/>
+            <column name="all_messages" type="COMPUTED"/>
+            <column name="last_message_event" type="other" />
+            <column name="last_message_event_with_content" type="other" />
+            <column name="last_non_empty_message_event" type="other" />
+            <column name="status" type="other" />
+        </loadData>
+    </changeSet>
+</databaseChangeLog>

@@ -1,3 +1,17 @@
+/*
+declaration:
+  version: 0.1
+  description: "Delete a user"
+  method: post
+  accepts: json
+  returns: json
+  namespace: auth_users
+  allowlist:
+    body:
+      - field: userIdCode
+        type: string
+        description: "User's unique identifier code (used for both login and id_code)"
+*/
 -- TODO rewrite with copy_row_with_modifiers
 WITH
     active_administrators AS (

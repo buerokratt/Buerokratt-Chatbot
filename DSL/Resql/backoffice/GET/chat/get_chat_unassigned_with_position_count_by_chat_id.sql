@@ -1,3 +1,24 @@
+/*
+declaration:
+  version: 0.1
+  description: "Determine a chat’s position in the unassigned chat queue and the total number of unassigned chats"
+  method: get
+  namespace: chat
+  returns: json
+  allowlist:
+    query:
+      - field: chatId
+        type: string
+        description: "Chat ID to retrieve position for (optional)"
+  response:
+    fields:
+      - field: position_in_unassigned_chats
+        type: integer
+        description: "Position of the specified chat in the unassigned queue (0 if none)"
+      - field: unassigned_chat_total
+        type: integer
+        description: "Total number of unassigned chats"
+*/
 WITH
     unassigned_chats AS (
         SELECT

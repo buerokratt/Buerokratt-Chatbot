@@ -1,3 +1,45 @@
+/*
+declaration:
+  version: 0.1
+  description: "Update message-related fields in the latest denormalized chat record, including message content, author, timestamps, and message tracking flags"
+  method: post
+  accepts: json
+  returns: json
+  namespace: chat
+  allowlist:
+    body:
+      - field: chatId
+        type: string
+        description: "Chat ID for which the denormalized record should be updated"
+      - field: lastMessageAuthorId
+        type: string
+        description: "ID of the last message author"
+      - field: lastMessageEvent
+        type: string
+        enum: ['', 'inactive-chat-ended', 'taken-over', 'unavailable_organization_ask_contacts', 'answered', 'terminated', 'chat_sent_to_csa_email', 'client-left', 'client_left_with_accepted', 'client_left_with_no_resolution', 'client_left_for_unknown_reasons', 'accepted', 'hate_speech', 'other', 'response_sent_to_client_email', 'greeting', 'requested-authentication', 'authentication_successful', 'authentication_failed', 'ask-permission', 'ask-permission-accepted', 'ask-permission-rejected', 'ask-permission-ignored', 'ask_to_forward_to_csa', 'forwarded_to_backoffice', 'continue_chatting_with_bot', 'rating', 'redirected', 'contact-information', 'contact-information-rejected', 'contact-information-fulfilled', 'unavailable-contact-information-fulfilled', 'contact-information-skipped', 'requested-chat-forward', 'requested-chat-forward-accepted', 'requested-chat-forward-rejected', 'unavailable_organization', 'unavailable_csas', 'unavailable_csas_ask_contacts', 'unavailable_holiday', 'pending-assigned', 'user-reached', 'user-not-reached', 'user-authenticated', 'message-read', 'waiting_validation', 'approved_validation', 'not-confident']
+        description: "Event type of the last message"
+      - field: content
+        type: string
+        description: "Content of the last message"
+      - field: lastMessageTimestamp
+        type: timestamp
+        description: "Timestamp of the last message"
+      - field: isCustomerMessage
+        type: boolean
+        description: "True if the message is from a customer"
+      - field: isSupportMessage
+        type: boolean
+        description: "True if the message is from a support agent"
+      - field: authorTimestamp
+        type: timestamp
+        description: "Timestamp when the message was authored"
+  response:
+    fields:
+      - field: updated
+        type: string
+        description: "Timestamp indicating when the message-related chat fields were updated"
+*/
+
 -- Using array approach directly
 SELECT copy_row_with_modifications(
     'denormalized_chat',                              -- Table name for denormalized_chat

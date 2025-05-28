@@ -1,3 +1,31 @@
+/*
+declaration:
+  version: 0.1
+  description: "Add or update a comment and metadata in the latest denormalized chat record"
+  method: post
+  accepts: json
+  returns: json
+  namespace: chat
+  allowlist:
+    body:
+      - field: chatId
+        type: string
+        description: "Base ID of the chat to update"
+      - field: comment
+        type: string
+        description: "Comment text to attach to the chat"
+      - field: commentAuthor
+        type: string
+        description: "Name of the person adding the comment"
+      - field: commentAddedDate
+        type: timestamp
+        description: "Timestamp when the comment was added"
+  response:
+    fields:
+      - field: updated
+        type: string
+        description: "Timestamp indicating when the comment update was applied"
+*/
 -- Using array approach directly
 SELECT copy_row_with_modifications(
     'chat.denormalized_chat',                              -- Table name for denormalized_chat

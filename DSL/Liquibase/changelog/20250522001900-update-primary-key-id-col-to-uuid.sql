@@ -108,6 +108,32 @@ ALTER TABLE message_preview DROP COLUMN id;
 ALTER TABLE message_preview RENAME COLUMN uuid_id TO id;
 ALTER TABLE message_preview ADD PRIMARY KEY (id);
 
+-- Modify scheduled_reports table
+ALTER TABLE scheduled_reports 
+  ADD COLUMN uuid_id UUID DEFAULT gen_random_uuid();
+UPDATE scheduled_reports SET uuid_id = gen_random_uuid();
+ALTER TABLE scheduled_reports DROP CONSTRAINT IF EXISTS scheduled_reports_id_key;
+ALTER TABLE scheduled_reports DROP COLUMN id;
+ALTER TABLE scheduled_reports RENAME COLUMN uuid_id TO id;
+ALTER TABLE scheduled_reports ADD PRIMARY KEY (id);
+
+-- Modify message_preview table
+ALTER TABLE user_overview_metric_preference
+  ADD COLUMN uuid_id UUID DEFAULT gen_random_uuid();
+UPDATE user_overview_metric_preference SET uuid_id = gen_random_uuid();
+ALTER TABLE user_overview_metric_preference DROP CONSTRAINT IF EXISTS user_overview_metric_pkey;
+
+ALTER TABLE user_overview_metric_preference ADD COLUMN created TIMESTAMP WITH TIME ZONE DEFAULT NOW();
+
+UPDATE user_overview_metric_preference
+SET created = NOW() - make_interval(secs => (SELECT MAX(id) FROM user_overview_metric_preference) - id);
+
+ALTER TABLE user_overview_metric_preference DROP COLUMN id;
+ALTER TABLE user_overview_metric_preference RENAME COLUMN uuid_id TO id;
+ALTER TABLE user_overview_metric_preference ADD PRIMARY KEY (id);
+
+CREATE INDEX idx_user_overview_metric_user_metric_created_ord 
+ON user_overview_metric_preference (user_id_code, metric, created DESC, ordinality);
 
 -- Drop sequences no longer needed
 DROP SEQUENCE IF EXISTS chat_id_seq;
@@ -120,6 +146,8 @@ DROP SEQUENCE IF EXISTS configuration_id_seq;
 DROP SEQUENCE IF EXISTS establishment_id_seq;
 DROP SEQUENCE IF EXISTS user_page_preferences_id_seq;
 DROP SEQUENCE IF EXISTS message_preview_id_seq;
+DROP SEQUENCE IF EXISTS message_preview_id_seq;
+DROP SEQUENCE IF EXISTS scheduled_reports_id_seq;
 
 -- Commit all changes
 COMMIT;

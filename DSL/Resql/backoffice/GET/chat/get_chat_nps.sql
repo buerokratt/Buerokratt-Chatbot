@@ -1,3 +1,18 @@
+/*
+declaration:
+  version: 0.1
+  description: "Calculate the Net Promoter Score (NPS) across all chats based on feedback ratings"
+  method: get
+  namespace: chat
+  returns: json
+  allowlist:
+    query: []
+  response:
+    fields:
+      - field: nps
+        type: number
+        description: "Net Promoter Score, rounded to two decimal places"
+*/
 WITH rated_chats AS (
     SELECT MAX(feedback_rating) AS rating
     FROM chat.chat

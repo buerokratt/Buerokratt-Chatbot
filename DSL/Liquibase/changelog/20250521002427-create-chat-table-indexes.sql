@@ -15,3 +15,15 @@ CREATE INDEX idx_chat_base_id_updated ON chat (base_id, updated DESC);
 
 -- Index for ended chats with empty end users by date
 CREATE INDEX idx_chat_ended_status_end_user_id ON chat (ended, status, end_user_id);
+
+-- Index for IDLE status chat counting by date range
+CREATE INDEX idx_chat_status_created_base_id 
+ON chat (status, created, base_id);
+
+-- Index for customer support transition analysis with window functions
+CREATE INDEX idx_chat_created_base_updated_support 
+ON chat (created, base_id, updated, customer_support_id);
+
+-- Index for external ID chat queries by end date
+CREATE INDEX idx_chat_ended_date_external_base 
+ON chat (ended, external_id, base_id);

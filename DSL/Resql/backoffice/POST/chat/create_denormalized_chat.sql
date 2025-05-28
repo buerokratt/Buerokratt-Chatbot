@@ -1,3 +1,151 @@
+/*
+declaration:
+  version: 0.1
+  description: "Insert a denormalized snapshot of chat data including metadata, messages, labels, and events"
+  method: post
+  accepts: json
+  returns: json
+  namespace: chat
+  allowlist:
+    body:
+      - field: chatId
+        type: string
+        description: "Unique identifier for the chat"
+      - field: customerSupportId
+        type: string
+        description: "ID of the assigned customer support agent"
+      - field: customerSupportDisplayName
+        type: string
+        description: "Display name of the assigned customer support agent"
+      - field: customerSupportFirstName
+        type: string
+        description: "First name of the customer support agent"
+      - field: customerSupportLastName
+        type: string
+        description: "Last name of the customer support agent"
+      - field: endUserId
+        type: string
+        description: "ID of the end user"
+      - field: endUserFirstName
+        type: string
+        description: "First name of the end user"
+      - field: endUserLastName
+        type: string
+        description: "Last name of the end user"
+      - field: endUserEmail
+        type: string
+        description: "Email address of the end user"
+      - field: endUserPhone
+        type: string
+        description: "Phone number of the end user"
+      - field: endUserOs
+        type: string
+        description: "Operating system of the end user"
+      - field: endUserUrl
+        type: string
+        description: "URL visited by the end user during the chat"
+      - field: status
+        type: string
+        enum: ['ENDED', 'OPEN', 'REDIRECTED', 'IDLE', 'VALIDATING']
+        description: "Status of the chat"
+      - field: created
+        type: timestamp
+        description: "Timestamp when the chat was created"
+      - field: updated
+        type: timestamp
+        description: "Timestamp when the chat was last updated"
+      - field: ended
+        type: timestamp
+        description: "Timestamp when the chat ended"
+      - field: forwardedTo
+        type: string
+        description: "ID of the agent the chat was forwarded to"
+      - field: forwardedToName
+        type: string
+        description: "Name of the agent the chat was forwarded to"
+      - field: receivedFrom
+        type: string
+        description: "ID of the source from which the chat was received"
+      - field: receivedFromName
+        type: string
+        description: "Name of the source from which the chat was received"
+      - field: externalId
+        type: string
+        description: "External system identifier for the chat"
+      - field: feedbackText
+        type: string
+        description: "Feedback text provided by the end user"
+      - field: feedbackRating
+        type: integer
+        description: "Feedback rating provided by the end user"
+      - field: csaTitle
+        type: string
+        description: "Title of the customer support agent"
+      - field: firstMessageTimestamp
+        type: timestamp
+        description: "Timestamp of the first message in the chat"
+      - field: lastMessageTimestamp
+        type: timestamp
+        description: "Timestamp of the last message in the chat"
+      - field: comment
+        type: string
+        description: "Comment attached to the chat"
+      - field: commentAddedDate
+        type: string
+        description: "Timestamp when the comment was added"
+      - field: commentAuthor
+        type: string
+        description: "Author of the chat comment"
+      - field: firstMessage
+        type: string
+        description: "Content of the first message (if not system message)"
+      - field: lastMessage
+        type: string
+        description: "Content of the last message (if not system message)"
+      - field: lastMessageIncludingEmptyContent
+        type: string
+        description: "Last message including empty or system messages"
+      - field: contactsMessage
+        type: string
+        description: "Contacts message if any (like contact card)"
+      - field: lastMessageEvent
+        type: string
+        enum: ['', 'inactive-chat-ended', 'taken-over', 'unavailable_organization_ask_contacts', 'answered', 'terminated', 'chat_sent_to_csa_email', 'client-left', 'client_left_with_accepted', 'client_left_with_no_resolution', 'client_left_for_unknown_reasons', 'accepted', 'hate_speech', 'other', 'response_sent_to_client_email', 'greeting', 'requested-authentication', 'authentication_successful', 'authentication_failed', 'ask-permission', 'ask-permission-accepted', 'ask-permission-rejected', 'ask-permission-ignored', 'ask_to_forward_to_csa', 'forwarded_to_backoffice', 'continue_chatting_with_bot', 'rating', 'redirected', 'contact-information', 'contact-information-rejected', 'contact-information-fulfilled', 'unavailable-contact-information-fulfilled', 'contact-information-skipped', 'requested-chat-forward', 'requested-chat-forward-accepted', 'requested-chat-forward-rejected', 'unavailable_organization', 'unavailable_csas', 'unavailable_csas_ask_contacts', 'unavailable_holiday', 'pending-assigned', 'user-reached', 'user-not-reached', 'user-authenticated', 'message-read', 'waiting_validation', 'approved_validation', 'not-confident']
+        description: "Type of the last message event"
+      - field: lastMessageEventWithContent
+        type: string
+        enum: ['', 'inactive-chat-ended', 'taken-over', 'unavailable_organization_ask_contacts', 'answered', 'terminated', 'chat_sent_to_csa_email', 'client-left', 'client_left_with_accepted', 'client_left_with_no_resolution', 'client_left_for_unknown_reasons', 'accepted', 'hate_speech', 'other', 'response_sent_to_client_email', 'greeting', 'requested-authentication', 'authentication_successful', 'authentication_failed', 'ask-permission', 'ask-permission-accepted', 'ask-permission-rejected', 'ask-permission-ignored', 'ask_to_forward_to_csa', 'forwarded_to_backoffice', 'continue_chatting_with_bot', 'rating', 'redirected', 'contact-information', 'contact-information-rejected', 'contact-information-fulfilled', 'unavailable-contact-information-fulfilled', 'contact-information-skipped', 'requested-chat-forward', 'requested-chat-forward-accepted', 'requested-chat-forward-rejected', 'unavailable_organization', 'unavailable_csas', 'unavailable_csas_ask_contacts', 'unavailable_holiday', 'pending-assigned', 'user-reached', 'user-not-reached', 'user-authenticated', 'message-read', 'waiting_validation', 'approved_validation', 'not-confident']
+        description: "Type of the last message event that had content"
+      - field: chatDurationInSeconds
+        type: integer
+        description: "Duration of the chat in seconds"
+      - field: customerMessagesCount
+        type: integer
+        description: "Number of messages sent by the customer"
+      - field: labels
+        type: array
+        items:
+          type: string
+        description: "List of labels associated with the chat"
+      - field: lastMessageWithContentAndNotRatingOrForward
+        type: string
+        description: "Content of the last meaningful message (excluding rating and forward)"
+      - field: lastMessageWithNotRatingOrForwardEventsTimestamp
+        type: timestamp
+        description: "Timestamp of last message not related to rating or forward"
+      - field: lastNonEmptyMessageEvent
+        type: string
+        enum: ['', 'inactive-chat-ended', 'taken-over', 'unavailable_organization_ask_contacts', 'answered', 'terminated', 'chat_sent_to_csa_email', 'client-left', 'client_left_with_accepted', 'client_left_with_no_resolution', 'client_left_for_unknown_reasons', 'accepted', 'hate_speech', 'other', 'response_sent_to_client_email', 'greeting', 'requested-authentication', 'authentication_successful', 'authentication_failed', 'ask-permission', 'ask-permission-accepted', 'ask-permission-rejected', 'ask-permission-ignored', 'ask_to_forward_to_csa', 'forwarded_to_backoffice', 'continue_chatting_with_bot', 'rating', 'redirected', 'contact-information', 'contact-information-rejected', 'contact-information-fulfilled', 'unavailable-contact-information-fulfilled', 'contact-information-skipped', 'requested-chat-forward', 'requested-chat-forward-accepted', 'requested-chat-forward-rejected', 'unavailable_organization', 'unavailable_csas', 'unavailable_csas_ask_contacts', 'unavailable_holiday', 'pending-assigned', 'user-reached', 'user-not-reached', 'user-authenticated', 'message-read', 'waiting_validation', 'approved_validation', 'not-confident']
+        description: "Event type of the last non-empty message"
+      - field: allMessages
+        type: array
+        items:
+          type: string
+        description: "All messages in the chat"
+      - field: firstSupportTimestamp
+        type: string
+        description: "Timestamp when the support agent first responded"
+*/
 INSERT INTO chat.denormalized_chat (
     chat_id,
     customer_support_id,

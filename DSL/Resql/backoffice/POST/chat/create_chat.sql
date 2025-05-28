@@ -1,3 +1,83 @@
+/*
+declaration:
+  version: 0.1
+  description: "Create a new chat session with all related metadata and optional feedback"
+  method: post
+  accepts: json
+  returns: json
+  namespace: chat
+  allowlist:
+    body:
+      - field: id
+        type: string
+        description: "Unique identifier for the chat session"
+      - field: customerSupportId
+        type: string
+        description: "ID of the customer support agent"
+      - field: customerSupportDisplayName
+        type: string
+        description: "Display name of the customer support agent"
+      - field: endUserId
+        type: string
+        description: "Unique identifier of the end user"
+      - field: endUserFirstName
+        type: string
+        description: "First name of the end user"
+      - field: endUserLastName
+        type: string
+        description: "Last name of the end user"
+      - field: status
+        type: string
+        enum: ['ENDED', 'OPEN', 'REDIRECTED', 'IDLE', 'VALIDATING']
+        description: "Status of the chat session (cast to chat_status_type)"
+      - field: created
+        type: string
+        description: "Chat creation timestamp (or 'CURRENT_TIMESTAMP' for now)"
+      - field: ended
+        type: string
+        description: "Chat end timestamp, may be null or 'CURRENT_TIMESTAMP'"
+      - field: endUserEmail
+        type: string
+        description: "Email address of the end user"
+      - field: endUserPhone
+        type: string
+        description: "Phone number of the end user"
+      - field: endUserOs
+        type: string
+        description: "Operating system used by the end user"
+      - field: endUserUrl
+        type: string
+        description: "URL visited by the end user during the chat"
+      - field: feedbackText
+        type: string
+        description: "Optional feedback text provided by the end user"
+      - field: feedbackRating
+        type: integer
+        description: "Optional numeric rating provided by the end user"
+      - field: externalId
+        type: string
+        description: "External system ID related to the chat"
+      - field: forwardedTo
+        type: string
+        description: "ID of the person/agent to whom the chat was forwarded"
+      - field: forwardedToName
+        type: string
+        description: "Name of the person/agent to whom the chat was forwarded"
+      - field: receivedFrom
+        type: string
+        description: "ID of the original sender of the chat"
+      - field: receivedFromName
+        type: string
+        description: "Name of the original sender of the chat"
+      - field: csaTitle
+        type: string
+        description: "Title of the customer support agent (nullable)"
+  response:
+    fields:
+      - field: updated
+        type: string
+        description: "Text value returned to confirm that the chat was successfully created"
+*/
 INSERT INTO chat.chat (
     base_id,
     customer_support_id,

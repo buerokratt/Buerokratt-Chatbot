@@ -179,6 +179,50 @@ updateDenormalizedChat:
       lastMessageAuthorId: ""
       lastMessageEvent: ${event}
   result: updateDenormalizedChatRes
+  next: updateDenormalizedChatMetricsMessageFields
+
+updateDenormalizedChatMetricsMessageFields:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_messages_for_metrics_message_fields_only"
+    body:
+      chatBaseId: ${chat.id}
+      messageId: ${message_res.response.body[0].id}
+      messageBaseId: ${message_res.response.body[0].baseId}
+      content: ""
+      lastMessageTimestamp: ${message_res.response.body[0].updated}
+      timestamp: ${message_res.response.body[0].updated}
+      messageCreated: ${message_res.response.body[0].updated}
+      messageUpdated: ${message_res.response.body[0].updated}
+      messageEvent: ${event}
+      messageAuthorRole: "backoffice-user"
+      messageAuthorId: ${authorId}
+      messageForwardedFromCsa: ""
+      messageForwardedToCsa: ""
+  result: updateDenormalizedChatMetricsMessageRes
+  next: updateDenormalizedChatMetricsChatFields
+
+updateDenormalizedChatMetricsChatFields:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_messages_for_metrics_chat_fields_only"
+    body:
+      chatBaseId: ${chat.id}
+      chatId: ${post_chat_res.response.body[0].id}
+      status: "ENDED"
+      endUserEmail: ${chat.endUserEmail}
+      endUserPhone: ${chat.endUserPhone}
+      feedbackRating: ${chat.feedbackRating ?? ""}
+      feedbackText: ${chat.feedbackText ?? ""}
+      customerSupportId: ${chat.customerSupportId}
+      customerSupportDisplayName: ${chat.customerSupportDisplayName}
+      customerSupportFirstName: "null"
+      customerSupportLastName: "null"
+      externalId: ${chat.externalId}
+      receivedFrom: ${chat.receivedFrom}
+      updated: ${post_chat_res.response.body[0].updated}
+      ended: ${post_chat_res.response.body[0].updated}
+  result: updateDenormalizedChatMetricsRes
   next: return_result
 
 return_result:
