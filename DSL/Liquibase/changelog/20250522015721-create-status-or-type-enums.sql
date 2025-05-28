@@ -71,7 +71,8 @@ CREATE TYPE event_type AS ENUM (
     'user-authenticated',
     'message-read',
     'waiting_validation',
-    'approved_validation'
+    'approved_validation',
+    'not-confident'
 );
 
 -- Chat status ENUM

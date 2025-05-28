@@ -2,7 +2,7 @@
 -- changeset ahmer-mt:20250524122754 ignore:true
 -- Create the denormalized table for chat metrics
 CREATE TABLE denormalized_chat_messages_for_metrics (
-    id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     chat_id UUID,
     chat_base_id VARCHAR(36),
     message_base_id VARCHAR(36),
@@ -23,8 +23,8 @@ CREATE TABLE denormalized_chat_messages_for_metrics (
     last_message_timestamp TIMESTAMP WITH TIME ZONE,
     message_created TIMESTAMP WITH TIME ZONE,
     message_updated TIMESTAMP WITH TIME ZONE,
-    message_event VARCHAR(128),
-    message_author_role VARCHAR(128),
+    message_event event_type,
+    message_author_role author_role_type,
     message_author_id VARCHAR(555),
     message_forwarded_from_csa VARCHAR,
     message_forwarded_to_csa VARCHAR,

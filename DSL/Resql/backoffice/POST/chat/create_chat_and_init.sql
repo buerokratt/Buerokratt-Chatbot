@@ -138,7 +138,8 @@ VALUES (
     :receivedFrom,
     :receivedFromName,
     CASE
-        WHEN :is_bot_active = 'true' THEN ''
-    ELSE ''
+      WHEN :is_bot_active = 'true' THEN ''
+      ELSE ''
+    END
 )
 RETURNING id, customer_support_id, customer_support_display_name, csa_title, updated::TEXT;

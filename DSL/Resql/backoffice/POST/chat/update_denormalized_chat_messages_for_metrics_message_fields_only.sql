@@ -75,8 +75,8 @@ SELECT
         WHEN :messageUpdated::TEXT = 'null' THEN NOW()
         ELSE :messageUpdated::TIMESTAMP WITH TIME ZONE
     END,
-    :messageEvent::VARCHAR,
-    :messageAuthorRole::VARCHAR,
+    LOWER(:messageEvent)::event_type,
+    :messageAuthorRole::author_role_type,
     :messageAuthorId::VARCHAR,
     :messageForwardedFromCsa::VARCHAR,
     :messageForwardedToCsa::VARCHAR,
