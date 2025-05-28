@@ -12,5 +12,5 @@ declaration:
         type: string
         description: "Generated unique request nonce"
 */
-INSERT INTO request_nonces (valid_until) VALUES (NOW() + INTERVAL '1 day') RETURNING
+INSERT INTO security.request_nonces (valid_until) VALUES (NOW() + INTERVAL '1 day') RETURNING
     nonce;

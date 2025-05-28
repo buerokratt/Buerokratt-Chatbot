@@ -18,8 +18,8 @@ declaration:
         description: "The nonce that was marked as used"
 */
 SELECT copy_row_with_modifications(
-    'request_nonces',
+    'security.request_nonces',
     'nonce', '', nonce,
     ARRAY['used_at', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR]::VARCHAR[]
-) as nonce FROM request_nonces
+) as nonce FROM security.request_nonces
 WHERE nonce = :updated_nonce AND used_at IS null;
