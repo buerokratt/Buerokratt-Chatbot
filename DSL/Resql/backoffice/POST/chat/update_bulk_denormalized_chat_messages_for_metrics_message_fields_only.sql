@@ -1,4 +1,4 @@
-INSERT INTO denormalized_chat_messages_for_metrics (
+INSERT INTO chat.denormalized_chat_messages_for_metrics (
     chat_base_id,
     chat_id,
     chat_status,
@@ -61,7 +61,7 @@ SELECT
     :messageForwardedToCsa::VARCHAR,
     msg_data.message_updated
 FROM (
-    SELECT * FROM denormalized_chat_messages_for_metrics
+    SELECT * FROM chat.denormalized_chat_messages_for_metrics
     WHERE chat_base_id = :chatBaseId
     ORDER BY timestamp DESC
     LIMIT 1
