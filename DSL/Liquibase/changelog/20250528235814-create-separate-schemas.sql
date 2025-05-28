@@ -1,11 +1,12 @@
 -- liquibase formatted sql
--- changeset athar-mt:20250525025518
+-- changeset athar-mt:20250528235814 ignore:true
 
 -- 1. Create schemas
 CREATE SCHEMA IF NOT EXISTS auth_users;
 CREATE SCHEMA IF NOT EXISTS chat;
 CREATE SCHEMA IF NOT EXISTS config;
 CREATE SCHEMA IF NOT EXISTS org;
+CREATE SCHEMA IF NOT EXISTS security;
 
 -- 2. Move tables to their respective schemas
 -- auth_users schema
@@ -19,9 +20,13 @@ ALTER TABLE IF EXISTS public.chat_history_comments SET SCHEMA chat;
 ALTER TABLE IF EXISTS public.chat SET SCHEMA chat;
 ALTER TABLE IF EXISTS public.message_preview SET SCHEMA chat;
 ALTER TABLE IF EXISTS public.message SET SCHEMA chat;
+ALTER TABLE IF EXISTS public.denormalized_chat_messages_for_metrics SET SCHEMA chat;
 
 -- config schema
 ALTER TABLE IF EXISTS public.configuration SET SCHEMA config;
 
 -- org schema
 ALTER TABLE IF EXISTS public.establishment SET SCHEMA org;
+
+-- security schema
+ALTER TABLE IF EXISTS public.request_nonces SET SCHEMA security;
