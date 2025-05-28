@@ -55,10 +55,10 @@ FROM chat.message AS m1
 WHERE
     chat_base_id IN (
         SELECT base_id
-        FROM chat AS c1
+        FROM chat.chat AS c1
         WHERE
             updated = (
-                SELECT MAX(c2.updated) FROM chat c2
+                SELECT MAX(c2.updated) FROM chat.chat c2
                 WHERE c2.base_id = c1.base_id
             )
             AND customer_support_id = :customerSupportId
