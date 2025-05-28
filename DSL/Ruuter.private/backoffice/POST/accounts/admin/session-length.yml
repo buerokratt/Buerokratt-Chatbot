@@ -14,22 +14,28 @@ declaration:
       - field: chatActiveDuration
         type: string
         description: "Body field 'chatActiveDuration'"
+      - field: showIdleWarning
+        type: string
+        description: "Body field 'showIdleWarning'"
 
 extractRequestData:
   assign:
     sessionLength: ${incoming.body.sessionLength}
     chatActiveDuration: ${incoming.body.chatActiveDuration}
+    showIdleWarning: ${incoming.body.showIdleWarning}
 
 setConfigurationValue:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/set-2-configuration-values"
+    url: "[#CHATBOT_RESQL]/set-3-configuration-values"
     body:
       created: ${new Date().toISOString()}
       key: "session_length"
       key2: "chat_active_duration"
+      key3: "show_idle_warning"
       value: ${sessionLength}
       value2: ${chatActiveDuration}
+      value3: ${showIdleWarning}
   result: res
 
 return_result:

@@ -46,7 +46,8 @@
     "forward": "Suuna",
     "chosen": "Valitud",
     "read": "Loetud",
-    "statusClarification": "Staatuse täpsustus"
+    "statusClarification": "Staatuse täpsustus",
+    "displayText": "Kuva tekst"
   },
   "sorting": {
     "desc": "kahanevalt",

@@ -46,7 +46,8 @@
     "forward": "Forward",
     "chosen": "Chosen",
     "read": "Read",
-    "statusClarification": "Status clarification"
+    "statusClarification": "Status clarification",
+    "displayText": "Display message"
   },
   "sorting": {
     "desc": "descending",

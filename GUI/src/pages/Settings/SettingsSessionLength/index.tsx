@@ -1,7 +1,7 @@
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import { AxiosError } from 'axios';
 import { useTranslation } from 'react-i18next';
-import { Button, Card, FormInput, Track } from 'components';
+import { Button, Card, FormInput, Switch, Track } from 'components';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useToast } from 'hooks/useToast';
 import { apiDev } from 'services/api';
@@ -13,6 +13,7 @@ import { Controller, useForm } from 'react-hook-form';
 type FormValues = {
   sessionLength: string;
   chatActiveDuration: string;
+  showIdleWarning: boolean;
 };
 
 type ConfigItem = {
@@ -29,6 +30,7 @@ const SettingsSessionLength: FC = () => {
     defaultValues: {
       sessionLength: '',
       chatActiveDuration: '',
+      showIdleWarning: false,
     },
   });
 
@@ -37,17 +39,20 @@ const SettingsSessionLength: FC = () => {
       acc[item.key] = item.value;
       return acc;
     }, {} as Record<string, string>);
-  }
+  };
 
   const sessionLength = watch('sessionLength');
   const chatActiveDuration = watch('chatActiveDuration');
+  const showIdleWarning = watch('showIdleWarning');
 
   useQuery({
     queryKey: ['accounts/admin/session-length', 'prod'],
     onSuccess: (res: any) => {
       const data = extractConfigMap(res.response);
+      console.log('data',data,'should true?', data.show_idle_warning?.toLowerCase() === "true")
       setValue('sessionLength', data.session_length ?? '');
       setValue('chatActiveDuration', data.chat_active_duration ?? '');
+      setValue('showIdleWarning', data.show_idle_warning?.toLowerCase() === "true");
     },
   });
 
@@ -55,7 +60,8 @@ const SettingsSessionLength: FC = () => {
     mutationFn: () =>
       apiDev.post('accounts/admin/session-length', {
         sessionLength: sessionLength,
-        chatActiveDuration: chatActiveDuration
+        chatActiveDuration: chatActiveDuration,
+        showIdleWarning: showIdleWarning.toString(),
       }),
     onSuccess: () => {
       toast.open({
@@ -73,14 +79,18 @@ const SettingsSessionLength: FC = () => {
     },
   });
 
-  const valueInRange = (inputValue: string, minValue: number, maxValue: number) => {
+  const valueInRange = (
+    inputValue: string,
+    minValue: number,
+    maxValue: number
+  ) => {
     const value = parseInt(inputValue);
-    if(!value) {
+    if (!value) {
       return false;
     } else {
       return value < minValue || value > maxValue;
     }
-  }
+  };
 
   const onSubmit = (data: FormValues) => {
     if (!data.sessionLength) {
@@ -96,12 +106,12 @@ const SettingsSessionLength: FC = () => {
         message: t('settings.userSession.invalidSession'),
       });
     } else if (valueInRange(data.chatActiveDuration, 5, 480)) {
-    toast.open({
-      type: 'error',
-      title: t('global.notificationError'),
-      message: t('settings.chatDuration.invalidSession'),
-    });
-  } else {
+      toast.open({
+        type: 'error',
+        title: t('global.notificationError'),
+        message: t('settings.chatDuration.invalidSession'),
+      });
+    } else {
       sessionLengthMutation.mutate();
     }
   };
@@ -133,7 +143,9 @@ const SettingsSessionLength: FC = () => {
                 />
               )}
             />
-            <label className="minute">{t('settings.userSession.minutes')}</label>
+            <label className="minute">
+              {t('settings.userSession.minutes')}
+            </label>
           </Track>
           <label className="rule">{t('settings.userSession.rule')}</label>
         </Track>
@@ -154,8 +166,24 @@ const SettingsSessionLength: FC = () => {
                 />
               )}
             />
-            <label className="minute">{t('settings.chatDuration.minutes')}</label>
+            <label className="minute">
+              {t('settings.chatDuration.minutes')}
+            </label>
           </Track>
+          <Controller
+            name="showIdleWarning"
+            control={control}
+            render={({ field }) => (
+              <Switch
+                label={t('global.displayText')}
+                onLabel={t('global.yes') ?? 'yes'}
+                offLabel={t('global.no') ?? 'no'}
+                onCheckedChange={(e) => field.onChange(e)}
+                checked={field.value}
+                {...field}
+              />
+            )}
+          />
           <label className="rule">{t('settings.chatDuration.rule')}</label>
         </Track>
       </Card>
@@ -163,4 +191,6 @@ const SettingsSessionLength: FC = () => {
   );
 };
 
-export default withAuthorization(SettingsSessionLength, [ROLES.ROLE_ADMINISTRATOR]);
+export default withAuthorization(SettingsSessionLength, [
+  ROLES.ROLE_ADMINISTRATOR,
+]);
