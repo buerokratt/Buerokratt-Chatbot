@@ -18,7 +18,7 @@ declaration:
         description: "Timestamp when the chat record was duplicated and CSA cleared"
 */
 SELECT copy_row_with_modifications(
-    'chat',                                   -- Table name
+    'chat.chat',                                   -- Table name
     'id', '::UUID',                        -- ID column name and type
     (SELECT id FROM chat WHERE base_id = dc.chat_id ORDER BY updated DESC LIMIT 1)::VARCHAR,
     ARRAY[                                    -- Direct array of modifications
@@ -28,14 +28,14 @@ SELECT copy_row_with_modifications(
         'updated', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR
     ]::VARCHAR[]
 ), NOW()::TEXT as updated
-FROM denormalized_chat dc
+FROM chat.denormalized_chat dc
 WHERE
     dc.ended IS NULL
     AND dc.customer_support_id = :userId
     -- Get only the latest record for each chat
     AND dc.denormalized_record_created = (
         SELECT MAX(dc_inner.denormalized_record_created)
-        FROM denormalized_chat dc_inner
+        FROM chat.denormalized_chat dc_inner
         WHERE dc_inner.chat_id = dc.chat_id
         AND dc_inner.ended IS NULL
         AND dc_inner.customer_support_id = :userId

@@ -18,7 +18,7 @@ declaration:
         description: "Timestamp when the CSA was unassigned and chat record updated"
 */
 SELECT copy_row_with_modifications(
-    'chat',
+    'chat.chat',
     'id', '::UUID', id::VARCHAR,
     ARRAY[
         'customer_support_id', '', '',
@@ -26,10 +26,10 @@ SELECT copy_row_with_modifications(
         'csa_title', '', '',
         'updated', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR
     ]::VARCHAR[]
-), NOW()::TEXT as updated FROM chat
+), NOW()::TEXT as updated FROM chat.chat
 WHERE
     updated = (
-        SELECT MAX(updated) FROM chat
+        SELECT MAX(updated) FROM chat.chat
         WHERE base_id = :chatId
     )
     AND base_id = :chatId
