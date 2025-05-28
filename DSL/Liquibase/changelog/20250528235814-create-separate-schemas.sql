@@ -35,6 +35,9 @@ ALTER TABLE IF EXISTS public.request_nonces SET SCHEMA security;
 -- analytics schema
 ALTER TABLE IF EXISTS public.scheduled_reports SET SCHEMA analytics;
 
+-- service_management schema
+ALTER TABLE IF EXISTS public.service_trigger SET SCHEMA service_management;
+
 DO $$
 DECLARE
     idx_record RECORD;
@@ -47,6 +50,7 @@ DECLARE
     org_tables TEXT[] := ARRAY['establishment'];
     security_tables TEXT[] := ARRAY['request_nonces'];
     analytics_tables TEXT[] := ARRAY['scheduled_reports'];
+    service_management_tables TEXT[] := ARRAY['service_trigger'];
     target_schema TEXT;
 BEGIN
     FOR idx_record IN 
@@ -59,7 +63,7 @@ BEGIN
         JOIN pg_namespace n ON t.relnamespace = n.oid
         JOIN pg_class idx ON i.indexrelid = idx.oid
         JOIN pg_namespace idx_ns ON idx.relnamespace = idx_ns.oid
-        WHERE t.relname = ANY(config_tables || chat_tables || auth_users_tables || org_tables || security_tables || analytics_tables)
+        WHERE t.relname = ANY(config_tables || chat_tables || auth_users_tables || org_tables || security_tables || analytics_tables || service_management_tables)
         AND n.nspname = 'public'  -- Current schema of the tables
     LOOP
         -- Determine target schema based on which array the table is in
@@ -75,6 +79,8 @@ BEGIN
             target_schema := 'security';
         ELSIF idx_record.table_name = ANY(analytics_tables) THEN
             target_schema := 'analytics';
+        ELSIF idx_record.table_name = ANY(service_management_tables) THEN
+            target_schema := 'service_management';
         ELSE
             target_schema := NULL; -- Should not happen with our WHERE clause
         END IF;

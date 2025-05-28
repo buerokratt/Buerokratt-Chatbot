@@ -27,6 +27,6 @@ WHERE
     status = 'approved'
     AND id = (
         SELECT MAX(id)
-        FROM service_trigger
+        FROM service_management.service_trigger
         WHERE service_name = :serviceName
     );
