@@ -161,7 +161,7 @@ All arguments should be of type `VARCHAR`.
 
 ### SQLFluff Code Formatting
 
-This project uses SQLFluff for SQL code formatting and linting to ensure consistent code style across all SQL files. A [`.sqlfluff` configuration file](/.sqlfluff) exists in the project root and is developed according to [SQL-001](https://github.com/buerokratt/Buerokratt-onboarding/blob/main/Architectural-Decision-Records-ADR/data-storage/relational-databases/4.%20sql-queries.md#context).
+This project uses SQLFluff for SQL code formatting and linting to ensure consistent code style across all SQL files. A [`.sqlfluff` configuration file](/.sqlfluff) exists in the project root and is developed according to [SQL-001](https://github.com/buerokratt/Buerokratt-onboarding/blob/main/Architectural-Decision-Records-ADR/data-storage/relational-databases/4.%20sql-queries.md#sql-001-enforce-standardized-sql-formatting).
 
 #### Setup and Usage
 
