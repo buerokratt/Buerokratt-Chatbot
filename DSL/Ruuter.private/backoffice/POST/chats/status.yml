@@ -127,7 +127,7 @@ postChat:
       endUserLastName: ${chat.endUserLastName}
       status: "ENDED"
       created: ${chat.created}
-      ended: "CURRENT_TIMESTAMP"
+      ended: ${chat.ended ?? "CURRENT_TIMESTAMP"}
       feedbackRating: ${chat.feedbackRating ?? ""}
       feedbackText: ${chat.feedbackText ?? ""}
       endUserEmail: ${chat.endUserEmail}
@@ -165,7 +165,7 @@ updateDenormalizedChat:
       feedbackText: ${chat.feedbackText ?? ""}
       externalId: ${chat.externalId}
       created: ${chat.created}
-      ended: ${post_chat_res.response.body[0].updated}
+      ended: ${chat.ended ?? post_chat_res.response.body[0].updated}
       forwardedTo: ${chat.forwardedTo}
       forwardedToName: ${chat.forwardedToName}
       receivedFrom: ${chat.receivedFrom}
@@ -221,7 +221,7 @@ updateDenormalizedChatMetricsChatFields:
       externalId: ${chat.externalId}
       receivedFrom: ${chat.receivedFrom}
       updated: ${post_chat_res.response.body[0].updated}
-      ended: ${post_chat_res.response.body[0].updated}
+      ended: ${chat.ended ?? post_chat_res.response.body[0].updated}
   result: updateDenormalizedChatMetricsRes
   next: return_result
 
