@@ -26,11 +26,11 @@ WITH
             ROW_NUMBER() OVER (
                 ORDER BY created
             ) AS position
-        FROM chat AS c1
+        FROM chat AS c_1
         WHERE
             updated = (
-                SELECT MAX(c2.updated) FROM chat AS c2
-                WHERE c1.base_id = c2.base_id
+                SELECT MAX(c_2.updated) FROM chat AS c_2
+                WHERE c_1.base_id = c_2.base_id
             )
             AND ended IS NULL
             AND customer_support_id = ''

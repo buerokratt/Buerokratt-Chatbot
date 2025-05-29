@@ -144,21 +144,27 @@ FROM (
             WHEN :is_csa_title_visible = 'true' THEN csa_title
             ELSE ''
         END AS csa_title,
-        last_message_event AS last_message_event,
+        last_message_event,
         created,
-        ROW_NUMBER() OVER (PARTITION BY chat_id ORDER BY denormalized_record_created DESC) as rn
+        ROW_NUMBER()
+            OVER (
+                PARTITION BY chat_id
+                ORDER BY denormalized_record_created DESC
+            )
+        AS rn
     FROM denormalized_chat
 ) AS subquery
-WHERE rn = 1
-  AND created::DATE BETWEEN :start::date AND :end::date
-  AND ended IS NOT NULL
-  AND last_message_event IN (
-      'unavailable_holiday',
-      'unavailable-contact-information-fulfilled',
-      'contact-information-skipped',
-      'unavailable_organization',
-      'unavailable_csas',
-      'unavailable_csas_ask_contacts'
-  )
-ORDER BY created ASC 
+WHERE
+    rn = 1
+    AND created::DATE BETWEEN :start::date AND :end::date
+    AND ended IS NOT NULL
+    AND last_message_event IN (
+        'unavailable_holiday',
+        'unavailable-contact-information-fulfilled',
+        'contact-information-skipped',
+        'unavailable_organization',
+        'unavailable_csas',
+        'unavailable_csas_ask_contacts'
+    )
+ORDER BY created ASC
 LIMIT :limit;

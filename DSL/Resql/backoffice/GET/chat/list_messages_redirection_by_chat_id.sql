@@ -75,7 +75,7 @@ SELECT
     forwarded_from_csa,
     forwarded_to_csa,
     updated
-FROM message AS m1
+FROM message AS m_1
 WHERE base_id = ANY(ARRAY(
     SELECT content::VARCHAR [] AS message_ids
     FROM message
@@ -86,6 +86,6 @@ WHERE base_id = ANY(ARRAY(
     LIMIT 1
 ))
 AND updated = (
-    SELECT MAX(m2.updated) FROM message AS m2
-    WHERE chat_base_id = :chatId and m1.base_id = m2.base_id
+    SELECT MAX(m_2.updated) FROM message AS m_2
+    WHERE chat_base_id = :chatId AND m_1.base_id = m_2.base_id
 );

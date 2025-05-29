@@ -18,9 +18,12 @@ declaration:
 */
 WITH
     grouped_configurations AS (
-        SELECT DISTINCT ON (key) id, key, created
+        SELECT DISTINCT ON (key)
+            id,
+            key,
+            created
         FROM configuration
-        ORDER BY key, created DESC
+        ORDER BY key ASC, created DESC
     )
 
 SELECT

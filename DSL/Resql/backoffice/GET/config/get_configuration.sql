@@ -26,11 +26,11 @@ SELECT
     id,
     key,
     value
-FROM configuration AS c1
+FROM configuration AS c_1
 WHERE
     key = :key
     AND created = (
-            SELECT MAX(c2.created) FROM configuration as c2
-            WHERE c2.key = c1.key
+        SELECT MAX(c_2.created) FROM configuration AS c_2
+        WHERE c_2.key = c_1.key
     )
     AND NOT deleted;

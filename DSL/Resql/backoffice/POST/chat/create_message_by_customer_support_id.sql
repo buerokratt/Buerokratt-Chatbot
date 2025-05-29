@@ -38,34 +38,37 @@ declaration:
         description: "New base ID generated for the copied message"
 */
 
-SELECT copy_row_with_modifications(
-    'message',
-    'id', '::UUID', id::VARCHAR,
-    ARRAY[
-        'content', '', :content,
-        'event', '::event_type', :event,
-        'author_id', '', :authorId,
-        'author_role', '::author_role_type', :authorRole,
-        'base_id', '', gen_random_uuid(),
-        'created', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR,
-        'updated', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR
-    ]::VARCHAR[]
-)::INTEGER as id, chat_base_id, base_id
-FROM message AS m1
+SELECT
+    COPY_ROW_WITH_MODIFICATIONS(
+        'message',
+        'id', '::UUID', id::VARCHAR,
+        ARRAY[
+            'content', '', :content,
+            'event', '::event_type', :event,
+            'author_id', '', :authorId,
+            'author_role', '::author_role_type', :authorRole,
+            'base_id', '', GEN_RANDOM_UUID(),
+            'created', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR,
+            'updated', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR
+        ]::VARCHAR []
+    )::INTEGER AS id,
+    chat_base_id,
+    base_id
+FROM message AS m_1
 WHERE
     chat_base_id IN (
         SELECT base_id
-        FROM chat AS c1
+        FROM chat AS c_1
         WHERE
             updated = (
-                SELECT MAX(c2.updated) FROM chat c2
-                WHERE c2.base_id = c1.base_id
+                SELECT MAX(c_2.updated) FROM chat AS c_2
+                WHERE c_2.base_id = c_1.base_id
             )
             AND customer_support_id = :customerSupportId
             AND ended IS null
     )
     AND id = (
-        SELECT id FROM message AS m2
-        WHERE m1.chat_base_id = m2.chat_base_id
+        SELECT id FROM message AS m_2
+        WHERE m_1.chat_base_id = m_2.chat_base_id
         ORDER BY updated DESC LIMIT 1
     );

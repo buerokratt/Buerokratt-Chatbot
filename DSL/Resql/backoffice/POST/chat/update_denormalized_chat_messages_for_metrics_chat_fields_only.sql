@@ -27,7 +27,7 @@ INSERT INTO denormalized_chat_messages_for_metrics (
     last_message_timestamp,
     timestamp
 )
-SELECT 
+SELECT
     CASE
         WHEN :chatBaseId::TEXT = 'null' THEN chat_base_id
         ELSE :chatBaseId
@@ -59,7 +59,9 @@ SELECT
         ELSE NULLIF(:feedbackRating::TEXT, '')::INTEGER
     END,
     CASE
-        WHEN :customerSupportDisplayName::TEXT = 'null' AND :customerSupportId::TEXT = customer_support_id::TEXT 
+        WHEN
+            :customerSupportDisplayName::TEXT = 'null'
+            AND :customerSupportId::TEXT = customer_support_id::TEXT
             THEN customer_support_display_name
         WHEN :customerSupportDisplayName::TEXT = 'null'
             THEN NULL
@@ -70,14 +72,18 @@ SELECT
         ELSE :customerSupportId::VARCHAR
     END,
     CASE
-        WHEN :customerSupportFirstName::TEXT = 'null' AND :customerSupportId::TEXT = customer_support_id::TEXT 
+        WHEN
+            :customerSupportFirstName::TEXT = 'null'
+            AND :customerSupportId::TEXT = customer_support_id::TEXT
             THEN customer_support_first_name
         WHEN :customerSupportFirstName::TEXT = 'null'
             THEN NULL
         ELSE :customerSupportFirstName::VARCHAR
     END,
     CASE
-        WHEN :customerSupportLastName::TEXT = 'null' AND :customerSupportId::TEXT = customer_support_id::TEXT 
+        WHEN
+            :customerSupportLastName::TEXT = 'null'
+            AND :customerSupportId::TEXT = customer_support_id::TEXT
             THEN customer_support_last_name
         WHEN :customerSupportLastName::TEXT = 'null'
             THEN NULL

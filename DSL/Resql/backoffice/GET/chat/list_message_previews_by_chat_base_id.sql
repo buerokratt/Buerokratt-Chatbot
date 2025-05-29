@@ -19,7 +19,9 @@ declaration:
         type: string
         description: "Base identifier of the chat associated with the preview"
 */
-SELECT DISTINCT ON (chat_base_id) content, chat_base_id
-  FROM message_preview
-  Where chat_base_id = :chatId
-  ORDER BY chat_base_id, created DESC;
+SELECT DISTINCT ON (chat_base_id)
+    content,
+    chat_base_id
+FROM message_preview
+WHERE chat_base_id = :chatId
+ORDER BY chat_base_id ASC, created DESC;

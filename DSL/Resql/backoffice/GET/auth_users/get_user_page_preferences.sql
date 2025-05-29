@@ -31,7 +31,12 @@ declaration:
         type: timestamp
         description: "Creation timestamp"
 */
-SELECT id, user_id, page_name, page_results, created
+SELECT
+    id,
+    user_id,
+    page_name,
+    page_results,
+    created
 FROM user_page_preferences
 WHERE
     user_id = :user_id

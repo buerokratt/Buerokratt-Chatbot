@@ -29,7 +29,7 @@ WITH
         SELECT
             key,
             value
-        FROM configuration AS c1
+        FROM configuration AS c_1
         WHERE key IN (
             'is_bot_active',
             'is_burokratt_active',
@@ -38,13 +38,13 @@ WITH
             'is_edit_chat_visible'
         )
         AND created = (
-            SELECT MAX(c2.created) FROM configuration AS c2
-            WHERE c1.key = c2.key
+            SELECT MAX(c_2.created) FROM configuration AS c_2
+            WHERE c_1.key = c_2.key
         )
         AND deleted = FALSE
     ),
 
-new_configuration AS (
+    new_configuration AS (
         SELECT
             new_values.key,
             new_values.value

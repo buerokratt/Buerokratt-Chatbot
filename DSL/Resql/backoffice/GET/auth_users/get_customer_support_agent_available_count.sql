@@ -19,5 +19,5 @@ WHERE
     (status = 'online' OR status = 'idle')
     AND created = (
         SELECT MAX(d_1.created) FROM denormalized_user_data AS d_2
-        where d_1.id_code = d_2.id_code
+        WHERE d_1.id_code = d_2.id_code
     );

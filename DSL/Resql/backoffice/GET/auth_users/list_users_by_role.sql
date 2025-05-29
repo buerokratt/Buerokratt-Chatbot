@@ -1,105 +1,3 @@
-/*
-declaration:
-  version: 0.1
-  description: "Search and paginate through active users with authorities using multiple filter criteria and sorting options"
-  method: get
-  namespace: auth_users
-  returns: json
-  allowlist:
-    query:
-      - field: is_csa_title_visible
-        type: string
-        enum: ['true', 'false']
-        description: "Flag to control CSA title visibility"
-      - field: page_size
-        type: integer
-        description: "Number of records per page"
-      - field: roles
-        type: string
-        description: "Comma-separated list of roles to filter by (in array format)"
-      - field: search_display_name_and_csa_title
-        type: string
-        description: "Search term for display name and CSA title (optional)"
-      - field: search_full_name_and_csa_title
-        type: string
-        description: "Search term for full name and CSA title (optional)"
-      - field: show_active_only
-        type: string
-        enum: ['true', 'false']
-        description: "Flag to show only active (non-offline) users"
-      - field: search_full_name
-        type: string
-        description: "Search term for full name (optional)"
-      - field: search_id_code
-        type: string
-        description: "Search term for ID code (optional)"
-      - field: search_display_name
-        type: string
-        description: "Search term for display name (optional)"
-      - field: search_csa_title
-        type: string
-        description: "Search term for CSA title (optional)"
-      - field: search_csa_email
-        type: string
-        description: "Search term for CSA email (optional)"
-      - field: search_authority
-        type: string
-        description: "Search term for authority/role (optional)"
-      - field: search_department
-        type: string
-        description: "Search term for department (optional)"
-      - field: excluded_users
-        type: string
-        description: "Comma-separated list of user ID codes to exclude"
-      - field: sorting
-        type: string
-        enum: ['name asc', 'name desc', 'idCode asc', 'idCode desc', 'Role asc', 'Role desc', 'displayName asc', 'displayName desc', 'csaTitle asc', 'csaTitle desc', 'csaEmail asc', 'csaEmail desc', 'department asc', 'department desc', 'customerSupportStatus asc', 'customerSupportStatus desc']
-        description: "Sorting criteria and direction"
-      - field: page
-        type: integer
-        description: "Page number (1-based)"
-  response:
-    fields:
-      - field: login
-        type: string
-        description: "User's login identifier"
-      - field: first_name
-        type: string
-        description: "User's first name"
-      - field: last_name
-        type: string
-        description: "User's last name"
-      - field: id_code
-        type: string
-        description: "User's unique identifier"
-      - field: display_name
-        type: string
-        description: "User's display name"
-      - field: csa_title
-        type: string
-        description: "Customer Support Agent title (conditionally visible)"
-      - field: csa_email
-        type: string
-        description: "Customer Support Agent email address"
-      - field: department
-        type: string
-        description: "User's department"
-      - field: authorities
-        type: string
-        description: "User's authority/permission level"
-      - field: customer_support_status
-        type: string
-        description: "User's current support status"
-      - field: status_comment
-        type: string
-        description: "Additional comment about user's status"
-      - field: status_comment_time_stamp
-        type: timestamp
-        description: "Timestamp when status comment was created"
-      - field: total_pages
-        type: integer
-        description: "Total number of pages available"
-*/
 SELECT
     login,
     first_name,
@@ -126,12 +24,14 @@ WHERE
         FROM denormalized_user_data AS d_2
         WHERE d_1.id_code = d_2.id_code
     )
-    AND (authority_name)::TEXT[] && 
-        (SELECT array_agg(trim(e)) FROM 
-            unnest(string_to_array(
-            btrim(:roles, '[]'), 
-            ','
-            )) AS e)::TEXT ARRAY
+    AND (authority_name)::TEXT []
+    && (
+        SELECT ARRAY_AGG(TRIM(e)) FROM
+            UNNEST(STRING_TO_ARRAY(
+                BTRIM(:roles, '[]'),
+                ','
+            )) AS e
+    )::TEXT ARRAY
     AND (
         :search_display_name_and_csa_title IS NULL
         OR display_name ILIKE '%' || :search_display_name_and_csa_title || '%'
@@ -139,10 +39,12 @@ WHERE
     )
     AND (
         :search_full_name_and_csa_title IS NULL
-        OR (first_name || ' ' || last_name) ILIKE '%' || :search_full_name_and_csa_title || '%'
+        OR (first_name || ' ' || last_name) ILIKE '%'
+        || :search_full_name_and_csa_title
+        || '%'
         OR csa_title ILIKE '%' || :search_full_name_and_csa_title || '%'
     )
-    AND ((:show_active_only)::boolean <> TRUE OR status <> 'offline')
+    AND ((:show_active_only)::BOOLEAN <> TRUE OR status <> 'offline')
     AND (:search_full_name IS NULL OR (
         (first_name || ' ' || last_name) ILIKE '%' || :search_full_name || '%'
     ))
@@ -180,4 +82,5 @@ ORDER BY
     CASE WHEN :sorting = 'department desc' THEN department END DESC,
     CASE WHEN :sorting = 'customerSupportStatus asc' THEN status END ASC,
     CASE WHEN :sorting = 'customerSupportStatus desc' THEN status END DESC
-OFFSET ((GREATEST((:page)::integer, 1) - 1) * (:page_size)::integer) LIMIT (:page_size)::integer;
+LIMIT
+    (:page_size)::INTEGER OFFSET ((GREATEST((:page)::INTEGER, 1) - 1) * (:page_size)::INTEGER);

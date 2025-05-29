@@ -66,13 +66,13 @@ declaration:
         type: timestamp
         description: "Timestamp when the message record was last updated"
 */
-WITH filtered_messages AS (
-    SELECT DISTINCT ON (m.base_id)
-    *
-    FROM message m
-    WHERE m.chat_base_id = :chatId
-    ORDER BY m.base_id, m.updated DESC
-)
+WITH
+    filtered_messages AS (
+        SELECT DISTINCT ON (m.base_id) *
+        FROM message AS m
+        WHERE m.chat_base_id = :chatId
+        ORDER BY m.base_id ASC, m.updated DESC
+    )
 
 SELECT
     fm.base_id AS id,

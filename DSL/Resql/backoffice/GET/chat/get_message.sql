@@ -83,4 +83,4 @@ SELECT
 FROM message
 WHERE base_id = :id
 ORDER BY updated DESC
-LIMIT 1
+LIMIT 1;
