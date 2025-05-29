@@ -20,7 +20,7 @@ declaration:
 SELECT
     NOW()::TEXT AS updated,
     COPY_ROW_WITH_MODIFICATIONS(
-        'chat',
+        'chat.chat',
         'id', '::UUID', id::VARCHAR,
         ARRAY[
             'customer_support_id', '', '',

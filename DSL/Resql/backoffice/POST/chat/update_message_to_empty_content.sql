@@ -23,17 +23,17 @@ declaration:
 SELECT
     NOW()::TEXT AS updated,
     COPY_ROW_WITH_MODIFICATIONS(
-        'message',
+        'chat.message',
         'id', '::UUID', id::VARCHAR,
         ARRAY[
             'content', '', '',
             'updated', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR
         ]::VARCHAR []
     )
-FROM message AS m_1
+FROM chat.message AS m_1
 WHERE
     chat_base_id IN (
         :chats) AND updated = (
-        SELECT MAX(updated) FROM message AS m_2
+        SELECT MAX(updated) FROM chat.message AS m_2
         WHERE m_1.chat_base_id = m_2.chat_base_id AND m_1.base_id = m_2.base_id
     );

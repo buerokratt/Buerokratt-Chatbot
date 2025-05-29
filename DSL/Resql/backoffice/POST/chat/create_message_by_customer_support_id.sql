@@ -40,7 +40,7 @@ declaration:
 
 SELECT
     COPY_ROW_WITH_MODIFICATIONS(
-        'message',
+        'chat.message',
         'id', '::UUID', id::VARCHAR,
         ARRAY[
             'content', '', :content,
@@ -54,21 +54,21 @@ SELECT
     )::INTEGER AS id,
     chat_base_id,
     base_id
-FROM message AS m_1
+FROM chat.message AS m_1
 WHERE
     chat_base_id IN (
         SELECT base_id
-        FROM chat AS c_1
+        FROM chat.chat AS c_1
         WHERE
             updated = (
-                SELECT MAX(c_2.updated) FROM chat AS c_2
+                SELECT MAX(c_2.updated) FROM chat.chat AS c_2
                 WHERE c_2.base_id = c_1.base_id
             )
             AND customer_support_id = :customerSupportId
             AND ended IS null
     )
     AND id = (
-        SELECT id FROM message AS m_2
+        SELECT id FROM chat.message AS m_2
         WHERE m_1.chat_base_id = m_2.chat_base_id
         ORDER BY updated DESC LIMIT 1
     );

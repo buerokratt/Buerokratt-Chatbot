@@ -35,7 +35,7 @@ declaration:
         description: "User's department"
 */
 SELECT COPY_ROW_WITH_MODIFICATIONS(
-    'user',
+    'auth_users.user',
     'id', '::UUID', id::VARCHAR,
     ARRAY[
         'first_name', '', :firstName,

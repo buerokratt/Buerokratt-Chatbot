@@ -29,7 +29,7 @@ declaration:
 
 SELECT
     (COPY_ROW_WITH_MODIFICATIONS(
-        'chat',
+        'chat.chat',
         'id', '::UUID', id::VARCHAR,
         ARRAY[
             'end_user_id', '', :endUserId,

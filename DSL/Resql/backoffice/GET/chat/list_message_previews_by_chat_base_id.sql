@@ -22,6 +22,6 @@ declaration:
 SELECT DISTINCT ON (chat_base_id)
     content,
     chat_base_id
-FROM message_preview
+FROM chat.message_preview
 WHERE chat_base_id = :chatId
 ORDER BY chat_base_id ASC, created DESC;

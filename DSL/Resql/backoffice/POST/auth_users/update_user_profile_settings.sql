@@ -35,7 +35,7 @@ declaration:
 */
 SELECT
     COPY_ROW_WITH_MODIFICATIONS(
-        'denormalized_user_data',
+        'auth_users.denormalized_user_data',
         'id', '::UUID', id::VARCHAR,
         ARRAY[
             'forwarded_chat_popup_notifications', '', :forwardedChatPopupNotifications,
@@ -48,7 +48,7 @@ SELECT
             'created', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR
         ]::VARCHAR []
     )
-FROM denormalized_user_data
+FROM auth_users.denormalized_user_data
 WHERE id_code = :userId
 ORDER BY created DESC
 LIMIT 1;

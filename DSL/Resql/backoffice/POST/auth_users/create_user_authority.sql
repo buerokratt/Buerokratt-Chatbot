@@ -41,7 +41,7 @@ declaration:
         description: "User's department"
 */
 SELECT COPY_ROW_WITH_MODIFICATIONS(
-    'denormalized_user_data',
+    'auth_users.denormalized_user_data',
     'id', '::UUID', id::VARCHAR,
     ARRAY[
         'first_name', '', :firstName,
@@ -54,7 +54,7 @@ SELECT COPY_ROW_WITH_MODIFICATIONS(
         'authority_name', '::authority_role_type[]', (ARRAY[:roles])::VARCHAR,
         'created', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR
     ]::VARCHAR []
-) FROM denormalized_user_data
+) FROM auth_users.denormalized_user_data
 WHERE id_code = :userIdCode
 ORDER BY created DESC
 LIMIT 1;

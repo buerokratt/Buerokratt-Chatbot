@@ -69,7 +69,7 @@ declaration:
 WITH
     filtered_messages AS (
         SELECT DISTINCT ON (m.base_id) *
-        FROM message AS m
+        FROM chat.message AS m
         WHERE m.chat_base_id = :chatId
         ORDER BY m.base_id ASC, m.updated DESC
     )
