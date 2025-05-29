@@ -31,11 +31,15 @@ ALTER TABLE IF EXISTS org.establishment SET SCHEMA public;
 -- analytics schema
 ALTER TABLE IF EXISTS analytics.scheduled_reports SET SCHEMA public;
 
+-- security schema
+ALTER TABLE IF EXISTS security.request_nonces SET SCHEMA public;
+
 -- 2. Drop schemas if empty
 DROP SCHEMA IF EXISTS auth_users;
 DROP SCHEMA IF EXISTS chat;
 DROP SCHEMA IF EXISTS config;
 DROP SCHEMA IF EXISTS org;
 DROP SCHEMA IF EXISTS analytics;
+DROP SCHEMA IF EXISTS security;
 
 COMMIT;

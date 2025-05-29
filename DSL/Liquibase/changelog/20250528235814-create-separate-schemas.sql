@@ -7,6 +7,7 @@ CREATE SCHEMA IF NOT EXISTS chat;
 CREATE SCHEMA IF NOT EXISTS config;
 CREATE SCHEMA IF NOT EXISTS org;
 CREATE SCHEMA IF NOT EXISTS analytics;
+CREATE SCHEMA IF NOT EXISTS security;
 
 -- 2. Move tables to their respective schemas
 -- auth_users schema
@@ -36,3 +37,6 @@ ALTER TABLE IF EXISTS public.establishment SET SCHEMA org;
 
 -- analytics schema
 ALTER TABLE IF EXISTS public.scheduled_reports SET SCHEMA analytics;
+
+-- security schema
+ALTER TABLE IF EXISTS public.request_nonces SET SCHEMA security;
