@@ -82,17 +82,24 @@ WHERE
     AND m.chat_base_id = mu.chat_base_id;
 
 UPDATE chat c
-SET
-  created = m.min_created
+SET created = LEAST(m.min_created, c.min_created)
 FROM (
   SELECT
     chat_base_id,
     MIN(created) AS min_created
   FROM message
   GROUP BY chat_base_id
-) m
+) m,
+(
+  SELECT
+    base_id,
+    MIN(created) AS min_created
+  FROM chat
+  GROUP BY base_id  
+) c_min
 WHERE c.base_id = m.chat_base_id
-  AND (c.created > m.min_created);
+  AND c.base_id = c_min.base_id
+  AND c.created != LEAST(m.min_created, c_min.min_created);
 
 WITH first_row_by_base_id AS (
   SELECT
@@ -107,3 +114,17 @@ SET
 FROM first_row_by_base_id f
 WHERE c.base_id = f.base_id
   AND c.id = f.min_id;
+
+UPDATE chat 
+SET ended = subquery.min_ended
+FROM (
+    SELECT 
+        base_id,
+        MIN(ended) as min_ended
+    FROM chat 
+    WHERE ended IS NOT NULL
+    GROUP BY base_id
+) subquery
+WHERE chat.base_id = subquery.base_id
+  AND chat.ended IS NOT NULL
+  AND chat.ended != subquery.min_ended;

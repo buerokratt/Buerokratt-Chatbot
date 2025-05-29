@@ -18,9 +18,12 @@ declaration:
 */
 WITH
     grouped_configurations AS (
-        SELECT DISTINCT ON (key) id, key, created
-        FROM config.configuration
-        ORDER BY key, created DESC
+        SELECT DISTINCT ON (key)
+            id,
+            key,
+            created
+        FROM configuration
+        ORDER BY key ASC, created DESC
     )
 
 SELECT
@@ -38,7 +41,7 @@ FROM (
         key,
         value,
         deleted
-    FROM config.configuration
+    FROM configuration
     WHERE
         key = 'estimated_waiting_time'
         AND id IN (SELECT id FROM grouped_configurations)
@@ -56,7 +59,7 @@ FROM (
             key,
             value,
             deleted
-        FROM config.configuration
+        FROM configuration
         WHERE
             key = 'is_estimated_waiting_time_active'
             AND id IN (SELECT id FROM grouped_configurations)

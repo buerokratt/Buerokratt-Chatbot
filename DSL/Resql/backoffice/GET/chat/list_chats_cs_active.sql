@@ -96,12 +96,38 @@ declaration:
         type: string
         description: "Title of the customer support agent (included only if is_csa_title_visible is true)"
 */
-WITH latest_chat_versions AS (
-    -- First get the latest version of each chat
-    SELECT DISTINCT ON (chat_id) *
-    FROM chat.denormalized_chat
-    ORDER BY chat_id, denormalized_record_created DESC
-)
+WITH
+    latest_chat_versions AS (
+        -- Get the latest version of each chat with explicit columns
+        SELECT DISTINCT ON (chat_id)
+            chat_id,
+            customer_support_id,
+            customer_support_display_name,
+            end_user_id,
+            end_user_first_name,
+            end_user_last_name,
+            status,
+            created,
+            updated,
+            ended,
+            end_user_email,
+            end_user_phone,
+            end_user_os,
+            end_user_url,
+            external_id,
+            forwarded_to,
+            forwarded_to_name,
+            received_from,
+            received_from_name,
+            customer_messages_count,
+            last_message_with_content_and_not_rating_or_forward,
+            contacts_message,
+            last_message_with_not_rating_or_forward_events_timestamp,
+            last_message_event_with_content,
+            csa_title
+        FROM denormalized_chat
+        ORDER BY chat_id ASC, denormalized_record_created DESC
+    )
 
 SELECT
     chat_id AS id,
@@ -134,8 +160,8 @@ SELECT
     END AS csa_title
 
 FROM latest_chat_versions
-WHERE 
-    ended IS NULL 
+WHERE
+    ended IS NULL
     AND customer_support_id <> :bot_institution_id
     AND status <> 'VALIDATING'
 ORDER BY created ASC

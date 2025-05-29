@@ -76,11 +76,11 @@ VALUES (
         ELSE (GEN_RANDOM_UUID()::VARCHAR)
     END),
     :content,
-    LOWER(:event)::event_type,
+    LOWER(:event)::EVENT_TYPE,
     :authorId,
     :authorFirstName,
     :authorLastName,
-    :authorRole::author_role_type,
+    :authorRole::AUTHOR_ROLE_TYPE,
     (NULLIF(:rating, '')::INTEGER),
     :forwardedByUser,
     :forwardedFromCsa,

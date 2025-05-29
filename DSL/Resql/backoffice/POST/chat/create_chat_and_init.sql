@@ -115,13 +115,13 @@ VALUES (
     :endUserId,
     :endUserFirstName,
     :endUserLastName,
-    :status::chat_status_type,
-    CASE 
-        WHEN :created::TEXT = 'CURRENT_TIMESTAMP' THEN now()
-        ELSE COALESCE(:created::TIMESTAMP WITH TIME ZONE, now())
+    :status::CHAT_STATUS_TYPE,
+    CASE
+        WHEN :created::TEXT = 'CURRENT_TIMESTAMP' THEN NOW()
+        ELSE COALESCE(:created::TIMESTAMP WITH TIME ZONE, NOW())
     END,
     (CASE
-        WHEN :ended::TEXT = 'CURRENT_TIMESTAMP' THEN now()
+        WHEN :ended::TEXT = 'CURRENT_TIMESTAMP' THEN NOW()
         WHEN (:ended = '') THEN NULL
         WHEN (:ended = 'null') THEN NULL
         ELSE :ended::TIMESTAMP WITH TIME ZONE
@@ -138,8 +138,9 @@ VALUES (
     :receivedFrom,
     :receivedFromName,
     CASE
-      WHEN :is_bot_active = 'true' THEN ''
-      ELSE ''
+        WHEN :is_bot_active = 'true' THEN ''
+        ELSE ''
     END
 )
-RETURNING id, customer_support_id, customer_support_display_name, csa_title, updated::TEXT;
+RETURNING
+    id, customer_support_id, customer_support_display_name, csa_title, updated::TEXT;

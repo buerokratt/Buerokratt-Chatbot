@@ -18,9 +18,12 @@ declaration:
 */
 WITH
     grouped_configurations AS (
-        SELECT DISTINCT ON (key) id, key, created
-        FROM config.configuration
-        ORDER BY key, created DESC
+        SELECT DISTINCT ON (key)
+            id,
+            key,
+            created
+        FROM configuration
+        ORDER BY key ASC, created DESC
     )
 
 SELECT
@@ -36,7 +39,7 @@ FROM (
         key,
         value,
         deleted
-    FROM config.configuration
+    FROM configuration
     WHERE
         key = 'greeting_message_est'
         AND id IN (SELECT id FROM grouped_configurations)
@@ -54,7 +57,7 @@ FROM (
             key,
             value,
             deleted
-        FROM config.configuration
+        FROM configuration
         WHERE
             key = 'is_greeting_message_active'
             AND id IN (SELECT id FROM grouped_configurations)

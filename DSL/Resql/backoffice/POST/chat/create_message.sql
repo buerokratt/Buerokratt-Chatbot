@@ -81,19 +81,19 @@ VALUES (
         ELSE (GEN_RANDOM_UUID()::VARCHAR)
     END),
     :content,
-    LOWER(:event)::event_type,
-    CASE 
-        WHEN :authorTimestamp::TEXT = 'CURRENT_TIMESTAMP' THEN now()
-        ELSE COALESCE(:authorTimestamp::TIMESTAMP WITH TIME ZONE, now())
+    LOWER(:event)::EVENT_TYPE,
+    CASE
+        WHEN :authorTimestamp::TEXT = 'CURRENT_TIMESTAMP' THEN NOW()
+        ELSE COALESCE(:authorTimestamp::TIMESTAMP WITH TIME ZONE, NOW())
     END,
-    CASE 
-        WHEN :created::TEXT = 'CURRENT_TIMESTAMP' THEN now()
-        ELSE COALESCE(:created::TIMESTAMP WITH TIME ZONE, now())
+    CASE
+        WHEN :created::TEXT = 'CURRENT_TIMESTAMP' THEN NOW()
+        ELSE COALESCE(:created::TIMESTAMP WITH TIME ZONE, NOW())
     END,
     :authorId,
     :authorFirstName,
     :authorLastName,
-    :authorRole::author_role_type,
+    :authorRole::AUTHOR_ROLE_TYPE,
     (NULLIF(:rating, '')::INTEGER),
     :forwardedByUser,
     :forwardedFromCsa,

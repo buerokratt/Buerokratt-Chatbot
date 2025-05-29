@@ -28,7 +28,7 @@ INSERT INTO chat.denormalized_chat_messages_for_metrics (
     message_forwarded_to_csa,
     timestamp
 )
-SELECT 
+SELECT
     chat_base_id,
     chat_id,
     chat_status,
@@ -46,13 +46,14 @@ SELECT
     updated,
     ended,
     CASE
-        WHEN :content::TEXT <> '' AND first_message_timestamp IS NULL THEN
-            CASE
-                WHEN :lastMessageTimestamp::TEXT = 'CURRENT_TIMESTAMP' THEN NOW()
-                WHEN :lastMessageTimestamp::TEXT = '' THEN NULL
-                WHEN :lastMessageTimestamp::TEXT = 'null' THEN NOW()
-                ELSE :lastMessageTimestamp::TIMESTAMP WITH TIME ZONE
-            END
+        WHEN :content::TEXT <> '' AND first_message_timestamp IS NULL
+            THEN
+                CASE
+                    WHEN :lastMessageTimestamp::TEXT = 'CURRENT_TIMESTAMP' THEN NOW()
+                    WHEN :lastMessageTimestamp::TEXT = '' THEN NULL
+                    WHEN :lastMessageTimestamp::TEXT = 'null' THEN NOW()
+                    ELSE :lastMessageTimestamp::TIMESTAMP WITH TIME ZONE
+                END
         ELSE first_message_timestamp
     END,
     CASE
@@ -75,8 +76,8 @@ SELECT
         WHEN :messageUpdated::TEXT = 'null' THEN NOW()
         ELSE :messageUpdated::TIMESTAMP WITH TIME ZONE
     END,
-    LOWER(:messageEvent)::event_type,
-    :messageAuthorRole::author_role_type,
+    LOWER(:messageEvent)::EVENT_TYPE,
+    :messageAuthorRole::AUTHOR_ROLE_TYPE,
     :messageAuthorId::VARCHAR,
     :messageForwardedFromCsa::VARCHAR,
     :messageForwardedToCsa::VARCHAR,

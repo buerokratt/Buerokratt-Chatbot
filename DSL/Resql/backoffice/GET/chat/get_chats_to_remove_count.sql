@@ -22,8 +22,8 @@ declaration:
 SELECT COUNT(*) AS total_count
 FROM (
     SELECT DISTINCT ON (chat_id) *
-    FROM chat.denormalized_chat
-    ORDER BY chat_id, denormalized_record_created DESC
+    FROM denormalized_chat
+    ORDER BY chat_id ASC, denormalized_record_created DESC
 ) AS latest_chats
 WHERE
     latest_chats.ended IS NOT NULL
@@ -37,15 +37,16 @@ WHERE
         OR
         (
             latest_chats.end_user_id IS NULL
-            OR latest_chats.end_user_id = '' AND latest_chats.ended::DATE <= :anon_date::DATE
+            OR latest_chats.end_user_id = ''
+            AND latest_chats.ended::DATE <= :anon_date::DATE
         )
     )
     AND (
-        latest_chats.all_messages IS NOT NULL 
-        AND array_length(latest_chats.all_messages, 1) > 0
+        latest_chats.all_messages IS NOT NULL
+        AND ARRAY_LENGTH(latest_chats.all_messages, 1) > 0
         AND EXISTS (
             SELECT 1
-            FROM unnest(latest_chats.all_messages) AS message_content
+            FROM UNNEST(latest_chats.all_messages) AS message_content
             WHERE message_content IS NOT NULL AND message_content <> ''
         )
     );

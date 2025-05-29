@@ -16,8 +16,8 @@ declaration:
         description: "Array of establishment names"
 */
 SELECT ARRAY_AGG(name) AS names
-FROM org.establishment AS e1
+FROM establishment AS e_1
 WHERE created = (
-    SELECT MAX(e2.created) FROM org.establishment AS e2
-    WHERE e1.base_id = e2.base_id
+    SELECT MAX(e_2.created) FROM establishment AS e_2
+    WHERE e_1.base_id = e_2.base_id
 ) AND deleted = false

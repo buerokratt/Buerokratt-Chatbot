@@ -1,4 +1,3 @@
-
 /*
 declaration:
   version: 0.1
@@ -45,7 +44,7 @@ WITH
         SELECT
             key,
             value
-        FROM config.configuration AS c1
+        FROM configuration AS c_1
         WHERE key IN (
             'organizationMondayWorkingTimeStartISO',
             'organizationMondayWorkingTimeEndISO',
@@ -69,8 +68,8 @@ WITH
             'organizationWorkingTimeNationalHolidays'
         )
         AND created = (
-            SELECT MAX(c2.created) FROM config.configuration as c2
-            WHERE c2.key = c1.key
+            SELECT MAX(c_2.created) FROM configuration AS c_2
+            WHERE c_2.key = c_1.key
         )
         AND deleted = FALSE
     ),
@@ -204,50 +203,68 @@ WITH
                     is_the_same_on_all_working_days
                     THEN
                         TO_CHAR(
-                            now(),
+                            NOW(),
                             (SELECT time_format FROM consts)
                         )::TIME
                 WHEN current_day.current_day = 'monday'
                     THEN CASE
                         WHEN
                             (
-                                SELECT TO_CHAR(value, (SELECT time_format FROM consts))::TIME
+                                SELECT
+                                    TO_CHAR(
+                                        value, (SELECT time_format FROM consts)
+                                    )::TIME
                                 FROM monday_start_time
                             )
                             > (
-                                SELECT TO_CHAR(value, (SELECT time_format FROM consts))::TIME
+                                SELECT
+                                    TO_CHAR(
+                                        value, (SELECT time_format FROM consts)
+                                    )::TIME
                                 FROM monday_end_time
                             )
                             THEN
                                 TO_CHAR(
-                                    now(),
+                                    NOW(),
                                     (SELECT time_format FROM consts)
                                 )::TIME BETWEEN
                                 (
-                                    SELECT TO_CHAR(value, (SELECT time_format FROM consts))::TIME
+                                    SELECT
+                                        TO_CHAR(
+                                            value, (SELECT time_format FROM consts)
+                                        )::TIME
                                     FROM monday_start_time
                                 ) AND (SELECT max_time FROM consts
                                 )::TIME
                                 OR TO_CHAR(
-                                    now(),
+                                    NOW(),
                                     (SELECT time_format FROM consts)
                                 )::TIME BETWEEN (SELECT min_time FROM consts
                                 )::TIME AND
                                 (
-                                    SELECT TO_CHAR(value, (SELECT time_format FROM consts))::TIME
+                                    SELECT
+                                        TO_CHAR(
+                                            value, (SELECT time_format FROM consts)
+                                        )::TIME
                                     FROM monday_end_time
                                 )
                         ELSE
                             TO_CHAR(
-                                now(),
+                                NOW(),
                                 (SELECT time_format FROM consts)
                             )::TIME BETWEEN
                             (
-                                SELECT TO_CHAR(value, (SELECT time_format FROM consts))::TIME
+                                SELECT
+                                    TO_CHAR(
+                                        value, (SELECT time_format FROM consts)
+                                    )::TIME
                                 FROM monday_start_time
                             ) AND
                             (
-                                SELECT TO_CHAR(value, (SELECT time_format FROM consts))::TIME
+                                SELECT
+                                    TO_CHAR(
+                                        value, (SELECT time_format FROM consts)
+                                    )::TIME
                                 FROM monday_end_time
                             )
                     END
@@ -255,43 +272,61 @@ WITH
                     THEN CASE
                         WHEN
                             (
-                                SELECT TO_CHAR(value, (SELECT time_format FROM consts))::TIME
+                                SELECT
+                                    TO_CHAR(
+                                        value, (SELECT time_format FROM consts)
+                                    )::TIME
                                 FROM tuesday_start_time
                             )
                             > (
-                                SELECT TO_CHAR(value, (SELECT time_format FROM consts))::TIME
+                                SELECT
+                                    TO_CHAR(
+                                        value, (SELECT time_format FROM consts)
+                                    )::TIME
                                 FROM tuesday_end_time
                             )
                             THEN
                                 TO_CHAR(
-                                    now(),
+                                    NOW(),
                                     (SELECT time_format FROM consts)
                                 )::TIME BETWEEN
                                 (
-                                    SELECT TO_CHAR(value, (SELECT time_format FROM consts))::TIME
+                                    SELECT
+                                        TO_CHAR(
+                                            value, (SELECT time_format FROM consts)
+                                        )::TIME
                                     FROM tuesday_start_time
                                 ) AND (SELECT max_time FROM consts
                                 )::TIME
                                 OR TO_CHAR(
-                                    now(),
+                                    NOW(),
                                     (SELECT time_format FROM consts)
                                 )::TIME BETWEEN (SELECT min_time FROM consts
                                 )::TIME AND
                                 (
-                                    SELECT TO_CHAR(value, (SELECT time_format FROM consts))::TIME
+                                    SELECT
+                                        TO_CHAR(
+                                            value, (SELECT time_format FROM consts)
+                                        )::TIME
                                     FROM tuesday_end_time
                                 )
                         ELSE
                             TO_CHAR(
-                                now(),
+                                NOW(),
                                 (SELECT time_format FROM consts)
                             )::TIME BETWEEN
                             (
-                                SELECT TO_CHAR(value, (SELECT time_format FROM consts))::TIME
+                                SELECT
+                                    TO_CHAR(
+                                        value, (SELECT time_format FROM consts)
+                                    )::TIME
                                 FROM tuesday_start_time
                             ) AND
                             (
-                                SELECT TO_CHAR(value, (SELECT time_format FROM consts))::TIME
+                                SELECT
+                                    TO_CHAR(
+                                        value, (SELECT time_format FROM consts)
+                                    )::TIME
                                 FROM tuesday_end_time
                             )
                     END
@@ -299,43 +334,61 @@ WITH
                     THEN CASE
                         WHEN
                             (
-                                SELECT TO_CHAR(value, (SELECT time_format FROM consts))::TIME
+                                SELECT
+                                    TO_CHAR(
+                                        value, (SELECT time_format FROM consts)
+                                    )::TIME
                                 FROM wednesday_start_time
                             )
                             > (
-                                SELECT TO_CHAR(value, (SELECT time_format FROM consts))::TIME
+                                SELECT
+                                    TO_CHAR(
+                                        value, (SELECT time_format FROM consts)
+                                    )::TIME
                                 FROM wednesday_end_time
                             )
                             THEN
                                 TO_CHAR(
-                                    now(),
+                                    NOW(),
                                     (SELECT time_format FROM consts)
                                 )::TIME BETWEEN
                                 (
-                                    SELECT TO_CHAR(value, (SELECT time_format FROM consts))::TIME
+                                    SELECT
+                                        TO_CHAR(
+                                            value, (SELECT time_format FROM consts)
+                                        )::TIME
                                     FROM wednesday_start_time
                                 ) AND (SELECT max_time FROM consts
                                 )::TIME
                                 OR TO_CHAR(
-                                    now(),
+                                    NOW(),
                                     (SELECT time_format FROM consts)
                                 )::TIME BETWEEN (SELECT min_time FROM consts
                                 )::TIME AND
                                 (
-                                    SELECT TO_CHAR(value, (SELECT time_format FROM consts))::TIME
+                                    SELECT
+                                        TO_CHAR(
+                                            value, (SELECT time_format FROM consts)
+                                        )::TIME
                                     FROM wednesday_end_time
                                 )
                         ELSE
                             TO_CHAR(
-                                now(),
+                                NOW(),
                                 (SELECT time_format FROM consts)
                             )::TIME BETWEEN
                             (
-                                SELECT TO_CHAR(value, (SELECT time_format FROM consts))::TIME
+                                SELECT
+                                    TO_CHAR(
+                                        value, (SELECT time_format FROM consts)
+                                    )::TIME
                                 FROM wednesday_start_time
                             ) AND
                             (
-                                SELECT TO_CHAR(value, (SELECT time_format FROM consts))::TIME
+                                SELECT
+                                    TO_CHAR(
+                                        value, (SELECT time_format FROM consts)
+                                    )::TIME
                                 FROM wednesday_end_time
                             )
                     END
@@ -343,43 +396,61 @@ WITH
                     THEN CASE
                         WHEN
                             (
-                                SELECT TO_CHAR(value, (SELECT time_format FROM consts))::TIME
+                                SELECT
+                                    TO_CHAR(
+                                        value, (SELECT time_format FROM consts)
+                                    )::TIME
                                 FROM thursday_start_time
                             )
                             > (
-                                SELECT TO_CHAR(value, (SELECT time_format FROM consts))::TIME
+                                SELECT
+                                    TO_CHAR(
+                                        value, (SELECT time_format FROM consts)
+                                    )::TIME
                                 FROM thursday_end_time
                             )
                             THEN
                                 TO_CHAR(
-                                    now(),
+                                    NOW(),
                                     (SELECT time_format FROM consts)
                                 )::TIME BETWEEN
                                 (
-                                    SELECT TO_CHAR(value, (SELECT time_format FROM consts))::TIME
+                                    SELECT
+                                        TO_CHAR(
+                                            value, (SELECT time_format FROM consts)
+                                        )::TIME
                                     FROM thursday_start_time
                                 ) AND (SELECT max_time FROM consts
                                 )::TIME
                                 OR TO_CHAR(
-                                    now(),
+                                    NOW(),
                                     (SELECT time_format FROM consts)
                                 )::TIME BETWEEN (SELECT min_time FROM consts
                                 )::TIME AND
                                 (
-                                    SELECT TO_CHAR(value, (SELECT time_format FROM consts))::TIME
+                                    SELECT
+                                        TO_CHAR(
+                                            value, (SELECT time_format FROM consts)
+                                        )::TIME
                                     FROM thursday_end_time
                                 )
                         ELSE
                             TO_CHAR(
-                                now(),
+                                NOW(),
                                 (SELECT time_format FROM consts)
                             )::TIME BETWEEN
                             (
-                                SELECT TO_CHAR(value, (SELECT time_format FROM consts))::TIME
+                                SELECT
+                                    TO_CHAR(
+                                        value, (SELECT time_format FROM consts)
+                                    )::TIME
                                 FROM thursday_start_time
                             ) AND
                             (
-                                SELECT TO_CHAR(value, (SELECT time_format FROM consts))::TIME
+                                SELECT
+                                    TO_CHAR(
+                                        value, (SELECT time_format FROM consts)
+                                    )::TIME
                                 FROM thursday_end_time
                             )
                     END
@@ -387,43 +458,61 @@ WITH
                     THEN CASE
                         WHEN
                             (
-                                SELECT TO_CHAR(value, (SELECT time_format FROM consts))::TIME
+                                SELECT
+                                    TO_CHAR(
+                                        value, (SELECT time_format FROM consts)
+                                    )::TIME
                                 FROM friday_start_time
                             )
                             > (
-                                SELECT TO_CHAR(value, (SELECT time_format FROM consts))::TIME
+                                SELECT
+                                    TO_CHAR(
+                                        value, (SELECT time_format FROM consts)
+                                    )::TIME
                                 FROM friday_end_time
                             )
                             THEN
                                 TO_CHAR(
-                                    now(),
+                                    NOW(),
                                     (SELECT time_format FROM consts)
                                 )::TIME BETWEEN
                                 (
-                                    SELECT TO_CHAR(value, (SELECT time_format FROM consts))::TIME
+                                    SELECT
+                                        TO_CHAR(
+                                            value, (SELECT time_format FROM consts)
+                                        )::TIME
                                     FROM friday_start_time
                                 ) AND (SELECT max_time FROM consts
                                 )::TIME
                                 OR TO_CHAR(
-                                    now(),
+                                    NOW(),
                                     (SELECT time_format FROM consts)
                                 )::TIME BETWEEN (SELECT min_time FROM consts
                                 )::TIME AND
                                 (
-                                    SELECT TO_CHAR(value, (SELECT time_format FROM consts))::TIME
+                                    SELECT
+                                        TO_CHAR(
+                                            value, (SELECT time_format FROM consts)
+                                        )::TIME
                                     FROM friday_end_time
                                 )
                         ELSE
                             TO_CHAR(
-                                now(),
+                                NOW(),
                                 (SELECT time_format FROM consts)
                             )::TIME BETWEEN
                             (
-                                SELECT TO_CHAR(value, (SELECT time_format FROM consts))::TIME
+                                SELECT
+                                    TO_CHAR(
+                                        value, (SELECT time_format FROM consts)
+                                    )::TIME
                                 FROM friday_start_time
                             ) AND
                             (
-                                SELECT TO_CHAR(value, (SELECT time_format FROM consts))::TIME
+                                SELECT
+                                    TO_CHAR(
+                                        value, (SELECT time_format FROM consts)
+                                    )::TIME
                                 FROM friday_end_time
                             )
                     END
@@ -431,43 +520,61 @@ WITH
                     THEN CASE
                         WHEN
                             (
-                                SELECT TO_CHAR(value, (SELECT time_format FROM consts))::TIME
+                                SELECT
+                                    TO_CHAR(
+                                        value, (SELECT time_format FROM consts)
+                                    )::TIME
                                 FROM saturday_start_time
                             )
                             > (
-                                SELECT TO_CHAR(value, (SELECT time_format FROM consts))::TIME
+                                SELECT
+                                    TO_CHAR(
+                                        value, (SELECT time_format FROM consts)
+                                    )::TIME
                                 FROM saturday_end_time
                             )
                             THEN
                                 TO_CHAR(
-                                    now(),
+                                    NOW(),
                                     (SELECT time_format FROM consts)
                                 )::TIME BETWEEN
                                 (
-                                    SELECT TO_CHAR(value, (SELECT time_format FROM consts))::TIME
+                                    SELECT
+                                        TO_CHAR(
+                                            value, (SELECT time_format FROM consts)
+                                        )::TIME
                                     FROM saturday_start_time
                                 ) AND (SELECT max_time FROM consts
                                 )::TIME
                                 OR TO_CHAR(
-                                    now(),
+                                    NOW(),
                                     (SELECT time_format FROM consts)
                                 )::TIME BETWEEN (SELECT min_time FROM consts
                                 )::TIME AND
                                 (
-                                    SELECT TO_CHAR(value, (SELECT time_format FROM consts))::TIME
+                                    SELECT
+                                        TO_CHAR(
+                                            value, (SELECT time_format FROM consts)
+                                        )::TIME
                                     FROM saturday_end_time
                                 )
                         ELSE
                             TO_CHAR(
-                                now(),
+                                NOW(),
                                 (SELECT time_format FROM consts)
                             )::TIME BETWEEN
                             (
-                                SELECT TO_CHAR(value, (SELECT time_format FROM consts))::TIME
+                                SELECT
+                                    TO_CHAR(
+                                        value, (SELECT time_format FROM consts)
+                                    )::TIME
                                 FROM saturday_start_time
                             ) AND
                             (
-                                SELECT TO_CHAR(value, (SELECT time_format FROM consts))::TIME
+                                SELECT
+                                    TO_CHAR(
+                                        value, (SELECT time_format FROM consts)
+                                    )::TIME
                                 FROM saturday_end_time
                             )
                     END
@@ -483,26 +590,32 @@ WITH
                         )
                         THEN
                             TO_CHAR(
-                                now(),
+                                NOW(),
                                 (SELECT time_format FROM consts)
                             )::TIME BETWEEN
                             (
-                                SELECT TO_CHAR(value, (SELECT time_format FROM consts))::TIME
+                                SELECT
+                                    TO_CHAR(
+                                        value, (SELECT time_format FROM consts)
+                                    )::TIME
                                 FROM sunday_start_time
                             ) AND (SELECT max_time FROM consts
                             )::TIME
                             OR TO_CHAR(
-                                now(),
+                                NOW(),
                                 (SELECT time_format FROM consts)
                             )::TIME BETWEEN (SELECT min_time FROM consts
                             )::TIME AND
                             (
-                                SELECT TO_CHAR(value, (SELECT time_format FROM consts))::TIME
+                                SELECT
+                                    TO_CHAR(
+                                        value, (SELECT time_format FROM consts)
+                                    )::TIME
                                 FROM sunday_end_time
                             )
                     ELSE
                         TO_CHAR(
-                            now(),
+                            NOW(),
                             (SELECT time_format FROM consts)
                         )::TIME BETWEEN
                         (
@@ -528,24 +641,28 @@ WITH
                     THEN CASE
                         WHEN is_closed_on_weekends.is_closed_on_weekends THEN FALSE
                         ELSE
-                            COALESCE(EXISTS
-                            (
-                                SELECT 1
-                                FROM working_week_days
-                                WHERE
-                                    TRIM(current_day.current_day)
-                                    = ANY(STRING_TO_ARRAY(value, ','))
-                            ), FALSE)
+                            COALESCE(
+                                EXISTS
+                                (
+                                    SELECT 1
+                                    FROM working_week_days
+                                    WHERE
+                                        TRIM(current_day.current_day)
+                                        = ANY(STRING_TO_ARRAY(value, ','))
+                                ), FALSE
+                            )
                     END
                 ELSE
-                    COALESCE(EXISTS
-                    (
-                        SELECT 1
-                        FROM working_week_days
-                        WHERE
-                            TRIM(current_day.current_day)
-                            = ANY(STRING_TO_ARRAY(value, ','))
-                    ), FALSE)
+                    COALESCE(
+                        EXISTS
+                        (
+                            SELECT 1
+                            FROM working_week_days
+                            WHERE
+                                TRIM(current_day.current_day)
+                                = ANY(STRING_TO_ARRAY(value, ','))
+                        ), FALSE
+                    )
             END AS is_within_working_days
         FROM current_day
             CROSS JOIN is_closed_on_weekends

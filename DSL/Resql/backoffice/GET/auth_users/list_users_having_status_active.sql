@@ -40,5 +40,5 @@ FROM
 WHERE
     u.status = 'active'
 ORDER BY
-    u.id_code,
+    u.id_code ASC,
     u.created DESC;

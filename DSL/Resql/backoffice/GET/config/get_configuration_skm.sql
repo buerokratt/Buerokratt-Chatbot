@@ -37,7 +37,7 @@ WITH
             id,
             key,
             value
-        FROM config.configuration AS c1
+        FROM configuration AS c_1
         WHERE key IN (
             'skm_range',
             'skm_documents',
@@ -48,8 +48,8 @@ WITH
             'skm_semantic_configuration'
         )
         AND created = (
-            SELECT MAX(c2.created) FROM config.configuration as c2
-            WHERE c2.key = c1.key
+            SELECT MAX(c_2.created) FROM configuration AS c_2
+            WHERE c_2.key = c_1.key
         )
         AND NOT deleted
     )
@@ -61,5 +61,7 @@ SELECT
     MAX(CASE WHEN key = 'skm_max_tokens' THEN value END) AS max_tokens,
     MAX(CASE WHEN key = 'skm_index_name' THEN value END) AS index_name,
     MAX(CASE WHEN key = 'skm_query_type' THEN value END) AS query_type,
-    MAX(CASE WHEN KEY = 'skm_semantic_configuration' THEN value END) AS semantic_configuration
+    MAX(
+        CASE WHEN key = 'skm_semantic_configuration' THEN value END
+    ) AS semantic_configuration
 FROM configuration_values;

@@ -17,28 +17,36 @@ declaration:
         type: string
         description: "Timestamp when the chat record was duplicated and CSA cleared"
 */
-SELECT copy_row_with_modifications(
-    'chat.chat',                                   -- Table name
-    'id', '::UUID',                        -- ID column name and type
-    (SELECT id FROM chat.chat WHERE base_id = dc.chat_id ORDER BY updated DESC LIMIT 1)::VARCHAR,
-    ARRAY[                                    -- Direct array of modifications
-        'customer_support_id', '', '',        -- Reset customer_support_id
-        'customer_support_display_name', '', '',  -- Reset customer_support_display_name
-        'csa_title', '', '', -- Reset csa_title
-        'updated', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR
-    ]::VARCHAR[]
-), NOW()::TEXT as updated
-FROM chat.denormalized_chat dc
+SELECT
+    NOW()::TEXT AS updated,
+    COPY_ROW_WITH_MODIFICATIONS(
+        'chat',                                   -- Table name
+        'id', '::UUID',                        -- ID column name and type
+        (
+            SELECT id FROM chat
+            WHERE base_id = dc.chat_id
+            ORDER BY updated DESC LIMIT 1
+        )::VARCHAR,
+        ARRAY[                                    -- Direct array of modifications
+            'customer_support_id', '', '',        -- Reset customer_support_id
+            -- Reset customer_support_display_name
+            'customer_support_display_name', '', '',
+            'csa_title', '', '', -- Reset csa_title
+            'updated', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR
+        ]::VARCHAR []
+    )
+FROM denormalized_chat AS dc
 WHERE
     dc.ended IS NULL
     AND dc.customer_support_id = :userId
     -- Get only the latest record for each chat
     AND dc.denormalized_record_created = (
         SELECT MAX(dc_inner.denormalized_record_created)
-        FROM chat.denormalized_chat dc_inner
-        WHERE dc_inner.chat_id = dc.chat_id
-        AND dc_inner.ended IS NULL
-        AND dc_inner.customer_support_id = :userId
+        FROM denormalized_chat AS dc_inner
+        WHERE
+            dc_inner.chat_id = dc.chat_id
+            AND dc_inner.ended IS NULL
+            AND dc_inner.customer_support_id = :userId
     )
     AND dc.last_message_with_content_and_not_rating_or_forward IS NOT NULL
     AND dc.last_message_with_not_rating_or_forward_events_timestamp IS NOT NULL;

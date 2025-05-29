@@ -95,7 +95,7 @@ WITH
         SELECT
             key,
             value
-        FROM config.configuration AS c1
+        FROM configuration AS c_1
         WHERE key IN (
             'organizationMondayWorkingTimeStartISO',
             'organizationMondayWorkingTimeEndISO',
@@ -126,13 +126,13 @@ WITH
             'organizationBotCannotAnswerMessage'
         )
         AND created = (
-            SELECT MAX(c2.created) FROM config.configuration AS c2
-            WHERE c1.key = c2.key
+            SELECT MAX(c_2.created) FROM configuration AS c_2
+            WHERE c_1.key = c_2.key
         )
         AND deleted = FALSE
     ),
 
-new_configuration AS (
+    new_configuration AS (
         SELECT
             new_values.key,
             new_values.value
@@ -198,8 +198,14 @@ new_configuration AS (
                 'organizationAllWeekdaysTimeStartISO',
                 :organizationAllWeekdaysTimeStartISO
             ),
-            ('organizationAllWeekdaysTimeEndISO', :organizationAllWeekdaysTimeEndISO),
-            ('organizationWorkingTimeWeekdays', :organizationWorkingTimeWeekdays),
+            (
+                'organizationAllWeekdaysTimeEndISO',
+                :organizationAllWeekdaysTimeEndISO
+            ),
+            (
+                'organizationWorkingTimeWeekdays',
+                :organizationWorkingTimeWeekdays
+            ),
             ('organizationClosedOnWeekEnds', :organizationClosedOnWeekEnds),
             (
                 'organizationTheSameOnAllWorkingDays',
@@ -210,8 +216,14 @@ new_configuration AS (
                 :organizationWorkingTimeNationalHolidays
             ),
             ('organizationWorkingAllTime', :organizationWorkingAllTime),
-            ('organizationNoCsaAskForContacts', :organizationNoCsaAskForContacts),
-            ('organizationNoCsaAvailableMessage', :organizationNoCsaAvailableMessage),
+            (
+                'organizationNoCsaAskForContacts',
+                :organizationNoCsaAskForContacts
+            ),
+            (
+                'organizationNoCsaAvailableMessage',
+                :organizationNoCsaAvailableMessage
+            ),
             (
                 'organizationOutsideWorkingHoursAskForContacts',
                 :organizationOutsideWorkingHoursAskForContacts
@@ -231,7 +243,7 @@ new_configuration AS (
         ) AS new_values (key, value)
     )
 
-INSERT INTO config.configuration (key, value)
+INSERT INTO configuration (key, value)
 SELECT
     new_configuration.key,
     new_configuration.value

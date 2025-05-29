@@ -27,30 +27,33 @@ declaration:
         description: "Timestamp indicating when the update was applied"
 */
 -- Using array approach directly
-SELECT copy_row_with_modifications(
-    'chat.denormalized_chat',                              -- Table name for denormalized_chat
-    'id', '::UUID', id::VARCHAR,                   -- ID column handling
-    ARRAY[                                            -- Direct array of modifications
-        'chat_id', '', :chatId,
-        'end_user_email', '', :endUserEmail,
-        'end_user_phone', '', :endUserPhone,
-        'updated', '::TIMESTAMP WITH TIME ZONE', 
+SELECT
+    COPY_ROW_WITH_MODIFICATIONS(
+        -- Table name for denormalized_chat
+        'denormalized_chat',
+        'id', '::UUID', id::VARCHAR,                   -- ID column handling
+        -- Direct array of modifications
+        ARRAY[
+            'chat_id', '', :chatId,
+            'end_user_email', '', :endUserEmail,
+            'end_user_phone', '', :endUserPhone,
+            'updated', '::TIMESTAMP WITH TIME ZONE',
             CASE
                 WHEN :updated::TEXT = 'CURRENT_TIMESTAMP' THEN NOW()::VARCHAR
                 WHEN :updated::TEXT = '' THEN NULL
                 WHEN :updated::TEXT = 'null' THEN NOW()::VARCHAR
                 ELSE :updated::VARCHAR
             END,
-        'denormalized_record_created', '::TIMESTAMP WITH TIME ZONE', 
+            'denormalized_record_created', '::TIMESTAMP WITH TIME ZONE',
             CASE
                 WHEN :updated::TEXT = 'CURRENT_TIMESTAMP' THEN NOW()::VARCHAR
                 WHEN :updated::TEXT = '' THEN NULL
                 WHEN :updated::TEXT = 'null' THEN NOW()::VARCHAR
                 ELSE :updated::VARCHAR
             END
-    ]::VARCHAR[]
-)
-FROM chat.denormalized_chat
+        ]::VARCHAR []
+    )
+FROM denormalized_chat
 WHERE chat_id = :chatId
 ORDER BY denormalized_record_created DESC
 LIMIT 1;

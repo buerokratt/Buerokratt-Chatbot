@@ -23,15 +23,18 @@ declaration:
         type: string
         description: "Timestamp when the chat record was updated"
 */
-SELECT (copy_row_with_modifications(
-    'chat.chat',
-    'id', '::UUID', id::VARCHAR,
-    ARRAY[
-        'end_user_email', '', :endUserEmail,
-        'end_user_phone', '', :endUserPhone,
-        'updated', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR
-    ]::VARCHAR[]
-)) AS id, NOW()::TEXT as updated FROM chat.chat
+SELECT
+    (COPY_ROW_WITH_MODIFICATIONS(
+        'chat',
+        'id', '::UUID', id::VARCHAR,
+        ARRAY[
+            'end_user_email', '', :endUserEmail,
+            'end_user_phone', '', :endUserPhone,
+            'updated', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR
+        ]::VARCHAR []
+    )) AS id,
+    NOW()::TEXT AS updated
+FROM chat
 WHERE base_id = :chatId
 ORDER BY id DESC
 LIMIT 1;

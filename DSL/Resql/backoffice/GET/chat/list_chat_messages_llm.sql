@@ -66,13 +66,31 @@ declaration:
         type: timestamp
         description: "Timestamp when the message record was last updated"
 */
-WITH filtered_messages AS (
+WITH
+    filtered_messages AS (
         SELECT DISTINCT ON (m.base_id)
-        *
-        FROM chat.message m
+            m.base_id,
+            m.chat_base_id,
+            m.content,
+            m.buttons,
+            m.options,
+            m.event,
+            m.author_id,
+            m.author_timestamp,
+            m.author_first_name,
+            m.author_last_name,
+            m.author_role,
+            m.forwarded_by_user,
+            m.forwarded_from_csa,
+            m.forwarded_to_csa,
+            m.rating,
+            m.created,
+            m.updated
+        FROM message AS m
         WHERE m.chat_base_id = :chatId
-        ORDER BY m.base_id, m.updated DESC
+        ORDER BY m.base_id ASC, m.updated DESC
     ),
+
     latest_messages AS (
         SELECT
             fm.base_id AS id,
@@ -93,7 +111,7 @@ WITH filtered_messages AS (
             fm.created,
             fm.updated
         FROM filtered_messages AS fm
-        WHERE event <> 'greeting' OR event IS NULL
+        WHERE fm.event <> 'greeting' OR fm.event IS NULL
     )
 
 SELECT *
@@ -101,8 +119,6 @@ FROM (
     SELECT *
     FROM latest_messages
     ORDER BY created DESC
-    LIMIT
-        10
-        OFFSET 1
+    LIMIT 10 OFFSET 1
 ) AS limited_messages
-ORDER BY created ASC
+ORDER BY created ASC;

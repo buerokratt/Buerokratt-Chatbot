@@ -23,5 +23,5 @@ WHERE
     AND created = (
         SELECT MAX(created) FROM auth_users."user"
         WHERE id_code = :userIdCode
-    ) 
+    )
     AND status <> 'deleted'

@@ -16,20 +16,29 @@ declaration:
         type: string
         description: "Message displayed when bot cannot answer and forwarding is enabled"
 */
-WITH configuration_values AS (
-    SELECT id,
-           KEY,
-           value
-    FROM config.configuration AS c1
-    WHERE KEY IN ('organizationBotCannotAnswerAskToForwardToCSA', 
-                  'organizationBotCannotAnswerMessage')
-      AND created = (
-        SELECT MAX(c2.created) FROM config.configuration as c2
-        WHERE c2.key = c1.key
+WITH
+    configuration_values AS (
+        SELECT
+            id,
+            key,
+            value
+        FROM configuration AS c_1
+        WHERE key IN (
+            'organizationBotCannotAnswerAskToForwardToCSA',
+            'organizationBotCannotAnswerMessage'
         )
-      AND NOT deleted
-)
+        AND created = (
+            SELECT MAX(c_2.created) FROM configuration AS c_2
+            WHERE c_2.key = c_1.key
+        )
+        AND NOT deleted
+    )
+
 SELECT
-    MAX(CASE WHEN KEY = 'organizationBotCannotAnswerAskToForwardToCSA' THEN value END) AS is_ask_to_forward_to_csa,
-    MAX(CASE WHEN KEY = 'organizationBotCannotAnswerMessage' THEN value END) AS ask_to_forward_to_csa_message
+    MAX(
+        CASE WHEN key = 'organizationBotCannotAnswerAskToForwardToCSA' THEN value END
+    ) AS is_ask_to_forward_to_csa,
+    MAX(
+        CASE WHEN key = 'organizationBotCannotAnswerMessage' THEN value END
+    ) AS ask_to_forward_to_csa_message
 FROM configuration_values;

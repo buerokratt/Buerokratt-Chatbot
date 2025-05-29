@@ -137,16 +137,22 @@ FROM (
             WHEN :is_csa_title_visible = 'true' THEN csa_title
             ELSE ''
         END AS csa_title,
-        last_message_event AS last_message_event,
+        last_message_event,
         created,
         last_message_with_content_and_not_rating_or_forward,
         last_message_with_not_rating_or_forward_events_timestamp,
         last_non_empty_message_event,
-        ROW_NUMBER() OVER (PARTITION BY chat_id ORDER BY denormalized_record_created DESC) as rn
-    FROM chat.denormalized_chat
+        ROW_NUMBER()
+            OVER (
+                PARTITION BY chat_id
+                ORDER BY denormalized_record_created DESC
+            )
+        AS rn
+    FROM denormalized_chat
 ) AS c
-WHERE rn = 1
-  AND ended IS NULL
-  AND last_message_event = 'waiting_validation'
+WHERE
+    rn = 1
+    AND ended IS NULL
+    AND last_message_event = 'waiting_validation'
 ORDER BY created ASC
 LIMIT :limit::INTEGER;

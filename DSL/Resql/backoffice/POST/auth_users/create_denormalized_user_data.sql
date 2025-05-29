@@ -60,7 +60,7 @@ VALUES (
     :lastName,
     :displayName,
     :displayName,
-    :userStatus::user_status,
+    :userStatus::USER_STATUS,
     ARRAY[:roles],
     :csaTitle,
     :csaEmail,

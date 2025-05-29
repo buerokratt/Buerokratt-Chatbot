@@ -115,7 +115,7 @@ endChat:
       endUserLastName: ${activeChat.endUserLastName ?? ""}
       status: "ENDED"
       created: ${activeChat.created ?? "CURRENT_TIMESTAMP"}
-      ended: "CURRENT_TIMESTAMP"
+      ended: ${activeChat.ended ?? "CURRENT_TIMESTAMP"}
       feedbackRating: ${activeChat.feedbackRating ?? ""}
       feedbackText: ${activeChat.feedbackText ?? ""}
       endUserEmail: ${activeChat.endUserEmail ?? ""}
@@ -153,7 +153,7 @@ updateDenormalizedChat:
       feedbackRating: ""
       externalId: ${activeChat.externalId ?? ""}
       created: ${activeChat.created ?? end_chat_res.response.body[0].updated}
-      ended: ${end_chat_res.response.body[0].updated}
+      ended: ${activeChat.ended ?? end_chat_res.response.body[0].updated}
       forwardedTo: ${activeChat.forwardedTo ?? ""}
       forwardedToName: ${activeChat.forwardedToName ?? ""}
       receivedFrom: ${activeChat.receivedFrom ?? ""}
@@ -209,7 +209,7 @@ updateDenormalizedChatMetricsChatFields:
       externalId: ${activeChat.externalId ?? ""}
       receivedFrom: ${activeChat.receivedFrom ?? ""}
       updated: ${end_chat_res.response.body[0].updated}
-      ended: ${end_chat_res.response.body[0].updated}
+      ended: ${activeChat.ended ?? end_chat_res.response.body[0].updated}
   result: updateDenormalizedChatMetricsRes
   next: notify_chats
 

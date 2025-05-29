@@ -131,7 +131,7 @@ redirectChat:
       feedbackRating: ""
       externalId: ${forwardChatRes.response.body.data.format_forward_destination_response.generatedChatId}
       created: ${activeChat.created}
-      ended: "CURRENT_TIMESTAMP"
+      ended: ${activeChat.ended ?? "CURRENT_TIMESTAMP"}
       forwardedTo: ${activeChat.forwardedTo}
       forwardedToName: ${activeChat.forwardedToName}
       receivedFrom: ${activeChat.receivedFrom}
@@ -161,13 +161,35 @@ updateDenormalizedChat:
       feedbackRating: ""
       externalId: ${forwardChatRes.response.body.data.format_forward_destination_response.generatedChatId}
       created: ${activeChat.created}
-      ended: ${redirectChatRes.response.body[0].updated}
+      ended: ${activeChat.ended ?? redirectChatRes.response.body[0].updated}
       forwardedTo: ${activeChat.forwardedTo}
       forwardedToName: ${activeChat.forwardedToName}
       receivedFrom: ${activeChat.receivedFrom}
       receivedFromName: ${activeChat.receivedFromName}
       updated: ${redirectChatRes.response.body[0].updated}
   result: updateDenormalizedChatRes
+
+updateDenormalizedChatMetricsChatFields:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_messages_for_metrics_chat_fields_only"
+    body:
+      chatBaseId: ${chatId}
+      chatId: ${redirectChatRes.response.body[0].id}
+      status: "REDIRECTED"
+      endUserEmail: ${activeChat.endUserEmail}
+      endUserPhone: ${activeChat.endUserPhone}
+      feedbackText: ""
+      feedbackRating: ""
+      customerSupportId: ${activeChat.customerSupportId}
+      customerSupportDisplayName: ${activeChat.customerSupportDisplayName}
+      customerSupportFirstName: "null"
+      customerSupportLastName: "null"
+      externalId: ${forwardChatRes.response.body.data.format_forward_destination_response.generatedChatId}
+      receivedFrom: ${activeChat.receivedFrom}
+      updated: ${redirectChatRes.response.body[0].updated}
+      ended: ${activeChat.ended ?? redirectChatRes.response.body[0].updated}
+  result: updateDenormalizedChatMetricsRes
 
 getAvailableCSACount:
   call: http.get

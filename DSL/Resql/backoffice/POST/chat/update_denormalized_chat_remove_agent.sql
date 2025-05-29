@@ -21,38 +21,41 @@ declaration:
         description: "Timestamp indicating when the CSA fields were cleared"
 */
 -- Using array approach directly
-SELECT copy_row_with_modifications(
-    'chat.denormalized_chat',                              -- Table name for denormalized_chat
-    'id', '::UUID', id::VARCHAR,                   -- ID column handling
-    ARRAY[                                            -- Direct array of modifications
-        'chat_id', '', :chatId,
-        'customer_support_id', '', '',
-        'customer_support_display_name', '', '',
-        'customer_support_first_name', '', '',
-        'customer_support_last_name', '', '',
-        'csa_title', '', '',
-        'updated', '::TIMESTAMP WITH TIME ZONE', 
+SELECT
+    COPY_ROW_WITH_MODIFICATIONS(
+        -- Table name for denormalized_chat
+        'denormalized_chat',
+        'id', '::UUID', id::VARCHAR,                   -- ID column handling
+        -- Direct array of modifications
+        ARRAY[
+            'chat_id', '', :chatId,
+            'customer_support_id', '', '',
+            'customer_support_display_name', '', '',
+            'customer_support_first_name', '', '',
+            'customer_support_last_name', '', '',
+            'csa_title', '', '',
+            'updated', '::TIMESTAMP WITH TIME ZONE',
             CASE
                 WHEN :updated::TEXT = 'CURRENT_TIMESTAMP' THEN NOW()::VARCHAR
                 WHEN :updated::TEXT = '' THEN NULL
                 WHEN :updated::TEXT = 'null' THEN NOW()::VARCHAR
                 ELSE :updated::VARCHAR
             END,
-        'denormalized_record_created', '::TIMESTAMP WITH TIME ZONE', 
+            'denormalized_record_created', '::TIMESTAMP WITH TIME ZONE',
             CASE
                 WHEN :updated::TEXT = 'CURRENT_TIMESTAMP' THEN NOW()::VARCHAR
                 WHEN :updated::TEXT = '' THEN NULL
                 WHEN :updated::TEXT = 'null' THEN NOW()::VARCHAR
                 ELSE :updated::VARCHAR
             END
-    ]::VARCHAR[]
-)
-FROM chat.denormalized_chat
+        ]::VARCHAR []
+    )
+FROM denormalized_chat
 WHERE
     denormalized_record_created = (
         SELECT MAX(denormalized_record_created)
-        FROM chat.denormalized_chat dc_inner
+        FROM denormalized_chat
         WHERE chat_id = :chatId
     )
     AND chat_id = :chatId
-    AND ended IS null;
+    AND ended IS NULL;
