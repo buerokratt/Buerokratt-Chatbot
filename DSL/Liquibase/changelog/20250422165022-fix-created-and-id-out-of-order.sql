@@ -107,3 +107,17 @@ SET
 FROM first_row_by_base_id f
 WHERE c.base_id = f.base_id
   AND c.id = f.min_id;
+
+UPDATE chat 
+SET ended = subquery.min_ended
+FROM (
+    SELECT 
+        base_id,
+        MIN(ended) as min_ended
+    FROM chat 
+    WHERE ended IS NOT NULL
+    GROUP BY base_id
+) subquery
+WHERE chat.base_id = subquery.base_id
+  AND chat.ended IS NOT NULL
+  AND chat.ended != subquery.min_ended;

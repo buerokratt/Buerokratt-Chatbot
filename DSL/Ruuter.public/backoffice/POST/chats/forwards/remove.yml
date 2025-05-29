@@ -119,6 +119,28 @@ updateDenormalizedChat:
       updated: ${insert_chat_res.response.body[0].updated}
   result: return_result
 
+updateDenormalizedChatMetricsChatFields:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_messages_for_metrics_chat_fields_only"
+    body:
+      chatBaseId: ${chatId}
+      chatId: ${insert_chat_res.response.body[0].id}
+      status: ${activeChat.status}
+      endUserEmail: ${activeChat.endUserEmail}
+      endUserPhone: ${activeChat.endUserPhone}
+      feedbackText: ""
+      feedbackRating: ""
+      customerSupportId: ${activeChat.customerSupportId}
+      customerSupportDisplayName: ${activeChat.customerSupportDisplayName}
+      customerSupportFirstName: "null"
+      customerSupportLastName: "null"
+      externalId: ${activeChat.externalId}
+      receivedFrom: ${activeChat.receivedFrom}
+      updated: ${insert_chat_res.response.body[0].updated}
+      ended: ${activeChat.ended}
+  result: updateDenormalizedChatMetricsRes
+
 return_result:
   return: ${insert_chat_res.response.body}
   next: end
