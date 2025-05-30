@@ -14,6 +14,7 @@ type FormValues = {
   sessionLength: string;
   chatActiveDuration: string;
   showIdleWarning: boolean;
+  autoCloseConversation: boolean;
 };
 
 type ConfigItem = {
@@ -25,12 +26,14 @@ type ConfigItem = {
 const SettingsSessionLength: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
+  const displayAutoCloseConfigurations = import.meta.env.REACT_APP_SHOW_AUTO_CLOSE_CONFIG.toLowerCase() === 'true';
 
   const { control, handleSubmit, setValue, watch } = useForm<FormValues>({
     defaultValues: {
       sessionLength: '',
       chatActiveDuration: '',
       showIdleWarning: false,
+      autoCloseConversation: true
     },
   });
 
@@ -44,15 +47,16 @@ const SettingsSessionLength: FC = () => {
   const sessionLength = watch('sessionLength');
   const chatActiveDuration = watch('chatActiveDuration');
   const showIdleWarning = watch('showIdleWarning');
+  const autoCloseConversation = watch('autoCloseConversation');
 
   useQuery({
     queryKey: ['accounts/admin/session-length', 'prod'],
     onSuccess: (res: any) => {
       const data = extractConfigMap(res.response);
-      console.log('data',data,'should true?', data.show_idle_warning?.toLowerCase() === "true")
       setValue('sessionLength', data.session_length ?? '');
       setValue('chatActiveDuration', data.chat_active_duration ?? '');
       setValue('showIdleWarning', data.show_idle_warning?.toLowerCase() === "true");
+      setValue('autoCloseConversation', data.auto_close_conversation?.toLowerCase() === "true");
     },
   });
 
@@ -186,6 +190,24 @@ const SettingsSessionLength: FC = () => {
           />
           <label className="rule">{t('settings.chatDuration.rule')}</label>
         </Track>
+        {displayAutoCloseConfigurations && (
+          <Track>
+            <Controller
+              name="autoCloseConversation"
+              control={control}
+              render={({ field }) => (
+                <Switch
+                  label={t('settings.autoClose')}
+                  onLabel={t('global.yes') ?? 'yes'}
+                  offLabel={t('global.no') ?? 'no'}
+                  onCheckedChange={(e) => field.onChange(e)}
+                  checked={field.value}
+                  {...field}
+                />
+              )}
+            />
+          </Track>
+        )}
       </Card>
     </>
   );

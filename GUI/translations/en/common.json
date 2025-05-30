@@ -312,6 +312,7 @@
   },
   "settings": {
     "title": "Settings",
+    "autoClose": "Close chat automatically",
     "users": {
       "title": "Users",
       "name": "Name",
