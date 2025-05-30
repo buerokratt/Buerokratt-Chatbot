@@ -28,7 +28,7 @@ INSERT INTO denormalized_chat_messages_for_metrics (
     message_forwarded_to_csa,
     timestamp
 )
-SELECT 
+SELECT
     base_record.chat_base_id,
     base_record.chat_id,
     base_record.chat_status,
@@ -45,17 +45,14 @@ SELECT
     base_record.created,
     base_record.updated,
     base_record.ended,
-    CASE
-        WHEN base_record.first_message_timestamp IS NULL THEN msg_data.message_updated
-        ELSE base_record.first_message_timestamp
-    END,
+    COALESCE(base_record.first_message_timestamp, msg_data.message_updated),
     msg_data.message_updated,
     msg_data.message_id::UUID,
     msg_data.message_base_id,
     msg_data.message_updated,
     msg_data.message_updated,
-    LOWER(:messageEvent)::event_type,
-    :messageAuthorRole::author_role_type,
+    LOWER(:messageEvent)::EVENT_TYPE,
+    :messageAuthorRole::AUTHOR_ROLE_TYPE,
     :messageAuthorId::VARCHAR,
     :messageForwardedFromCsa::VARCHAR,
     :messageForwardedToCsa::VARCHAR,
@@ -65,11 +62,11 @@ FROM (
     WHERE chat_base_id = :chatBaseId
     ORDER BY timestamp DESC
     LIMIT 1
-) base_record
-CROSS JOIN (
-    SELECT 
-        (SELECT value) ->> 'id' as message_id,
-        (SELECT value) ->> 'baseId' as message_base_id,
-        ((SELECT value) ->> 'updated')::TIMESTAMP WITH TIME ZONE as message_updated
-    FROM JSON_ARRAY_ELEMENTS(ARRAY_TO_JSON(ARRAY[:messages])) WITH ORDINALITY
-) msg_data;
+) AS base_record
+    CROSS JOIN (
+        SELECT
+            (SELECT value) ->> 'id' AS message_id,
+            (SELECT value) ->> 'baseId' AS message_base_id,
+            ((SELECT value) ->> 'updated')::TIMESTAMP WITH TIME ZONE AS message_updated
+        FROM JSON_ARRAY_ELEMENTS(ARRAY_TO_JSON(ARRAY[:messages])) WITH ORDINALITY
+    ) AS msg_data;

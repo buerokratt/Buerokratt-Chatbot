@@ -34,7 +34,7 @@ declaration:
         type: string
         description: "User's department"
 */
-SELECT copy_row_with_modifications(
+SELECT COPY_ROW_WITH_MODIFICATIONS(
     'user',
     'id', '::UUID', id::VARCHAR,
     ARRAY[
@@ -46,7 +46,7 @@ SELECT copy_row_with_modifications(
         'csa_email', '', :csaEmail,
         'department', '', :department,
         'created', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR
-    ]::VARCHAR[]
+    ]::VARCHAR []
 ) FROM "user"
 WHERE created = (
     SELECT MAX(created) FROM "user"

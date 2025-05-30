@@ -2,7 +2,6 @@
 
 # Scope
 
-
 This repo will primarily contain:
 
 1. Architectural and other documentation;
@@ -44,13 +43,13 @@ This repo will primarily contain:
 - For setting up the database initially, run
   `docker run --platform linux/amd64 --network=bykstack riaee/byk-users-db:liquibase20220615 --url=jdbc:postgresql://users_db:5432/byk --username=byk --password=01234 --changelog-file=./master.yml update`
 - Run migrations added in this repository by running the helper script `./migrate.sh`
-- When creating new migrations, use the helper `./create-migration.sh name-of-migration` which will create 
-  timestamped XML Liquibase file, timestamped SQL migration file and timestamped rollback SQL file 
-  in the correct directory with the required headers. 
-  The SQL file should contain schema migrations, the rollback SQL file should contain rollback logic 
+- When creating new migrations, use the helper `./create-migration.sh name-of-migration` which will create
+  timestamped XML Liquibase file, timestamped SQL migration file and timestamped rollback SQL file
+  in the correct directory with the required headers.
+  The SQL file should contain schema migrations, the rollback SQL file should contain rollback logic
   (see [VC-002](https://github.com/buerokratt/Buerokratt-onboarding/blob/main/Architectural-Decision-Records-ADR/data-storage/relational-databases/1.%20version-control.md#vc-002-enforcing-sql-only-for-all-database-schema-changes)
-  for more details). In case rollback is not needed, the relevant SQL file and the `<rollback>...</rollback>` tag in XML 
-  file can be deleted. The XML file is required to track changes and manage migrations 
+  for more details). In case rollback is not needed, the relevant SQL file and the `<rollback>...</rollback>` tag in XML
+  file can be deleted. The XML file is required to track changes and manage migrations
   (see [VC-003](https://github.com/buerokratt/Buerokratt-onboarding/blob/main/Architectural-Decision-Records-ADR/data-storage/relational-databases/1.%20version-control.md#vc-003-enforcing-liquibase-xml-for-change-tracking-and-validations)
   for more details).
 
@@ -96,7 +95,9 @@ like this:
 ```
 
 ### copy_row_with_modifications postgres function
+
 function `copy_row_with_modifications` has next signature:
+
 ```SQL
 CREATE OR REPLACE FUNCTION copy_row_with_modifications(
     table_name_to_copy_from VARCHAR,
@@ -106,8 +107,10 @@ CREATE OR REPLACE FUNCTION copy_row_with_modifications(
     VARIADIC modifications  VARCHAR[]
 ) RETURNS VARCHAR LANGUAGE
 ```
+
 The function copies a row from the specified table by given primary key column with applying modifications.
 So that maintainability of next SQL query is improved:
+
 ```SQL
 INSERT INTO some_table(
     base_id, column1, column2, column3, column4, column5, column6, column7, column8, updated
@@ -118,8 +121,10 @@ WHERE base_id = :base_id
 ORDER BY updated DESC
 LIMIT 1;
 ```
+
 Each time an additional column is added to `some_table`, all sql queries should be updated to add this column.
 The function automatically forms sql query with all column and modifies only given columns:
+
 ```SQL
 SELECT copy_row_with_modifications(
     'some_table',
@@ -134,23 +139,65 @@ WHERE base_id = :base_id
 ORDER BY updated DESC
 LIMIT 1;
 ```
+
 It accepts next arguments:
-* `table_name_to_copy_from` - table name as string where copy row. Type: `VARCHAR`
-* `id_column_name` - name of id column. Type: `VARCHAR`
-* `id_column_conversion_expression` - how to convert `VARCHAR` to id column type. If column type is `VARCHAR` already, 
+
+- `table_name_to_copy_from` - table name as string where copy row. Type: `VARCHAR`
+- `id_column_name` - name of id column. Type: `VARCHAR`
+- `id_column_conversion_expression` - how to convert `VARCHAR` to id column type. If column type is `VARCHAR` already,
   than empty string `''` should be provided. Type: `VARCHAR`.
-* `id_to_copy` - The id value of row to copy. Type: `VARCHAR`.
-* `modifications VARCHAR[]` - each modification comes in set of 3 arguments 
+- `id_to_copy` - The id value of row to copy. Type: `VARCHAR`.
+- `modifications VARCHAR[]` - each modification comes in set of 3 arguments
   with idea similar to `(id_column_name, id_column_conversion_expression, id_column_conversion_expression)`:
-  * first comes column name to modify (to update). Type: `VARCHAR`.
-  * second comes how to convert `VARCHAR` to actual column type. 
+  - first comes column name to modify (to update). Type: `VARCHAR`.
+  - second comes how to convert `VARCHAR` to actual column type.
     If column type is already `VARCHAR` than empty string `''` should be provided. Type: `VARCHAR`.
-  * third comes column value. It has to be `VARCHAR`. Type: `VARCHAR`.
+  - third comes column value. It has to be `VARCHAR`. Type: `VARCHAR`.
 
 The function returns value of argument `id_to_copy`. Type: `VARCHAR`.
 
 Current limitation:
 All arguments should be of type `VARCHAR`.
 
+### SQLFluff Code Formatting
+
+This project uses SQLFluff for SQL code formatting and linting to ensure consistent code style across all SQL files. A [`.sqlfluff` configuration file](/.sqlfluff) exists in the project root and is developed according to [SQL-001](https://github.com/buerokratt/Buerokratt-onboarding/blob/main/Architectural-Decision-Records-ADR/data-storage/relational-databases/4.%20sql-queries.md#sql-001-enforce-standardized-sql-formatting).
+
+#### Setup and Usage
+
+1. Install SQLFluff:
+
+   ```bash
+   pip install sqlfluff
+   ```
+
+2. Format SQL files:
+
+   ```bash
+   sqlfluff fix path/to/your/file.sql
+   ```
+
+3. Check SQL files for linting issues:
+
+   ```bash
+   sqlfluff lint path/to/your/file.sql
+   ```
+
+4. Format all SQL files in the project:
+   ```bash
+   sqlfluff fix .
+   ```
+
+#### Important Note
+
+Due to Resql variables and templating syntax used in this project, SQLFluff may sometimes report syntax errors for valid SQL queries that contain Resql-specific variables (e.g., `:variable_name`). After running SQLFluff formatting, always manually double-check your SQL files to ensure that:
+
+- Resql variables remain intact and properly formatted
+- The SQL logic and syntax are still correct
+- No unintended changes were made to templated sections
+
+It's recommended to test your SQL queries after SQLFluff formatting to ensure they still work correctly with the Resql engine.
+
 ### Tests
+
 To run tests use `perform-tests.sh` script. It will create test database, load fixtures and run tests

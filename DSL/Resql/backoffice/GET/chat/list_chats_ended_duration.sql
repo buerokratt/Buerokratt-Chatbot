@@ -16,8 +16,7 @@ declaration:
         type: integer
         description: "Sum of chat durations in seconds for the specified time window"
 */
-SELECT
-    SUM(chat_duration_in_seconds) AS duration_in_seconds
+SELECT SUM(chat_duration_in_seconds) AS duration_in_seconds
 FROM (
     SELECT DISTINCT ON (chat_id)
         chat_id,
@@ -25,8 +24,8 @@ FROM (
         ended,
         customer_support_id
     FROM denormalized_chat
-    ORDER BY chat_id, denormalized_record_created DESC
-) latest_chats
+    ORDER BY chat_id ASC, denormalized_record_created DESC
+) AS latest_chats
 WHERE
     ended IS NOT NULL
     AND ended > (NOW() - '1 month'::INTERVAL)

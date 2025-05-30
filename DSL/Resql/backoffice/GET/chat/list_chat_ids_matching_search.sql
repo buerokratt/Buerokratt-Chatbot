@@ -25,7 +25,7 @@ WITH
             E'(.*)' AS regx_e_4,
             E'%\\1%' AS regx_e_5
     ),
-    
+
     regx AS (
         SELECT
             LOWER(
@@ -44,9 +44,9 @@ WITH
         FROM consts
     )
 
-SELECT DISTINCT base_id as chat_id
+SELECT DISTINCT base_id AS chat_id
 FROM chat
-WHERE 
+WHERE
     base_id ILIKE (SELECT search_key FROM regx)
     OR customer_support_display_name ILIKE (SELECT search_key FROM regx)
     OR end_user_first_name ILIKE (SELECT search_key FROM regx)

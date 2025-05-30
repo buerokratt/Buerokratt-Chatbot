@@ -103,15 +103,15 @@ INSERT INTO chat (
 )
 VALUES (
     :id, :customerSupportId, :customerSupportDisplayName, :endUserId, :endUserFirstName,
-    :endUserLastName, :status::chat_status_type, 
-    CASE 
-        WHEN :created::TEXT = 'CURRENT_TIMESTAMP' THEN now()
-        ELSE COALESCE(:created::TIMESTAMP WITH TIME ZONE, now())
+    :endUserLastName, :status::CHAT_STATUS_TYPE,
+    CASE
+        WHEN :created::TEXT = 'CURRENT_TIMESTAMP' THEN NOW()
+        ELSE COALESCE(:created::TIMESTAMP WITH TIME ZONE, NOW())
     END,
     (
         CASE
-            WHEN :ended::TEXT = 'CURRENT_TIMESTAMP' THEN now()
-            WHEN (:ended = '') THEN null WHEN (:ended = 'null') THEN now()
+            WHEN :ended::TEXT = 'CURRENT_TIMESTAMP' THEN NOW()
+            WHEN (:ended = '') THEN null WHEN (:ended = 'null') THEN NOW()
             ELSE :ended::TIMESTAMP WITH TIME ZONE
         END
     )::TIMESTAMP WITH TIME ZONE,
