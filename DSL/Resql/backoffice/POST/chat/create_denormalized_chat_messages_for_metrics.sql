@@ -1,4 +1,4 @@
-INSERT INTO denormalized_chat_messages_for_metrics (
+INSERT INTO chat.denormalized_chat_messages_for_metrics (
     chat_id,
     chat_base_id,
     message_id,

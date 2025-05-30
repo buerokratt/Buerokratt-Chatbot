@@ -17,6 +17,6 @@ declaration:
         description: "Unique identifier(s) of the customer support agent(s) associated with the chat"
 */
 SELECT DISTINCT customer_support_id
-FROM chat
+FROM chat.chat
 WHERE
     base_id = :chatId AND customer_support_id <> '' AND customer_support_id IS NOT NULL;

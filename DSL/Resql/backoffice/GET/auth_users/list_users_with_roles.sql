@@ -53,11 +53,11 @@ SELECT
     END AS csa_title,
     csa_email,
     authority_name AS authorities
-FROM denormalized_user_data AS d_1
+FROM auth_users.denormalized_user_data AS d_1
 WHERE
     user_status <> 'deleted'
     AND ARRAY_LENGTH(authority_name, 1) > 0
     AND created = (
-        SELECT MAX(d_2.created) FROM denormalized_user_data AS d_2
+        SELECT MAX(d_2.created) FROM auth_users.denormalized_user_data AS d_2
         WHERE d_1.id_code = d_2.id_code
     );

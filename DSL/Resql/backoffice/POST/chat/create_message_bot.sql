@@ -41,7 +41,7 @@ declaration:
         type: string
         description: "Text response confirming that messages were inserted"
 */
-INSERT INTO message (
+INSERT INTO chat.message (
     chat_base_id,
     base_id,
     content,

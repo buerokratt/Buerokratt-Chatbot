@@ -22,7 +22,7 @@ declaration:
 SELECT COUNT(*) AS total_count
 FROM (
     SELECT DISTINCT ON (chat_id) *
-    FROM denormalized_chat
+    FROM chat.denormalized_chat
     ORDER BY chat_id ASC, denormalized_record_created DESC
 ) AS latest_chats
 WHERE

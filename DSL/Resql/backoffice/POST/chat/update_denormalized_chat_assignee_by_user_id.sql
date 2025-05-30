@@ -23,7 +23,7 @@ declaration:
 
 SELECT
     COPY_ROW_WITH_MODIFICATIONS(
-        'denormalized_chat',                                   -- Table name
+        'chat.denormalized_chat',                                   -- Table name
         'id', '::UUID',                        -- ID column name and type
         dc.id::VARCHAR,
         ARRAY[                                    -- Direct array of modifications
@@ -50,14 +50,14 @@ SELECT
             END
         ]::VARCHAR []
     )
-FROM denormalized_chat AS dc
+FROM chat.denormalized_chat AS dc
 WHERE
     dc.ended IS NULL
     AND dc.customer_support_id = :userId
     -- Get only the latest record for each chat
     AND dc.denormalized_record_created = (
         SELECT MAX(dc_inner.denormalized_record_created)
-        FROM denormalized_chat AS dc_inner
+        FROM chat.denormalized_chat AS dc_inner
         WHERE
             dc_inner.chat_id = dc.chat_id
             AND dc_inner.ended IS NULL

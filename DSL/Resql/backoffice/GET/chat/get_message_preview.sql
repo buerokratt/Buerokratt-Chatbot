@@ -17,7 +17,7 @@ declaration:
         description: "Content of the latest message preview"
 */
 SELECT content AS preview
-FROM message_preview
+FROM chat.message_preview
 WHERE chat_base_id = :chatId
 ORDER BY created DESC
 LIMIT 1;

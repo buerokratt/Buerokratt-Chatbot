@@ -23,7 +23,7 @@ declaration:
           type: string
         description: "List of column names selected by the user to be visible on the page"
 */
-INSERT INTO user_page_preferences (
+INSERT INTO auth_users.user_page_preferences (
     user_id, page_name, page_results, selected_columns
 )
 VALUES (

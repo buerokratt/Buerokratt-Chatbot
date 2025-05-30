@@ -46,5 +46,5 @@ WITH
     )
 
 SELECT DISTINCT chat_id
-FROM chat_history_comments
+FROM chat.chat_history_comments
 WHERE comment ILIKE (SELECT search_key FROM regx);

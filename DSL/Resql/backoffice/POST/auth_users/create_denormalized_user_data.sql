@@ -40,7 +40,7 @@ declaration:
         type: string
         description: "User's department"
 */
-INSERT INTO denormalized_user_data (
+INSERT INTO auth_users.denormalized_user_data (
     login,
     id_code,
     first_name,
@@ -61,7 +61,7 @@ VALUES (
     :displayName,
     :displayName,
     :userStatus::USER_STATUS,
-    ARRAY[:roles],
+    ARRAY[:roles]::authority_role_type[],
     :csaTitle,
     :csaEmail,
     :department

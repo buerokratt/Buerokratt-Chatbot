@@ -35,7 +35,7 @@ declaration:
         type: string
         description: "Associated configuration value"
 */
-INSERT INTO configuration (key, value)
+INSERT INTO config.configuration (key, value)
 VALUES (
     'widgetProactiveSeconds',
     :widgetProactiveSeconds

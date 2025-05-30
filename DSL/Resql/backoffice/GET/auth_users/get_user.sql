@@ -17,11 +17,11 @@ declaration:
         description: "User's unique identifier"
 */
 SELECT id_code
-FROM "user"
+FROM auth_users."user"
 WHERE
     id_code = :userIdCode
     AND created = (
-        SELECT MAX(created) FROM "user"
+        SELECT MAX(created) FROM auth_users."user"
         WHERE id_code = :userIdCode
     )
     AND status <> 'deleted'

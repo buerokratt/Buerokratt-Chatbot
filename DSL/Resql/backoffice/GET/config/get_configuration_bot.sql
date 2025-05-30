@@ -31,7 +31,7 @@ WITH
             id,
             key,
             value
-        FROM configuration AS c_1
+        FROM config.configuration AS c_1
         WHERE key IN (
             'is_bot_active',
             'is_burokratt_active',
@@ -40,7 +40,7 @@ WITH
             'is_edit_chat_visible'
         )
         AND created = (
-            SELECT MAX(c_2.created) FROM configuration AS c_2
+            SELECT MAX(c_2.created) FROM config.configuration AS c_2
             WHERE c_1.key = c_2.key
         )
         AND NOT deleted

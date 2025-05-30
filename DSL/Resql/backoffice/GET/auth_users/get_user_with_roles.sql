@@ -56,7 +56,7 @@ SELECT
     END AS csa_title,
     csa_email,
     authority_name AS authorities
-FROM denormalized_user_data
+FROM auth_users.denormalized_user_data
 WHERE
     id_code = :login
 ORDER BY created DESC

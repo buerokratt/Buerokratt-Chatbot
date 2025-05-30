@@ -1,4 +1,4 @@
-INSERT INTO denormalized_chat_messages_for_metrics (
+INSERT INTO chat.denormalized_chat_messages_for_metrics (
     chat_base_id,
     chat_id,
     message_id,
@@ -124,7 +124,7 @@ SELECT
         WHEN :updated::TEXT = 'null' THEN timestamp
         ELSE :updated::TIMESTAMP WITH TIME ZONE
     END
-FROM denormalized_chat_messages_for_metrics
+FROM chat.denormalized_chat_messages_for_metrics
 WHERE chat_base_id = :chatBaseId
 ORDER BY timestamp DESC
 LIMIT 1;

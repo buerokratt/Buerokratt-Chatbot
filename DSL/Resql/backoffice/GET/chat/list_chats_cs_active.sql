@@ -125,7 +125,7 @@ WITH
             last_message_with_not_rating_or_forward_events_timestamp,
             last_message_event_with_content,
             csa_title
-        FROM denormalized_chat
+        FROM chat.denormalized_chat
         ORDER BY chat_id ASC, denormalized_record_created DESC
     )
 

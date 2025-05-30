@@ -146,7 +146,7 @@ declaration:
         type: string
         description: "Timestamp when the support agent first responded"
 */
-INSERT INTO denormalized_chat (
+INSERT INTO chat.denormalized_chat (
     chat_id,
     customer_support_id,
     customer_support_display_name,

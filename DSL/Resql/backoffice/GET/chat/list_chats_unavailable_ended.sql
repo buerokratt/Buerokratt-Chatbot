@@ -152,7 +152,7 @@ FROM (
                 ORDER BY denormalized_record_created DESC
             )
         AS rn
-    FROM denormalized_chat
+    FROM chat.denormalized_chat
 ) AS subquery
 WHERE
     rn = 1
@@ -167,4 +167,4 @@ WHERE
         'unavailable_csas_ask_contacts'
     )
 ORDER BY created ASC
-LIMIT :limit;
+LIMIT :limit::INTEGER;

@@ -24,7 +24,7 @@ declaration:
 */
 SELECT
     (COPY_ROW_WITH_MODIFICATIONS(
-        'chat',
+        'chat.chat',
         'id', '::UUID', id::VARCHAR,
         ARRAY[
             'labels', '::VARCHAR[]', (ARRAY[:labels])::VARCHAR,
@@ -32,7 +32,7 @@ SELECT
         ]::VARCHAR []
     )) AS id,
     NOW()::TEXT AS updated
-FROM chat
+FROM chat.chat
 WHERE base_id = :chatId
 ORDER BY id DESC
 LIMIT 1;

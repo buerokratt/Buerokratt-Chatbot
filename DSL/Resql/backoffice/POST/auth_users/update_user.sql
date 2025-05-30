@@ -35,7 +35,7 @@ declaration:
         description: "User's department"
 */
 SELECT COPY_ROW_WITH_MODIFICATIONS(
-    'user',
+    'auth_users.user',
     'id', '::UUID', id::VARCHAR,
     ARRAY[
         'first_name', '', :firstName,
@@ -47,8 +47,8 @@ SELECT COPY_ROW_WITH_MODIFICATIONS(
         'department', '', :department,
         'created', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR
     ]::VARCHAR []
-) FROM "user"
+) FROM auth_users."user"
 WHERE created = (
-    SELECT MAX(created) FROM "user"
+    SELECT MAX(created) FROM auth_users."user"
     WHERE id_code = :userIdCode
 );

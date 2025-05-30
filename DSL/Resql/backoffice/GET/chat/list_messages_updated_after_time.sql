@@ -89,7 +89,7 @@ WITH
             m.rating,
             m.created,
             m.updated
-        FROM message AS m
+        FROM chat.message AS m
         WHERE m.chat_base_id = :chatId
         ORDER BY m.base_id ASC, m.updated DESC
     )

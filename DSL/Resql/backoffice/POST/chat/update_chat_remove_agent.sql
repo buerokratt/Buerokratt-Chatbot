@@ -20,7 +20,7 @@ declaration:
 SELECT
     NOW()::TEXT AS updated,
     COPY_ROW_WITH_MODIFICATIONS(
-        'chat',
+        'chat.chat',
         'id', '::UUID', id::VARCHAR,
         ARRAY[
             'customer_support_id', '', '',
@@ -29,10 +29,10 @@ SELECT
             'updated', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR
         ]::VARCHAR []
     )
-FROM chat
+FROM chat.chat
 WHERE
     updated = (
-        SELECT MAX(updated) FROM chat
+        SELECT MAX(updated) FROM chat.chat
         WHERE base_id = :chatId
     )
     AND base_id = :chatId

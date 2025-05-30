@@ -34,7 +34,7 @@ SELECT
     comment,
     created,
     author_display_name
-FROM chat_history_comments
+FROM chat.chat_history_comments
 WHERE chat_id = :chatId
 ORDER BY created DESC
 LIMIT 1;

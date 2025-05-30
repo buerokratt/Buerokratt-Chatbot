@@ -27,7 +27,7 @@ declaration:
 SELECT
     COPY_ROW_WITH_MODIFICATIONS(
         -- Table name for denormalized_chat
-        'denormalized_chat',
+        'chat.denormalized_chat',
         'id', '::UUID', id::VARCHAR,                   -- ID column handling
         -- Direct array of modifications
         ARRAY[
@@ -49,7 +49,7 @@ SELECT
             END
         ]::VARCHAR []
     )
-FROM denormalized_chat
+FROM chat.denormalized_chat
 WHERE chat_id = :chatId
 ORDER BY denormalized_record_created DESC
 LIMIT 1;

@@ -17,7 +17,7 @@ declaration:
         description: "Unique base identifier of the chat"
 */
 SELECT base_id
-FROM chat
+FROM chat.chat
 WHERE
     ended IS NOT NULL
     AND status = 'ENDED'

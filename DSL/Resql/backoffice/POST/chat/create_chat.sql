@@ -78,7 +78,7 @@ declaration:
         type: string
         description: "Text value returned to confirm that the chat was successfully created"
 */
-INSERT INTO chat (
+INSERT INTO chat.chat (
     base_id,
     customer_support_id,
     customer_support_display_name,

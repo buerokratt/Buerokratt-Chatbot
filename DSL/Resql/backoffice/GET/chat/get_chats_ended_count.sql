@@ -22,7 +22,7 @@ declaration:
 WITH
     max_chats AS (
         SELECT COUNT(*) AS total_count
-        FROM chat
+        FROM chat.chat
         WHERE
             ended IS NOT NULL
             AND status = 'ENDED'

@@ -55,7 +55,7 @@ declaration:
         type: string
         description: "Text indicating the update result of the insert operation"
 */
-INSERT INTO message (
+INSERT INTO chat.message (
     chat_base_id,
     base_id,
     content,

@@ -117,7 +117,7 @@ SELECT
         WHEN :is_csa_title_visible = 'true' THEN c.csa_title
         ELSE ''
     END AS csa_title
-FROM denormalized_chat AS c
+FROM chat.denormalized_chat AS c
 WHERE c.chat_id = :id
 ORDER BY c.denormalized_record_created DESC
 LIMIT 1;
