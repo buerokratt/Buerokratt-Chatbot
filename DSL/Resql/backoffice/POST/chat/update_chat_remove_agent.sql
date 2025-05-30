@@ -29,10 +29,10 @@ SELECT
             'updated', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR
         ]::VARCHAR []
     )
-FROM chat
+FROM chat.chat
 WHERE
     updated = (
-        SELECT MAX(updated) FROM chat
+        SELECT MAX(updated) FROM chat.chat
         WHERE base_id = :chatId
     )
     AND base_id = :chatId

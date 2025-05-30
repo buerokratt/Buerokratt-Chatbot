@@ -45,7 +45,7 @@ WITH
     )
 
 SELECT DISTINCT base_id AS chat_id
-FROM chat
+FROM chat.chat
 WHERE
     base_id ILIKE (SELECT search_key FROM regx)
     OR customer_support_display_name ILIKE (SELECT search_key FROM regx)

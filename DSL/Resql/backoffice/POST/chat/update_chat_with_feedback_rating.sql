@@ -30,7 +30,7 @@ SELECT
         ]::VARCHAR []
     )) AS id,
     NOW()::TEXT AS updated
-FROM chat
+FROM chat.chat
 WHERE base_id = :id
 ORDER BY updated DESC
 LIMIT 1;
