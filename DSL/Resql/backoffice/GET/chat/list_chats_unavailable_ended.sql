@@ -167,4 +167,4 @@ WHERE
         'unavailable_csas_ask_contacts'
     )
 ORDER BY created ASC
-LIMIT :limit;
+LIMIT :limit::INTEGER;

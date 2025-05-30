@@ -32,8 +32,7 @@ SELECT
     )
 FROM chat.message AS m_1
 WHERE
-    chat_base_id IN (
-        :chats) AND updated = (
+    chat_base_id IN (:chats) AND updated = (
         SELECT MAX(updated) FROM chat.message AS m_2
         WHERE m_1.chat_base_id = m_2.chat_base_id AND m_1.base_id = m_2.base_id
     );

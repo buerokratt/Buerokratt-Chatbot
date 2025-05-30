@@ -23,7 +23,7 @@ SELECT
         'chat.chat',                                   -- Table name
         'id', '::UUID',                        -- ID column name and type
         (
-            SELECT id FROM chat
+            SELECT id FROM chat.chat
             WHERE base_id = dc.chat_id
             ORDER BY updated DESC LIMIT 1
         )::VARCHAR,

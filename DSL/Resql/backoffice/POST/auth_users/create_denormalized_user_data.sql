@@ -61,7 +61,7 @@ VALUES (
     :displayName,
     :displayName,
     :userStatus::USER_STATUS,
-    ARRAY[:roles],
+    ARRAY[:roles]::authority_role_type[],
     :csaTitle,
     :csaEmail,
     :department

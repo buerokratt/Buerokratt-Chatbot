@@ -205,8 +205,8 @@ WHERE (
         OR end_user_first_name ILIKE '%' || :search || '%'
         OR contacts_message ILIKE '%' || :search || '%'
         OR comment ILIKE '%' || :search || '%'
-        OR status ILIKE '%' || :search || '%'
-        OR last_message_event ILIKE '%' || :search || '%'
+        OR status::TEXT ILIKE '%' || :search || '%'
+        OR last_message_event::TEXT ILIKE '%' || :search || '%'
         OR chat_id ILIKE '%' || :search || '%'
         OR TO_CHAR(first_message_timestamp, 'DD.MM.YYYY HH24:MI:SS') ILIKE '%'
         || :search

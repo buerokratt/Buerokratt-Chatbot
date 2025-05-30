@@ -52,7 +52,7 @@ SELECT
             'all_messages', '::TEXT[]', '{}'
         ]::VARCHAR []
     )
-FROM chat.denormalized_chat
+FROM chat.denormalized_chat AS dc
 WHERE chat_id IN (:chats) AND denormalized_record_created = (
     SELECT MAX(denormalized_record_created)
     FROM chat.denormalized_chat AS dc_inner

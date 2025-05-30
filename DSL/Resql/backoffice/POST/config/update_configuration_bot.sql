@@ -58,7 +58,7 @@ WITH
         ) AS new_values (key, value)
     )
 
-INSERT INTO configuration (key, value)
+INSERT INTO config.configuration (key, value)
 SELECT
     new_configuration.key,
     new_configuration.value
