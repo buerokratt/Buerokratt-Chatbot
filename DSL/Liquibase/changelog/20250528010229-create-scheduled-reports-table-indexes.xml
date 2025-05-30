@@ -4,7 +4,7 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
     <changeSet id="20250528010229" author="ahmer-mt">
-        <sqlFile path="changelog/20250528010229-create-scheduled-reports-table-indexes.sql.sql" />
+        <sqlFile path="changelog/20250528010229-create-scheduled-reports-table-indexes.sql" />
         <rollback>
             <sqlFile path="changelog/20250528010229-rollback.sql" />
         </rollback>

@@ -82,7 +82,7 @@ WHERE
     AND m.chat_base_id = mu.chat_base_id;
 
 UPDATE chat c
-SET created = LEAST(m.min_created, c.min_created)
+SET created = LEAST(m.min_created, c_min.min_created)
 FROM (
   SELECT
     chat_base_id,

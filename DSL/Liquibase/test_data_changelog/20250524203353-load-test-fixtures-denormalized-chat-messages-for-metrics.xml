@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+    <changeSet id="20250524203353" author="Artsiom Beida" context="@test">
+        <loadData
+                file="data/test-fixtures/denormalized_chat_messages_for_metrics.csv"
+                tableName="denormalized_chat_messages_for_metrics"
+                schemaName="chat"
+        >
+            <column name="created" type="COMPUTED"/>
+            <column name="updated" type="COMPUTED"/>
+            <column name="ended" type="COMPUTED"/>
+            <column name="first_message_timestamp" type="COMPUTED"/>
+            <column name="last_message_timestamp" type="COMPUTED"/>
+            <column name="message_created" type="COMPUTED"/>
+            <column name="message_updated" type="COMPUTED"/>
+            <column name="message_event" type="other"/>
+            <column name="message_author_role" type="other"/>
+            <column name="timestamp" type="COMPUTED"/>
+        </loadData>
+    </changeSet>
+</databaseChangeLog>

@@ -7,6 +7,7 @@ http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
         <loadData
                 file="data/test-fixtures/user.csv"
                 tableName="user"
+                schemaName="auth_users"
         >
             <column name="selected_columns" type="COMPUTED"/>
             <column name="created" type="COMPUTED"/>
