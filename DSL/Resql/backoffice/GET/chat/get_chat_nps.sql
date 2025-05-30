@@ -16,7 +16,7 @@ declaration:
 WITH
     rated_chats AS (
         SELECT MAX(feedback_rating) AS rating
-        FROM chat
+        FROM chat.chat
         WHERE feedback_rating IS NOT NULL
         GROUP BY base_id
     ),
