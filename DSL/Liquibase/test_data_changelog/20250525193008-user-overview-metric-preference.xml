@@ -3,13 +3,14 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
-    <changeSet id="20250525190008" author="Artsiom Beida" context="@test">
+    <changeSet id="20250525193008" author="Artsiom Beida" context="@test">
         <loadData
-                file="data/test-fixtures/message_preview.csv"
-                tableName="message_preview"
-                schemaName="chat"
+                file="data/test-fixtures/user_overview_metric_preference.csv"
+                tableName="user_overview_metric_preference"
+                schemaName="auth_users"
         >
             <column name="created" type="COMPUTED"/>
+            <column name="updated" type="COMPUTED"/>
         </loadData>
     </changeSet>
 </databaseChangeLog>
