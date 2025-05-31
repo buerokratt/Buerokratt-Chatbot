@@ -166,7 +166,7 @@ WHERE
         :search_department IS NULL
         OR department ILIKE '%' || :search_department || '%'
     )
-    AND id_code NOT IN (:excluded_users)
+    AND id_code <> ALL(STRING_TO_ARRAY(:excluded_users, ','))
 ORDER BY
     CASE WHEN :sorting = 'name asc' THEN first_name END ASC,
     CASE WHEN :sorting = 'name desc' THEN first_name END DESC,
