@@ -17,9 +17,18 @@ declaration:
         type: string
         description: "The nonce that was marked as used"
 */
-SELECT COPY_ROW_WITH_MODIFICATIONS(
-    'security.request_nonces',
-    'nonce', '', nonce,
-    ARRAY['used_at', '::TIMESTAMP WITH TIME ZONE', NOW()::VARCHAR]::VARCHAR []
-) AS nonce FROM security.request_nonces
-WHERE nonce = :updated_nonce AND used_at IS null;
+INSERT INTO security.request_nonces (nonce, valid_until, used_at)
+SELECT
+    :updated_nonce,
+    valid_until,
+    NOW()
+FROM security.request_nonces
+WHERE
+    nonce = ''
+    AND created_at
+    = (
+        SELECT MAX(created_at) FROM security.request_nonces
+        WHERE nonce = :updated_nonce
+    )
+    AND used_at IS NULL
+RETURNING nonce;
