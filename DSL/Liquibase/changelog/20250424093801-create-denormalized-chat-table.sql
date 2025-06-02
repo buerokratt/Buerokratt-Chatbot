@@ -172,6 +172,18 @@ ON denormalized_chat USING gin (
     immutable_array_to_string(all_messages, ' ') gin_trgm_ops
 );
 
+
+-- Uncomment and test perfomrance if list_chats_cs_ended query becomes slow:
+-- Create GIN trigram indexes for each ILIKE searchable field
+-- CREATE INDEX idx_denorm_chat_support_display_name_trgm ON chat.denormalized_chat USING GIN (customer_support_display_name gin_trgm_ops);
+-- CREATE INDEX idx_denorm_chat_end_user_first_name_trgm ON chat.denormalized_chat USING GIN (end_user_first_name gin_trgm_ops);
+-- CREATE INDEX idx_denorm_chat_contacts_message_trgm ON chat.denormalized_chat USING GIN (contacts_message gin_trgm_ops);
+-- CREATE INDEX idx_denorm_chat_comment_trgm ON chat.denormalized_chat USING GIN (comment gin_trgm_ops);
+-- CREATE INDEX idx_denorm_chat_last_message_trgm ON chat.denormalized_chat USING GIN (last_message gin_trgm_ops);
+-- CREATE INDEX idx_denorm_chat_chat_id_trgm ON chat.denormalized_chat USING GIN (chat_id gin_trgm_ops);
+-- CREATE INDEX idx_denorm_chat_first_msg_formatted ON chat.denormalized_chat USING GIN (TO_CHAR(first_message_timestamp, 'DD.MM.YYYY HH24:MI:SS') gin_trgm_ops);
+-- CREATE INDEX idx_denorm_chat_ended_formatted ON chat.denormalized_chat USING GIN (TO_CHAR(ended, 'DD.MM.YYYY HH24:MI:SS') gin_trgm_ops);
+
 -- Updated INSERT script to include both IDLE and non-IDLE chats
 INSERT INTO denormalized_chat (
     chat_id,
