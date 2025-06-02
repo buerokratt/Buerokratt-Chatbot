@@ -1,0 +1,2 @@
+name,dataset_id,period,metrics,created,updated,start_date,end_date,deleted
+test,test,test,{},'2025-05-31 19:27:42.561641 +00:00'::TIMESTAMP WITH TIME ZONE,'2025-05-31 19:27:42.561641 +00:00'::TIMESTAMP WITH TIME ZONE,,,false

@@ -27,3 +27,17 @@ ON chat (created, base_id, updated, customer_support_id);
 -- Index for external ID chat queries by end date
 CREATE INDEX idx_chat_ended_date_external_base 
 ON chat (ended, external_id, base_id);
+
+-- Uncomment and test performance if list_chat_ids_matching_search is required and slow
+-- Enable pg_trgm extension if not already enabled
+-- CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
+-- Create GIN trigram indexes for each searchable field
+-- CREATE INDEX idx_chat_base_id_trgm ON chat.chat USING GIN (base_id gin_trgm_ops);
+-- CREATE INDEX idx_chat_support_name_trgm ON chat.chat USING GIN (customer_support_display_name gin_trgm_ops);
+-- CREATE INDEX idx_chat_first_name_trgm ON chat.chat USING GIN (end_user_first_name gin_trgm_ops);
+-- CREATE INDEX idx_chat_last_name_trgm ON chat.chat USING GIN (end_user_last_name gin_trgm_ops);
+-- CREATE INDEX idx_chat_user_id_trgm ON chat.chat USING GIN (end_user_id gin_trgm_ops);
+-- CREATE INDEX idx_chat_email_trgm ON chat.chat USING GIN (end_user_email gin_trgm_ops);
+-- CREATE INDEX idx_chat_phone_trgm ON chat.chat USING GIN (end_user_phone gin_trgm_ops);
+-- CREATE INDEX idx_chat_url_trgm ON chat.chat USING GIN (end_user_url gin_trgm_ops);
