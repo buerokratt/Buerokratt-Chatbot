@@ -313,6 +313,7 @@
   "settings": {
     "title": "Seaded",
     "autoClose": "Lõpeta vestlus automaatselt",
+    "autoCloseText": "Lõppsõnum",
     "users": {
       "title": "Kasutajad",
       "name": "Nimi",

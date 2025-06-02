@@ -17,25 +17,32 @@ declaration:
       - field: showIdleWarning
         type: string
         description: "Body field 'showIdleWarning'"
+      - field: showIdleWarning
+        type: string
+        description: "Body field 'autoCloseConversation'"
+      - field: showIdleWarning
+        type: string
+        description: "Body field 'autoCloseText'"
 
 extractRequestData:
   assign:
     sessionLength: ${incoming.body.sessionLength}
     chatActiveDuration: ${incoming.body.chatActiveDuration}
     showIdleWarning: ${incoming.body.showIdleWarning}
+    autoCloseConversation: ${incoming.body.autoCloseConversation}
+    autoCloseText: ${incoming.body.autoCloseText}
 
 setConfigurationValue:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/set-3-configuration-values"
+    url: "[#CHATBOT_RESQL]/set-session-length-conf"
     body:
       created: ${new Date().toISOString()}
-      key: "session_length"
-      key2: "chat_active_duration"
-      key3: "show_idle_warning"
-      value: ${sessionLength}
-      value2: ${chatActiveDuration}
-      value3: ${showIdleWarning}
+      session_length: ${sessionLength}
+      chat_active_duration: ${chatActiveDuration}
+      show_idle_warning: ${showIdleWarning}
+      auto_close_conversation: ${autoCloseConversation}
+      auto_close_text: ${autoCloseText}
   result: res
 
 return_result:

@@ -313,6 +313,7 @@
   "settings": {
     "title": "Settings",
     "autoClose": "Close chat automatically",
+    "autoCloseText": "End message",
     "users": {
       "title": "Users",
       "name": "Name",

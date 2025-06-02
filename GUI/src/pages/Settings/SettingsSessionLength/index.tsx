@@ -1,7 +1,14 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { AxiosError } from 'axios';
 import { useTranslation } from 'react-i18next';
-import { Button, Card, FormInput, Switch, Track } from 'components';
+import {
+  Button,
+  Card,
+  FormInput,
+  FormTextarea,
+  Switch,
+  Track,
+} from 'components';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useToast } from 'hooks/useToast';
 import { apiDev } from 'services/api';
@@ -9,12 +16,14 @@ import './SettingsSessionLength.scss';
 import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';
 import { Controller, useForm } from 'react-hook-form';
+import { WELCOME_MESSAGE_LENGTH } from '../../../constants/config';
 
 type FormValues = {
   sessionLength: string;
   chatActiveDuration: string;
   showIdleWarning: boolean;
   autoCloseConversation: boolean;
+  autoCloseText: string;
 };
 
 type ConfigItem = {
@@ -26,14 +35,16 @@ type ConfigItem = {
 const SettingsSessionLength: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
-  const displayAutoCloseConfigurations = import.meta.env.REACT_APP_SHOW_AUTO_CLOSE_CONFIG.toLowerCase() === 'true';
+  const displayAutoCloseConfigurations =
+    import.meta.env.REACT_APP_SHOW_AUTO_CLOSE_CONFIG.toLowerCase() === 'true';
 
   const { control, handleSubmit, setValue, watch } = useForm<FormValues>({
     defaultValues: {
       sessionLength: '',
       chatActiveDuration: '',
       showIdleWarning: false,
-      autoCloseConversation: true
+      autoCloseConversation: true,
+      autoCloseText: '',
     },
   });
 
@@ -44,19 +55,43 @@ const SettingsSessionLength: FC = () => {
     }, {} as Record<string, string>);
   };
 
-  const sessionLength = watch('sessionLength');
-  const chatActiveDuration = watch('chatActiveDuration');
-  const showIdleWarning = watch('showIdleWarning');
-  const autoCloseConversation = watch('autoCloseConversation');
+  const [
+    sessionLength,
+    chatActiveDuration,
+    showIdleWarning,
+    autoCloseConversation,
+    autoCloseText,
+  ] = watch([
+    'sessionLength',
+    'chatActiveDuration',
+    'showIdleWarning',
+    'autoCloseConversation',
+    'autoCloseText',
+  ]);
 
   useQuery({
     queryKey: ['accounts/admin/session-length', 'prod'],
     onSuccess: (res: any) => {
       const data = extractConfigMap(res.response);
-      setValue('sessionLength', data.session_length ?? '');
-      setValue('chatActiveDuration', data.chat_active_duration ?? '');
-      setValue('showIdleWarning', data.show_idle_warning?.toLowerCase() === "true");
-      setValue('autoCloseConversation', data.auto_close_conversation?.toLowerCase() === "true");
+
+      const stringFields = {
+        sessionLength: data.session_length,
+        chatActiveDuration: data.chat_active_duration,
+        autoCloseText: data.auto_close_text,
+      };
+
+      const booleanFields = {
+        showIdleWarning: data.show_idle_warning,
+        autoCloseConversation: data.auto_close_conversation,
+      };
+
+      Object.entries(stringFields).forEach(([key, value]) =>
+        setValue(key as keyof FormValues, value ?? '')
+      );
+
+      Object.entries(booleanFields).forEach(([key, value]) =>
+        setValue(key as keyof FormValues, value?.toLowerCase() === 'true')
+      );
     },
   });
 
@@ -66,6 +101,8 @@ const SettingsSessionLength: FC = () => {
         sessionLength: sessionLength,
         chatActiveDuration: chatActiveDuration,
         showIdleWarning: showIdleWarning.toString(),
+        autoCloseConversation: autoCloseConversation.toString(),
+        autoCloseText: autoCloseText,
       }),
     onSuccess: () => {
       toast.open({
@@ -191,19 +228,45 @@ const SettingsSessionLength: FC = () => {
           <label className="rule">{t('settings.chatDuration.rule')}</label>
         </Track>
         {displayAutoCloseConfigurations && (
-          <Track>
+          <Track
+            gap={16}
+            direction="vertical"
+            align="left"
+            style={{ paddingRight: '20px' }}
+          >
             <Controller
               name="autoCloseConversation"
               control={control}
               render={({ field }) => (
-                <Switch
-                  label={t('settings.autoClose')}
-                  onLabel={t('global.yes') ?? 'yes'}
-                  offLabel={t('global.no') ?? 'no'}
-                  onCheckedChange={(e) => field.onChange(e)}
-                  checked={field.value}
-                  {...field}
-                />
+                <>
+                  <Switch
+                    label={t('settings.autoClose')}
+                    onLabel={t('global.yes') ?? 'yes'}
+                    offLabel={t('global.no') ?? 'no'}
+                    onCheckedChange={(e) => field.onChange(e)}
+                    checked={field.value}
+                    {...field}
+                  />
+
+                  {autoCloseConversation && (
+                    <Controller
+                      name="autoCloseText"
+                      control={control}
+                      render={({ field }) => (
+                        <FormTextarea
+                          label={t('settings.autoCloseText')}
+                          minRows={4}
+                          maxLength={WELCOME_MESSAGE_LENGTH}
+                          showMaxLength={true}
+                          maxLengthBottom
+                          onChange={(e) => field.onChange(e.target.value)}
+                          defaultValue={autoCloseText}
+                          name="label"
+                        />
+                      )}
+                    />
+                  )}
+                </>
               )}
             />
           </Track>
