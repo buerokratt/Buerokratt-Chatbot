@@ -231,6 +231,35 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
           )}
         />
 
+        <Controller
+          control={control}
+          name="authorities"
+          rules={{ required: requiredText }}
+          render={({ field: { onChange, onBlur, name, ref } }) => (
+            <div className="multiSelect">
+              <label className="multiSelect__label">
+                {t('settings.users.userRoles')}
+              </label>
+              <div className="multiSelect__wrapper">
+                <Select
+                  name={name}
+                  maxMenuHeight={165}
+                  ref={ref}
+                  onBlur={onBlur}
+                  required={true}
+                  options={roles}
+                  defaultValue={user?.authorities.map((v) => {
+                    return { label: t(`roles.${v ?? ''}`), value: v };
+                  })}
+                  isMulti={true}
+                  placeholder={t('global.choose')}
+                  onChange={onChange}
+                />
+              </div>
+            </div>
+          )}
+        />
+
         {errors.authorities && (
           <span style={{ color: '#f00', marginTop: '-1rem' }}>
             {errors.authorities.message}
