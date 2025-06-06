@@ -1,0 +1,18 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'WIDGET-DOMAINS'"
+  method: get
+  accepts: json
+  returns: json
+  namespace: backoffice
+
+getWidgetDomains:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-widget-domains"
+  result: widgetDomains
+
+return_result:
+  return: ${widgetDomains.response.body}
+  next: end

@@ -309,6 +309,11 @@
     "ROLE_ANALYST": "Analüütik",
     "ROLE_UNAUTHENTICATED": "Autentimata"
   },
+  "multiDomains": {
+    "addNew": "Lisa uus",
+    "title": "Multidomeenid",
+    "domainName": "Domeeni nimi"
+  },
   "settings": {
     "title": "Seaded",
     "users": {
