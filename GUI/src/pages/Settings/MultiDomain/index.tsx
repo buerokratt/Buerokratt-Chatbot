@@ -1,11 +1,10 @@
-import { FC, useRef } from 'react';
+import { FC, useRef, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { AxiosError } from 'axios';
 
 import { Button, Card, FormInput, Icon, Track } from 'components';
-import { WidgetConfig } from 'types/widgetConfig';
 import { useToast } from 'hooks/useToast';
 import { apiDev } from 'services/api';
 import withAuthorization from 'hoc/with-authorization';
@@ -16,21 +15,21 @@ import './MultiDomain.scss';
 type WDomain = {
   name: string;
   url: string;
+  active?: boolean;
 };
 
 const MultiDomain: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
   const hasRendered = useRef<boolean>();
-  const { control, register, handleSubmit, reset } = useForm<{
+  const { control, handleSubmit, reset } = useForm<{
     widgetDomains: WDomain[];
   }>({
     defaultValues: {
-      widgetDomains: [
-        { name: '', url: '' },
-      ],
+      widgetDomains: [],
     },
   });
+  const [initialDomains, setInitialDomains] = useState<WDomain[]>([]);
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -39,7 +38,9 @@ const MultiDomain: FC = () => {
 
   const widgetDomainsMutation = useMutation({
     mutationFn: (data: WDomain[]) =>
-      apiDev.post<WidgetConfig>('configs/widget-domains', data),
+      apiDev.post('configs/widget-domains', {
+        widgetDomains: JSON.stringify(data),
+      }),
     onSuccess: () => {
       toast.open({
         type: 'success',
@@ -61,6 +62,7 @@ const MultiDomain: FC = () => {
     onSuccess: (data: any) => {
       const initialData = data.response ?? [];
       if (!hasRendered.current) {
+        setInitialDomains(initialData);
         reset({ widgetDomains: initialData });
         hasRendered.current = true;
       }
@@ -68,8 +70,31 @@ const MultiDomain: FC = () => {
   });
 
   const handleFormSubmit = handleSubmit((data) => {
-    widgetDomainsMutation.mutate(data);
+    widgetDomainsMutation.mutate(convertDomains(data.widgetDomains));
   });
+
+  const convertDomains = (newWidgets: WDomain[]) => {
+    const isSame = (a: WDomain, b: WDomain) =>
+      a.name === b.name && a.url === b.url;
+
+    const result: WDomain[] = [];
+
+    for (const a of initialDomains) {
+      const matchInB = newWidgets.find((b) => isSame(a, b));
+      if (!matchInB) {
+        result.push({ ...a, active: false });
+      }
+    }
+
+    for (const b of newWidgets) {
+      const matchInA = initialDomains.find((a) => isSame(a, b));
+      if (!matchInA) {
+        result.push({ ...b, active: true });
+      }
+    }
+
+    return result;
+  };
 
   if (hasRendered.current === undefined) return <>Loading...</>;
 
@@ -79,7 +104,7 @@ const MultiDomain: FC = () => {
 
       <Card
         footer={
-          <Track gap={8} justify="end" align={"right"}>
+          <Track gap={8} justify="end" align={'right'}>
             <Button
               appearance="secondary"
               onClick={() => append({ name: '', url: '' })}
@@ -107,7 +132,7 @@ const MultiDomain: FC = () => {
                 <FormInput
                   label={`${index + 1}. ${t('multiDomains.domainName')}`}
                   className="inline-form"
-                  style={{ width: "500px"}}
+                  style={{ width: '500px' }}
                   {...field}
                 />
               )}
@@ -115,13 +140,14 @@ const MultiDomain: FC = () => {
             <Controller
               name={`widgetDomains.${index}.url`}
               control={control}
-              render={({ field }) => <FormInput
-                label="URL"
-                className="inline-form"
-                style={{ width: "500px"}}
-                {...field}
-              />
-            }
+              render={({ field }) => (
+                <FormInput
+                  label="URL"
+                  className="inline-form"
+                  style={{ width: '500px' }}
+                  {...field}
+                />
+              )}
             />
             <Track gap={8} justify="between">
               <Button
@@ -129,7 +155,7 @@ const MultiDomain: FC = () => {
                 disabled={fields.length === 1}
                 onClick={() => remove(index)}
               >
-                <Icon icon={<MdDeleteOutline color={'rgba(0,0,0,0.54)'} />} />
+                <Icon icon={<MdDeleteOutline color="white" />} />
               </Button>
             </Track>
           </Track>

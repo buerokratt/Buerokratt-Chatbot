@@ -8,13 +8,13 @@ declaration:
   namespace: backoffice
   allowlist:
     body:
-      - field: widget-domains
+      - field: widgetDomains
         type: object
         description: "Body field 'widget-domains'"
 
 extractRequestData:
   assign:
-    widgetDomains: ${incoming.body.widget-domains}
+    widgetDomains: ${incoming.body.widgetDomains}
 
 setWidgetDomains:
   call: http.post
