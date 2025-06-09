@@ -11,6 +11,7 @@ import { apiDev } from 'services/api';
 import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';
 import { MdDeleteOutline } from 'react-icons/md';
+import './MultiDomain.scss';
 
 type WDomain = {
   name: string;
@@ -26,7 +27,6 @@ const MultiDomain: FC = () => {
   }>({
     defaultValues: {
       widgetDomains: [
-        { name: '', url: '' },
         { name: '', url: '' },
       ],
     },
@@ -68,8 +68,6 @@ const MultiDomain: FC = () => {
   });
 
   const handleFormSubmit = handleSubmit((data) => {
-
-
     widgetDomainsMutation.mutate(data);
   });
 
@@ -81,7 +79,7 @@ const MultiDomain: FC = () => {
 
       <Card
         footer={
-          <Track gap={8} justify="center">
+          <Track gap={8} justify="end" align={"right"}>
             <Button
               appearance="secondary"
               onClick={() => append({ name: '', url: '' })}
@@ -96,11 +94,10 @@ const MultiDomain: FC = () => {
       >
         {fields.map((_, index) => (
           <Track
-            gap={20}
+            gap={10}
             key={index}
             direction="horizontal"
-            align={'left'}
-            justify="center"
+            justify="start"
             style={{ marginBottom: '15px' }}
           >
             <Controller
@@ -109,6 +106,8 @@ const MultiDomain: FC = () => {
               render={({ field }) => (
                 <FormInput
                   label={`${index + 1}. ${t('multiDomains.domainName')}`}
+                  className="inline-form"
+                  style={{ width: "500px"}}
                   {...field}
                 />
               )}
@@ -116,7 +115,13 @@ const MultiDomain: FC = () => {
             <Controller
               name={`widgetDomains.${index}.url`}
               control={control}
-              render={({ field }) => <FormInput label="URL" {...field} />}
+              render={({ field }) => <FormInput
+                label="URL"
+                className="inline-form"
+                style={{ width: "500px"}}
+                {...field}
+              />
+            }
             />
             <Track gap={8} justify="between">
               <Button
