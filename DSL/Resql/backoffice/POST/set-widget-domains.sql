@@ -3,4 +3,4 @@ SELECT
     x->>'name',
     x->>'url',
     (x->>'active')::boolean
-FROM jsonb_array_elements(:widget-domains::jsonb) AS x;
+FROM jsonb_array_elements(:domains::jsonb) AS x;

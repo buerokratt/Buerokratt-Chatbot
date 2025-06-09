@@ -1,4 +1,4 @@
-SELECT name, url
+SELECT DISTINCT ON (name) name, url
 FROM widget_domains
 WHERE active = TRUE
-ORDER BY created DESC;
+ORDER BY name, created DESC;
