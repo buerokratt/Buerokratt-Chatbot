@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker run --rm --network bykstack -v `pwd`/DSL/Liquibase/test_data_changelog:/liquibase/test_data_changelog -v `pwd`/DSL/Liquibase/test.yml:/liquibase/test.yml -v `pwd`/DSL/Liquibase/data:/liquibase/data liquibase/liquibase --defaultsFile=/liquibase/changelog/liquibase.properties --changelog-file=test.yml --url=jdbc:postgresql://users_db:5432/byk?user=byk --password=01234 --contexts=test update
+docker run --rm --network bykstack -v `pwd`/DSL/Liquibase/liquibase.properties:/liquibase/liquibase.properties -v `pwd`/DSL/Liquibase/test_data_changelog:/liquibase/test_data_changelog -v `pwd`/DSL/Liquibase/test.yaml:/liquibase/changelog.yaml -v `pwd`/DSL/Liquibase/data:/liquibase/data liquibase/liquibase --defaultsFile=/liquibase/liquibase.properties --contexts=test update
