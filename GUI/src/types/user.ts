@@ -10,7 +10,7 @@ export interface User {
   csaTitle: string;
   csaEmail: string;
   authorities: ROLES[];
-  domains: { label: string; value: string }[];
+  domains: string[];
   customerSupportStatus: 'online' | 'idle' | 'offline';
   department: string;
   statusComment: string;

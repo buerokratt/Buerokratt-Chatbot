@@ -89,6 +89,10 @@ const SettingsUsers: FC = () => {
     fetchData();
   }, [userInfo?.idCode]);
 
+  const mapUserDomains = (domainIds: string[], domainsList: WDomain[]): WDomain[] => {
+    return domainsList.filter((domain) => domainIds.includes(domain.domainId));
+  }
+
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
@@ -300,8 +304,8 @@ const SettingsUsers: FC = () => {
     );
   };
 
-  const usersColumns = useMemo(
-    () => [
+  const usersColumns = useMemo(() => {
+    const baseColumns = [
       columnHelper.accessor(
         (row) => `${row.firstName ?? ''} ${row.lastName ?? ''}`,
         {
@@ -370,9 +374,30 @@ const SettingsUsers: FC = () => {
           size: '1%',
         },
       }),
-    ],
-    []
-  );
+    ];
+
+    const domainColumn = columnHelper.accessor(
+      (data: User) => {
+        const mapped = mapUserDomains(data.domains ?? [], widgetDomains);
+        return mapped.map((d) => d.name);
+      },
+      {
+        header: t('multiDomains.title') ?? '',
+        cell: (props) => props.getValue().join(', '),
+        filterFn: (row, _, filterValue) => {
+          const mapped = mapUserDomains(row.original.domains ?? [], widgetDomains);
+          return mapped.some((d) =>
+            d.name.toLowerCase().includes(filterValue.toLowerCase())
+          );
+        },
+      }
+    );
+
+    return import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN.toLowerCase() === 'true'
+      ? [...baseColumns.slice(0, 3), domainColumn, ...baseColumns.slice(3)]
+      : baseColumns;
+  }, [t, widgetDomains]);
+
 
   if (!usersList) return <>Loading...</>;
 

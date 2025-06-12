@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo } from 'react';
+import { FC, useMemo } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { AxiosError } from 'axios';
@@ -33,7 +33,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user, domainsList }) => {
       login: user?.login,
       idCode: user?.idCode,
       authorities: user?.authorities,
-      domains: user?.domains,
+      domains: user?.domains || [],
       displayName: user?.displayName,
       csaTitle: user?.csaTitle,
       csaEmail: user?.csaEmail,
@@ -61,10 +61,6 @@ const UserModal: FC<UserModalProps> = ({ onClose, user, domainsList }) => {
     ],
     []
   );
-
-  useEffect(() => {
-    console.log(user?.domains   )
-  }, [user]);
 
   const mapUserDomains = (domainIds: string[], allDomains: WDomain[]): {label: string, value: string}[] => {
     return allDomains
@@ -255,10 +251,16 @@ const UserModal: FC<UserModalProps> = ({ onClose, user, domainsList }) => {
           )}
         />
 
-        <Controller
+        {errors.authorities && (
+          <span style={{ color: '#f00', marginTop: '-1rem' }}>
+            {errors.authorities.message}
+          </span>
+        )}
+
+        {import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN.toLowerCase() === 'true' && (<Controller
           control={control}
           name="domains"
-          rules={{ required: requiredText }}
+          rules={{}}
           render={({ field: { onChange, onBlur, name, ref } }) => (
             <div className="multiSelect">
               <label className="multiSelect__label">
@@ -270,23 +272,20 @@ const UserModal: FC<UserModalProps> = ({ onClose, user, domainsList }) => {
                   maxMenuHeight={165}
                   ref={ref}
                   onBlur={onBlur}
-                  required={true}
+                  required={false}
                   options={domainOptions}
-                  defaultValue={mapUserDomains(user?.domains ?? [], domainsList)}
+                  defaultValue={mapUserDomains(user?.domains ?? [], domainsList ?? [])}
                   isMulti={true}
                   placeholder={t('global.choose')}
-                  onChange={onChange}
+                  onChange={(val) => {
+                    onChange(val || []);
+                  }}
                 />
               </div>
             </div>
           )}
-        />
+        />)}
 
-        {errors.authorities && (
-          <span style={{ color: '#f00', marginTop: '-1rem' }}>
-            {errors.authorities.message}
-          </span>
-        )}
         <FormInput
           {...register('displayName', {
             required: requiredText,
