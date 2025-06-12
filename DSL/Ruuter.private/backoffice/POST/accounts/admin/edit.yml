@@ -43,6 +43,7 @@ extractRequestData:
     csa_email: ${incoming.body.csa_email}
     roles: ${incoming.body.roles}
     department: ${incoming.body.department}
+    domains: ${incoming.body.domains}
  
 getUser:
   call: http.post
@@ -74,6 +75,12 @@ updateUser:
       csaEmail: ${csa_email}
       department: ${department}
   result: add_user_res
+  next: checkForDomains
+
+checkForDomains:
+  switch:
+    - condition: ${domains.length > 0}
+      next: updateRolesWithDomains
   next: updateRoles
 
 updateRoles:
@@ -84,6 +91,18 @@ updateRoles:
       userIdCode: ${userIdCode}
       roles: ${roles}
       created: ${new Date().toISOString()}
+  result: add_roles_res
+  next: return_result
+
+updateRolesWithDomains:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-user-role-domains"
+    body:
+      userIdCode: ${userIdCode}
+      roles: ${roles}
+      created: ${new Date().toISOString()}
+      domains: ${domains}
   result: add_roles_res
   next: return_result
 

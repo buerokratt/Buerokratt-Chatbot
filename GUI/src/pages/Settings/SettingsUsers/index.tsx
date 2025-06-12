@@ -1,6 +1,6 @@
 import { FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   ColumnFiltersState,
   PaginationState,
@@ -21,6 +21,7 @@ import withAuthorization from 'hoc/with-authorization';
 import { CustomerSupportActivityDTO } from 'types/customerSupportActivity';
 import useStore from '../../../store';
 import { format } from 'date-fns';
+import { WDomain } from '../../../types/widgetModels';
 
 const SettingsUsers: FC = () => {
   const { t } = useTranslation();
@@ -30,6 +31,7 @@ const SettingsUsers: FC = () => {
   const userInfo = useStore((state) => state.userInfo);
   const [newUserModal, setNewUserModal] = useState(false);
   const [changeStatusDialog, setChangeStatusDialog] = useState(false);
+  const [widgetDomains, setWidgetDomains] = useState<WDomain[]>([]);
   const [editableRow, setEditableRow] = useState<User | null>(null);
   const [deletableRow, setDeletableRow] = useState<string | number | null>(
     null
@@ -70,6 +72,14 @@ const SettingsUsers: FC = () => {
       })
       .catch((error: any) => console.log(error));
   };
+
+  useQuery({
+    queryKey: ['configs/widget-domains', 'prod'],
+    onSuccess: (data: any) => {
+      const initialData = data.response ?? [];
+        setWidgetDomains(initialData);
+    }
+  });
 
   useEffect(() => {
     getUsers(pagination, sorting, columnFilters);
@@ -425,6 +435,7 @@ const SettingsUsers: FC = () => {
             setNewUserModal(false);
             getUsers(pagination, sorting, columnFilters);
           }}
+          domainsList={widgetDomains}
         />
       )}
 
@@ -473,6 +484,7 @@ const SettingsUsers: FC = () => {
             setEditableRow(null);
             getUsers(pagination, sorting, columnFilters);
           }}
+          domainsList={widgetDomains}
         />
       )}
 

@@ -1,4 +1,4 @@
-import { FC, useMemo } from 'react';
+import { FC, useEffect, useMemo } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { AxiosError } from 'axios';
@@ -11,13 +11,15 @@ import { useToast } from 'hooks/useToast';
 import { ROLES } from 'utils/constants';
 import Select from 'react-select';
 import './SettingsUsers.scss';
+import { WDomain } from '../../../types/widgetModels';
 
 type UserModalProps = {
   onClose: () => void;
   user?: User;
+  domainsList?: WDomain[];
 };
 
-const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
+const UserModal: FC<UserModalProps> = ({ onClose, user, domainsList }) => {
   const { t } = useTranslation();
   const toast = useToast();
   const queryClient = useQueryClient();
@@ -31,6 +33,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
       login: user?.login,
       idCode: user?.idCode,
       authorities: user?.authorities,
+      domains: user?.domains,
       displayName: user?.displayName,
       csaTitle: user?.csaTitle,
       csaEmail: user?.csaEmail,
@@ -57,6 +60,27 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
       { label: t('roles.ROLE_ANALYST'), value: ROLES.ROLE_ANALYST },
     ],
     []
+  );
+
+  useEffect(() => {
+    console.log(user?.domains   )
+  }, [user]);
+
+  const mapUserDomains = (domainIds: string[], allDomains: WDomain[]): {label: string, value: string}[] => {
+    return allDomains
+      .filter(domain => domainIds.includes(domain.domainId))
+      .map(domain => ({
+        label: domain.name,
+        value: domain.domainId
+      }));
+  }
+
+  const domainOptions = useMemo(() =>
+      domainsList?.map(domain => ({
+        label: domain.name,
+        value: domain.domainId,
+      })),
+    [domainsList]
   );
 
   const userCreateMutation = useMutation({
@@ -233,12 +257,12 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
 
         <Controller
           control={control}
-          name="authorities"
+          name="domains"
           rules={{ required: requiredText }}
           render={({ field: { onChange, onBlur, name, ref } }) => (
             <div className="multiSelect">
               <label className="multiSelect__label">
-                {t('settings.users.userRoles')}
+                {t('multiDomains.title')}
               </label>
               <div className="multiSelect__wrapper">
                 <Select
@@ -247,10 +271,8 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
                   ref={ref}
                   onBlur={onBlur}
                   required={true}
-                  options={roles}
-                  defaultValue={user?.authorities.map((v) => {
-                    return { label: t(`roles.${v ?? ''}`), value: v };
-                  })}
+                  options={domainOptions}
+                  defaultValue={mapUserDomains(user?.domains ?? [], domainsList)}
                   isMulti={true}
                   placeholder={t('global.choose')}
                   onChange={onChange}
