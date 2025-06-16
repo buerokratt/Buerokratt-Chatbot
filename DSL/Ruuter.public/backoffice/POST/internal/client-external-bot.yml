@@ -69,8 +69,8 @@ assign_data_sources:
               type: api_key
               key: "[#CHATBOT_EXTERNAL_API_KEY]"
 
-logPath:
-  log: "${baseUrl}/${servicePath}"
+logstepAZUREDS:
+  log: ${data_sources}
 
 get_chat_messages:
   call: http.post
