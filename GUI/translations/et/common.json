@@ -480,5 +480,8 @@
   "notification": {
     "title": "Bürokratt",
     "newMessage": "Uus sõnum."
+  },
+  "landing": {
+    "title": "Tere tulemast Bürokratti"
   }
 }
