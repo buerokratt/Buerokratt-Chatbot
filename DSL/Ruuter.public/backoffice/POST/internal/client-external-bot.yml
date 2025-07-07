@@ -137,7 +137,7 @@ check_value:
       next: get_organization_bot_answer_config  
     - condition: ${correct_value.map((item) => item.text)[0].startsWith('$validate_')}
       next: assign_validation_event  
-    - condition: ${correct_value.map((item) => item.text)[0] === 'The requested information is not available in the retrieved data. Please try another query or topic.'}
+    - condition: ${correct_value.map((item) => item.text)[0] === 'The requested information is not found in the retrieved data. Please try another query or topic.'}
       next: assign_unavailable_info_message  
   next: format_messages
   
