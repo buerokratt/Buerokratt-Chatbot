@@ -151,6 +151,8 @@ check_value:
       next: get_organization_bot_answer_config  
     - condition: ${correct_value.map((item) => item.text)[0].startsWith('$validate_')}
       next: assign_validation_event  
+    - condition: ${correct_value.map((item) => item.text)[0] === 'The requested information is not found in the retrieved data. Please try another query or topic.'}
+      next: assign_unavailable_info_message    
   next: format_messages
   
 return_value:
@@ -212,6 +214,15 @@ assign_back_office_event:
         text: ${bot_answer_config.askToForwardToCsaMessage}
         context: ${context}
     event: "${bot_answer_config.isAskToForwardToCsa === 'true' ? 'ask_to_forward_to_csa' : ''}"
+  next: format_messages
+
+assign_unavailable_info_message:
+  assign:
+    correct_value:
+      - recipient_id: ${sender}
+        text: "Mulle kättesaadavates andmetes puudub teie küsimusele vastav info. Palun täpsustage oma küsimust."
+        context: ${test.response.body.choices[0].message.context}
+    event: ""
   next: format_messages
 
 format_messages:
