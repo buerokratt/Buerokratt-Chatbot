@@ -1,0 +1,96 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'EVENT'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: authorRole
+        type: string
+        description: "Body field 'authorRole'"
+      - field: authorTimestamp
+        type: string
+        description: "Body field 'authorTimestamp'"
+      - field: content
+        type: string
+        description: "Body field 'content'"
+      - field: event
+        type: string
+        description: "Body field 'event'"
+      - field: id
+        type: string
+        description: "Body field 'id'"
+      - field: rating
+        type: string
+        description: "Body field 'rating'"
+
+extractRequestData:
+  assign:
+    messageId: ${incoming.body.id}
+    event: ${incoming.body.event}
+    content: ${incoming.body.content}
+    authorRole: ${incoming.body.authorRole}
+    authorTimestamp: ${incoming.body.authorTimestamp}
+    rating: ${incoming.body.rating}
+  next: getMessageById
+
+getMessageById:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-message-by-id"
+    body:
+      id: ${messageId}
+  result: res
+  next: assignMessage  
+
+assignMessage:
+  assign:
+    message: ${res.response.body[0]}
+  next: insertMessage
+
+insertMessage:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-message"
+    body:
+      messageId: ${messageId}
+      chatId: ${message.chatBaseId}
+      authorId: ${message.authorId ?? "end-user"}
+      authorTimestamp: ${authorTimestamp ?? new Date().toISOString()}
+      authorFirstName: ${message.authorFirstName ?? ""}
+      authorLastName: ${message.authorLastName ?? ""}
+      authorRole: "end-user"
+      created: ${message.created ?? new Date().toISOString()}
+      content: ${content ?? ""}
+      event: ${event ?? ""}
+      forwardedByUser: ${message.forwardedByUser ?? ""}
+      forwardedFromCsa: ${message.forwardedFromCsa ?? ""}
+      forwardedToCsa: ${message.forwardedToCsa ?? ""}
+      rating: ${rating ?? ""}
+  result: insertMessageResult
+  next: notify_chats
+
+notify_chats:
+  template: "[#CHATBOT_PROJECT_LAYER]/chats/notify"
+  requestType: templates
+  body:
+    chatId: ${message.chatBaseId}
+  result: chats_notify_res
+  next: notify_messages
+
+notify_messages:
+  template: "[#CHATBOT_PROJECT_LAYER]/messages/notify"
+  requestType: templates
+  body:
+    chatId: ${message.chatBaseId}
+    type: "message"
+    messageId: ${messageId}
+  result: messages_notify_res
+  next: return_result
+
+return_result:
+  return: "Message Event Sent Successfully"
+  next: end

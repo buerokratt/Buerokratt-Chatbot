@@ -1,0 +1,40 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'Get Delete Config Settings'"
+  method: get
+  accepts: json
+  returns: json
+  namespace: backoffice
+
+getConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-conversation-delete-settings"
+  result: res
+  next: validate_response
+
+validate_response:
+  switch:
+    - condition: "${res.response.body.length > 0}"
+      next: mapConfigData
+  next: return_not_found
+
+mapConfigData:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_HBS]/return_delete_chat_config"
+    headers:
+      type: json
+    body:
+      configurationArray: ${res.response.body}
+  result: formattedData
+
+return_result:
+  wrapper: false
+  return: ${formattedData.response.body}
+  next: end
+
+return_not_found:
+  return: "error: not found"
+  next: end

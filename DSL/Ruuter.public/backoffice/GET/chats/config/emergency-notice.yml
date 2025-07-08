@@ -1,0 +1,40 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'EMERGENCY-NOTICE'"
+  method: get
+  accepts: json
+  returns: json
+  namespace: backoffice
+
+getEmergencyNotice:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-emergency-notice"
+  result: res
+  next: validate_res
+
+validate_res:
+  switch:
+    - condition: "${res.response.body.length > 0}"
+      next: mapEmergencyNoticeData
+  next: return_not_found
+
+mapEmergencyNoticeData:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_HBS]/return_emergency_notice"
+    headers:
+      type: json
+    body:
+      configurationArray: ${res.response.body}
+  result: formattedData
+  next: return_result
+
+return_result:
+  return: ${formattedData.response.body}
+  next: end
+
+return_not_found:
+  return: "error: not found"
+  next: end

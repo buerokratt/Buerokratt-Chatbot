@@ -2,9 +2,9 @@ anon_conversations:
   trigger: 0 15 * * * ?
   type: http
   method: GET
-  url: http://localhost:8088/tasks/delete-conversations?isAuth=false&skipAuth=true
+  url: http://localhost:8088/backoffice/cron-tasks/delete-conversations?isAuth=false&skipAuth=true
 auth_conversations:
   trigger: 0 15 * * * ?
   type: http
   method: GET
-  url: http://localhost:8088/tasks/delete-conversations?isAuth=true&skipAuth=true
+  url: http://localhost:8088/backoffice/cron-tasks/delete-conversations?isAuth=true&skipAuth=true

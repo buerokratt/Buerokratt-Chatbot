@@ -102,6 +102,7 @@ const SettingsSkmConfiguration: FC = () => {
     maxTokens: t('settings.skmConfiguration.tooltip.maxTokens'),
     indexName: t('settings.skmConfiguration.tooltip.indexName'),
     queryType: t('settings.skmConfiguration.tooltip.queryType'),
+    semanticConfiguration: t('settings.skmConfiguration.tooltip.semanticConfiguration'),
   };
 
   if (!skmConfig) {
@@ -114,6 +115,7 @@ const SettingsSkmConfiguration: FC = () => {
       <p>{t('settings.skmConfiguration.description')}</p>
       <Card
         key={key}
+        isScrollable
         footer={
           <Track justify="end">
             <Button onClick={handleFormSubmit}>{t('global.save')}</Button>
@@ -134,6 +136,7 @@ const SettingsSkmConfiguration: FC = () => {
                   onChange={field.onChange}
                   defaultValue={field.value}
                   name="label"
+                  height={320}
                   useRichText
                 />
                 {getTooltip('systemMessage')}
@@ -141,21 +144,8 @@ const SettingsSkmConfiguration: FC = () => {
             )}
           />
           {getNumberControl('maxTokens')}
-          <Controller
-            name="indexName"
-            control={control}
-            render={({ field }) => (
-              <Track gap={10} style={{ width: '100%' }}>
-                <FormInput
-                  name="indexName"
-                  label={t('settings.skmConfiguration.indexName')}
-                  onChange={field.onChange}
-                  value={field.value}
-                />
-                {getTooltip('indexName')}
-              </Track>
-            )}
-          />
+          {getTextControl('indexName')}
+          {getTextControl('semanticConfiguration')}
           <Controller
             name="queryType"
             control={control}
@@ -179,7 +169,7 @@ const SettingsSkmConfiguration: FC = () => {
     </>
   );
 
-  function getTooltip(name: 'range' | 'documents' | 'systemMessage' | 'maxTokens' | 'indexName' | 'queryType') {
+  function getTooltip(name: 'range' | 'documents' | 'systemMessage' | 'maxTokens' | 'indexName' | 'queryType' | 'semanticConfiguration') {
     return (
       <Tooltip content={tooltips[name]}>
         <span>
@@ -205,6 +195,28 @@ const SettingsSkmConfiguration: FC = () => {
               name={name}
               label={t(`settings.skmConfiguration.${name}`)}
               type="number"
+              onChange={field.onChange}
+              value={field.value}
+            />
+            {getTooltip(name)}
+          </Track>
+        )}
+      />
+    );
+  }
+
+  function getTextControl(
+    name: 'indexName' | 'semanticConfiguration'
+  ) {
+    return (
+      <Controller
+        name={name}
+        control={control}
+        render={({ field }) => (
+          <Track gap={10} style={{ width: '100%' }}>
+            <FormInput
+              name="indexName"
+              label={t(`settings.skmConfiguration.${name}`)}
               onChange={field.onChange}
               value={field.value}
             />

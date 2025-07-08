@@ -15,7 +15,7 @@ const Tooltip: FC<PropsWithChildren<TooltipProps>> = ({ content, children }) => 
           {children}
         </RadixTooltip.Trigger>
         <RadixTooltip.Portal>
-          <RadixTooltip.Content className='tooltip'>
+          <RadixTooltip.Content className='tooltip' style={{ zIndex: 1000 }}>
             {content}
             <RadixTooltip.Arrow className='tooltip__arrow' />
           </RadixTooltip.Content>

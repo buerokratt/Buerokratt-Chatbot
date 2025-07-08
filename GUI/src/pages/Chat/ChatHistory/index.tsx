@@ -9,6 +9,8 @@ const History: FC = () => {
   return (
     <ChatHistory
       toastContext={useToast()}
+      showEmail={import.meta.env.REACT_APP_SHOW_HISTORY_EMAIL === 'true'}
+      showSortingLabel={import.meta.env.REACT_APP_SHOW_HISTORY_SORTING === 'true'}
       user={useStore.getState().userInfo}
     />
   );
@@ -16,6 +18,5 @@ const History: FC = () => {
 
 export default withAuthorization(History, [
   ROLES.ROLE_ADMINISTRATOR,
-  ROLES.ROLE_CHATBOT_TRAINER,
-  ROLES.ROLE_SERVICE_MANAGER,
+  ROLES.ROLE_CUSTOMER_SUPPORT_AGENT,
 ]);
