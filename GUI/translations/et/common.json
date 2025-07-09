@@ -128,6 +128,8 @@
     "changeStatus": "Muuda staatust",
     "waiting_validation": "Vastust koostatakse",
     "approved_validation": "Kinnitatud valideerimine",
+    "changingMessage": "Vestluse muutmine",
+    "messageEdited": "Vestluse sisu on muudetud! {{date}}",
     "active": {
       "list": "Aktiivsed vestlused",
       "myChats": "Minu vestlused",

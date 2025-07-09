@@ -300,11 +300,7 @@ const Chat: FC<ChatProps> = ({
       message: Message;
       editing: boolean;
     }) => {
-      if (editing) {
-        return apiDev.post('agents/chats/messages/edit', message);
-      } else {
-        return apiDev.post('agents/chats/messages/insert', message);
-      }
+      return apiDev.post(`agents/chats/messages/${editing ? 'edit' : 'insert'}`, message);
     },
     onSuccess: (res: any) => {
       return res.data.response;
@@ -566,6 +562,7 @@ const Chat: FC<ChatProps> = ({
           setMessagesList((oldMessages) => [...oldMessages, message]);
         }
       } catch (error) {
+        console.error(error);
         setMessagesList((oldMessages) => [...oldMessages, newMessage]);
       } finally {
         setResponseText('');
@@ -606,11 +603,14 @@ const Chat: FC<ChatProps> = ({
   };
 
   const checkIsMessageEditable = (message: Message): boolean => {
+    const lastestCsaMessage = messagesList.filter((m) => m.authorId === userInfo.idCode).pop();
+    const isLastCsaMessage = lastestCsaMessage?.id === message.id;
     return (
       isChatEditingAllowed &&
       chat.customerSupportId === userInfo.idCode &&
       message.authorId === userInfo.idCode &&
-      message.id
+      message.id &&
+      isLastCsaMessage
     );
   };
 
@@ -646,6 +646,7 @@ const Chat: FC<ChatProps> = ({
         return updatedMessages;
       });
     } catch (error) {
+      console.error(error);
       setMessagesList((oldMessages) => [...oldMessages, retryMessage]);
     }
   };
@@ -791,7 +792,7 @@ const Chat: FC<ChatProps> = ({
               {selectedMessage ? (
                 <div className="active-chat__toolbar edit-toolbar">
                   <div className="edit-toolbar__header">
-                    Vestluse muutmine
+                    {t('chat.changingMessage')}
                     <MdOutlineCreate className="active-chat__edit-icon" />
                   </div>
                   <div className="edit-toolbar__textarea">
