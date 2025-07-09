@@ -12,6 +12,7 @@ import {ROLES} from 'utils/constants';
 import {DeleteChatSettings} from "../../../types/deleteChatSettings";
 import {differenceInCalendarDays, format, parse, subDays} from "date-fns";
 import DeletionChatOverview from "../../../components/DeletionChatOverview";
+import { dateToLocalExcludingDST, dateToUTCExcludingDST } from 'utils/convert-date';
 
 const DeleteConversations: FC = () => {
     const {t} = useTranslation();
@@ -59,7 +60,13 @@ const DeleteConversations: FC = () => {
             setIsAuthMessages(deleteConfig.isAuthConversations === 'true');
             setAuthPeriod(Number(deleteConfig.authPeriod ?? 160));
             setAnonymPeriod(Number(deleteConfig.anonymPeriod ?? 160));
-            setDeletionTime(deleteConfig?.deletionTimeISO === '' ? new Date().toISOString() : new Date(deleteConfig.deletionTimeISO).toISOString());
+            setDeletionTime(
+              deleteConfig?.deletionTimeISO === ''
+                ? dateToLocalExcludingDST(new Date().toISOString())
+                : dateToLocalExcludingDST(
+                    new Date(deleteConfig.deletionTimeISO).toISOString()
+                  )
+            );
             reset(deleteConfig)
         }
     }, [deleteConfig]);
@@ -94,12 +101,14 @@ const DeleteConversations: FC = () => {
 
     const setDeleteConversationsData = (data: DeleteChatSettings) => {
         return {
-            ...data,
-            isAnonymConversations: data.isAnonymConversations || false,
-            isAuthConversations: data.isAuthConversations || false,
-            anonymPeriod: data.anonymPeriod || 360,
-            authPeriod: data.authPeriod || 360,
-            deletionTimeISO: data.deletionTimeISO || new Date().toISOString()
+          ...data,
+          isAnonymConversations: data.isAnonymConversations || false,
+          isAuthConversations: data.isAuthConversations || false,
+          anonymPeriod: data.anonymPeriod || 360,
+          authPeriod: data.authPeriod || 360,
+          deletionTimeISO:
+            dateToUTCExcludingDST(data.deletionTimeISO) ||
+            dateToUTCExcludingDST(new Date().toISOString()),
         };
     }
 
