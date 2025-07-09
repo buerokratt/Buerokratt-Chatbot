@@ -32,6 +32,7 @@ extract_data:
     authorId: ${incoming.body.authorId}
     holidays: ${incoming.body.holidays}
     holidayNames: ${incoming.body.holidayNames}
+    isOrgAvailable: false
     event: ""
 
 getSkmConfig:
@@ -134,12 +135,79 @@ check_value:
     - condition: ${correct_value.map((item) => item.text)[0] === 'ERROR'}
       next: return_bot_error
     - condition: ${correct_value.map((item) => item.text)[0] === '$backoffice' || correct_value.map((item) => item.text)[0].startsWith('$backoffice')}
-      next: get_organization_bot_answer_config  
+      next: get_organization_base_config  
     - condition: ${correct_value.map((item) => item.text)[0].startsWith('$validate_')}
       next: assign_validation_event  
     - condition: ${correct_value.map((item) => item.text)[0] === 'The requested information is not found in the retrieved data. Please try another query or topic.'}
       next: assign_unavailable_info_message  
   next: format_messages
+
+get_organization_base_config:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-organization-base-config"
+  result: org_base_config_res
+  next: assign_organization_base_config
+
+assign_organization_base_config:
+  assign:
+    base_config: ${org_base_config_res.response.body[0]}
+  next: check_if_organization_is_available_all_time
+
+check_if_organization_is_available_all_time:
+  switch:
+    - condition: ${base_config.isAvailableAllTime === 'true'}
+      next: get_all_available_csas
+  next: get_organization_working_details
+
+get_organization_working_details:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-is-organization-available"
+    body:
+      holidays: ${holidays}
+      holiday_names: ${holidayNames}
+      current_timestamp: ${new Date().toISOString()}
+  result: org_res
+  next: assign_organization_details
+
+assign_organization_details:
+  assign:
+    org_details: ${org_res.response.body[0]}
+  next: check_if_organization_is_available
+
+check_if_organization_is_available:
+  switch:
+    - condition: ${org_details.isWithinWorkingTime === true && org_details.isWithinWorkingDays === true && org_details.isAllowedToWorkAtHolidays === true}
+      next: get_all_available_csas
+    - condition: ${org_details.isWithinWorkingTime === true && org_details.isWithinWorkingDays === true && org_details.isAllowedToWorkAtHolidays === false && org_details.isHoliday == true}
+      next: get_organization_bot_answer_config
+    - condition: ${org_details.isWithinWorkingTime === true && org_details.isWithinWorkingDays === true && org_details.isAllowedToWorkAtHolidays === false && org_details.isHoliday == false}
+      next: get_all_available_csas
+  next: get_organization_bot_answer_config
+
+get_all_available_csas:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-all-available-customer-support-agents"
+  result: csas_res
+  next: assign_available_csas
+
+assign_available_csas:
+  assign:
+    available_csas: ${csas_res.response.body.length}
+  next: check_if_csas_are_available
+
+check_if_csas_are_available:
+  switch:
+    - condition: ${available_csas == 0}
+      next: get_organization_bot_answer_config
+  next: assign_organization_available
+
+assign_organization_available:
+  assign:
+    isOrgAvailable: true
+  next: get_organization_bot_answer_config
   
 return_value:
   return: ${correct_value}
@@ -203,7 +271,7 @@ assign_back_office_event:
       - recipient_id: ${sender}
         text: ${bot_answer_config.askToForwardToCsaMessage}
         context: ${test.response.body.choices[0].message.context}
-    event: "${bot_answer_config.isAskToForwardToCsa === 'true' ? 'ask_to_forward_to_csa' : ''}"
+    event: "${bot_answer_config.isAskToForwardToCsa === 'true' && isOrgAvailable === true ? 'ask_to_forward_to_csa' : ''}"
   next: format_messages
 
 assign_unavailable_info_message:
