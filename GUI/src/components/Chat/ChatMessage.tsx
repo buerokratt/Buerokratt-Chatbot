@@ -8,7 +8,7 @@ import {
   MdOutlineCheck,
 } from 'react-icons/md';
 import { Message } from '../../types/message';
-import { CHAT_EVENTS, MessageStatus } from '../../types/chat';
+import { CHAT_EVENTS } from '../../types/chat';
 import Markdownify from './Markdownify';
 import { useTranslation } from 'react-i18next';
 import './Typing.scss';
@@ -199,7 +199,8 @@ const ChatMessage: FC<ChatMessageProps> = ({
                                 title: t('global.notification'),
                                 message: t('chat.validations.messageChanged'),
                               });
-                            } catch (_) {
+                            } catch (error) {
+                              console.error(error);
                               toast.open({
                                 type: 'error',
                                 title: t('global.notificationError'),
@@ -271,6 +272,13 @@ const ChatMessage: FC<ChatMessageProps> = ({
           </time>
         </span>
       ) : null}{' '}
+      {message.originalBaseId && (
+        <div className="active-chat__message-date">
+          {t('chat.messageEdited', {
+            date: format(new Date(message?.updated ?? new Date()), 'HH:mm:ss'),
+          })}
+        </div>
+      )}
     </div>
   );
 };
