@@ -29,7 +29,7 @@ declaration:
       - field: event
         type: string
         description: "Body field 'event'"
-    headers:
+    header:
       - field: cookie
         type: string
         description: "Cookie field"

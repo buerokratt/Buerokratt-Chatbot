@@ -11,7 +11,7 @@ declaration:
       - field: isAuth
         type: boolean
         description: "Body field 'isAuth'"
-    headers:
+    header:
       - field: x-ruuter-nonce
         type: string
         description: "Nonce field"
