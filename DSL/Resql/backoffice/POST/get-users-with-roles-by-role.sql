@@ -8,6 +8,8 @@ SELECT u.login,
        u.department,
        ua.authority_name AS authorities,
        csa.status AS customer_support_status,
+       csa.status_comment as status_comment,
+       csa.created AS status_comment_time_stamp,
        CEIL(COUNT(*) OVER() / :page_size::DECIMAL) AS total_pages
 FROM "user" u
 LEFT JOIN (
@@ -21,7 +23,7 @@ LEFT JOIN (
       )
 ) ua ON u.id_code = ua.user_id
 JOIN (
-    SELECT id_code, status, ROW_NUMBER() OVER (PARTITION BY id_code ORDER BY id DESC) AS rn
+    SELECT id_code, status, status_comment, created, ROW_NUMBER() OVER (PARTITION BY id_code ORDER BY id DESC) AS rn
     FROM customer_support_agent_activity
 ) csa ON u.id_code = csa.id_code AND csa.rn = 1
 WHERE u.status <> 'deleted'

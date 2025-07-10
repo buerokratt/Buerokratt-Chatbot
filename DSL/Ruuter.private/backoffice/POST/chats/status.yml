@@ -111,7 +111,7 @@ postChat:
       id: ${chat.id}
       customerSupportId: ${chat.customerSupportId}
       customerSupportDisplayName: ${chat.customerSupportDisplayName}
-      csaTitle: ${chat.ended ?? ""}
+      csaTitle: ${chat.csaTitle ?? ""}
       endUserId: ${chat.endUserId}
       endUserFirstName: ${chat.endUserFirstName}
       endUserLastName: ${chat.endUserLastName}

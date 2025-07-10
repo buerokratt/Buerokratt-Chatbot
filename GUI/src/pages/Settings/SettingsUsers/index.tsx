@@ -11,7 +11,7 @@ import {
 import { AxiosError } from 'axios';
 import { MdOutlineEdit, MdOutlineDeleteOutline } from 'react-icons/md';
 import { apiDev } from 'services/api';
-import { Button, Card, DataTable, Dialog, Icon, Track } from 'components';
+import { Button, Card, DataTable, Dialog, Icon, Tooltip, Track } from 'components';
 import { User, UserSearchFilters } from 'types/user';
 import { deleteUser } from 'services/users';
 import { useToast } from 'hooks/useToast';
@@ -20,6 +20,7 @@ import { ROLES } from 'utils/constants';
 import withAuthorization from 'hoc/with-authorization';
 import { CustomerSupportActivityDTO } from 'types/customerSupportActivity';
 import useStore from '../../../store';
+import { format } from 'date-fns';
 
 const SettingsUsers: FC = () => {
   const { t } = useTranslation();
@@ -100,7 +101,7 @@ const SettingsUsers: FC = () => {
         getUsers(pagination, sorting, columnFilters);
       }
     } catch (err) {
-      console.error('Failed to fetch data');
+      console.error('Failed to fetch data', err);
     }
   };
 
@@ -147,6 +148,7 @@ const SettingsUsers: FC = () => {
         userIdCode: selectedUserIdCode,
         customerSupportActive: data.customerSupportActive,
         customerSupportStatus: data.customerSupportStatus,
+        statusComment: data.statusComment,
       }),
     onSuccess: async () => {
       getUsers(pagination, sorting, columnFilters);
@@ -239,9 +241,10 @@ const SettingsUsers: FC = () => {
       <Button
         appearance="text"
         onClick={() => {
-          if (props.getValue() === 'online' || props.getValue() === 'idle')
+          if (props.getValue() === 'online' || props.getValue() === 'idle') {
             setSelectedUserIdCode(props.row.original.idCode);
             setChangeStatusDialog(true);
+          }
         }}
         style={{
           borderRadius: '50%',
@@ -260,6 +263,30 @@ const SettingsUsers: FC = () => {
           }}
         ></span>
       </Button>
+    );
+  };
+
+  const statusCommentView = (props: any) => {
+    const value = props.getValue();
+    const statusTimeStamp = format(new Date(props.row.original.statusCommentTimeStamp), 'HH:mm:ss');
+    const statusDateTimeStamp = format(new Date(props.row.original.statusCommentTimeStamp), 'dd.MM HH:mm');
+    const statusComment = value.length < 13 ? `${value}` : `${value?.slice?.(0, 13)}...`;
+    return (
+      <Tooltip content={value.length > 13 ? `${statusDateTimeStamp} ${value}` : ''}>
+        <span style={{ maxWidth: '170px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          {value ? statusComment : ''}
+          {value ? (
+            <time
+              dateTime={statusTimeStamp}
+              className="active-chat__message-date"
+            >
+              {statusTimeStamp}
+            </time>
+          ) : (
+            ''
+          )}
+        </span>
+      </Tooltip>
     );
   };
 
@@ -309,6 +336,10 @@ const SettingsUsers: FC = () => {
         enableColumnFilter: false,
         cell: customerSupportStatusView,
       }),
+      columnHelper.accessor('statusComment', {
+        header: t('global.statusClarification') ?? '',
+        cell: statusCommentView,
+      }),
       columnHelper.accessor('csaEmail', {
         header: t('settings.users.email') ?? '',
       }),
@@ -344,47 +375,49 @@ const SettingsUsers: FC = () => {
         </Button>
       </Track>
 
-      <Card>
-        <DataTable
-          data={usersList}
-          columns={usersColumns}
-          sortable
-          filterable
-          pagination={pagination}
-          columnFilters={columnFilters}
-          setPagination={(state: PaginationState) => {
-            if (
-              state.pageIndex === pagination.pageIndex &&
-              state.pageSize === pagination.pageSize
-            )
-              return;
-            setPagination(state);
-            updatePageSize.mutate({ page_results: state.pageSize });
-            getUsers(state, sorting, columnFilters);
-          }}
-          sorting={sorting}
-          setSorting={(state: SortingState) => {
-            setSorting(state);
-            getUsers(pagination, state, columnFilters);
-          }}
-          setFiltering={(state: ColumnFiltersState) => {
-            setColumnFilters(state);
-            const searchfilters = checkFilters(state);
-            const hasData = Object.values(searchfilters).some(
-              (value) => value !== ''
-            );
+      <div style={{ height: 'auto', overflow: 'auto' }}>
+        <Card>
+          <DataTable
+            data={usersList}
+            columns={usersColumns}
+            sortable
+            filterable
+            pagination={pagination}
+            columnFilters={columnFilters}
+            setPagination={(state: PaginationState) => {
+              if (
+                state.pageIndex === pagination.pageIndex &&
+                state.pageSize === pagination.pageSize
+              )
+                return;
+              setPagination(state);
+              updatePageSize.mutate({ page_results: state.pageSize });
+              getUsers(state, sorting, columnFilters);
+            }}
+            sorting={sorting}
+            setSorting={(state: SortingState) => {
+              setSorting(state);
+              getUsers(pagination, state, columnFilters);
+            }}
+            setFiltering={(state: ColumnFiltersState) => {
+              setColumnFilters(state);
+              const searchfilters = checkFilters(state);
+              const hasData = Object.values(searchfilters).some(
+                (value) => value !== ''
+              );
 
-            if (hasData) {
-              const intialPagination = { pageIndex: 0, pageSize: 10 };
-              getUsers(intialPagination, sorting, state, true);
-            } else {
-              getUsers(pagination, sorting, state);
-            }
-          }}
-          pagesCount={totalPages}
-          isClientSide={false}
-        />
-      </Card>
+              if (hasData) {
+                const intialPagination = { pageIndex: 0, pageSize: 10 };
+                getUsers(intialPagination, sorting, state, true);
+              } else {
+                getUsers(pagination, sorting, state);
+              }
+            }}
+            pagesCount={totalPages}
+            isClientSide={false}
+          />
+        </Card>
+      </div>
 
       {newUserModal && (
         <UserModal
@@ -417,8 +450,10 @@ const SettingsUsers: FC = () => {
                 appearance="primary"
                 onClick={() => {
                   customerSupportActivityMutation.mutate({
+                    customerSupportId: selectedUserIdCode ?? '',
                     customerSupportActive: false,
                     customerSupportStatus: 'offline',
+                    statusComment: ''
                   });
                 }}
               >

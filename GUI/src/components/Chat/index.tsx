@@ -657,11 +657,14 @@ const Chat: FC<ChatProps> = ({
   };
 
   const checkIsMessageEditable = (message: Message): boolean => {
+    const lastestCsaMessage = messagesList.filter((m) => m.authorId === userInfo.idCode).pop();
+    const isLastCsaMessage = lastestCsaMessage?.id === message.id;
     return (
       isChatEditingAllowed &&
       chat.customerSupportId === userInfo.idCode &&
       message.authorId === userInfo.idCode &&
-      message.id
+      message.id &&
+      isLastCsaMessage
     );
   };
 
@@ -851,7 +854,7 @@ const Chat: FC<ChatProps> = ({
               {selectedMessage ? (
                 <div className="active-chat__toolbar edit-toolbar">
                   <div className="edit-toolbar__header">
-                    Vestluse muutmine
+                    {t('chat.changingMessage')}
                     <MdOutlineCreate className="active-chat__edit-icon" />
                   </div>
                   <div className="edit-toolbar__textarea">

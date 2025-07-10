@@ -15,12 +15,15 @@ import {
   FormCheckbox,
   FormInput,
   Icon,
+  Tooltip,
   Track,
 } from 'components';
 import { User } from 'types/user';
 import { Chat } from 'types/chat';
 import { useDebouncedCallback } from 'use-debounce';
 import useStore from 'store';
+import { format } from 'date-fns';
+import { DialogTrigger } from '@radix-ui/react-dialog';
 
 type ForwardToColleaugeModalProps = {
     chat: Chat;
@@ -108,31 +111,61 @@ const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({
       ) : null;
     };
 
+    const statusCommentView = (props: any) => {
+    const value = props.getValue();
+    const statusTimeStamp = format(new Date(props.row.original.statusCommentTimeStamp), 'HH:mm:ss');
+    const statusDateTimeStamp = format(new Date(props.row.original.statusCommentTimeStamp), 'dd.MM HH:mm');
+    const statusComment = value.length < 13 ? `${value}` : `${value?.slice?.(0, 13)}...`;
+    return (
+      <Tooltip content={value.length > 13 ? `${statusDateTimeStamp} ${value}` : ''}>
+       <DialogTrigger asChild>
+        <span style={{ maxWidth: '170px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          {value ? statusComment : ''}
+          {value ? (
+            <time
+              dateTime={statusTimeStamp}
+              className="active-chat__message-date"
+            >
+              {statusTimeStamp}
+            </time>
+          ) : (
+            ''
+          )}
+        </span>
+       </DialogTrigger>
+      </Tooltip>
+    );
+  };
+
     const usersColumns = useMemo(
-        () => [
-            columnHelper.accessor(
-                (row) => `${row.firstName ?? ''} ${row.lastName ?? ''}`,
-                {
-                    id: `name`,
-                    header: t('settings.users.name') ?? '',
-                }
-            ),
-            columnHelper.accessor('csaTitle', {
-                header: t('settings.users.userTitle') ?? '',
-            }),
-            columnHelper.accessor('customerSupportStatus', {
-                header: t('global.status') ?? '',
-                cell: customerSupportStatusView,
-            }),
-            columnHelper.display({
-                id: 'forward',
-                cell: forwardView,
-                meta: {
-                    size: '1%',
-                },
-            }),
-        ],
-        []
+      () => [
+        columnHelper.accessor(
+          (row) => `${row.firstName ?? ''} ${row.lastName ?? ''}`,
+          {
+            id: `name`,
+            header: t('settings.users.name') ?? '',
+          }
+        ),
+        columnHelper.accessor('csaTitle', {
+          header: t('settings.users.userTitle') ?? '',
+        }),
+        columnHelper.accessor('customerSupportStatus', {
+          header: t('global.status') ?? '',
+          cell: customerSupportStatusView,
+        }),
+        columnHelper.accessor('statusComment', {
+          header: t('global.statusClarification') ?? '',
+          cell: statusCommentView,
+        }),
+        columnHelper.display({
+          id: 'forward',
+          cell: forwardView,
+          meta: {
+            size: '1%',
+          },
+        }),
+      ],
+      []
     );
 
   return (

@@ -14,7 +14,7 @@ declaration:
       - field: message
         type: json
         description: "Body field 'message'"
-    headers:
+    header:
       - field: cookie
         type: string
         description: "Cookie field"
@@ -142,7 +142,7 @@ assign_chat_cookie:
       Domain: "[#DOMAIN]"
       Secure: true
       HttpOnly: true
-      SameSite: "Lax"
+      SameSite: "[#COOKIE_SAME_SITE]"
       Max-Age: 0
   next: blacklist_user_jwt
 

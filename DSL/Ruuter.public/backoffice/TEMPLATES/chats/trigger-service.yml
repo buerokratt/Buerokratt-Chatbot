@@ -18,7 +18,6 @@ declaration:
         type: string
         description: "chatId field"    
 
-# TODO: Handle Service Module Services
 assign_data:
   assign:
     message: ${incoming.body.message}
@@ -34,6 +33,12 @@ assign_data:
 check_for_service_type:
   switch:
     - condition: ${serviceType === 'common_service'}
+      next: check_for_service_method
+  next: check_if_its_a_microservice
+
+check_if_its_a_microservice:
+  switch:
+    - condition: ${servicePath.includes('_mcq_')} # Could be a more complex check
       next: check_for_service_method
   next: get_service_trigger_for_service
 
