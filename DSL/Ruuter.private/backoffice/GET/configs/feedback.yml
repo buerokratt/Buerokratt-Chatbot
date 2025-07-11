@@ -1,16 +1,16 @@
 declaration:
   call: declare
   version: 0.1
-  description: "Decription placeholder for 'WIDGET-CONFIG'"
+  description: "Decription placeholder for 'FEEDBACK'"
   method: get
   accepts: json
   returns: json
   namespace: backoffice
 
-getWidgetConfig:
+getFeedbackConfig:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/get-widget-config"
+    url: "[#CHATBOT_RESQL]/get-feedback-config"
   result: res
 
 return_result:

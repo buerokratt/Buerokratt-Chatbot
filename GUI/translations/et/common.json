@@ -363,6 +363,13 @@
       "noticeChanged": "Teate seadeid muudeti edukalt",
       "endDateError": "Lõppkuupäev peab olema alguskuupäevast suurem"
     },
+    "feedback": {
+      "title": "Tagasiside",
+      "feedbackActive": "Tagasiside aktiivne",
+      "feedbackQuestion": "Tagasiside küsimus",
+      "noticeActive": "Teade aktiivne",
+      "notice": "Teade"
+    },
     "appearance": {
       "title": "Välimus ja käitumine",
       "widgetBubbleMessageText": "Märguandesõnum",
