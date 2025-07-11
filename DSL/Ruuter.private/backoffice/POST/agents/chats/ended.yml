@@ -27,7 +27,7 @@ declaration:
         type: string
         description: "Body field 'search'"
       - field: customerSupportIds
-        type: array
+        type: object
         description: "Body field 'customerSupportIds'"
 
 extractRequestData:

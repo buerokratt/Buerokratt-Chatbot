@@ -14,7 +14,9 @@ SELECT
     forwarded_to_csa,
     created,
     event,
-    rating
+    rating,
+    original_base_id,
+    updated
 FROM message
 WHERE base_id = :id
 ORDER BY updated DESC

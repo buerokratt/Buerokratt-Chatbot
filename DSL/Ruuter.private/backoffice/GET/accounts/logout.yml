@@ -7,7 +7,7 @@ declaration:
   returns: json
   namespace: backoffice
   allowlist:
-    headers:
+    header:
       - field: cookie
         type: string
         description: "Cookie field"
@@ -51,6 +51,7 @@ setCustomerSupportAgentAway:
       userIdCode: ${idCode}
       active: false
       status: "offline"
+      statusComment: ""
       created: ${new Date().toISOString()}
   result: set_status_res
   next: blacklistCustomJwt
@@ -74,7 +75,7 @@ assign_cookie:
       Max-Age: 0
       Secure: true
       HttpOnly: true
-      SameSite: "Lax"
+      SameSite: "[#COOKIE_SAME_SITE]"
   next: return_result
 
 return_result:

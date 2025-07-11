@@ -2,7 +2,7 @@ declaration:
   call: declare
   version: 0.1
   description: "Decription placeholder for 'Approve Validation'"
-  method: get
+  method: post
   accepts: json
   returns: json
   namespace: backoffice

@@ -7,7 +7,7 @@ declaration:
   returns: json
   namespace: backoffice
   allowlist:
-    headers:
+    header:
       - field: cookie
         type: string
         description: "Cookie field"

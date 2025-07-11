@@ -104,6 +104,12 @@ check_if_bot_is_unable_to_reply:
       next: check_if_client_bot_is_active
     - condition: ${post_message_to_bot_result.response.body?.[0]?.text == 'Suunan teid klienditeenindajale. Varuge natukene kannatust.'}
       next: get_organization_base_config
+    - condition: ${post_message_to_bot_result.response.body?.[0]?.text == 'Suunan vestluse nõustajale. Palun oodake.'}
+      next: get_organization_base_config
+    - condition: ${post_message_to_bot_result.response.body?.[0]?.text == 'Suunan teid klienditeenindajale. Palun oodake.'}
+      next: get_organization_base_config
+    - condition: ${post_message_to_bot_result.response.body?.[0]?.text == 'Suunan teid riigiinfo konsultandile. Varuge natukene kannatust.'}
+      next: get_organization_base_config
     - condition: ${post_message_to_bot_result.response.body?.[0]?.text.startsWith("#common_service") || post_message_to_bot_result.response.body?.[0]?.text.startsWith("#service")}
       next: assign_service_content_from_bot_response
   next: extract_bot_responses
@@ -230,7 +236,7 @@ check_if_organization_is_available:
     - condition: ${org_details.isWithinWorkingTime === true && org_details.isWithinWorkingDays === true && org_details.isAllowedToWorkAtHolidays === true}
       next: get_all_available_csas
     - condition: ${org_details.isWithinWorkingTime === true && org_details.isWithinWorkingDays === true && org_details.isAllowedToWorkAtHolidays === false && org_details.isHoliday == true}
-      next: return_is_a_holiday
+      next: return_organization_is_not_available
     - condition: ${org_details.isWithinWorkingTime === true && org_details.isWithinWorkingDays === true && org_details.isAllowedToWorkAtHolidays === false && org_details.isHoliday == false}
       next: get_all_available_csas
   next: return_organization_is_not_available

@@ -1,5 +1,6 @@
 {
   "global": {
+    "email": "Email",
     "save": "Salvesta",
     "add": "Lisa",
     "edit": "Muuda",
@@ -44,7 +45,13 @@
     "today": "Täna",
     "forward": "Suuna",
     "chosen": "Valitud",
-    "read": "Loetud"
+    "read": "Loetud",
+    "statusClarification": "Staatuse täpsustus"
+  },
+  "sorting": {
+    "desc": "kahanevalt",
+    "asc": "kasvavalt",
+    "sorting": "Sorteerimine"
   },
   "mainMenu": {
     "menuLabel": "Põhinavigatsioon",
@@ -121,6 +128,8 @@
     "changeStatus": "Muuda staatust",
     "waiting_validation": "Vastust koostatakse",
     "approved_validation": "Kinnitatud valideerimine",
+    "changingMessage": "Vestluse muutmine",
+    "messageEdited": "Vestluse sisu on muudetud! {{date}}",
     "active": {
       "list": "Aktiivsed vestlused",
       "myChats": "Minu vestlused",
@@ -323,6 +332,8 @@
       "soundNotifications": "Häälmärguanded",
       "popupNotifications": "Pop-up märguanded",
       "newUnansweredChat": "Uus vastamata vestlus",
+      "newForwardedChatTitle": "Suunatud vestlus",
+      "newForwardedChatMessage": "Sulle suunati uus vestlus!",
       "newForwardedChat": "Uus suunatud vestlus",
       "newValidationMessage": "Uus teade kinnitamiseks",
       "useAutocorrect": "Teksti autokorrektor",
@@ -332,7 +343,8 @@
       "idCodePlaceholder": "Isikukood peab algama riigi eesliitega, (eg.EE12345678910)",
       "choose": "Vali",
       "userExists": "Kasutaja on olemas",
-      "userChangeStatusMessage": "Kas sa soovid kasutaja staatuseks muuta eemal?"
+      "userChangeStatusMessage": "Kas sa soovid kasutaja staatuseks muuta eemal?",
+      "statusCommentUpdated": "Staatuse täpsustus uuendatud"
     },
     "chat": {
       "chatActive": "Vestlusrobot aktiivne",
@@ -371,7 +383,7 @@
       "description": "Peale tööaja lõppemist, juhul kui juturobot ise kliendi küsimustele vastata ei oska, küsib ta kliendi kontaktandmeid.",
       "openFrom": "Avatud alates",
       "openUntil": "Avatud kuni",
-      "publicHolidays": "Arvesta riigipühadega",
+      "publicHolidays": "Saadaval riigipühadel",
       "consider": "Arvesta",
       "dontConsider": "Ära arvesta",
       "closedOnWeekends": "Nädalavahetustel suletud",

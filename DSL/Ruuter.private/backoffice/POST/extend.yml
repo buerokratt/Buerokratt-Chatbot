@@ -7,7 +7,7 @@ declaration:
   returns: json
   namespace: backoffice
   allowlist:
-    headers:
+    header:
       - field: cookie
         type: string
         description: "Cookie field"
@@ -30,7 +30,7 @@ assign_cookie:
       Domain: "[#DOMAIN]"
       Secure: true
       HttpOnly: true
-      SameSite: "Lax"
+      SameSite: "[#COOKIE_SAME_SITE]"
 
 return_result:
   headers:

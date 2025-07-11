@@ -115,6 +115,7 @@ const SettingsSkmConfiguration: FC = () => {
       <p>{t('settings.skmConfiguration.description')}</p>
       <Card
         key={key}
+        isScrollable
         footer={
           <Track justify="end">
             <Button onClick={handleFormSubmit}>{t('global.save')}</Button>
@@ -135,6 +136,7 @@ const SettingsSkmConfiguration: FC = () => {
                   onChange={field.onChange}
                   defaultValue={field.value}
                   name="label"
+                  height={320}
                   useRichText
                 />
                 {getTooltip('systemMessage')}

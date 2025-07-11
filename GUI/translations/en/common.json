@@ -1,5 +1,6 @@
 {
   "global": {
+    "email": "Email",
     "save": "Save",
     "add": "Add",
     "edit": "Edit",
@@ -44,7 +45,13 @@
     "today": "Today",
     "forward": "Forward",
     "chosen": "Chosen",
-    "read": "Read"
+    "read": "Read",
+    "statusClarification": "Status clarification"
+  },
+  "sorting": {
+    "desc": "descending",
+    "asc": "ascending",
+    "sorting": "Sorting"
   },
   "mainMenu": {
     "menuLabel": "Main navigation",
@@ -121,6 +128,8 @@
     "changeStatus": "Change status",
     "waiting_validation": "Waiting for validation",
     "approved_validation": "Approved Validation",
+    "changingMessage": "Changing the message",
+    "messageEdited": "The message has been changed! {{date}}",
     "active": {
       "list": "Active chat list",
       "myChats": "My chats",
@@ -323,6 +332,8 @@
       "soundNotifications": "Sound notifications",
       "popupNotifications": "Popup notifications",
       "newUnansweredChat": "New unanswered chat",
+      "newForwardedChatTitle": "Forwarded chat",
+      "newForwardedChatMessage": "You have new forwarded chat!",
       "newForwardedChat": "New forwarded chat",
       "newValidationMessage": "New message to validate",
       "useAutocorrect": "Text auto corrector",
@@ -332,7 +343,8 @@
       "idCodePlaceholder": "The personal identification number must start with a country prefix, (eg.EE12345678910)",
       "choose": "Choose",
       "userExists": "User Exists",
-      "userChangeStatusMessage": "Do you want to change the user status to away?"
+      "userChangeStatusMessage": "Do you want to change the user status to away?",
+      "statusCommentUpdated": "Status clarification updated"
     },
     "chat": {
       "chatActive": "Chatbot active",
@@ -371,7 +383,7 @@
       "description": "After the end of the working hours, if the chatbot cannot answer the customer's questions by itself, it will ask for the customer's contact details.",
       "openFrom": "Open from",
       "openUntil": "Open until",
-      "publicHolidays": "Consider public holidays",
+      "publicHolidays": "Available on national holidays",
       "consider": "Consider",
       "dontConsider": "Don't Consider",
       "closedOnWeekends": "Closed on weekends",

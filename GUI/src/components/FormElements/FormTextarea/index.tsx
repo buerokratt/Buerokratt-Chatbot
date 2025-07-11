@@ -19,6 +19,7 @@ type TextareaProps = TextareaAutosizeProps &
     showMaxLength?: boolean;
     maxLengthBottom?: boolean;
     useRichText?: boolean;
+    height?: number;
   };
 
 const FormTextarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
@@ -35,6 +36,7 @@ const FormTextarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       maxLengthBottom,
       defaultValue,
       useRichText,
+      height = 95,
       onChange,
       ...rest
     },
@@ -76,7 +78,7 @@ const FormTextarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           {useRichText ? (
             <RichTextarea
               id={id}
-              style={{ width: '100%', height: '95px' }}
+              style={{ width: '100%', height: `${height}px` }}
               maxLength={maxLength === -1 ? undefined : maxLength}
               ref={ref}
               defaultValue={defaultValue ?? ''}
@@ -94,7 +96,7 @@ const FormTextarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             >
               {createRegexRenderer([
                 [
-                  /https?:\/\/[-_.!~*\'()a-zA-Z0-9;\/?:\@&=+\$,%#]+/g,
+                  /https?:\/\/[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+/g,
                   ({ children, key, value }) => (
                     <a
                       style={{
