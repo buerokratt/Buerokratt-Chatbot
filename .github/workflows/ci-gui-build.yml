@@ -3,7 +3,7 @@ name: Build and publish GUI
 on:
   push:
     branches:
-      - dev
+      - sql-refacto
     paths:
       - '.env.gui'
 
