@@ -118,7 +118,7 @@ endChat:
       endUserLastName: ${activeChat.endUserLastName ?? ""}
       status: ${status ?? "ENDED"}
       created: ${activeChat.created ?? "CURRENT_TIMESTAMP"}
-      ended: ${activeChat.ended ?? "CURRENT_TIMESTAMP"
+      ended: ${activeChat.ended ?? "CURRENT_TIMESTAMP"}
       feedbackRating: ${activeChat.feedbackRating ?? ""}
       feedbackText: ${activeChat.feedbackText ?? ""}
       endUserEmail: ${activeChat.endUserEmail ?? ""}

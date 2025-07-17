@@ -248,7 +248,7 @@ check_if_organization_is_available:
       next: return_is_a_holiday
     - condition: ${org_details.isWithinWorkingTime === true && org_details.isWithinWorkingDays === true && org_details.isAllowedToWorkAtHolidays === false && org_details.isHoliday == false}
       next: get_all_available_csas
-  next: return_organization_is_not_available
+  next: get_all_available_csas
 
 return_is_a_holiday:
   call: http.post
@@ -397,7 +397,7 @@ updateDenormalizedChatCsasNotAvailableBot:
       isSupportMessage: false
       isCustomerMessage: false
       authorTimestamp: ${csas_not_available_message_result.response.body[0].updated}
-      content: ${base_config.noCsaMessage}
+      content: ${base_config.noCsaMessage}q
       lastMessageAuthorId: ${get_bot_name_result.response.body[0].value}
       lastMessageEvent: "${base_config.askForContacts === 'true' ? 'unavailable_csas_ask_contacts' : 'unavailable_csas'}"
   result: updateDenormalizedChatMessageCsasNotAvailableBotRes
@@ -431,6 +431,15 @@ redirect_chat_to_back_office:
     body:
       chatId: ${chatId}
   result: redirect_chat_to_back_office_result
+
+redirect_denormalized_chat_to_back_office:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/chat/update_denormalized_chat_remove_agent"
+    body:
+      chatId: ${chatId}
+      updated: ${redirect_chat_to_back_office_result.response.body[0].updated}
+  result: redirect_denormalized_chat_to_back_office_result
 
 add_chat_id_to_queue_notification_node:
   call: http.post
