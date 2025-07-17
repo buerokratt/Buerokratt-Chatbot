@@ -363,6 +363,13 @@
       "noticeChanged": "Emergency notice settings changed successfully",
       "endDateError": "End date must be greater than start date"
     },
+    "feedback": {
+      "title": "Feedback",
+      "feedbackActive": "Feedback active",
+      "feedbackQuestion": "Feedback question",
+      "noticeActive": "Notice active",
+      "notice": "Notice"
+    },
     "appearance": {
       "title": "Appearance and behavior",
       "widgetBubbleMessageText": "Widget bubble message text",
