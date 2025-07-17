@@ -43,6 +43,7 @@ SELECT
     m.content,
     m.event,
     m.created,
+    m.author_id,
     m.author_role,
     m.buttons,
     m.options,
