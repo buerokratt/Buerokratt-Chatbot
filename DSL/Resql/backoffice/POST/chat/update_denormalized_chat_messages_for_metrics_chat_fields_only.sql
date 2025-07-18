@@ -14,6 +14,7 @@ INSERT INTO chat.denormalized_chat_messages_for_metrics (
     customer_support_last_name,
     external_id,
     received_from,
+    created,
     updated,
     ended,
     message_created,
@@ -97,6 +98,7 @@ SELECT
         WHEN :receivedFrom::TEXT = 'null' THEN received_from
         ELSE :receivedFrom::VARCHAR
     END,
+    created,
     CASE
         WHEN :updated::TEXT = 'CURRENT_TIMESTAMP' THEN NOW()
         WHEN :updated::TEXT = '' THEN NULL
