@@ -84,7 +84,6 @@ declaration:
         type: string
         description: "Timestamp indicating when the new denormalized chat row was created"
 */
--- Using array approach directly
 SELECT
     COPY_ROW_WITH_MODIFICATIONS(
         -- Table name for denormalized_chat
