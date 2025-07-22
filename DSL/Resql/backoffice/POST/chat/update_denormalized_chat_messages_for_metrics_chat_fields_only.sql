@@ -1,3 +1,59 @@
+/*
+declaration:
+  version: 0.1
+  description: "Insert a denormalized chat message into metrics table with optional chat/message fields, reusing latest row as fallback"
+  method: post
+  namespace: chat
+  allowlist:
+    body:
+      - field: chatBaseId
+        type: string
+        description: "Chat base ID; if null, fallback to previous row value"
+      - field: chatId
+        type: string
+        description: "Chat UUID; if null, fallback to previous row value"
+      - field: status
+        type: string
+        description: "Chat status; if null, fallback to previous row value"
+      - field: endUserEmail
+        type: string
+        description: "End user email; optional"
+      - field: endUserPhone
+        type: string
+        description: "End user phone; optional"
+      - field: feedbackText
+        type: string
+        description: "Feedback text; optional"
+      - field: feedbackRating
+        type: string
+        description: "Feedback rating; optional"
+      - field: customerSupportDisplayName
+        type: string
+        description: "CSA display name; optional"
+      - field: customerSupportId
+        type: string
+        description: "CSA ID; used for matching fallback values"
+      - field: customerSupportFirstName
+        type: string
+        description: "CSA first name; optional"
+      - field: customerSupportLastName
+        type: string
+        description: "CSA last name; optional"
+      - field: externalId
+        type: string
+        description: "External chat ID; optional"
+      - field: receivedFrom
+        type: string
+        description: "Source of the chat; optional"
+      - field: updated
+        type: string
+        description: "Updated timestamp; CURRENT_TIMESTAMP, null, or specific timestamp"
+      - field: ended
+        type: string
+        description: "Ended timestamp; CURRENT_TIMESTAMP, null, or specific timestamp"
+  response:
+    fields: []
+*/
 INSERT INTO chat.denormalized_chat_messages_for_metrics (
     chat_base_id,
     chat_id,
