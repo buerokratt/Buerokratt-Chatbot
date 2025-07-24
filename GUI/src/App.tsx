@@ -25,6 +25,7 @@ import DeleteConversations from './pages/Settings/DeleteConversations';
 import ValidationRequests from './pages/Chat/ValidationRequests';
 import SettingsSkmConfiguration from 'pages/Settings/SettingsSkmConfiguration';
 import SettingsFeedback from 'pages/Settings/SettingsFeedback';
+import { getWidgetData } from './services/users';
 
 const App: FC = () => {
   useQuery<{
@@ -33,6 +34,20 @@ const App: FC = () => {
     queryKey: ['auth/jwt/userinfo', 'prod'],
     onSuccess: (res: { response: UserInfo }) => {
       localStorage.setItem('exp', res.response.JWTExpirationTimestamp);
+
+      getWidgetData(res.response.idCode)
+        .then((domains) => {
+          const selectedDomains = domains
+            .filter(d => d.selected)
+            .map(d => d.url)
+            .filter(Boolean);
+
+          useStore.getState().setUserDomains(selectedDomains);
+        })
+        .catch((e) => {
+          console.error('Failed to fetch widget data:', e);
+        });
+
       return useStore.getState().setUserInfo(res.response);
     },
   });
