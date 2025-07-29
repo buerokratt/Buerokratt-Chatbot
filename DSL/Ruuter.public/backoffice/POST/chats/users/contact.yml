@@ -72,7 +72,6 @@ updateDenormalizedChatMetricsChatFields:
       updated: ${insertEmailAndPhoneResult.response.body[0].updated}
       ended: "null"
   result: updateDenormalizedChatMetricsRes
-  next: returnSuccess
 
 notify_messages:
   template: "[#CHATBOT_PROJECT_LAYER]/messages/notify"
