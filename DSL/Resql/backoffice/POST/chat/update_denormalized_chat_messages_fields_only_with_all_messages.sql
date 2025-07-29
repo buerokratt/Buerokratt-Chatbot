@@ -44,7 +44,6 @@ declaration:
         type: string
         description: "Timestamp indicating when the message-related fields were updated"
 */
--- Using array approach directly
 SELECT
     COPY_ROW_WITH_MODIFICATIONS(
         -- Table name for denormalized_chat
