@@ -38,7 +38,7 @@ const Toast: FC<ToastProps> = ({ toast, close }) => {
       onEscapeKeyDown={close}
       open={open}
       onOpenChange={setOpen}
-      duration={toast.duration ?? POPUP_DURATION}
+      duration={toast.duration ?? POPUP_DURATION * 1000}
     >
       <RadixToast.Title className="toast__title h5">
         <Icon icon={toastIcons[toast.type]} />
