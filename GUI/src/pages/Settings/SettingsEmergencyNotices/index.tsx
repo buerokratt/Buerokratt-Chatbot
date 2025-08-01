@@ -1,5 +1,5 @@
-import { FC, useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { FC, useEffect, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { AxiosError } from 'axios';
 import { useTranslation } from 'react-i18next';
 
@@ -16,23 +16,51 @@ import {
   EmergencyNotice,
   EmergencyNoticeResponse,
 } from 'types/emergencyNotice';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { useToast } from 'hooks/useToast';
 import { apiDev } from 'services/api';
 import { format, parse } from 'date-fns';
 import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';
+import DomainSelector from '../../../components/DomainsSelector';
+import { getEmergencyNotice } from '../../../services/configurations';
+
+type SelectOption = { label: string; value: string; meta?: string };
 
 const SettingsEmergencyNotices: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
-  const { register, control, handleSubmit, reset, setValue } = useForm<EmergencyNotice>();
+  const { register, control, handleSubmit, reset, setValue } =
+    useForm<EmergencyNotice>({
+      defaultValues: {
+        emergencyNoticeStartISO: new Date(),
+        emergencyNoticeEndISO:   new Date(),
+        emergencyNoticeText:      '',
+        isEmergencyNoticeVisible: 'false',
+        domainUUID:               [],
+      },
+    });
   const [isEmergencyNoticeVisible, setIsEmergencyNoticeVisible] =
     useState(false);
+  const [loadingComplete, setLoadingComplete] = useState<boolean>(false);
   const [emergencyNoticeText, setEmergencyNoticeText] = useState('');
-  const { data: emergencyNotice } = useQuery<EmergencyNoticeResponse>({
-    queryKey: ['configs/emergency-notice', 'prod'],
-    onSuccess: (data: EmergencyNoticeResponse) => {
+
+  const multiDomainEnabled =
+    import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
+  const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
+
+  useEffect(() => {
+    if(multiDomainEnabled) {
+      setLoadingComplete(true)
+    } else {
+      fetchData('none');
+    }
+  }, []);
+
+  const fetchData = async (selectedDomain: string) => {
+    try {
+      const data: EmergencyNoticeResponse = await getEmergencyNotice(selectedDomain);
+
       const {
         isEmergencyNoticeVisible,
         emergencyNoticeStartISO,
@@ -40,7 +68,7 @@ const SettingsEmergencyNotices: FC = () => {
         emergencyNoticeText,
       } = data.response;
 
-      if (Object.keys(control._formValues).length > 0) return;
+      if(emergencyNoticeStartISO === '') return;
 
       const isEmergencyNoticeVisibleBoolean =
         isEmergencyNoticeVisible === 'true';
@@ -54,8 +82,11 @@ const SettingsEmergencyNotices: FC = () => {
         emergencyNoticeText,
         isEmergencyNoticeVisible,
       });
-    },
-  });
+      setLoadingComplete(true)
+    } catch (error) {
+      console.error('Failed to fetch emergency notice', error);
+    }
+  };
 
   const handleSwitchChange = (checked: boolean) => {
     const today = new Date();
@@ -95,6 +126,8 @@ const SettingsEmergencyNotices: FC = () => {
       });
       return;
     }
+
+    if(multiDomainEnabled) data.domainUUID = selectedDomains;
     emergencyNoticeMutation.mutate({
       ...data,
       isEmergencyNoticeVisible: isEmergencyNoticeVisible.toString(),
@@ -102,17 +135,54 @@ const SettingsEmergencyNotices: FC = () => {
     });
   });
 
-  if (!emergencyNotice || Object.keys(control._formValues).length === 0)
+  const resetSettingsToDefault = () => {
+    console.log("reseting")
+    setIsEmergencyNoticeVisible(false);
+    setEmergencyNoticeText('');
+    reset({
+      emergencyNoticeStartISO: new Date(),
+      emergencyNoticeEndISO: new Date(),
+      emergencyNoticeText: ' ',
+      isEmergencyNoticeVisible: 'false',
+    });
+  };
+
+  const mapDomainSelection = (selectedDomains: SelectOption[]) => {
+    if(!selectedDomains || selectedDomains.length === 0) return [];
+    return selectedDomains.map(so => so.value);
+  }
+
+  const handleDomainSelection = (selection: SelectOption[]): void => {
+    const domainSelection = mapDomainSelection(selection);
+
+    setSelectedDomains(domainSelection);
+
+    if (domainSelection.length === 1) {
+      fetchData(domainSelection[0]);
+    } else {
+      resetSettingsToDefault();
+    }
+  };
+
+  if (!loadingComplete)
     return <>Loading...</>;
 
   return (
     <>
       <h1>{t('settings.emergencyNotices.title')}</h1>
 
+      {multiDomainEnabled && (
+        <DomainSelector
+          onChange={(selected) => {
+            handleDomainSelection(selected);
+          }}
+        />
+      )}
+
       <Card
         footer={
           <Track justify="end">
-            <Button onClick={handleFormSubmit}>{t('global.save')}</Button>
+            <Button disabled={(multiDomainEnabled && selectedDomains.length === 0) || false} onClick={handleFormSubmit}>{t('global.save')}</Button>
           </Track>
         }
       >
