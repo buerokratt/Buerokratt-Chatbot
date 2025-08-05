@@ -103,6 +103,7 @@
     "chatForwardedTo": "Vestlus edastati aadressile",
     "chatEnded": "Vestlus lõppes",
     "reply": "Vasta",
+    "newMessage": "Uus sõnum!",
     "unansweredChats": "Vastamata vestlused",
     "unanswered": "Vastamata",
     "forwarded": "Suunatud",
@@ -128,6 +129,8 @@
     "changeStatus": "Muuda staatust",
     "waiting_validation": "Vastust koostatakse",
     "approved_validation": "Kinnitatud valideerimine",
+    "changingMessage": "Vestluse muutmine",
+    "messageEdited": "Vestluse sisu on muudetud! {{date}}",
     "active": {
       "list": "Aktiivsed vestlused",
       "myChats": "Minu vestlused",
@@ -325,6 +328,9 @@
       "userTitle": "Tiitel",
       "email": "E-post",
       "department": "Osakond",
+      "connectToSmax": "Seo Smaxiga",
+      "connectedToSmax": "Smaxiga seotud",
+      "disconnectFromSmax": "Seo Smaxist lahti",
       "addUser": "Lisa kasutaja",
       "editUser": "Muuda kasutajat",
       "deleteUser": "Kustuta kasutaja",
@@ -365,6 +371,13 @@
       "displayPeriod": "Kuvamisperiood",
       "noticeChanged": "Teate seadeid muudeti edukalt",
       "endDateError": "Lõppkuupäev peab olema alguskuupäevast suurem"
+    },
+    "feedback": {
+      "title": "Tagasiside",
+      "feedbackActive": "Tagasiside aktiivne",
+      "feedbackQuestion": "Tagasiside küsimus",
+      "noticeActive": "Teade aktiivne",
+      "notice": "Teade"
     },
     "appearance": {
       "title": "Välimus ja käitumine",

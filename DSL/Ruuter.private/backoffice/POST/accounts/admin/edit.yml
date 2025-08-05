@@ -24,7 +24,7 @@ declaration:
         type: string
         description: "Body field 'lastName'"
       - field: roles
-        type: array
+        type: object
         description: "Body field 'roles'"
       - field: userIdCode
         type: string
@@ -32,6 +32,9 @@ declaration:
       - field: department
         type: string
         description: "Body field 'department'"
+      - field: smaxAccountId
+        type: string
+        description: "Body field 'smaxAccountId'"
 
 extractRequestData:
   assign:
@@ -44,6 +47,7 @@ extractRequestData:
     roles: ${incoming.body.roles}
     department: ${incoming.body.department}
     domains: ${incoming.body.domains}
+    smax_account_id: ${incoming.body.smaxAccountId}
  
 getUser:
   call: http.post
@@ -74,6 +78,7 @@ updateUser:
       csaTitle: ${csaTitle}
       csaEmail: ${csa_email}
       department: ${department}
+      smaxAccountId: ${smax_account_id ?? ""}
   result: add_user_res
   next: checkForDomains
 

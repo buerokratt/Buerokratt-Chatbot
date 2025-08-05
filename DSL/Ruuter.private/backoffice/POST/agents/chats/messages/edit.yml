@@ -35,7 +35,7 @@ declaration:
       - field: originalCreated
         type: string
         description: "Body field 'originalCreated'"
-    headers:
+    header:
       - field: cookie
         type: string
         description: "Cookie field"
