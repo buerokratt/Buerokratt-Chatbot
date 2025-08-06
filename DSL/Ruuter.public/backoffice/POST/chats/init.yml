@@ -20,6 +20,9 @@ declaration:
       - field: endUserTechnicalData
         type: json
         description: "Body field 'endUserTechnicalData'"
+      - field: domain
+        type: string
+        description: "Body field 'domain'"
 
 extractRequestData:
   assign:
@@ -36,6 +39,7 @@ extractRequestData:
     forwardedToCsa: ""
     holidays: ${incoming.body.holidays}
     holidayNames: ${incoming.body.holidayNames}
+    domain: ${incoming.body.domain}
   next: getChatUuid
 
 getChatUuid:
@@ -164,6 +168,7 @@ postMessageToBot:
       content: ${content}
       holidays: ${holidays}
       holidayNames: ${holidayNames}
+      domain: ${domain}
   result: message_to_bot_result
   next: check_for_post_message_to_bot_result
 

@@ -17,28 +17,47 @@ import { apiDev } from 'services/api';
 import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';
 import { AiOutlineInfoCircle } from 'react-icons/ai';
-import { SkmConfig } from 'types/skmConfig';
+import { SkmConfig, SkmConfigResponse } from 'types/skmConfig';
 import { Controller, useForm } from 'react-hook-form';
 import { getQueryTypes } from './data';
+import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
+import DomainSelector from '../../../components/DomainsSelector';
+import { fetchConfigurationFromDomain } from '../../../services/configurations';
 
 const SettingsSkmConfiguration: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
-  const { control, handleSubmit, reset } =
-    useForm<SkmConfig>();
+  const { control, handleSubmit, reset } = useForm<SkmConfig>();
   const [key, setKey] = useState(0);
   const [skmConfig, setSkmConfig] = useState<SkmConfig | undefined>(undefined);
-
-  const getSkmConfig = async () => {
-    const res = await apiDev.get<{response: SkmConfig}>('configs/skm-config');
-    reset(res.data.response);
-    setSkmConfig(res.data.response);
-    setKey(key + 1);
-  }
+  const multiDomainEnabled =
+    import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
+  const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
 
   useEffect(() => {
-   getSkmConfig();
+    if (multiDomainEnabled) {
+      resetSettingsToDefault();
+    } else {
+      fetchData('none');
+    }
   }, []);
+
+  const fetchData = async (selectedDomain: string) => {
+    try {
+      const data: SkmConfigResponse =
+        await fetchConfigurationFromDomain<SkmConfigResponse>(
+          'configs/skm-config',
+          selectedDomain
+        );
+      const res = data.response;
+
+      reset(res);
+      setSkmConfig(res);
+      setKey(key + 1);
+    } catch (error) {
+      console.error('Failed to fetch emergency notice', error);
+    }
+  };
 
   const skmConfigMutation = useMutation({
     mutationFn: (data: SkmConfig) =>
@@ -67,6 +86,7 @@ const SettingsSkmConfiguration: FC = () => {
   const handleFormSubmit = handleSubmit((data) => {
     const validationMessage = isValid(data);
     if (validationMessage === '') {
+      data.domainUUID = multiDomainEnabled ? selectedDomains : [];
       skmConfigMutation.mutate(data);
     } else {
       toast.open({
@@ -102,8 +122,33 @@ const SettingsSkmConfiguration: FC = () => {
     maxTokens: t('settings.skmConfiguration.tooltip.maxTokens'),
     indexName: t('settings.skmConfiguration.tooltip.indexName'),
     queryType: t('settings.skmConfiguration.tooltip.queryType'),
-    semanticConfiguration: t('settings.skmConfiguration.tooltip.semanticConfiguration'),
+    semanticConfiguration: t(
+      'settings.skmConfiguration.tooltip.semanticConfiguration'
+    ),
   };
+
+  const resetSettingsToDefault = () => {
+    console.log('triggered')
+    const skmConfig = {
+      range: '3',
+      documents: '5',
+      systemMessage: '',
+      maxTokens: '1000',
+      indexName: '',
+      queryType: 'vector_semantic_hybrid',
+      semanticConfiguration: 'azureml-default',
+      domainUUID: [],
+    };
+    setSkmConfig(skmConfig);
+    reset(skmConfig);
+    setKey(key + 1);
+  };
+
+  const handleDomainSelection = useDomainSelectionHandler(
+    setSelectedDomains,
+    fetchData,
+    resetSettingsToDefault
+  );
 
   if (!skmConfig) {
     return <>Loading...</>;
@@ -113,6 +158,18 @@ const SettingsSkmConfiguration: FC = () => {
     <>
       <h1>{t('settings.skmConfiguration.title')}</h1>
       <p>{t('settings.skmConfiguration.description')}</p>
+
+      {multiDomainEnabled && (
+        <DomainSelector
+          disabled={
+            (multiDomainEnabled && selectedDomains.length === 0) || false
+          }
+          onChange={(selected) => {
+            handleDomainSelection(selected);
+          }}
+        />
+      )}
+
       <Card
         key={key}
         isScrollable
@@ -169,7 +226,16 @@ const SettingsSkmConfiguration: FC = () => {
     </>
   );
 
-  function getTooltip(name: 'range' | 'documents' | 'systemMessage' | 'maxTokens' | 'indexName' | 'queryType' | 'semanticConfiguration') {
+  function getTooltip(
+    name:
+      | 'range'
+      | 'documents'
+      | 'systemMessage'
+      | 'maxTokens'
+      | 'indexName'
+      | 'queryType'
+      | 'semanticConfiguration'
+  ) {
     return (
       <Tooltip content={tooltips[name]}>
         <span>
@@ -205,9 +271,7 @@ const SettingsSkmConfiguration: FC = () => {
     );
   }
 
-  function getTextControl(
-    name: 'indexName' | 'semanticConfiguration'
-  ) {
+  function getTextControl(name: 'indexName' | 'semanticConfiguration') {
     return (
       <Controller
         name={name}

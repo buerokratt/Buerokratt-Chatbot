@@ -20,6 +20,9 @@ declaration:
       - field: isEmergencyNoticeVisible
         type: string
         description: "Body field 'isEmergencyNoticeVisible'"
+      - field: domainUUID
+        type: string
+        description: "Body field 'domainUUID'"
 
 extractRequestData:
   assign:
@@ -27,13 +30,34 @@ extractRequestData:
     emergencyNoticeStartISO: ${incoming.body.emergencyNoticeStartISO}
     emergencyNoticeEndISO: ${incoming.body.emergencyNoticeEndISO}
     isEmergencyNoticeVisible: ${incoming.body.isEmergencyNoticeVisible}
+    domains: ${incoming.body.domainUUID}
   next: validateBody
 
 validateBody:
   switch:
     - condition: "${!!(new Date(emergencyNoticeStartISO) && new Date(emergencyNoticeEndISO))}"
-      next: setEmergencyNotice
+      next: checkForDomains
   next: returnInvalidBody
+
+checkForDomains:
+  switch:
+    - condition: ${domains.length > 0}
+      next: setDomainEmergencyNotice
+  next: setEmergencyNotice
+
+setDomainEmergencyNotice:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-domain-emergency-notice"
+    body:
+      emergencyNoticeText: ${emergencyNoticeText}
+      emergencyNoticeStartISO: ${emergencyNoticeStartISO}
+      emergencyNoticeEndISO: ${emergencyNoticeEndISO}
+      isEmergencyNoticeVisible: ${isEmergencyNoticeVisible}
+      created: ${new Date().toISOString()}
+      domains: ${JSON.stringify(domains)}
+  result: res
+  next: return_result
 
 setEmergencyNotice:
   call: http.post

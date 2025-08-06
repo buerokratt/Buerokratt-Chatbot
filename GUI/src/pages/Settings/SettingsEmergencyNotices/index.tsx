@@ -23,9 +23,8 @@ import { format, parse } from 'date-fns';
 import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';
 import DomainSelector from '../../../components/DomainsSelector';
-import { getEmergencyNotice } from '../../../services/configurations';
-
-type SelectOption = { label: string; value: string; meta?: string };
+import { fetchConfigurationFromDomain } from '../../../services/configurations';
+import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
 
 const SettingsEmergencyNotices: FC = () => {
   const { t } = useTranslation();
@@ -34,10 +33,10 @@ const SettingsEmergencyNotices: FC = () => {
     useForm<EmergencyNotice>({
       defaultValues: {
         emergencyNoticeStartISO: new Date(),
-        emergencyNoticeEndISO:   new Date(),
-        emergencyNoticeText:      '',
+        emergencyNoticeEndISO: new Date(),
+        emergencyNoticeText: '',
         isEmergencyNoticeVisible: 'false',
-        domainUUID:               [],
+        domainUUID: [],
       },
     });
   const [isEmergencyNoticeVisible, setIsEmergencyNoticeVisible] =
@@ -50,8 +49,8 @@ const SettingsEmergencyNotices: FC = () => {
   const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
 
   useEffect(() => {
-    if(multiDomainEnabled) {
-      setLoadingComplete(true)
+    if (multiDomainEnabled) {
+      setLoadingComplete(true);
     } else {
       fetchData('none');
     }
@@ -59,7 +58,11 @@ const SettingsEmergencyNotices: FC = () => {
 
   const fetchData = async (selectedDomain: string) => {
     try {
-      const data: EmergencyNoticeResponse = await getEmergencyNotice(selectedDomain);
+      const data: EmergencyNoticeResponse =
+        await fetchConfigurationFromDomain<EmergencyNoticeResponse>(
+          'configs/emergency-notice',
+          selectedDomain
+        );
 
       const {
         isEmergencyNoticeVisible,
@@ -68,7 +71,7 @@ const SettingsEmergencyNotices: FC = () => {
         emergencyNoticeText,
       } = data.response;
 
-      if(emergencyNoticeStartISO === '') return;
+      if (emergencyNoticeStartISO === '') return;
 
       const isEmergencyNoticeVisibleBoolean =
         isEmergencyNoticeVisible === 'true';
@@ -82,7 +85,7 @@ const SettingsEmergencyNotices: FC = () => {
         emergencyNoticeText,
         isEmergencyNoticeVisible,
       });
-      setLoadingComplete(true)
+      setLoadingComplete(true);
     } catch (error) {
       console.error('Failed to fetch emergency notice', error);
     }
@@ -127,7 +130,7 @@ const SettingsEmergencyNotices: FC = () => {
       return;
     }
 
-    if(multiDomainEnabled) data.domainUUID = selectedDomains;
+    data.domainUUID = multiDomainEnabled ? selectedDomains : [];
     emergencyNoticeMutation.mutate({
       ...data,
       isEmergencyNoticeVisible: isEmergencyNoticeVisible.toString(),
@@ -136,7 +139,6 @@ const SettingsEmergencyNotices: FC = () => {
   });
 
   const resetSettingsToDefault = () => {
-    console.log("reseting")
     setIsEmergencyNoticeVisible(false);
     setEmergencyNoticeText('');
     reset({
@@ -147,25 +149,13 @@ const SettingsEmergencyNotices: FC = () => {
     });
   };
 
-  const mapDomainSelection = (selectedDomains: SelectOption[]) => {
-    if(!selectedDomains || selectedDomains.length === 0) return [];
-    return selectedDomains.map(so => so.value);
-  }
+  const handleDomainSelection = useDomainSelectionHandler(
+    setSelectedDomains,
+    fetchData,
+    resetSettingsToDefault
+  );
 
-  const handleDomainSelection = (selection: SelectOption[]): void => {
-    const domainSelection = mapDomainSelection(selection);
-
-    setSelectedDomains(domainSelection);
-
-    if (domainSelection.length === 1) {
-      fetchData(domainSelection[0]);
-    } else {
-      resetSettingsToDefault();
-    }
-  };
-
-  if (!loadingComplete)
-    return <>Loading...</>;
+  if (!loadingComplete) return <>Loading...</>;
 
   return (
     <>
@@ -182,7 +172,14 @@ const SettingsEmergencyNotices: FC = () => {
       <Card
         footer={
           <Track justify="end">
-            <Button disabled={(multiDomainEnabled && selectedDomains.length === 0) || false} onClick={handleFormSubmit}>{t('global.save')}</Button>
+            <Button
+              disabled={
+                (multiDomainEnabled && selectedDomains.length === 0) || false
+              }
+              onClick={handleFormSubmit}
+            >
+              {t('global.save')}
+            </Button>
           </Track>
         }
       >

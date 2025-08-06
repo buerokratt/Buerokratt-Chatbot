@@ -8,7 +8,7 @@ import { useToast } from 'hooks/useToast';
 import { apiDev } from 'services/api';
 import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';
-import { BotConfig, BotConfigResponse } from 'types/botConfig';
+import { BotConfigResponse } from 'types/botConfig';
 import DomainSelector from '../../../components/DomainsSelector';
 import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
 import { fetchConfigurationFromDomain } from '../../../services/configurations';
@@ -54,10 +54,11 @@ const SettingsChatSettings: FC = () => {
 
   const fetchData = async (selectedDomain: string) => {
     try {
-      const data: BotConfigResponse = await fetchConfigurationFromDomain<BotConfigResponse>(
-        'configs/bot-config',
-        selectedDomain
-      );
+      const data: BotConfigResponse =
+        await fetchConfigurationFromDomain<BotConfigResponse>(
+          'configs/bot-config',
+          selectedDomain
+        );
 
       const res = data.response;
 
