@@ -17,7 +17,7 @@ declaration:
       - field: userIdCode
         type: string
         description: "Body field 'userIdCode'"
-    headers:
+    header:
       - field: cookie
         type: string
         description: "Cookie field"

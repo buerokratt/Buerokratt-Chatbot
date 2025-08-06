@@ -103,6 +103,7 @@
     "chatForwardedTo": "Chat forwarded to",
     "chatEnded": "Chat ended",
     "reply": "Reply",
+    "newMessage": "New message!",
     "unansweredChats": "Unanswered chats",
     "unanswered": "Unanswered",
     "forwarded": "Forwarded",
@@ -128,6 +129,8 @@
     "changeStatus": "Change status",
     "waiting_validation": "Waiting for validation",
     "approved_validation": "Approved Validation",
+    "changingMessage": "Changing the message",
+    "messageEdited": "The message has been changed! {{date}}",
     "active": {
       "list": "Active chat list",
       "myChats": "My chats",
@@ -325,6 +328,9 @@
       "userTitle": "User title",
       "email": "E-mail",
       "department": "Department",
+      "connectToSmax": "Connect to Smax",
+      "connectedToSmax": "Connected to Smax",
+      "disconnectFromSmax": "Disconnect from Smax",
       "addUser": "Add user",
       "editUser": "Edit user",
       "deleteUser": "Delete user",
@@ -365,6 +371,13 @@
       "displayPeriod": "Display period",
       "noticeChanged": "Emergency notice settings changed successfully",
       "endDateError": "End date must be greater than start date"
+    },
+    "feedback": {
+      "title": "Feedback",
+      "feedbackActive": "Feedback active",
+      "feedbackQuestion": "Feedback question",
+      "noticeActive": "Notice active",
+      "notice": "Notice"
     },
     "appearance": {
       "title": "Appearance and behavior",

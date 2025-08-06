@@ -29,7 +29,7 @@ declaration:
       - field: useAutocorrect
         type: boolean
         description: "Body field 'useAutocorrect'"
-    headers:
+    header:
       - field: cookie
         type: string
         description: "Cookie field"

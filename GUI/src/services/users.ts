@@ -29,18 +29,29 @@ export async function checkIfUserExists(userData: UserDTO) {
   return data;
 }
 
-export async function editUser(id: string | number, userData: UserDTO) {
+export async function editUser(
+  id: string | number,
+  userData: UserDTO,
+  smaxConnectDisconnect: boolean
+) {
   const authorities = userData.authorities
     .map((e: any) => e.value)
     .filter((item) => item);
   const fullName = userData.fullName?.trim();
-  const { data } = await apiDev.post<User>('accounts/admin/edit', {
+
+  const apiUrl = smaxConnectDisconnect
+    ? 'accounts/admin/smax-connection'
+    : 'accounts/admin/edit';
+
+  const { data } = await apiDev.post<User>(apiUrl, {
     firstName: fullName?.split(' ').slice(0, 1).join(' ') ?? '',
     lastName: fullName?.split(' ').slice(1, 2).join(' ') ?? '',
     userIdCode: id,
     displayName: userData.displayName,
     csaTitle: userData.csaTitle,
     csa_email: userData.csaEmail,
+    smaxAccountId: userData.smaxAccountId,
+    ...(smaxConnectDisconnect && { smaxConnectDisconnect }),
     roles:
       authorities.length === 0
         ? Object.values(userData.authorities)
