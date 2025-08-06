@@ -9,8 +9,8 @@ type ButtonMessageProps = {
 const ButtonMessage: FC<ButtonMessageProps> = ({ buttons }) => {
   return (
     <div className='button-container'>
-      {buttons.map(({title, payload}) => 
-        <span key={title}>{title}({payload})</span>
+      {buttons.map(({title}) => 
+        <span key={title}>{title}</span>
       )}
     </div>
   );

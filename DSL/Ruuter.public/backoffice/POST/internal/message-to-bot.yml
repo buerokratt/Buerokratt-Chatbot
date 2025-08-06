@@ -236,7 +236,7 @@ check_if_organization_is_available:
     - condition: ${org_details.isWithinWorkingTime === true && org_details.isWithinWorkingDays === true && org_details.isAllowedToWorkAtHolidays === true}
       next: get_all_available_csas
     - condition: ${org_details.isWithinWorkingTime === true && org_details.isWithinWorkingDays === true && org_details.isAllowedToWorkAtHolidays === false && org_details.isHoliday == true}
-      next: return_is_a_holiday
+      next: return_organization_is_not_available
     - condition: ${org_details.isWithinWorkingTime === true && org_details.isWithinWorkingDays === true && org_details.isAllowedToWorkAtHolidays === false && org_details.isHoliday == false}
       next: get_all_available_csas
   next: return_organization_is_not_available

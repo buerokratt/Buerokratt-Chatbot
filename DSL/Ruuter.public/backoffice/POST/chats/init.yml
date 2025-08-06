@@ -7,6 +7,10 @@ declaration:
   returns: json
   namespace: backoffice
   allowlist:
+    headers:
+      - field: cookie
+        type: string
+        description: "Cookie field"
     body:
       - field: holidayNames
         type: string
@@ -28,6 +32,8 @@ extractRequestData:
     content: ${incoming.body.message.content ?? ""}
     endUserId: ""
     endUserEmail: ""
+    endUserFirstName: ""
+    endUserLastName: ""
     endUserPhone: ""
     endUserOs: ${incoming.body.endUserTechnicalData.endUserOs}
     endUserUrl: ${incoming.body.endUserTechnicalData.endUserUrl}
@@ -36,7 +42,36 @@ extractRequestData:
     forwardedToCsa: ""
     holidays: ${incoming.body.holidays}
     holidayNames: ${incoming.body.holidayNames}
+
+checkIncomingCookie:
+  switch:
+    - condition: ${incoming.headers.cookie == null}
+      next: getChatUuid
+  next: getTaraUserInfo
+
+getTaraUserInfo:
+  call: http.post
+  args:
+   url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
+   contentType: plaintext
+   headers:
+    cookie: ${incoming.headers.cookie}
+   plaintext: 
+      "customSmaxJwtCookie"
+  result: tara_info
+
+checkTaraInfo:
+  switch:
+    - condition: ${tara_info.response.body !== null}
+      next: assignEndUserFields
   next: getChatUuid
+
+assignEndUserFields:
+  assign:
+    endUserId: ${tara_info.response.body.personalCode}
+    endUserEmail: ${tara_info.response.body.login}
+    endUserFirstName: ${tara_info.response.body.firstName}
+    endUserLastName: ${tara_info.response.body.lastName}
 
 getChatUuid:
   call: http.post
@@ -117,10 +152,10 @@ postClientMessage:
       event: ""
       authorTimestamp: ${authorTimestamp}
       authorId: ${endUserId}
-      authorFirstName: ""
+      authorFirstName: ${endUserFirstName}
       authorRole: ${authorRole}
       created: ${new Date().toISOString()}
-      authorLastName: ""
+      authorLastName: ${endUserLastName}
       rating: ""
       forwardedByUser: ${forwardedByUser}
       forwardedFromCsa: ${forwardedFromCsa}
@@ -135,8 +170,8 @@ insertChat:
     body:
       id: ${chatUuid}
       endUserId: ${endUserId}
-      endUserFirstName: ""
-      endUserLastName: ""
+      endUserFirstName: ${endUserFirstName}
+      endUserLastName: ${endUserLastName}
       status: "OPEN"
       lastMessage: ${content}
       created: ${new Date().toISOString()}
