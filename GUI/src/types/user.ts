@@ -12,6 +12,7 @@ export interface User {
   authorities: ROLES[];
   customerSupportStatus: 'online' | 'idle' | 'offline';
   department: string;
+  smaxAccountId?: string;
   statusComment: string;
 }
 
@@ -28,6 +29,7 @@ export interface UserDTO
     | 'csaTitle'
     | 'csaEmail'
     | 'department'
+    | 'smaxAccountId'
   > {}
 
 export interface UserSearchFilters {
