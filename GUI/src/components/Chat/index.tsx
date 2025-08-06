@@ -189,8 +189,9 @@ const Chat: FC<ChatProps> = ({
 
   const checkLastMessageVisibility = (entries: IntersectionObserverEntry[]) => {
     const [entry] = entries;
-    setIsCsaAtEnd(entry.isIntersecting);
-    if (isCsaAtEnd) {
+    const isVisible = entry.isIntersecting;
+    setIsCsaAtEnd(isVisible);
+    if (isVisible) {
       setIsNewMessageNotificationVisible(false);
     }
   };
