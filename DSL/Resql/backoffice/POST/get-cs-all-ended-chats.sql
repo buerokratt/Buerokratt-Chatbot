@@ -74,7 +74,7 @@ SELECT MAX(id) AS maxId
 FROM chat
 WHERE ended IS NOT NULL
   AND status <> 'IDLE'
-  AND ended::date BETWEEN :start::date AND :end::date
+  AND ended::date BETWEEN :start::timestamp with time zone AND :end::timestamp with time zone
 GROUP BY base_id
     ),
     EndedChatMessages AS (
