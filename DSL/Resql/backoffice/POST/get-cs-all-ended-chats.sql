@@ -75,6 +75,8 @@ FROM chat
 WHERE ended IS NOT NULL
   AND status <> 'IDLE'
   AND ended::date BETWEEN :start::date AND :end::date
+  AND (array_length(ARRAY[:urls]::TEXT[], 1) IS NULL
+    OR chat.end_user_url LIKE ANY(ARRAY[:urls]::TEXT[]))
 GROUP BY base_id
     ),
     EndedChatMessages AS (

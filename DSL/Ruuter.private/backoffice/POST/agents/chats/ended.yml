@@ -29,11 +29,15 @@ declaration:
       - field: customerSupportIds
         type: object
         description: "Body field 'customerSupportIds'"
+      - field: urls
+        type: array
+        description: "Body field 'urls'"
 
 extractRequestData:
   assign:
     startDate: "${incoming.body.startDate}"
     endDate: "${incoming.body.endDate}"
+    urls: ${incoming.body.urls}
 
 getEndedChats:
   call: http.post
@@ -47,6 +51,7 @@ getEndedChats:
       sorting: ${incoming.body.sorting}
       search: ${incoming.body.search}
       customerSupportIds: ${incoming.body.customerSupportIds?.join(',') ?? ''}
+      urls: ${urls}
   result: res
 
 returnSuccess:
