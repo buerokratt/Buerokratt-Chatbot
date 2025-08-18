@@ -46,7 +46,8 @@
     "forward": "Forward",
     "chosen": "Chosen",
     "read": "Read",
-    "statusClarification": "Status clarification"
+    "statusClarification": "Status clarification",
+    "selectAll": "Select all"
   },
   "sorting": {
     "desc": "descending",
@@ -59,6 +60,10 @@
     "openMenu": "Open menu",
     "openIcon": "Open menu icon",
     "closeIcon": "Close menu icon"
+  },
+  "multiDomains": {
+    "selectDomains": "Select Domains",
+    "noDomains": "No domains available. Please contact your system administrator."
   },
   "menu": {
     "conversations": "Conversations",

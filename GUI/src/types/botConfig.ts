@@ -5,3 +5,7 @@ export interface BotConfig {
   isCsaTitleVisible: string;
   isEditChatVisible: string;
 }
+
+export interface BotConfigResponse {
+  response: BotConfig;
+}

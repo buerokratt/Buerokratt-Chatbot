@@ -46,7 +46,8 @@
     "forward": "Suuna",
     "chosen": "Valitud",
     "read": "Loetud",
-    "statusClarification": "Staatuse täpsustus"
+    "statusClarification": "Staatuse täpsustus",
+    "selectAll": "Vali kõik"
   },
   "sorting": {
     "desc": "kahanevalt",
@@ -59,6 +60,10 @@
     "openMenu": "Ava menüü",
     "openMenuIcon": "Ava menüü ikoon",
     "closeMenuIcon": "Sulge menüü ikoon"
+  },
+  "multiDomains": {
+    "selectDomains": "Vali Domeenid",
+    "noDomains": "Domeene ei ole saadaval. Palun võtke ühendust süsteemiadministraatoriga."
   },
   "menu": {
     "conversations": "Vestlused",
