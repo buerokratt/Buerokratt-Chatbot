@@ -28,6 +28,8 @@ import SettingsFeedback from 'pages/Settings/SettingsFeedback';
 import { getWidgetData } from './services/users';
 
 const App: FC = () => {
+  const multiDomainEnabled = import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
+
   useQuery<{
     data: { custom_jwt_userinfo: UserInfo };
   }>({
@@ -35,18 +37,20 @@ const App: FC = () => {
     onSuccess: (res: { response: UserInfo }) => {
       localStorage.setItem('exp', res.response.JWTExpirationTimestamp);
 
-      getWidgetData(res.response.idCode)
-        .then((domains) => {
-          const selectedDomains = domains
-            .filter(d => d.selected)
-            .map(d => d.url)
-            .filter(Boolean);
+      if (multiDomainEnabled) {
+        getWidgetData(res.response.idCode)
+          .then((domains) => {
+            const selectedDomains = domains
+              .filter(d => d.selected)
+              .map(d => d.url)
+              .filter(Boolean);
 
-          useStore.getState().setUserDomains(selectedDomains);
-        })
-        .catch((e) => {
-          console.error('Failed to fetch widget data:', e);
-        });
+            useStore.getState().setUserDomains(selectedDomains);
+          })
+          .catch((e) => {
+            console.error('Failed to fetch widget data:', e);
+          });
+      }
 
       return useStore.getState().setUserInfo(res.response);
     },
