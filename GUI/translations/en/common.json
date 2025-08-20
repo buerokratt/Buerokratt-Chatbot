@@ -410,7 +410,8 @@
       "showIfOrganizationIsOutsideWorkingHoursWithContactsRequest": "Send a notification to the client about the company's outside working hours with a contact request",
       "outsideWorkingHoursMessage": "Outside working hours message",
       "showIfBotCannotAnswerAskToForwardToCSA": "If the Bürokratt cannot answer, ask for a customer service representative",
-      "botCannotAnswerMessage": "Notification if the Bürokratt cannot answer"
+      "botCannotAnswerMessage": "Notification if the Bürokratt cannot answer",
+      "iUseCSA": "I use customer service"
     },
     "userSession": {
       "title": "User session",

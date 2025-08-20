@@ -54,6 +54,7 @@ const SettingsWorkingTime: FC = () => {
   const organizationWorkingTimeWeekdays = watch(
     'organizationWorkingTimeWeekdays'
   );
+  const isIUseCSA = watch('organizationIUseCSA');
   const { data: workingTime } = useQuery<OrganizationWorkingTime>({
     queryKey: ['configs/organization-working-time', 'prod'],
     onSuccess: (data: any) => {
@@ -169,11 +170,11 @@ const SettingsWorkingTime: FC = () => {
         header={
           <Track gap={8} direction="vertical" align="left">
             <Controller
-              name="organizationWorkingAllTime"
+              name="organizationIUseCSA"
               control={control}
               render={({ field }) => (
                 <Switch
-                  label={t('settings.workingTime.availableAllTime')}
+                  label={t('settings.workingTime.iUseCSA')}
                   onLabel={t('global.yes').toString()}
                   offLabel={t('global.no').toString()}
                   onCheckedChange={field.onChange}
@@ -182,7 +183,23 @@ const SettingsWorkingTime: FC = () => {
                 />
               )}
             />
-            {!isOrganizationAvailableAllTime && (
+            {isIUseCSA && (
+              <Controller
+                name="organizationWorkingAllTime"
+                control={control}
+                render={({ field }) => (
+                  <Switch
+                    label={t('settings.workingTime.availableAllTime')}
+                    onLabel={t('global.yes').toString()}
+                    offLabel={t('global.no').toString()}
+                    onCheckedChange={field.onChange}
+                    checked={field.value}
+                    {...field}
+                  />
+                )}
+              />
+            )}
+            {!isOrganizationAvailableAllTime && isIUseCSA && (
               <Controller
                 name="organizationWorkingTimeNationalHolidays"
                 control={control}
@@ -198,7 +215,7 @@ const SettingsWorkingTime: FC = () => {
                 )}
               />
             )}
-            {!isOrganizationAvailableAllTime && (
+            {!isOrganizationAvailableAllTime && isIUseCSA && (
               <Controller
                 name="organizationClosedOnWeekEnds"
                 control={control}
@@ -214,7 +231,7 @@ const SettingsWorkingTime: FC = () => {
                 )}
               />
             )}
-            {!isOrganizationAvailableAllTime && (
+            {!isOrganizationAvailableAllTime && isIUseCSA && (
               <Controller
                 name="organizationTheSameOnAllWorkingDays"
                 control={control}
@@ -234,7 +251,8 @@ const SettingsWorkingTime: FC = () => {
         }
       >
         {isOrganizationTheSameOnAllWorkingDays &&
-          !isOrganizationAvailableAllTime && (
+          !isOrganizationAvailableAllTime &&
+          isIUseCSA && (
             <Track>
               <label className="Label">
                 {t(
@@ -304,6 +322,7 @@ const SettingsWorkingTime: FC = () => {
           )}
         {!isOrganizationTheSameOnAllWorkingDays &&
           !isOrganizationAvailableAllTime &&
+          isIUseCSA &&
           weekdaysOptions
             .filter(
               (d) =>
@@ -415,7 +434,7 @@ const SettingsWorkingTime: FC = () => {
                 )}
               </Track>
             ))}
-        {!isOrganizationAvailableAllTime && (
+        {!isOrganizationAvailableAllTime && isIUseCSA && (
           <Controller
             name="organizationOutsideWorkingHoursAskForContacts"
             control={control}
@@ -433,7 +452,7 @@ const SettingsWorkingTime: FC = () => {
             )}
           />
         )}
-        {!isOrganizationAvailableAllTime && (
+        {!isOrganizationAvailableAllTime && isIUseCSA && (
           <Controller
             name="organizationOutsideWorkingHoursAskForContacts"
             control={control}
@@ -451,7 +470,7 @@ const SettingsWorkingTime: FC = () => {
             )}
           />
         )}
-        {!isOrganizationAvailableAllTime && (
+        {!isOrganizationAvailableAllTime && isIUseCSA && (
           <div style={{ paddingRight: '20px' }}>
             <Controller
               name="organizationOutsideWorkingHoursMessage"
@@ -471,70 +490,78 @@ const SettingsWorkingTime: FC = () => {
             />
           </div>
         )}
-        <Controller
-          name="organizationNoCsaAskForContacts"
-          control={control}
-          render={({ field }) => (
-            <Switch
-              label={t('settings.workingTime.showIfCSAIsNotAvailable')}
-              onLabel={t('global.yes').toString()}
-              offLabel={t('global.no').toString()}
-              onCheckedChange={(e) => field.onChange(!e)}
-              checked={!field.value}
-              {...field}
-            />
-          )}
-        />
-        <Controller
-          name="organizationNoCsaAskForContacts"
-          control={control}
-          render={({ field }) => (
-            <Switch
-              label={t(
-                'settings.workingTime.showIfCSAIsNotAvailableWithContactsRequest'
-              )}
-              onLabel={t('global.yes').toString()}
-              offLabel={t('global.no').toString()}
-              onCheckedChange={field.onChange}
-              checked={field.value}
-              {...field}
-            />
-          )}
-        />
-        <div style={{ paddingRight: '20px' }}>
+        {isIUseCSA && (
           <Controller
-            name="organizationNoCsaAvailableMessage"
+            name="organizationNoCsaAskForContacts"
             control={control}
             render={({ field }) => (
-              <FormTextarea
-                label={t('settings.workingTime.noCsaAvailableMessage')}
-                maxLength={NO_CSA_MESSAGE_LENGTH}
-                showMaxLength
-                maxLengthBottom
-                onChange={field.onChange}
-                defaultValue={field.value}
-                name="label"
-                useRichText
+              <Switch
+                label={t('settings.workingTime.showIfCSAIsNotAvailable')}
+                onLabel={t('global.yes').toString()}
+                offLabel={t('global.no').toString()}
+                onCheckedChange={(e) => field.onChange(!e)}
+                checked={!field.value}
+                {...field}
               />
             )}
           />
-        </div>
-        <Controller
-          name="organizationBotCannotAnswerAskToForwardToCSA"
-          control={control}
-          render={({ field }) => (
-            <Switch
-              label={t(
-                'settings.workingTime.showIfBotCannotAnswerAskToForwardToCSA'
+        )}
+        {isIUseCSA && (
+          <Controller
+            name="organizationNoCsaAskForContacts"
+            control={control}
+            render={({ field }) => (
+              <Switch
+                label={t(
+                  'settings.workingTime.showIfCSAIsNotAvailableWithContactsRequest'
+                )}
+                onLabel={t('global.yes').toString()}
+                offLabel={t('global.no').toString()}
+                onCheckedChange={field.onChange}
+                checked={field.value}
+                {...field}
+              />
+            )}
+          />
+        )}
+        {isIUseCSA && (
+          <div style={{ paddingRight: '20px' }}>
+            <Controller
+              name="organizationNoCsaAvailableMessage"
+              control={control}
+              render={({ field }) => (
+                <FormTextarea
+                  label={t('settings.workingTime.noCsaAvailableMessage')}
+                  maxLength={NO_CSA_MESSAGE_LENGTH}
+                  showMaxLength
+                  maxLengthBottom
+                  onChange={field.onChange}
+                  defaultValue={field.value}
+                  name="label"
+                  useRichText
+                />
               )}
-              onLabel={t('global.yes').toString()}
-              offLabel={t('global.no').toString()}
-              onCheckedChange={field.onChange}
-              checked={field.value}
-              {...field}
             />
-          )}
-        />
+          </div>
+        )}
+        {isIUseCSA && (
+          <Controller
+            name="organizationBotCannotAnswerAskToForwardToCSA"
+            control={control}
+            render={({ field }) => (
+              <Switch
+                label={t(
+                  'settings.workingTime.showIfBotCannotAnswerAskToForwardToCSA'
+                )}
+                onLabel={t('global.yes').toString()}
+                offLabel={t('global.no').toString()}
+                onCheckedChange={field.onChange}
+                checked={field.value}
+                {...field}
+              />
+            )}
+          />
+        )}
         <div style={{ paddingRight: '20px' }}>
           <Controller
             name="organizationBotCannotAnswerMessage"
