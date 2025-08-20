@@ -207,7 +207,13 @@ get_organization_base_config:
 assign_organization_base_config:
   assign:
     base_config: ${org_base_config_res.response.body[0]}
-  next: check_if_organization_is_available_all_time
+  next: check_if_organization_use_csa
+
+check_if_organization_use_csa:
+  switch:
+    - condition: ${base_config.isOrganizationUseCsa === 'true'}
+      next: check_if_organization_is_available_all_time
+  next: return_organization_does_not_use_csa
 
 check_if_organization_is_available_all_time:
   switch:
@@ -273,6 +279,23 @@ return_organization_is_not_available:
           authorLastName: ""
           created: ${new Date().toISOString()}
   result: organization_is_not_available_result
+  next: return_organization_is_not_available_res
+
+return_organization_does_not_use_csa:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-bot-message"
+    body:
+      messages:
+        - chatId: ${chatId}
+          content: ${base_config.botCannotAnswerMessage}
+          authorTimestamp: ${new Date().toISOString()}
+          event: "unavailable_organization"
+          authorId: ${get_bot_name_result.response.body[0].value}
+          authorFirstName: ""
+          authorLastName: ""
+          created: ${new Date().toISOString()}
+  result: organization_does_not_use_csa_result
   next: return_organization_is_not_available_res
 
 get_all_available_csas:
