@@ -411,7 +411,7 @@
       "outsideWorkingHoursMessage": "Outside working hours message",
       "showIfBotCannotAnswerAskToForwardToCSA": "If the Bürokratt cannot answer, ask for a customer service representative",
       "botCannotAnswerMessage": "Notification if the Bürokratt cannot answer",
-      "iUseCSA": "I use customer service"
+      "organizationUseCSA": "I use customer service"
     },
     "userSession": {
       "title": "User session",

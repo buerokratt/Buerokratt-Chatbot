@@ -70,7 +70,7 @@ export function getOrganizationTimeData(data: OrganizationWorkingTime) {
     organizationBotCannotAnswerAskToForwardToCSA:
       data.organizationBotCannotAnswerAskToForwardToCSA.toString() === 'true',
     organizationBotCannotAnswerMessage: data.organizationBotCannotAnswerMessage,
-    organizationIUseCSA: data.organizationIUseCSA.toString() === 'true',
+    organizationUseCSA: data.organizationUseCSA.toString() === 'true',
   };
 }
 
@@ -100,6 +100,6 @@ export function setOrganizationTimeData(data: OrganizationWorkingTime) {
       data.organizationOutsideWorkingHoursAskForContacts.toString(),
     organizationBotCannotAnswerAskToForwardToCSA:
       data.organizationBotCannotAnswerAskToForwardToCSA.toString(),
-    organizationIUseCSA: data.organizationIUseCSA.toString(),
+    organizationUseCSA: data.organizationUseCSA.toString(),
   };
 }

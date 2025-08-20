@@ -411,7 +411,7 @@
       "outsideWorkingHoursMessage": "Töövälise aja teavitus",
       "showIfBotCannotAnswerAskToForwardToCSA": "Kui Bürokratt ei oska vasta, kas küsida suunamist",
       "botCannotAnswerMessage": "Teavitus, kui Bürokratt ei oska vastata",
-      "iUseCSA": "Kasutan klienditeenindust"
+      "organizationUseCSA": "Kasutan klienditeenindust"
     },
     "userSession": {
       "title": "Kasutaja sessioon",

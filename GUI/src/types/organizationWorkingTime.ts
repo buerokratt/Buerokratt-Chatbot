@@ -26,5 +26,5 @@ export interface OrganizationWorkingTime {
   organizationOutsideWorkingHoursMessage: string;
   organizationBotCannotAnswerAskToForwardToCSA: boolean;
   organizationBotCannotAnswerMessage: string;
-  organizationIUseCSA: boolean;
+  organizationUseCSA: boolean;
 }

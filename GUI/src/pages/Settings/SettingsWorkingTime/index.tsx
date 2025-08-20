@@ -54,7 +54,7 @@ const SettingsWorkingTime: FC = () => {
   const organizationWorkingTimeWeekdays = watch(
     'organizationWorkingTimeWeekdays'
   );
-  const isIUseCSA = watch('organizationIUseCSA');
+  const isOrganizationUseCSA = watch('organizationUseCSA');
   const { data: workingTime } = useQuery<OrganizationWorkingTime>({
     queryKey: ['configs/organization-working-time', 'prod'],
     onSuccess: (data: any) => {
@@ -170,11 +170,11 @@ const SettingsWorkingTime: FC = () => {
         header={
           <Track gap={8} direction="vertical" align="left">
             <Controller
-              name="organizationIUseCSA"
+              name="organizationUseCSA"
               control={control}
               render={({ field }) => (
                 <Switch
-                  label={t('settings.workingTime.iUseCSA')}
+                  label={t('settings.workingTime.organizationUseCSA')}
                   onLabel={t('global.yes').toString()}
                   offLabel={t('global.no').toString()}
                   onCheckedChange={field.onChange}
@@ -183,7 +183,7 @@ const SettingsWorkingTime: FC = () => {
                 />
               )}
             />
-            {isIUseCSA && (
+            {isOrganizationUseCSA && (
               <Controller
                 name="organizationWorkingAllTime"
                 control={control}
@@ -199,7 +199,7 @@ const SettingsWorkingTime: FC = () => {
                 )}
               />
             )}
-            {!isOrganizationAvailableAllTime && isIUseCSA && (
+            {!isOrganizationAvailableAllTime && isOrganizationUseCSA && (
               <Controller
                 name="organizationWorkingTimeNationalHolidays"
                 control={control}
@@ -215,7 +215,7 @@ const SettingsWorkingTime: FC = () => {
                 )}
               />
             )}
-            {!isOrganizationAvailableAllTime && isIUseCSA && (
+            {!isOrganizationAvailableAllTime && isOrganizationUseCSA && (
               <Controller
                 name="organizationClosedOnWeekEnds"
                 control={control}
@@ -231,7 +231,7 @@ const SettingsWorkingTime: FC = () => {
                 )}
               />
             )}
-            {!isOrganizationAvailableAllTime && isIUseCSA && (
+            {!isOrganizationAvailableAllTime && isOrganizationUseCSA && (
               <Controller
                 name="organizationTheSameOnAllWorkingDays"
                 control={control}
@@ -252,7 +252,7 @@ const SettingsWorkingTime: FC = () => {
       >
         {isOrganizationTheSameOnAllWorkingDays &&
           !isOrganizationAvailableAllTime &&
-          isIUseCSA && (
+          isOrganizationUseCSA && (
             <Track>
               <label className="Label">
                 {t(
@@ -322,7 +322,7 @@ const SettingsWorkingTime: FC = () => {
           )}
         {!isOrganizationTheSameOnAllWorkingDays &&
           !isOrganizationAvailableAllTime &&
-          isIUseCSA &&
+          isOrganizationUseCSA &&
           weekdaysOptions
             .filter(
               (d) =>
@@ -434,7 +434,7 @@ const SettingsWorkingTime: FC = () => {
                 )}
               </Track>
             ))}
-        {!isOrganizationAvailableAllTime && isIUseCSA && (
+        {!isOrganizationAvailableAllTime && isOrganizationUseCSA && (
           <Controller
             name="organizationOutsideWorkingHoursAskForContacts"
             control={control}
@@ -452,7 +452,7 @@ const SettingsWorkingTime: FC = () => {
             )}
           />
         )}
-        {!isOrganizationAvailableAllTime && isIUseCSA && (
+        {!isOrganizationAvailableAllTime && isOrganizationUseCSA && (
           <Controller
             name="organizationOutsideWorkingHoursAskForContacts"
             control={control}
@@ -470,7 +470,7 @@ const SettingsWorkingTime: FC = () => {
             )}
           />
         )}
-        {!isOrganizationAvailableAllTime && isIUseCSA && (
+        {!isOrganizationAvailableAllTime && isOrganizationUseCSA && (
           <div style={{ paddingRight: '20px' }}>
             <Controller
               name="organizationOutsideWorkingHoursMessage"
@@ -490,7 +490,7 @@ const SettingsWorkingTime: FC = () => {
             />
           </div>
         )}
-        {isIUseCSA && (
+        {isOrganizationUseCSA && (
           <Controller
             name="organizationNoCsaAskForContacts"
             control={control}
@@ -506,7 +506,7 @@ const SettingsWorkingTime: FC = () => {
             )}
           />
         )}
-        {isIUseCSA && (
+        {isOrganizationUseCSA && (
           <Controller
             name="organizationNoCsaAskForContacts"
             control={control}
@@ -524,7 +524,7 @@ const SettingsWorkingTime: FC = () => {
             )}
           />
         )}
-        {isIUseCSA && (
+        {isOrganizationUseCSA && (
           <div style={{ paddingRight: '20px' }}>
             <Controller
               name="organizationNoCsaAvailableMessage"
@@ -544,7 +544,7 @@ const SettingsWorkingTime: FC = () => {
             />
           </div>
         )}
-        {isIUseCSA && (
+        {isOrganizationUseCSA && (
           <Controller
             name="organizationBotCannotAnswerAskToForwardToCSA"
             control={control}

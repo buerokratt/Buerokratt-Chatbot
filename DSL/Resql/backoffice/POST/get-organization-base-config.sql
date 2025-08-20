@@ -7,7 +7,8 @@ WITH configuration_values AS (
                   'organizationNoCsaAskForContacts', 
                   'organizationNoCsaAvailableMessage',
                   'organizationOutsideWorkingHoursAskForContacts',
-                  'organizationOutsideWorkingHoursMessage')
+                  'organizationOutsideWorkingHoursMessage',
+                  'organizationUseCSA')
       AND id IN (SELECT max(id) FROM configuration GROUP BY KEY)
       AND NOT deleted
 )
@@ -17,4 +18,5 @@ SELECT
     MAX(CASE WHEN KEY = 'organizationNoCsaAvailableMessage' THEN value END) AS no_csa_message,
     MAX(CASE WHEN KEY = 'organizationOutsideWorkingHoursAskForContacts' THEN value END) AS outside_working_hours_ask_for_contacts,
     MAX(CASE WHEN KEY = 'organizationOutsideWorkingHoursMessage' THEN value END) AS outside_working_hours_message
+    MAX(CASE WHEN KEY = 'organizationUseCSA' THEN value END) AS is_organization_use_csa
 FROM configuration_values;

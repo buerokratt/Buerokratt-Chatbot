@@ -89,9 +89,9 @@ declaration:
       - field: organizationBotCannotAnswerMessage
         type: string
         description: "Body field 'organizationBotCannotAnswerMessage'"  
-      - field: organizationIUseCSA
+      - field: organizationUseCSA
         type: string
-        description: "Body field 'organizationIUseCSA'"  
+        description: "Body field 'organizationUseCSA'"  
 
 extractRequestData:
   assign:
@@ -122,7 +122,7 @@ extractRequestData:
     organizationOutsideWorkingHoursMessage: ${incoming.body.organizationOutsideWorkingHoursMessage}
     organizationBotCannotAnswerAskToForwardToCSA: ${incoming.body.organizationBotCannotAnswerAskToForwardToCSA}
     organizationBotCannotAnswerMessage: ${incoming.body.organizationBotCannotAnswerMessage}
-    organizationIUseCSA: ${incoming.body.organizationIUseCSA}
+    organizationUseCSA: ${incoming.body.organizationUseCSA}
 
 setOrganizationWorkingTime:
   call: http.post
@@ -156,7 +156,7 @@ setOrganizationWorkingTime:
       organizationOutsideWorkingHoursMessage: ${organizationOutsideWorkingHoursMessage}
       organizationBotCannotAnswerAskToForwardToCSA: ${organizationBotCannotAnswerAskToForwardToCSA}
       organizationBotCannotAnswerMessage: ${organizationBotCannotAnswerMessage}
-      organizationIUseCSA: ${organizationIUseCSA}
+      organizationUseCSA: ${organizationUseCSA}
       created: ${new Date().toISOString()}
   result: setOrganizationWorkingTimeResult
 
