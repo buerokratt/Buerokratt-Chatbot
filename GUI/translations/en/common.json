@@ -312,6 +312,11 @@
     "ROLE_ANALYST": "Analyst",
     "ROLE_UNAUTHENTICATED": "Unauthenticated"
   },
+  "multiDomains": {
+    "addNew": "Add new",
+    "title": "Multidomains",
+    "domainName": "Domain name"
+  },
   "settings": {
     "title": "Settings",
     "users": {

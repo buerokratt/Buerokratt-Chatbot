@@ -1,0 +1,16 @@
+.inline-form {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+
+  .input__label {
+    flex: 0 0 auto;
+    width: auto;
+    margin-right: 4px;
+    white-space: nowrap;
+  }
+
+  .input__wrapper {
+    flex: 1;
+  }
+}
