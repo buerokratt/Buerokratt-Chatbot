@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { Layout } from 'components';
 import useStore from 'store';
+import { userStore as useHeaderStore } from '@buerokratt-ria/header';
 import { UserInfo } from 'types/userInfo';
 
 import ChatActive from 'pages/Chat/ChatActive';
@@ -46,6 +47,7 @@ const App: FC = () => {
               .filter(Boolean);
 
             useStore.getState().setUserDomains(selectedDomains);
+            useHeaderStore.getState().setUserDomains(selectedDomains);
           })
           .catch((e) => {
             console.error('Failed to fetch widget data:', e);
