@@ -10,6 +10,7 @@ export interface User {
   csaTitle: string;
   csaEmail: string;
   authorities: ROLES[];
+  domains: string[];
   customerSupportStatus: 'online' | 'idle' | 'offline';
   department: string;
   smaxAccountId?: string;
@@ -25,6 +26,7 @@ export interface UserDTO
     | 'fullName'
     | 'idCode'
     | 'authorities'
+    | 'domains'
     | 'displayName'
     | 'csaTitle'
     | 'csaEmail'
