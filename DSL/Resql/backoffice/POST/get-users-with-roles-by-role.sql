@@ -11,6 +11,7 @@ SELECT u.login,
        csa.status AS customer_support_status,
        csa.status_comment as status_comment,
        csa.created AS status_comment_time_stamp,
+       uwd.domain_ids AS domains,
        CEIL(COUNT(*) OVER() / :page_size::DECIMAL) AS total_pages
 FROM "user" u
 LEFT JOIN (
@@ -23,6 +24,13 @@ LEFT JOIN (
           GROUP BY user_id
       )
 ) ua ON u.id_code = ua.user_id
+LEFT JOIN (
+    SELECT DISTINCT ON (user_login)
+        user_login,
+        domain_id AS domain_ids
+    FROM user_widget_domains
+    ORDER BY user_login, created DESC
+) uwd ON u.login = uwd.user_login
 JOIN (
     SELECT id_code, status, status_comment, created, ROW_NUMBER() OVER (PARTITION BY id_code ORDER BY id DESC) AS rn
     FROM customer_support_agent_activity

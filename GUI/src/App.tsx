@@ -24,6 +24,7 @@ import ChatPending from 'pages/Chat/ChatPending';
 import DeleteConversations from './pages/Settings/DeleteConversations';
 import ValidationRequests from './pages/Chat/ValidationRequests';
 import SettingsSkmConfiguration from 'pages/Settings/SettingsSkmConfiguration';
+import MultiDomain from './pages/Settings/MultiDomain';
 import SettingsFeedback from 'pages/Settings/SettingsFeedback';
 import { getWidgetData } from './services/users';
 
@@ -77,6 +78,7 @@ const App: FC = () => {
         <Route path="/working-time" element={<SettingsWorkingTime />} />
         <Route path="/session-length" element={<SettingsSessionLength />} />
         <Route path="/skm-configuration" element={<SettingsSkmConfiguration />} />
+        <Route path="/multi-domains" element={<MultiDomain />} />
         <Route path="/uptime" element={<MonitoringUptime />} />
       </Route>
     </Routes>

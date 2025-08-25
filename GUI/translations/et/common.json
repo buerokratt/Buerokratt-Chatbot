@@ -47,7 +47,8 @@
     "chosen": "Valitud",
     "read": "Loetud",
     "statusClarification": "Staatuse täpsustus",
-    "selectAll": "Vali kõik"
+    "selectAll": "Vali kõik",
+    "displayText": "Kuva tekst"
   },
   "sorting": {
     "desc": "kahanevalt",
@@ -317,8 +318,15 @@
     "ROLE_ANALYST": "Analüütik",
     "ROLE_UNAUTHENTICATED": "Autentimata"
   },
+  "multiDomains": {
+    "addNew": "Lisa uus",
+    "title": "Multidomeenid",
+    "domainName": "Domeeni nimi"
+  },
   "settings": {
     "title": "Seaded",
+    "autoClose": "Lõpeta vestlus automaatselt",
+    "autoCloseText": "Lõppsõnum",
     "users": {
       "title": "Kasutajad",
       "name": "Nimi",
@@ -421,6 +429,13 @@
       "sessionChanged": "Sessiooni pikkuse muutmine õnnestus",
       "emptySession": "Sessiooni pikkuse väli ei tohi olla tühi",
       "invalidSession": "Sessiooni pikkus peab olema vahemikus 30 - 480 minutit"
+    },
+    "chatDuration": {
+      "description": "Aja möödumisel lõpetakse vestlus automaatselt.",
+      "duration": "Kasutaja poolse vastuse ooteaja pikkus",
+      "minutes": "minutit",
+      "rule": "Sessiooni pikkus on lubatud vahemikus 5 min - 480 min (8h)",
+      "invalidSession": "Sessiooni pikkus peab olema vahemikus 5 - 480 minutit"
     },
     "greeting": {
       "title": "Tervitussõnum"

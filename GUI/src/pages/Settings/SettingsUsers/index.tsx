@@ -1,6 +1,6 @@
 import { FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   ColumnFiltersState,
   PaginationState,
@@ -21,6 +21,7 @@ import withAuthorization from 'hoc/with-authorization';
 import { CustomerSupportActivityDTO } from 'types/customerSupportActivity';
 import useStore from '../../../store';
 import { format } from 'date-fns';
+import { WDomain } from '../../../types/widgetModels';
 
 const SettingsUsers: FC = () => {
   const { t } = useTranslation();
@@ -30,6 +31,7 @@ const SettingsUsers: FC = () => {
   const userInfo = useStore((state) => state.userInfo);
   const [newUserModal, setNewUserModal] = useState(false);
   const [changeStatusDialog, setChangeStatusDialog] = useState(false);
+  const [widgetDomains, setWidgetDomains] = useState<WDomain[]>([]);
   const [editableRow, setEditableRow] = useState<User | null>(null);
   const [deletableRow, setDeletableRow] = useState<string | number | null>(
     null
@@ -71,6 +73,14 @@ const SettingsUsers: FC = () => {
       .catch((error: any) => console.log(error));
   };
 
+  useQuery({
+    queryKey: ['configs/widget-domains', 'prod'],
+    onSuccess: (data: any) => {
+      const initialData = data.response ?? [];
+        setWidgetDomains(initialData);
+    }
+  });
+
   useEffect(() => {
     getUsers(pagination, sorting, columnFilters);
   }, []);
@@ -78,6 +88,10 @@ const SettingsUsers: FC = () => {
   useEffect(() => {
     fetchData();
   }, [userInfo?.idCode]);
+
+  const mapUserDomains = (domainIds: string[], domainsList: WDomain[]): WDomain[] => {
+    return domainsList.filter((domain) => domainIds.includes(domain.domainId));
+  }
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -290,8 +304,8 @@ const SettingsUsers: FC = () => {
     );
   };
 
-  const usersColumns = useMemo(
-    () => [
+  const usersColumns = useMemo(() => {
+    const baseColumns = [
       columnHelper.accessor(
         (row) => `${row.firstName ?? ''} ${row.lastName ?? ''}`,
         {
@@ -365,9 +379,30 @@ const SettingsUsers: FC = () => {
           size: '1%',
         },
       }),
-    ],
-    []
-  );
+    ];
+
+    const domainColumn = columnHelper.accessor(
+      (data: User) => {
+        const mapped = mapUserDomains(data.domains ?? [], widgetDomains);
+        return mapped.map((d) => d.name);
+      },
+      {
+        header: t('multiDomains.title') ?? '',
+        cell: (props) => props.getValue().join(', '),
+        filterFn: (row, _, filterValue) => {
+          const mapped = mapUserDomains(row.original.domains ?? [], widgetDomains);
+          return mapped.some((d) =>
+            d.name.toLowerCase().includes(filterValue.toLowerCase())
+          );
+        },
+      }
+    );
+
+    return import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN.toLowerCase() === 'true'
+      ? [...baseColumns.slice(0, 3), domainColumn, ...baseColumns.slice(3)]
+      : baseColumns;
+  }, [t, widgetDomains]);
+
 
   if (!usersList) return <>Loading...</>;
 
@@ -430,6 +465,7 @@ const SettingsUsers: FC = () => {
             setNewUserModal(false);
             getUsers(pagination, sorting, columnFilters);
           }}
+          domainsList={widgetDomains}
         />
       )}
 
@@ -478,6 +514,7 @@ const SettingsUsers: FC = () => {
             setEditableRow(null);
             getUsers(pagination, sorting, columnFilters);
           }}
+          domainsList={widgetDomains}
         />
       )}
 

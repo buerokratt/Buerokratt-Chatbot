@@ -86,6 +86,12 @@ declaration:
       - field: domainUUID
         type: string
         description: "Body field 'domainUUID'"
+      - field: organizationBotCannotAnswerAskToForwardToCSA
+        type: string
+        description: "Body field 'organizationBotCannotAnswerAskToForwardToCSA'"
+      - field: organizationBotCannotAnswerMessage
+        type: string
+        description: "Body field 'organizationBotCannotAnswerMessage'"  
 
 extractRequestData:
   assign:
