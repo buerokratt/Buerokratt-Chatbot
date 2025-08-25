@@ -11,12 +11,7 @@ import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';
 import { MdDeleteOutline } from 'react-icons/md';
 import './MultiDomain.scss';
-
-type WDomain = {
-  name: string;
-  url: string;
-  active?: boolean;
-};
+import { WDomain } from '../../../types/widgetModels';
 
 const MultiDomain: FC = () => {
   const { t } = useTranslation();
@@ -107,8 +102,7 @@ const MultiDomain: FC = () => {
           <Track gap={8} justify="end" align={'right'}>
             <Button
               appearance="secondary"
-              onClick={() => append({ name: '', url: '' })}
-            >
+              onClick={() => append({ name: '', url: '' , domainId: crypto.randomUUID()})}
               {t('multiDomains.addNew')}
             </Button>
             <Button onClick={handleSubmit(handleFormSubmit)}>

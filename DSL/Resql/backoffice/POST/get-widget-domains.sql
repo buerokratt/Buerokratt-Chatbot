@@ -1,4 +1,4 @@
-SELECT DISTINCT ON (name) name, url
+SELECT DISTINCT ON (domain_id) name, url, domain_id, active
 FROM widget_domains
 WHERE active = TRUE
-ORDER BY name, created DESC;
+ORDER BY domain_id, created DESC;

@@ -18,6 +18,10 @@ export async function createUser(userData: UserDTO) {
         ? Object.values(userData.authorities)
         : authorities,
     department: userData.department,
+    domains:
+      userData.domains.length === 0 || userData.domains[0] === null
+        ? []
+        : userData.domains.map(d => d.value)
   });
   return data;
 }
@@ -57,6 +61,10 @@ export async function editUser(
         ? Object.values(userData.authorities)
         : authorities,
     department: userData.department,
+    domains:
+      userData.domains.length === 0 || userData.domains[0] === null
+        ? []
+        : userData.domains.map(d => d.value)
   });
   return data;
 }
