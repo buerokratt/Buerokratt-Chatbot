@@ -83,6 +83,12 @@ declaration:
       - field: organizationOutsideWorkingHoursMessage
         type: string
         description: "Body field 'organizationOutsideWorkingHoursMessage'"
+      - field: organizationBotCannotAnswerAskToForwardToCSA
+        type: string
+        description: "Body field 'organizationBotCannotAnswerAskToForwardToCSA'"
+      - field: organizationBotCannotAnswerMessage
+        type: string
+        description: "Body field 'organizationBotCannotAnswerMessage'"  
 
 extractRequestData:
   assign:

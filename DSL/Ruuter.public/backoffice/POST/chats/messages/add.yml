@@ -20,7 +20,7 @@ declaration:
       - field: message
         type: json
         description: "Body field 'message'"
-    headers:
+    header:
       - field: cookie
         type: string
         description: "Cookie field"

@@ -467,3 +467,31 @@
   text-decoration: none;
   color: inherit;
 }
+
+.newMessageContainer {
+  position: absolute;
+  bottom: 115px;
+  right: 0;
+  background: transparent;
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 10px;
+}
+
+.newMessage {
+  display: inline-block;
+  width: max-content;
+  background-color: lightgray;
+  padding: 6px 28px;
+  border-radius: 8px;
+  margin-bottom: 2px;
+  margin-left: auto;
+  margin-right: 20px !important;
+  font-size: 18px;
+
+  &:hover {
+    cursor: pointer;
+    background-color: get-color(sapphire-blue-10);
+    color: white;
+  }
+}
