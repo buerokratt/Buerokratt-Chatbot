@@ -20,6 +20,9 @@ declaration:
       - field: message
         type: json
         description: "Body field 'message'"
+      - field: domain
+        type: string
+        description: "Body field 'domain'"
     header:
       - field: cookie
         type: string
@@ -35,6 +38,7 @@ extractRequestData:
     holidayNames: ${incoming.body.holidayNames}
     cookie: ${incoming.headers.cookie}
     silent: ${incoming.body.silent}
+    domain: ${incoming.body.domain}
   next: checkContentLength
 
 checkContentLength:
@@ -132,6 +136,7 @@ postMessageToBot:
       content: ${content}
       holidays: ${holidays}
       holidayNames: ${holidayNames}
+      domain: ${domain}
   result: message_to_bot_result
   next: check_for_post_message_to_bot_result
 

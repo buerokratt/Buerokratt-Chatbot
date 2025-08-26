@@ -6,6 +6,30 @@ declaration:
   accepts: json
   returns: json
   namespace: backoffice
+  allowlist:
+    params:
+      - field: domain
+        type: string
+        description: "Body field 'domain'"
+
+assignValues:
+  assign:
+    domain: ${incoming.params.domain}
+
+checkForDomain:
+  switch:
+    - condition: ${domain === 'none'}
+      next: getEmergencyNotice
+  next: getDomainEmergencyNotice
+
+getDomainEmergencyNotice:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-emergency-notice"
+    body:
+      domainUUID: ${domain}
+  result: res
+  next: validate_res
 
 getEmergencyNotice:
   call: http.post

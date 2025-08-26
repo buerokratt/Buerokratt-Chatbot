@@ -23,6 +23,9 @@ declaration:
       - field: isEditChatVisible
         type: string
         description: "Body field 'isEditChatVisible'"
+      - field: domainUUID
+        type: string
+        description: "Body field 'domainUUID'"
 
 extractRequestData:
   assign:
@@ -31,6 +34,28 @@ extractRequestData:
     is_csa_name_visible: ${incoming.body.isCsaNameVisible}
     is_csa_title_visible: ${incoming.body.isCsaTitleVisible}
     is_edit_chat_visible: ${incoming.body.isEditChatVisible}
+    domains: ${incoming.body.domainUUID}
+
+checkForDomains:
+  switch:
+    - condition: ${domains.length > 0}
+      next: setDomainBotConfig
+  next: setBotConfig
+
+setDomainBotConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-domain-bot-config"
+    body:
+      is_bot_active: ${is_bot_active}
+      is_burokratt_active: ${is_burokratt_active}
+      is_csa_name_visible: ${is_csa_name_visible}
+      is_csa_title_visible: ${is_csa_title_visible}
+      is_edit_chat_visible: ${is_edit_chat_visible}
+      created: ${new Date().toISOString()}
+      domains: ${JSON.stringify(domains)}
+  result: set_bot_config_res
+  next: return_result
 
 setBotConfig:
   call: http.post
