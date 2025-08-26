@@ -91,7 +91,7 @@ declaration:
         description: "Body field 'organizationBotCannotAnswerAskToForwardToCSA'"
       - field: organizationBotCannotAnswerMessage
         type: string
-        description: "Body field 'organizationBotCannotAnswerMessage'"  
+        description: "Body field 'organizationBotCannotAnswerMessage'"
 
 extractRequestData:
   assign:
