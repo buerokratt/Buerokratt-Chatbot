@@ -5,6 +5,7 @@ import TextareaAutosize, {
 import clsx from 'clsx';
 
 import './ChatTextArea.scss';
+import { useTranslation } from 'react-i18next';
 
 type TextareaProps = TextareaAutosizeProps & {
   label: string;
@@ -34,6 +35,7 @@ const ChatTextArea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     ref
   ) => {
     const id = useId();
+    const {i18n} = useTranslation();
     const [currentLength, setCurrentLength] = useState(
       (typeof defaultValue === 'string' && defaultValue.length) || 0
     );
@@ -62,6 +64,8 @@ const ChatTextArea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             maxLength={maxLength}
             minRows={minRows}
             maxRows={maxRows}
+            lang={i18n.language === 'et' ? 'et' : 'en'}
+            spellCheck={'true'}
             ref={ref}
             onKeyDownCapture={(e) => {
               if (e.key === 'Enter') {

@@ -1,53 +1,54 @@
 import { OrganizationWorkingTime } from 'types/organizationWorkingTime';
+import { dateToLocalExcludingDST, dateToUTCExcludingDST } from 'utils/convert-date';
 
 export function getOrganizationTimeData(data: OrganizationWorkingTime) {
   return {
-    organizationMondayWorkingTimeStartISO: convertDate(
+    organizationMondayWorkingTimeStartISO: dateToLocalExcludingDST(
       data.organizationMondayWorkingTimeStartISO
     ),
-    organizationMondayWorkingTimeEndISO: convertDate(
+    organizationMondayWorkingTimeEndISO: dateToLocalExcludingDST(
       data.organizationMondayWorkingTimeEndISO
     ),
-    organizationTuesdayWorkingTimeStartISO: convertDate(
+    organizationTuesdayWorkingTimeStartISO: dateToLocalExcludingDST(
       data.organizationTuesdayWorkingTimeStartISO
     ),
-    organizationTuesdayWorkingTimeEndISO: convertDate(
+    organizationTuesdayWorkingTimeEndISO: dateToLocalExcludingDST(
       data.organizationTuesdayWorkingTimeEndISO
     ),
-    organizationWednesdayWorkingTimeStartISO: convertDate(
+    organizationWednesdayWorkingTimeStartISO: dateToLocalExcludingDST(
       data.organizationWednesdayWorkingTimeStartISO
     ),
-    organizationWednesdayWorkingTimeEndISO: convertDate(
+    organizationWednesdayWorkingTimeEndISO: dateToLocalExcludingDST(
       data.organizationWednesdayWorkingTimeEndISO
     ),
-    organizationThursdayWorkingTimeStartISO: convertDate(
+    organizationThursdayWorkingTimeStartISO: dateToLocalExcludingDST(
       data.organizationThursdayWorkingTimeStartISO
     ),
-    organizationThursdayWorkingTimeEndISO: convertDate(
+    organizationThursdayWorkingTimeEndISO: dateToLocalExcludingDST(
       data.organizationThursdayWorkingTimeEndISO
     ),
-    organizationFridayWorkingTimeStartISO: convertDate(
+    organizationFridayWorkingTimeStartISO: dateToLocalExcludingDST(
       data.organizationFridayWorkingTimeStartISO
     ),
-    organizationFridayWorkingTimeEndISO: convertDate(
+    organizationFridayWorkingTimeEndISO: dateToLocalExcludingDST(
       data.organizationFridayWorkingTimeEndISO
     ),
-    organizationSaturdayWorkingTimeStartISO: convertDate(
+    organizationSaturdayWorkingTimeStartISO: dateToLocalExcludingDST(
       data.organizationSaturdayWorkingTimeStartISO
     ),
-    organizationSaturdayWorkingTimeEndISO: convertDate(
+    organizationSaturdayWorkingTimeEndISO: dateToLocalExcludingDST(
       data.organizationSaturdayWorkingTimeEndISO
     ),
-    organizationSundayWorkingTimeStartISO: convertDate(
+    organizationSundayWorkingTimeStartISO: dateToLocalExcludingDST(
       data.organizationSundayWorkingTimeStartISO
     ),
-    organizationSundayWorkingTimeEndISO: convertDate(
+    organizationSundayWorkingTimeEndISO: dateToLocalExcludingDST(
       data.organizationSundayWorkingTimeEndISO
     ),
-    organizationAllWeekdaysTimeStartISO: convertDate(
+    organizationAllWeekdaysTimeStartISO: dateToLocalExcludingDST(
       data.organizationAllWeekdaysTimeStartISO
     ),
-    organizationAllWeekdaysTimeEndISO: convertDate(
+    organizationAllWeekdaysTimeEndISO: dateToLocalExcludingDST(
       data.organizationAllWeekdaysTimeEndISO
     ),
     organizationClosedOnWeekEnds:
@@ -73,8 +74,18 @@ export function getOrganizationTimeData(data: OrganizationWorkingTime) {
 }
 
 export function setOrganizationTimeData(data: OrganizationWorkingTime) {
+  const adjustedTimeFields: Record<string, any> = {};
+
+  for (const [key, value] of Object.entries(data)) {
+    if (key.endsWith('ISO') && value) {
+      adjustedTimeFields[key] = dateToUTCExcludingDST(value);
+    } else {
+      adjustedTimeFields[key] = value;
+    }
+  }
+
   return {
-    ...data,
+    ...adjustedTimeFields,
     organizationClosedOnWeekEnds: data.organizationClosedOnWeekEnds.toString(),
     organizationTheSameOnAllWorkingDays:
       data.organizationTheSameOnAllWorkingDays.toString(),
@@ -91,5 +102,34 @@ export function setOrganizationTimeData(data: OrganizationWorkingTime) {
   };
 }
 
-const convertDate = (dateAsString?: string | Date): Date =>
-  dateAsString ? new Date(dateAsString) : new Date();
+export const getDefaultValues = () :OrganizationWorkingTime => {
+  return {
+    organizationMondayWorkingTimeStartISO: new Date(),
+    organizationMondayWorkingTimeEndISO: new Date(),
+    organizationTuesdayWorkingTimeStartISO: new Date(),
+    organizationTuesdayWorkingTimeEndISO: new Date(),
+    organizationWednesdayWorkingTimeStartISO: new Date(),
+    organizationWednesdayWorkingTimeEndISO: new Date(),
+    organizationThursdayWorkingTimeStartISO: new Date(),
+    organizationThursdayWorkingTimeEndISO: new Date(),
+    organizationFridayWorkingTimeStartISO: new Date(),
+    organizationFridayWorkingTimeEndISO: new Date(),
+    organizationSaturdayWorkingTimeStartISO: new Date(),
+    organizationSaturdayWorkingTimeEndISO: new Date(),
+    organizationSundayWorkingTimeStartISO: new Date(),
+    organizationSundayWorkingTimeEndISO: new Date(),
+    organizationAllWeekdaysTimeStartISO: new Date(),
+    organizationAllWeekdaysTimeEndISO: new Date(),
+    organizationWorkingTimeWeekdays: ['monday'],
+    organizationWorkingTimeNationalHolidays: false,
+    organizationClosedOnWeekEnds: false,
+    organizationTheSameOnAllWorkingDays: false,
+    organizationWorkingAllTime: false,
+    organizationNoCsaAskForContacts: false,
+    organizationNoCsaAvailableMessage: '',
+    organizationOutsideWorkingHoursAskForContacts: false,
+    organizationOutsideWorkingHoursMessage: '',
+    organizationBotCannotAnswerAskToForwardToCSA: false,
+    organizationBotCannotAnswerMessage: ''
+  }
+}

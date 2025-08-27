@@ -46,7 +46,9 @@
     "forward": "Suuna",
     "chosen": "Valitud",
     "read": "Loetud",
-    "statusClarification": "Staatuse täpsustus"
+    "statusClarification": "Staatuse täpsustus",
+    "selectAll": "Vali kõik",
+    "displayText": "Kuva tekst"
   },
   "sorting": {
     "desc": "kahanevalt",
@@ -59,6 +61,10 @@
     "openMenu": "Ava menüü",
     "openMenuIcon": "Ava menüü ikoon",
     "closeMenuIcon": "Sulge menüü ikoon"
+  },
+  "multiDomains": {
+    "selectDomains": "Vali Domeenid",
+    "noDomains": "Domeene ei ole saadaval. Palun võtke ühendust süsteemiadministraatoriga."
   },
   "menu": {
     "conversations": "Vestlused",
@@ -103,6 +109,7 @@
     "chatForwardedTo": "Vestlus edastati aadressile",
     "chatEnded": "Vestlus lõppes",
     "reply": "Vasta",
+    "newMessage": "Uus sõnum!",
     "unansweredChats": "Vastamata vestlused",
     "unanswered": "Vastamata",
     "forwarded": "Suunatud",
@@ -128,6 +135,8 @@
     "changeStatus": "Muuda staatust",
     "waiting_validation": "Vastust koostatakse",
     "approved_validation": "Kinnitatud valideerimine",
+    "changingMessage": "Vestluse muutmine",
+    "messageEdited": "Vestluse sisu on muudetud! {{date}}",
     "active": {
       "list": "Aktiivsed vestlused",
       "myChats": "Minu vestlused",
@@ -309,8 +318,15 @@
     "ROLE_ANALYST": "Analüütik",
     "ROLE_UNAUTHENTICATED": "Autentimata"
   },
+  "multiDomains": {
+    "addNew": "Lisa uus",
+    "title": "Multidomeenid",
+    "domainName": "Domeeni nimi"
+  },
   "settings": {
     "title": "Seaded",
+    "autoClose": "Lõpeta vestlus automaatselt",
+    "autoCloseText": "Lõppsõnum",
     "users": {
       "title": "Kasutajad",
       "name": "Nimi",
@@ -320,6 +336,9 @@
       "userTitle": "Tiitel",
       "email": "E-post",
       "department": "Osakond",
+      "connectToSmax": "Seo Smaxiga",
+      "connectedToSmax": "Smaxiga seotud",
+      "disconnectFromSmax": "Seo Smaxist lahti",
       "addUser": "Lisa kasutaja",
       "editUser": "Muuda kasutajat",
       "deleteUser": "Kustuta kasutaja",
@@ -360,6 +379,13 @@
       "displayPeriod": "Kuvamisperiood",
       "noticeChanged": "Teate seadeid muudeti edukalt",
       "endDateError": "Lõppkuupäev peab olema alguskuupäevast suurem"
+    },
+    "feedback": {
+      "title": "Tagasiside",
+      "feedbackActive": "Tagasiside aktiivne",
+      "feedbackQuestion": "Tagasiside küsimus",
+      "noticeActive": "Teade aktiivne",
+      "notice": "Teade"
     },
     "appearance": {
       "title": "Välimus ja käitumine",
@@ -403,6 +429,13 @@
       "sessionChanged": "Sessiooni pikkuse muutmine õnnestus",
       "emptySession": "Sessiooni pikkuse väli ei tohi olla tühi",
       "invalidSession": "Sessiooni pikkus peab olema vahemikus 30 - 480 minutit"
+    },
+    "chatDuration": {
+      "description": "Aja möödumisel lõpetakse vestlus automaatselt.",
+      "duration": "Kasutaja poolse vastuse ooteaja pikkus",
+      "minutes": "minutit",
+      "rule": "Sessiooni pikkus on lubatud vahemikus 5 min - 480 min (8h)",
+      "invalidSession": "Sessiooni pikkus peab olema vahemikus 5 - 480 minutit"
     },
     "greeting": {
       "title": "Tervitussõnum"

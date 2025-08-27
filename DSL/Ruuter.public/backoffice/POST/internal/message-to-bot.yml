@@ -20,6 +20,9 @@ declaration:
       - field: holidays
         type: string
         description: "Body field 'holidays'"
+      - field: domain
+        type: string
+        description: "Body field 'domain'"
 
 extractRequestData:
   assign:
@@ -27,6 +30,7 @@ extractRequestData:
     content: ${incoming.body.content ?? ""}
     holidays: ${incoming.body.holidays}
     holidayNames: ${incoming.body.holidayNames}
+    domain: ${incoming.body.domain}
   next: check_bot_is_active
 
 check_bot_is_active:
@@ -152,6 +156,7 @@ check_for_client_bot:
       authorId: ${get_bot_name_result.response.body[0].value}
       holidays: ${holidays}
       holidayNames: ${holidayNames}
+      domain: ${domain}
   result: converted_messages_res
   error: return_bot_error
   next: check_if_client_bot_is_unable_to_reply
@@ -236,7 +241,7 @@ check_if_organization_is_available:
     - condition: ${org_details.isWithinWorkingTime === true && org_details.isWithinWorkingDays === true && org_details.isAllowedToWorkAtHolidays === true}
       next: get_all_available_csas
     - condition: ${org_details.isWithinWorkingTime === true && org_details.isWithinWorkingDays === true && org_details.isAllowedToWorkAtHolidays === false && org_details.isHoliday == true}
-      next: return_is_a_holiday
+      next: return_organization_is_not_available
     - condition: ${org_details.isWithinWorkingTime === true && org_details.isWithinWorkingDays === true && org_details.isAllowedToWorkAtHolidays === false && org_details.isHoliday == false}
       next: get_all_available_csas
   next: return_organization_is_not_available

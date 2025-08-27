@@ -1,0 +1,44 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'FEEDBACK'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: feedbackActive
+        type: string
+        description: "Body field 'feedbackActive'"
+      - field: feedbackQuestion
+        type: string
+        description: "Body field 'feedbackQuestion'"
+      - field: feedbackNoticeActive
+        type: string
+        description: "Body field 'feedbackNoticeActive'"
+      - field: feedbackNotice
+        type: string
+        description: "Body field 'feedbackNotice'"
+    
+extractRequestData:
+  assign:
+    feedbackActive: ${incoming.body.feedbackActive}
+    feedbackQuestion: ${incoming.body.feedbackQuestion}
+    feedbackNoticeActive: ${incoming.body.feedbackNoticeActive}
+    feedbackNotice: ${incoming.body.feedbackNotice}
+
+setSkmConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-feedback-config"
+    body:
+      feedbackActive: ${feedbackActive}
+      feedbackQuestion: ${feedbackQuestion}
+      feedbackNoticeActive: ${feedbackNoticeActive}
+      feedbackNotice: ${feedbackNotice}
+      created: ${new Date().toISOString()}
+  result: return_result
+
+return_result:
+  return: 'Feedback configurations changed successfully'

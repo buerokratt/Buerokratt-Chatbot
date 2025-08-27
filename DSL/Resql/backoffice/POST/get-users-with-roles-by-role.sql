@@ -6,10 +6,12 @@ SELECT u.login,
        u.csa_title,
        u.csa_email,
        u.department,
+       u.smax_account_id,
        ua.authority_name AS authorities,
        csa.status AS customer_support_status,
        csa.status_comment as status_comment,
        csa.created AS status_comment_time_stamp,
+       uwd.domain_ids AS domains,
        CEIL(COUNT(*) OVER() / :page_size::DECIMAL) AS total_pages
 FROM "user" u
 LEFT JOIN (
@@ -22,6 +24,13 @@ LEFT JOIN (
           GROUP BY user_id
       )
 ) ua ON u.id_code = ua.user_id
+LEFT JOIN (
+    SELECT DISTINCT ON (user_login)
+        user_login,
+        domain_id AS domain_ids
+    FROM user_widget_domains
+    ORDER BY user_login, created DESC
+) uwd ON u.login = uwd.user_login
 JOIN (
     SELECT id_code, status, status_comment, created, ROW_NUMBER() OVER (PARTITION BY id_code ORDER BY id DESC) AS rn
     FROM customer_support_agent_activity
@@ -73,6 +82,8 @@ ORDER BY
    CASE WHEN :sorting = 'csaEmail desc' THEN u.csa_email END DESC,
    CASE WHEN :sorting = 'department asc' THEN u.department END ASC,
    CASE WHEN :sorting = 'department desc' THEN u.department END DESC,
+   CASE WHEN :sorting = 'smaxAccountId asc' THEN u.smax_account_id END ASC,
+   CASE WHEN :sorting = 'smaxAccountId desc' THEN u.smax_account_id END DESC,
    CASE WHEN :sorting = 'customerSupportStatus asc' THEN csa.status END ASC,
    CASE WHEN :sorting = 'customerSupportStatus desc' THEN csa.status END DESC
 OFFSET ((GREATEST(:page, 1) - 1) * :page_size) LIMIT :page_size;
