@@ -46,7 +46,9 @@
     "forward": "Suuna",
     "chosen": "Valitud",
     "read": "Loetud",
-    "statusClarification": "Staatuse täpsustus"
+    "statusClarification": "Staatuse täpsustus",
+    "selectAll": "Vali kõik",
+    "displayText": "Kuva tekst"
   },
   "sorting": {
     "desc": "kahanevalt",
@@ -59,6 +61,10 @@
     "openMenu": "Ava menüü",
     "openMenuIcon": "Ava menüü ikoon",
     "closeMenuIcon": "Sulge menüü ikoon"
+  },
+  "multiDomains": {
+    "selectDomains": "Vali Domeenid",
+    "noDomains": "Domeene ei ole saadaval. Palun võtke ühendust süsteemiadministraatoriga."
   },
   "menu": {
     "conversations": "Vestlused",
@@ -319,6 +325,8 @@
   },
   "settings": {
     "title": "Seaded",
+    "autoClose": "Lõpeta vestlus automaatselt",
+    "autoCloseText": "Lõppsõnum",
     "users": {
       "title": "Kasutajad",
       "name": "Nimi",
@@ -422,6 +430,13 @@
       "emptySession": "Sessiooni pikkuse väli ei tohi olla tühi",
       "invalidSession": "Sessiooni pikkus peab olema vahemikus 30 - 480 minutit"
     },
+    "chatDuration": {
+      "description": "Aja möödumisel lõpetakse vestlus automaatselt.",
+      "duration": "Kasutaja poolse vastuse ooteaja pikkus",
+      "minutes": "minutit",
+      "rule": "Sessiooni pikkus on lubatud vahemikus 5 min - 480 min (8h)",
+      "invalidSession": "Sessiooni pikkus peab olema vahemikus 5 - 480 minutit"
+    },
     "greeting": {
       "title": "Tervitussõnum"
     },
@@ -498,5 +513,8 @@
   "notification": {
     "title": "Bürokratt",
     "newMessage": "Uus sõnum."
+  },
+  "landing": {
+    "title": "Tere tulemast Bürokratti"
   }
 }

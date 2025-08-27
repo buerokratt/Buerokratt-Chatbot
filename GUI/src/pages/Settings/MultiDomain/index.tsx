@@ -103,7 +103,6 @@ const MultiDomain: FC = () => {
             <Button
               appearance="secondary"
               onClick={() => append({ name: '', url: '' , domainId: crypto.randomUUID()})}
-            >
               {t('multiDomains.addNew')}
             </Button>
             <Button onClick={handleSubmit(handleFormSubmit)}>
