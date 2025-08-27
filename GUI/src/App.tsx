@@ -25,6 +25,7 @@ import ChatPending from 'pages/Chat/ChatPending';
 import DeleteConversations from './pages/Settings/DeleteConversations';
 import ValidationRequests from './pages/Chat/ValidationRequests';
 import SettingsSkmConfiguration from 'pages/Settings/SettingsSkmConfiguration';
+import LandingPage from 'pages';
 import MultiDomain from './pages/Settings/MultiDomain';
 import SettingsFeedback from 'pages/Settings/SettingsFeedback';
 import { getWidgetData } from './services/users';
@@ -62,7 +63,8 @@ const App: FC = () => {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route index element={<Navigate to="/active" />} />
+        <Route index element={<Navigate to="/landing" />} />
+        <Route path="/landing" element={<LandingPage />} />
         <Route path="/unanswered" element={<ChatUnanswered />} />
         <Route path="/active" element={<ChatActive />} />
         <Route path="/delete-conversations" element={<DeleteConversations />} />
@@ -83,6 +85,10 @@ const App: FC = () => {
         <Route path="/chatbot/feedback" element={<SettingsFeedback />} />
         <Route path="/working-time" element={<SettingsWorkingTime />} />
         <Route path="/session-length" element={<SettingsSessionLength />} />
+        <Route
+          path="/skm-configuration"
+          element={<SettingsSkmConfiguration />}
+        />
         <Route path="/skm-configuration" element={<SettingsSkmConfiguration />} />
         <Route path="/multi-domains" element={<MultiDomain />} />
         <Route path="/uptime" element={<MonitoringUptime />} />

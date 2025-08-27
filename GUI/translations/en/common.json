@@ -513,5 +513,8 @@
   "notification": {
     "title": "Bürokratt",
     "newMessage": "New message."
+  },
+  "landing": {
+    "title": "Welcome to Bürokratt"
   }
 }
