@@ -1,5 +1,5 @@
-import { FC, useState } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { FC, useEffect, useRef, useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { AxiosError } from 'axios';
 
@@ -8,11 +8,18 @@ import { useToast } from 'hooks/useToast';
 import { apiDev } from 'services/api';
 import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';
-import { BotConfig } from 'types/botConfig';
+import { BotConfigResponse } from 'types/botConfig';
+import DomainSelector from '../../../components/DomainsSelector';
+import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
+import { fetchConfigurationFromDomain } from '../../../services/configurations';
 
 const SettingsChatSettings: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
+  const hasRendered = useRef<boolean>();
+  const multiDomainEnabled =
+    import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
+  const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
   const [isBotActive, setIsBotActive] = useState<boolean | undefined>(
     undefined
   );
@@ -36,18 +43,37 @@ const SettingsChatSettings: FC = () => {
     boolean | null
   >(null);
 
-  const { data: config } = useQuery<{ config: BotConfig }>({
-    queryKey: ['configs/bot-config', 'prod'],
-    onSuccess(data: any) {
+  useEffect(() => {
+    if (multiDomainEnabled) {
+      hasRendered.current = true;
+      resetSettingsToDefault();
+    } else {
+      fetchData('none');
+    }
+  }, []);
+
+  const fetchData = async (selectedDomain: string) => {
+    try {
+      const data: BotConfigResponse =
+        await fetchConfigurationFromDomain<BotConfigResponse>(
+          'configs/bot-config',
+          selectedDomain
+        );
+
       const res = data.response;
+
       setIsBotActive(res.isBotActive === 'true');
       setIsBurokrattActive(res.isBurokrattActive === 'true');
       setCurrentIsBurokrattActive(res.isBurokrattActive === 'true');
       setIsNameVisible(res.isCsaNameVisible === 'true');
       setIsTitleVisible(res.isCsaTitleVisible === 'true');
       setIsEditChatVisible(res.isEditChatVisible === 'true');
-    },
-  });
+
+      hasRendered.current = true;
+    } catch (error) {
+      console.error('Failed to fetch appearance', error);
+    }
+  };
 
   const botConfigMutation = useMutation({
     mutationFn: (data: {
@@ -56,6 +82,7 @@ const SettingsChatSettings: FC = () => {
       is_csa_name_visible: boolean;
       is_csa_title_visible: boolean;
       is_edit_chat_visible: boolean;
+      domainUUID: string[];
     }) => {
       return apiDev.post(`configs/bot-config`, {
         isBotActive: data.is_bot_active.toString(),
@@ -63,6 +90,7 @@ const SettingsChatSettings: FC = () => {
         isCsaNameVisible: data.is_csa_name_visible.toString(),
         isCsaTitleVisible: data.is_csa_title_visible.toString(),
         isEditChatVisible: data.is_edit_chat_visible.toString(),
+        domainUUID: data.domainUUID,
       });
     },
     onSuccess: async () => {
@@ -95,16 +123,42 @@ const SettingsChatSettings: FC = () => {
       is_csa_name_visible: isNameVisible ?? true,
       is_csa_title_visible: isTitleVisible ?? true,
       is_edit_chat_visible: isEditChatVisible ?? true,
+      domainUUID: multiDomainEnabled ? selectedDomains : [],
     });
   };
 
-  if (!config) {
+  const resetSettingsToDefault = () => {
+    setIsBotActive(false);
+    setIsBurokrattActive(false);
+    setCurrentIsBurokrattActive(false);
+    setIsNameVisible(false);
+    setIsTitleVisible(false);
+    setIsEditChatVisible(false);
+  };
+
+  const handleDomainSelection = useDomainSelectionHandler(
+    setSelectedDomains,
+    fetchData,
+    resetSettingsToDefault
+  );
+
+  if (!hasRendered) {
     return <>Loading...</>;
   }
 
   return (
     <>
       <h1>{t('settings.title')}</h1>
+
+      {multiDomainEnabled && (
+        <div style={{ marginBottom: '11px' }}>
+          <DomainSelector
+            onChange={(selected) => {
+              handleDomainSelection(selected);
+            }}
+          />
+        </div>
+      )}
 
       <Card
         header={
@@ -183,6 +237,7 @@ const SettingsChatSettings: FC = () => {
                     is_csa_name_visible: isNameVisible ?? true,
                     is_csa_title_visible: isTitleVisible ?? true,
                     is_edit_chat_visible: isEditChatVisible ?? true,
+                    domainUUID: multiDomainEnabled ? selectedDomains : [],
                   });
                 }}
               >

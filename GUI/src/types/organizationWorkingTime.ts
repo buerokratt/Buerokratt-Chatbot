@@ -27,4 +27,9 @@ export interface OrganizationWorkingTime {
   organizationBotCannotAnswerAskToForwardToCSA: boolean;
   organizationBotCannotAnswerMessage: string;
   organizationUseCSA: boolean;
+  domainUUID?: string[];
+}
+
+export interface OrganizationWorkingTimeResponse {
+  response: OrganizationWorkingTime;
 }

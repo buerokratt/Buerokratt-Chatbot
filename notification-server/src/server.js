@@ -71,6 +71,7 @@ app.post("/add-chat-to-termination-queue", express.json(), express.text(), (req,
     
     addToTerminationQueue(
       body.chatId,
+      body.timeout,
       () => fetch(`${process.env.RUUTER_URL}/chats/end`, {
         method: 'POST',
         headers: {

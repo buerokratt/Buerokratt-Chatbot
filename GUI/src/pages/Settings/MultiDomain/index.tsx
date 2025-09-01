@@ -102,8 +102,7 @@ const MultiDomain: FC = () => {
           <Track gap={8} justify="end" align={'right'}>
             <Button
               appearance="secondary"
-              onClick={() => append({ name: '', url: '' , domainId: crypto.randomUUID()})}
-            >
+              onClick={() => append({ name: '', url: '' , domainId: crypto.randomUUID()})}>
               {t('multiDomains.addNew')}
             </Button>
             <Button onClick={handleSubmit(handleFormSubmit)}>

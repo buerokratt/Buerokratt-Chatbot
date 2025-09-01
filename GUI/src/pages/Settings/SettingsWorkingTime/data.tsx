@@ -103,3 +103,35 @@ export function setOrganizationTimeData(data: OrganizationWorkingTime) {
     organizationUseCSA: data.organizationUseCSA.toString(),
   };
 }
+
+export const getDefaultValues = () :OrganizationWorkingTime => {
+  return {
+    organizationMondayWorkingTimeStartISO: new Date(),
+    organizationMondayWorkingTimeEndISO: new Date(),
+    organizationTuesdayWorkingTimeStartISO: new Date(),
+    organizationTuesdayWorkingTimeEndISO: new Date(),
+    organizationWednesdayWorkingTimeStartISO: new Date(),
+    organizationWednesdayWorkingTimeEndISO: new Date(),
+    organizationThursdayWorkingTimeStartISO: new Date(),
+    organizationThursdayWorkingTimeEndISO: new Date(),
+    organizationFridayWorkingTimeStartISO: new Date(),
+    organizationFridayWorkingTimeEndISO: new Date(),
+    organizationSaturdayWorkingTimeStartISO: new Date(),
+    organizationSaturdayWorkingTimeEndISO: new Date(),
+    organizationSundayWorkingTimeStartISO: new Date(),
+    organizationSundayWorkingTimeEndISO: new Date(),
+    organizationAllWeekdaysTimeStartISO: new Date(),
+    organizationAllWeekdaysTimeEndISO: new Date(),
+    organizationWorkingTimeWeekdays: ['monday'],
+    organizationWorkingTimeNationalHolidays: false,
+    organizationClosedOnWeekEnds: false,
+    organizationTheSameOnAllWorkingDays: false,
+    organizationWorkingAllTime: false,
+    organizationNoCsaAskForContacts: false,
+    organizationNoCsaAvailableMessage: '',
+    organizationOutsideWorkingHoursAskForContacts: false,
+    organizationOutsideWorkingHoursMessage: '',
+    organizationBotCannotAnswerAskToForwardToCSA: false,
+    organizationBotCannotAnswerMessage: ''
+  }
+}

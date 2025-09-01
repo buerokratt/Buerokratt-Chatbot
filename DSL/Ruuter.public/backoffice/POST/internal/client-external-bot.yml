@@ -23,7 +23,10 @@ declaration:
         description: "Body field 'holidayNames'"
       - field: holidays
         type: string
-        description: "Body field 'holidays'"  
+        description: "Body field 'holidays'"
+      - field: domain
+        type: string
+        description: "Body field 'domain'"
 
 extract_data:
   assign:
@@ -34,6 +37,35 @@ extract_data:
     holidayNames: ${incoming.body.holidayNames}
     isOrgAvailable: false
     event: ""
+    domain: ${incoming.body.domain}
+
+checkForDomain:
+  switch:
+    - condition: ${domain === 'none'}
+      next: getSkmConfig
+  next: getDomainUUID
+
+getDomainUUID:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-uuid"
+    body:
+      domainUrl: ${domain + '%'}
+  result: domainUuid
+  next: validate_domain_res
+
+validate_domain_res:
+  switch:
+    - condition: ${domainUuid.response.body.length > 0}
+      next: getDomainSkmConfig
+  next: getSkmConfig
+
+getDomainSkmConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-skm-config"
+  result: skm_res
+  next: assignSkmConfig
 
 getSkmConfig:
   call: http.post
