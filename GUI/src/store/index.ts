@@ -39,6 +39,7 @@ const useStore = create<StoreState>((set, get, store) => ({
   userInfo: null,
   userId: '',
   activeChats: [],
+  userDomains: [],
   pendingChats: [],
   userDomains: [],
   selectedChatId: null,

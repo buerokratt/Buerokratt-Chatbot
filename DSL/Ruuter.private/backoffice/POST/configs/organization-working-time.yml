@@ -83,12 +83,15 @@ declaration:
       - field: organizationOutsideWorkingHoursMessage
         type: string
         description: "Body field 'organizationOutsideWorkingHoursMessage'"
+      - field: domainUUID
+        type: string
+        description: "Body field 'domainUUID'"
       - field: organizationBotCannotAnswerAskToForwardToCSA
         type: string
         description: "Body field 'organizationBotCannotAnswerAskToForwardToCSA'"
       - field: organizationBotCannotAnswerMessage
         type: string
-        description: "Body field 'organizationBotCannotAnswerMessage'"  
+        description: "Body field 'organizationBotCannotAnswerMessage'"
 
 extractRequestData:
   assign:
@@ -119,6 +122,50 @@ extractRequestData:
     organizationOutsideWorkingHoursMessage: ${incoming.body.organizationOutsideWorkingHoursMessage}
     organizationBotCannotAnswerAskToForwardToCSA: ${incoming.body.organizationBotCannotAnswerAskToForwardToCSA}
     organizationBotCannotAnswerMessage: ${incoming.body.organizationBotCannotAnswerMessage}
+    domains: ${incoming.body.domainUUID}
+
+checkForDomains:
+  switch:
+    - condition: ${domains.length > 0}
+      next: setDomainOrganizationWorkingTime
+  next: setOrganizationWorkingTime
+
+setDomainOrganizationWorkingTime:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-domain-organization-working-time"
+    body:
+      organizationMondayWorkingTimeStartISO: ${organizationMondayWorkingTimeStartISO}
+      organizationMondayWorkingTimeEndISO: ${organizationMondayWorkingTimeEndISO}
+      organizationTuesdayWorkingTimeStartISO: ${organizationTuesdayWorkingTimeStartISO}
+      organizationTuesdayWorkingTimeEndISO: ${organizationTuesdayWorkingTimeEndISO}
+      organizationWednesdayWorkingTimeStartISO: ${organizationWednesdayWorkingTimeStartISO}
+      organizationWednesdayWorkingTimeEndISO: ${organizationWednesdayWorkingTimeEndISO}
+      organizationThursdayWorkingTimeStartISO: ${organizationThursdayWorkingTimeStartISO}
+      organizationThursdayWorkingTimeEndISO: ${organizationThursdayWorkingTimeEndISO}
+      organizationFridayWorkingTimeStartISO: ${organizationFridayWorkingTimeStartISO}
+      organizationFridayWorkingTimeEndISO: ${organizationFridayWorkingTimeEndISO}
+      organizationSaturdayWorkingTimeStartISO: ${organizationSaturdayWorkingTimeStartISO}
+      organizationSaturdayWorkingTimeEndISO: ${organizationSaturdayWorkingTimeEndISO}
+      organizationSundayWorkingTimeStartISO: ${organizationSundayWorkingTimeStartISO}
+      organizationSundayWorkingTimeEndISO: ${organizationSundayWorkingTimeEndISO}
+      organizationAllWeekdaysTimeStartISO: ${organizationAllWeekdaysTimeStartISO}
+      organizationAllWeekdaysTimeEndISO: ${organizationAllWeekdaysTimeEndISO}
+      organizationWorkingTimeWeekdays: ${organizationWorkingTimeWeekdays}
+      organizationClosedOnWeekEnds: ${organizationClosedOnWeekEnds}
+      organizationTheSameOnAllWorkingDays: ${organizationTheSameOnAllWorkingDays}
+      organizationWorkingTimeNationalHolidays: ${organizationWorkingTimeNationalHolidays}
+      organizationWorkingAllTime: ${organizationWorkingAllTime}
+      organizationNoCsaAskForContacts: ${organizationNoCsaAskForContacts}
+      organizationNoCsaAvailableMessage: ${organizationNoCsaAvailableMessage}
+      organizationOutsideWorkingHoursAskForContacts: ${organizationOutsideWorkingHoursAskForContacts}
+      organizationOutsideWorkingHoursMessage: ${organizationOutsideWorkingHoursMessage}
+      organizationBotCannotAnswerAskToForwardToCSA: ${organizationBotCannotAnswerAskToForwardToCSA}
+      organizationBotCannotAnswerMessage: ${organizationBotCannotAnswerMessage}
+      created: ${new Date().toISOString()}
+      domains: ${JSON.stringify(domains)}
+  result: setOrganizationWorkingTimeResult
+  next: mapOrganizationWorkingTimeData
 
 setOrganizationWorkingTime:
   call: http.post

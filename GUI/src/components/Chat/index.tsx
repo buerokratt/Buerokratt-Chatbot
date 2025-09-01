@@ -107,6 +107,7 @@ const Chat: FC<ChatProps> = ({
   const [isNewMessageNotificationVisible, setIsNewMessageNotificationVisible] =
     useState<boolean>(false);
   const [isCsaAtEnd, setIsCsaAtEnd] = useState<boolean>(true);
+  const isCsaAtEndRef = useRef(isCsaAtEnd);
 
   const [newMessageEffect] = useNewMessageSound();
   const navigate = useNavigate();
@@ -181,6 +182,10 @@ const Chat: FC<ChatProps> = ({
     messageListRef.current = messagesList;
   }, [messagesList]);
 
+  useEffect(() => {
+    isCsaAtEndRef.current = isCsaAtEnd;
+  }, [isCsaAtEnd]);
+
   const options = {
     root: null,
     rootMargin: '70px',
@@ -189,8 +194,9 @@ const Chat: FC<ChatProps> = ({
 
   const checkLastMessageVisibility = (entries: IntersectionObserverEntry[]) => {
     const [entry] = entries;
-    setIsCsaAtEnd(entry.isIntersecting);
-    if (isCsaAtEnd) {
+    const isVisible = entry.isIntersecting;
+    setIsCsaAtEnd(isVisible);
+    if (isVisible) {
       setIsNewMessageNotificationVisible(false);
     }
   };
@@ -211,12 +217,14 @@ const Chat: FC<ChatProps> = ({
   }, [chatRef, options, isNewMessageNotificationVisible]);
 
   const handleLastUserMessage = (newMessages: Message[]) => {
-    if (
-      newMessages[0].event === '' &&
-      newMessages[0].authorRole === 'end-user' &&
-      chat.customerSupportId === userInfo?.idCode
-    ) {
-      setIsNewMessageNotificationVisible(!isCsaAtEnd);
+    const hasMatchingMessage = newMessages.some(
+      (msg) =>
+        msg.event === '' &&
+        msg.authorRole === 'end-user'
+    );
+
+    if (hasMatchingMessage) {
+      setIsNewMessageNotificationVisible(!isCsaAtEndRef.current);
     }
   };
 
@@ -232,62 +240,14 @@ const Chat: FC<ChatProps> = ({
           'agents/chats/messages/preview?chatId=' + chat.id
         );
         setPreviewTypingMessage(previewMessage.data.response);
+        if (
+          !previewMessage.data.response &&
+          messageListRef.current?.length > 0
+        ) {
+          await getNewMessages();
+        }
       } else if (messageListRef.current?.length > 0) {
-        const res =
-          (await apiDev.get(
-            `agents/chats/messages/new?chatId=${chat.id}&lastRead=${
-              chat.lastMessageTimestamp?.split('+')[0] ?? ''
-            }`
-          )) ?? [];
-        const messages = res.data.response;
-        setPreviewTypingMessage(undefined);
-        const filteredMessages = messages?.filter((newMessage: Message) => {
-          return filterMessages(messageListRef.current, newMessage);
-        });
-
-        let newDisplayableMessages = filteredMessages?.filter(
-          (msg: Message) => msg.authorId != userInfo?.idCode
-        );
-
-        if (newDisplayableMessages?.length > 0) {
-          setTimeout(() => {
-            handleLastUserMessage(newDisplayableMessages);
-          }, 500)
-          setMessagesList((oldMessages) => [
-            ...oldMessages,
-            ...newDisplayableMessages,
-          ]);
-        }
-
-        handlePermissionMessages();
-
-        const actionEventTypes = [
-          'ask-permission-accepted',
-          'ask-permission-rejected',
-          'ask-permission-ignored',
-          'contact-information-fulfilled',
-          'contact-information-rejected',
-          'requested-chat-forward',
-          'requested-chat-forward-accepted',
-          'requested-chat-forward-rejected',
-          'pending-assigned',
-          'user-reached',
-          'user-not-reached',
-          'user-authenticated',
-          'authentication-successful',
-          'authentication-failed',
-          'redirectedMessageByOwner',
-          'redirectedMessageClaimed',
-          'redirectedMessage',
-        ];
-
-        const eventMessages: Message[] = filteredMessages?.filter(
-          (e: Message) => actionEventTypes.includes(e.event ?? '')
-        );
-
-        if (eventMessages?.length > 0) {
-          await getMessages();
-        }
+        await getNewMessages();
       }
     };
 
@@ -297,6 +257,64 @@ const Chat: FC<ChatProps> = ({
       events.close();
     };
   }, [chat.id]);
+
+  const getNewMessages = async () => {
+    const res =
+      (await apiDev.get(
+        `agents/chats/messages/new?chatId=${chat.id}&lastRead=${
+          chat.lastMessageTimestamp?.split('+')[0] ?? ''
+        }`
+      )) ?? [];
+    const messages = res.data.response;
+    setPreviewTypingMessage(undefined);
+    const filteredMessages = messages?.filter((newMessage: Message) => {
+      return filterMessages(messageListRef.current, newMessage);
+    });
+
+    let newDisplayableMessages = filteredMessages?.filter(
+      (msg: Message) => msg.authorId != userInfo?.idCode
+    );
+
+    if (newDisplayableMessages?.length > 0) {
+      setTimeout(() => {
+        handleLastUserMessage(newDisplayableMessages);
+      }, 500);
+      setMessagesList((oldMessages) => [
+        ...oldMessages,
+        ...newDisplayableMessages,
+      ]);
+    }
+
+    handlePermissionMessages();
+
+    const actionEventTypes = [
+      'ask-permission-accepted',
+      'ask-permission-rejected',
+      'ask-permission-ignored',
+      'contact-information-fulfilled',
+      'contact-information-rejected',
+      'requested-chat-forward',
+      'requested-chat-forward-accepted',
+      'requested-chat-forward-rejected',
+      'pending-assigned',
+      'user-reached',
+      'user-not-reached',
+      'user-authenticated',
+      'authentication-successful',
+      'authentication-failed',
+      'redirectedMessageByOwner',
+      'redirectedMessageClaimed',
+      'redirectedMessage',
+    ];
+
+    const eventMessages: Message[] = filteredMessages?.filter((e: Message) =>
+      actionEventTypes.includes(e.event ?? '')
+    );
+
+    if (eventMessages?.length > 0) {
+      await getMessages();
+    }
+  };
 
   const getMessages = async () => {
     const { data: res } = await apiDev.post('agents/chats/messages/all', {
