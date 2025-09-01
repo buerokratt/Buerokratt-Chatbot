@@ -12,6 +12,7 @@ const History: FC = () => {
       showEmail={import.meta.env.REACT_APP_SHOW_HISTORY_EMAIL === 'true'}
       showSortingLabel={import.meta.env.REACT_APP_SHOW_HISTORY_SORTING === 'true'}
       user={useStore.getState().userInfo}
+      userDomains={useStore}
     />
   );
 };

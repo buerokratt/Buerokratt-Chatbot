@@ -47,7 +47,7 @@ const useStore = create<StoreState>((set, get, store) => ({
   setPendingChats: (chats) => set({ pendingChats: chats }),
   setUserInfo: (data) => set({ userInfo: data, userId: data?.idCode || '' }),
   setSelectedChatId: (id) => set({ selectedChatId: id }),
-  setUserDomains: (data: string[]) => set({ userDomains: data}),
+  setUserDomains: (data: string[]) => set({ userDomains: data }),
   setChatCsaActive: (active) => {
     set({
       chatCsaActive: active,
