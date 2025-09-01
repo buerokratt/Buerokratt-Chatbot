@@ -152,12 +152,16 @@ post_answer:
 logstepAZUREBOT:
   log: ${test}
 
+assign_context:
+  assign:
+    context: ${test.response.body.choices[0].message.context}
+
 assign_value:
   assign:
     correct_value:
       - recipient_id: ${sender}
         text: ${test.response.body.choices[0].message.content.replace(/\n/g,"\\n").replace(" \. ", ". ")}
-        context: ${test.response.body.choices[0].message.context}
+        context: ${context}
   next: check_value
 
 check_value:
@@ -184,7 +188,13 @@ get_organization_base_config:
 assign_organization_base_config:
   assign:
     base_config: ${org_base_config_res.response.body[0]}
-  next: check_if_organization_is_available_all_time
+  next: check_if_organization_use_csa
+
+check_if_organization_use_csa:
+  switch:
+    - condition: ${base_config.isOrganizationUseCsa === 'true'}
+      next: check_if_organization_is_available_all_time
+  next: assign_organization_does_not_use_csa
 
 check_if_organization_is_available_all_time:
   switch:
@@ -254,7 +264,7 @@ assign_validation_event:
     correct_value:
       - recipient_id: ${sender}
         text: ${correct_value.map((item) => item.text)[0].replace('$validate_', '')}
-        context: ${test.response.body.choices[0].message.context}
+        context: ${context}
     event: "waiting_validation"
   next: change_chat_status 
 
@@ -281,7 +291,7 @@ assign_unavailable_message:
     correct_value:
       - recipient_id: ${sender}
         text: "Edasine lahendamine toimub vastavalt pöördumiste protsessile väljaspool AI-assistendi lahendust."
-        context: ${test.response.body.choices[0].message.context}
+        context: ${context}
     event: ""
   next: format_messages
 
@@ -302,7 +312,7 @@ assign_back_office_event:
     correct_value:
       - recipient_id: ${sender}
         text: ${bot_answer_config.askToForwardToCsaMessage}
-        context: ${test.response.body.choices[0].message.context}
+        context: ${context}
     event: "${bot_answer_config.isAskToForwardToCsa === 'true' && isOrgAvailable === true ? 'ask_to_forward_to_csa' : ''}"
   next: format_messages
 
@@ -311,8 +321,17 @@ assign_unavailable_info_message:
     correct_value:
       - recipient_id: ${sender}
         text: "Mulle kättesaadavates andmetes puudub teie küsimusele vastav info. Palun täpsustage oma küsimust."
-        context: ${test.response.body.choices[0].message.context}
+        context: ${context}
     event: ""
+  next: format_messages
+
+assign_organization_does_not_use_csa:
+  assign:
+    correct_value:
+      - recipient_id: ${sender}
+        text: ${base_config.botCannotAnswerMessage}
+        context: ${context}
+    event: "unavailable_organization"
   next: format_messages
 
 format_messages:
