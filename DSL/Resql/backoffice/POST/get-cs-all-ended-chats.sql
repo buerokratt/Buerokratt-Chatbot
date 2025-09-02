@@ -100,6 +100,7 @@ SELECT
     labels,
     created,
     feedback_text,
+    test,
     feedback_rating
 FROM chat
     RIGHT JOIN MaxChats ON id = maxId
@@ -144,7 +145,7 @@ SELECT
     )) FILTER (
     WHERE NOT (
     c2.customer_support_id = :csaId
-    AND (lo.latest_open_csa IS NULL OR lo.latest_open_csa <> csaId)
+    AND (lo.latest_open_csa IS NULL OR lo.latest_open_csa <> :csaId)
     )
     ) AS all_csa_names,
     ARRAY_AGG(DISTINCT c2.customer_support_id) FILTER (
@@ -188,6 +189,7 @@ SELECT c.base_id AS id,
        m.updated AS last_message_timestamp,
        c.feedback_text,
        c.feedback_rating,
+       c.test as isTest,
        nps,
        CSAFullNames.all_csa_names AS all_csa,
        CEIL(COUNT(*) OVER() / :page_size::DECIMAL) AS total_pages

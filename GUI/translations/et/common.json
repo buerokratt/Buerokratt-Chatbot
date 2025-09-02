@@ -48,7 +48,8 @@
     "read": "Loetud",
     "statusClarification": "Staatuse täpsustus",
     "selectAll": "Vali kõik",
-    "displayText": "Kuva tekst"
+    "displayText": "Kuva tekst",
+    "test": "Test"
   },
   "sorting": {
     "desc": "kahanevalt",
@@ -63,6 +64,9 @@
     "closeMenuIcon": "Sulge menüü ikoon"
   },
   "multiDomains": {
+    "addNew": "Lisa uus",
+    "title": "Multidomeenid",
+    "domainName": "Domeeni nimi",
     "selectDomains": "Vali Domeenid",
     "noDomains": "Domeene ei ole saadaval. Palun võtke ühendust süsteemiadministraatoriga."
   },
@@ -317,11 +321,6 @@
     "ROLE_CHATBOT_TRAINER": "Vestlusroboti treener",
     "ROLE_ANALYST": "Analüütik",
     "ROLE_UNAUTHENTICATED": "Autentimata"
-  },
-  "multiDomains": {
-    "addNew": "Lisa uus",
-    "title": "Multidomeenid",
-    "domainName": "Domeeni nimi"
   },
   "settings": {
     "title": "Seaded",
