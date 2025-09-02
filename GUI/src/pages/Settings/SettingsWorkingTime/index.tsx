@@ -1,22 +1,15 @@
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { useTranslation } from 'react-i18next';
 import { format, parse } from 'date-fns';
-import {
-  Button,
-  Card,
-  FormDatepicker,
-  FormTextarea,
-  Switch,
-  Track,
-} from 'components';
-import { OrganizationWorkingTime } from 'types/organizationWorkingTime';
+import { Button, Card, FormDatepicker, FormTextarea, Switch, Track } from 'components';
+import { OrganizationWorkingTime, OrganizationWorkingTimeResponse } from 'types/organizationWorkingTime';
 import { useToast } from 'hooks/useToast';
 import { apiDev } from 'services/api';
 import './SettingsWorkingTime.scss';
-import { getOrganizationTimeData, setOrganizationTimeData } from './data';
+import { getDefaultValues, getOrganizationTimeData, setOrganizationTimeData } from './data';
 import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';
 import {
@@ -24,6 +17,9 @@ import {
   NO_CSA_MESSAGE_LENGTH,
   OUTSIDE_WORKING_HOURS_MESSAGE_LENGTH,
 } from 'constants/config';
+import DomainSelector from '../../../components/DomainsSelector';
+import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
+import { fetchConfigurationFromDomain } from '../../../services/configurations';
 
 type FieldDateNames = {
   start: string;
@@ -44,30 +40,61 @@ const SettingsWorkingTime: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
   const { control, getValues, handleSubmit, reset, watch } =
-    useForm<OrganizationWorkingTime>();
+    useForm<OrganizationWorkingTime>({
+      defaultValues: getDefaultValues(),
+    });
+  const [loadingCompleted, setLoadingCompleted] = useState<boolean>(false);
   const [key, setKey] = useState(0);
+  const multiDomainEnabled =
+    import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
+  const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
+
+  const resetSettingsToDefault = () => {
+    reset(getDefaultValues());
+    setKey(key + 1);
+  };
+
+  useEffect(() => {
+    if (!multiDomainEnabled) {
+      fetchData('none');
+    } else {
+      resetSettingsToDefault();
+      setLoadingCompleted(true);
+    }
+  }, []);
+
   const isOrganizationAvailableAllTime = watch('organizationWorkingAllTime');
   const isOrganizationClosedOnWeekEnds = watch('organizationClosedOnWeekEnds');
   const isOrganizationTheSameOnAllWorkingDays = watch(
-    'organizationTheSameOnAllWorkingDays'
+    'organizationTheSameOnAllWorkingDays',
   );
   const organizationWorkingTimeWeekdays = watch(
-    'organizationWorkingTimeWeekdays'
+    'organizationWorkingTimeWeekdays',
   );
-  const { data: workingTime } = useQuery<OrganizationWorkingTime>({
-    queryKey: ['configs/organization-working-time', 'prod'],
-    onSuccess: (data: any) => {
-      if (Object.keys(control._formValues).length > 0) return;
-      reset(getOrganizationTimeData(data.response));
+
+  const fetchData = async (selectedDomain: string) => {
+    try {
+      const data: OrganizationWorkingTimeResponse =
+        await fetchConfigurationFromDomain<OrganizationWorkingTimeResponse>(
+          'configs/organization-working-time',
+          selectedDomain,
+        );
+      const res = data.response;
+
+      reset(getOrganizationTimeData(res));
       setKey(key + 1);
-    },
-  });
+      setLoadingCompleted(true);
+
+    } catch (error) {
+      console.error('Failed to working time', error);
+    }
+  };
 
   const workingTimeMutation = useMutation({
     mutationFn: (data: OrganizationWorkingTime) =>
       apiDev.post<OrganizationWorkingTime>(
         'configs/organization-working-time',
-        setOrganizationTimeData(data)
+        setOrganizationTimeData(data),
       ),
     onSuccess: () => {
       toast.open({
@@ -85,9 +112,10 @@ const SettingsWorkingTime: FC = () => {
     },
   });
 
-  const handleFormSubmit = handleSubmit((data) =>
-    workingTimeMutation.mutate(data)
-  );
+  const handleFormSubmit = handleSubmit((data) => {
+    data.domainUUID = multiDomainEnabled ? selectedDomains : [];
+    workingTimeMutation.mutate(data);
+  });
 
   function sortAndJoin(array: string[]): string {
     return array.toSorted((a, b) => a.localeCompare(b)).join(',');
@@ -95,10 +123,6 @@ const SettingsWorkingTime: FC = () => {
 
   function filterAndJoin(array: string[], day: string): string {
     return array.filter((pd: string) => pd !== day.toLowerCase()).join(',');
-  }
-
-  if (!workingTime || Object.keys(control._formValues).length === 0) {
-    return <>Loading...</>;
   }
 
   const handleTime = (field: any, date: any, isStart: boolean) => {
@@ -123,7 +147,7 @@ const SettingsWorkingTime: FC = () => {
     const convertedDate = parse(
       format(getValues(date) as Date, 'HH:mm:ss'),
       'HH:mm:ss',
-      new Date()
+      new Date(),
     );
     let adjustedTime = new Date(convertedDate);
     if (isStart) {
@@ -152,10 +176,31 @@ const SettingsWorkingTime: FC = () => {
     return { start: startingTime, end: endingTime };
   };
 
+  const handleDomainSelection = useDomainSelectionHandler(
+    setSelectedDomains,
+    fetchData,
+    resetSettingsToDefault,
+  );
+
+  if (!loadingCompleted) {
+    return <>Loading...</>;
+  }
+
   return (
     <>
       <h1>{t('settings.workingTime.title')}</h1>
       <p>{t('settings.workingTime.description')}</p>
+
+      {multiDomainEnabled && (
+        <div style={{ marginBottom: '11px' }}>
+          <DomainSelector
+            onChange={(selected) => {
+              handleDomainSelection(selected);
+            }}
+          />
+        </div>
+      )}
+
       <Card
         key={key}
         isHeaderLight={true}
@@ -242,7 +287,7 @@ const SettingsWorkingTime: FC = () => {
                     isOrganizationClosedOnWeekEnds
                       ? 'settings.workingTime.allWeekdaysExceptWeekend'
                       : 'settings.workingTime.allWeekdays'
-                  }`
+                  }`,
                 )}
               </label>
               <Controller
@@ -262,7 +307,7 @@ const SettingsWorkingTime: FC = () => {
                           parse(
                             format(field.value as Date, 'HH:mm:ss'),
                             'HH:mm:ss',
-                            new Date()
+                            new Date(),
                           ) ?? new Date('0')
                         }
                         onChange={(date) => handleTime(field, date, true)}
@@ -290,7 +335,7 @@ const SettingsWorkingTime: FC = () => {
                           parse(
                             format(field.value as Date, 'HH:mm:ss'),
                             'HH:mm:ss',
-                            new Date()
+                            new Date(),
                           ) ?? new Date('0')
                         }
                         onChange={(date) => handleTime(field, date, false)}
@@ -310,7 +355,7 @@ const SettingsWorkingTime: FC = () => {
                 !(
                   isOrganizationClosedOnWeekEnds &&
                   (d === 'Saturday' || d === 'Sunday')
-                )
+                ),
             )
             .map((d) => (
               <Track key={d}>
@@ -330,13 +375,13 @@ const SettingsWorkingTime: FC = () => {
                           field.onChange(
                             value
                               ? sortAndJoin([
-                                  ...field.value.toString().split(','),
-                                  d.toLowerCase(),
-                                ])
+                                ...field.value.toString().split(','),
+                                d.toLowerCase(),
+                              ])
                               : filterAndJoin(
-                                  field.value.toString().split(','),
-                                  d
-                                )
+                                field.value.toString().split(','),
+                                d,
+                              ),
                           );
                         }}
                         checked={field.value?.includes(d.toLowerCase())}
@@ -366,7 +411,7 @@ const SettingsWorkingTime: FC = () => {
                                 parse(
                                   format(field.value as Date, 'HH:mm:ss'),
                                   'HH:mm:ss',
-                                  new Date()
+                                  new Date(),
                                 ) ?? new Date('0')
                               }
                               onChange={(date) => handleTime(field, date, true)}
@@ -396,7 +441,7 @@ const SettingsWorkingTime: FC = () => {
                                 parse(
                                   format(field.value as Date, 'HH:mm:ss'),
                                   'HH:mm:ss',
-                                  new Date()
+                                  new Date(),
                                 ) ?? new Date('0')
                               }
                               onChange={(date) =>
@@ -422,7 +467,7 @@ const SettingsWorkingTime: FC = () => {
             render={({ field }) => (
               <Switch
                 label={t(
-                  'settings.workingTime.showIfOrganizationIsOutsideWorkingHours'
+                  'settings.workingTime.showIfOrganizationIsOutsideWorkingHours',
                 )}
                 onLabel={t('global.yes').toString()}
                 offLabel={t('global.no').toString()}
@@ -440,7 +485,7 @@ const SettingsWorkingTime: FC = () => {
             render={({ field }) => (
               <Switch
                 label={t(
-                  'settings.workingTime.showIfOrganizationIsOutsideWorkingHoursWithContactsRequest'
+                  'settings.workingTime.showIfOrganizationIsOutsideWorkingHoursWithContactsRequest',
                 )}
                 onLabel={t('global.yes').toString()}
                 offLabel={t('global.no').toString()}
@@ -491,7 +536,7 @@ const SettingsWorkingTime: FC = () => {
           render={({ field }) => (
             <Switch
               label={t(
-                'settings.workingTime.showIfCSAIsNotAvailableWithContactsRequest'
+                'settings.workingTime.showIfCSAIsNotAvailableWithContactsRequest',
               )}
               onLabel={t('global.yes').toString()}
               offLabel={t('global.no').toString()}
@@ -525,7 +570,7 @@ const SettingsWorkingTime: FC = () => {
           render={({ field }) => (
             <Switch
               label={t(
-                'settings.workingTime.showIfBotCannotAnswerAskToForwardToCSA'
+                'settings.workingTime.showIfBotCannotAnswerAskToForwardToCSA',
               )}
               onLabel={t('global.yes').toString()}
               offLabel={t('global.no').toString()}

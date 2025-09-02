@@ -107,6 +107,7 @@ const Chat: FC<ChatProps> = ({
   const [isNewMessageNotificationVisible, setIsNewMessageNotificationVisible] =
     useState<boolean>(false);
   const [isCsaAtEnd, setIsCsaAtEnd] = useState<boolean>(true);
+  const isCsaAtEndRef = useRef(isCsaAtEnd);
 
   const [newMessageEffect] = useNewMessageSound();
   const navigate = useNavigate();
@@ -181,6 +182,10 @@ const Chat: FC<ChatProps> = ({
     messageListRef.current = messagesList;
   }, [messagesList]);
 
+  useEffect(() => {
+    isCsaAtEndRef.current = isCsaAtEnd;
+  }, [isCsaAtEnd]);
+
   const options = {
     root: null,
     rootMargin: '70px',
@@ -212,12 +217,14 @@ const Chat: FC<ChatProps> = ({
   }, [chatRef, options, isNewMessageNotificationVisible]);
 
   const handleLastUserMessage = (newMessages: Message[]) => {
-    if (
-      newMessages[0].event === '' &&
-      newMessages[0].authorRole === 'end-user' &&
-      chat.customerSupportId === userInfo?.idCode
-    ) {
-      setIsNewMessageNotificationVisible(!isCsaAtEnd);
+    const hasMatchingMessage = newMessages.some(
+      (msg) =>
+        msg.event === '' &&
+        msg.authorRole === 'end-user'
+    );
+
+    if (hasMatchingMessage) {
+      setIsNewMessageNotificationVisible(!isCsaAtEndRef.current);
     }
   };
 

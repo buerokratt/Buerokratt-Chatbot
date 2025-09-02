@@ -46,7 +46,10 @@
     "forward": "Forward",
     "chosen": "Chosen",
     "read": "Read",
-    "statusClarification": "Status clarification"
+    "statusClarification": "Status clarification",
+    "selectAll": "Select all",
+    "displayText": "Display message",
+    "test": "Test"
   },
   "sorting": {
     "desc": "descending",
@@ -59,6 +62,13 @@
     "openMenu": "Open menu",
     "openIcon": "Open menu icon",
     "closeIcon": "Close menu icon"
+  },
+  "multiDomains": {
+    "addNew": "Add new",
+    "title": "Multidomains",
+    "domainName": "Domain name",
+    "selectDomains": "Select Domains",
+    "noDomains": "No domains available. Please contact your system administrator."
   },
   "menu": {
     "conversations": "Conversations",
@@ -312,13 +322,10 @@
     "ROLE_ANALYST": "Analyst",
     "ROLE_UNAUTHENTICATED": "Unauthenticated"
   },
-  "multiDomains": {
-    "addNew": "Add new",
-    "title": "Multidomains",
-    "domainName": "Domain name"
-  },
   "settings": {
     "title": "Settings",
+    "autoClose": "Close chat automatically",
+    "autoCloseText": "End message",
     "users": {
       "title": "Users",
       "name": "Name",
@@ -420,7 +427,14 @@
       "minutes": "Minutes",
       "sessionChanged": "Session length changed successfully",
       "emptySession": "Session length can't be empty",
-      "invalidSession": "Session length must be between 30 and 480 minuites"
+      "invalidSession": "Session length must be between 30 and 480 minutes"
+    },
+    "chatDuration": {
+      "description": "When the time expires, the conversation will end automatically.",
+      "duration": "Time for user to respond",
+      "minutes": "minutes",
+      "rule": "Session length is allowed between 5 min - 480 min (8h)",
+      "invalidSession": "Conversation timeout duration must be between 5 and 480 minutes"
     },
     "greeting": {
       "title": "Greeting message"
@@ -498,5 +512,8 @@
   "notification": {
     "title": "Bürokratt",
     "newMessage": "New message."
+  },
+  "landing": {
+    "title": "Welcome to Bürokratt"
   }
 }

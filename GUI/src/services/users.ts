@@ -1,5 +1,6 @@
 import { apiDev } from './api';
 import { User, UserDTO } from 'types/user';
+import { DomainSelection } from '../types/domainsModels';
 
 export async function createUser(userData: UserDTO) {
   const authorities = userData.authorities
@@ -72,6 +73,15 @@ export async function editUser(
 export async function deleteUser(id: string | number) {
   const { data } = await apiDev.post<User>('accounts/admin/delete', {
     userIdCode: id,
+  });
+  return data;
+}
+
+export async function getWidgetData(userId: string) {
+  const { data } = await apiDev.get<DomainSelection[]>('accounts/widget-data', {
+    params: {
+      user_id: userId,
+    },
   });
   return data;
 }
