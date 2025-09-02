@@ -38,7 +38,13 @@ get_organization_base_config:
 assign_organization_base_config:
   assign:
     base_config: ${org_base_config_res.response.body[0]}
-  next: check_if_organization_is_available_all_time
+  next: check_if_organization_use_csa
+
+check_if_organization_use_csa:
+  switch:
+    - condition: ${base_config.isOrganizationUseCsa === 'true'}
+      next: check_if_organization_is_available_all_time
+  next: return_organization_is_not_available
 
 check_if_organization_is_available_all_time:
   switch:

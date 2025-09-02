@@ -417,7 +417,8 @@
       "showIfOrganizationIsOutsideWorkingHoursWithContactsRequest": "Saada kliendile töövälise aja teavitus koos kontakti päringuga",
       "outsideWorkingHoursMessage": "Töövälise aja teavitus",
       "showIfBotCannotAnswerAskToForwardToCSA": "Kui Bürokratt ei oska vasta, kas küsida suunamist",
-      "botCannotAnswerMessage": "Teavitus, kui Bürokratt ei oska vastata"
+      "botCannotAnswerMessage": "Teavitus, kui Bürokratt ei oska vastata",
+      "organizationUseCSA": "Kasutan klienditeenindust"
     },
     "userSession": {
       "title": "Kasutaja sessioon",
