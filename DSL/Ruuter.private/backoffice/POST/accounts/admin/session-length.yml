@@ -20,7 +20,7 @@ declaration:
       - field: showIdleWarning
         type: string
         description: "Body field 'autoCloseConversation'"
-      - field: showIdleWarning
+      - field: autoCloseText
         type: string
         description: "Body field 'autoCloseText'"
 

@@ -51,7 +51,7 @@ getEndedChats:
       sorting: ${incoming.body.sorting}
       search: ${incoming.body.search}
       customerSupportIds: ${incoming.body.customerSupportIds?.join(',') ?? ''}
-      csaId: 'chatbot'
+      csaId: ${"chatbot"}
       urls: ${urls}
   result: res
 

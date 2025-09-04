@@ -1,0 +1,35 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'MARK-TEST'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: chatId
+        type: string
+        description: "Body field 'chatId'"
+      - field: isTest
+        type: boolean
+        description: "Body field 'isTest'"
+
+extractRequestData:
+  assign:
+    chatId: ${incoming.body.chatId}
+    isTest: ${incoming.body.isTest}
+
+updateChat:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/update-test-chat"
+    body:
+      chatId: ${chatId}
+      isTest: ${isTest}
+      created: ${new Date().toISOString()}
+  result: updatedChat
+
+return_result:
+  return: ${updatedChat.response.body}
+  next: end
