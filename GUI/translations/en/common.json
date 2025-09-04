@@ -48,7 +48,8 @@
     "read": "Read",
     "statusClarification": "Status clarification",
     "selectAll": "Select all",
-    "displayText": "Display message"
+    "displayText": "Display message",
+    "test": "Test"
   },
   "sorting": {
     "desc": "descending",
@@ -63,6 +64,9 @@
     "closeIcon": "Close menu icon"
   },
   "multiDomains": {
+    "addNew": "Add new",
+    "title": "Multidomains",
+    "domainName": "Domain name",
     "selectDomains": "Select Domains",
     "noDomains": "No domains available. Please contact your system administrator."
   },
@@ -317,11 +321,6 @@
     "ROLE_CHATBOT_TRAINER": "Chatbot trainer",
     "ROLE_ANALYST": "Analyst",
     "ROLE_UNAUTHENTICATED": "Unauthenticated"
-  },
-  "multiDomains": {
-    "addNew": "Add new",
-    "title": "Multidomains",
-    "domainName": "Domain name"
   },
   "settings": {
     "title": "Settings",
