@@ -1,0 +1,79 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'DOWNLOAD'"
+  method: post
+  accepts: json
+  returns: data
+  namespace: analytics
+  allowlist:
+    body:
+      - date_rows:
+        type: object
+        description: "Array of string arrays for the date rows at the top of the XSLX file"
+      - field: end
+        type: string
+        description: "Body field 'end'"
+      - field: metrics
+        type: string
+        description: "Body field 'metrics'"
+      - field: metric_names
+        type: object
+        description: "Localized metric names"
+      - field: start
+        type: string
+        description: "Body field 'start'"
+      - field: urls
+        type: array
+        description: "Body field 'urls'"
+      - field: showTest
+        type: boolean
+        description: "Body field 'showTest'"
+
+get_metrics:
+  call: http.post
+  args:
+    url: "[#ANALYTICS_RUUTER]/odp/metrics"
+    body:
+      metrics: ${incoming.body.metrics}
+      start: ${incoming.body.start}
+      end: ${incoming.body.end}
+      urls: ${incoming.body.urls}
+      showTest: ${incoming.body.showTest}
+      period: "never"
+  result: metrics
+
+convert_data:
+  call: http.post
+  args:
+    url: "[#ANALYTICS_DMAPPER_HBS]/get-metric-rows"
+    headers:
+      type: "json"
+    body:
+      results: ${metrics.response.body}
+      fields: ${incoming.body.metric_names}
+      layout: false
+  result: dataObject
+
+merge:
+  call: http.post
+  args:
+    url: "[#ANALYTICS_DMAPPER]/file-manager/merge"
+    body:
+      array1: ${dataObject.response.body}
+      array2: ${incoming.body.date_rows}
+  result: mergedRules
+
+get_xlsx_data:
+  call: http.post
+  args:
+    url: "[#ANALYTICS_DMAPPER]/conversion/array-to-xlsx"
+    body:
+      data: ${mergedRules.response.body.array}
+  result: xlsxData
+
+return_success:
+  wrapper: false
+  return: ${xlsxData.response.body}
+  next: end
+  status: 200
