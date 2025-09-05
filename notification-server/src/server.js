@@ -6,7 +6,7 @@ const {
   buildNotificationSearchInterval,
   buildQueueCounter,
 } = require("./addOns");
-const { enqueueChatId, dequeueChatId, sendBulkNotification } = require("./openSearch");
+const { enqueueChatId, dequeueChatId, sendBulkNotification, createAzureOpenAIStreamRequest } = require("./openSearch");
 const { addToTerminationQueue, removeFromTerminationQueue } = require("./terminationQueue");
 const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
@@ -101,6 +101,32 @@ app.post("/remove-chat-from-termination-queue", (req, res) => {
     res.status(200).json({ response: 'Chat termination will be canceled' });
   } catch {
     res.status(500).json({ response: 'error' });
+  }
+});
+
+app.post("/trigger-azure-stream/:channelId", express.json(), async (req, res) => {
+  try {
+    const { channelId } = req.params;
+    const { messages, options = {} } = req.body;
+
+    if (!messages || !Array.isArray(messages)) {
+      return res.status(400).json({ error: "Messages array is required" });
+    }
+
+    const streamId = await createAzureOpenAIStreamRequest({
+      channelId,
+      messages,
+      options,
+    });
+
+    res.status(200).json({
+      success: true,
+      streamId,
+      message: "Azure OpenAI streaming started",
+    });
+  } catch (error) {
+    console.error("Error triggering Azure stream:", error);
+    res.status(500).json({ error: "Failed to start streaming" });
   }
 });
 
