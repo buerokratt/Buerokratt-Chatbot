@@ -1,6 +1,7 @@
 const { v4: uuidv4 } = require('uuid');
-
-const activeConnections = new Map();
+const streamQueue = require("./streamQueue");
+const { createAzureOpenAIStreamRequest } = require("./openSearch");
+const { activeConnections } = require("./connectionManager");
 
 function buildSSEResponse({ res, req, buildCallbackFunction, channelId }) {
   addSSEHeader(req, res);
@@ -13,6 +14,12 @@ function buildSSEResponse({ res, req, buildCallbackFunction, channelId }) {
     sender,
     channelId,
   });
+
+  if (channelId) {
+    setTimeout(() => {
+      processPendingStreamsForChannel(channelId);
+    }, 1000);
+  }
 
   const cleanUp = buildCallbackFunction({ connectionId, sender });
 
@@ -62,7 +69,33 @@ function buildSender(res) {
   };
 }
 
+function processPendingStreamsForChannel(channelId) {
+  const pendingRequests = streamQueue.getPendingRequests(channelId);
+
+  if (pendingRequests.length > 0) {
+    pendingRequests.forEach(async (requestData) => {
+      if (streamQueue.shouldRetry(requestData)) {
+        try {
+          await createAzureOpenAIStreamRequest({
+            channelId,
+            messages: requestData.messages,
+            options: requestData.options,
+          });
+
+          streamQueue.removeFromQueue(channelId, requestData.id);
+        } catch (error) {
+          console.error(`Failed to process queued stream for channel ${channelId}:`, error);
+          streamQueue.incrementRetryCount(channelId, requestData.id);
+        }
+      } else {
+        streamQueue.removeFromQueue(channelId, requestData.id);
+      }
+    });
+  }
+}
+
 module.exports = {
   activeConnections,
   buildSSEResponse,
+  processPendingStreamsForChannel,
 };

@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { buildSSEResponse, activeConnections } = require("./sseUtil");
+const { buildSSEResponse } = require("./sseUtil");
 const { serverConfig } = require("./config");
 const {
   buildNotificationSearchInterval,
@@ -12,6 +12,7 @@ const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 const csurf = require("csurf");
 const { initializeAzureOpenAI } = require("./azureOpenAI");
+const streamQueue = require("./streamQueue");
 
 const app = express();
 
@@ -131,15 +132,32 @@ app.post("/channels/:channelId/stream", async (req, res) => {
 
     res.status(200).json(result);
   } catch (error) {
-    console.error("Error triggering Azure stream:", error);
-
-    if (error.message === "No active connections found for this channel") {
+    if (error.message.includes("No active connections found for this channel - request queued")) {
+      res.status(202).json({
+        message: "Request queued - will be processed when connection becomes available",
+        status: "queued",
+      });
+    } else if (error.message === "No active connections found for this channel") {
       res.status(404).json({ error: error.message });
     } else {
       res.status(500).json({ error: "Failed to start streaming" });
     }
   }
 });
+
+setInterval(() => {
+  const now = Date.now();
+  const oneHour = 60 * 60 * 1000;
+
+  for (const [channelId, requests] of streamQueue.queue.entries()) {
+    const staleRequests = requests.filter((req) => now - req.timestamp > oneHour || !streamQueue.shouldRetry(req));
+
+    staleRequests.forEach((staleReq) => {
+      streamQueue.removeFromQueue(channelId, staleReq.id);
+      console.log(`Cleaned up stale stream request for channel ${channelId}`);
+    });
+  }
+}, 5 * 60 * 1000);
 
 const server = app.listen(serverConfig.port, () => {
   console.log(`Server running on port ${serverConfig.port}`);

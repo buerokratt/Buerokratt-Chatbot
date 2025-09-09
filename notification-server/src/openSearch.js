@@ -1,7 +1,8 @@
 const { Client } = require("@opensearch-project/opensearch");
 const { openSearchConfig } = require("./config");
 const { streamAzureOpenAIResponse } = require("./azureOpenAI");
-const { activeConnections } = require("./sseUtil");
+const { activeConnections } = require("./connectionManager");
+const streamQueue = require("./streamQueue");
 
 let client = buildClient();
 
@@ -43,6 +44,8 @@ async function createAzureOpenAIStreamRequest({ channelId, messages, options = {
     );
 
     if (connections.length === 0) {
+      const requestId = streamQueue.addToQueue(channelId, { messages, options });
+      console.log(`No active connections for channel ${channelId}, queued request ${requestId}`);
       throw new Error("No active connections found for this channel");
     }
 
@@ -107,9 +110,8 @@ async function createAzureOpenAIStreamRequest({ channelId, messages, options = {
       connectionsCount: connections.length,
       message: "Azure OpenAI streaming completed for all connections",
     };
-  } catch (error) {
-    console.error("Error in createAzureOpenAIStreamRequest:", error);
-    throw error;
+  } finally {
+    // No-op for now
   }
 }
 
