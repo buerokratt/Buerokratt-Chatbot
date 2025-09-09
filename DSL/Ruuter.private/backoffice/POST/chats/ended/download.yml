@@ -8,68 +8,109 @@ declaration:
   namespace: analytics
   allowlist:
     body:
-      - date_rows:
-        type: object
-        description: "Array of string arrays for the date rows at the top of the XSLX file"
-      - field: end
-        type: string
-        description: "Body field 'end'"
-      - field: metrics
-        type: string
-        description: "Body field 'metrics'"
-      - field: metric_names
-        type: object
-        description: "Localized metric names"
       - field: start
         type: string
         description: "Body field 'start'"
+      - field: end
+        type: string
+        description: "Body field 'end'"
       - field: urls
         type: array
         description: "Body field 'urls'"
-      - field: showTest
-        type: boolean
-        description: "Body field 'showTest'"
+      - field: columns
+        type: array
+        description: "Body field 'columns'"
+      - field: sorting
+        type: string
+        description: "Body field 'sorting'"
+      - field: search
+        type: string
+        description: "Body field 'search'"
+      - field: customerSupportIds
+        type: object
+        description: "Body field 'customerSupportIds'"
 
-get_metrics:
+extractRequestData:
+  assign:
+    startDate: ${incoming.body.start}
+    endDate: ${incoming.body.end}
+    sorting: ${"created desc"}
+    search: ${incoming.body.search}
+    columns: ${incoming.body.columns}
+    urls: ${incoming.body.urls}
+
+getEndedChats:
   call: http.post
   args:
-    url: "[#ANALYTICS_RUUTER]/odp/metrics"
+    url: "[#CHATBOT_RESQL]/get-cs-all-ended-chats"
     body:
-      metrics: ${incoming.body.metrics}
-      start: ${incoming.body.start}
-      end: ${incoming.body.end}
-      urls: ${incoming.body.urls}
-      showTest: ${incoming.body.showTest}
-      period: "never"
-  result: metrics
+      start: ${startDate}
+      end: ${endDate}
+      page: ${0}
+      page_size: ${1000}
+      sorting: ${sorting}
+      search: ${search}
+      customerSupportIds: ${incoming.body.customerSupportIds?.join(',') ?? ''}
+      csaId: ${"chatbot"}
+      urls: ${urls}
+  result: endedChats
 
-convert_data:
+checkEndedChats:
+  log: ${endedChats.response.body}
+
+mapChatIds:
   call: http.post
   args:
-    url: "[#ANALYTICS_DMAPPER_HBS]/get-metric-rows"
+    url: "[#CHATBOT_DMAPPER_HBS]/get_chat_ids"
     headers:
-      type: "json"
+      type: json
     body:
-      results: ${metrics.response.body}
-      fields: ${incoming.body.metric_names}
-      layout: false
-  result: dataObject
+      chats: ${endedChats.response.body}
+  result: convertedIds
 
-merge:
+checkMappedId:
+  log: ${convertedIds.response.body}
+
+getChatMessages:
   call: http.post
   args:
-    url: "[#ANALYTICS_DMAPPER]/file-manager/merge"
+    url: "[#CHATBOT_RESQL]/get-chats-with-messages"
     body:
-      array1: ${dataObject.response.body}
-      array2: ${incoming.body.date_rows}
-  result: mergedRules
+      chatIds: ${convertedIds.response.body}
+  result: chatMessages
+
+checkChatMessages:
+  log: ${chatMessages.response.body}
+
+#convert_data:
+#  call: http.post
+#  args:
+#    url: "[#ANALYTICS_DMAPPER_HBS]/get-metric-rows"
+#    headers:
+#      type: "json"
+#    body:
+#      results: ${metrics.response.body}
+#      fields: ${incoming.body.metric_names}
+#      layout: false
+#  result: dataObject
+#
+#merge:
+#  call: http.post
+#  args:
+#    url: "[#ANALYTICS_DMAPPER]/file-manager/merge"
+#    body:
+#      array1: ${dataObject.response.body}
+#      array2: ${incoming.body.date_rows}
+#  result: mergedRules
 
 get_xlsx_data:
   call: http.post
   args:
-    url: "[#ANALYTICS_DMAPPER]/conversion/array-to-xlsx"
+    url: "[#CHATBOT_DMAPPER]/conversion/chats-to-xlsx"
     body:
-      data: ${mergedRules.response.body.array}
+      columns: ${columns}
+      chatMessages: ${chatMessages.response.body}
+      endedChats: ${endedChats.response.body}
   result: xlsxData
 
 return_success:
