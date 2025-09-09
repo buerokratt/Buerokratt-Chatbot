@@ -1,15 +1,24 @@
 const { v4: uuidv4 } = require('uuid');
 
-function buildSSEResponse({ res, req, buildCallbackFunction }) {
+const activeConnections = new Map();
+
+function buildSSEResponse({ res, req, buildCallbackFunction, channelId }) {
   addSSEHeader(req, res);
   keepStreamAlive(res);
   const connectionId = generateConnectionID();
   const sender = buildSender(res);
-  
+
+  activeConnections.set(connectionId, {
+    res,
+    sender,
+    channelId,
+  });
+
   const cleanUp = buildCallbackFunction({ connectionId, sender });
 
-  req.on('close', () => {
-    console.log('Client disconnected from SSE');
+  req.on("close", () => {
+    console.log(`Client disconnected from SSE for channel ${channelId}`);
+    activeConnections.delete(connectionId);
     cleanUp?.();
   });
 }
@@ -44,9 +53,16 @@ function generateConnectionID() {
 }
 
 function buildSender(res) {
-  return data => res.write(`data: ${JSON.stringify(data)}\n\n`);
+  return (data) => {
+    try {
+      res.write(`data: ${JSON.stringify(data)}\n\n`);
+    } catch (error) {
+      console.error("SSE write error:", error);
+    }
+  };
 }
 
 module.exports = {
+  activeConnections,
   buildSSEResponse,
 };

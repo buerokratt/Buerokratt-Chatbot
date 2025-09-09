@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { buildSSEResponse } = require("./sseUtil");
+const { buildSSEResponse, activeConnections } = require("./sseUtil");
 const { serverConfig } = require("./config");
 const {
   buildNotificationSearchInterval,
@@ -11,6 +11,7 @@ const { addToTerminationQueue, removeFromTerminationQueue } = require("./termina
 const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 const csurf = require("csurf");
+const { initializeAzureOpenAI } = require("./azureOpenAI");
 
 const app = express();
 
@@ -20,12 +21,20 @@ app.use(express.json({ extended: false }));
 app.use(cookieParser());
 app.use(csurf({ cookie: true, ignoreMethods: ['GET', 'POST']}));
 
+try {
+  initializeAzureOpenAI();
+  console.log("Azure OpenAI initialized successfully");
+} catch (error) {
+  console.error("Failed to initialize Azure OpenAI:", error.message);
+}
+
 app.get("/sse/notifications/:channelId", (req, res) => {
   const { channelId } = req.params;
   buildSSEResponse({
     req,
     res,
     buildCallbackFunction: buildNotificationSearchInterval({ channelId }),
+    channelId,
   });
 });
 
@@ -104,7 +113,7 @@ app.post("/remove-chat-from-termination-queue", (req, res) => {
   }
 });
 
-app.post("/trigger-azure-stream/:channelId", express.json(), async (req, res) => {
+app.post("/channels/:channelId/stream", async (req, res) => {
   try {
     const { channelId } = req.params;
     const { messages, options = {} } = req.body;
@@ -113,20 +122,21 @@ app.post("/trigger-azure-stream/:channelId", express.json(), async (req, res) =>
       return res.status(400).json({ error: "Messages array is required" });
     }
 
-    const streamId = await createAzureOpenAIStreamRequest({
+    const result = await createAzureOpenAIStreamRequest({
       channelId,
       messages,
       options,
     });
 
-    res.status(200).json({
-      success: true,
-      streamId,
-      message: "Azure OpenAI streaming started",
-    });
+    res.status(200).json(result);
   } catch (error) {
     console.error("Error triggering Azure stream:", error);
-    res.status(500).json({ error: "Failed to start streaming" });
+
+    if (error.message === "No active connections found for this channel") {
+      res.status(404).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: "Failed to start streaming" });
+    }
   }
 });
 

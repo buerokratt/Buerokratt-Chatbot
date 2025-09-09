@@ -1,6 +1,7 @@
 const { Client } = require("@opensearch-project/opensearch");
 const { openSearchConfig } = require("./config");
 const { streamAzureOpenAIResponse } = require("./azureOpenAI");
+const { activeConnections } = require("./sseUtil");
 
 let client = buildClient();
 
@@ -24,96 +25,92 @@ async function searchNotification({ channelId, connectionId, sender }) {
     for (const hit of response.body.hits.hits) {
       const notification = hit._source;
 
-      if (notification.type === "azure_openai_stream") {
-        await handleAzureOpenAIStream(notification, sender, connectionId);
-      } else {
-        await sender(notification.payload);
-      }
+      await sender(notification.payload);
 
       await markAsSent(hit, connectionId);
     }
   } catch (e) {
-    console.error(e);
+    console.error("processing notification error:", e);
     await sender({ error: "Notification processing failed" });
   }
 }
 
-async function handleAzureOpenAIStream(notification, sender, connectionId) {
-  const { messages, options, streamId } = notification.payload;
+async function createAzureOpenAIStreamRequest({ channelId, messages, options = {} }) {
 
   try {
-    const response = await streamAzureOpenAIResponse(messages, options);
+    const connections = Array.from(activeConnections.entries()).filter(
+      ([_, connData]) => connData.channelId === channelId
+    );
 
-    sender({
-      type: "stream_start",
-      streamId,
-      channelId: notification.channelId,
-    });
-
-    for await (const part of response) {
-      const content = part.choices[0]?.delta?.content;
-      if (content) {
-        sender({
-          type: "stream_chunk",
-          streamId,
-          content: content,
-          isComplete: false,
-        });
-      }
+    if (connections.length === 0) {
+      throw new Error("No active connections found for this channel");
     }
 
-    sender({
-      type: "stream_complete",
-      streamId,
-      content: "",
-      isComplete: true,
+    const streamingPromises = connections.map(async ([connectionId, connData]) => {
+      const { sender } = connData;
+
+      try {
+        const response = await streamAzureOpenAIResponse(messages, options);
+        if (!activeConnections.has(connectionId)) {
+          return;
+        }
+
+        sender({
+          type: "stream_start",
+          streamId: channelId,
+          channelId: channelId,
+        });
+
+        for await (const part of response) {
+          if (!activeConnections.has(connectionId)) {
+            break;
+          }
+
+          const content = part.choices[0]?.delta?.content;
+          if (content) {
+            sender({
+              type: "stream_chunk",
+              channelId,
+              content: content,
+              isComplete: false,
+            });
+          }
+        }
+
+        if (activeConnections.has(connectionId)) {
+          sender({
+            type: "stream_complete",
+            channelId,
+            content: "",
+            isComplete: true,
+          });
+        }
+
+      } catch (error) {
+        if (activeConnections.has(connectionId)) {
+          sender({
+            type: "stream_error",
+            channelId,
+            content: `Failed to stream response ${error}`,
+            isComplete: true,
+          });
+        }
+        throw error;
+      }
     });
-    await cleanupCompletedStreams(notification._id);
+
+    await Promise.all(streamingPromises);
+
+    return {
+      success: true,
+      channelId,
+      connectionsCount: connections.length,
+      message: "Azure OpenAI streaming completed for all connections",
+    };
   } catch (error) {
-    console.error("Azure OpenAI streaming error:", error);
-    sender({
-      type: "stream_error",
-      streamId,
-      content: "Failed to stream response",
-      isComplete: true,
-    });
-    await cleanupCompletedStreams(notification._id);
+    console.error("Error in createAzureOpenAIStreamRequest:", error);
+    throw error;
   }
-}
-
-async function createAzureOpenAIStreamRequest({ channelId, messages, options = {} }) {
-  const notificationId = uuidv4();
-
-  await client
-    .index({
-      index: openSearchConfig.notificationIndex,
-      id: notificationId,
-      body: {
-        channelId,
-        type: "azure_openai_stream",
-        payload: {
-          messages,
-          options,
-          streamId: notificationId,
-        },
-        timestamp: Date.now(),
-        sentTo: [],
-      },
-      refresh: true,
-    })
-    .catch(handleError);
-
-  return notificationId;
-}
-
-
-async function cleanupCompletedStreams(streamId) {
-  await client
-    .delete({
-      index: openSearchConfig.notificationIndex,
-      id: streamId,
-    })
-    .catch(handleError);
 }
 
 async function sendBulkNotification({ operations }) {
