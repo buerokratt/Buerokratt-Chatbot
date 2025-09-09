@@ -100,6 +100,7 @@ app.post("/add-chat-to-termination-queue", express.json(), express.text(), (req,
 
     res.status(200).json({ response: 'Chat will be terminated soon' });
   } catch (error) {
+    console.error("Error adding chat to termination queue:", error);
     res.status(500).json({ response: 'error' });
   }
 });
