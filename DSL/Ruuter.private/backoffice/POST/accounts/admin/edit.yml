@@ -84,7 +84,7 @@ updateUser:
 
 checkForDomains:
   switch:
-    - condition: ${domains.length > 0}
+    - condition: ${domains && domains.length > 0}
       next: updateRolesWithDomains
   next: updateRoles
 
