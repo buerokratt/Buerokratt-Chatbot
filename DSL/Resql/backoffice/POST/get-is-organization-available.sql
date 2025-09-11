@@ -116,11 +116,11 @@ organization_time AS
    WHERE KEY = 'organizationWorkingTimeNationalHolidays'),
      is_within_working_time AS
   (SELECT CASE
-              WHEN is_the_same_on_all_working_days THEN TO_CHAR(:current_timestamp::timestamp, (SELECT timeFormat FROM consts))::TIME BETWEEN
-                     (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
-                      FROM all_weekdays_start_time) AND
-                     (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
-                      FROM all_weekdays_end_time)
+              WHEN is_the_same_on_all_working_days
+                AND TO_CHAR(:current_timestamp::timestamp, (SELECT timeFormat FROM consts))::TIME
+                BETWEEN (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME FROM all_weekdays_start_time)
+                AND (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME FROM all_weekdays_end_time)
+               THEN TRUE
               WHEN current_day.current_day = 'monday' THEN CASE
                                                                WHEN
                                                                       (SELECT TO_CHAR(value, (SELECT timeFormat FROM consts))::TIME
@@ -256,6 +256,7 @@ organization_time AS
                                                                            ELSE FALSE
                                                                        END
                                                               END
+              WHEN is_the_same_on_all_working_days.is_the_same_on_all_working_days THEN TRUE
               ELSE CASE
                        WHEN EXISTS
                               (SELECT 1
@@ -265,7 +266,8 @@ organization_time AS
                    END
           END AS is_within_working_days
    FROM current_day
-   CROSS JOIN is_closed_on_weekends),
+   CROSS JOIN is_closed_on_weekends
+    CROSS JOIN is_the_same_on_all_working_days),
      is_today_holiday AS
   (SELECT CASE
               WHEN TO_CHAR(CURRENT_DATE, (SELECT dateFormat FROM consts)) IN (:holidays) THEN format('Bürokratt pole saadaval, kuna täna on %s rahvuspüha "%s", palun jätke oma kontaktandmed ja me võtame teiega esimesel võimalusel ühendust', TO_CHAR(CURRENT_DATE, (SELECT dateFormat FROM consts)), holiday_names)
