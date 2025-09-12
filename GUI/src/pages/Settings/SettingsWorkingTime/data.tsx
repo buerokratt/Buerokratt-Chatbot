@@ -59,7 +59,7 @@ export function getOrganizationTimeData(data: OrganizationWorkingTime) {
       data.organizationWorkingTimeNationalHolidays.toString() === 'true',
     organizationWorkingTimeWeekdays: data.organizationWorkingTimeWeekdays ?? [],
     organizationWorkingAllTime:
-      data.organizationWorkingAllTime.toString() === 'true',
+      data.organizationWorkingAllTime.toString() === 'true' ?? false,
     organizationNoCsaAskForContacts:
       data.organizationNoCsaAskForContacts.toString() === 'true',
     organizationNoCsaAvailableMessage: data.organizationNoCsaAvailableMessage,
@@ -89,18 +89,18 @@ export function setOrganizationTimeData(data: OrganizationWorkingTime) {
     ...adjustedTimeFields,
     organizationClosedOnWeekEnds: data.organizationClosedOnWeekEnds.toString(),
     organizationTheSameOnAllWorkingDays:
-      data.organizationTheSameOnAllWorkingDays.toString(),
+      data.organizationTheSameOnAllWorkingDays.toString() ?? false,
     organizationWorkingTimeNationalHolidays:
       data.organizationWorkingTimeNationalHolidays.toString(),
-    organizationWorkingTimeWeekdays: data.organizationWorkingTimeWeekdays ?? [],
-    organizationWorkingAllTime: data.organizationWorkingAllTime.toString(),
+    organizationWorkingTimeWeekdays: data.organizationWorkingTimeWeekdays ?? ['monday'],
+    organizationWorkingAllTime: data.organizationWorkingAllTime.toString() ?? false,
     organizationNoCsaAskForContacts:
       data.organizationNoCsaAskForContacts.toString(),
     organizationOutsideWorkingHoursAskForContacts:
       data.organizationOutsideWorkingHoursAskForContacts.toString(),
     organizationBotCannotAnswerAskToForwardToCSA:
       data.organizationBotCannotAnswerAskToForwardToCSA.toString(),
-    organizationUseCSA: data.organizationUseCSA.toString(),
+    organizationUseCSA: data.organizationUseCSA.toString() ?? true,
   };
 }
 
@@ -132,6 +132,7 @@ export const getDefaultValues = () :OrganizationWorkingTime => {
     organizationOutsideWorkingHoursAskForContacts: false,
     organizationOutsideWorkingHoursMessage: '',
     organizationBotCannotAnswerAskToForwardToCSA: false,
-    organizationBotCannotAnswerMessage: ''
+    organizationBotCannotAnswerMessage: '',
+    organizationUseCSA: false
   }
 }
