@@ -166,6 +166,7 @@ setDomainOrganizationWorkingTime:
       organizationOutsideWorkingHoursMessage: ${organizationOutsideWorkingHoursMessage}
       organizationBotCannotAnswerAskToForwardToCSA: ${organizationBotCannotAnswerAskToForwardToCSA}
       organizationBotCannotAnswerMessage: ${organizationBotCannotAnswerMessage}
+      organizationUseCSA: ${incoming.body.organizationUseCSA}
       created: ${new Date().toISOString()}
       domains: ${JSON.stringify(domains)}
   result: setOrganizationWorkingTimeResult
