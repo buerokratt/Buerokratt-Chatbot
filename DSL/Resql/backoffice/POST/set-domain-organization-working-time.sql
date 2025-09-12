@@ -39,7 +39,8 @@ WHERE
     'organizationOutsideWorkingHoursAskForContacts',
     'organizationOutsideWorkingHoursMessage',
     'organizationBotCannotAnswerAskToForwardToCSA',
-    'organizationBotCannotAnswerMessage'
+    'organizationBotCannotAnswerMessage',
+    'organizationUseCSA'
     )
   AND c.deleted = FALSE
   AND c.id = (
@@ -84,7 +85,8 @@ FROM (
     ('organizationOutsideWorkingHoursAskForContacts',   :organizationOutsideWorkingHoursAskForContacts),
     ('organizationOutsideWorkingHoursMessage',          :organizationOutsideWorkingHoursMessage),
     ('organizationBotCannotAnswerAskToForwardToCSA',    :organizationBotCannotAnswerAskToForwardToCSA),
-    ('organizationBotCannotAnswerMessage',              :organizationBotCannotAnswerMessage)
+    ('organizationBotCannotAnswerMessage',              :organizationBotCannotAnswerMessage),
+    ('organizationUseCSA',                          :organizationUseCSA)
     ) AS v(key, value)
     )
 INSERT INTO configuration (key, value, domain, created)
