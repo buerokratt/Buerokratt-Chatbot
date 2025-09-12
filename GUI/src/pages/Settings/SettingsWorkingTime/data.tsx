@@ -59,7 +59,7 @@ export function getOrganizationTimeData(data: OrganizationWorkingTime) {
       data.organizationWorkingTimeNationalHolidays.toString() === 'true',
     organizationWorkingTimeWeekdays: data.organizationWorkingTimeWeekdays ?? [],
     organizationWorkingAllTime:
-      data.organizationWorkingAllTime.toString() === 'true' ?? false,
+      data.organizationWorkingAllTime.toString() === 'true',
     organizationNoCsaAskForContacts:
       data.organizationNoCsaAskForContacts.toString() === 'true',
     organizationNoCsaAvailableMessage: data.organizationNoCsaAvailableMessage,
