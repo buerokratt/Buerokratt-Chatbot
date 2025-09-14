@@ -30,7 +30,7 @@ async function streamAzureOpenAIResponse(messages, options = {}) {
     initializeAzureOpenAI();
   }
 
-  const { max_tokens = 4096, temperature = 1, top_p = 1, stream = true } = options;
+  const { max_tokens = 4096, temperature = 1, top_p = 1, stream = true, data_sources } = options;
 
   try {
     const response = await client.chat.completions.create({
@@ -40,6 +40,7 @@ async function streamAzureOpenAIResponse(messages, options = {}) {
       temperature,
       top_p,
       model: azureConfig.modelName,
+      data_sources: data_sources,
     });
 
     return response;
