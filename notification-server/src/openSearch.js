@@ -37,6 +37,7 @@ async function searchNotification({ channelId, connectionId, sender }) {
 }
 
 async function createAzureOpenAIStreamRequest({ channelId, messages, options = {} }) {
+  const { stream = true } = options;
 
   try {
     const connections = Array.from(activeConnections.entries()).filter(
@@ -49,52 +50,64 @@ async function createAzureOpenAIStreamRequest({ channelId, messages, options = {
       throw new Error("No active connections found for this channel");
     }
 
-    const streamingPromises = connections.map(async ([connectionId, connData]) => {
+    const responsePromises = connections.map(async ([connectionId, connData]) => {
       const { sender } = connData;
 
       try {
         const response = await streamAzureOpenAIResponse(messages, options);
+
         if (!activeConnections.has(connectionId)) {
           return;
         }
 
-        sender({
-          type: "stream_start",
-          streamId: channelId,
-          channelId: channelId,
-        });
+        if (stream) {
+          sender({
+            type: "stream_start",
+            streamId: channelId,
+            channelId: channelId,
+          });
 
-        for await (const part of response) {
-          if (!activeConnections.has(connectionId)) {
-            break;
+          for await (const part of response) {
+            if (!activeConnections.has(connectionId)) {
+              break;
+            }
+
+            const content = part.choices[0]?.delta?.content;
+            if (content) {
+              sender({
+                type: "stream_chunk",
+                channelId,
+                content: content,
+                isComplete: false,
+              });
+            }
           }
 
-          const content = part.choices[0]?.delta?.content;
-          if (content) {
+          if (activeConnections.has(connectionId)) {
             sender({
-              type: "stream_chunk",
+              type: "stream_complete",
               channelId,
-              content: content,
-              isComplete: false,
+              content: "",
+              isComplete: true,
             });
           }
-        }
+        } else {
+          const content = response.choices[0]?.message?.content || "";
 
-        if (activeConnections.has(connectionId)) {
           sender({
-            type: "stream_complete",
+            type: "complete_response",
             channelId,
-            content: "",
+            content: content,
             isComplete: true,
           });
         }
-
       } catch (error) {
         if (activeConnections.has(connectionId)) {
+          const errorMessage = `Failed to ${stream ? "stream" : "generate"} response: ${error.message}`;
           sender({
-            type: "stream_error",
+            type: stream ? "stream_error" : "response_error",
             channelId,
-            content: `Failed to stream response ${error}`,
+            content: errorMessage,
             isComplete: true,
           });
         }
@@ -102,16 +115,17 @@ async function createAzureOpenAIStreamRequest({ channelId, messages, options = {
       }
     });
 
-    await Promise.all(streamingPromises);
+    await Promise.all(responsePromises);
 
     return {
       success: true,
       channelId,
       connectionsCount: connections.length,
-      message: "Azure OpenAI streaming completed for all connections",
+      message: `Azure OpenAI ${stream ? "streaming" : "response"} completed for all connections`,
     };
-  } finally {
-    // No-op for now
+  } catch (error) {
+    console.error(`Error in createAzureOpenAIStreamRequest (stream=${stream}):`, error);
+    throw error;
   }
 }
 
