@@ -8,109 +8,39 @@ declaration:
   namespace: analytics
   allowlist:
     body:
-      - field: start
-        type: string
-        description: "Body field 'start'"
-      - field: end
-        type: string
-        description: "Body field 'end'"
-      - field: urls
+      - field: headers
         type: array
-        description: "Body field 'urls'"
-      - field: columns
+        description: "Body field 'headers'"
+      - field: rows
         type: array
-        description: "Body field 'columns'"
-      - field: sorting
-        type: string
-        description: "Body field 'sorting'"
-      - field: search
-        type: string
-        description: "Body field 'search'"
-      - field: customerSupportIds
-        type: object
-        description: "Body field 'customerSupportIds'"
+        description: "Body field 'rows'"
+      - field: chatIds
+        type: array
+        description: "Body field 'chatIds'"
 
 extractRequestData:
   assign:
-    startDate: ${incoming.body.start}
-    endDate: ${incoming.body.end}
-    sorting: ${"created desc"}
-    search: ${incoming.body.search}
-    columns: ${incoming.body.columns}
-    urls: ${incoming.body.urls}
-
-getEndedChats:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RESQL]/get-cs-all-ended-chats"
-    body:
-      start: ${startDate}
-      end: ${endDate}
-      page: ${0}
-      page_size: ${1000}
-      sorting: ${sorting}
-      search: ${search}
-      customerSupportIds: ${incoming.body.customerSupportIds?.join(',') ?? ''}
-      csaId: ${"chatbot"}
-      urls: ${urls}
-  result: endedChats
-
-checkEndedChats:
-  log: ${endedChats.response.body}
-
-mapChatIds:
-  call: http.post
-  args:
-    url: "[#CHATBOT_DMAPPER_HBS]/get_chat_ids"
-    headers:
-      type: json
-    body:
-      chats: ${endedChats.response.body}
-  result: convertedIds
-
-checkMappedId:
-  log: ${convertedIds.response.body}
+    headers: ${incoming.body.headers}
+    rows: ${incoming.body.rows}
+    chatIds: ${incoming.body.chatIds}
 
 getChatMessages:
   call: http.post
   args:
     url: "[#CHATBOT_RESQL]/get-chats-with-messages"
     body:
-      chatIds: ${convertedIds.response.body}
+      chatIds: ${chatIds}
   result: chatMessages
-
-checkChatMessages:
-  log: ${chatMessages.response.body}
-
-#convert_data:
-#  call: http.post
-#  args:
-#    url: "[#ANALYTICS_DMAPPER_HBS]/get-metric-rows"
-#    headers:
-#      type: "json"
-#    body:
-#      results: ${metrics.response.body}
-#      fields: ${incoming.body.metric_names}
-#      layout: false
-#  result: dataObject
-#
-#merge:
-#  call: http.post
-#  args:
-#    url: "[#ANALYTICS_DMAPPER]/file-manager/merge"
-#    body:
-#      array1: ${dataObject.response.body}
-#      array2: ${incoming.body.date_rows}
-#  result: mergedRules
 
 get_xlsx_data:
   call: http.post
   args:
     url: "[#CHATBOT_DMAPPER]/conversion/chats-to-xlsx"
     body:
-      columns: ${columns}
       chatMessages: ${chatMessages.response.body}
-      endedChats: ${endedChats.response.body}
+      chatHeaders: ${headers}
+      chatIds: ${chatIds}
+      chatRows: ${rows}
   result: xlsxData
 
 return_success:
