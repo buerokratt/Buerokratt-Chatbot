@@ -50,6 +50,7 @@ assignBgkConfig:
     chatbot_external_api_key: "[#BGK_CHATBOT_EXTERNAL_API_KEY]"
     chatbot_external_bot_url: "[#BGK_CHATBOT_EXTERNAL_BOT_URL]"
     semantic_configuration: "[#BGK_SEMANTIC_CONFIGURATION]"
+    stream: "[#BGK_STREAM]"
 
 logstepAZURESAADAME:
   log: ${incoming.body.message}
@@ -125,7 +126,7 @@ trigger_ai_stream:
         max_tokens: ${parseInt(max_tokens ?? '1000')}
         temperature: 0
         top_p: 1
-        stream: true
+        stream: ${stream}
         frequency_penalty: 0
         presence_penalty: 0
   result: test
