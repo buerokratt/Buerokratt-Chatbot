@@ -10,6 +10,7 @@ const History: FC = () => {
     <ChatHistory
       toastContext={useToast()}
       showEmail={import.meta.env.REACT_APP_SHOW_HISTORY_EMAIL === 'true'}
+      showDownload={true}
       showSortingLabel={import.meta.env.REACT_APP_SHOW_HISTORY_SORTING === 'true'}
       user={useStore.getState().userInfo}
       userDomains={useStore}
