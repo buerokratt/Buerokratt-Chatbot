@@ -35,6 +35,9 @@ declaration:
       - field: smaxAccountId
         type: string
         description: "Body field 'smaxAccountId'"
+      - field: domains
+        type: array
+        description: "Body field 'domains'"
 
 extractRequestData:
   assign:
