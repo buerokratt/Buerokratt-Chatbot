@@ -40,10 +40,15 @@ async function streamAzureOpenAIResponse(messages, options = {}) {
       temperature,
       top_p,
       model: azureConfig.modelName,
-      data_sources: data_sources,
+      data_sources,
     });
 
-    return response;
+    if (stream) {
+      return response;
+    } else {
+      const completion = await response;
+      return completion;
+    }
   } catch (error) {
     console.error("Azure OpenAI API error:", error);
     throw error;

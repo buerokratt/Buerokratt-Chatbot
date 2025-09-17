@@ -62,7 +62,11 @@ function generateConnectionID() {
 function buildSender(res) {
   return (data) => {
     try {
-      res.write(`data: ${JSON.stringify(data)}\n\n`);
+      const formattedData = typeof data === "string" ? data : JSON.stringify(data);
+      res.write(`data: ${formattedData}\n\n`);
+      if (typeof res.flush === "function") {
+        res.flush();
+      }
     } catch (error) {
       console.error("SSE write error:", error);
     }
