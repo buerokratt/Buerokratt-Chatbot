@@ -26,14 +26,12 @@ function initializeAzureOpenAI() {
 }
 
 async function streamAzureOpenAIResponse(messages, options = {}) {
-  if (!client) {
-    initializeAzureOpenAI();
-  }
+  if (!client) initializeAzureOpenAI();
 
   const { max_tokens = 4096, temperature = 1, top_p = 1, stream = true, data_sources } = options;
 
   try {
-    const response = await client.chat.completions.create({
+    const requestConfig = {
       messages,
       stream,
       max_tokens,
@@ -41,13 +39,12 @@ async function streamAzureOpenAIResponse(messages, options = {}) {
       top_p,
       model: azureConfig.modelName,
       data_sources,
-    });
+    };
 
     if (stream) {
-      return response;
+      return client.chat.completions.create(requestConfig);
     } else {
-      const completion = await response;
-      return completion;
+      return await client.chat.completions.create(requestConfig);
     }
   } catch (error) {
     console.error("Azure OpenAI API error:", error);
