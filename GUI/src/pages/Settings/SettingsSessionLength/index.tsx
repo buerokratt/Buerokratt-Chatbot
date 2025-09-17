@@ -43,8 +43,7 @@ const SettingsSessionLength: FC = () => {
       sessionLength: '',
       chatActiveDuration: '',
       showIdleWarning: false,
-      autoCloseConversation: true,
-      autoCloseText: '',
+      autoCloseText: ''
     },
   });
 
@@ -59,13 +58,11 @@ const SettingsSessionLength: FC = () => {
     sessionLength,
     chatActiveDuration,
     showIdleWarning,
-    autoCloseConversation,
-    autoCloseText,
+    autoCloseText
   ] = watch([
     'sessionLength',
     'chatActiveDuration',
     'showIdleWarning',
-    'autoCloseConversation',
     'autoCloseText',
   ]);
 
