@@ -93,11 +93,13 @@ async function createAzureOpenAIStreamRequest({ channelId, messages, options = {
           }
         } else {
           const content = response.choices[0]?.message?.content || "";
+          const context = response.choices[0]?.message?.context || {};
 
           sender({
             type: "complete_response",
             channelId,
             content: content,
+            context,
             isComplete: true,
           });
         }
