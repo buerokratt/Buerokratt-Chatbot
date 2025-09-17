@@ -46,6 +46,8 @@ import { useNewMessageSound } from 'hooks/useAudio';
 import './Chat.scss';
 import { useInterval } from 'usehooks-ts';
 import { BotConfig } from 'types/botConfig';
+import { DomainSelection } from '../../types/domainsModels';
+import { getWidgetData } from '../../services/users';
 
 type ChatProps = {
   chat: ChatType;
@@ -111,6 +113,7 @@ const Chat: FC<ChatProps> = ({
 
   const [newMessageEffect] = useNewMessageSound();
   const navigate = useNavigate();
+  const [allDomains, setAllDomains] = useState<DomainSelection[]>([]);
 
   const askPermissionsTimeoutInSeconds = 60;
   let messagesLength = 0;
@@ -160,6 +163,14 @@ const Chat: FC<ChatProps> = ({
       localStorage.removeItem('focused_chat');
     }
   };
+
+  useEffect(() => {
+    if(userInfo?.idCode) {
+      getWidgetData(userInfo?.idCode).then((domains) => {
+        setAllDomains(domains);
+      })
+    }
+  }, [userInfo?.idCode]);
 
   useEffect(() => {
     localStorage.setItem('focused_chat', chat.id);
@@ -723,8 +734,11 @@ const Chat: FC<ChatProps> = ({
     }
   };
 
+
+  const url = chat.endUserUrl;
+
   useQuery<{ config: BotConfig }>({
-    queryKey: ['configs/bot-config', 'prod'],
+    queryKey: ['configs/bot-config' + '?domain=none', 'prod'],
     onSuccess(data: any) {
       setIsChatEditingAllowed(data.response.isEditChatVisible === 'true');
     },
