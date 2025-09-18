@@ -51,6 +51,9 @@
     "displayText": "Kuva tekst",
     "test": "Test"
   },
+  "files": {
+    "download_xlsx": "Lae alla XLSX"
+  },
   "sorting": {
     "desc": "kahanevalt",
     "asc": "kasvavalt",
