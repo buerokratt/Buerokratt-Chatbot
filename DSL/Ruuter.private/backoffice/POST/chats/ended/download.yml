@@ -1,0 +1,50 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'DOWNLOAD'"
+  method: post
+  accepts: json
+  returns: data
+  namespace: analytics
+  allowlist:
+    body:
+      - field: headers
+        type: array
+        description: "Body field 'headers'"
+      - field: rows
+        type: array
+        description: "Body field 'rows'"
+      - field: chatIds
+        type: array
+        description: "Body field 'chatIds'"
+
+extractRequestData:
+  assign:
+    headers: ${incoming.body.headers}
+    rows: ${incoming.body.rows}
+    chatIds: ${incoming.body.chatIds}
+
+getChatMessages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-chats-with-messages"
+    body:
+      chatIds: ${chatIds}
+  result: chatMessages
+
+get_xlsx_data:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/conversion/chats-to-xlsx"
+    body:
+      chatMessages: ${chatMessages.response.body}
+      chatHeaders: ${headers}
+      chatIds: ${chatIds}
+      chatRows: ${rows}
+  result: xlsxData
+
+return_success:
+  wrapper: false
+  return: ${xlsxData.response.body}
+  next: end
+  status: 200

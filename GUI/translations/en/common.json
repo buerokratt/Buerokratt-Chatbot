@@ -51,6 +51,9 @@
     "displayText": "Display message",
     "test": "Test"
   },
+  "files": {
+    "download_xlsx": "Download XLSX"
+  },
   "sorting": {
     "desc": "descending",
     "asc": "ascending",
