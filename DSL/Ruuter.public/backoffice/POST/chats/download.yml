@@ -58,7 +58,7 @@ checkPdfExists:
 
 checkIsEmailPresent:
   switch:
-    - condition: ${email !== null}
+    - condition: ${email}
       next: sendPdfToEmail
   next: returnFile
 
