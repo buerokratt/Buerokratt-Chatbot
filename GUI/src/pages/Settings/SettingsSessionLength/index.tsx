@@ -1,14 +1,7 @@
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import { AxiosError } from 'axios';
 import { useTranslation } from 'react-i18next';
-import {
-  Button,
-  Card,
-  FormInput,
-  FormTextarea,
-  Switch,
-  Track,
-} from 'components';
+import { Button, Card, FormInput, FormTextarea, Switch, Track } from 'components';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useToast } from 'hooks/useToast';
 import { apiDev } from 'services/api';
@@ -22,7 +15,8 @@ type FormValues = {
   sessionLength: string;
   chatActiveDuration: string;
   showIdleWarning: boolean;
-  autoCloseConversation: boolean;
+  idleMessage: string;
+  showAutoCloseText: boolean;
   autoCloseText: string;
 };
 
@@ -35,15 +29,14 @@ type ConfigItem = {
 const SettingsSessionLength: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
-  const displayAutoCloseConfigurations =
-    import.meta.env.REACT_APP_SHOW_AUTO_CLOSE_CONFIG.toLowerCase() === 'true';
 
   const { control, handleSubmit, setValue, watch } = useForm<FormValues>({
     defaultValues: {
       sessionLength: '',
       chatActiveDuration: '',
       showIdleWarning: false,
-      autoCloseConversation: true,
+      idleMessage: '',
+      showAutoCloseText: false,
       autoCloseText: '',
     },
   });
@@ -55,19 +48,15 @@ const SettingsSessionLength: FC = () => {
     }, {} as Record<string, string>);
   };
 
-  const [
-    sessionLength,
-    chatActiveDuration,
-    showIdleWarning,
-    autoCloseConversation,
-    autoCloseText,
-  ] = watch([
-    'sessionLength',
-    'chatActiveDuration',
-    'showIdleWarning',
-    'autoCloseConversation',
-    'autoCloseText',
-  ]);
+  const [sessionLength, chatActiveDuration, showIdleWarning, idleMessage, showAutoCloseText, autoCloseText] =
+    watch([
+      'sessionLength',
+      'chatActiveDuration',
+      'showIdleWarning',
+      'idleMessage',
+      'showAutoCloseText',
+      'autoCloseText'
+    ]);
 
   useQuery({
     queryKey: ['accounts/admin/session-length', 'prod'],
@@ -78,11 +67,12 @@ const SettingsSessionLength: FC = () => {
         sessionLength: data.session_length,
         chatActiveDuration: data.chat_active_duration,
         autoCloseText: data.auto_close_text,
+        idleMessage: data.idle_message
       };
 
       const booleanFields = {
         showIdleWarning: data.show_idle_warning,
-        autoCloseConversation: data.auto_close_conversation,
+        showAutoCloseText: data.show_auto_close_text
       };
 
       Object.entries(stringFields).forEach(([key, value]) =>
@@ -101,7 +91,8 @@ const SettingsSessionLength: FC = () => {
         sessionLength: sessionLength,
         chatActiveDuration: chatActiveDuration,
         showIdleWarning: showIdleWarning.toString(),
-        autoCloseConversation: autoCloseConversation.toString(),
+        idleMessage: idleMessage,
+        showAutoCloseText: showAutoCloseText.toString(),
         autoCloseText: autoCloseText,
       }),
     onSuccess: () => {
@@ -211,36 +202,24 @@ const SettingsSessionLength: FC = () => {
               {t('settings.chatDuration.minutes')}
             </label>
           </Track>
-          <Controller
-            name="showIdleWarning"
-            control={control}
-            render={({ field }) => (
-              <Switch
-                label={t('global.displayText')}
-                onLabel={t('global.yes') ?? 'yes'}
-                offLabel={t('global.no') ?? 'no'}
-                onCheckedChange={(e) => field.onChange(e)}
-                checked={field.value}
-                {...field}
-              />
-            )}
-          />
           <label className="rule">{t('settings.chatDuration.rule')}</label>
+
+
         </Track>
-        {displayAutoCloseConfigurations && (
           <Track
             gap={16}
             direction="vertical"
             align="left"
             style={{ paddingRight: '20px' }}
           >
+
             <Controller
-              name="autoCloseConversation"
+              name="showIdleWarning"
               control={control}
               render={({ field }) => (
                 <>
                   <Switch
-                    label={t('settings.autoClose')}
+                    label={t('global.displayText')}
                     onLabel={t('global.yes') ?? 'yes'}
                     offLabel={t('global.no') ?? 'no'}
                     onCheckedChange={(e) => field.onChange(e)}
@@ -248,7 +227,42 @@ const SettingsSessionLength: FC = () => {
                     {...field}
                   />
 
-                  {autoCloseConversation && (
+                  {showIdleWarning && (
+                    <Controller
+                      name="idleMessage"
+                      control={control}
+                      render={({ field }) => (
+                        <FormTextarea
+                          label={t('settings.idleWarningText')}
+                          minRows={4}
+                          maxLength={WELCOME_MESSAGE_LENGTH}
+                          showMaxLength={true}
+                          maxLengthBottom
+                          onChange={(e) => field.onChange(e.target.value)}
+                          defaultValue={idleMessage}
+                          name="label"
+                        />
+                      )}
+                    />
+                  )}
+                </>
+              )}
+            />
+            <Controller
+              name="showAutoCloseText"
+              control={control}
+              render={({ field }) => (
+                <>
+                  <Switch
+                    label={t('settings.showAutoCloseText')}
+                    onLabel={t('global.yes') ?? 'yes'}
+                    offLabel={t('global.no') ?? 'no'}
+                    onCheckedChange={(e) => field.onChange(e)}
+                    checked={field.value}
+                    {...field}
+                  />
+
+                  {showAutoCloseText && (
                     <Controller
                       name="autoCloseText"
                       control={control}
@@ -270,7 +284,6 @@ const SettingsSessionLength: FC = () => {
               )}
             />
           </Track>
-        )}
       </Card>
     </>
   );

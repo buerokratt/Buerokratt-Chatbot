@@ -1,7 +1,7 @@
 const abortQueue = [];
 const timeouts = new Map();
 
-function addToTerminationQueue(id, timeout, callback) {
+function addToTerminationQueue(id, timeout = 10, callback) {
     if (timeouts.has(id)) {
         clearTimeout(timeouts.get(id));
     }
@@ -13,7 +13,7 @@ function addToTerminationQueue(id, timeout, callback) {
         if (aborts.length === 0) {
             await callback();
         }
-    }, timeout);
+    }, timeout * 1000);
 
     timeouts.set(id, handle);
 }
