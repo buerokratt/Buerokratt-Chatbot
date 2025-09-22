@@ -325,6 +325,8 @@
   "settings": {
     "title": "Settings",
     "autoClose": "Close chat automatically",
+    "idleWarningText": "Idle warning message",
+    "showAutoCloseText": "Show end message",
     "autoCloseText": "End message",
     "users": {
       "title": "Users",

@@ -13,7 +13,8 @@ WITH configuration_values AS (
                   'widgetAnimation',
                   'chat_active_duration',
                   'show_idle_warning',
-                  'auto_close_conversation',
+                  'idle_message',
+                  'show_auto_close_text',
                   'auto_close_text',
                   'is_burokratt_active',
                   'feedbackActive', 
@@ -21,7 +22,6 @@ WITH configuration_values AS (
                   'feedbackNoticeActive',
                   'feedbackNotice')
       AND id IN (SELECT max(id) FROM configuration GROUP BY KEY)
---       AND "domain" = :domainUUID::UUID
       AND NOT deleted
 )
 SELECT
@@ -33,7 +33,8 @@ SELECT
     MAX(CASE WHEN KEY = 'widgetAnimation' THEN value END) AS widget_animation,
     MAX(CASE WHEN KEY = 'chat_active_duration' THEN value END) AS chat_active_duration,
     MAX(CASE WHEN KEY = 'show_idle_warning' THEN value END) AS show_idle_warning,
-    MAX(CASE WHEN KEY = 'auto_close_conversation' THEN value END) AS auto_close_conversation,
+    MAX(CASE WHEN KEY = 'show_auto_close_text' THEN value END) AS show_auto_close_text,
+    MAX(CASE WHEN KEY = 'idle_message' THEN value END) AS idle_message,
     MAX(CASE WHEN KEY = 'auto_close_text' THEN value END) AS auto_close_text,
     MAX(CASE WHEN KEY = 'is_burokratt_active' THEN value END) AS is_burokratt_active,
     MAX(CASE WHEN KEY = 'feedbackActive' THEN value END) AS feedback_active,

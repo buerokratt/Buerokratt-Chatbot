@@ -325,6 +325,8 @@
   "settings": {
     "title": "Seaded",
     "autoClose": "Lõpeta vestlus automaatselt",
+    "idleWarningText": "Sõnum, kui kasutaja ei vasta",
+    "showAutoCloseText": "Kuva lõppsõnum",
     "autoCloseText": "Lõppsõnum",
     "users": {
       "title": "Kasutajad",
