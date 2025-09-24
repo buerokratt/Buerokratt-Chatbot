@@ -21,40 +21,19 @@ getDeadChats:
 validateDeadChats:
   switch:
     - condition: ${deadChats.response.body.length > 0}
-      next: mapChatIds
+      next: checkTimIds
   next: return_not_found
 
-mapChatIds:
+checkTimIds:
   call: http.post
   args:
-    url: "[#CHATBOT_DMAPPER_HBS]/map-dead-chat-ids"
-    headers:
-      type: json
+    url: "[#CHATBOT_TIM]/sessionkey/keysString"
     body:
-      configurationArray: ${mapChatIds.response.body}
-  result: mappedIds
-
-checkV:
-  log: ${mappedIds.response.body}
-
-getNewNonce:
-  call: http.post
-  args:
-    url: "[#TRAINING_RESQL]/get-new-nonce"
-  result: newNonce
-
-getTaraUserInfo:
-  call: http.post
-  args:
-    url: "[#CHATBOT_TIM]/sessionkey/keys"
-    headers:
-      x-ruuter-nonce: ${newNonce.response.body[0].nonce}
-    body:
-      keys: ${mappedIds.response.body}
-  result: keys
+      keys: ${deadChats.response.body[0].baseIds?.join(',')}
+  result: deadKeys
 
 returnSuccess:
-  return: ${keys.response.body}
+  return: ${JSON.parse(deadKeys.response.body)}
   next: end
 
 return_not_found:
