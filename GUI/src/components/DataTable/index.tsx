@@ -54,6 +54,7 @@ type DataTableProps = {
   disableHead?: boolean;
   pagesCount?: number;
   meta?: TableMeta<any>;
+  noOverflowX?: boolean;
   selectedRow?: (row: Row<any>) => boolean;
 };
 
@@ -114,6 +115,7 @@ const DataTable: FC<DataTableProps> = ({
   disableHead,
   pagesCount,
   meta,
+  noOverflowX = false,
   selectedRow,
 }) => {
   const id = useId();
@@ -186,7 +188,9 @@ const DataTable: FC<DataTableProps> = ({
 
   return (
     <>
-      <div className="data-table__scrollWrapper">
+      <div className="data-table__scrollWrapper"
+           style={{ overflowX: noOverflowX ? "hidden" : "auto" }}
+      >
         <table className="data-table">
           {!disableHead && (
             <thead>
