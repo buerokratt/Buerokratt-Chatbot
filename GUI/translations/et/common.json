@@ -463,6 +463,16 @@
       "messageChanged": "Tervitust muudeti edukalt",
       "emptyMessage": "Tervitussõnumi väli ei tohi olla tühi"
     },
+    "sessionLength": {
+      "tooltip": {
+        "sessionLength": "Selle väljaga saab määrata, kui kaua tagatoas sisseloginud kasutaja võib olla passiivne, enne kui ta automaatselt välja logitakse. Seadistus mõjutab ainult tagatoa kasutajaid.",
+        "idleTimout": "Määrab aja, mille möödumisel loetakse kasutaja passiivseks ja käivitatakse vestluse sulgemise protsess.",
+        "showIdleMessage": "Enne vestluse lõpetamist saab passiivsele kasutajale saata hoiatava sõnumi. Kui valida \"Jah\", kuvatakse vestluses hoiatav sõnum vahetult enne sulgemist. Kui valida \"Ei\", siis sõnumit ei saadeta.",
+        "idleMessageText": "Enne vestluse lõpetamist saadetakse passiivsele kasutajale hoiatava sõnumi. Sõnumi alla kuvatakse ainult ühte nuppu \"Jätka\", mis annab võimaluse kasutajal vestlust jätkata.",
+        "showEndMessage": "Vestlust lõpetades on vestlusaknast näha viimast lauset Bürokrati poolt saadetuna. Kui valida \"Jah\", kuvatakse vestluses viimase reana Bürokrati lõppsõnumit. Kui valida \"Ei\", siis sõnumit ei kuvata ning kasutajale minimeeritakse vestlusaken automaatselt.",
+        "endMessageText": "Vestlus lõpetatakse kasutaja vaatest nii, et vestlusaken jääb avatuks. Kasutaja näeb aknas viimase sõnumina Bürokrati teadet, mille sõnumi sisu on määratud selles seadistuses."
+      }
+    },
     "skmConfiguration": {
       "title": "SKMi konfiguratsioon",
       "description": "Siin on võimalik SKMi parameetreid sätestada.",
