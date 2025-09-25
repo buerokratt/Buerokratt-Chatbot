@@ -463,6 +463,16 @@
       "messageChanged": "Welcome message changed successfully",
       "emptyMessage": "Welcome message can't be empty"
     },
+    "sessionLength": {
+      "tooltip": {
+        "sessionLength": "This field defines how long a back-office user can remain inactive before being automatically logged out. The setting applies only to back office users.",
+        "idleTimout": "Specifies the time after which the user is considered inactive and the chat closing flow is triggered.",
+        "showIdleMessage": "Before ending the chat, a warning message can be sent to an inactive user. If \"Yes\" is selected, the warning message will be displayed in the chat shortly before the chat is closed. If \"No\" is selected, the message will not be sent.",
+        "idleMessageText": "Before ending the chat, a warning message is sent to the inactive user. Only one option \"Continue\" is displayed below the message, clicking it will allow the user to continue chatting.",
+        "showEndMessage": "When ending the chat, the last sentence from Bürokratt will be visible in the chat window. If \"Yes\" is selected, Bürokratt's closing message will be displayed as the final line in the chat. If \"No\" is selected, the message will not be shown and the chat window will be automatically minimized for the user.",
+        "endMessageText": "The chat is ended from the user's perspective while keeping the chat window open. The user will see this Bürokratt's message as the final sentence in the chat widget."
+      }
+    },
     "skmConfiguration": {
       "title": "SKM Configuration",
       "description": "Here it is possible to set SKM parameters.",
