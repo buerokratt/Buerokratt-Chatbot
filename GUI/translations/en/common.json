@@ -423,7 +423,22 @@
       "outsideWorkingHoursMessage": "Outside working hours message",
       "showIfBotCannotAnswerAskToForwardToCSA": "If the Bürokratt cannot answer, ask for a customer service representative",
       "botCannotAnswerMessage": "Notification if the Bürokratt cannot answer",
-      "organizationUseCSA": "I use customer service"
+      "organizationUseCSA": "I use customer service",
+      "tooltip": {
+        "useCsa": "Select \"Yes\" if employees can take chat messages, this option will open up the working hours settings. If there are no employees, select \"No\". This will hide the additional settings as there is no need to set working hours.",
+        "work24/7": "Select \"Yes\" if employees are available 24/7, even during public holidays. Select \"No\" if time periods need to be customized depending on your organization's working hours.",
+        "workingHolidays": "On public holidays, the conversation behaves the same way as outside working hours.",
+        "workingWeekends": "Select \"Yes\" if there are no working hours on weekends. Select \"No\" if there are working hours on weekends. Keep in mind to select \"No\" even if working hours are scheduled for only one weekend day.",
+        "workingSameEachDay": "Select \"Yes\" if the working hours are the same on all weekdays. Select \"No\" if the hours differ. For example, select \"No\" when Monday to Friday have the same hours, but Saturday is different. This setting also considers the previously configured \"Closed on weekends\" option, if weekends are not part of the working hours, only Monday to Friday will be shown.",
+        "sendCsa": "This option is linked to the next setting, but the difference is whether the customer's contact information is requested. By selecting \"Yes\", only the message in the \"outside working hours message\" field will be sent to the customer. No contact details will be requested from the customer.",
+        "sendCsaWithContactDataRequest": "This option is connected to the previous setting, but here the customer's contact details are requested. By selecting \"Yes\", the customer will see a notification message and additional fields such as \"email address\", \"phone number\", and \"describe your question\". The content of the notification is defined in the \"outside working hours message\" field. When selecting \"No\", the logic from the previous setting will automatically apply, where no contact information is requested.",
+        "outOfWorkingHoursText": "Text displayed to the customer during out-of-office hours. We recommend taking previous settings into account. For example, if contact detail collection is enabled, this should be reflected in the message, such as: \"It is currently outside of our working hours, you may leave your contact details so we can get back to you later.\"",
+        "csaOutOfReach": "This option is linked to the next setting, but the difference is whether the customer's contact information is requested. By selecting \"Yes\", only the message in the \"notification of the absence of a customer service represetative\" field will be sent to the customer. No contact details will be requested from the customer.",
+        "csaOutOfReachWithContactDataRequest": "This option is connected to the previous setting, but here the customer's contact details are requested. By selecting \"Yes\", the customer will see a notification message and additional fields such as \"email address\", \"phone number\", and \"describe your question\". The content of the notification is defined in the \"notification of the absence of a customer service represetative\" field. When selecting \"No\", the logic from the previous setting will automatically apply, where no contact information is requested.",
+        "allCsaAway": "Text displayed to the customer when all the employees are away or busy. We recommend taking previous settings into account. For example, if contact detail collection is enabled, this should be reflected in the message, such as: \"Currently all our represtatives are busy, you may leave your contact details so we can get back to you later.\"",
+        "bykCouldNotRespondRedirect": "Select \"Yes\" if you want the conversation to be forwarded to an employee when Bürokratt is unable to answer. Select \"No\" if forwarding should not occur. In that case, the conversation will continue in the same window with Bürokratt.",
+        "bykCouldNotRespond": "Text displayed when Bürokratt is unable to provide an answer."
+      }
     },
     "userSession": {
       "title": "User session",
