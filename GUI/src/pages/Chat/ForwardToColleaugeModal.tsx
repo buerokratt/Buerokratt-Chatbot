@@ -162,6 +162,7 @@ const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({
           cell: forwardView,
           meta: {
             size: '1%',
+            sticky: 'right'
           },
         }),
       ],
@@ -210,8 +211,22 @@ const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({
       {usersList && (
         <DataTable
           data={usersList}
+          noOverflowX={true}
           columns={usersColumns}
           sortable
+          tableBodyPrefix={
+            <tr    style={{
+              height: 0,
+              border: "none",
+              padding: 0,
+            }}>
+              <td style={{ width: "auto", height: 0, padding: 0, border: "none" }} />
+              <td style={{ width: "auto", height: 0, padding: 0, border: "none" }} />
+              <td style={{ width: "auto", height: 0, padding: 0, border: "none" }} />
+              <td style={{ width: "auto", height: 0, padding: 0, border: "none" }} />
+              <td style={{ minWidth: "110px", height: 0, padding: 0, border: "none" }} />
+            </tr>
+          }
           pagination={pagination}
           setPagination={(state: PaginationState) => {
             if (

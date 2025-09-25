@@ -1,0 +1,34 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'ADD KEY'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: chatId
+        type: string
+        description: "Body field 'chatId'"
+      - field: timeout
+        type: string
+        description: "Body field 'timeout'"
+
+extractRequestData:
+  assign:
+    chatId: ${incoming.body.chatId}
+    timeout: ${incoming.body.timeout}
+
+addKeyToTim:
+  call: http.post
+  args:
+    url: "[#CHATBOT_TIM]/sessionkey/add"
+    body:
+      sessionKey: ${chatId}
+      sessionLength: ${timeout}
+  result: addedKey
+
+return_result:
+  return: "Key added to the tim sadly"
+  next: end
