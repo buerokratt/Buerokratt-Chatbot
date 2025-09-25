@@ -153,9 +153,6 @@ check_for_client_bot:
     body:
       sender: ${chatId}
       message: ${content}
-      authorId: ${get_bot_name_result.response.body[0].value}
-      holidays: ${holidays}
-      holidayNames: ${holidayNames}
       domain: ${domain}
   result: converted_messages_res
   error: return_bot_error
@@ -165,6 +162,8 @@ check_if_client_bot_is_unable_to_reply:
   switch:
     - condition: ${converted_messages_res == 'ERROR' || converted_messages_res.response.body.response === 'ERROR'}
       next: check_for_bgk_bot
+    - condition: ${converted_messages_res.response.body.response == 'stream triggered'}
+      next: return_message_sent  
   next: assign_fallback_bot_converted_messages_res
 
 check_for_bgk_bot:
@@ -174,9 +173,6 @@ check_for_bgk_bot:
     body:
       sender: ${chatId}
       message: ${content}
-      authorId: ${get_bot_name_result.response.body[0].value}
-      holidays: ${holidays}
-      holidayNames: ${holidayNames}
   result: converted_messages_res
   error: return_bot_error
   next: check_if_bgk_bot_is_unable_to_reply
@@ -185,6 +181,8 @@ check_if_bgk_bot_is_unable_to_reply:
   switch:
     - condition: ${converted_messages_res == 'ERROR'}
       next: check_if_user_wants_csa
+    - condition: ${converted_messages_res.response.body.response == 'stream triggered'}
+      next: return_message_sent
   next: assign_fallback_bot_converted_messages_res
 
 assign_fallback_bot_converted_messages_res:

@@ -6,11 +6,13 @@ const {
   buildNotificationSearchInterval,
   buildQueueCounter,
 } = require("./addOns");
-const { enqueueChatId, dequeueChatId, sendBulkNotification } = require("./openSearch");
+const { enqueueChatId, dequeueChatId, sendBulkNotification, createAzureOpenAIStreamRequest } = require("./openSearch");
 const { addToTerminationQueue, removeFromTerminationQueue } = require("./terminationQueue");
 const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 const csurf = require("csurf");
+const { initializeAzureOpenAI } = require("./azureOpenAI");
+const streamQueue = require("./streamQueue");
 
 const app = express();
 
@@ -20,12 +22,20 @@ app.use(express.json({ extended: false }));
 app.use(cookieParser());
 app.use(csurf({ cookie: true, ignoreMethods: ['GET', 'POST']}));
 
+try {
+  initializeAzureOpenAI();
+  console.log("Azure OpenAI initialized successfully");
+} catch (error) {
+  console.error("Failed to initialize Azure OpenAI:", error.message);
+}
+
 app.get("/sse/notifications/:channelId", (req, res) => {
   const { channelId } = req.params;
   buildSSEResponse({
     req,
     res,
     buildCallbackFunction: buildNotificationSearchInterval({ channelId }),
+    channelId,
   });
 });
 
@@ -91,6 +101,7 @@ app.post("/add-chat-to-termination-queue", express.json(), express.text(), (req,
 
     res.status(200).json({ response: 'Chat will be terminated soon' });
   } catch (error) {
+    console.error("Error adding chat to termination queue:", error);
     res.status(500).json({ response: 'error' });
   }
 });
@@ -103,6 +114,50 @@ app.post("/remove-chat-from-termination-queue", (req, res) => {
     res.status(500).json({ response: 'error' });
   }
 });
+
+app.post("/channels/:channelId/stream", async (req, res) => {
+  try {
+    const { channelId } = req.params;
+    const { messages, options = {} } = req.body;
+
+    if (!messages || !Array.isArray(messages)) {
+      return res.status(400).json({ error: "Messages array is required" });
+    }
+
+    const result = await createAzureOpenAIStreamRequest({
+      channelId,
+      messages,
+      options,
+    });
+
+    res.status(200).json(result);
+  } catch (error) {
+    if (error.message.includes("No active connections found for this channel - request queued")) {
+      res.status(202).json({
+        message: "Request queued - will be processed when connection becomes available",
+        status: "queued",
+      });
+    } else if (error.message === "No active connections found for this channel") {
+      res.status(404).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: "Failed to start streaming" });
+    }
+  }
+});
+
+setInterval(() => {
+  const now = Date.now();
+  const oneHour = 60 * 60 * 1000;
+
+  for (const [channelId, requests] of streamQueue.queue.entries()) {
+    const staleRequests = requests.filter((req) => now - req.timestamp > oneHour || !streamQueue.shouldRetry(req));
+
+    staleRequests.forEach((staleReq) => {
+      streamQueue.removeFromQueue(channelId, staleReq.id);
+      console.log(`Cleaned up stale stream request for channel ${channelId}`);
+    });
+  }
+}, 5 * 60 * 1000);
 
 const server = app.listen(serverConfig.port, () => {
   console.log(`Server running on port ${serverConfig.port}`);
