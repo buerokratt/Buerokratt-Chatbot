@@ -1,30 +1,133 @@
 const { Client } = require("@opensearch-project/opensearch");
 const { openSearchConfig } = require("./config");
+const { streamAzureOpenAIResponse } = require("./azureOpenAI");
+const { activeConnections } = require("./connectionManager");
+const streamQueue = require("./streamQueue");
 
 let client = buildClient();
 
 async function searchNotification({ channelId, connectionId, sender }) {
   try {
-    const response = await client.search({
-      index: openSearchConfig.notificationIndex,
-      body: {
-        query: {
-          bool: {
-            must: { match: { channelId } },
-            must_not: { match: { sentTo: connectionId } },
+    const response = await client
+      .search({
+        index: openSearchConfig.notificationIndex,
+        body: {
+          query: {
+            bool: {
+              must: { match: { channelId } },
+              must_not: { match: { sentTo: connectionId } },
+            },
           },
+          sort: { timestamp: { order: "asc" } },
         },
-        sort: { timestamp: { order: "asc" } },
-      },
-    }).catch(handleError);;
+      })
+      .catch(handleError);
 
     for (const hit of response.body.hits.hits) {
-      await sender(hit._source.payload);
+      const notification = hit._source;
+
+      await sender(notification.payload);
+
       await markAsSent(hit, connectionId);
     }
   } catch (e) {
-    console.error(e);
-    await sender({});
+    console.error("processing notification error:", e);
+    await sender({ error: "Notification processing failed" });
+  }
+}
+
+async function createAzureOpenAIStreamRequest({ channelId, messages, options = {} }) {
+  const { stream = true } = options;
+
+  try {
+    const connections = Array.from(activeConnections.entries()).filter(
+      ([_, connData]) => connData.channelId === channelId
+    );
+
+    if (connections.length === 0) {
+      const requestId = streamQueue.addToQueue(channelId, { messages, options });
+      console.log(`No active connections for channel ${channelId}, queued request ${requestId}`);
+      throw new Error("No active connections found for this channel");
+    }
+
+    const responsePromises = connections.map(async ([connectionId, connData]) => {
+      const { sender } = connData;
+
+      try {
+        const response = await streamAzureOpenAIResponse(messages, options);
+
+        if (!activeConnections.has(connectionId)) {
+          return;
+        }
+
+        if (stream) {
+          sender({
+            type: "stream_start",
+            streamId: channelId,
+            channelId: channelId,
+          });
+
+          for await (const part of response) {
+            if (!activeConnections.has(connectionId)) {
+              break;
+            }
+
+            const content = part.choices[0]?.delta?.content;
+            if (content) {
+              sender({
+                type: "stream_chunk",
+                channelId,
+                content: content,
+                isComplete: false,
+              });
+            }
+          }
+
+          if (activeConnections.has(connectionId)) {
+            sender({
+              type: "stream_complete",
+              channelId,
+              content: "",
+              isComplete: true,
+            });
+          }
+        } else {
+          const content = response.choices[0]?.message?.content || "";
+          const context = response.choices[0]?.message?.context || {};
+
+          sender({
+            type: "complete_response",
+            channelId,
+            content: content,
+            context,
+            isComplete: true,
+          });
+        }
+      } catch (error) {
+        if (activeConnections.has(connectionId)) {
+          const errorMessage = `Failed to ${stream ? "stream" : "generate"} response: ${error.message}`;
+          sender({
+            type: stream ? "stream_error" : "response_error",
+            channelId,
+            content: errorMessage,
+            isComplete: true,
+          });
+        }
+        throw error;
+      }
+    });
+
+    await Promise.all(responsePromises);
+
+    return {
+      success: true,
+      channelId,
+      connectionsCount: connections.length,
+      message: `Azure OpenAI ${stream ? "streaming" : "response"} completed for all connections`,
+    };
+  } catch (error) {
+    console.error(`Error in createAzureOpenAIStreamRequest (stream=${stream}):`, error);
+    throw error;
   }
 }
 
@@ -149,5 +252,6 @@ module.exports = {
   enqueueChatId,
   dequeueChatId,
   findChatIdOrder,
-  sendBulkNotification
+  sendBulkNotification,
+  createAzureOpenAIStreamRequest,
 };

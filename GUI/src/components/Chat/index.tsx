@@ -46,6 +46,8 @@ import { useNewMessageSound } from 'hooks/useAudio';
 import './Chat.scss';
 import { useInterval } from 'usehooks-ts';
 import { BotConfig } from 'types/botConfig';
+import { DomainSelection } from '../../types/domainsModels';
+import { getWidgetData } from '../../services/users';
 
 type ChatProps = {
   chat: ChatType;
@@ -111,6 +113,9 @@ const Chat: FC<ChatProps> = ({
 
   const [newMessageEffect] = useNewMessageSound();
   const navigate = useNavigate();
+  const [allDomains, setAllDomains] = useState<DomainSelection[]>([]);
+  const multiDomainEnabled =
+    import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
 
   const askPermissionsTimeoutInSeconds = 60;
   let messagesLength = 0;
@@ -160,6 +165,14 @@ const Chat: FC<ChatProps> = ({
       localStorage.removeItem('focused_chat');
     }
   };
+
+  useEffect(() => {
+    if(multiDomainEnabled && userInfo?.idCode) {
+      getWidgetData(userInfo?.idCode).then((domains) => {
+        setAllDomains(domains);
+      })
+    }
+  }, [userInfo?.idCode, multiDomainEnabled]);
 
   useEffect(() => {
     localStorage.setItem('focused_chat', chat.id);
@@ -723,8 +736,21 @@ const Chat: FC<ChatProps> = ({
     }
   };
 
+  let url = 'none';
+
+  if(multiDomainEnabled && allDomains.length > 0) {
+    const chatUrl = chat.endUserUrl ?? '';
+    const found = allDomains.find(domain =>
+      chatUrl.includes(domain.url)
+    );
+
+    if(found) {
+      url = found.id
+    }
+  }
+
   useQuery<{ config: BotConfig }>({
-    queryKey: ['configs/bot-config', 'prod'],
+    queryKey: ['configs/bot-config?domain=' + url, 'prod'],
     onSuccess(data: any) {
       setIsChatEditingAllowed(data.response.isEditChatVisible === 'true');
     },

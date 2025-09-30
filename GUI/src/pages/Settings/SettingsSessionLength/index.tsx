@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { AxiosError } from 'axios';
 import { useTranslation } from 'react-i18next';
-import { Button, Card, FormInput, FormTextarea, Switch, Track } from 'components';
+import { Button, Card, FormInput, FormTextarea, Icon, Switch, Tooltip, Track } from 'components';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useToast } from 'hooks/useToast';
 import { apiDev } from 'services/api';
@@ -10,6 +10,7 @@ import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';
 import { Controller, useForm } from 'react-hook-form';
 import { WELCOME_MESSAGE_LENGTH } from '../../../constants/config';
+import { AiOutlineInfoCircle } from 'react-icons/ai';
 
 type FormValues = {
   sessionLength: string;
@@ -40,6 +41,36 @@ const SettingsSessionLength: FC = () => {
       autoCloseText: '',
     },
   });
+
+  const tooltips = {
+    sessionLength: t('settings.sessionLength.tooltip.sessionLength'),
+    idleTimout: t('settings.sessionLength.tooltip.idleTimout'),
+    showIdleMessage: t('settings.sessionLength.tooltip.showIdleMessage'),
+    idleMessageText: t('settings.sessionLength.tooltip.idleMessageText'),
+    showEndMessage: t('settings.sessionLength.tooltip.showEndMessage'),
+    endMessageText: t('settings.sessionLength.tooltip.endMessageText'),
+  };
+
+  const getTooltip = (
+    name:
+      | 'sessionLength'
+      | 'idleTimout'
+      | 'showIdleMessage'
+      | 'idleMessageText'
+      | 'showEndMessage'
+      | 'endMessageText'
+  ) => {
+    return (
+      <Tooltip content={tooltips[name]}>
+        <span>
+          <Icon
+            icon={<AiOutlineInfoCircle fontSize={20} color="#005aa3" />}
+            size="medium"
+          />
+        </span>
+      </Tooltip>
+    );
+  }
 
   const extractConfigMap = (response: ConfigItem[]): Record<string, string> => {
     return response.reduce((acc, item) => {
@@ -166,18 +197,22 @@ const SettingsSessionLength: FC = () => {
               name="sessionLength"
               control={control}
               render={({ field }) => (
-                <FormInput
-                  {...field}
-                  labelWidth={130}
-                  name="session-length"
-                  label={t('settings.userSession.sessionLength')}
-                  type="number"
-                />
+                  <FormInput
+                    {...field}
+                    labelWidth={130}
+                    name="session-length"
+                    label={t('settings.userSession.sessionLength')}
+                    type="number"
+                  />
+
               )}
             />
-            <label className="minute">
-              {t('settings.userSession.minutes')}
-            </label>
+            <Track gap={10}>
+              <label className="minute">
+                {t('settings.userSession.minutes')}
+              </label>
+              {getTooltip('sessionLength')}
+            </Track>
           </Track>
           <label className="rule">{t('settings.userSession.rule')}</label>
         </Track>
@@ -189,18 +224,22 @@ const SettingsSessionLength: FC = () => {
               name="chatActiveDuration"
               control={control}
               render={({ field }) => (
-                <FormInput
-                  {...field}
-                  labelWidth={130}
-                  name="chatActiveDuration"
-                  label={t('settings.chatDuration.duration')}
-                  type="number"
-                />
+                  <FormInput
+                    {...field}
+                    labelWidth={130}
+                    name="chatActiveDuration"
+                    label={t('settings.chatDuration.duration')}
+                    type="number"
+                  />
+
               )}
             />
-            <label className="minute">
-              {t('settings.chatDuration.minutes')}
-            </label>
+            <Track gap={10} >
+              <label className="minute">
+                {t('settings.chatDuration.minutes')}
+              </label>
+              {getTooltip('idleTimout')}
+            </Track>
           </Track>
           <label className="rule">{t('settings.chatDuration.rule')}</label>
 
@@ -212,12 +251,12 @@ const SettingsSessionLength: FC = () => {
             align="left"
             style={{ paddingRight: '20px' }}
           >
-
             <Controller
               name="showIdleWarning"
               control={control}
               render={({ field }) => (
                 <>
+                <Track gap={120}>
                   <Switch
                     label={t('global.displayText')}
                     onLabel={t('global.yes') ?? 'yes'}
@@ -226,8 +265,10 @@ const SettingsSessionLength: FC = () => {
                     checked={field.value}
                     {...field}
                   />
-
+                  {getTooltip('showIdleMessage')}
+                </Track>
                   {showIdleWarning && (
+                    <Track gap={10} style={{ width: '100%' }}>
                     <Controller
                       name="idleMessage"
                       control={control}
@@ -244,6 +285,8 @@ const SettingsSessionLength: FC = () => {
                         />
                       )}
                     />
+                      {getTooltip('idleMessageText')}
+                    </Track>
                   )}
                 </>
               )}
@@ -253,6 +296,7 @@ const SettingsSessionLength: FC = () => {
               control={control}
               render={({ field }) => (
                 <>
+                  <Track gap={70}>
                   <Switch
                     label={t('settings.showAutoCloseText')}
                     onLabel={t('global.yes') ?? 'yes'}
@@ -261,8 +305,10 @@ const SettingsSessionLength: FC = () => {
                     checked={field.value}
                     {...field}
                   />
-
+                  {getTooltip('showEndMessage')}
+                  </Track>
                   {showAutoCloseText && (
+                    <Track gap={10} style={{ width: '100%' }}>
                     <Controller
                       name="autoCloseText"
                       control={control}
@@ -279,6 +325,8 @@ const SettingsSessionLength: FC = () => {
                         />
                       )}
                     />
+                      {getTooltip('endMessageText')}
+                    </Track>
                   )}
                 </>
               )}
