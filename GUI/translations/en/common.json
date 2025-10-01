@@ -497,7 +497,7 @@
         "indexName": "The name of the index created in Azure.",
         "queryType": "Choose a search type.",
         "semanticConfiguration": "Semantic configuration of an index created in Azure",
-        "inScope": "In Work..."
+        "inScope": "When the search service returns 0 chunks from the data, the user query is not sent on to the LLM (when 'Yes' is selected) and a predefined response is sent to the user straight from the search service"
       },
       "validation": {
         "range": "Range must be between 1 and 5",

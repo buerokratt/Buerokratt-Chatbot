@@ -497,7 +497,7 @@
         "indexName": "Azures loodud indeksi nimi.",
         "queryType": "Vali otsingutüüp.",
         "semanticConfiguration": "Azures loodud indeksi semantiline konfiguratsioon",
-        "inScope": "In Work..."
+        "inScope": "Kui otsing tagastab andmetest 0 vastet, siis 'Jah' puhul ei saadeta kasutaja küsimust keelemudelile, vaid kindlaksmääratud vastus tuleb otsingusüsteemist"
       },
       "validation": {
         "range": "Rangus peab olema vahemikus 1 kuni 5",
