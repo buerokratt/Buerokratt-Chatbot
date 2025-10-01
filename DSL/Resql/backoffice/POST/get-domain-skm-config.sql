@@ -9,7 +9,8 @@ WITH configuration_values AS (
                   'skm_max_tokens',
                   'skm_index_name',
                   'skm_query_type',
-                  'skm_semantic_configuration')
+                  'skm_semantic_configuration',
+                  'skm_in_scope')
       AND id IN (SELECT max(id) FROM configuration GROUP BY KEY)
       AND "domain" = :domainUUID::UUID
       AND NOT deleted
@@ -21,5 +22,6 @@ SELECT
     MAX(CASE WHEN KEY = 'skm_max_tokens' THEN value END) AS max_tokens,
     MAX(CASE WHEN KEY = 'skm_index_name' THEN value END) AS index_name,
     MAX(CASE WHEN KEY = 'skm_query_type' THEN value END) AS query_type,
-    MAX(CASE WHEN KEY = 'skm_semantic_configuration' THEN value END) AS semantic_configuration
+    MAX(CASE WHEN KEY = 'skm_semantic_configuration' THEN value END) AS semantic_configuration,
+    MAX(CASE WHEN KEY = 'skm_in_scope' THEN value END) AS in_scope
 FROM configuration_values;

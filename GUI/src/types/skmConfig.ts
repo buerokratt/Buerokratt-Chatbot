@@ -6,6 +6,7 @@ export interface SkmConfig {
   indexName: string;
   queryType: string;
   semanticConfiguration: string;
+  inScope: string;
   domainUUID?: string[];
 }
 

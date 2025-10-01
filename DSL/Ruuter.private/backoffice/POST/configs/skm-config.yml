@@ -29,6 +29,9 @@ declaration:
       - field: semanticConfiguration
         type: string
         description: "Body field 'semanticConfiguration'"    
+      - field: inScope
+        type: string
+        description: "Body field 'inScope'"
 
 extractRequestData:
   assign:
@@ -39,6 +42,7 @@ extractRequestData:
     skm_index_name: ${incoming.body.indexName}
     skm_query_type: ${incoming.body.queryType}
     skm_semantic_configuration: ${incoming.body.semanticConfiguration}
+    skm_in_scope: ${incoming.body.inScope}
 
 setSkmConfig:
   call: http.post
@@ -52,6 +56,7 @@ setSkmConfig:
       skm_index_name: ${skm_index_name}
       skm_query_type: ${skm_query_type}
       skm_semantic_configuration: ${skm_semantic_configuration}
+      skm_in_scope: ${skm_in_scope}
       created: ${new Date().toISOString()}
   result: return_result
 
