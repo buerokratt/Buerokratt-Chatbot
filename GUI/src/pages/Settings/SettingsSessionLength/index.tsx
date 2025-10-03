@@ -1,7 +1,16 @@
 import { FC } from 'react';
 import { AxiosError } from 'axios';
 import { useTranslation } from 'react-i18next';
-import { Button, Card, FormInput, FormTextarea, Icon, Switch, Tooltip, Track } from 'components';
+import {
+  Button,
+  Card,
+  FormInput,
+  FormTextarea,
+  Icon,
+  Switch,
+  Tooltip,
+  Track,
+} from 'components';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useToast } from 'hooks/useToast';
 import { apiDev } from 'services/api';
@@ -11,6 +20,7 @@ import { ROLES } from 'utils/constants';
 import { Controller, useForm } from 'react-hook-form';
 import { WELCOME_MESSAGE_LENGTH } from '../../../constants/config';
 import { AiOutlineInfoCircle } from 'react-icons/ai';
+import { InfoTooltip } from '../../../utils/getToolTipWithText';
 
 type FormValues = {
   sessionLength: string;
@@ -256,17 +266,15 @@ const SettingsSessionLength: FC = () => {
               control={control}
               render={({ field }) => (
                 <>
-                <Track gap={120}>
                   <Switch
                     label={t('global.displayText')}
                     onLabel={t('global.yes') ?? 'yes'}
                     offLabel={t('global.no') ?? 'no'}
                     onCheckedChange={(e) => field.onChange(e)}
                     checked={field.value}
+                    tooltip={<InfoTooltip name='settings.sessionLength.tooltip.showIdleMessage' />}
                     {...field}
                   />
-                  {getTooltip('showIdleMessage')}
-                </Track>
                   {showIdleWarning && (
                     <Track gap={10} style={{ width: '100%' }}>
                     <Controller
@@ -285,7 +293,7 @@ const SettingsSessionLength: FC = () => {
                         />
                       )}
                     />
-                      {getTooltip('idleMessageText')}
+                      {getTooltip('settings.sessionLength.tooltip.showEndMessage')}
                     </Track>
                   )}
                 </>
@@ -296,17 +304,15 @@ const SettingsSessionLength: FC = () => {
               control={control}
               render={({ field }) => (
                 <>
-                  <Track gap={70}>
                   <Switch
                     label={t('settings.showAutoCloseText')}
                     onLabel={t('global.yes') ?? 'yes'}
                     offLabel={t('global.no') ?? 'no'}
                     onCheckedChange={(e) => field.onChange(e)}
                     checked={field.value}
+                    tooltip={<InfoTooltip name='settings.sessionLength.tooltip.showEndMessage' />}
                     {...field}
                   />
-                  {getTooltip('showEndMessage')}
-                  </Track>
                   {showAutoCloseText && (
                     <Track gap={10} style={{ width: '100%' }}>
                     <Controller
