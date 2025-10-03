@@ -23,7 +23,7 @@ function removeFromTerminationQueue(id) {
 }
 
 function spliceAborts(id) {
-    const abortIndex = abortQueue.findIndex((x) => x.id === id && 5000 > (Date.now() - x.at));
+    const abortIndex = abortQueue.findIndex((x) => x.id === id && 10000 > (Date.now() - x.at));
     if (abortIndex === -1) {
         return [];
     }
