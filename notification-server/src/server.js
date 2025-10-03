@@ -75,14 +75,14 @@ app.post("/dequeue", async (req, res) => {
   }
 });
 
-app.post("/add-chat-to-termination-queue", express.json(), express.text(), (req, res) => {
+app.post("/add-chat-to-termination-queue", express.json(), express.text(),async (req, res) => {
   try {
     const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
     
     addToTerminationQueue(
       body.chatId,
       body.timeout,
-      () => fetch(`${process.env.RUUTER_URL}/chats/end`, {
+      () => fetch(`${process.env.RUUTER_URL}/backoffice/chats/end`, {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
