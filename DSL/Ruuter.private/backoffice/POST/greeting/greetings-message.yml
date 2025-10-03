@@ -15,7 +15,7 @@ declaration:
         type: string
         description: "Body field 'est'"
       - field: domainUUID
-        type: string
+        type: object
         description: "Body field 'domainUUID'"
 
 extractRequestData:

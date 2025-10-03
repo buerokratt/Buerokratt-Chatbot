@@ -87,8 +87,7 @@ const SettingsWelcomeMessage: FC = () => {
         isActive: (welcomeMessageActive || false).toString(),
         est: welcomeMessage,
       };
-
-      if (multiDomainEnabled) requestData.domainUUID = selectedDomains;
+      requestData.domainUUID = multiDomainEnabled ? selectedDomains : [];
 
       welcomeMessageMutation.mutate(requestData);
     }
