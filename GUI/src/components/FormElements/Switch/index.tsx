@@ -1,4 +1,4 @@
-import { forwardRef, useId } from 'react';
+import { forwardRef, ReactNode, useId } from 'react';
 import * as RadixSwitch from '@radix-ui/react-switch';
 import { useTranslation } from 'react-i18next';
 import { ControllerRenderProps } from 'react-hook-form';
@@ -15,6 +15,7 @@ type SwitchProps = Partial<ControllerRenderProps> & {
   defaultChecked?: boolean;
   hideLabel?: boolean;
   onCheckedChange?: (checked: boolean) => void;
+  tooltip?: ReactNode;
 };
 
 const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
@@ -29,6 +30,7 @@ const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
       hideLabel,
       onCheckedChange,
       defaultChecked,
+      tooltip
     },
     ref
   ) => {
@@ -57,6 +59,7 @@ const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
           <span className="switch__on">{onValueLabel}</span>
           <span className="switch__off">{offValueLabel}</span>
         </RadixSwitch.Root>
+        {tooltip && <span className="switch__tooltip">{tooltip}</span>}
       </div>
     );
   }
