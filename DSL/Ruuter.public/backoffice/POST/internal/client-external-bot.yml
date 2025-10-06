@@ -73,7 +73,7 @@ assign_data_sources:
           index_name: ${skm_config.indexName}
           semantic_configuration: ${skm_config.semanticConfiguration ?? 'azureml-default'}
           query_type: ${skm_config.queryType}
-          in_scope: true
+          in_scope: ${skm_config.inScope === 'true' ?? true}
           strictness: ${parseInt(skm_config.range ?? '3')}
           top_n_documents: ${parseInt(skm_config.documents ?? '5')}
           authentication:

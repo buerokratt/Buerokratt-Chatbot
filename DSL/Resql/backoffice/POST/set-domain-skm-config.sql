@@ -19,7 +19,8 @@ WHERE
      'skm_max_tokens',
      'skm_index_name',
      'skm_query_type',
-     'skm_semantic_configuration'
+     'skm_semantic_configuration',
+     'skm_in_scope'
     )
   AND c.deleted = FALSE
   AND c.id = (
@@ -44,7 +45,8 @@ FROM (
         ('skm_max_tokens', :skm_max_tokens),
         ('skm_index_name', :skm_index_name),
         ('skm_query_type', :skm_query_type),
-        ('skm_semantic_configuration', :skm_semantic_configuration)
+        ('skm_semantic_configuration', :skm_semantic_configuration),
+        ('skm_in_scope', :skm_in_scope)
    ) AS v(key, value)
     )
 INSERT INTO configuration (key, value, domain, created)
