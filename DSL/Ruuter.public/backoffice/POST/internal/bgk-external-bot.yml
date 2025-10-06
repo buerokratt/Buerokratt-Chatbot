@@ -35,6 +35,7 @@ assignBgkConfig:
     chatbot_external_api_key: "[#BGK_CHATBOT_EXTERNAL_API_KEY]"
     chatbot_external_bot_url: "[#BGK_CHATBOT_EXTERNAL_BOT_URL]"
     semantic_configuration: "[#BGK_SEMANTIC_CONFIGURATION]"
+    in_scope: "[#BGK_IN_SCOPE]"
     stream: "[#BGK_STREAM]"
 
 check_if_client_bot_is_active:
@@ -52,7 +53,7 @@ assign_data_sources:
           index_name: ${index_name}
           semantic_configuration: ${semantic_configuration}
           query_type: ${query_type}
-          in_scope: true
+          in_scope: ${in_scope.toLowerCase() === 'true'}
           strictness: ${parseInt(strictness ?? '3')}
           top_n_documents: ${parseInt(documents ?? '5')}
           authentication:

@@ -8,6 +8,7 @@ import {
   FormSelect,
   FormTextarea,
   Icon,
+  Switch,
   Tooltip,
   Track,
 } from 'components';
@@ -33,7 +34,7 @@ const SettingsSkmConfiguration: FC = () => {
   const multiDomainEnabled =
     import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
   const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
-
+  
   useEffect(() => {
     if (multiDomainEnabled) {
       resetSettingsToDefault();
@@ -66,6 +67,7 @@ const SettingsSkmConfiguration: FC = () => {
         range: data.range.toString(),
         documents: data.documents.toString(),
         maxTokens: data.maxTokens.toString(),
+        inScope: data.inScope.toString(),
       }),
     onSuccess: () => {
       toast.open({
@@ -125,10 +127,10 @@ const SettingsSkmConfiguration: FC = () => {
     semanticConfiguration: t(
       'settings.skmConfiguration.tooltip.semanticConfiguration'
     ),
+    inScope: t('settings.skmConfiguration.tooltip.inScope'),
   };
 
   const resetSettingsToDefault = () => {
-    console.log('triggered')
     const skmConfig = {
       range: '3',
       documents: '5',
@@ -137,6 +139,7 @@ const SettingsSkmConfiguration: FC = () => {
       indexName: '',
       queryType: 'vector_semantic_hybrid',
       semanticConfiguration: 'azureml-default',
+      inScope: 'true',
       domainUUID: [],
     };
     setSkmConfig(skmConfig);
@@ -221,6 +224,7 @@ const SettingsSkmConfiguration: FC = () => {
               </Track>
             )}
           />
+          {getSwitchControl('inScope')}
         </Track>
       </Card>
     </>
@@ -235,6 +239,7 @@ const SettingsSkmConfiguration: FC = () => {
       | 'indexName'
       | 'queryType'
       | 'semanticConfiguration'
+      | 'inScope'
   ) {
     return (
       <Tooltip content={tooltips[name]}>
@@ -283,6 +288,30 @@ const SettingsSkmConfiguration: FC = () => {
               label={t(`settings.skmConfiguration.${name}`)}
               onChange={field.onChange}
               value={field.value}
+            />
+            {getTooltip(name)}
+          </Track>
+        )}
+      />
+    );
+  }
+
+  function getSwitchControl(name: 'inScope') {
+    return (
+      <Controller
+        name={name}
+        control={control}
+        render={({ field }) => (
+          <Track gap={10} style={{ width: '100%' }}>
+            <Switch
+              label={t(`settings.skmConfiguration.${name}`)}
+              onCheckedChange={(value) => {
+                field.onChange(value.toString());
+              }}
+              checked={field.value === 'true'}
+              onLabel={t('global.yes').toString()}
+              offLabel={t('global.no').toString()}
+              {...field}
             />
             {getTooltip(name)}
           </Track>
