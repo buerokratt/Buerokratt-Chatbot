@@ -194,6 +194,7 @@ const SettingsSessionLength: FC = () => {
       <h1>{t('settings.userSession.sessionLength')}</h1>
       <Card
         isBodyDivided={true}
+        isScrollable={true}
         footer={
           <Track justify="end">
             <Button onClick={handleSubmit(onSubmit)}>{t('global.save')}</Button>
