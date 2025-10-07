@@ -18,7 +18,6 @@ FilteredMessages AS (
 ),
 LatestActiveUser AS (
   SELECT
-ORDER BY mc.base_id,mc.author_timestamp DESC
     u.id_code, u.created, u.csa_title
   FROM
     "user" u INNER JOIN (
