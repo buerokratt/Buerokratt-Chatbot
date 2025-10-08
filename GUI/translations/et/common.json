@@ -254,7 +254,7 @@
       "requested-authentication": "Küsiti autentimist",
       "authentication_successful": "Autentimine õnnestus {{date}}",
       "authentication_failed": "Autentimine ebaõnnestus {{date}}",
-      "ask-permission": "Küsiti nõusolekut",
+      "ask-permission": "Küsiti nõusolekut {{date}}",
       "ask-permission-accepted": "Nõusolek antud {{date}}",
       "ask-permission-rejected": "Nõusolekust keeldutud {{date}}",
       "ask-permission-ignored": "Nõusolek ignoreeritud {{date}}",
