@@ -294,7 +294,7 @@ const SettingsSessionLength: FC = () => {
                         />
                       )}
                     />
-                      {getTooltip('settings.sessionLength.tooltip.showEndMessage')}
+                      {getTooltip('idleMessageText')}
                     </Track>
                   )}
                 </>
