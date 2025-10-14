@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 
@@ -29,6 +29,8 @@ import LandingPage from 'pages';
 import MultiDomain from './pages/Settings/MultiDomain';
 import SettingsFeedback from 'pages/Settings/SettingsFeedback';
 import { getWidgetData } from './services/users';
+import { generateUEID } from './utils/generateUEID';
+import { CHAT_SESSIONS } from './constants/config';
 
 const App: FC = () => {
   const multiDomainEnabled = import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
@@ -59,6 +61,69 @@ const App: FC = () => {
       return useStore.getState().setUserInfo(res.response);
     },
   });
+
+  useEffect(() => {
+    const delay = 1000;
+
+    const timeOutId = setTimeout(() => {
+      initializeSession();
+    }, delay);
+
+    return () => clearTimeout(timeOutId);
+  }, []);
+
+
+  const initializeSession = () => {
+    let tabId = sessionStorage.getItem("tabId");
+    if (!tabId) {
+      tabId = generateUEID();
+      sessionStorage.setItem("tabId", tabId);
+    }
+
+    let currentState = getCurrentSessionState();
+
+    if (!currentState.ids.includes(tabId)) {
+      currentState.ids.push(tabId);
+      currentState.count = currentState.ids.length;
+      localStorage.setItem(
+        CHAT_SESSIONS.SESSION_STATE_KEY,
+        JSON.stringify(currentState)
+      );
+    }
+
+    const handleTabClose = () => {
+      const currentAppState = JSON.parse(
+        localStorage.getItem(CHAT_SESSIONS.SESSION_STATE_KEY) as string
+      ) || { ids: [], count: 0 };
+
+      const updatedIds = currentAppState.ids.filter(
+        (id: string) => id !== tabId
+      );
+      const updatedState = {
+        ids: updatedIds,
+        count: updatedIds.length,
+      };
+
+      localStorage.setItem(
+        CHAT_SESSIONS.SESSION_STATE_KEY,
+        JSON.stringify(updatedState)
+      );
+    };
+
+    window.addEventListener("beforeunload", handleTabClose);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleTabClose);
+    };
+  };
+
+  const getCurrentSessionState = () => {
+    return (
+      JSON.parse(
+        localStorage.getItem(CHAT_SESSIONS.SESSION_STATE_KEY) as string
+      ) || { ids: [], count: 0 }
+    );
+  };
 
   return (
     <Routes>
