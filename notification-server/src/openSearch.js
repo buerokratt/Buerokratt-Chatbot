@@ -47,7 +47,6 @@ async function createAzureOpenAIStreamRequest({ channelId, messages, options = {
     if (connections.length === 0) {
       const requestId = streamQueue.addToQueue(channelId, { messages, options });
       console.log(`No active connections for channel ${channelId}, queued request ${requestId}`);
-      throw new Error("No active connections found for this channel");
     }
 
     const responsePromises = connections.map(async ([connectionId, connData]) => {
