@@ -315,7 +315,13 @@
     "oneDay": "1 päev",
     "sevenDays": "7 päeva",
     "thirtyOneDay": "31 päeva",
-    "ninetyDays": "90 päeva"
+    "ninetyDays": "90 päeva",
+    "tooltip": {
+      "removeAuth": "Vali \"Jah\" kui soovid autentitud vestluste kustutamist. Perioodi aja täpsustus avaneb automaatselt. Vali \"Ei\" kui soovid, et vestlusi ei kustutataks.",
+      "removeAnon": "Vali \"Jah\" kui soovid anonüümsete vestluste kustutamist. Perioodi aja täpsustus avaneb automaatselt. Vali \"Ei\" kui soovid, et vestlusi ei kustutataks.",
+      "removalTime": "Kellaajaline seadistus, mis kell viimasel päeval vestluse kustutamine toimub.",
+      "displayExpiringConversations": "Vali ajavahemik, et näha mis vestlused kuuluvad lähiajal kustutamisele."
+    }
   },
   "roles": {
     "ROLE_ADMINISTRATOR": "Administraator",
