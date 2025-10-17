@@ -51,6 +51,8 @@ getDomainSkmConfig:
   call: http.post
   args:
     url: "[#CHATBOT_RESQL]/get-domain-skm-config"
+    body:
+      domainUUID: ${domainUuid.response.body[0].domainId}
   result: skm_res
   next: assignSkmConfig
 
