@@ -66,17 +66,22 @@ async function createAzureOpenAIStreamRequest({ channelId, messages, options = {
             channelId: channelId,
           });
 
-          for await (const part of response) {
-            if (!activeConnections.has(connectionId)) {
-              break;
-            }
+          let context;
 
-            const content = part.choices[0]?.delta?.content;
+          for await (const part of response) {
+            if (!activeConnections.has(connectionId)) break;
+
+            const choice = part.choices?.[0];
+            if (!choice) continue;
+
+            if (!context && choice.delta?.context) context = choice.delta.context;
+            
+            const content = choice.delta?.content;
             if (content) {
               sender({
                 type: "stream_chunk",
                 channelId,
-                content: content,
+                content,
                 isComplete: false,
               });
             }
@@ -87,6 +92,7 @@ async function createAzureOpenAIStreamRequest({ channelId, messages, options = {
               type: "stream_complete",
               channelId,
               content: "",
+              context: context || {},
               isComplete: true,
             });
           }
