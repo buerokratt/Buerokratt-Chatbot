@@ -236,12 +236,15 @@ const DeleteConversations: FC = () => {
                                             }
                                             value={authPeriod}
                                         />
+                                      <Track gap={10} justify={"start"} direction={"horizontal"}>
                                         <label className="minute">
-                                            {t('deleteConversation.days')}
+                                          {t('deleteConversation.days')}
                                         </label>
+                                        <InfoTooltip name="deleteConversation.tooltip.days" />
+                                      </Track>
                                     </Track>
                                     <label className="rule">
-                                        {t('deleteConversation.deletionNote')}
+                                        {t('deleteConversation.deletionAuthNote')}
                                     </label>
                                 </Track>
                             )}
@@ -287,12 +290,15 @@ const DeleteConversations: FC = () => {
                                             }}
                                             value={anonymPeriod}
                                         />
+                                      <Track gap={10} align={"center"} justify={"start"} direction={"horizontal"}>
                                         <label className="minute">
-                                            {t('deleteConversation.days')}
+                                          {t('deleteConversation.days')}
                                         </label>
+                                        <InfoTooltip name="deleteConversation.tooltip.days" />
+                                      </Track>
                                     </Track>
                                     <label className="rule">
-                                        {t('deleteConversation.deletionNote')}
+                                        {t('deleteConversation.deletionAnonNote')}
                                     </label>
                                 </Track>
                             )}
@@ -391,9 +397,9 @@ const DeleteConversations: FC = () => {
                                             onClick={() => handleDatesUpdate(31)}>{t('deleteConversation.thirtyOneDay')}</Button>
                                     <Button appearance={"text"}
                                             onClick={() => handleDatesUpdate(90)}>{t('deleteConversation.ninetyDays')}</Button>
+                                    <InfoTooltip name="deleteConversation.tooltip.displayExpiringConversations" />
                                 </Track>
 
-                              <InfoTooltip name="deleteConversation.tooltip.displayExpiringConversations" />
                             </Track>
                             <Track gap={40} align={"center"}>
                                 {t('deleteConversation.periodConversations')} <b>{removableChatsCount}</b>
