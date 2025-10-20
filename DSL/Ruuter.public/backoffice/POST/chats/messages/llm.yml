@@ -71,11 +71,24 @@ check_value:
       next: get_organization_base_config
     - condition: ${correct_value.map((item) => item.text)[0].startsWith('$validate_')}
       next: assign_validation_event
+    - condition: ${correct_value.map((item) => item.text)[0] === '$general_knowledge' || correct_value.map((item) => item.text)[0].startsWith('$general_knowledge')}
+      next: trigger_bgk_bot  
     - condition: ${correct_value.map((item) => item.text)[0] === 'The requested information is not found in the retrieved data. Please try another query or topic.'}
       next: assign_unavailable_info_message
     - condition: ${correct_value.map((item) => item.text)[0] === 'The requested information is not available in the retrieved data. Please try another query or topic.'}
       next: assign_unavailable_info_message
   next: format_messages
+
+trigger_bgk_bot:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL]/internal/bgk-external-bot"
+    body:
+      sender: ${sender}
+      message: ${message}
+  result: bgk_bot_response
+  error: return_bad_request
+  next: end
 
 get_organization_base_config:
   call: http.post
