@@ -302,7 +302,8 @@
   },
   "deleteConversation": {
     "deletionTime": "Deletion time",
-    "deletionNote": "Defines the time after which anonymous messages are automatically deleted.",
+    "deletionAnonNote": "Defines the time after which anonymous messages are automatically deleted.",
+    "deletionAuthNote": "Defines the time after which authenticated messages are automatically deleted.",
     "conversationDeleting": "Conversation deletion",
     "generateCsv": "Generate CSV",
     "periodConversations": "Conversations in period",
@@ -315,7 +316,14 @@
     "oneDay": "1 day",
     "sevenDays": "7 days",
     "thirtyOneDay": "31 day",
-    "ninetyDays": "90 days"
+    "ninetyDays": "90 days",
+    "tooltip": {
+      "removeAuth": "Select \"Yes\" if you want authenticated conversations to be deleted. The period selection will open automatically. Select \"No\" if you do not want the conversations to be deleted.",
+      "removeAnon": "Select \"Yes\" if you want anonymous conversations to be deleted. The period selection will open automatically. Select \"No\" if you do not want the conversations to be deleted.",
+      "days": "Set the time by the number of days",
+      "removalTime": "Time setting that specifies the exact hour on the final day when the conversation will be deleted.\n",
+      "displayExpiringConversations": "Select a time period to see which conversations are scheduled for deletion in the near future.\n"
+    }
   },
   "roles": {
     "ROLE_ADMINISTRATOR": "Administrator",

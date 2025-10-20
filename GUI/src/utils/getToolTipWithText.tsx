@@ -11,13 +11,16 @@ export const InfoTooltip: React.FC<TooltipProps> = ({ name }) => {
   const { t } = useTranslation();
 
   return (
-    <Tooltip content={t(name)}>
-      <span>
-        <Icon
-          icon={<AiOutlineInfoCircle fontSize={20} color="#005aa3" />}
-          size="medium"
-        />
-      </span>
-    </Tooltip>
+    <div  style={{ display: "flex", alignItems: "center" }}>
+      <Tooltip content={t(name)}>
+        <span>
+          <Icon
+            style={{ paddingTop: '6px'}}
+            icon={<AiOutlineInfoCircle fontSize={20} color="#005aa3" />}
+            size="medium"
+          />
+        </span>
+      </Tooltip>
+    </div>
   );
 };
