@@ -49,6 +49,17 @@ app.get("/sse/queue/:id", (req, res) => {
   });
 });
 
+app.use((req, res, next) => {
+  console.log("NEW REQUEST");
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
+  console.log("Headers:", req.headers);
+  if (req.body && Object.keys(req.body).length > 0) {
+    console.log("Body:", req.body);
+  }
+  console.log("---------------------------------------------------");
+  next();
+});
+
 app.post("/bulk-notifications", async (req, res) => {
   try {
     await sendBulkNotification(req.body);
@@ -62,7 +73,7 @@ app.post("/add-to-logout-queue", async (req, res) => {
   const cookies = req.headers.cookie;
 
   try {
-    addToLogoutQueue(
+    await addToLogoutQueue(
         cookies,
         5,
         () => fetch(`${process.env.PRIVATE_RUUTER_URL}/backoffice/accounts/logout`, {
@@ -81,9 +92,9 @@ app.post("/add-to-logout-queue", async (req, res) => {
   }
 });
 
-app.post("/remove-from-logout-queue", (req, res) => {
+app.post("/remove-from-logout-queue",async (req, res) => {
   try {
-    removeFromLogoutQueue(req.headers.cookie);
+    await removeFromLogoutQueue(req.headers.cookie);
     res.status(200).json({ response: 'Logout would be canceled' });
   } catch {
     res.status(500).json({ response: 'error' });
