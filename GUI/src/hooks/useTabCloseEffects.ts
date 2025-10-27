@@ -10,12 +10,9 @@ declare global {
 }
 
 const useTabCloseEffect = () => {
-  const initLogoutUrl = `${
-    import.meta.env.REACT_APP_NOTIFICATION_NODE_URL
-  }/add-to-logout-queue`;
-  const abortLogoutUrl = `${
-    import.meta.env.REACT_APP_NOTIFICATION_NODE_URL
-  }/remove-from-logout-queue`;
+  const baseUrl = import.meta.env.REACT_APP_NOTIFICATION_NODE_URL;
+  const logoutPath = '/add-to-logout-queue';
+  const cancelLogoutPath = '/remove-from-logout-queue'
 
   const isLastSession = (): boolean => {
     const currentState = JSON.parse(
@@ -24,23 +21,37 @@ const useTabCloseEffect = () => {
     return currentState.count <= 1;
   };
 
+  const getCurrentSessionState = () => {
+    return (
+      JSON.parse(
+        localStorage.getItem(CHAT_SESSIONS.SESSION_STATE_KEY) as string
+      ) || { ids: [], count: 0 }
+    );
+  };
+
+  const makeCall = (decision: "add" | "cancel") => {
+    try {
+      const supportsBeacon = !!navigator.sendBeacon;
+
+      const currenntPath = decision === "add" ? logoutPath : cancelLogoutPath;
+
+      if (supportsBeacon) {
+        const blob = new Blob([], {
+          type: 'application/x-www-form-urlencoded',
+        });
+        navigator.sendBeacon(baseUrl + currenntPath, blob);
+      } else {
+        return notificationApiDev.post(currenntPath);
+      }
+    } catch (err) {
+      console.warn('Beacon failed, falling back to logout mutation', err);
+      return notificationApiDev.post(decision === "add" ? logoutPath : cancelLogoutPath);
+    }
+  }
+
   useEffect(() => {
     setTimeout(() => {
-      try {
-        const supportsBeacon = !!navigator.sendBeacon;
-
-        if (supportsBeacon) {
-          const blob = new Blob([], {
-            type: 'application/x-www-form-urlencoded',
-          });
-          navigator.sendBeacon(abortLogoutUrl, blob);
-        } else {
-          return notificationApiDev.post('/remove-chat-from-termination-queue');
-        }
-      } catch (err) {
-        console.warn('Beacon failed, falling back to logout mutation', err);
-        return notificationApiDev.post('/remove-chat-from-termination-queue');
-      }
+      return makeCall("cancel");
     }, 2500);
   }, []);
 
@@ -79,33 +90,12 @@ const useTabCloseEffect = () => {
       const lastInitial = currentAppState.count <= 1;
 
       if (lastInitial && isLastSession()) {
-        try {
-          const supportsBeacon = !!navigator.sendBeacon;
-          if (supportsBeacon) {
-            const blob = new Blob([], {
-              type: 'application/x-www-form-urlencoded',
-            });
-            navigator.sendBeacon(initLogoutUrl, blob);
-          } else {
-            notificationApiDev.get('/add-to-logout-queue');
-          }
-        } catch (err) {
-          console.warn('Beacon failed, falling back to axios instance', err);
-          notificationApiDev.get('/add-to-logout-queue');
-        }
+        return makeCall("add");
       }
     };
 
     window.addEventListener('beforeunload', handleTabClose);
   }, []);
-
-  const getCurrentSessionState = () => {
-    return (
-      JSON.parse(
-        localStorage.getItem(CHAT_SESSIONS.SESSION_STATE_KEY) as string
-      ) || { ids: [], count: 0 }
-    );
-  };
 };
 
 export default useTabCloseEffect;
