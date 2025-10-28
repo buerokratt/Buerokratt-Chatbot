@@ -85,7 +85,7 @@ trigger_bgk_bot:
     url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL]/internal/bgk-external-bot"
     body:
       sender: ${sender}
-      message: ${message}
+      message: ${message.content ?? ''}
   result: bgk_bot_response
   error: return_bad_request
   next: end

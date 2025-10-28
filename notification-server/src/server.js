@@ -13,6 +13,7 @@ const cookieParser = require("cookie-parser");
 const csurf = require("csurf");
 const { initializeAzureOpenAI } = require("./azureOpenAI");
 const streamQueue = require("./streamQueue");
+const {addToLogoutQueue, removeFromLogoutQueue} = require("./logoutQueue");
 
 const app = express();
 
@@ -48,10 +49,53 @@ app.get("/sse/queue/:id", (req, res) => {
   });
 });
 
+app.use((req, res, next) => {
+  console.log("NEW REQUEST");
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
+  console.log("Headers:", req.headers);
+  if (req.body && Object.keys(req.body).length > 0) {
+    console.log("Body:", req.body);
+  }
+  console.log("---------------------------------------------------");
+  next();
+});
+
 app.post("/bulk-notifications", async (req, res) => {
   try {
     await sendBulkNotification(req.body);
     res.status(200).json({ response: 'sent successfully' });
+  } catch {
+    res.status(500).json({ response: 'error' });
+  }
+});
+
+app.post("/add-to-logout-queue", async (req, res) => {
+  const cookies = req.headers.cookie;
+
+  try {
+    await addToLogoutQueue(
+        cookies,
+        5,
+        () => fetch(`${process.env.PRIVATE_RUUTER_URL}/backoffice/accounts/logout`, {
+          method: 'GET',
+          headers: {
+            'cookie': cookies,
+          }
+        })
+    );
+
+    console.log('User was loged out.')
+    res.sendStatus(200);
+  } catch (err) {
+    console.error('Error forwarding request:', JSON.stringify(err));
+    res.sendStatus(500);
+  }
+});
+
+app.post("/remove-from-logout-queue",async (req, res) => {
+  try {
+    await removeFromLogoutQueue(req.headers.cookie);
+    res.status(200).json({ response: 'Logout would be canceled' });
   } catch {
     res.status(500).json({ response: 'error' });
   }
