@@ -150,12 +150,14 @@ app.post("/add-chat-to-termination-queue", express.json(), express.text(),async 
   }
 });
 
-app.post("/remove-chat-from-termination-queue", (req, res) => {
+app.post("/remove-chat-from-termination-queue", express.json(), express.text(), async (req, res) => {
+  const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
+  
   try {
-    removeFromTerminationQueue(req.body.chatId);
-    res.status(200).json({ response: 'Chat termination will be canceled' });
+    removeFromTerminationQueue(body.chatId);
+    res.status(200).json({ response: "Chat termination will be canceled" });
   } catch {
-    res.status(500).json({ response: 'error' });
+    res.status(500).json({ response: "error" });
   }
 });
 
