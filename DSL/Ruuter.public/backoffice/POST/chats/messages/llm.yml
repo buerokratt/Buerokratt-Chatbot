@@ -135,10 +135,10 @@ check_if_organization_is_available:
     - condition: ${org_details.isWithinWorkingTime === true && org_details.isWithinWorkingDays === true && org_details.isAllowedToWorkAtHolidays === true}
       next: get_all_available_csas
     - condition: ${org_details.isWithinWorkingTime === true && org_details.isWithinWorkingDays === true && org_details.isAllowedToWorkAtHolidays === false && org_details.isHoliday == true}
-      next: get_organization_bot_answer_config
+      next: assign_outside_working_hours
     - condition: ${org_details.isWithinWorkingTime === true && org_details.isWithinWorkingDays === true && org_details.isAllowedToWorkAtHolidays === false && org_details.isHoliday == false}
       next: get_all_available_csas
-  next: get_organization_bot_answer_config
+  next: assign_outside_working_hours
 
 get_all_available_csas:
   call: http.post
@@ -155,8 +155,26 @@ assign_available_csas:
 check_if_csas_are_available:
   switch:
     - condition: ${available_csas == 0}
-      next: get_organization_bot_answer_config
+      next: assign_no_csas_available
   next: assign_organization_available
+
+assign_no_csas_available:
+  assign:
+    correct_value:
+      - recipient_id: ${sender}
+        text: ${base_config.noCsaMessage}
+        context: ${context}
+    event: "${base_config.askForContacts === 'true' ? 'unavailable_csas_ask_contacts' : 'unavailable_csas'}"
+  next: format_messages
+
+assign_outside_working_hours:
+  assign:
+    correct_value:
+      - recipient_id: ${sender}
+        text: ${base_config.outsideWorkingHoursMessage}
+        context: ${context}
+    event: "${base_config.outsideWorkingHoursAskForContacts === 'true' ? 'unavailable_organization_ask_contacts' : 'unavailable_organization'}"
+  next: format_messages  
 
 assign_organization_available:
   assign:
