@@ -42,7 +42,30 @@ getChat:
     body:
       id: ${chatId}
   result: res
-  next: return_result
+  next: checkIfChatIsEnded
+
+checkIfChatIsEnded:
+  switch:
+    - condition: ${res.response.body[0].status == "ENDED"}
+      next: unassign_cookie
+  next:  return_result
+
+unassign_cookie:
+  assign:
+    userCookie:
+      userJwt: null
+      Domain: "[#DOMAIN]"
+      Secure: true
+      HttpOnly: true
+      SameSite: "[#COOKIE_SAME_SITE]"
+      Max-Age: 0
+  next: remove_cookie
+
+remove_cookie:
+  headers: 
+    Set-Cookie: ${userCookie}
+  return: ${res.response.body[0]}
+  next: end
 
 return_result:
   return: ${res.response.body[0]}
