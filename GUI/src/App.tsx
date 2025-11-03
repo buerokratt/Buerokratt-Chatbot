@@ -57,6 +57,12 @@ const App: FC = () => {
           });
       }
 
+      if(useStore.getState().userInfo && useStore.getState().userInfo?.idCode !== res.response.idCode) {
+        //
+      }
+
+      console.log('logged in as', useStore.getState().userInfo, 'and new ', res.response)
+
       return useStore.getState().setUserInfo(res.response);
     },
   });
