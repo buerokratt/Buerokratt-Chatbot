@@ -9,18 +9,22 @@ declaration:
   allowlist:
     body:
       - field: headers
-        type: array
+        type: object
         description: "Body field 'headers'"
+      - field: language
+        type: string
+        description: "Body field 'language'"
       - field: rows
-        type: array
+        type: object
         description: "Body field 'rows'"
       - field: chatIds
-        type: array
+        type: object
         description: "Body field 'chatIds'"
 
 extractRequestData:
   assign:
     headers: ${incoming.body.headers}
+    language: ${incoming.body.language}
     rows: ${incoming.body.rows}
     chatIds: ${incoming.body.chatIds}
 
@@ -41,6 +45,7 @@ get_xlsx_data:
       chatHeaders: ${headers}
       chatIds: ${chatIds}
       chatRows: ${rows}
+      language: ${language}
   result: xlsxData
 
 return_success:
