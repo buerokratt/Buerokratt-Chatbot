@@ -234,6 +234,7 @@
       "unavailable_holiday_ask_contacts": "Puhkus ja küsitakse kontakte",
       "user-reached": "Kasutajaga võeti ühendust",
       "user-not-reached": "Kasutajaga ei õnnestunud ühendust saada",
+      "user-authenticated": "{{name}} on autenditud {{date}}",
       "ask_to_forward_to_csa": "Vestlus paluti klienditeenindajale suunata",
       "forwarded_to_backoffice": "Vestlus suunatakse klienditeenindajale",
       "continue_chatting_with_bot": "Jätkake vestlust kasutajaga bürokratt"
