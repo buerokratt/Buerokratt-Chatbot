@@ -22,6 +22,7 @@ import { CustomerSupportActivityDTO } from 'types/customerSupportActivity';
 import useStore from '../../../store';
 import { format } from 'date-fns';
 import { WDomain } from '../../../types/widgetModels';
+import { isSmaxIntegrationEnabled } from 'constants/config';
 
 const SettingsUsers: FC = () => {
   const { t } = useTranslation();
@@ -360,11 +361,15 @@ const SettingsUsers: FC = () => {
       columnHelper.accessor('department', {
         header: t('settings.users.department') ?? '',
       }),
-      columnHelper.accessor('smaxAccountId', {
-        header: t('settings.users.connectedToSmax') ?? '',
-        enableColumnFilter: false,
-        cell: (props) => (props.getValue() ? t('global.yes') : t('global.no')),
-      }),
+      ...(isSmaxIntegrationEnabled
+        ? [
+        columnHelper.accessor('smaxAccountId', {
+          header: t('settings.users.connectedToSmax') ?? '',
+          enableColumnFilter: false,
+          cell: (props) => (props.getValue() ? t('global.yes') : t('global.no')),
+        }),
+          ]
+        : []),
       columnHelper.display({
         id: 'edit',
         cell: editView,
