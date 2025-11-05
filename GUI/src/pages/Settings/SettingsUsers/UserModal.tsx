@@ -12,6 +12,7 @@ import { ROLES } from 'utils/constants';
 import Select from 'react-select';
 import './SettingsUsers.scss';
 import { WDomain } from '../../../types/widgetModels';
+import { isSmaxIntegrationEnabled } from 'constants/config';
 
 type UserModalProps = {
   onClose: () => void;
@@ -192,7 +193,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user, domainsList }) => {
           <Button appearance="secondary" onClick={onClose}>
             {t('global.cancel')}
           </Button>
-          {user && (
+          {user && isSmaxIntegrationEnabled && (
             <Button onClick={handleSmaxConnection}>
               {user.smaxAccountId
                 ? t('settings.users.disconnectFromSmax')
