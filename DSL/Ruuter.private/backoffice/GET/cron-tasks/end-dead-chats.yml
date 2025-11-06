@@ -33,7 +33,7 @@ checkTimIds:
   result: deadKeys
 
 returnSuccess:
-  return: ${JSON.parse(deadKeys.response.body)}
+  return: ${deadKeys.response.body}
   next: end
 
 return_not_found:

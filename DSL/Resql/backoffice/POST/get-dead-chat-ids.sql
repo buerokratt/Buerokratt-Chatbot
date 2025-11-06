@@ -7,4 +7,5 @@ FROM (
          ORDER BY base_id, updated DESC
      ) latest
 WHERE latest.status IS NOT NULL
-  AND latest.status <> 'ENDED';
+  AND latest.status <> 'ENDED'
+  AND latest.ended IS NULL;
