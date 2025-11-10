@@ -59,14 +59,20 @@ async function createAzureOpenAIStreamRequest({ channelId, messages, options = {
           return;
         }
 
+        const openAIFallback1 = "The requested information is not found in the retrieved data. Please try another query or topic.";
+        const openAIFallback2 = "The requested information is not available in the retrieved data. Please try another query or topic.";
+        const estonianFallback = "Mulle kättesaadavates andmetes puudub teie küsimusele vastav info. Palun täpsustage oma küsimust.";
+
         if (stream) {
           sender({
             type: "stream_start",
             streamId: channelId,
-            channelId: channelId,
+            channelId,
           });
 
           let context;
+          let cumulative = "";
+          let startedStreaming = false;
 
           for await (const part of response) {
             if (!activeConnections.has(connectionId)) break;
@@ -75,9 +81,27 @@ async function createAzureOpenAIStreamRequest({ channelId, messages, options = {
             if (!choice) continue;
 
             if (!context && choice.delta?.context) context = choice.delta.context;
-            
+
             const content = choice.delta?.content;
-            if (content) {
+            if (!content) continue;
+
+            cumulative += content;
+
+            if (!startedStreaming) {
+              const isPrefixOfT1 = openAIFallback1.startsWith(cumulative);
+              const isPrefixOfT2 = openAIFallback2.startsWith(cumulative);
+
+              if (isPrefixOfT1 || isPrefixOfT2) continue;
+              
+              startedStreaming = true;
+
+              sender({
+                type: "stream_chunk",
+                channelId,
+                content: cumulative,
+                isComplete: false,
+              });
+            } else {
               sender({
                 type: "stream_chunk",
                 channelId,
@@ -88,6 +112,18 @@ async function createAzureOpenAIStreamRequest({ channelId, messages, options = {
           }
 
           if (activeConnections.has(connectionId)) {
+            if (!startedStreaming) {
+              const trimmed = cumulative.trim();
+              if (trimmed === openAIFallback1 || trimmed === openAIFallback2) {
+                sender({
+                  type: "stream_chunk",
+                  channelId,
+                  content: estonianFallback,
+                  isComplete: false,
+                });
+              }
+            }
+
             sender({
               type: "stream_complete",
               channelId,
@@ -97,9 +133,14 @@ async function createAzureOpenAIStreamRequest({ channelId, messages, options = {
             });
           }
         } else {
-          const content = response.choices[0]?.message?.content || "";
+          let content = response.choices[0]?.message?.content || "";
           const context = response.choices[0]?.message?.context || {};
 
+          const trimmed = content.trim();
+          const isDefaultMessage = trimmed === openAIFallback1 || trimmed === openAIFallback2;
+
+          if (isDefaultMessage) content = estonianFallback;
+          
           sender({
             type: "complete_response",
             channelId,
