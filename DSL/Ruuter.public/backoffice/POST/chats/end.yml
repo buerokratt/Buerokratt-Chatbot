@@ -21,6 +21,7 @@ declaration:
 
 extractRequestData:
   assign:
+    cookie: ${incoming.headers.cookie ?? "nonce"}
     chatId: "${incoming.body.message.chatId}"
     event: "${incoming.body.message.event}"
     authorRole: ${incoming.body.message.authorRole}
@@ -121,7 +122,21 @@ endChat:
       receivedFrom: ${activeChat.receivedFrom ?? ""}
       receivedFromName: ${activeChat.receivedFromName ?? ""}
   result: end_chat_res
+  next: checkForCookie
+
+checkForCookie:
+  switch:
+    - condition: ${cookie === "nonce"}
+      next: notify_chats_final
   next: blacklist_chat_jwt
+
+notify_chats_final:
+  template: "[#CHATBOT_PROJECT_LAYER]/chats/notify"
+  requestType: templates
+  body:
+    chatId: ${chatId}
+  result: chats_notify_res
+  next: return_empty_result
 
 blacklist_chat_jwt:
   call: http.post
@@ -129,7 +144,7 @@ blacklist_chat_jwt:
     url: "[#CHATBOT_TIM]/jwt/custom-jwt-blacklist"
     contentType: plaintext
     headers:
-      cookie: ${incoming.headers.cookie}
+      cookie: ${cookie}
     plaintext: "chatJwt"
   result: chat_blacklist_res
   next: assign_chat_cookie
@@ -152,7 +167,7 @@ blacklist_user_jwt:
     url: "[#CHATBOT_TIM]/jwt/custom-jwt-blacklist"
     contentType: plaintext
     headers:
-      cookie: ${incoming.headers.cookie}
+      cookie: ${cookie}
     plaintext: "userJwt"
   result: client_blacklist_res
   next: notify_chats
@@ -175,6 +190,10 @@ remove_chat_id_from_queue_notification_node_if_existed:
 return_result:
   headers:
     Set-Cookie: ${chatCookie}
+  return: "Ended Chat Successfully"
+  next: end
+
+return_empty_result:
   return: "Ended Chat Successfully"
   next: end
 
