@@ -82,7 +82,7 @@ const FormTagInput: FC<FormTagInputProps> = ({
             onClick={handleClearAll}
             aria-label="Clear all tags"
           >
-            <Icon icon={<MdOutlineClose fontSize={18} />} size="medium" />
+            <Icon icon={<MdOutlineClose fontSize={20} />} size="medium" />
           </button>
         )}
       </div>

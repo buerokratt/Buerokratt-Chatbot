@@ -85,9 +85,7 @@
   }
 
   &__clear-all {
-    position: absolute;
-    top: 8px;
-    right: 8px;
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
