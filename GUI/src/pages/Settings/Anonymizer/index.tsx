@@ -10,10 +10,7 @@ import {
   FormSelect,
   FormTagInput,
   FormTextarea,
-  Icon,
   IconSwitch,
-  Switch,
-  SwitchBox,
   Track,
 } from 'components';
 import { useMutation } from '@tanstack/react-query';
@@ -24,7 +21,6 @@ import { ROLES } from 'utils/constants';
 import DomainSelector from '../../../components/DomainsSelector';
 import { fetchConfigurationFromDomain } from '../../../services/configurations';
 import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
-import { set } from 'date-fns';
 
 type SelectOption = { label: string; value: string; meta?: string };
 
@@ -41,9 +37,24 @@ const Anonymizer: FC = () => {
   const multiDomainEnabled =
     import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
   const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
+  const [entities, setEntities] = useState<string[]>([
+    'Person',
+    'Location',
+    'Phone number',
+    'Email address',
+    'Organization',
+    'Other',
+    'Other',
+    'Other',
+    'Other',
+    'Other',
+    'Other',
+  ]);
   const [loadingComplete, setLoadingComplete] = useState<boolean>(false);
+  const [selectedEntities, setSelectedEntities] = useState<{
+    [key: string]: boolean;
+  }>({});
 
-  // TODO: Enhance to be used later when fetching data
   const anonymizationApproaches: SelectOption[] = [
     {
       label: 'Replace',
@@ -72,7 +83,7 @@ const Anonymizer: FC = () => {
   }, []);
 
   const fetchData = async (selectedDomain: string) => {
-    try { 
+    try {
       // Todo: fetch data
       setLoadingComplete(true);
     } catch (error) {
@@ -80,8 +91,7 @@ const Anonymizer: FC = () => {
     }
   };
 
-  const handleFormSubmit = () => {
-  };
+  const handleFormSubmit = () => {};
 
   const resetSettingsToDefault = () => {};
 
@@ -149,16 +159,39 @@ const Anonymizer: FC = () => {
               {t('settings.anonymizer.entitiesDescription')}
             </p>
 
-            {/* <FormCheckbox
-              label={t('chat.active.onlyActiveAgentsss')}
-              name="active"
-              item={{
-                label: 'sasdaskldkdajdlaskdjakldjlsakdjlaskjd',
-                value: 'active',
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(3, 1fr)',
+                gap: '0px',
+                columnGap: '56px',
+                marginTop: '16px',
               }}
-              onChange={(e) => {}}
-              isInverted={true}
-            /> */}
+            >
+              {entities.map((entity, index) => {
+                const entityId = `entity-${index}-${entity}`;
+                return (
+                  <Track direction='vertical' key={entityId}>
+                    <FormCheckbox
+                      name={entityId}
+                      isInverted={true}
+                      item={{
+                        label: entity,
+                        value: entity,
+                      }}
+                      checked={selectedEntities[entityId] || false}
+                      onChange={(e) => {
+                        setSelectedEntities((prev) => ({
+                          ...prev,
+                          [entityId]: e.target.checked,
+                        }));
+                      }}
+                    />
+                    <div style={{ height: '1px', backgroundColor: '#eceaeaff', margin: '8px 0', width: '100%' }} />
+                  </Track>
+                );
+              })}
+            </div>
           </Collapsible>
           <Collapsible
             title={t('settings.anonymizer.allowList')}
