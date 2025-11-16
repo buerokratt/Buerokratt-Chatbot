@@ -3,9 +3,10 @@ import { forwardRef, InputHTMLAttributes, useId } from 'react';
 import './FormCheckbox.scss';
 
 type FormCheckboxType = InputHTMLAttributes<HTMLInputElement> & {
-  label: string;
-  name: string;
+  label?: string;
+  name?: string;
   hideLabel?: boolean;
+  isInverted?: boolean;
   item: {
     label: string;
     value: string;
@@ -18,6 +19,7 @@ const FormCheckbox = forwardRef<HTMLInputElement, FormCheckboxType>((
     label,
     name,
     hideLabel,
+    isInverted,
     item,
     ...rest
   },
@@ -26,7 +28,7 @@ const FormCheckbox = forwardRef<HTMLInputElement, FormCheckboxType>((
   const uid = useId();
 
   return (
-    <div className='checkbox'>
+    <div className={`checkbox ${isInverted ? 'checkbox--inverted' : ''}`}>
       {label && !hideLabel && <label className='checkbox__label'>{label}</label>}
       <div className='checkbox__item'>
         <input ref={ref} type='checkbox' name={name} id={uid} value={item.value} defaultChecked={item.checked} {...rest} />
