@@ -11,7 +11,9 @@ function addToLogoutQueue(id, timeout = 10, callback) {
         timeouts.delete(id);
 
         if (aborts.length === 0) {
-            await callback();
+            try {
+                await callback();
+            } catch (_) { }
         }
     }, timeout * 1000);
 
