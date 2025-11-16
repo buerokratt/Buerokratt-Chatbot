@@ -9,6 +9,7 @@ import FormCheckbox from './FormCheckbox';
 import FormDatepicker from './FormDatepicker';
 import SwitchBox from './SwitchBox';
 import FormTagInput from './FormTagInput';
+import IconSwitch from './IconSwitch';
 
 export {
   FormInput,
@@ -22,4 +23,5 @@ export {
   FormDatepicker,
   SwitchBox,
   FormTagInput,
+  IconSwitch,
 };

@@ -11,6 +11,7 @@ import {
   FormTagInput,
   FormTextarea,
   Icon,
+  IconSwitch,
   Switch,
   SwitchBox,
   Track,
@@ -33,7 +34,7 @@ const Anonymizer: FC = () => {
   const [denyList, setDenyList] = useState<string[]>([]);
   const [anonymizeBeforeLLM, setAnonymizeBeforeLLM] = useState<boolean>(false);
   const [anonymizeBeforeGlobalClassifier, setAnonymizeBeforeGlobalClassifier] =
-    useState<boolean>(false);
+    useState<boolean>(true);
   const multiDomainEnabled =
     import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
   const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
@@ -42,19 +43,19 @@ const Anonymizer: FC = () => {
   // TODO: Enhance to be used later when fetching data
   const anonymizationApproaches: SelectOption[] = [
     {
-      label: 'replace',
+      label: 'Replace',
       value: 'replace',
     },
     {
-      label: 'mask',
+      label: 'Mask',
       value: 'mask',
     },
     {
-      label: 'redact',
+      label: 'Redact',
       value: 'redact',
     },
     {
-      label: 'encrypt',
+      label: 'Encrypt',
       value: 'encrypt',
     },
   ];
@@ -144,7 +145,7 @@ const Anonymizer: FC = () => {
             <p style={{ color: '#686B78', fontSize: '14px' }}>
               {t('settings.anonymizer.entitiesDescription')}
             </p>
-         
+
             {/* <FormCheckbox
               label={t('chat.active.onlyActiveAgentsss')}
               name="active"
@@ -198,6 +199,22 @@ const Anonymizer: FC = () => {
               </p>
             </Track>
           </Collapsible>
+          <Track gap={8} align="center">
+            <IconSwitch
+              checked={anonymizeBeforeLLM}
+              onCheckedChange={setAnonymizeBeforeLLM}
+            />
+            <label>{t('settings.anonymizer.anonymizationBeforeLLM')}</label>
+          </Track>
+          <Track gap={8} align="center">
+            <IconSwitch
+              checked={anonymizeBeforeGlobalClassifier}
+              onCheckedChange={setAnonymizeBeforeGlobalClassifier}
+            />
+            <label>
+              {t('settings.anonymizer.anonymizationBeforeGlobalClassifier')}
+            </label>
+          </Track>
         </Track>
       </Card>
       <h1>{t('settings.anonymizer.testingTitle')}</h1>
