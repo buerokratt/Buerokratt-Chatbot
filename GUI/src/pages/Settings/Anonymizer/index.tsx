@@ -24,6 +24,7 @@ import { ROLES } from 'utils/constants';
 import DomainSelector from '../../../components/DomainsSelector';
 import { fetchConfigurationFromDomain } from '../../../services/configurations';
 import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
+import { set } from 'date-fns';
 
 type SelectOption = { label: string; value: string; meta?: string };
 
@@ -32,6 +33,8 @@ const Anonymizer: FC = () => {
   const toast = useToast();
   const [allowList, setAllowList] = useState<string[]>([]);
   const [denyList, setDenyList] = useState<string[]>([]);
+  const [inputText, setInputText] = useState('');
+  const [outputText, setOutputText] = useState('');
   const [anonymizeBeforeLLM, setAnonymizeBeforeLLM] = useState<boolean>(false);
   const [anonymizeBeforeGlobalClassifier, setAnonymizeBeforeGlobalClassifier] =
     useState<boolean>(true);
@@ -228,14 +231,25 @@ const Anonymizer: FC = () => {
             placeholder={t(
               'settings.anonymizer.inputTextPlaceholder'
             ).toString()}
+            value={inputText}
+            onChange={(e) => {
+              setInputText(e.target.value);
+            }}
             minRows={5}
             maxRows={5}
           />
           <Track justify="end" gap={8} style={{ width: '100%' }}>
             <Button
-              onClick={() => {}}
+              onClick={() => {
+                setInputText('');
+              }}
               appearance="secondary"
-              style={{ color: '#005aa3', boxShadow: '0 0 0 2px #005aa3' }}
+              style={{
+                color: inputText.trim() === '' ? undefined : '#005aa3',
+                boxShadow:
+                  inputText.trim() === '' ? undefined : '0 0 0 2px #005aa3',
+              }}
+              disabled={inputText.trim() === ''}
             >
               {t('settings.anonymizer.clear')}
             </Button>
@@ -248,9 +262,10 @@ const Anonymizer: FC = () => {
             placeholder={t(
               'settings.anonymizer.outputTextPlaceholder'
             ).toString()}
-            disabled
+            value={outputText}
             minRows={5}
             maxRows={5}
+            disabled
           />
         </Track>
       </Card>
