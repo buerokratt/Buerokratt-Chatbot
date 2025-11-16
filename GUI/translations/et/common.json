@@ -529,6 +529,30 @@
         "maxTokens": "Maksimaalne tokenite arv peab olema vahemikus 1 kuni 2000",
         "systemMessage": "Süsteemisõnumi väli ei tohi olla tühi"
       }
+    },
+    "anonymizer": {
+      "settingsTitle": "Anonümiseerija Seaded",
+      "approach": "Anonümiseerimise lähenemine",
+      "approachOptionsPlaceholder": "- Valige valik -",
+      "entities": "Anonümiseeritavad üksused",
+      "entitiesDescription": "Valige, milliseid üksuste tüüpe soovite kasutaja vestlustes anonümiseerida.",
+      "allowList": "Lisage sõnu lubatud nimekirja",
+      "allowListDescription": "Lubatud nimekiri sisaldab sõnu, mida ei tohiks anonümiseerida",
+      "allowListPlaceholder": "Sisestage sõna ja vajutage Enter, et lisada lubatud nimekirja",
+      "denyList": "Lisage sõnu keelatud nimekirja",
+      "denyListDescription": "Keelatud nimekiri sisaldab sõnu, mida tuleks anonümiseerida",
+      "denyListPlaceholder": "Sisestage sõna ja vajutage Enter, et lisada keelatud nimekirja",
+      "anonymizationBeforeLLM": "Anonümiseerimine enne LLM-i",
+      "anonymizationBeforeGlobalClassifier": "Anonümiseerimine enne globaalset klassifikaatorit",
+      "saveSettings": "Salvesta seaded",
+      "testingTitle": "Anonümiseerija Testimine",
+      "testingDescription": "Anonümiseerija konfiguratsiooni testimiseks sisestage sisendtekst ja vajutage \"Anonümise\"",
+      "inputText": "Sisendtekst",
+      "inputTextPlaceholder": "Sisestage anonümiseeritav tekst",
+      "clear": "Tühjenda",
+      "anonymize": "Anonümise",
+      "outputText": "Väljundtekst de-identified",
+      "outputTextPlaceholder": "Anonümiseeritud tekst ilmub siia"
     }
   },
   "monitoring": {

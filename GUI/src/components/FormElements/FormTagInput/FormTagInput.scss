@@ -1,0 +1,131 @@
+@import 'src/styles/tools/spacing';
+@import 'src/styles/tools/color';
+@import 'src/styles/settings/variables/other';
+@import 'src/styles/settings/variables/typography';
+
+.tag-input {
+  $self: &;
+  width: 100%;
+
+  &__container {
+    position: relative;
+    border: 1px solid get-color(black-coral-6);
+    border-radius: $veera-radius-s;
+    padding: get-spacing(paldiski);
+    min-height: 100px;
+    display: flex;
+    align-items: flex-start;
+    gap: get-spacing(paldiski);
+  }
+
+  &__tags {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+
+  &__tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: rgb(234 246 255);
+    border-radius: $veera-radius-s;
+    padding: 6px 8px;
+    font-size: $veera-font-size-100;
+    line-height: 20px;
+    color: var(--color-black);
+  }
+
+  &__tag-text {
+    flex: 1;
+  }
+
+  &__tag-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: get-color(black-coral-12);
+    transition: color 0.2s;
+
+    &:hover {
+      background-color: transparent;
+    }
+
+    &:focus {
+      outline: 2px solid get-color(sapphire-blue-10);
+      outline-offset: 2px;
+      border-radius: 2px;
+    }
+  }
+
+  &__input {
+    flex: 1;
+    min-width: 120px;
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: $veera-font-size-100;
+    line-height: 24px;
+    color: var(--color-black);
+    padding: 0;
+
+    &::placeholder {
+      color: get-color(black-coral-6);
+    }
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  &__clear-all {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    color: get-color(black-coral-12);
+    transition: color 0.2s;
+    border-radius: $veera-radius-s;
+
+    &:hover {
+      color: get-color(black-coral-20);
+      background-color: transparent;
+    }
+
+    &:focus {
+      outline: 2px solid get-color(sapphire-blue-10);
+      outline-offset: 2px;
+    }
+  }
+
+  &--disabled {
+    #{$self}__container {
+      background-color: get-color(black-coral-0);
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    #{$self}__input {
+      cursor: not-allowed;
+    }
+
+    #{$self}__tag-close,
+    #{$self}__clear-all {
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+  }
+}
+

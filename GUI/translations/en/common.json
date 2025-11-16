@@ -529,6 +529,30 @@
         "maxTokens": "Maxmimum number of tokens must be between 1 and 2000",
         "systemMessage": "System message can't be empty"
       }
+    },
+    "anonymizer": {
+      "settingsTitle": "Anonymizer Settings",
+      "approach": "Anonymization approach",
+      "approachOptionsPlaceholder": "- Select option -",
+      "entities": "Entities to anonymize",
+      "entitiesDescription": "Select the types of entities you want to anonymize in the conversations with the user.",
+      "allowList": "Add words to the allowlist",
+      "allowListDescription": "Allowlist contains words that should not be anonymized",
+      "allowListPlaceholder": "Enter a word and press Enter to add to the allowlist",
+      "denyList": "Add words to the denylist",
+      "denyListDescription": "Denylist contains words that should be anonymized",
+      "denyListPlaceholder": "Enter a word and press Enter to add to the denylist",
+      "anonymizationBeforeLLM": "Anonymization before LLM",
+      "anonymizationBeforeGlobalClassifier": "Anonymization before Global classifier",
+      "saveSettings": "Save Settings",
+      "testingTitle": "Anonymizer Testing",
+      "testingDescription": "To test your anonymizer configuration, enter the input text and press \"Anonymize\"",
+      "inputText": "Input text",
+      "inputTextPlaceholder": "Enter text to be anonymized",
+      "clear": "Clear",
+      "anonymize": "Anonymize",
+      "outputText": "Output text de-identified",
+      "outputTextPlaceholder": "Anonymized text will appear here"
     }
   },
   "monitoring": {

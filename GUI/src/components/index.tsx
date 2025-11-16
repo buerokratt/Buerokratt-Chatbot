@@ -13,6 +13,7 @@ import {
   FormCheckbox,
   FormDatepicker,
   SwitchBox,
+  FormTagInput,
 } from './FormElements';
 import DataTable from './DataTable';
 import Tooltip from './Tooltip';
@@ -56,4 +57,5 @@ export {
   Dialog,
   Section,
   Chat,
+  FormTagInput,
 };

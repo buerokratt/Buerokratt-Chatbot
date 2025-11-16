@@ -6,11 +6,11 @@ import { ControllerRenderProps } from 'react-hook-form';
 import './Switch.scss';
 
 type SwitchProps = Partial<ControllerRenderProps> & {
-  onLabel?: string;
-  offLabel?: string;
+  onLabel?: string | React.ReactNode;
+  offLabel?: string | React.ReactNode;
   onColor?: string;
   name?: string;
-  label: string;
+  label?: string;
   checked?: boolean;
   defaultChecked?: boolean;
   hideLabel?: boolean;
