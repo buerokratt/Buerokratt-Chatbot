@@ -26,7 +26,7 @@ This repo will primarily contain:
 - Clone [RASA](https://github.com/buerokratt/Rasa-for-Buerokratt)
 - choose dev branch and run `docker build -t rasa .`
 - Clone [Anonymizer](https://github.com/buerokratt/Presidio-Anonymizer)
-- choose dev branch and run `docker build -t anonymizer .`
+- choose dev branch and run `docker build --platform=linux/amd64 -t anonymizer .`
 
 ### Run with local bot
 

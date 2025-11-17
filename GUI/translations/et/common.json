@@ -552,7 +552,9 @@
       "clear": "Tühjenda",
       "anonymize": "Anonümise",
       "outputText": "Väljundtekst de-identified",
-      "outputTextPlaceholder": "Anonümiseeritud tekst ilmub siia"
+      "outputTextPlaceholder": "Anonümiseeritud tekst ilmub siia",
+      "savedSettingsSuccessfully": "Anonümiseerija seaded on edukalt salvestatud",
+      "textAnonymized": "Tekst on edukalt anonümiseeritud"
     }
   },
   "monitoring": {

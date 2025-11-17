@@ -552,7 +552,9 @@
       "clear": "Clear",
       "anonymize": "Anonymize",
       "outputText": "Output text de-identified",
-      "outputTextPlaceholder": "Anonymized text will appear here"
+      "outputTextPlaceholder": "Anonymized text will appear here",
+      "savedSettingsSuccessfully": "Anonymizer settings saved successfully",
+      "textAnonymized": "Text anonymized successfully"
     }
   },
   "monitoring": {
