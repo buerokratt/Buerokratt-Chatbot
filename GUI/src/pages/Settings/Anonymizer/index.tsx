@@ -382,7 +382,8 @@ const Anonymizer: FC = () => {
               {t('settings.anonymizer.anonymizationBeforeLLM')}
             </label>
           </Track>
-          <Track gap={8} align="center">
+          {/* To be added when the global classifier feature is available */}
+          {/* <Track gap={8} align="center">
             <IconSwitch
               checked={
                 anonymizerConfig?.isAnonymizationBeforeGlobalClassifier ?? false
@@ -400,7 +401,7 @@ const Anonymizer: FC = () => {
             <label style={{ cursor: 'default' }}>
               {t('settings.anonymizer.anonymizationBeforeGlobalClassifier')}
             </label>
-          </Track>
+          </Track> */}
         </Track>
       </Card>
       <h1>{t('settings.anonymizer.testingTitle')}</h1>

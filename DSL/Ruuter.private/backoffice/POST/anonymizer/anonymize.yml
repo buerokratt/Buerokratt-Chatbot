@@ -45,16 +45,36 @@ assignConfigs:
   assign:
     configs: ${res.response.body[0]}
 
+prepareAnonymizerConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_HBS]/prepare_anonymizer_config"
+    headers:
+      type: json
+    body:
+      text: ${text}
+      approach: ${configs.anonymizerSelectedApproach}
+      entities: ${configs.anonymizerSelectedEntities.split(',')}
+      allowlist: ${configs.anonymizerAllowlist.split(',')}
+      denylist: ${configs.anonymizerDenylist.split(',')}
+      hash_type: "[#ANONYMIZER_HASH_TYPE]"
+  result: preparedConfigs
+
+assignPreparedConfigs:
+  assign:
+    preparedConfigs: ${preparedConfigs.response.body}
+  
 anonoymizeText:
   call: http.post
   args:
     url: "[#CHATBOT_ANONYMIZER]/anonymize"
     body:
-      text: ${text}
-      entities: ${configs.anonymizerSelectedEntities.split(',')}
-      allowlist: ${configs.anonymizerAllowlist.split(',')}
-      denylist: ${configs.anonymizerDenylist.split(',')}
-  result: anonoymize_res    
+      text: ${preparedConfigs.text}
+      anonymizers: ${preparedConfigs.anonymizers}
+      entities: ${preparedConfigs.entities}
+      allowlist: ${preparedConfigs.allowlist}
+      denylist: ${preparedConfigs.denylist}
+  result: anonymize_res
 
 return_result:
-  return: "${anonoymize_res.response.body.text}"
+  return: "${anonymize_res.response.body.text}"
