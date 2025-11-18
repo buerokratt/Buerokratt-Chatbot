@@ -55,7 +55,13 @@ getAnonymizerConfig:
 assignAnonymizerConfigs:
   assign:
     anonymizer_configs: ${anonymizer_configs_res.response.body[0]}
-  next: prepareAnonymizerConfig  
+  next: check_if_anonymize_before_llm
+
+check_if_anonymize_before_llm:
+  switch:
+    - condition: ${anonymizer_configs.isAnonymizationBeforeLlm === true}
+      next: prepareAnonymizerConfig
+  next: check_if_client_bot_is_active
 
 prepareAnonymizerConfig:
   call: http.post
