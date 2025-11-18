@@ -12,7 +12,7 @@ services:
       - application.logging.displayResponseContent=true
       - application.logging.printStackTrace=true
       - application.internalRequests.disabled=true
-      - application.httpRequestTimeout=30000
+      - application.httpRequestTimeout=50000
       - server.port=8086
     volumes:
       - ./DSL/Ruuter.public:/DSL
@@ -48,7 +48,7 @@ services:
       - application.logging.displayResponseContent=true
       - application.logging.printStackTrace=true
       - application.internalRequests.disabled=true
-      - application.httpRequestTimeout=30000
+      - application.httpRequestTimeout=50000
       - server.port=8088
       - application.externalAuthAllowed=/cron-tasks/delete-conversations,chats/back-up-removable-chats,chats/chat-to-remove,chats/empty-conversations-by-chat-ids,smax/chats/sync,/cron-tasks/end-dead-chats
     volumes:
