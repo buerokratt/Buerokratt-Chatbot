@@ -257,7 +257,7 @@ const Anonymizer: FC = () => {
                       name={entityId}
                       isInverted={true}
                       item={{
-                        label: entity,
+                        label: t(`settings.anonymizer.entitiesList.${entity.toLowerCase()}`),
                         value: entity,
                       }}
                       checked={

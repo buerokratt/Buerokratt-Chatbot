@@ -554,7 +554,25 @@
       "outputText": "Output text de-identified",
       "outputTextPlaceholder": "Anonymized text will appear here",
       "savedSettingsSuccessfully": "Anonymizer settings saved successfully",
-      "textAnonymized": "Text anonymized successfully"
+      "textAnonymized": "Text anonymized successfully",
+      "entitiesList": {
+        "car_number": "CAR_NUMBER",
+        "url": "URL",
+        "phone_number": "PHONE_NUMBER",
+        "medical_license": "MEDICAL_LICENSE",
+        "ip_address": "IP_ADDRESS",
+        "organization": "ORGANIZATION",
+        "iban_code": "IBAN_CODE",
+        "email_address": "EMAIL_ADDRESS",
+        "location": "LOCATION",
+        "date_time": "DATE_TIME",
+        "est_id_doc": "EST_ID_DOC",
+        "ee_personal_code": "EE_PERSONAL_CODE",
+        "credit_card": "CREDIT_CARD",
+        "person": "PERSON",
+        "gpe": "GPE",
+        "crypto": "CRYPTO"
+      }
     }
   },
   "monitoring": {

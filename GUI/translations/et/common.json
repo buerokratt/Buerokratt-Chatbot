@@ -554,7 +554,25 @@
       "outputText": "Väljundtekst",
       "outputTextPlaceholder": "Siia ilmub anonümiseeritud tekst",
       "savedSettingsSuccessfully": "Anonümiseerija seaded on edukalt salvestatud",
-      "textAnonymized": "Tekst on anonümiseeritud"
+      "textAnonymized": "Tekst on anonümiseeritud",
+      "entitiesList": {
+        "car_number": "AUTONUMBER",
+        "url": "VEEBIAADRESS",
+        "phone_number": "TELEFONINUMBER",
+        "medical_license": "MEDITSIINILINE_LITSENTS",
+        "ip_address": "IP_AADRESS",
+        "organization": "ORGANISATSIOON",
+        "iban_code": "IBAN_KOOD",
+        "email_address": "E_POSTI_AADRESS",
+        "location": "ASUKOHT",
+        "date_time": "KUUPÄEV_JA_KELLAAEG",
+        "est_id_doc": "EESTI_DOKUMENDI_NR",
+        "ee_personal_code": "ISIKUKOOD",
+        "credit_card": "KREDIITKAART",
+        "person": "ISIK",
+        "gpe": "RIIK_VÕI_LINN",
+        "crypto": "KRÜPTORAHAKOTT"
+      }
     }
   },
   "monitoring": {
