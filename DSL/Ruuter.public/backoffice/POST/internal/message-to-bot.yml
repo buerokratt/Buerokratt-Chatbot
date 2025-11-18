@@ -173,6 +173,7 @@ check_for_bgk_bot:
     body:
       sender: ${chatId}
       message: ${content}
+      domain: ${domain}
   result: converted_messages_res
   error: return_bot_error
   next: check_if_bgk_bot_is_unable_to_reply

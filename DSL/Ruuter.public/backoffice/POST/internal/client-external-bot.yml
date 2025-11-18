@@ -25,6 +25,85 @@ extract_data:
     sender: ${incoming.body.sender}
     domain: ${incoming.body.domain}
     stream: "[#SKM_STREAM]"
+    message: ${incoming.body.message ?? ''}
+
+check_if_anonymizer_is_active:
+  switch:
+    - condition: ${[#ANONYMIZER_ENABLED] === true}
+      next: checkForPassedDomain
+  next: checkForDomain
+
+checkForPassedDomain:
+  switch:
+    - condition: ${domain === 'none'}
+      next: getAnonymizerConfig
+  next: getDomainAnonymizerConfig
+
+getAnonymizerConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-anonymizer-config"
+  result: anonymizer_configs_res
+  next: assignAnonymizerConfigs
+
+getDomainAnonymizerConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-anonymizer-config"
+    body:
+      domainUUID: ${domain}
+  result: anonymizer_configs_res
+  next: assignAnonymizerConfigs
+
+assignAnonymizerConfigs:
+  assign:
+    anonymizer_configs: ${anonymizer_configs_res.response.body[0]}
+  next: check_if_anonymize_before_llm
+
+check_if_anonymize_before_llm:
+  switch:
+    - condition: ${anonymizer_configs.isAnonymizationBeforeLlm === 'true'}
+      next: prepareAnonymizerConfig
+  next: checkForDomain
+
+prepareAnonymizerConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_HBS]/prepare_anonymizer_config"
+    headers:
+      type: json
+    body:
+      text: ${text}
+      approach: ${anonymizer_configs.anonymizerSelectedApproach}
+      entities: ${anonymizer_configs.anonymizerSelectedEntities.split(',')}
+      allowlist: ${anonymizer_configs.anonymizerAllowlist.split(',')}
+      denylist: ${anonymizer_configs.anonymizerDenylist.split(',')}
+      hash_type: "[#ANONYMIZER_HASH_TYPE]"
+  result: preparedAnonymizerConfigs
+  next: assignPreparedAnonymizerConfigs
+
+assignPreparedAnonymizerConfigs:
+  assign:
+    preparedAnonymizerConfigs: ${preparedAnonymizerConfigs.response.body}
+  next: anonymizeText
+
+anonymizeText:
+  call: http.post
+  args:
+    url: "[#CHATBOT_ANONYMIZER]/anonymize"
+    body:
+      text: ${preparedAnonymizerConfigs.text}
+      anonymizers: ${preparedAnonymizerConfigs.anonymizers}
+      entities: ${preparedAnonymizerConfigs.entities}
+      allowlist: ${preparedAnonymizerConfigs.allowlist}
+      denylist: ${preparedAnonymizerConfigs.denylist}
+  result: anonymize_res
+  next: assign_anonymized_message
+
+assign_anonymized_message:
+  assign:
+    message: ${anonymize_res.response.body.text}
+  next: checkForDomain
 
 checkForDomain:
   switch:
@@ -105,7 +184,7 @@ prepare_messages:
     body:
       prompt_message: "${skm_config.systemMessage} The current date is ${currentDate}"
       messages: ${chat_messages_res.response.body}
-      new_message: ${incoming.body.message ?? ''}
+      new_message: ${message}
   result: prepare_messages_res
 
 assign_messages:

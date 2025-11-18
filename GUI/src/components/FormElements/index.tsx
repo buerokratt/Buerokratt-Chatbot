@@ -8,6 +8,8 @@ import FormRadios from './FormRadios';
 import FormCheckbox from './FormCheckbox';
 import FormDatepicker from './FormDatepicker';
 import SwitchBox from './SwitchBox';
+import FormTagInput from './FormTagInput';
+import IconSwitch from './IconSwitch';
 
 export {
   FormInput,
@@ -20,4 +22,6 @@ export {
   FormCheckbox,
   FormDatepicker,
   SwitchBox,
+  FormTagInput,
+  IconSwitch,
 };

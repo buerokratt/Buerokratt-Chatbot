@@ -13,8 +13,8 @@ import './FormTextarea.scss';
 
 type TextareaProps = TextareaAutosizeProps &
   RichTextareaProps & {
-    label: string;
-    name: string;
+    label?: string;
+    name?: string;
     hideLabel?: boolean;
     showMaxLength?: boolean;
     maxLengthBottom?: boolean;
@@ -81,6 +81,7 @@ const FormTextarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
               style={{ width: '100%', height: `${height}px` }}
               maxLength={maxLength === -1 ? undefined : maxLength}
               ref={ref}
+              disabled={disabled}
               defaultValue={defaultValue ?? ''}
               aria-label={hideLabel ? label : undefined}
               onChange={(e) => {
@@ -123,6 +124,7 @@ const FormTextarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
               ref={ref}
               defaultValue={defaultValue}
               aria-label={hideLabel ? label : undefined}
+              disabled={disabled}
               onChange={(e) => {
                 if (onChange) onChange(e);
                 handleOnChange(e);
