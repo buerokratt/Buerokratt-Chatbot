@@ -30,6 +30,7 @@ import MultiDomain from './pages/Settings/MultiDomain';
 import SettingsFeedback from 'pages/Settings/SettingsFeedback';
 import { getWidgetData } from './services/users';
 import useTabCloseEffect from './hooks/useTabCloseEffects';
+import Anonymizer from 'pages/Settings/Anonymizer';
 
 const App: FC = () => {
   const multiDomainEnabled = import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
@@ -94,6 +95,7 @@ const App: FC = () => {
         />
         <Route path="/skm-configuration" element={<SettingsSkmConfiguration />} />
         <Route path="/multi-domains" element={<MultiDomain />} />
+        <Route path="/anonymizer" element={<Anonymizer />} />
         <Route path="/uptime" element={<MonitoringUptime />} />
       </Route>
     </Routes>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+
+    <changeSet id="20260153791910" author="ahmedyasser">
+        <insert tableName="configuration">
+            <column name="key" value="anonymizer_selected_approach"/>
+            <column name="value" value=""/>
+        </insert>
+        <insert tableName="configuration">
+            <column name="key" value="anonymizer_selected_entities"/>
+            <column name="value" value=""/>
+        </insert>
+        <insert tableName="configuration">
+            <column name="key" value="anonymizer_allowlist"/>
+            <column name="value" value=""/>
+        </insert>
+        <insert tableName="configuration">
+            <column name="key" value="anonymizer_denylist"/>
+            <column name="value" value=""/>
+        </insert>
+        <insert tableName="configuration">
+            <column name="key" value="is_anonymization_before_llm"/>
+            <column name="value" value="false"/>
+        </insert>
+        <insert tableName="configuration">
+            <column name="key" value="is_anonymization_before_global_classifier"/>
+            <column name="value" value="false"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

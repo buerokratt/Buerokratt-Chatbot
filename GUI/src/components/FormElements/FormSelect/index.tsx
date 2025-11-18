@@ -9,8 +9,10 @@ import './FormSelect.scss';
 import { ControllerRenderProps } from 'react-hook-form';
 
 type FormSelectProps = Partial<ControllerRenderProps> & SelectHTMLAttributes<HTMLSelectElement> & {
-  label: ReactNode;
-  name: string;
+  label?: ReactNode;
+  name?: string;
+  placeholder?: string;
+  placeholderColor?: string;
   hideLabel?: boolean;
   direction?: 'down' | 'up';
   defaultValue?: string | null;
@@ -33,6 +35,7 @@ const FormSelect= forwardRef<HTMLSelectElement, FormSelectProps>((
     options,
     disabled,
     placeholder,
+    placeholderColor,
     defaultValue,
     onSelectionChange,
     ...rest
@@ -78,7 +81,7 @@ const FormSelect= forwardRef<HTMLSelectElement, FormSelectProps>((
       {label && !hideLabel && <label htmlFor={id} className='select__label' {...getLabelProps()}>{label}</label>}
       <div className='select__wrapper' >
         <div className='select__trigger' {...getToggleButtonProps()}>
-          {selectedItem?.label ?? placeholderValue}
+          <p style={{ overflow: 'hidden', color: selectedItem?.label ? undefined : placeholderColor }}>{selectedItem?.label ?? placeholderValue}</p>
           <Icon label='Dropdown icon' size='medium' icon={<MdArrowDropDown color='#5D6071' />} />
         </div>
         <ul ref={ref} className={direction === 'down' ? 'select__menu' : 'select__menu_up'} {...getMenuProps()}>
