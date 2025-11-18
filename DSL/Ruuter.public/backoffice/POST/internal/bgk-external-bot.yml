@@ -59,7 +59,7 @@ assignAnonymizerConfigs:
 
 check_if_anonymize_before_llm:
   switch:
-    - condition: ${anonymizer_configs.isAnonymizationBeforeLlm === true}
+    - condition: ${anonymizer_configs.isAnonymizationBeforeLlm === 'true'}
       next: prepareAnonymizerConfig
   next: check_if_client_bot_is_active
 
