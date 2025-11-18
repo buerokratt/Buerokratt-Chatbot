@@ -550,8 +550,8 @@
       "inputText": "Sisendtekst",
       "inputTextPlaceholder": "Sisestage anonümiseeritav tekst",
       "clear": "Tühjenda",
-      "anonymize": "Anonümise",
-      "outputText": "Väljundtekst de-identified",
+      "anonymize": "Anonümiseeri",
+      "outputText": "Väljundtekst on anonümiseeritud",
       "outputTextPlaceholder": "Anonümiseeritud tekst ilmub siia",
       "savedSettingsSuccessfully": "Anonümiseerija seaded on edukalt salvestatud",
       "textAnonymized": "Tekst on edukalt anonümiseeritud"
