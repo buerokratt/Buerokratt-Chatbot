@@ -12,6 +12,7 @@ services:
       - application.logging.displayResponseContent=true
       - application.logging.printStackTrace=true
       - application.internalRequests.disabled=true
+      - application.httpRequestTimeout=30000
       - server.port=8086
     volumes:
       - ./DSL/Ruuter.public:/DSL
@@ -47,6 +48,7 @@ services:
       - application.logging.displayResponseContent=true
       - application.logging.printStackTrace=true
       - application.internalRequests.disabled=true
+      - application.httpRequestTimeout=30000
       - server.port=8088
       - application.externalAuthAllowed=/cron-tasks/delete-conversations,chats/back-up-removable-chats,chats/chat-to-remove,chats/empty-conversations-by-chat-ids,smax/chats/sync,/cron-tasks/end-dead-chats
     volumes:
@@ -285,13 +287,11 @@ services:
       - PYTHONUNBUFFERED=1
     volumes:
       - ./anonymizer/config:/app/config:ro
-      - models_cache:/app/models      
     networks:
       - bykstack
 
 volumes:
   opensearch-data:
-  models_cache:
   spacy_models:
   
 networks:
