@@ -15,6 +15,9 @@ declaration:
       - field: sender
         type: string
         description: Body field 'sender'  
+      - field: domain
+        type: string
+        description: "Body field 'domain'"  
 
 extract_data:
   assign:
@@ -37,18 +40,34 @@ assignBgkConfig:
     semantic_configuration: "[#BGK_SEMANTIC_CONFIGURATION]"
     in_scope: "[#BGK_IN_SCOPE]"
     stream: "[#BGK_STREAM]"
+    domain: ${incoming.body.domain}
     message: ${incoming.body.message ?? ''}
 
 check_if_anonymizer_is_active:
   switch:
     - condition: ${[#ANONYMIZER_ENABLED] === true}
-      next: getAnonymizerConfig
+      next: checkForPassedDomain
   next: check_if_client_bot_is_active
+
+checkForPassedDomain:
+  switch:
+    - condition: ${domain === 'none'}
+      next: getAnonymizerConfig
+  next: getDomainAnonymizerConfig
 
 getAnonymizerConfig:
   call: http.post
   args:
     url: "[#CHATBOT_RESQL]/get-anonymizer-config"
+  result: anonymizer_configs_res
+  next: assignAnonymizerConfigs
+
+getDomainAnonymizerConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-anonymizer-config"
+    body:
+      domainUUID: ${domain}
   result: anonymizer_configs_res
   next: assignAnonymizerConfigs
 
