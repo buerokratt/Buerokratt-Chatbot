@@ -97,13 +97,11 @@ const Anonymizer: FC = () => {
 
   const anonymizeText = () => {
     setIsAnonymizingText(true);
+    const isThereSelectedDomain =
+      selectedDomains.length === 1 ? selectedDomains[0] : 'none';
     anonymizeTextMutation.mutate({
       text: inputText.trim(),
-      domain: multiDomainEnabled
-        ? selectedDomains.length === 1
-          ? selectedDomains[0]
-          : 'none'
-        : 'none',
+      domain: multiDomainEnabled ? isThereSelectedDomain : 'none',
     });
   };
 
@@ -257,7 +255,7 @@ const Anonymizer: FC = () => {
                       name={entityId}
                       isInverted={true}
                       item={{
-                        label: entity,
+                        label: t(`settings.anonymizer.entitiesList.${entity.toLowerCase()}`),
                         value: entity,
                       }}
                       checked={
@@ -277,9 +275,13 @@ const Anonymizer: FC = () => {
                               updatedEntities.push(entityId);
                             }
                           } else {
-                            updatedEntities = updatedEntities.filter(
-                              (id) => id !== entityId
-                            );
+                            const result = [];
+                            for (const id of updatedEntities) {
+                              if (id !== entityId) {
+                                result.push(id);
+                              }
+                            }
+                            updatedEntities = result;
                           }
                           return {
                             ...prev,

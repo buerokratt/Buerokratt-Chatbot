@@ -82,6 +82,7 @@ trigger_bgk_bot:
     body:
       sender: ${sender}
       message: ${message.content ?? ''}
+      domain: ${domain}
   result: bgk_bot_response
   error: return_bad_request
   next: end

@@ -89,7 +89,7 @@ prepareAnonymizerConfig:
     headers:
       type: json
     body:
-      text: ${text}
+      text: ${message}
       approach: ${anonymizer_configs.anonymizerSelectedApproach}
       entities: ${anonymizer_configs.anonymizerSelectedEntities.split(',')}
       allowlist: ${anonymizer_configs.anonymizerAllowlist.split(',')}
