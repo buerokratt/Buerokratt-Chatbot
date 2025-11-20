@@ -69,7 +69,7 @@ anonoymizeText:
   args:
     url: "[#CHATBOT_ANONYMIZER]/anonymize"
     body:
-      text: ${preparedConfigs.text}
+      texts: ${[preparedConfigs.text]}
       anonymizers: ${preparedConfigs.anonymizers}
       entities: ${preparedConfigs.entities}
       allowlist: ${preparedConfigs.allowlist}
@@ -77,4 +77,4 @@ anonoymizeText:
   result: anonymize_res
 
 return_result:
-  return: "${anonymize_res.response.body.text}"
+  return: "${anonymize_res.response.body.results[0].text}"
