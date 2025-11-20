@@ -52,7 +52,7 @@ prepareAnonymizerConfig:
     headers:
       type: json
     body:
-      text: ${text}
+      texts: ${[text]}
       approach: ${configs.anonymizerSelectedApproach}
       entities: ${configs.anonymizerSelectedEntities.split(',')}
       allowlist: ${configs.anonymizerAllowlist.split(',')}
@@ -69,7 +69,7 @@ anonoymizeText:
   args:
     url: "[#CHATBOT_ANONYMIZER]/anonymize"
     body:
-      text: ${preparedConfigs.text}
+      texts: ${preparedConfigs.texts}
       anonymizers: ${preparedConfigs.anonymizers}
       entities: ${preparedConfigs.entities}
       allowlist: ${preparedConfigs.allowlist}
@@ -77,4 +77,4 @@ anonoymizeText:
   result: anonymize_res
 
 return_result:
-  return: "${anonymize_res.response.body.text}"
+  return: "${anonymize_res.response.body.results[0].text}"

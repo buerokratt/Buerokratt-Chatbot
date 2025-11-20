@@ -43,84 +43,6 @@ assignBgkConfig:
     domain: ${incoming.body.domain}
     message: ${incoming.body.message ?? ''}
 
-check_if_anonymizer_is_active:
-  switch:
-    - condition: ${[#ANONYMIZER_ENABLED] === true}
-      next: checkForPassedDomain
-  next: check_if_client_bot_is_active
-
-checkForPassedDomain:
-  switch:
-    - condition: ${domain === 'none'}
-      next: getAnonymizerConfig
-  next: getDomainAnonymizerConfig
-
-getAnonymizerConfig:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RESQL]/get-anonymizer-config"
-  result: anonymizer_configs_res
-  next: assignAnonymizerConfigs
-
-getDomainAnonymizerConfig:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RESQL]/get-domain-anonymizer-config"
-    body:
-      domainUUID: ${domain}
-  result: anonymizer_configs_res
-  next: assignAnonymizerConfigs
-
-assignAnonymizerConfigs:
-  assign:
-    anonymizer_configs: ${anonymizer_configs_res.response.body[0]}
-  next: check_if_anonymize_before_llm
-
-check_if_anonymize_before_llm:
-  switch:
-    - condition: ${anonymizer_configs.isAnonymizationBeforeLlm === 'true'}
-      next: prepareAnonymizerConfig
-  next: check_if_client_bot_is_active
-
-prepareAnonymizerConfig:
-  call: http.post
-  args:
-    url: "[#CHATBOT_DMAPPER_HBS]/prepare_anonymizer_config"
-    headers:
-      type: json
-    body:
-      text: ${message}
-      approach: ${anonymizer_configs.anonymizerSelectedApproach}
-      entities: ${anonymizer_configs.anonymizerSelectedEntities.split(',')}
-      allowlist: ${anonymizer_configs.anonymizerAllowlist.split(',')}
-      denylist: ${anonymizer_configs.anonymizerDenylist.split(',')}
-      hash_type: "[#ANONYMIZER_HASH_TYPE]"
-  result: preparedAnonymizerConfigs
-  next: assignPreparedAnonymizerConfigs
-
-assignPreparedAnonymizerConfigs:
-  assign:
-    preparedAnonymizerConfigs: ${preparedAnonymizerConfigs.response.body}
-  next: anonymizeText
-
-anonymizeText:
-  call: http.post
-  args:
-    url: "[#CHATBOT_ANONYMIZER]/anonymize"
-    body:
-      text: ${preparedAnonymizerConfigs.text}
-      anonymizers: ${preparedAnonymizerConfigs.anonymizers}
-      entities: ${preparedAnonymizerConfigs.entities}
-      allowlist: ${preparedAnonymizerConfigs.allowlist}
-      denylist: ${preparedAnonymizerConfigs.denylist}
-  result: anonymize_res
-  next: assign_anonymized_message
-
-assign_anonymized_message:
-  assign:
-    message: ${anonymize_res.response.body.text}
-  next: check_if_client_bot_is_active
-
 check_if_client_bot_is_active:
   switch:
     - condition: ${[#BGK_ACTIVE] === true}
@@ -172,6 +94,84 @@ prepare_messages:
 assign_messages:
   assign:
     messages: ${prepare_messages_res.response.body}
+
+check_if_anonymizer_is_active:
+  switch:
+    - condition: ${[#ANONYMIZER_ENABLED] === true}
+      next: checkForPassedDomain
+  next: trigger_ai_stream
+
+checkForPassedDomain:
+  switch:
+    - condition: ${domain === 'none'}
+      next: getAnonymizerConfig
+  next: getDomainAnonymizerConfig
+
+getAnonymizerConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-anonymizer-config"
+  result: anonymizer_configs_res
+  next: assignAnonymizerConfigs
+
+getDomainAnonymizerConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-anonymizer-config"
+    body:
+      domainUUID: ${domain}
+  result: anonymizer_configs_res
+  next: assignAnonymizerConfigs
+
+assignAnonymizerConfigs:
+  assign:
+    anonymizer_configs: ${anonymizer_configs_res.response.body[0]}
+  next: check_if_anonymize_before_llm
+
+check_if_anonymize_before_llm:
+  switch:
+    - condition: ${anonymizer_configs.isAnonymizationBeforeLlm === 'true'}
+      next: prepareAnonymizerConfig
+  next: trigger_ai_stream
+
+prepareAnonymizerConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_HBS]/prepare_anonymizer_config"
+    headers:
+      type: json
+    body:
+      texts: ${messages.slice(1).map(i => i.content)}
+      approach: ${anonymizer_configs.anonymizerSelectedApproach}
+      entities: ${anonymizer_configs.anonymizerSelectedEntities.split(',')}
+      allowlist: ${anonymizer_configs.anonymizerAllowlist.split(',')}
+      denylist: ${anonymizer_configs.anonymizerDenylist.split(',')}
+      hash_type: "[#ANONYMIZER_HASH_TYPE]"
+  result: preparedAnonymizerConfigs
+  next: assignPreparedAnonymizerConfigs
+
+assignPreparedAnonymizerConfigs:
+  assign:
+    preparedAnonymizerConfigs: ${preparedAnonymizerConfigs.response.body}
+  next: anonymizeText
+
+anonymizeText:
+  call: http.post
+  args:
+    url: "[#CHATBOT_ANONYMIZER]/anonymize"
+    body:
+      texts: ${preparedAnonymizerConfigs.texts}
+      anonymizers: ${preparedAnonymizerConfigs.anonymizers}
+      entities: ${preparedAnonymizerConfigs.entities}
+      allowlist: ${preparedAnonymizerConfigs.allowlist}
+      denylist: ${preparedAnonymizerConfigs.denylist}
+  result: anonymize_res
+  next: assign_anonymized_messages
+
+assign_anonymized_messages:
+  assign:
+    anonymizedMessages: ${anonymize_res.response.body.results}
+    messages: "$=messages.map((e, i) => i ? {...e, content: anonymizedMessages[i-1].text} : e)="
   
 trigger_ai_stream:
   call: http.post
