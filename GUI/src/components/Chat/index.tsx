@@ -51,8 +51,6 @@ import { getWidgetData } from '../../services/users';
 
 type ChatProps = {
   chat: ChatType;
-  isCsaNameVisible: boolean;
-  isCsaTitleVisible: boolean;
   onChatEnd: (chat: ChatType) => void;
   onForwardToColleauge?: (chat: ChatType) => void;
   onForwardToEstablishment?: (chat: ChatType) => void;
@@ -70,8 +68,6 @@ type GroupedMessage = {
 
 const Chat: FC<ChatProps> = ({
   chat,
-  isCsaNameVisible,
-  isCsaTitleVisible,
   onChatEnd,
   onForwardToColleauge,
   onForwardToEstablishment,
@@ -750,9 +746,9 @@ const Chat: FC<ChatProps> = ({
   }
 
   useQuery<{ config: BotConfig }>({
-    queryKey: ['configs/bot-config?domain=' + url, 'prod'],
+    queryKey: ['agents/csa/is-chat-editable?domain=' + url, 'prod'],
     onSuccess(data: any) {
-      setIsChatEditingAllowed(data.response.isEditChatVisible === 'true');
+      setIsChatEditingAllowed(data.response === 'true');
     },
   });
 

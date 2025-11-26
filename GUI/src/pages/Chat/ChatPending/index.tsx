@@ -48,14 +48,6 @@ const ChatPending: FC = () => {
     useHeaderStore.getState().loadPendingChats();
   }, []);
 
-  const { data: csaNameVisiblity } = useQuery<{ isVisible: boolean }>({
-    queryKey: ['agents/admin/name-visibility', 'prod'],
-  });
-
-  const { data: csaTitleVisibility } = useQuery<{ isVisible: boolean }>({
-    queryKey: ['agents/admin/title-visibility', 'prod'],
-  });
-
   const groupedPendingChats = useHeaderStore((state) =>
     state.getGroupedPendingChats()
   );
@@ -212,8 +204,6 @@ const ChatPending: FC = () => {
           {selectedChat && (
             <Chat
               chat={selectedChat}
-              isCsaNameVisible={csaNameVisiblity?.isVisible ?? false}
-              isCsaTitleVisible={csaTitleVisibility?.isVisible ?? false}
               onChatEnd={setEndChatModal}
               onForwardToColleauge={setForwardToColleaugeModal}
               onForwardToEstablishment={setForwardToEstablishmentModal}

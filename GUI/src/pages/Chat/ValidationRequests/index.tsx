@@ -25,14 +25,6 @@ const ValidationRequests: React.FC = () => {
     useHeaderStore.getState().loadValidationChats();
   }, []);
 
-  const { data: csaNameVisiblity } = useQuery<{ isVisible: boolean }>({
-    queryKey: ['agents/admin/name-visibility', 'prod'],
-  });
-
-  const { data: csaTitleVisibility } = useQuery<{ isVisible: boolean }>({
-    queryKey: ['agents/admin/title-visibility', 'prod'],
-  });
-
   const validationChats = useHeaderStore((state) => state.getValidationChats());
 
   useEffect(() => {}, [selectedChatId]);
@@ -73,8 +65,6 @@ const ValidationRequests: React.FC = () => {
           {selectedChat && (
             <Chat
               chat={selectedChat}
-              isCsaNameVisible={csaNameVisiblity?.isVisible ?? false}
-              isCsaTitleVisible={csaTitleVisibility?.isVisible ?? false}
               onChatEnd={() => {}}
               onForwardToColleauge={() => {}}
               onForwardToEstablishment={() => {}}
