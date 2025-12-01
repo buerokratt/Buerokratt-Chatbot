@@ -159,7 +159,7 @@ prepareAnonymizerConfig:
     headers:
       type: json
     body:
-      texts: ${messages.slice(1).map(i => i.content)}
+      texts: ${messages.filter(i => i.role === 'user').map(i => i.content)}
       approach: ${anonymizer_configs.anonymizerSelectedApproach}
       entities: ${anonymizer_configs.anonymizerSelectedEntities.split(',')}
       allowlist: ${anonymizer_configs.anonymizerAllowlist.split(',')}
@@ -189,7 +189,7 @@ anonymizeText:
 assign_anonymized_messages:
   assign:
     anonymizedMessages: ${anonymize_res.response.body.results}
-    messages: "$=messages.map((e, i) => i ? {...e, content: anonymizedMessages[i-1].text} : e)="
+    messages: "$=messages.map((m, i) => m.role === 'user' ? {...m, content: anonymizedMessages[messages.slice(0, i).filter(msg => msg.role === 'user').length].text} : m)="
 
 trigger_ai_stream:
   call: http.post

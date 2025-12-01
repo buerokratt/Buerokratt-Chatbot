@@ -57,15 +57,6 @@ const ChatActive: FC = () => {
     useHeaderStore.getState().loadActiveChats();
   }, []);
 
-  const { data: csaNameVisiblity } = useQuery<{ isVisible: boolean }>({
-    queryKey: ['agents/admin/name-visibility', 'prod'],
-  });
-
-  const { data: csaTitleVisibility } = useQuery<{ isVisible: boolean }>({
-    queryKey: ['agents/admin/title-visibility', 'prod'],
-  });
-
-
   const handleCsaForward = async (chat: ChatType, user: User) => {
     try {
       await apiDev.post('chats/redirect', {
@@ -204,8 +195,6 @@ const ChatActive: FC = () => {
             {selectedChat && (
               <Chat
                 chat={selectedChat}
-                isCsaNameVisible={csaNameVisiblity?.isVisible ?? false}
-                isCsaTitleVisible={csaTitleVisibility?.isVisible ?? false}
                 onChatEnd={setEndChatModal}
                 onForwardToColleauge={setForwardToColleaugeModal}
                 onForwardToEstablishment={setForwardToEstablishmentModal}
