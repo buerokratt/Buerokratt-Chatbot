@@ -9,21 +9,28 @@ type InputProps = PropsWithChildren<InputHTMLAttributes<HTMLInputElement>> & {
   hideLabel?: boolean;
   maxLength?: number;
   className?: string;
+  labelWidth?: number;
 };
 
 const FieldInput = forwardRef<HTMLInputElement, InputProps>(
   (
-    { label, name, disabled, hideLabel, maxLength, className, children, ...rest },
+    { label, name, disabled, hideLabel, maxLength, className, labelWidth, children, ...rest },
     ref
   ) => {
     const id = useId();
 
+    const isGrid = typeof labelWidth === 'number';
+
     const inputClasses = clsx('input', disabled && 'input--disabled');
 
     return (
-      <div className={`${inputClasses} ${className}`}>
+      <div className={`${inputClasses} ${className}`} style={
+        isGrid
+          ? { display: 'grid', gridTemplateColumns: `${labelWidth}px 1fr`, alignItems: 'left' }
+          : undefined
+      }>
         {label && !hideLabel && (
-          <label htmlFor={id} className="input__label">
+          <label htmlFor={id} className="input__label" style={isGrid ? { paddingRight: 8 } : undefined}>
             {label}
           </label>
         )}

@@ -31,12 +31,15 @@ interface StoreState {
   getGroupedUnansweredChats: () => GroupedChat;
   loadPendingChats: () => Promise<void>;
   getGroupedPendingChats: () => GroupedPendingChat;
+  userDomains: string[];
+  setUserDomains: (domains: string[]) => void;
 }
 
 const useStore = create<StoreState>((set, get, store) => ({
   userInfo: null,
   userId: '',
   activeChats: [],
+  userDomains: [],
   pendingChats: [],
   selectedChatId: null,
   chatCsaActive: false,
@@ -44,6 +47,7 @@ const useStore = create<StoreState>((set, get, store) => ({
   setPendingChats: (chats) => set({ pendingChats: chats }),
   setUserInfo: (data) => set({ userInfo: data, userId: data?.idCode || '' }),
   setSelectedChatId: (id) => set({ selectedChatId: id }),
+  setUserDomains: (data: string[]) => set({ userDomains: data }),
   setChatCsaActive: (active) => {
     set({
       chatCsaActive: active,

@@ -1,7 +1,7 @@
 import { FC, useEffect, useRef, useState } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { useForm, Controller, useWatch } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { AxiosError } from 'axios';
 
@@ -14,7 +14,6 @@ import {
   Switch,
   Track,
 } from 'components';
-import { WidgetConfig } from 'types/widgetConfig';
 import { useToast } from 'hooks/useToast';
 import bykLogo from 'assets/logo-white.svg';
 import './SettingsAppearance.scss';
@@ -24,6 +23,13 @@ import { ChromePicker } from 'react-color';
 import { MdOutlinePalette } from 'react-icons/md';
 import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';
+import DomainSelector from '../../../components/DomainsSelector';
+import { fetchConfigurationFromDomain } from '../../../services/configurations';
+import {
+  WidgetAppearance,
+  WidgetAppearanceResponse,
+} from '../../../types/widgetAppearance';
+import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
 
 const variants = {
   initial: {
@@ -39,27 +45,51 @@ const SettingsAppearance: FC = () => {
   const toast = useToast();
   const hasRendered = useRef<boolean>();
   const { register, control, handleSubmit, reset, setValue } =
-    useForm<WidgetConfig>();
+    useForm<WidgetAppearance>();
   const [showPreview, setShowPreview] = useState(false);
   const [showColorPalette, setShowColorPalette] = useState(false);
   const [delayFinished, setDelayFinished] = useState(false);
-  useQuery<WidgetConfig>({
-    queryKey: ['configs/widget', 'prod'],
-    onSuccess: (data: any) => {
+  const multiDomainEnabled =
+    import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
+  const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (multiDomainEnabled) {
+      hasRendered.current = true;
+      resetSettingsToDefault();
+    } else {
+      fetchData('none');
+    }
+  }, []);
+
+  const fetchData = async (selectedDomain: string) => {
+    try {
+      const data: WidgetAppearanceResponse =
+        await fetchConfigurationFromDomain<WidgetAppearanceResponse>(
+          'configs/widget',
+          selectedDomain
+        );
+
       const res = data.response;
-      if (!hasRendered.current) {
-        reset({
-          ...res,
-          isWidgetActive: res.isWidgetActive === 'true',
-          widgetAnimation:
-            res.widgetAnimation.length === 0
-              ? 'shockwave'
-              : res.widgetAnimation,
-        });
+
+      if(res.isWidgetActive === null) {
+        resetSettingsToDefault();
         hasRendered.current = true;
+        return;
       }
-    },
-  });
+
+      reset({
+        ...res,
+        isWidgetActive: res.isWidgetActive === 'true',
+        widgetAnimation:
+          res.widgetAnimation?.length === 0 ? 'shockwave' : res.widgetAnimation,
+      });
+
+      hasRendered.current = true;
+    } catch (error) {
+      console.error('Failed to fetch appearance', error);
+    }
+  };
 
   const isWidgetActive = useWatch({
     control,
@@ -81,8 +111,8 @@ const SettingsAppearance: FC = () => {
   const widgetAnimation = useWatch({ control, name: 'widgetAnimation' });
 
   const widgetConfigMutation = useMutation({
-    mutationFn: (data: WidgetConfig) =>
-      apiDev.post<WidgetConfig>('configs/widget', data),
+    mutationFn: (data: WidgetAppearance) =>
+      apiDev.post<WidgetAppearance>('configs/widget', data),
     onSuccess: () => {
       toast.open({
         type: 'success',
@@ -122,6 +152,7 @@ const SettingsAppearance: FC = () => {
   };
 
   const handleFormSubmit = handleSubmit((data) => {
+    data.domainUUID = multiDomainEnabled ? selectedDomains : [];
     widgetConfigMutation.mutate(data);
   });
 
@@ -140,16 +171,50 @@ const SettingsAppearance: FC = () => {
     });
   };
 
+  const resetSettingsToDefault = () => {
+    reset({
+      widgetProactiveSeconds: 2,
+      widgetDisplayBubbleMessageSeconds: 2,
+      widgetBubbleMessageText: '',
+      widgetColor: '#27ff00',
+      isWidgetActive: false,
+      widgetAnimation: 'shockwave',
+    });
+  };
+
+  const handleDomainSelection = useDomainSelectionHandler(
+    setSelectedDomains,
+    fetchData,
+    resetSettingsToDefault
+  );
+
   if (hasRendered.current === undefined) return <>Loading...</>;
 
   return (
     <div ref={colorComponentRef}>
       <h1 style={{ paddingBottom: 16 }}>{t('settings.appearance.title')}</h1>
 
+      {multiDomainEnabled && (
+        <div style={{ marginBottom: '11px' }}>
+          <DomainSelector
+            onChange={(selected) => {
+              handleDomainSelection(selected);
+            }}
+          />
+        </div>
+      )}
+
       <Card
         footer={
           <Track gap={8} justify="end">
-            <Button onClick={handleFormSubmit}>{t('global.save')}</Button>
+            <Button
+              disabled={
+                (multiDomainEnabled && selectedDomains.length === 0) || false
+              }
+              onClick={handleFormSubmit}
+            >
+              {t('global.save')}
+            </Button>
             <Button appearance="secondary" onClick={handlePreview}>
               {t('global.preview')}
             </Button>
@@ -279,4 +344,6 @@ const SettingsAppearance: FC = () => {
   );
 };
 
-export default withAuthorization(SettingsAppearance, [ROLES.ROLE_ADMINISTRATOR]);
+export default withAuthorization(SettingsAppearance, [
+  ROLES.ROLE_ADMINISTRATOR,
+]);

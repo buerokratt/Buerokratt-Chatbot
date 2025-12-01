@@ -20,6 +20,9 @@ declaration:
       - field: holidays
         type: string
         description: "Body field 'holidays'"
+      - field: domain
+        type: string
+        description: "Body field 'domain'"
 
 extractRequestData:
   assign:
@@ -27,6 +30,7 @@ extractRequestData:
     content: ${incoming.body.content ?? ""}
     holidays: ${incoming.body.holidays}
     holidayNames: ${incoming.body.holidayNames}
+    domain: ${incoming.body.domain}
   next: check_bot_is_active
 
 check_bot_is_active:
@@ -104,6 +108,12 @@ check_if_bot_is_unable_to_reply:
       next: check_if_client_bot_is_active
     - condition: ${post_message_to_bot_result.response.body?.[0]?.text == 'Suunan teid klienditeenindajale. Varuge natukene kannatust.'}
       next: get_organization_base_config
+    - condition: ${post_message_to_bot_result.response.body?.[0]?.text == 'Suunan vestluse nõustajale. Palun oodake.'}
+      next: get_organization_base_config
+    - condition: ${post_message_to_bot_result.response.body?.[0]?.text == 'Suunan teid klienditeenindajale. Palun oodake.'}
+      next: get_organization_base_config
+    - condition: ${post_message_to_bot_result.response.body?.[0]?.text == 'Suunan teid riigiinfo konsultandile. Varuge natukene kannatust.'}
+      next: get_organization_base_config
     - condition: ${post_message_to_bot_result.response.body?.[0]?.text.startsWith("#common_service") || post_message_to_bot_result.response.body?.[0]?.text.startsWith("#service")}
       next: assign_service_content_from_bot_response
   next: extract_bot_responses
@@ -143,9 +153,7 @@ check_for_client_bot:
     body:
       sender: ${chatId}
       message: ${content}
-      authorId: ${get_bot_name_result.response.body[0].value}
-      holidays: ${holidays}
-      holidayNames: ${holidayNames}
+      domain: ${domain}
   result: converted_messages_res
   error: return_bot_error
   next: check_if_client_bot_is_unable_to_reply
@@ -154,6 +162,8 @@ check_if_client_bot_is_unable_to_reply:
   switch:
     - condition: ${converted_messages_res == 'ERROR' || converted_messages_res.response.body.response === 'ERROR'}
       next: check_for_bgk_bot
+    - condition: ${converted_messages_res.response.body.response == 'stream triggered'}
+      next: return_message_sent  
   next: assign_fallback_bot_converted_messages_res
 
 check_for_bgk_bot:
@@ -163,9 +173,7 @@ check_for_bgk_bot:
     body:
       sender: ${chatId}
       message: ${content}
-      authorId: ${get_bot_name_result.response.body[0].value}
-      holidays: ${holidays}
-      holidayNames: ${holidayNames}
+      domain: ${domain}
   result: converted_messages_res
   error: return_bot_error
   next: check_if_bgk_bot_is_unable_to_reply
@@ -174,6 +182,8 @@ check_if_bgk_bot_is_unable_to_reply:
   switch:
     - condition: ${converted_messages_res == 'ERROR'}
       next: check_if_user_wants_csa
+    - condition: ${converted_messages_res.response.body.response == 'stream triggered'}
+      next: return_message_sent
   next: assign_fallback_bot_converted_messages_res
 
 assign_fallback_bot_converted_messages_res:
@@ -201,7 +211,13 @@ get_organization_base_config:
 assign_organization_base_config:
   assign:
     base_config: ${org_base_config_res.response.body[0]}
-  next: check_if_organization_is_available_all_time
+  next: check_if_organization_use_csa
+
+check_if_organization_use_csa:
+  switch:
+    - condition: ${base_config.isOrganizationUseCsa === 'true'}
+      next: check_if_organization_is_available_all_time
+  next: return_organization_does_not_use_csa
 
 check_if_organization_is_available_all_time:
   switch:
@@ -230,7 +246,7 @@ check_if_organization_is_available:
     - condition: ${org_details.isWithinWorkingTime === true && org_details.isWithinWorkingDays === true && org_details.isAllowedToWorkAtHolidays === true}
       next: get_all_available_csas
     - condition: ${org_details.isWithinWorkingTime === true && org_details.isWithinWorkingDays === true && org_details.isAllowedToWorkAtHolidays === false && org_details.isHoliday == true}
-      next: return_is_a_holiday
+      next: return_organization_is_not_available
     - condition: ${org_details.isWithinWorkingTime === true && org_details.isWithinWorkingDays === true && org_details.isAllowedToWorkAtHolidays === false && org_details.isHoliday == false}
       next: get_all_available_csas
   next: return_organization_is_not_available
@@ -267,6 +283,23 @@ return_organization_is_not_available:
           authorLastName: ""
           created: ${new Date().toISOString()}
   result: organization_is_not_available_result
+  next: return_organization_is_not_available_res
+
+return_organization_does_not_use_csa:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-bot-message"
+    body:
+      messages:
+        - chatId: ${chatId}
+          content: ${base_config.botCannotAnswerMessage}
+          authorTimestamp: ${new Date().toISOString()}
+          event: "unavailable_organization"
+          authorId: ${get_bot_name_result.response.body[0].value}
+          authorFirstName: ""
+          authorLastName: ""
+          created: ${new Date().toISOString()}
+  result: organization_does_not_use_csa_result
   next: return_organization_is_not_available_res
 
 get_all_available_csas:

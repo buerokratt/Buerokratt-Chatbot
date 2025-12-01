@@ -8,6 +8,7 @@ import {
   FormSelect,
   FormTextarea,
   Icon,
+  Switch,
   Tooltip,
   Track,
 } from 'components';
@@ -17,28 +18,47 @@ import { apiDev } from 'services/api';
 import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';
 import { AiOutlineInfoCircle } from 'react-icons/ai';
-import { SkmConfig } from 'types/skmConfig';
+import { SkmConfig, SkmConfigResponse } from 'types/skmConfig';
 import { Controller, useForm } from 'react-hook-form';
 import { getQueryTypes } from './data';
+import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
+import DomainSelector from '../../../components/DomainsSelector';
+import { fetchConfigurationFromDomain } from '../../../services/configurations';
 
 const SettingsSkmConfiguration: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
-  const { control, handleSubmit, reset } =
-    useForm<SkmConfig>();
+  const { control, handleSubmit, reset } = useForm<SkmConfig>();
   const [key, setKey] = useState(0);
   const [skmConfig, setSkmConfig] = useState<SkmConfig | undefined>(undefined);
-
-  const getSkmConfig = async () => {
-    const res = await apiDev.get<{response: SkmConfig}>('configs/skm-config');
-    reset(res.data.response);
-    setSkmConfig(res.data.response);
-    setKey(key + 1);
-  }
-
+  const multiDomainEnabled =
+    import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
+  const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
+  
   useEffect(() => {
-   getSkmConfig();
+    if (multiDomainEnabled) {
+      resetSettingsToDefault();
+    } else {
+      fetchData('none');
+    }
   }, []);
+
+  const fetchData = async (selectedDomain: string) => {
+    try {
+      const data: SkmConfigResponse =
+        await fetchConfigurationFromDomain<SkmConfigResponse>(
+          'configs/skm-config',
+          selectedDomain
+        );
+      const res = data.response;
+
+      reset(res);
+      setSkmConfig(res);
+      setKey(key + 1);
+    } catch (error) {
+      console.error('Failed to fetch emergency notice', error);
+    }
+  };
 
   const skmConfigMutation = useMutation({
     mutationFn: (data: SkmConfig) =>
@@ -47,6 +67,7 @@ const SettingsSkmConfiguration: FC = () => {
         range: data.range.toString(),
         documents: data.documents.toString(),
         maxTokens: data.maxTokens.toString(),
+        inScope: data.inScope.toString(),
       }),
     onSuccess: () => {
       toast.open({
@@ -67,6 +88,7 @@ const SettingsSkmConfiguration: FC = () => {
   const handleFormSubmit = handleSubmit((data) => {
     const validationMessage = isValid(data);
     if (validationMessage === '') {
+      data.domainUUID = multiDomainEnabled ? selectedDomains : [];
       skmConfigMutation.mutate(data);
     } else {
       toast.open({
@@ -102,7 +124,34 @@ const SettingsSkmConfiguration: FC = () => {
     maxTokens: t('settings.skmConfiguration.tooltip.maxTokens'),
     indexName: t('settings.skmConfiguration.tooltip.indexName'),
     queryType: t('settings.skmConfiguration.tooltip.queryType'),
+    semanticConfiguration: t(
+      'settings.skmConfiguration.tooltip.semanticConfiguration'
+    ),
+    inScope: t('settings.skmConfiguration.tooltip.inScope'),
   };
+
+  const resetSettingsToDefault = () => {
+    const skmConfig = {
+      range: '3',
+      documents: '5',
+      systemMessage: '',
+      maxTokens: '1000',
+      indexName: '',
+      queryType: 'vector_semantic_hybrid',
+      semanticConfiguration: 'azureml-default',
+      inScope: 'true',
+      domainUUID: [],
+    };
+    setSkmConfig(skmConfig);
+    reset(skmConfig);
+    setKey(key + 1);
+  };
+
+  const handleDomainSelection = useDomainSelectionHandler(
+    setSelectedDomains,
+    fetchData,
+    resetSettingsToDefault
+  );
 
   if (!skmConfig) {
     return <>Loading...</>;
@@ -112,8 +161,21 @@ const SettingsSkmConfiguration: FC = () => {
     <>
       <h1>{t('settings.skmConfiguration.title')}</h1>
       <p>{t('settings.skmConfiguration.description')}</p>
+
+      {multiDomainEnabled && (
+        <DomainSelector
+          disabled={
+            (multiDomainEnabled && selectedDomains.length === 0) || false
+          }
+          onChange={(selected) => {
+            handleDomainSelection(selected);
+          }}
+        />
+      )}
+
       <Card
         key={key}
+        isScrollable
         footer={
           <Track justify="end">
             <Button onClick={handleFormSubmit}>{t('global.save')}</Button>
@@ -134,6 +196,7 @@ const SettingsSkmConfiguration: FC = () => {
                   onChange={field.onChange}
                   defaultValue={field.value}
                   name="label"
+                  height={320}
                   useRichText
                 />
                 {getTooltip('systemMessage')}
@@ -141,21 +204,8 @@ const SettingsSkmConfiguration: FC = () => {
             )}
           />
           {getNumberControl('maxTokens')}
-          <Controller
-            name="indexName"
-            control={control}
-            render={({ field }) => (
-              <Track gap={10} style={{ width: '100%' }}>
-                <FormInput
-                  name="indexName"
-                  label={t('settings.skmConfiguration.indexName')}
-                  onChange={field.onChange}
-                  value={field.value}
-                />
-                {getTooltip('indexName')}
-              </Track>
-            )}
-          />
+          {getTextControl('indexName')}
+          {getTextControl('semanticConfiguration')}
           <Controller
             name="queryType"
             control={control}
@@ -174,12 +224,23 @@ const SettingsSkmConfiguration: FC = () => {
               </Track>
             )}
           />
+          {getSwitchControl('inScope')}
         </Track>
       </Card>
     </>
   );
 
-  function getTooltip(name: 'range' | 'documents' | 'systemMessage' | 'maxTokens' | 'indexName' | 'queryType') {
+  function getTooltip(
+    name:
+      | 'range'
+      | 'documents'
+      | 'systemMessage'
+      | 'maxTokens'
+      | 'indexName'
+      | 'queryType'
+      | 'semanticConfiguration'
+      | 'inScope'
+  ) {
     return (
       <Tooltip content={tooltips[name]}>
         <span>
@@ -207,6 +268,50 @@ const SettingsSkmConfiguration: FC = () => {
               type="number"
               onChange={field.onChange}
               value={field.value}
+            />
+            {getTooltip(name)}
+          </Track>
+        )}
+      />
+    );
+  }
+
+  function getTextControl(name: 'indexName' | 'semanticConfiguration') {
+    return (
+      <Controller
+        name={name}
+        control={control}
+        render={({ field }) => (
+          <Track gap={10} style={{ width: '100%' }}>
+            <FormInput
+              name="indexName"
+              label={t(`settings.skmConfiguration.${name}`)}
+              onChange={field.onChange}
+              value={field.value}
+            />
+            {getTooltip(name)}
+          </Track>
+        )}
+      />
+    );
+  }
+
+  function getSwitchControl(name: 'inScope') {
+    return (
+      <Controller
+        name={name}
+        control={control}
+        render={({ field }) => (
+          <Track gap={10} style={{ width: '100%' }}>
+            <Switch
+              label={t(`settings.skmConfiguration.${name}`)}
+              onCheckedChange={(value) => {
+                field.onChange(value.toString());
+              }}
+              checked={field.value === 'true'}
+              onLabel={t('global.yes').toString()}
+              offLabel={t('global.no').toString()}
+              {...field}
             />
             {getTooltip(name)}
           </Track>

@@ -20,7 +20,10 @@ declaration:
       - field: message
         type: json
         description: "Body field 'message'"
-    headers:
+      - field: domain
+        type: string
+        description: "Body field 'domain'"
+    header:
       - field: cookie
         type: string
         description: "Cookie field"
@@ -35,11 +38,12 @@ extractRequestData:
     holidayNames: ${incoming.body.holidayNames}
     cookie: ${incoming.headers.cookie}
     silent: ${incoming.body.silent}
+    domain: ${incoming.body.domain}
   next: checkContentLength
 
 checkContentLength:
   switch:
-    - condition: ${content.length > 1000}
+    - condition: ${content.length > 3000}
       next: return_content_length_exceeded
   next: get_chat_info
 
@@ -132,6 +136,7 @@ postMessageToBot:
       content: ${content}
       holidays: ${holidays}
       holidayNames: ${holidayNames}
+      domain: ${domain}
   result: message_to_bot_result
   next: check_for_post_message_to_bot_result
 

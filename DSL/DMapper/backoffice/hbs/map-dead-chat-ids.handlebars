@@ -1,0 +1,6 @@
+[
+  {{#each chats}}
+    {"sessionKey" : "{{this.baseId}}"}
+    {{#unless @last}},{{/unless}}
+  {{/each}}
+]

@@ -11,19 +11,43 @@ declaration:
       - field: sessionLength
         type: string
         description: "Body field 'sessionLength'"
+      - field: chatActiveDuration
+        type: string
+        description: "Body field 'chatActiveDuration'"
+      - field: showIdleWarning
+        type: string
+        description: "Body field 'showIdleWarning'"
+      - field: idleMessage
+        type: string
+        description: "Body field 'idleMessage'"
+      - field: showAutoCloseText
+        type: string
+        description: "Body field 'showAutoCloseText'"
+      - field: autoCloseText
+        type: string
+        description: "Body field 'autoCloseText'"
 
 extractRequestData:
   assign:
     sessionLength: ${incoming.body.sessionLength}
+    chatActiveDuration: ${incoming.body.chatActiveDuration}
+    showIdleWarning: ${incoming.body.showIdleWarning}
+    idleMessage: ${incoming.body.idleMessage}
+    showAutoCloseText: ${incoming.body.showAutoCloseText}
+    autoCloseText: ${incoming.body.autoCloseText}
 
 setConfigurationValue:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/set-configuration-value"
+    url: "[#CHATBOT_RESQL]/set-session-length-conf"
     body:
       created: ${new Date().toISOString()}
-      key: "session_length"
-      value: ${sessionLength}
+      session_length: ${sessionLength}
+      chat_active_duration: ${chatActiveDuration}
+      show_idle_warning: ${showIdleWarning}
+      idle_message: ${idleMessage}
+      show_auto_close_text: ${showAutoCloseText}
+      auto_close_text: ${autoCloseText}
   result: res
 
 return_result:

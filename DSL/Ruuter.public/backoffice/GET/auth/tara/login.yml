@@ -7,10 +7,26 @@ declaration:
   returns: json
   namespace: backoffice
   allowlist:
-    headers:
+    header:
       - field: cookie
         type: string
         description: "Cookie field"
+
+assignValues:
+  assign:
+    wholeCookie: ${incoming.headers.cookie}
+
+
+get_old_user:
+  call: http.post
+  args:
+    url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
+    contentType: plaintext
+    headers:
+      cookie: ${incoming.headers.cookie}
+    plaintext:
+      "customJwtCookie"
+  result: oldLogin
 
 get_tara_user_info:
   call: http.get
@@ -51,7 +67,24 @@ checkIfUserExists:
 assignUser:
   assign:
     user: ${user_info.response.body[0]}
-  next: generate_cookie  
+
+checkIfNewLogin:
+  switch:
+    - condition: ${oldLogin.response.body != null && oldLogin.response.body.idCode !== user.idCode}
+      next: logOutOldUser
+  next: generate_cookie
+
+logOutOldUser:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-customer-support-status"
+    body:
+      active: ${false}
+      userIdCode: ${oldLogin.response.body.idCode}
+      status: ${"offline"}
+      statusComment: ${""}
+      created: ${new Date().toISOString()}
+  result: res
 
 generate_cookie:
   call: http.post
@@ -82,7 +115,7 @@ assign_cookie:
       Domain: "[#DOMAIN]"
       Secure: true
       HttpOnly: true
-      SameSite: "Lax"
+      SameSite: "[#COOKIE_SAME_SITE]"
   next: setCustomerSupportAgentAway
 
 setCustomerSupportAgentAway:
@@ -94,6 +127,7 @@ setCustomerSupportAgentAway:
       userIdCode: ${tara_info.response.body.personalCode}
       created: ${new Date().toISOString()}
       status: "offline"
+      statusComment: ""
   result: setCustomerSupportAgentAwayResult
   next: return_value  
 

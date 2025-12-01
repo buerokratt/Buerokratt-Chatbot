@@ -4,7 +4,6 @@ import {
   PaginationState,
   SortingState,
 } from '@tanstack/react-table';
-import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { MdOutlineArrowForward } from 'react-icons/md';
 import { apiDev } from 'services/api';
@@ -16,12 +15,15 @@ import {
   FormCheckbox,
   FormInput,
   Icon,
+  Tooltip,
   Track,
 } from 'components';
 import { User } from 'types/user';
 import { Chat } from 'types/chat';
 import { useDebouncedCallback } from 'use-debounce';
 import useStore from 'store';
+import { format } from 'date-fns';
+import { DialogTrigger } from '@radix-ui/react-dialog';
 
 type ForwardToColleaugeModalProps = {
     chat: Chat;
@@ -94,41 +96,77 @@ const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({
         );
     };
 
-    const forwardView = (props: any) => (
+    const forwardView = (props: any) => {
+      const status = props.row.original.customerSupportStatus;
+      return status === 'online' || status === 'idle' ? (
         <Button
-            appearance="text"
-            onClick={() => onForward(chat, props.row.original)}
+          appearance="text"
+          onClick={() => {
+            onForward(chat, props.row.original);
+          }}
         >
-            <Icon icon={<MdOutlineArrowForward color="rgba(0, 0, 0, 0.54)"/>}/>
-            {t('global.forward')}
+          <Icon icon={<MdOutlineArrowForward color="rgba(0, 0, 0, 0.54)" />} />
+          {t('global.forward')}
         </Button>
+      ) : null;
+    };
+
+    const statusCommentView = (props: any) => {
+    const value = props.getValue();
+    const statusTimeStamp = format(new Date(props.row.original.statusCommentTimeStamp), 'HH:mm:ss');
+    const statusDateTimeStamp = format(new Date(props.row.original.statusCommentTimeStamp), 'dd.MM HH:mm');
+    const statusComment = value.length < 13 ? `${value}` : `${value?.slice?.(0, 13)}...`;
+    return (
+      <Tooltip content={value.length > 13 ? `${statusDateTimeStamp} ${value}` : ''}>
+       <DialogTrigger asChild>
+        <span style={{ maxWidth: '170px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          {value ? statusComment : ''}
+          {value ? (
+            <time
+              dateTime={statusTimeStamp}
+              className="active-chat__message-date"
+            >
+              {statusTimeStamp}
+            </time>
+          ) : (
+            ''
+          )}
+        </span>
+       </DialogTrigger>
+      </Tooltip>
     );
+  };
 
     const usersColumns = useMemo(
-        () => [
-            columnHelper.accessor(
-                (row) => `${row.firstName ?? ''} ${row.lastName ?? ''}`,
-                {
-                    id: `name`,
-                    header: t('settings.users.name') ?? '',
-                }
-            ),
-            columnHelper.accessor('csaTitle', {
-                header: t('settings.users.userTitle') ?? '',
-            }),
-            columnHelper.accessor('customerSupportStatus', {
-                header: t('global.status') ?? '',
-                cell: customerSupportStatusView,
-            }),
-            columnHelper.display({
-                id: 'forward',
-                cell: forwardView,
-                meta: {
-                    size: '1%',
-                },
-            }),
-        ],
-        []
+      () => [
+        columnHelper.accessor(
+          (row) => `${row.firstName ?? ''} ${row.lastName ?? ''}`,
+          {
+            id: `name`,
+            header: t('settings.users.name') ?? '',
+          }
+        ),
+        columnHelper.accessor('csaTitle', {
+          header: t('settings.users.userTitle') ?? '',
+        }),
+        columnHelper.accessor('customerSupportStatus', {
+          header: t('global.status') ?? '',
+          cell: customerSupportStatusView,
+        }),
+        columnHelper.accessor('statusComment', {
+          header: t('global.statusClarification') ?? '',
+          cell: statusCommentView,
+        }),
+        columnHelper.display({
+          id: 'forward',
+          cell: forwardView,
+          meta: {
+            size: '1%',
+            sticky: 'right'
+          },
+        }),
+      ],
+      []
     );
 
   return (
@@ -173,8 +211,22 @@ const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({
       {usersList && (
         <DataTable
           data={usersList}
+          noOverflowX={true}
           columns={usersColumns}
           sortable
+          tableBodyPrefix={
+            <tr    style={{
+              height: 0,
+              border: "none",
+              padding: 0,
+            }}>
+              <td style={{ width: "auto", height: 0, padding: 0, border: "none" }} />
+              <td style={{ width: "auto", height: 0, padding: 0, border: "none" }} />
+              <td style={{ width: "auto", height: 0, padding: 0, border: "none" }} />
+              <td style={{ width: "auto", height: 0, padding: 0, border: "none" }} />
+              <td style={{ minWidth: "110px", height: 0, padding: 0, border: "none" }} />
+            </tr>
+          }
           pagination={pagination}
           setPagination={(state: PaginationState) => {
             if (

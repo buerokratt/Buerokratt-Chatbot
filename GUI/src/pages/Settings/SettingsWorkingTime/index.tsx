@@ -1,6 +1,6 @@
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { useTranslation } from 'react-i18next';
 import { format, parse } from 'date-fns';
@@ -12,17 +12,29 @@ import {
   Switch,
   Track,
 } from 'components';
-import { OrganizationWorkingTime } from 'types/organizationWorkingTime';
+import {
+  OrganizationWorkingTime,
+  OrganizationWorkingTimeResponse,
+} from 'types/organizationWorkingTime';
 import { useToast } from 'hooks/useToast';
 import { apiDev } from 'services/api';
 import './SettingsWorkingTime.scss';
-import { getOrganizationTimeData, setOrganizationTimeData } from './data';
+import {
+  getDefaultValues,
+  getOrganizationTimeData,
+  setOrganizationTimeData,
+} from './data';
 import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';
 import {
+  BOT_CANNOT_ANSWER_MESSAGE_LENGTH,
   NO_CSA_MESSAGE_LENGTH,
   OUTSIDE_WORKING_HOURS_MESSAGE_LENGTH,
 } from 'constants/config';
+import DomainSelector from '../../../components/DomainsSelector';
+import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
+import { fetchConfigurationFromDomain } from '../../../services/configurations';
+import { InfoTooltip } from '../../../utils/getToolTipWithText';
 
 type FieldDateNames = {
   start: string;
@@ -43,8 +55,29 @@ const SettingsWorkingTime: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
   const { control, getValues, handleSubmit, reset, watch } =
-    useForm<OrganizationWorkingTime>();
+    useForm<OrganizationWorkingTime>({
+      defaultValues: getDefaultValues(),
+    });
+  const [loadingCompleted, setLoadingCompleted] = useState<boolean>(false);
   const [key, setKey] = useState(0);
+  const multiDomainEnabled =
+    import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
+  const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
+
+  const resetSettingsToDefault = () => {
+    reset(getDefaultValues());
+    setKey(key + 1);
+  };
+
+  useEffect(() => {
+    if (!multiDomainEnabled) {
+      fetchData('none');
+    } else {
+      resetSettingsToDefault();
+      setLoadingCompleted(true);
+    }
+  }, []);
+
   const isOrganizationAvailableAllTime = watch('organizationWorkingAllTime');
   const isOrganizationClosedOnWeekEnds = watch('organizationClosedOnWeekEnds');
   const isOrganizationTheSameOnAllWorkingDays = watch(
@@ -53,14 +86,23 @@ const SettingsWorkingTime: FC = () => {
   const organizationWorkingTimeWeekdays = watch(
     'organizationWorkingTimeWeekdays'
   );
-  const { data: workingTime } = useQuery<OrganizationWorkingTime>({
-    queryKey: ['configs/organization-working-time', 'prod'],
-    onSuccess: (data: any) => {
-      if (Object.keys(control._formValues).length > 0) return;
-      reset(getOrganizationTimeData(data.response));
+  const isOrganizationUseCSA = watch('organizationUseCSA');
+  const fetchData = async (selectedDomain: string) => {
+    try {
+      const data: OrganizationWorkingTimeResponse =
+        await fetchConfigurationFromDomain<OrganizationWorkingTimeResponse>(
+          'configs/organization-working-time',
+          selectedDomain
+        );
+      const res = data.response;
+
+      reset(getOrganizationTimeData(res));
       setKey(key + 1);
-    },
-  });
+      setLoadingCompleted(true);
+    } catch (error) {
+      console.error('Failed to working time', error);
+    }
+  };
 
   const workingTimeMutation = useMutation({
     mutationFn: (data: OrganizationWorkingTime) =>
@@ -84,9 +126,10 @@ const SettingsWorkingTime: FC = () => {
     },
   });
 
-  const handleFormSubmit = handleSubmit((data) =>
-    workingTimeMutation.mutate(data)
-  );
+  const handleFormSubmit = handleSubmit((data) => {
+    data.domainUUID = multiDomainEnabled ? selectedDomains : [];
+    workingTimeMutation.mutate(data);
+  });
 
   function sortAndJoin(array: string[]): string {
     return array.toSorted((a, b) => a.localeCompare(b)).join(',');
@@ -94,10 +137,6 @@ const SettingsWorkingTime: FC = () => {
 
   function filterAndJoin(array: string[], day: string): string {
     return array.filter((pd: string) => pd !== day.toLowerCase()).join(',');
-  }
-
-  if (!workingTime || Object.keys(control._formValues).length === 0) {
-    return <>Loading...</>;
   }
 
   const handleTime = (field: any, date: any, isStart: boolean) => {
@@ -151,10 +190,31 @@ const SettingsWorkingTime: FC = () => {
     return { start: startingTime, end: endingTime };
   };
 
+  const handleDomainSelection = useDomainSelectionHandler(
+    setSelectedDomains,
+    fetchData,
+    resetSettingsToDefault
+  );
+
+  if (!loadingCompleted) {
+    return <>Loading...</>;
+  }
+
   return (
     <>
       <h1>{t('settings.workingTime.title')}</h1>
       <p>{t('settings.workingTime.description')}</p>
+
+      {multiDomainEnabled && (
+        <div style={{ marginBottom: '11px' }}>
+          <DomainSelector
+            onChange={(selected) => {
+              handleDomainSelection(selected);
+            }}
+          />
+        </div>
+      )}
+
       <Card
         key={key}
         isHeaderLight={true}
@@ -168,36 +228,55 @@ const SettingsWorkingTime: FC = () => {
         header={
           <Track gap={8} direction="vertical" align="left">
             <Controller
-              name="organizationWorkingAllTime"
+              name="organizationUseCSA"
               control={control}
               render={({ field }) => (
                 <Switch
-                  label={t('settings.workingTime.availableAllTime')}
+                  label={t('settings.workingTime.organizationUseCSA')}
                   onLabel={t('global.yes').toString()}
                   offLabel={t('global.no').toString()}
                   onCheckedChange={field.onChange}
                   checked={field.value}
+                  tooltip={<InfoTooltip name="settings.workingTime.tooltip.useCsa" />}
                   {...field}
                 />
               )}
             />
-            {!isOrganizationAvailableAllTime && (
+            {isOrganizationUseCSA && (
+              <Controller
+                name="organizationWorkingAllTime"
+                control={control}
+                render={({ field }) => (
+                  <Switch
+                    label={t('settings.workingTime.availableAllTime')}
+                    onLabel={t('global.yes').toString()}
+                    offLabel={t('global.no').toString()}
+                    onCheckedChange={field.onChange}
+                    checked={field.value}
+                    tooltip={<InfoTooltip name="settings.workingTime.tooltip.work24/7" />}
+                    {...field}
+                  />
+                )}
+              />
+            )}
+            {!isOrganizationAvailableAllTime && isOrganizationUseCSA && (
               <Controller
                 name="organizationWorkingTimeNationalHolidays"
                 control={control}
                 render={({ field }) => (
                   <Switch
                     label={t('settings.workingTime.publicHolidays')}
-                    onLabel={t('settings.workingTime.consider').toString()}
-                    offLabel={t('settings.workingTime.dontConsider').toString()}
+                    onLabel={t('global.yes').toString()}
+                    offLabel={t('global.no').toString()}
                     onCheckedChange={field.onChange}
                     checked={field.value}
+                    tooltip={<InfoTooltip name="settings.workingTime.tooltip.workingHolidays" />}
                     {...field}
                   />
                 )}
               />
             )}
-            {!isOrganizationAvailableAllTime && (
+            {!isOrganizationAvailableAllTime && isOrganizationUseCSA && (
               <Controller
                 name="organizationClosedOnWeekEnds"
                 control={control}
@@ -208,12 +287,13 @@ const SettingsWorkingTime: FC = () => {
                     offLabel={t('global.no').toString()}
                     onCheckedChange={field.onChange}
                     checked={field.value}
+                    tooltip={<InfoTooltip name="settings.workingTime.tooltip.workingWeekends" />}
                     {...field}
                   />
                 )}
               />
             )}
-            {!isOrganizationAvailableAllTime && (
+            {!isOrganizationAvailableAllTime && isOrganizationUseCSA && (
               <Controller
                 name="organizationTheSameOnAllWorkingDays"
                 control={control}
@@ -224,6 +304,7 @@ const SettingsWorkingTime: FC = () => {
                     offLabel={t('global.no').toString()}
                     onCheckedChange={field.onChange}
                     checked={field.value}
+                    tooltip={<InfoTooltip name="settings.workingTime.tooltip.workingSameEachDay" />}
                     {...field}
                   />
                 )}
@@ -233,7 +314,8 @@ const SettingsWorkingTime: FC = () => {
         }
       >
         {isOrganizationTheSameOnAllWorkingDays &&
-          !isOrganizationAvailableAllTime && (
+          !isOrganizationAvailableAllTime &&
+          isOrganizationUseCSA && (
             <Track>
               <label className="Label">
                 {t(
@@ -303,6 +385,7 @@ const SettingsWorkingTime: FC = () => {
           )}
         {!isOrganizationTheSameOnAllWorkingDays &&
           !isOrganizationAvailableAllTime &&
+          isOrganizationUseCSA &&
           weekdaysOptions
             .filter(
               (d) =>
@@ -414,7 +497,7 @@ const SettingsWorkingTime: FC = () => {
                 )}
               </Track>
             ))}
-        {!isOrganizationAvailableAllTime && (
+        {!isOrganizationAvailableAllTime && isOrganizationUseCSA && (
           <Controller
             name="organizationOutsideWorkingHoursAskForContacts"
             control={control}
@@ -427,12 +510,13 @@ const SettingsWorkingTime: FC = () => {
                 offLabel={t('global.no').toString()}
                 onCheckedChange={(e) => field.onChange(!e)}
                 checked={!field.value}
+                tooltip={<InfoTooltip name="settings.workingTime.tooltip.sendCsa" />}
                 {...field}
               />
             )}
           />
         )}
-        {!isOrganizationAvailableAllTime && (
+        {!isOrganizationAvailableAllTime && isOrganizationUseCSA && (
           <Controller
             name="organizationOutsideWorkingHoursAskForContacts"
             control={control}
@@ -445,20 +529,122 @@ const SettingsWorkingTime: FC = () => {
                 offLabel={t('global.no').toString()}
                 onCheckedChange={field.onChange}
                 checked={field.value}
+                tooltip={<InfoTooltip name="settings.workingTime.tooltip.sendCsaWithContactDataRequest" />}
                 {...field}
               />
             )}
           />
         )}
-        {!isOrganizationAvailableAllTime && (
+        {!isOrganizationAvailableAllTime && isOrganizationUseCSA && (
           <div style={{ paddingRight: '20px' }}>
             <Controller
               name="organizationOutsideWorkingHoursMessage"
               control={control}
               render={({ field }) => (
+                <Track gap={10} style={{ width: '100%'}}>
+                  <FormTextarea
+                    label={t('settings.workingTime.outsideWorkingHoursMessage')}
+                    maxLength={OUTSIDE_WORKING_HOURS_MESSAGE_LENGTH}
+                    showMaxLength
+                    maxLengthBottom
+                    onChange={field.onChange}
+                    defaultValue={field.value}
+                    name="label"
+                    useRichText
+                  />
+                  <InfoTooltip name="settings.workingTime.tooltip.outOfWorkingHoursText" />
+                </Track>
+              )}
+            />
+          </div>
+        )}
+        {isOrganizationUseCSA && (
+          <Controller
+            name="organizationNoCsaAskForContacts"
+            control={control}
+            render={({ field }) => (
+              <Switch
+                label={t('settings.workingTime.showIfCSAIsNotAvailable')}
+                onLabel={t('global.yes').toString()}
+                offLabel={t('global.no').toString()}
+                onCheckedChange={(e) => field.onChange(!e)}
+                checked={!field.value}
+                tooltip={<InfoTooltip name="settings.workingTime.tooltip.csaOutOfReach" />}
+                {...field}
+              />
+            )}
+          />
+        )}
+        {isOrganizationUseCSA && (
+          <Controller
+            name="organizationNoCsaAskForContacts"
+            control={control}
+            render={({ field }) => (
+              <Switch
+                label={t(
+                  'settings.workingTime.showIfCSAIsNotAvailableWithContactsRequest'
+                )}
+                onLabel={t('global.yes').toString()}
+                offLabel={t('global.no').toString()}
+                onCheckedChange={field.onChange}
+                checked={field.value}
+                tooltip={<InfoTooltip name="settings.workingTime.tooltip.csaOutOfReachWithContactDataRequest" />}
+                {...field}
+              />
+            )}
+          />
+        )}
+        {isOrganizationUseCSA && (
+          <div style={{ paddingRight: '20px' }}>
+            <Controller
+              name="organizationNoCsaAvailableMessage"
+              control={control}
+              render={({ field }) => (
+                <Track gap={10} style={{ width: '100%'}}>
+                  <FormTextarea
+                    label={t('settings.workingTime.noCsaAvailableMessage')}
+                    maxLength={NO_CSA_MESSAGE_LENGTH}
+                    showMaxLength
+                    maxLengthBottom
+                    onChange={field.onChange}
+                    defaultValue={field.value}
+                    name="label"
+                    useRichText
+                  />
+                  <InfoTooltip name="settings.workingTime.tooltip.allCsaAway" />
+                </Track>
+              )}
+            />
+          </div>
+        )}
+        {isOrganizationUseCSA && (
+          <Controller
+            name="organizationBotCannotAnswerAskToForwardToCSA"
+            control={control}
+            render={({ field }) => (
+              <Switch
+                label={t(
+                  'settings.workingTime.showIfBotCannotAnswerAskToForwardToCSA'
+                )}
+                onLabel={t('global.yes').toString()}
+                offLabel={t('global.no').toString()}
+                onCheckedChange={field.onChange}
+                checked={field.value}
+                tooltip={<InfoTooltip name="settings.workingTime.tooltip.bykCouldNotRespondRedirect" />}
+                {...field}
+              />
+            )}
+          />
+        )}
+        <div style={{ paddingRight: '20px' }}>
+          <Controller
+            name="organizationBotCannotAnswerMessage"
+            control={control}
+            render={({ field }) => (
+              <Track gap={10} style={{ width: '100%'}}>
                 <FormTextarea
-                  label={t('settings.workingTime.outsideWorkingHoursMessage')}
-                  maxLength={OUTSIDE_WORKING_HOURS_MESSAGE_LENGTH}
+                  label={t('settings.workingTime.botCannotAnswerMessage')}
+                  maxLength={BOT_CANNOT_ANSWER_MESSAGE_LENGTH}
                   showMaxLength
                   maxLengthBottom
                   onChange={field.onChange}
@@ -466,55 +652,8 @@ const SettingsWorkingTime: FC = () => {
                   name="label"
                   useRichText
                 />
-              )}
-            />
-          </div>
-        )}
-        <Controller
-          name="organizationNoCsaAskForContacts"
-          control={control}
-          render={({ field }) => (
-            <Switch
-              label={t('settings.workingTime.showIfCSAIsNotAvailable')}
-              onLabel={t('global.yes').toString()}
-              offLabel={t('global.no').toString()}
-              onCheckedChange={(e) => field.onChange(!e)}
-              checked={!field.value}
-              {...field}
-            />
-          )}
-        />
-        <Controller
-          name="organizationNoCsaAskForContacts"
-          control={control}
-          render={({ field }) => (
-            <Switch
-              label={t(
-                'settings.workingTime.showIfCSAIsNotAvailableWithContactsRequest'
-              )}
-              onLabel={t('global.yes').toString()}
-              offLabel={t('global.no').toString()}
-              onCheckedChange={field.onChange}
-              checked={field.value}
-              {...field}
-            />
-          )}
-        />
-        <div style={{ paddingRight: '20px' }}>
-          <Controller
-            name="organizationNoCsaAvailableMessage"
-            control={control}
-            render={({ field }) => (
-              <FormTextarea
-                label={t('settings.workingTime.noCsaAvailableMessage')}
-                maxLength={NO_CSA_MESSAGE_LENGTH}
-                showMaxLength
-                maxLengthBottom
-                onChange={field.onChange}
-                defaultValue={field.value}
-                name="label"
-                useRichText
-              />
+                <InfoTooltip name="settings.workingTime.tooltip.bykCouldNotRespond" />
+              </Track>
             )}
           />
         </div>

@@ -46,6 +46,8 @@ import { useNewMessageSound } from 'hooks/useAudio';
 import './Chat.scss';
 import { useInterval } from 'usehooks-ts';
 import { BotConfig } from 'types/botConfig';
+import { DomainSelection } from '../../types/domainsModels';
+import { getWidgetData } from '../../services/users';
 
 type ChatProps = {
   chat: ChatType;
@@ -80,6 +82,7 @@ const Chat: FC<ChatProps> = ({
   const { t } = useTranslation();
   const userInfo = useStore((state) => state.userInfo);
   const chatRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const [messageGroups, setMessageGroups] = useState<GroupedMessage[]>([]);
   const messageGroupsRef = useRef(messageGroups);
@@ -103,9 +106,16 @@ const Chat: FC<ChatProps> = ({
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [isChatEditingAllowed, setIsChatEditingAllowed] =
     useState<boolean>(false);
+  const [isNewMessageNotificationVisible, setIsNewMessageNotificationVisible] =
+    useState<boolean>(false);
+  const [isCsaAtEnd, setIsCsaAtEnd] = useState<boolean>(true);
+  const isCsaAtEndRef = useRef(isCsaAtEnd);
 
   const [newMessageEffect] = useNewMessageSound();
   const navigate = useNavigate();
+  const [allDomains, setAllDomains] = useState<DomainSelection[]>([]);
+  const multiDomainEnabled =
+    import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
 
   const askPermissionsTimeoutInSeconds = 60;
   let messagesLength = 0;
@@ -157,6 +167,14 @@ const Chat: FC<ChatProps> = ({
   };
 
   useEffect(() => {
+    if(multiDomainEnabled && userInfo?.idCode) {
+      getWidgetData(userInfo?.idCode).then((domains) => {
+        setAllDomains(domains);
+      })
+    }
+  }, [userInfo?.idCode, multiDomainEnabled]);
+
+  useEffect(() => {
     localStorage.setItem('focused_chat', chat.id);
     return () => {
       localStorage.removeItem('focused_chat');
@@ -178,65 +196,71 @@ const Chat: FC<ChatProps> = ({
   }, [messagesList]);
 
   useEffect(() => {
+    isCsaAtEndRef.current = isCsaAtEnd;
+  }, [isCsaAtEnd]);
+
+  const options = {
+    root: null,
+    rootMargin: '70px',
+    threshold: 0.2,
+  };
+
+  const checkLastMessageVisibility = (entries: IntersectionObserverEntry[]) => {
+    const [entry] = entries;
+    const isVisible = entry.isIntersecting;
+    setIsCsaAtEnd(isVisible);
+    if (isVisible) {
+      setIsNewMessageNotificationVisible(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!chatRef.current) return;
+
+    const observer = new IntersectionObserver(
+      checkLastMessageVisibility,
+      options
+    );
+    if (chatRef.current) observer.observe(chatRef.current);
+
+    return () => {
+      if (chatRef.current) observer.unobserve(chatRef.current);
+    };
+
+  }, [chatRef, options, isNewMessageNotificationVisible]);
+
+  const handleLastUserMessage = (newMessages: Message[]) => {
+    const hasMatchingMessage = newMessages.some(
+      (msg) =>
+        msg.event === '' &&
+        msg.authorRole === 'end-user'
+    );
+
+    if (hasMatchingMessage) {
+      setIsNewMessageNotificationVisible(!isCsaAtEndRef.current);
+    }
+  };
+
+  const scrollDown = () => {
+    if (!chatRef.current || !messageGroups) return;
+    chatRef.current.scrollIntoView({ block: 'end', inline: 'end' });
+  };
+
+  useEffect(() => {
     const onMessage = async (res: any) => {
       if (res.type === 'preview') {
         const previewMessage = await apiDev.get(
           'agents/chats/messages/preview?chatId=' + chat.id
         );
         setPreviewTypingMessage(previewMessage.data.response);
+        if (
+          !previewMessage.data.response &&
+          messageListRef.current?.length > 0
+        ) {
+          await getNewMessages();
+        }
       } else if (messageListRef.current?.length > 0) {
-        const res =
-          (await apiDev.get(
-            `agents/chats/messages/new?chatId=${chat.id}&lastRead=${
-              chat.lastMessageTimestamp?.split('+')[0] ?? ''
-            }`
-          )) ?? [];
-        const messages = res.data.response;
-        setPreviewTypingMessage(undefined);
-        const filteredMessages = messages?.filter((newMessage: Message) => {
-          return filterMessages(messageListRef.current, newMessage);
-        });
-
-        let newDisplayableMessages = filteredMessages?.filter(
-          (msg: Message) => msg.authorId != userInfo?.idCode
-        );
-
-        if (newDisplayableMessages?.length > 0) {
-          setMessagesList((oldMessages) => [
-            ...oldMessages,
-            ...newDisplayableMessages,
-          ]);
-        }
-
-        handlePermissionMessages();
-
-        const actionEventTypes = [
-          'ask-permission-accepted',
-          'ask-permission-rejected',
-          'ask-permission-ignored',
-          'contact-information-fulfilled',
-          'contact-information-rejected',
-          'requested-chat-forward',
-          'requested-chat-forward-accepted',
-          'requested-chat-forward-rejected',
-          'pending-assigned',
-          'user-reached',
-          'user-not-reached',
-          'user-authenticated',
-          'authentication-successful',
-          'authentication-failed',
-          'redirectedMessageByOwner',
-          'redirectedMessageClaimed',
-          'redirectedMessage',
-        ];
-
-        const eventMessages: Message[] = filteredMessages?.filter(
-          (e: Message) => actionEventTypes.includes(e.event ?? '')
-        );
-
-        if (eventMessages?.length > 0) {
-          await getMessages();
-        }
+        await getNewMessages();
       }
     };
 
@@ -246,6 +270,64 @@ const Chat: FC<ChatProps> = ({
       events.close();
     };
   }, [chat.id]);
+
+  const getNewMessages = async () => {
+    const res =
+      (await apiDev.get(
+        `agents/chats/messages/new?chatId=${chat.id}&lastRead=${
+          chat.lastMessageTimestamp?.split('+')[0] ?? ''
+        }`
+      )) ?? [];
+    const messages = res.data.response;
+    setPreviewTypingMessage(undefined);
+    const filteredMessages = messages?.filter((newMessage: Message) => {
+      return filterMessages(messageListRef.current, newMessage);
+    });
+
+    let newDisplayableMessages = filteredMessages?.filter(
+      (msg: Message) => msg.authorId != userInfo?.idCode
+    );
+
+    if (newDisplayableMessages?.length > 0) {
+      setTimeout(() => {
+        handleLastUserMessage(newDisplayableMessages);
+      }, 500);
+      setMessagesList((oldMessages) => [
+        ...oldMessages,
+        ...newDisplayableMessages,
+      ]);
+    }
+
+    handlePermissionMessages();
+
+    const actionEventTypes = [
+      'ask-permission-accepted',
+      'ask-permission-rejected',
+      'ask-permission-ignored',
+      'contact-information-fulfilled',
+      'contact-information-rejected',
+      'requested-chat-forward',
+      'requested-chat-forward-accepted',
+      'requested-chat-forward-rejected',
+      'pending-assigned',
+      'user-reached',
+      'user-not-reached',
+      'user-authenticated',
+      'authentication-successful',
+      'authentication-failed',
+      'redirectedMessageByOwner',
+      'redirectedMessageClaimed',
+      'redirectedMessage',
+    ];
+
+    const eventMessages: Message[] = filteredMessages?.filter((e: Message) =>
+      actionEventTypes.includes(e.event ?? '')
+    );
+
+    if (eventMessages?.length > 0) {
+      await getMessages();
+    }
+  };
 
   const getMessages = async () => {
     const { data: res } = await apiDev.post('agents/chats/messages/all', {
@@ -300,11 +382,8 @@ const Chat: FC<ChatProps> = ({
       message: Message;
       editing: boolean;
     }) => {
-      if (editing) {
-        return apiDev.post('agents/chats/messages/edit', message);
-      } else {
-        return apiDev.post('agents/chats/messages/insert', message);
-      }
+      const endpoint = editing ? 'edit' : 'insert';
+      return apiDev.post(`agents/chats/messages/${endpoint}`, message);
     },
     onSuccess: (res: any) => {
       return res.data.response;
@@ -370,13 +449,14 @@ const Chat: FC<ChatProps> = ({
         forwardedToCsa: userInfo?.idCode ?? '',
       }),
     onSuccess: async () => {
-      if (chat.customerSupportId === '') {
-        navigate('/active', {
-          state: {
-            chatId: chat.id,
-          },
-        });
-      } else {
+      navigate('/active', {
+        state: {
+          chatId: chat.id,
+          customerSupportId: userInfo?.idCode ?? '',
+        },
+      });
+
+      if (chat.customerSupportId != '') {
         chat.customerSupportId = userInfo?.idCode;
       }
       onRefresh();
@@ -521,7 +601,9 @@ const Chat: FC<ChatProps> = ({
 
   useEffect(() => {
     if (!chatRef.current || !messageGroups) return;
-    chatRef.current.scrollIntoView({ block: 'end', inline: 'end' });
+    if(isCsaAtEnd) {
+      chatRef.current.scrollIntoView({ block: 'end', inline: 'end' });
+    }
   }, [messageGroups, previewTypingMessage]);
 
   const handleResponseTextSend = async (editMessage: boolean) => {
@@ -565,6 +647,7 @@ const Chat: FC<ChatProps> = ({
           setMessagesList((oldMessages) => [...oldMessages, message]);
         }
       } catch (error) {
+        console.error(error)
         setMessagesList((oldMessages) => [...oldMessages, newMessage]);
       } finally {
         setResponseText('');
@@ -605,11 +688,14 @@ const Chat: FC<ChatProps> = ({
   };
 
   const checkIsMessageEditable = (message: Message): boolean => {
+    const lastestCsaMessage = messagesList.filter((m) => m.authorId === userInfo.idCode).pop();
+    const isLastCsaMessage = lastestCsaMessage?.id === message.id;
     return (
       isChatEditingAllowed &&
       chat.customerSupportId === userInfo.idCode &&
       message.authorId === userInfo.idCode &&
-      message.id
+      message.id &&
+      isLastCsaMessage
     );
   };
 
@@ -645,12 +731,26 @@ const Chat: FC<ChatProps> = ({
         return updatedMessages;
       });
     } catch (error) {
+      console.error(error)
       setMessagesList((oldMessages) => [...oldMessages, retryMessage]);
     }
   };
 
+  let url = 'none';
+
+  if(multiDomainEnabled && allDomains.length > 0) {
+    const chatUrl = chat.endUserUrl ?? '';
+    const found = allDomains.find(domain =>
+      chatUrl.includes(domain.url)
+    );
+
+    if(found) {
+      url = found.id
+    }
+  }
+
   useQuery<{ config: BotConfig }>({
-    queryKey: ['configs/bot-config', 'prod'],
+    queryKey: ['configs/bot-config?domain=' + url, 'prod'],
     onSuccess(data: any) {
       setIsChatEditingAllowed(data.response.isEditChatVisible === 'true');
     },
@@ -715,7 +815,7 @@ const Chat: FC<ChatProps> = ({
                     )}
                   </div>
 
-                  <div className="active-chat__messages">
+                  <div ref={containerRef} className="active-chat__messages">
                     {group.messages.map((message, i) => (
                       <div key={`${message.authorTimestamp}-${i}`}>
                         <ChatMessage
@@ -784,13 +884,21 @@ const Chat: FC<ChatProps> = ({
           <div id="anchor" ref={chatRef}></div>
         </div>
 
+        {!isCsaAtEnd && isNewMessageNotificationVisible && (
+          <div className="newMessageContainer">
+            <button onClick={scrollDown} className="newMessage">
+              {t('chat.newMessage')}
+            </button>
+          </div>
+        )}
+
         {chat.customerSupportId == userInfo?.idCode &&
           chat.status != CHAT_STATUS.IDLE && (
             <>
               {selectedMessage ? (
                 <div className="active-chat__toolbar edit-toolbar">
                   <div className="edit-toolbar__header">
-                    Vestluse muutmine
+                    {t('chat.changingMessage')}
                     <MdOutlineCreate className="active-chat__edit-icon" />
                   </div>
                   <div className="edit-toolbar__textarea">

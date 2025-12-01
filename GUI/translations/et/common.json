@@ -1,5 +1,6 @@
 {
   "global": {
+    "email": "Email",
     "save": "Salvesta",
     "add": "Lisa",
     "edit": "Muuda",
@@ -44,7 +45,19 @@
     "today": "Täna",
     "forward": "Suuna",
     "chosen": "Valitud",
-    "read": "Loetud"
+    "read": "Loetud",
+    "statusClarification": "Staatuse täpsustus",
+    "selectAll": "Vali kõik",
+    "displayText": "Kuva tekst",
+    "test": "Test"
+  },
+  "files": {
+    "download_xlsx": "Lae alla XLSX"
+  },
+  "sorting": {
+    "desc": "kahanevalt",
+    "asc": "kasvavalt",
+    "sorting": "Sorteerimine"
   },
   "mainMenu": {
     "menuLabel": "Põhinavigatsioon",
@@ -52,6 +65,13 @@
     "openMenu": "Ava menüü",
     "openMenuIcon": "Ava menüü ikoon",
     "closeMenuIcon": "Sulge menüü ikoon"
+  },
+  "multiDomains": {
+    "addNew": "Lisa uus",
+    "title": "Multidomeenid",
+    "domainName": "Domeeni nimi",
+    "selectDomains": "Vali Domeenid",
+    "noDomains": "Domeene ei ole saadaval. Palun võtke ühendust süsteemiadministraatoriga."
   },
   "menu": {
     "conversations": "Vestlused",
@@ -96,6 +116,7 @@
     "chatForwardedTo": "Vestlus edastati aadressile",
     "chatEnded": "Vestlus lõppes",
     "reply": "Vasta",
+    "newMessage": "Uus sõnum!",
     "unansweredChats": "Vastamata vestlused",
     "unanswered": "Vastamata",
     "forwarded": "Suunatud",
@@ -121,6 +142,8 @@
     "changeStatus": "Muuda staatust",
     "waiting_validation": "Vastust koostatakse",
     "approved_validation": "Kinnitatud valideerimine",
+    "changingMessage": "Vestluse muutmine",
+    "messageEdited": "Vestluse sisu on muudetud! {{date}}",
     "active": {
       "list": "Aktiivsed vestlused",
       "myChats": "Minu vestlused",
@@ -211,6 +234,7 @@
       "unavailable_holiday_ask_contacts": "Puhkus ja küsitakse kontakte",
       "user-reached": "Kasutajaga võeti ühendust",
       "user-not-reached": "Kasutajaga ei õnnestunud ühendust saada",
+      "user-authenticated": "{{name}} on autenditud {{date}}",
       "ask_to_forward_to_csa": "Vestlus paluti klienditeenindajale suunata",
       "forwarded_to_backoffice": "Vestlus suunatakse klienditeenindajale",
       "continue_chatting_with_bot": "Jätkake vestlust kasutajaga bürokratt"
@@ -231,7 +255,7 @@
       "requested-authentication": "Küsiti autentimist",
       "authentication_successful": "Autentimine õnnestus {{date}}",
       "authentication_failed": "Autentimine ebaõnnestus {{date}}",
-      "ask-permission": "Küsiti nõusolekut",
+      "ask-permission": "Küsiti nõusolekut {{date}}",
       "ask-permission-accepted": "Nõusolek antud {{date}}",
       "ask-permission-rejected": "Nõusolekust keeldutud {{date}}",
       "ask-permission-ignored": "Nõusolek ignoreeritud {{date}}",
@@ -279,7 +303,8 @@
   },
   "deleteConversation": {
     "deletionTime": "Kustutamise kellaeg",
-    "deletionNote": "Määrab aja, mille möödudes anonüümsed sõnumid automaatselt kustutatakse.",
+    "deletionAnonNote": "Määrab aja, mille möödudes anonüümsed sõnumid automaatselt kustutatakse.",
+    "deletionAuthNote": "Määrab aja, mille möödudes autentitud sõnumid automaatselt kustutatakse.",
     "conversationDeleting": "Vestluste kustutamine",
     "generateCsv": "Genereeri CSV",
     "periodConversations": "Vestlusi perioodis",
@@ -288,11 +313,18 @@
     "authConversationsRemoval": "Autentitud vestlused kustutatakse",
     "anonymConversationsDelete": "Anonüümsed vestlused kustutatakse",
     "period": "Periood",
-    "days": "days",
+    "days": "päeva",
     "oneDay": "1 päev",
     "sevenDays": "7 päeva",
     "thirtyOneDay": "31 päeva",
-    "ninetyDays": "90 päeva"
+    "ninetyDays": "90 päeva",
+    "tooltip": {
+      "removeAuth": "Vali \"Jah\" kui soovid autentitud vestluste kustutamist. Perioodi aja täpsustus avaneb automaatselt. Vali \"Ei\" kui soovid, et vestlusi ei kustutataks.",
+      "removeAnon": "Vali \"Jah\" kui soovid anonüümsete vestluste kustutamist. Perioodi aja täpsustus avaneb automaatselt. Vali \"Ei\" kui soovid, et vestlusi ei kustutataks.",
+      "days": "Määra ajavahemik päevade arvuga.",
+      "removalTime": "Kellaajaline seadistus, mis kell viimasel päeval vestluse kustutamine toimub.",
+      "displayExpiringConversations": "Vali ajavahemik, et näha mis vestlused kuuluvad lähiajal kustutamisele."
+    }
   },
   "roles": {
     "ROLE_ADMINISTRATOR": "Administraator",
@@ -304,6 +336,10 @@
   },
   "settings": {
     "title": "Seaded",
+    "autoClose": "Lõpeta vestlus automaatselt",
+    "idleWarningText": "Sõnum, kui kasutaja ei vasta",
+    "showAutoCloseText": "Kuva lõppsõnum",
+    "autoCloseText": "Lõppsõnum",
     "users": {
       "title": "Kasutajad",
       "name": "Nimi",
@@ -313,6 +349,9 @@
       "userTitle": "Tiitel",
       "email": "E-post",
       "department": "Osakond",
+      "connectToSmax": "Seo Smaxiga",
+      "connectedToSmax": "Smaxiga seotud",
+      "disconnectFromSmax": "Seo Smaxist lahti",
       "addUser": "Lisa kasutaja",
       "editUser": "Muuda kasutajat",
       "deleteUser": "Kustuta kasutaja",
@@ -323,6 +362,8 @@
       "soundNotifications": "Häälmärguanded",
       "popupNotifications": "Pop-up märguanded",
       "newUnansweredChat": "Uus vastamata vestlus",
+      "newForwardedChatTitle": "Suunatud vestlus",
+      "newForwardedChatMessage": "Sulle suunati uus vestlus!",
       "newForwardedChat": "Uus suunatud vestlus",
       "newValidationMessage": "Uus teade kinnitamiseks",
       "useAutocorrect": "Teksti autokorrektor",
@@ -332,7 +373,8 @@
       "idCodePlaceholder": "Isikukood peab algama riigi eesliitega, (eg.EE12345678910)",
       "choose": "Vali",
       "userExists": "Kasutaja on olemas",
-      "userChangeStatusMessage": "Kas sa soovid kasutaja staatuseks muuta eemal?"
+      "userChangeStatusMessage": "Kas sa soovid kasutaja staatuseks muuta eemal?",
+      "statusCommentUpdated": "Staatuse täpsustus uuendatud"
     },
     "chat": {
       "chatActive": "Vestlusrobot aktiivne",
@@ -351,6 +393,13 @@
       "noticeChanged": "Teate seadeid muudeti edukalt",
       "endDateError": "Lõppkuupäev peab olema alguskuupäevast suurem"
     },
+    "feedback": {
+      "title": "Tagasiside",
+      "feedbackActive": "Tagasiside aktiivne",
+      "feedbackQuestion": "Tagasiside küsimus",
+      "noticeActive": "Teade aktiivne",
+      "notice": "Teade"
+    },
     "appearance": {
       "title": "Välimus ja käitumine",
       "widgetBubbleMessageText": "Märguandesõnum",
@@ -364,7 +413,7 @@
       "description": "Peale tööaja lõppemist, juhul kui juturobot ise kliendi küsimustele vastata ei oska, küsib ta kliendi kontaktandmeid.",
       "openFrom": "Avatud alates",
       "openUntil": "Avatud kuni",
-      "publicHolidays": "Arvesta riigipühadega",
+      "publicHolidays": "Saadaval riigipühadel",
       "consider": "Arvesta",
       "dontConsider": "Ära arvesta",
       "closedOnWeekends": "Nädalavahetustel suletud",
@@ -380,7 +429,25 @@
       "noCsaAvailableMessage": "Klienditeenindaja eemaloleku teavitus",
       "showIfOrganizationIsOutsideWorkingHours": "Saada kliendile töövälise aja teavitus",
       "showIfOrganizationIsOutsideWorkingHoursWithContactsRequest": "Saada kliendile töövälise aja teavitus koos kontakti päringuga",
-      "outsideWorkingHoursMessage": "Töövälise aja teavitus"
+      "outsideWorkingHoursMessage": "Töövälise aja teavitus",
+      "showIfBotCannotAnswerAskToForwardToCSA": "Kui Bürokratt ei oska vasta, kas küsida suunamist",
+      "botCannotAnswerMessage": "Teavitus, kui Bürokratt ei oska vastata",
+      "organizationUseCSA": "Kasutan klienditeenindust",
+      "tooltip": {
+        "useCsa": "Vali \"Jah\", kui vestlusi võtavad vastu töötajad, sellega avanevad tööaja täpsemad seadistused. Kui töötajaid ei ole, vali \"Ei\" ja tööaega pole vaja määrata.",
+        "work24/7": "Vali \"Jah\" kui vastajate tööaeg on ööpäevaringne, sh ka riigipühadel. Kui valida \"Ei\", saab valida täpsemaid ajavahemikke ja tingimusi.\n",
+        "workingHolidays": "Riigipühadel käitub vestlus samamoodi nagu töövälisel ajal.",
+        "workingWeekends": "Vali \"Jah\", kui nädalavahetusel pole tööaega. Vali \"Ei\", kui nädalavahetusel on töötunde. Isegi kui ainult ühel päeval nädalavahetusel on töötunde ette nähtud, tuleb seadistuses valida \"Ei\".",
+        "workingSameEachDay": "Vali \"Jah\", kui tööaeg on kõigil tööpäevadel samasugune. Vali \"Ei\", kui tööajad erinevad, näiteks E-R on ühine aeg, aga laupäeval teine. See seadistus arvestab ka eelnevalt seadistatud \"Nädalavahetusel suletud\" valikut, kui nädalavahetus ei kuulu tööaja sisse, siis on nähtaval ainult valikud esmaspäevast reedeni.",
+        "sendCsa": "See valik on seotud järgmise seadistusega, kuid erinevus seisneb kliendi kontaktandmete küsimises. Kui valida \"Jah\", saadetakse kliendile ainult teavitustekst, mille sisu on määratud väljal \"Töövälise aja teavitus\". Kliendilt kontaktandmeid ei küsita.",
+        "sendCsaWithContactDataRequest": "See valik on seotud eelmise seadistusega, kuid siin küsitakse kliendilt kontaktandmeid. Kui valida \"Jah\", kuvatakse kliendile teavitustekst ja lisanduvad väljad nagu \"e-posti aadress\", \"telefoninumber\" ja \"täpsusta siin oma küsimust\". Kuvatava teksti sisu on seadistatav väljal \"Töövälise aja teavitus\". Kui valida \"Ei\", rakendub automaatselt eelmise teavituse loogika, kus kontaktandmeid ei küsita.",
+        "outOfWorkingHoursText": "Tekst, mida kuvatakse kliendile töövälisel ajal. Soovitame arvestada eelnevate seadistustega ehk kui kontakti päring on sisse lülitatud, siis võiks see kajastuda ka tekstis, \"Hetkel on meil tööväline aeg, võite jätta meile oma kontaktandmed, et saaksime teiega hiljem ühendust võtta.\"",
+        "csaOutOfReach": "See valik on seotud järgmise seadistusega, kuid erinevus seisneb kliendi kontaktandmete küsimises. Kui valida \"Jah\", saadetakse kliendile ainult eemaloleku teavitustekst, mille sisu on määratud väljal \"Klienditeenindaja eemaoleku teavitus\". Kliendilt kontaktandmeid ei küsita.",
+        "csaOutOfReachWithContactDataRequest": "See valik on seotud eelmise seadistusega, kuid siin küsitakse kliendilt kontaktandmeid. Kui valida \"Jah\", kuvatakse kliendile eemaloleku teavitustekst ja lisanduvad väljad nagu \"e-posti aadress\", \"telefoninumber\" ja \"täpsusta siin oma küsimust\". Kuvatava teksti sisu on seadistatav väljal \"Klienditeenindaja eemaoleku teavitus\". Kui valida \"Ei\", rakendub automaatselt eelmise teavituse loogika, kus kontaktandmeid ei küsita.",
+        "allCsaAway": "Tekst, mida kuvatakse kliendile klienditeenindaja eemaoleku korral. Soovitame arvestada eelnevate seadistustega ehk kui kontakti päring on sisse lülitatud, siis võiks see kajastuda ka tekstis, \"Hetkel on kõik klienditeenindajad eemal, võite jätta meile oma kontaktandmed, et saaksime teiega hiljem ühendust võtta.\"",
+        "bykCouldNotRespondRedirect": "Vali \"Jah\", kui soovid, et vestlus suunatakse töötajale kui Bürokratt ei oska vastata. Vali \"Ei\", kui töötajale suunamist ei toimu, sel juhul vestlus jätkub samas aknas Bürokratiga.",
+        "bykCouldNotRespond": "Tekst, mida kuvatakse kui Bürokratt ei oska vastata."
+      }
     },
     "userSession": {
       "title": "Kasutaja sessioon",
@@ -391,6 +458,13 @@
       "sessionChanged": "Sessiooni pikkuse muutmine õnnestus",
       "emptySession": "Sessiooni pikkuse väli ei tohi olla tühi",
       "invalidSession": "Sessiooni pikkus peab olema vahemikus 30 - 480 minutit"
+    },
+    "chatDuration": {
+      "description": "Aja möödumisel lõpetakse vestlus automaatselt.",
+      "duration": "Kasutaja poolse vastuse ooteaja pikkus",
+      "minutes": "minutit",
+      "rule": "Sessiooni pikkus on lubatud vahemikus 5 min - 480 min (8h)",
+      "invalidSession": "Sessiooni pikkus peab olema vahemikus 5 - 480 minutit"
     },
     "greeting": {
       "title": "Tervitussõnum"
@@ -413,6 +487,16 @@
       "messageChanged": "Tervitust muudeti edukalt",
       "emptyMessage": "Tervitussõnumi väli ei tohi olla tühi"
     },
+    "sessionLength": {
+      "tooltip": {
+        "sessionLength": "Selle väljaga saab määrata, kui kaua tagatoas sisseloginud kasutaja võib olla passiivne, enne kui ta automaatselt välja logitakse. Seadistus mõjutab ainult tagatoa kasutajaid.",
+        "idleTimout": "Määrab aja, mille möödumisel loetakse kasutaja passiivseks ja käivitatakse vestluse sulgemise protsess.",
+        "showIdleMessage": "Enne vestluse lõpetamist saab passiivsele kasutajale saata hoiatava sõnumi. Kui valida \"Jah\", kuvatakse vestluses hoiatav sõnum vahetult enne sulgemist. Kui valida \"Ei\", siis sõnumit ei saadeta.",
+        "idleMessageText": "Enne vestluse lõpetamist saadetakse passiivsele kasutajale hoiatava sõnumi. Sõnumi alla kuvatakse ainult ühte nuppu \"Jätka\", mis annab võimaluse kasutajal vestlust jätkata.",
+        "showEndMessage": "Vestlust lõpetades on vestlusaknast näha viimast lauset Bürokrati poolt saadetuna. Kui valida \"Jah\", kuvatakse vestluses viimase reana Bürokrati lõppsõnumit. Kui valida \"Ei\", siis sõnumit ei kuvata ning kasutajale minimeeritakse vestlusaken automaatselt. Sõnumit kuvatakse lõppkasutajale 1 minut, seejärel rakendub lõppsõnumi seadistus.",
+        "endMessageText": "Vestlus lõpetatakse kasutaja vaatest nii, et vestlusaken jääb avatuks. Kasutaja näeb aknas viimase sõnumina Bürokrati teadet, mille sõnumi sisu on määratud selles seadistuses."
+      }
+    },
     "skmConfiguration": {
       "title": "SKMi konfiguratsioon",
       "description": "Siin on võimalik SKMi parameetreid sätestada.",
@@ -427,19 +511,67 @@
       "simple": "Märksõna",
       "vectorSimpleHybrid": "Hübriid (märksõna + vektor)",
       "vectorSemanticHybrid": "Hübriid + semantiline",
+      "semanticConfiguration": "Semantiline Konfiguratsioon",
+      "inScope": "Vastused ainult asutuse andmete põhjal",
       "tooltip": {
-        "range": "Rangus määrab künnise, mille alusel dokumente peetakse teie päringutele asjakohasteks. Ranguse tõstmine tähendab kõrgemat asjakohasuse künnist ja rohkemate vähem asjakohaste dokumentide filtreerimist. Väga kõrge rangus võib aga põhjustada vastuste genereerimise ebaõnnestumise, kuna kättesaadavaid dokumente on liiga vähe. Vaikimisi on ranguse tase 3.Võimalikud väärtused: 1 - 5",
+        "range": "Rangus määrab künnise, mille alusel xdokumente peetakse teie päringutele asjakohasteks. Ranguse tõstmine tähendab kõrgemat asjakohasuse künnist ja rohkemate vähem asjakohaste dokumentide filtreerimist. Väga kõrge rangus võib aga põhjustada vastuste genereerimise ebaõnnestumise, kuna kättesaadavaid dokumente on liiga vähe. Vaikimisi on ranguse tase 3.Võimalikud väärtused: 1 - 5",
         "documents": "See määrab teie andmeindeksist vastuste koostamiseks kasutatavate kõrgeima skooriga dokumentide arvu. Seda väärtust tasub suurendada, kui teil on lühikesed dokumendid või soovite pakkuda rohkem konteksti. Vaikeväärtus on 5.Võimalikud väärtused: 1 - 20",
         "systemMessage": "Anna mudelile juhised ja kontekst selle kohta, kuidas see peaks käituma.",
         "maxTokens": "Sea piirang mudeli vastuses kasutatavate tokenite arvule.Võimalikud väärtused: 1 - 2000",
         "indexName": "Azures loodud indeksi nimi.",
-        "queryType": "Vali otsingutüüp."
+        "queryType": "Vali otsingutüüp.",
+        "semanticConfiguration": "Azures loodud indeksi semantiline konfiguratsioon",
+        "inScope": "Kui otsing tagastab andmetest 0 vastet, siis 'Jah' puhul ei saadeta kasutaja küsimust keelemudelile, vaid kindlaksmääratud vastus tuleb otsingusüsteemist"
       },
       "validation": {
         "range": "Rangus peab olema vahemikus 1 kuni 5",
         "documents": "Leitud dokumendid peab olema vahemikus 1 kuni 20",
         "maxTokens": "Maksimaalne tokenite arv peab olema vahemikus 1 kuni 2000",
         "systemMessage": "Süsteemisõnumi väli ei tohi olla tühi"
+      }
+    },
+    "anonymizer": {
+      "settingsTitle": "Anonümiseerija seaded",
+      "approach": "Anonümiseerimise viis",
+      "approachOptionsPlaceholder": "- Tehke valik -",
+      "entities": "Anonümiseeritavad andmetüübid",
+      "entitiesDescription": "Valige, milliseid andmetüüpe soovite vestlustes anonümiseerida",
+      "allowList": "Lisage sõnu lubatute nimekirja",
+      "allowListDescription": "Sõnad, mida ei tohiks anonümiseerida, kuigi need sisalduvad valitud andmetüübis",
+      "allowListPlaceholder": "Sisestage sõna ja vajutage Enter, et lisada lubatute nimekirja",
+      "denyList": "Lisage sõnu keelatute nimekirja",
+      "denyListDescription": "Sõnad, mida tuleks anonümiseerida, kuigi need ei sisaldu valitud andmetüübis",
+      "denyListPlaceholder": "Sisestage sõna ja vajutage Enter, et lisada keelatute nimekirja",
+      "anonymizationBeforeLLM": "Anonümiseerimine enne SKM-i",
+      "anonymizationBeforeGlobalClassifier": "Anonümiseerimine enne klassifitseerijat",
+      "saveSettings": "Salvesta seaded",
+      "testingTitle": "Anonümiseerija testimine",
+      "testingDescription": "Anonümiseerija seadistuse testimiseks sisestage tekst ja vajutage \"Anonümiseeri\"",
+      "inputText": "Sisendtekst",
+      "inputTextPlaceholder": "Sisestage anonümiseeritav tekst",
+      "clear": "Tühjenda",
+      "anonymize": "Anonümiseeri",
+      "outputText": "Väljundtekst",
+      "outputTextPlaceholder": "Siia ilmub anonümiseeritud tekst",
+      "savedSettingsSuccessfully": "Anonümiseerija seaded on edukalt salvestatud",
+      "textAnonymized": "Tekst on anonümiseeritud",
+      "entitiesList": {
+        "car_number": "AUTONUMBER",
+        "url": "VEEBIAADRESS",
+        "phone_number": "TELEFONINUMBER",
+        "medical_license": "MEDITSIINILINE_LITSENTS",
+        "ip_address": "IP_AADRESS",
+        "organization": "ORGANISATSIOON",
+        "iban_code": "IBAN_KOOD",
+        "email_address": "E_POSTI_AADRESS",
+        "location": "ASUKOHT",
+        "date_time": "KUUPÄEV_JA_KELLAAEG",
+        "est_id_doc": "EESTI_DOKUMENDI_NR",
+        "ee_personal_code": "ISIKUKOOD",
+        "credit_card": "KREDIITKAART",
+        "person": "ISIK",
+        "gpe": "RIIK_VÕI_LINN",
+        "crypto": "KRÜPTORAHAKOTT"
       }
     }
   },
@@ -466,5 +598,8 @@
   "notification": {
     "title": "Bürokratt",
     "newMessage": "Uus sõnum."
+  },
+  "landing": {
+    "title": "Tere tulemast Bürokratti"
   }
 }

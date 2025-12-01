@@ -24,4 +24,12 @@ export interface OrganizationWorkingTime {
   organizationNoCsaAvailableMessage: string;
   organizationOutsideWorkingHoursAskForContacts: boolean;
   organizationOutsideWorkingHoursMessage: string;
+  organizationBotCannotAnswerAskToForwardToCSA: boolean;
+  organizationBotCannotAnswerMessage: string;
+  organizationUseCSA: boolean;
+  domainUUID?: string[];
+}
+
+export interface OrganizationWorkingTimeResponse {
+  response: OrganizationWorkingTime;
 }

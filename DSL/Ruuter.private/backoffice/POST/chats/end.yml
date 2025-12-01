@@ -135,6 +135,14 @@ remove_chat_id_from_queue_notification_node_if_existed:
       id: ${chatId}
   result: remove_chat_id_from_queue_notification_node_if_existed_res
 
+removeKeyFromTim:
+  call: http.post
+  args:
+    url: "[#CHATBOT_TIM]/sessionkey/delete"
+    body:
+      sessionKey: ${chatId}
+  result: removedKey
+
 return_result:
   return: "Ended Chat Successfully"
   next: end

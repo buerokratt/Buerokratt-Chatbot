@@ -12,6 +12,8 @@ import {ROLES} from 'utils/constants';
 import {DeleteChatSettings} from "../../../types/deleteChatSettings";
 import {differenceInCalendarDays, format, parse, subDays} from "date-fns";
 import DeletionChatOverview from "../../../components/DeletionChatOverview";
+import { dateToLocalExcludingDST, dateToUTCExcludingDST } from 'utils/convert-date';
+import { InfoTooltip } from '../../../utils/getToolTipWithText';
 
 const DeleteConversations: FC = () => {
     const {t} = useTranslation();
@@ -59,7 +61,13 @@ const DeleteConversations: FC = () => {
             setIsAuthMessages(deleteConfig.isAuthConversations === 'true');
             setAuthPeriod(Number(deleteConfig.authPeriod ?? 160));
             setAnonymPeriod(Number(deleteConfig.anonymPeriod ?? 160));
-            setDeletionTime(deleteConfig?.deletionTimeISO === '' ? new Date().toISOString() : new Date(deleteConfig.deletionTimeISO).toISOString());
+            setDeletionTime(
+              deleteConfig?.deletionTimeISO === ''
+                ? dateToLocalExcludingDST(new Date().toISOString())
+                : dateToLocalExcludingDST(
+                    new Date(deleteConfig.deletionTimeISO).toISOString()
+                  )
+            );
             reset(deleteConfig)
         }
     }, [deleteConfig]);
@@ -94,12 +102,14 @@ const DeleteConversations: FC = () => {
 
     const setDeleteConversationsData = (data: DeleteChatSettings) => {
         return {
-            ...data,
-            isAnonymConversations: data.isAnonymConversations || false,
-            isAuthConversations: data.isAuthConversations || false,
-            anonymPeriod: data.anonymPeriod || 360,
-            authPeriod: data.authPeriod || 360,
-            deletionTimeISO: data.deletionTimeISO || new Date().toISOString()
+          ...data,
+          isAnonymConversations: data.isAnonymConversations || false,
+          isAuthConversations: data.isAuthConversations || false,
+          anonymPeriod: data.anonymPeriod || 360,
+          authPeriod: data.authPeriod || 360,
+          deletionTimeISO:
+            dateToUTCExcludingDST(data.deletionTimeISO) ||
+            dateToUTCExcludingDST(new Date().toISOString()),
         };
     }
 
@@ -202,6 +212,7 @@ const DeleteConversations: FC = () => {
                                     field.onChange(value)
                                 }}
                                 checked={isAuthMessaged}
+                                tooltip={<InfoTooltip name="deleteConversation.tooltip.removeAuth" />}
                                 {...field}
                             />
                         )}
@@ -225,12 +236,15 @@ const DeleteConversations: FC = () => {
                                             }
                                             value={authPeriod}
                                         />
+                                      <Track gap={10} justify={"start"} direction={"horizontal"}>
                                         <label className="minute">
-                                            {t('deleteConversation.days')}
+                                          {t('deleteConversation.days')}
                                         </label>
+                                        <InfoTooltip name="deleteConversation.tooltip.days" />
+                                      </Track>
                                     </Track>
                                     <label className="rule">
-                                        {t('deleteConversation.deletionNote')}
+                                        {t('deleteConversation.deletionAuthNote')}
                                     </label>
                                 </Track>
                             )}
@@ -253,6 +267,7 @@ const DeleteConversations: FC = () => {
                                 }
                                 }
                                 checked={isAnonymMessaged}
+                                tooltip={<InfoTooltip name="deleteConversation.tooltip.removeAnon" />}
                                 {...field}
                             />
                         )}
@@ -275,12 +290,15 @@ const DeleteConversations: FC = () => {
                                             }}
                                             value={anonymPeriod}
                                         />
+                                      <Track gap={10} align={"center"} justify={"start"} direction={"horizontal"}>
                                         <label className="minute">
-                                            {t('deleteConversation.days')}
+                                          {t('deleteConversation.days')}
                                         </label>
+                                        <InfoTooltip name="deleteConversation.tooltip.days" />
+                                      </Track>
                                     </Track>
                                     <label className="rule">
-                                        {t('deleteConversation.deletionNote')}
+                                        {t('deleteConversation.deletionAnonNote')}
                                     </label>
                                 </Track>
                             )}
@@ -299,7 +317,7 @@ const DeleteConversations: FC = () => {
                                     <Track gap={10} align={"center"} direction={"horizontal"}>
                                         {t('deleteConversation.deletionTime')}
                                     </Track>
-                                    <Track>
+                                    <Track gap={10}>
                                         <FormDatepicker
                                             {...field}
                                             label={t('deleteConversation.deletionTime')}
@@ -318,6 +336,7 @@ const DeleteConversations: FC = () => {
                                                 field.onChange(e)
                                             }}
                                         />
+                                      <InfoTooltip name="deleteConversation.tooltip.removalTime" />
                                     </Track>
                                 </Track>
                             )}
@@ -378,7 +397,9 @@ const DeleteConversations: FC = () => {
                                             onClick={() => handleDatesUpdate(31)}>{t('deleteConversation.thirtyOneDay')}</Button>
                                     <Button appearance={"text"}
                                             onClick={() => handleDatesUpdate(90)}>{t('deleteConversation.ninetyDays')}</Button>
+                                    <InfoTooltip name="deleteConversation.tooltip.displayExpiringConversations" />
                                 </Track>
+
                             </Track>
                             <Track gap={40} align={"center"}>
                                 {t('deleteConversation.periodConversations')} <b>{removableChatsCount}</b>

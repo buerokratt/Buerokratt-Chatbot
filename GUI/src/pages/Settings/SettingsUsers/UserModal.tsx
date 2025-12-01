@@ -11,13 +11,16 @@ import { useToast } from 'hooks/useToast';
 import { ROLES } from 'utils/constants';
 import Select from 'react-select';
 import './SettingsUsers.scss';
+import { WDomain } from '../../../types/widgetModels';
+import { isSmaxIntegrationEnabled } from 'constants/config';
 
 type UserModalProps = {
   onClose: () => void;
   user?: User;
+  domainsList?: WDomain[];
 };
 
-const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
+const UserModal: FC<UserModalProps> = ({ onClose, user, domainsList }) => {
   const { t } = useTranslation();
   const toast = useToast();
   const queryClient = useQueryClient();
@@ -31,11 +34,13 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
       login: user?.login,
       idCode: user?.idCode,
       authorities: user?.authorities,
+      domains: user?.domains || [],
       displayName: user?.displayName,
       csaTitle: user?.csaTitle,
       csaEmail: user?.csaEmail,
       fullName: user?.fullName,
       department: user?.department,
+      smaxAccountId: user?.smaxAccountId,
     },
   });
 
@@ -57,6 +62,23 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
       { label: t('roles.ROLE_ANALYST'), value: ROLES.ROLE_ANALYST },
     ],
     []
+  );
+
+  const mapUserDomains = (domainIds: string[], allDomains: WDomain[]): {label: string, value: string}[] => {
+    return allDomains
+      .filter(domain => domainIds.includes(domain.domainId))
+      .map(domain => ({
+        label: domain.name,
+        value: domain.domainId
+      }));
+  }
+
+  const domainOptions = useMemo(() =>
+      domainsList?.map(domain => ({
+        label: domain.name,
+        value: domain.domainId,
+      })),
+    [domainsList]
   );
 
   const userCreateMutation = useMutation({
@@ -86,10 +108,12 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
     mutationFn: ({
       id,
       userData,
+      smaxConnectDisconnect = false,
     }: {
       id: string | number;
       userData: UserDTO;
-    }) => editUser(id, userData),
+      smaxConnectDisconnect?: boolean;
+    }) => editUser(id, userData, smaxConnectDisconnect),
     onSuccess: async () => {
       await queryClient.invalidateQueries([
         'accounts/customer-support-agents',
@@ -146,6 +170,18 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
     }
   });
 
+  const handleSmaxConnection = handleSubmit((data) => {
+    if (user) {
+      userEditMutation.mutate({
+        id: user.idCode,
+        userData: data,
+        smaxConnectDisconnect: true,
+      });
+    } else {
+      checkIfUserExistsMutation.mutate({ userData: data });
+    }
+  });
+
   const requiredText = t('settings.users.required') ?? '*';
 
   return (
@@ -157,6 +193,13 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
           <Button appearance="secondary" onClick={onClose}>
             {t('global.cancel')}
           </Button>
+          {user && isSmaxIntegrationEnabled && (
+            <Button onClick={handleSmaxConnection}>
+              {user.smaxAccountId
+                ? t('settings.users.disconnectFromSmax')
+                : t('settings.users.connectToSmax')}
+            </Button>
+          )}
           <Button onClick={handleUserSubmit}>
             {user ? t('settings.users.editUser') : t('settings.users.addUser')}
           </Button>
@@ -236,6 +279,36 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
             {errors.authorities.message}
           </span>
         )}
+
+        {import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN.toLowerCase() === 'true' && (<Controller
+          control={control}
+          name="domains"
+          rules={{}}
+          render={({ field: { onChange, onBlur, name, ref } }) => (
+            <div className="multiSelect">
+              <label className="multiSelect__label">
+                {t('multiDomains.title')}
+              </label>
+              <div className="multiSelect__wrapper">
+                <Select
+                  name={name}
+                  maxMenuHeight={165}
+                  ref={ref}
+                  onBlur={onBlur}
+                  required={false}
+                  options={domainOptions}
+                  defaultValue={mapUserDomains(user?.domains ?? [], domainsList ?? [])}
+                  isMulti={true}
+                  placeholder={t('global.choose')}
+                  onChange={(val) => {
+                    onChange(val || []);
+                  }}
+                />
+              </div>
+            </div>
+          )}
+        />)}
+
         <FormInput
           {...register('displayName', {
             required: requiredText,

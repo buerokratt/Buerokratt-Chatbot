@@ -26,7 +26,10 @@ WITH last_configuration AS (
      'organizationNoCsaAskForContacts',
      'organizationNoCsaAvailableMessage',
      'organizationOutsideWorkingHoursAskForContacts',
-     'organizationOutsideWorkingHoursMessage')
+     'organizationOutsideWorkingHoursMessage',
+     'organizationBotCannotAnswerAskToForwardToCSA',
+     'organizationBotCannotAnswerMessage',
+     'organizationUseCSA')
     AND id IN (SELECT max(id) from configuration GROUP BY key)
     AND deleted = FALSE
 ), new_configuration as (
@@ -57,7 +60,10 @@ WITH last_configuration AS (
         ('organizationNoCsaAskForContacts', :organizationNoCsaAskForContacts),
         ('organizationNoCsaAvailableMessage', :organizationNoCsaAvailableMessage),
         ('organizationOutsideWorkingHoursAskForContacts', :organizationOutsideWorkingHoursAskForContacts),
-        ('organizationOutsideWorkingHoursMessage', :organizationOutsideWorkingHoursMessage)
+        ('organizationOutsideWorkingHoursMessage', :organizationOutsideWorkingHoursMessage),
+        ('organizationBotCannotAnswerAskToForwardToCSA', :organizationBotCannotAnswerAskToForwardToCSA),
+        ('organizationBotCannotAnswerMessage', :organizationBotCannotAnswerMessage),
+        ('organizationUseCSA', :organizationUseCSA)
    ) as new_values (key, value)
 )
 INSERT INTO configuration (key, value, created)

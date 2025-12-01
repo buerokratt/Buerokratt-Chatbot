@@ -1,0 +1,41 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'END DEAD CHATS'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: training
+  allowlist:
+    header:
+      - field: x-ruuter-nonce
+        type: string
+        description: "Nonce field"
+
+getDeadChats:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-dead-chat-ids"
+  result: deadChats
+
+validateDeadChats:
+  switch:
+    - condition: ${deadChats.response.body.length > 0}
+      next: checkTimIds
+  next: return_not_found
+
+checkTimIds:
+  call: http.post
+  args:
+    url: "[#CHATBOT_TIM]/sessionkey/keysString"
+    body:
+      keys: ${deadChats.response.body[0].baseIds?.join(',')}
+  result: deadKeys
+
+returnSuccess:
+  return: ${deadKeys.response.body}
+  next: end
+
+return_not_found:
+  return: "No chats were found dead."
+  next: end

@@ -1,35 +1,64 @@
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { AxiosError } from 'axios';
 import { useTranslation } from 'react-i18next';
 
 import { Button, Card, FormTextarea, Switch, Track } from 'components';
 import { WELCOME_MESSAGE_LENGTH } from 'constants/config';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { useToast } from 'hooks/useToast';
 import { apiDev } from 'services/api';
 import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';
+import DomainSelector from '../../../components/DomainsSelector';
+import { fetchConfigurationFromDomain } from '../../../services/configurations';
+import {
+  GreetingsMessage,
+  GreetingsMessageResponse,
+} from '../../../types/greetingMessage';
+import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
+
+type SelectOption = { label: string; value: string; meta?: string };
 
 const SettingsWelcomeMessage: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
   const [welcomeMessage, setWelcomeMessage] = useState<string>('');
+  const multiDomainEnabled =
+    import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
+  const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
+  const [loadingComplete, setLoadingComplete] = useState<boolean>(false);
+
   const [welcomeMessageActive, setWelcomeMessageActive] = useState<
     boolean | undefined
   >(undefined);
-  useQuery({
-    queryKey: ['greeting/message', 'prod'],
-    onSuccess: (res: any) => {
-      setWelcomeMessage(res.response.est ?? '');
-      setWelcomeMessageActive(res.response.isActive ?? false);
-    },
-  });
+
+  useEffect(() => {
+    if(multiDomainEnabled) {
+      setLoadingComplete(true)
+    } else {
+      fetchData('none');
+    }
+  }, []);
+
+  const fetchData = async (selectedDomain: string) => {
+    try {
+      const data: GreetingsMessageResponse =
+        await fetchConfigurationFromDomain<GreetingsMessageResponse>(
+          'greeting/message',
+          selectedDomain
+        );
+
+      setWelcomeMessageActive(data.response.isActive);
+      setWelcomeMessage(data.response.est);
+      setLoadingComplete(true)
+    } catch (error) {
+      console.error('Failed to fetch greeting message', error);
+    }
+  };
 
   const welcomeMessageMutation = useMutation({
-    mutationFn: () =>
-      apiDev.post('greeting/message', {
-        message: welcomeMessage,
-      }),
+    mutationFn: (data: GreetingsMessage) =>
+      apiDev.post('greeting/greetings-message', data),
     onSuccess: () => {
       toast.open({
         type: 'success',
@@ -37,20 +66,6 @@ const SettingsWelcomeMessage: FC = () => {
         message: t('settings.welcomeMessage.messageChanged'),
       });
     },
-    onError: (error: AxiosError) => {
-      toast.open({
-        type: 'error',
-        title: t('global.notificationError'),
-        message: error.message,
-      });
-    },
-  });
-
-  const messageActivityMutation = useMutation({
-    mutationFn: (value: boolean) =>
-      apiDev.post('greeting/is-active', {
-        isActive: value,
-      }),
     onError: (error: AxiosError) => {
       toast.open({
         type: 'error',
@@ -68,12 +83,28 @@ const SettingsWelcomeMessage: FC = () => {
         message: t('settings.welcomeMessage.emptyMessage'),
       });
     } else {
-      messageActivityMutation.mutate(welcomeMessageActive ?? true);
-      welcomeMessageMutation.mutate();
+      const requestData: GreetingsMessage = {
+        isActive: (welcomeMessageActive || false).toString(),
+        est: welcomeMessage,
+      };
+      requestData.domainUUID = multiDomainEnabled ? selectedDomains : [];
+
+      welcomeMessageMutation.mutate(requestData);
     }
   };
 
-  if (welcomeMessageActive === undefined) {
+  const resetSettingsToDefault = () => {
+    setWelcomeMessageActive(false);
+    setWelcomeMessage('');
+  };
+
+  const handleDomainSelection = useDomainSelectionHandler(
+    setSelectedDomains,
+    fetchData,
+    resetSettingsToDefault
+  );
+
+  if (!loadingComplete) {
     return <>Loading...</>;
   }
 
@@ -81,10 +112,26 @@ const SettingsWelcomeMessage: FC = () => {
     <>
       <h1>{t('settings.welcomeMessage.welcomeMessage')}</h1>
       <p>{t('settings.welcomeMessage.description')}</p>
+
+      {multiDomainEnabled && (
+        <DomainSelector
+          onChange={(selected) => {
+            handleDomainSelection(selected);
+          }}
+        />
+      )}
+
       <Card
         footer={
           <Track justify="end">
-            <Button onClick={handleFormSubmit}>{t('global.save')}</Button>
+            <Button
+              disabled={
+                (multiDomainEnabled && selectedDomains.length === 0) || false
+              }
+              onClick={handleFormSubmit}
+            >
+              {t('global.save')}
+            </Button>
           </Track>
         }
       >
@@ -111,4 +158,6 @@ const SettingsWelcomeMessage: FC = () => {
   );
 };
 
-export default withAuthorization(SettingsWelcomeMessage, [ROLES.ROLE_ADMINISTRATOR]);
+export default withAuthorization(SettingsWelcomeMessage, [
+  ROLES.ROLE_ADMINISTRATOR,
+]);

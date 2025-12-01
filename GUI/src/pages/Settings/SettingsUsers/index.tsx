@@ -1,6 +1,6 @@
 import { FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   ColumnFiltersState,
   PaginationState,
@@ -11,7 +11,7 @@ import {
 import { AxiosError } from 'axios';
 import { MdOutlineEdit, MdOutlineDeleteOutline } from 'react-icons/md';
 import { apiDev } from 'services/api';
-import { Button, Card, DataTable, Dialog, Icon, Track } from 'components';
+import { Button, Card, DataTable, Dialog, Icon, Tooltip, Track } from 'components';
 import { User, UserSearchFilters } from 'types/user';
 import { deleteUser } from 'services/users';
 import { useToast } from 'hooks/useToast';
@@ -20,6 +20,9 @@ import { ROLES } from 'utils/constants';
 import withAuthorization from 'hoc/with-authorization';
 import { CustomerSupportActivityDTO } from 'types/customerSupportActivity';
 import useStore from '../../../store';
+import { format } from 'date-fns';
+import { WDomain } from '../../../types/widgetModels';
+import { isSmaxIntegrationEnabled } from 'constants/config';
 
 const SettingsUsers: FC = () => {
   const { t } = useTranslation();
@@ -29,6 +32,7 @@ const SettingsUsers: FC = () => {
   const userInfo = useStore((state) => state.userInfo);
   const [newUserModal, setNewUserModal] = useState(false);
   const [changeStatusDialog, setChangeStatusDialog] = useState(false);
+  const [widgetDomains, setWidgetDomains] = useState<WDomain[]>([]);
   const [editableRow, setEditableRow] = useState<User | null>(null);
   const [deletableRow, setDeletableRow] = useState<string | number | null>(
     null
@@ -70,6 +74,14 @@ const SettingsUsers: FC = () => {
       .catch((error: any) => console.log(error));
   };
 
+  useQuery({
+    queryKey: ['configs/widget-domains', 'prod'],
+    onSuccess: (data: any) => {
+      const initialData = data.response ?? [];
+        setWidgetDomains(initialData);
+    }
+  });
+
   useEffect(() => {
     getUsers(pagination, sorting, columnFilters);
   }, []);
@@ -77,6 +89,10 @@ const SettingsUsers: FC = () => {
   useEffect(() => {
     fetchData();
   }, [userInfo?.idCode]);
+
+  const mapUserDomains = (domainIds: string[], domainsList: WDomain[]): WDomain[] => {
+    return domainsList.filter((domain) => domainIds.includes(domain.domainId));
+  }
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -100,7 +116,7 @@ const SettingsUsers: FC = () => {
         getUsers(pagination, sorting, columnFilters);
       }
     } catch (err) {
-      console.error('Failed to fetch data');
+      console.error('Failed to fetch data', err);
     }
   };
 
@@ -147,6 +163,7 @@ const SettingsUsers: FC = () => {
         userIdCode: selectedUserIdCode,
         customerSupportActive: data.customerSupportActive,
         customerSupportStatus: data.customerSupportStatus,
+        statusComment: data.statusComment,
       }),
     onSuccess: async () => {
       getUsers(pagination, sorting, columnFilters);
@@ -239,9 +256,10 @@ const SettingsUsers: FC = () => {
       <Button
         appearance="text"
         onClick={() => {
-          if (props.getValue() === 'online' || props.getValue() === 'idle')
+          if (props.getValue() === 'online' || props.getValue() === 'idle') {
             setSelectedUserIdCode(props.row.original.idCode);
             setChangeStatusDialog(true);
+          }
         }}
         style={{
           borderRadius: '50%',
@@ -263,8 +281,32 @@ const SettingsUsers: FC = () => {
     );
   };
 
-  const usersColumns = useMemo(
-    () => [
+  const statusCommentView = (props: any) => {
+    const value = props.getValue();
+    const statusTimeStamp = format(new Date(props.row.original.statusCommentTimeStamp), 'HH:mm:ss');
+    const statusDateTimeStamp = format(new Date(props.row.original.statusCommentTimeStamp), 'dd.MM HH:mm');
+    const statusComment = value.length < 13 ? `${value}` : `${value?.slice?.(0, 13)}...`;
+    return (
+      <Tooltip content={value.length > 13 ? `${statusDateTimeStamp} ${value}` : ''}>
+        <span style={{ maxWidth: '170px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          {value ? statusComment : ''}
+          {value ? (
+            <time
+              dateTime={statusTimeStamp}
+              className="active-chat__message-date"
+            >
+              {statusTimeStamp}
+            </time>
+          ) : (
+            ''
+          )}
+        </span>
+      </Tooltip>
+    );
+  };
+
+  const usersColumns = useMemo(() => {
+    const baseColumns = [
       columnHelper.accessor(
         (row) => `${row.firstName ?? ''} ${row.lastName ?? ''}`,
         {
@@ -309,12 +351,25 @@ const SettingsUsers: FC = () => {
         enableColumnFilter: false,
         cell: customerSupportStatusView,
       }),
+      columnHelper.accessor('statusComment', {
+        header: t('global.statusClarification') ?? '',
+        cell: statusCommentView,
+      }),
       columnHelper.accessor('csaEmail', {
         header: t('settings.users.email') ?? '',
       }),
       columnHelper.accessor('department', {
         header: t('settings.users.department') ?? '',
       }),
+      ...(isSmaxIntegrationEnabled
+        ? [
+        columnHelper.accessor('smaxAccountId', {
+          header: t('settings.users.connectedToSmax') ?? '',
+          enableColumnFilter: false,
+          cell: (props) => (props.getValue() ? t('global.yes') : t('global.no')),
+        }),
+          ]
+        : []),
       columnHelper.display({
         id: 'edit',
         cell: editView,
@@ -329,9 +384,30 @@ const SettingsUsers: FC = () => {
           size: '1%',
         },
       }),
-    ],
-    []
-  );
+    ];
+
+    const domainColumn = columnHelper.accessor(
+      (data: User) => {
+        const mapped = mapUserDomains(data.domains ?? [], widgetDomains);
+        return mapped.map((d) => d.name);
+      },
+      {
+        header: t('multiDomains.title') ?? '',
+        cell: (props) => props.getValue().join(', '),
+        filterFn: (row, _, filterValue) => {
+          const mapped = mapUserDomains(row.original.domains ?? [], widgetDomains);
+          return mapped.some((d) =>
+            d.name.toLowerCase().includes(filterValue.toLowerCase())
+          );
+        },
+      }
+    );
+
+    return import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN.toLowerCase() === 'true'
+      ? [...baseColumns.slice(0, 3), domainColumn, ...baseColumns.slice(3)]
+      : baseColumns;
+  }, [t, widgetDomains]);
+
 
   if (!usersList) return <>Loading...</>;
 
@@ -344,47 +420,49 @@ const SettingsUsers: FC = () => {
         </Button>
       </Track>
 
-      <Card>
-        <DataTable
-          data={usersList}
-          columns={usersColumns}
-          sortable
-          filterable
-          pagination={pagination}
-          columnFilters={columnFilters}
-          setPagination={(state: PaginationState) => {
-            if (
-              state.pageIndex === pagination.pageIndex &&
-              state.pageSize === pagination.pageSize
-            )
-              return;
-            setPagination(state);
-            updatePageSize.mutate({ page_results: state.pageSize });
-            getUsers(state, sorting, columnFilters);
-          }}
-          sorting={sorting}
-          setSorting={(state: SortingState) => {
-            setSorting(state);
-            getUsers(pagination, state, columnFilters);
-          }}
-          setFiltering={(state: ColumnFiltersState) => {
-            setColumnFilters(state);
-            const searchfilters = checkFilters(state);
-            const hasData = Object.values(searchfilters).some(
-              (value) => value !== ''
-            );
+      <div style={{ height: 'auto', overflow: 'auto' }}>
+        <Card>
+          <DataTable
+            data={usersList}
+            columns={usersColumns}
+            sortable
+            filterable
+            pagination={pagination}
+            columnFilters={columnFilters}
+            setPagination={(state: PaginationState) => {
+              if (
+                state.pageIndex === pagination.pageIndex &&
+                state.pageSize === pagination.pageSize
+              )
+                return;
+              setPagination(state);
+              updatePageSize.mutate({ page_results: state.pageSize });
+              getUsers(state, sorting, columnFilters);
+            }}
+            sorting={sorting}
+            setSorting={(state: SortingState) => {
+              setSorting(state);
+              getUsers(pagination, state, columnFilters);
+            }}
+            setFiltering={(state: ColumnFiltersState) => {
+              setColumnFilters(state);
+              const searchfilters = checkFilters(state);
+              const hasData = Object.values(searchfilters).some(
+                (value) => value !== ''
+              );
 
-            if (hasData) {
-              const intialPagination = { pageIndex: 0, pageSize: 10 };
-              getUsers(intialPagination, sorting, state, true);
-            } else {
-              getUsers(pagination, sorting, state);
-            }
-          }}
-          pagesCount={totalPages}
-          isClientSide={false}
-        />
-      </Card>
+              if (hasData) {
+                const intialPagination = { pageIndex: 0, pageSize: 10 };
+                getUsers(intialPagination, sorting, state, true);
+              } else {
+                getUsers(pagination, sorting, state);
+              }
+            }}
+            pagesCount={totalPages}
+            isClientSide={false}
+          />
+        </Card>
+      </div>
 
       {newUserModal && (
         <UserModal
@@ -392,6 +470,7 @@ const SettingsUsers: FC = () => {
             setNewUserModal(false);
             getUsers(pagination, sorting, columnFilters);
           }}
+          domainsList={widgetDomains}
         />
       )}
 
@@ -417,8 +496,10 @@ const SettingsUsers: FC = () => {
                 appearance="primary"
                 onClick={() => {
                   customerSupportActivityMutation.mutate({
+                    customerSupportId: selectedUserIdCode ?? '',
                     customerSupportActive: false,
                     customerSupportStatus: 'offline',
+                    statusComment: ''
                   });
                 }}
               >
@@ -438,6 +519,7 @@ const SettingsUsers: FC = () => {
             setEditableRow(null);
             getUsers(pagination, sorting, columnFilters);
           }}
+          domainsList={widgetDomains}
         />
       )}
 

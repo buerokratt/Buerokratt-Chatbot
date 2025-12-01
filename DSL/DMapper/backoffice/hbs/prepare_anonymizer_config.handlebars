@@ -1,0 +1,41 @@
+{
+  "texts": [{{#each texts}}"{{filterControlCharacters (escapeQuotes this)}}"{{#unless @last}},{{/unless}}{{/each}}],
+  "entities": [{{#each entities}}"{{this}}"{{#unless @last}},{{/unless}}{{/each}}],
+  "allowlist": [{{#each allowlist}}"{{this}}"{{#unless @last}},{{/unless}}{{/each}}],
+  "denylist": [{{#each denylist}}"{{this}}"{{#unless @last}},{{/unless}}{{/each}}],
+  "anonymizers": {
+    {{#if (eq approach "replace")}}
+      {{#each entities}}
+        "{{this}}": {"type": "replace", "new_value": "[{{this}}]"}
+        {{#unless @last}},{{/unless}}
+      {{/each}}
+      {{#if entities}},{{/if}}
+      "DEFAULT": {"type": "replace", "new_value": "[REDACTED]"}
+    {{else if (eq approach "redact")}}
+      "DEFAULT": {"type": "redact"}
+    {{else if (eq approach "mask")}}
+      {{#each entities}}
+        "{{this}}": {
+          "type": "mask",
+          "masking_char": "*",
+          "chars_to_mask": 4,
+          "from_end": true
+        }
+        {{#unless @last}},{{/unless}}
+      {{/each}}
+    {{else if (eq approach "hash")}}
+      {{#each entities}}
+        "{{this}}": {
+          "type": "hash",
+          "hash_type": "{{../hash_type}}"
+        }
+        {{#unless @last}},{{/unless}}
+      {{/each}}
+      {{#if entities}},{{/if}}
+      "DEFAULT": {
+        "type": "hash", 
+        "hash_type": "{{hash_type}}"
+      }
+    {{/if}}
+  }
+}

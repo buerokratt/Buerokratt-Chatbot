@@ -41,6 +41,31 @@ const LinkPreview: React.FC<{
   );
 };
 
+const hasSpecialFormat = (m: string) => m.includes("\n\n") && m.indexOf(".") > 0 && m.indexOf(":") > m.indexOf(".");
+
+function formatMessage(message?: string): string {
+  if (!message) return '';
+
+  return message
+    .replace(/&#x([0-9A-Fa-f]+);/g, (_, hex) =>
+      String.fromCharCode(parseInt(hex, 16))
+    )
+    .replace(/(^|\n)(\d{4})\.\s/g, (match, prefix, year) => {
+      const remainingText = message.substring(
+        message.indexOf(match) + match.length
+      );
+      const sentenceEnd = remainingText.indexOf('\n\n');
+      if (sentenceEnd !== -1) {
+        const currentSentence = remainingText.substring(0, sentenceEnd);
+        if (currentSentence.trim().endsWith(':')) {
+          return `${prefix}${year}. `;
+        }
+      }
+      return `${prefix}${year}\\. `;
+    })
+    .replace(/(?<=\n)\d+\.\s/g, hasSpecialFormat(message) ? '\n\n$&' : '$&');
+}
+
 const Markdownify: React.FC<MarkdownifyProps> = ({
   message,
   sanitizeLinks = false,
@@ -60,9 +85,7 @@ const Markdownify: React.FC<MarkdownifyProps> = ({
         disableParsingRawHTML: true,
       }}
     >
-      {message?.replace(/&#x([0-9A-Fa-f]+);/g, (_, hex) => {
-        return String.fromCharCode(parseInt(hex, 16));
-      }) ?? ''}
+      {formatMessage(message)}
     </Markdown>
   </div>
 );

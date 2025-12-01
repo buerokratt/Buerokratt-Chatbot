@@ -5,4 +5,11 @@ export interface SkmConfig {
   maxTokens: string;
   indexName: string;
   queryType: string;
+  semanticConfiguration: string;
+  inScope: string;
+  domainUUID?: string[];
+}
+
+export interface SkmConfigResponse {
+  response: SkmConfig;
 }
