@@ -183,6 +183,42 @@ detect_intent:
   result: llmResponse
   next: return_result
 
+check_for_intent:
+  switch:
+    - condition: ${llmResponse.response.body.intent === 'OOD'}
+      next: return_skip
+  next: validate_service
+
+assign_service_intent:
+  assign:
+    detected_intent: ${llmResponse.response.body.intent}
+
+validate_service:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/get-active-service-by-name"
+    body:
+      service_name: ${detected_intent}
+  result: validated_intent
+  next: assignSkmConfig
+
+check_intent_present:
+  switch:
+    - condition: ${validated_intent.response.body.length > 0}
+      next: trigger_service
+  next: return_skip
+
+trigger_service:
+  template: "[#CHATBOT_PROJECT_LAYER]/chats/trigger-service"
+  requestType: templates
+  body:
+    message: ${service_content}
+    chatId: ${chatId}
+    authorId: ${get_bot_name_result.response.body[0].value}
+  result: converted_messages_res
+  error: return_bot_error
+  next: check_for_trigger_service_response
+
 return_result:
   return: "stream triggered"
   next: end
