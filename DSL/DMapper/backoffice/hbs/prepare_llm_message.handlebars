@@ -1,0 +1,14 @@
+[
+  {{#if (filterControlCharacters prompt_message)}}
+    {
+        "role": "system",
+        "content": "{{filterControlCharacters prompt_message}}"
+    }
+  {{/if}}
+  {{#if new_message}},
+    {
+        "role": "user",
+        "content": "{{filterControlCharacters new_message}}"
+    }
+  {{/if}}
+]

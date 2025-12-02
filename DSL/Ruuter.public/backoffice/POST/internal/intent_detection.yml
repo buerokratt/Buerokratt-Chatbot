@@ -1,0 +1,207 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: Description placeholder for 'INTENT_DETECTION'
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: message
+        type: string
+        description: Body field 'message'
+      - field: sender
+        type: string
+        description: Body field 'sender'
+      - field: domain
+        type: string
+        description: "Body field 'domain'"
+
+assignParameters:
+  assign:
+    currentDate: ${new Date().toISOString().split('T')[0]}
+    sender: ${incoming.body.sender}
+    domain: ${incoming.body.domain}
+    message: ${incoming.body.message ?? ''}
+
+assignBgkConfig:
+  assign:
+    strictness: "[#ID_BGK_STRICTNESS]"
+    max_tokens: "[#ID_BGK_MAX_TOKENS]"
+    documents: "[#ID_BGK_DOCUMENTS]"
+    index_name: "[#ID_BGK_INDEX_NAME]"
+    query_type: "[#ID_BGK_QUERY_TYPE]"
+    system_message: "[#ID_BGK_SYSTEM_MESSAGE]"
+    search_endpoint: "[#ID_BGK_SEARCH_ENDPOINT]"
+    chatbot_external_key: "[#ID_BGK_CHATBOT_EXTERNAL_KEY]"
+    embedded_endpoint: "[#ID_BGK_EMBEDDED_ENDPOINT_AZURE]"
+    chatbot_external_api_key: "[#ID_BGK_CHATBOT_EXTERNAL_API_KEY]"
+    chatbot_external_bot_url: "[#ID_BGK_CHATBOT_EXTERNAL_BOT_URL]"
+    semantic_configuration: "[#ID_BGK_SEMANTIC_CONFIGURATION]"
+    in_scope: "[#ID_BGK_IN_SCOPE]"
+    stream: "[#ID_BGK_STREAM]"
+
+
+check_if_client_bot_is_active:
+  switch:
+    - condition: ${[#ID_BGK_ACTIVE] === true}
+      next: assign_data_sources
+  next: get_organization_base_config
+
+assign_data_sources:
+  assign:
+    data_sources:
+      - type: azure_search
+        parameters:
+          endpoint: ${search_endpoint}
+          index_name: ${index_name}
+          semantic_configuration: ${semantic_configuration}
+          query_type: ${query_type}
+          in_scope: ${in_scope.toLowerCase() === 'true'}
+          strictness: ${parseInt(strictness ?? '3')}
+          top_n_documents: ${parseInt(documents ?? '5')}
+          authentication:
+            type: api_key
+            key: ${chatbot_external_key}
+          embedding_dependency:
+            type: endpoint
+            endpoint: ${embedded_endpoint}
+            authentication:
+              type: api_key
+              key: ${chatbot_external_api_key}
+
+get_chat_messages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-llm-chat-message"
+    body:
+      chatId: ${sender}
+  result: chat_messages_res
+
+prepare_messages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_HBS]/prepare-llm-messages"
+    headers:
+      type: json
+    body:
+      prompt_message: "${system_message} The current date is ${currentDate}"
+      new_message: ${message}
+  result: prepare_messages_res
+
+assign_messages:
+  assign:
+    messages: ${prepare_messages_res.response.body}
+
+checkVZ:
+  log: ${messages}
+
+check_if_anonymizer_is_active:
+  switch:
+    - condition: ${[#ANONYMIZER_ENABLED] === true}
+      next: checkForPassedDomain
+  next: ask_llm
+
+checkForPassedDomain:
+  switch:
+    - condition: ${domain === 'none'}
+      next: getAnonymizerConfig
+  next: getDomainAnonymizerConfig
+
+getAnonymizerConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-anonymizer-config"
+  result: anonymizer_configs_res
+  next: assignAnonymizerConfigs
+
+getDomainAnonymizerConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-anonymizer-config"
+    body:
+      domainUUID: ${domain}
+  result: anonymizer_configs_res
+  next: assignAnonymizerConfigs
+
+assignAnonymizerConfigs:
+  assign:
+    anonymizer_configs: ${anonymizer_configs_res.response.body[0]}
+  next: check_if_anonymize_before_llm
+
+check_if_anonymize_before_llm:
+  switch:
+    - condition: ${anonymizer_configs.isAnonymizationBeforeLlm === 'true'}
+      next: prepareAnonymizerConfig
+  next: trigger_ai_stream
+
+prepareAnonymizerConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_HBS]/prepare_anonymizer_config"
+    headers:
+      type: json
+    body:
+      texts: ${messages.slice(1).map(i => i.content)}
+      approach: ${anonymizer_configs.anonymizerSelectedApproach}
+      entities: ${anonymizer_configs.anonymizerSelectedEntities.split(',')}
+      allowlist: ${anonymizer_configs.anonymizerAllowlist.split(',')}
+      denylist: ${anonymizer_configs.anonymizerDenylist.split(',')}
+      hash_type: "[#ANONYMIZER_HASH_TYPE]"
+  result: preparedAnonymizerConfigs
+  next: assignPreparedAnonymizerConfigs
+
+assignPreparedAnonymizerConfigs:
+  assign:
+    preparedAnonymizerConfigs: ${preparedAnonymizerConfigs.response.body}
+  next: anonymizeText
+
+anonymizeText:
+  call: http.post
+  args:
+    url: "[#CHATBOT_ANONYMIZER]/anonymize"
+    body:
+      texts: ${preparedAnonymizerConfigs.texts}
+      anonymizers: ${preparedAnonymizerConfigs.anonymizers}
+      entities: ${preparedAnonymizerConfigs.entities}
+      allowlist: ${preparedAnonymizerConfigs.allowlist}
+      denylist: ${preparedAnonymizerConfigs.denylist}
+  result: anonymize_res
+  next: assign_anonymized_messages
+
+assign_anonymized_messages:
+  assign:
+    anonymizedMessages: ${anonymize_res.response.body.results}
+    messages: "$=messages.map((e, i) => i ? {...e, content: anonymizedMessages[i-1].text} : e)="
+
+ask_llm:
+  call: http.post
+  args:
+    url: ${"https://buerokratt.cognitiveservices.azure.com/openai/deployments/text-embedding-3-large/embeddings?api-version=2023-05-15"}
+    headers:
+      Content-Type: application/json
+    body:
+      messages: ${messages}
+      options:
+#        data_sources: ${data_sources}
+        max_tokens: ${parseInt(max_tokens ?? '1000')}
+        temperature: 0
+        top_p: 1
+        stream: ${stream.toLowerCase() === 'true'}
+        frequency_penalty: 0
+        presence_penalty: 0
+  result: llmResponse
+
+checkVV:
+  log: ${llmResponse}
+
+checkVVV:
+  log: ${llmResponse.response}
+
+checkVVVV:
+  log: ${llmResponse.response.body}
+
+return_result:
+  return: "stream triggered"
+  next: end

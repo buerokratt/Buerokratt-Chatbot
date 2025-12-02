@@ -31,6 +31,17 @@ extractRequestData:
     holidays: ${incoming.body.holidays}
     holidayNames: ${incoming.body.holidayNames}
     domain: ${incoming.body.domain}
+  next: check_for_intent
+
+check_for_intent:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL]/internal/intent_detection"
+    body:
+      sender: ${chatId}
+      message: ${content}
+      domain: ${domain}
+  result: llm_response
   next: check_bot_is_active
 
 check_bot_is_active:
