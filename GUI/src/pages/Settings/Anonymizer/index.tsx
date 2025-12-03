@@ -61,6 +61,7 @@ const Anonymizer: FC = () => {
   ];
 
   useEffect(() => {
+    resetSettingsToDefault();
     if (multiDomainEnabled) {
       setLoadingComplete(true);
     } else {
@@ -87,7 +88,6 @@ const Anonymizer: FC = () => {
   };
 
   const saveSettings = () => {
-    setIsSavingSettings(true);
     if (anonymizerConfig) {
       setIsSavingSettings(true);
       anonymizerConfig.domainUUID = multiDomainEnabled ? selectedDomains : [];
