@@ -41,8 +41,14 @@ check_for_intent:
       sender: ${chatId}
       message: ${content}
       domain: ${domain}
-  result: llm_response
-  next: check_bot_is_active
+  result: converted_messages_res
+  next: check_intent_result
+
+check_intent_result:
+  switch:
+    - condition: ${converted_messages_res.response.body === 'skip'}
+      next: check_bot_is_active
+  next: add_bot_message_to_db
 
 check_bot_is_active:
   call: http.post
