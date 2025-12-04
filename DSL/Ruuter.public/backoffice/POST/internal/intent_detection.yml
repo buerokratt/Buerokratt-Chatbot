@@ -18,34 +18,52 @@ declaration:
         type: string
         description: "Body field 'domain'"
 
+get_bot_name:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-configuration"
+    body:
+      key: "bot_institution_id"
+    error: return_bad_request
+  result: get_bot_name_result
+  next: check_if_bot_name_exists
+
+check_if_bot_name_exists:
+  switch:
+    - condition: ${get_bot_name_result.response.body[0]?.value != null}
+      next: assignParameters
+  next: return_skip
+
 assignParameters:
   assign:
     currentDate: ${new Date().toISOString().split('T')[0]}
     sender: ${incoming.body.sender}
     domain: ${incoming.body.domain}
     message: ${incoming.body.message ?? ''}
+    botName: ${get_bot_name_result.response.body[0].value}
 
-assignBgkConfig:
+assignIDLLMConfig:
   assign:
-    strictness: "[#ID_BGK_STRICTNESS]"
-    max_tokens: "[#ID_BGK_MAX_TOKENS]"
-    documents: "[#ID_BGK_DOCUMENTS]"
-    index_name: "[#ID_BGK_INDEX_NAME]"
-    query_type: "[#ID_BGK_QUERY_TYPE]"
-    system_message: "[#ID_BGK_SYSTEM_MESSAGE]"
-    search_endpoint: "[#ID_BGK_SEARCH_ENDPOINT]"
-    chatbot_external_key: "[#ID_BGK_CHATBOT_EXTERNAL_KEY]"
-    embedded_endpoint: "[#ID_BGK_EMBEDDED_ENDPOINT_AZURE]"
-    chatbot_external_api_key: "[#ID_BGK_CHATBOT_EXTERNAL_API_KEY]"
-    chatbot_external_bot_url: "[#ID_BGK_CHATBOT_EXTERNAL_BOT_URL]"
-    semantic_configuration: "[#ID_BGK_SEMANTIC_CONFIGURATION]"
-    in_scope: "[#ID_BGK_IN_SCOPE]"
-    stream: "[#ID_BGK_STREAM]"
+    strictness: "[#ID_LLM_STRICTNESS]"
+    max_tokens: "[#ID_LLM_MAX_TOKENS]"
+    documents: "[#ID_LLM_DOCUMENTS]"
+    index_name: "[#ID_LLM_INDEX_NAME]"
+    query_type: "[#ID_LLM_QUERY_TYPE]"
+    system_message: "[#ID_LLM_SYSTEM_MESSAGE]"
+    search_endpoint: "[#ID_LLM_SEARCH_ENDPOINT]"
+    completion_endpoint: "[#ID_LLM_COMPLETION_ENDPOINT]"
+    chatbot_external_key: "[#ID_LLM_CHATBOT_EXTERNAL_KEY]"
+    embedded_endpoint: "[#ID_LLM_EMBEDDED_ENDPOINT_AZURE]"
+    chatbot_external_api_key: "[#ID_LLM_CHATBOT_EXTERNAL_API_KEY]"
+    chatbot_external_bot_url: "[#ID_LLM_CHATBOT_EXTERNAL_BOT_URL]"
+    semantic_configuration: "[#ID_LLM_SEMANTIC_CONFIGURATION]"
+    in_scope: "[#ID_LLM_IN_SCOPE]"
+    stream: "[#ID_LLM_STREAM]"
 
 
-check_if_client_bot_is_active:
+check_if_bot_is_active:
   switch:
-    - condition: ${[#ID_BGK_ACTIVE] === true}
+    - condition: ${[#ID_LLM_ACTIVE] === true}
       next: assign_data_sources
   next: return_skip
 
@@ -167,7 +185,7 @@ assign_anonymized_messages:
 detect_intent:
   call: http.post
   args:
-    url: ${embedded_endpoint}
+    url: ${completion_endpoint}
     headers:
       Content-Type: application/json
     body:
@@ -181,26 +199,32 @@ detect_intent:
         frequency_penalty: 0
         presence_penalty: 0
   result: llmResponse
-  next: return_result
+  next: check_for_choices
+
+check_for_choices:
+  switch:
+    - condition: ${llmResponse.response.body.length > 0}
+      next: assign_intent_json
+  next: return_skip
+
+assign_intent_json:
+  assign:
+    intentJson: ${JSON.parse(llmResponse.response.body.choices[0].message.content)}
 
 check_for_intent:
   switch:
-    - condition: ${llmResponse.response.body.intent === 'OOD'}
+    - condition: ${intentJson.intent === 'OOD'}
       next: return_skip
   next: validate_service
-
-assign_service_intent:
-  assign:
-    detected_intent: ${llmResponse.response.body.intent}
 
 validate_service:
   call: http.post
   args:
     url: "[#SERVICE_RESQL]/get-active-service-by-name"
     body:
-      service_name: ${detected_intent}
+      service_name: ${intentJson.intent}
   result: validated_intent
-  next: assignSkmConfig
+  next: check_intent_present
 
 check_intent_present:
   switch:
@@ -209,20 +233,46 @@ check_intent_present:
   next: return_skip
 
 trigger_service:
-  template: "[#CHATBOT_PROJECT_LAYER]/chats/trigger-service"
+  template: "[#CHATBOT_PROJECT_LAYER]/chats/trigger-llm-service"
   requestType: templates
   body:
     message: ${service_content}
+    entities: ${entities}
     chatId: ${chatId}
-    authorId: ${get_bot_name_result.response.body[0].value}
+    authorId: ${botName}
   result: converted_messages_res
-  error: return_bot_error
+  error: return_error
   next: check_for_trigger_service_response
 
+check_for_trigger_service_response:
+  switch:
+    - condition: ${converted_messages_res === 'Service is not approved'}
+      next: return_skip
+  next: add_bot_message_to_db
+
+add_bot_message_to_db:
+  switch:
+    - condition: ${converted_messages_res.length > 0}
+      next: do_add_bot_message_to_db
+  next: return_ok
+
+do_add_bot_message_to_db:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-bot-message"
+    body:
+      messages: ${converted_messages_res}
+  result: add_bot_message_to_bot_result
+  next: return_message_sent
+
 return_result:
-  return: "stream triggered"
+  return: "service triggered"
   next: end
 
 return_skip:
   return: "skip"
   next: end
+
+return_error:
+  status: 409
+  return: "Error calling llm"
