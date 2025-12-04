@@ -80,6 +80,8 @@ const Anonymizer: FC = () => {
       const res = data.response;
       if (res) {
         setAnonymizerConfig(res);
+      } else {
+        resetSettingsToDefault();
       }
       setLoadingComplete(true);
     } catch (error) {
