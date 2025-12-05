@@ -10,10 +10,10 @@ declaration:
     body:
       - field: message
         type: string
-        description: Body field 'message'
+        description: "Body field 'message'"
       - field: sender
         type: string
-        description: Body field 'sender'
+        description: "Body field 'sender'"
       - field: domain
         type: string
         description: "Body field 'domain'"
@@ -24,7 +24,7 @@ get_bot_name:
     url: "[#CHATBOT_RESQL]/get-configuration"
     body:
       key: "bot_institution_id"
-    error: return_bad_request
+    error: return_error
   result: get_bot_name_result
   next: check_if_bot_name_exists
 
@@ -42,28 +42,43 @@ assignParameters:
     message: ${incoming.body.message ?? ''}
     botName: ${get_bot_name_result.response.body[0].value}
 
-assignIDLLMConfig:
-  assign:
-    strictness: "[#ID_LLM_STRICTNESS]"
-    max_tokens: "[#ID_LLM_MAX_TOKENS]"
-    documents: "[#ID_LLM_DOCUMENTS]"
-    index_name: "[#ID_LLM_INDEX_NAME]"
-    query_type: "[#ID_LLM_QUERY_TYPE]"
-    system_message: "[#ID_LLM_SYSTEM_MESSAGE]"
-    search_endpoint: "[#ID_LLM_SEARCH_ENDPOINT]"
-    completion_endpoint: "[#ID_LLM_COMPLETION_ENDPOINT]"
-    chatbot_external_key: "[#ID_LLM_CHATBOT_EXTERNAL_KEY]"
-    embedded_endpoint: "[#ID_LLM_EMBEDDED_ENDPOINT_AZURE]"
-    chatbot_external_api_key: "[#ID_LLM_CHATBOT_EXTERNAL_API_KEY]"
-    chatbot_external_bot_url: "[#ID_LLM_CHATBOT_EXTERNAL_BOT_URL]"
-    semantic_configuration: "[#ID_LLM_SEMANTIC_CONFIGURATION]"
-    in_scope: "[#ID_LLM_IN_SCOPE]"
-    stream: "[#ID_LLM_STREAM]"
+get_system_input:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-configuration"
+    body:
+      key: "id_system_message"
+    error: return_error
+  result: llm_configuration
+  next: check_system_input
 
+check_system_input:
+  switch:
+    - condition: ${llm_configuration.response.body[0]?.value != null}
+      next: assign_config
+  next: return_skip
+
+assign_config:
+  assign:
+    strictness: "[#ID_STRICTNESS]"
+    max_tokens: "[#ID_MAX_TOKENS]"
+    documents: "[#ID_DOCUMENTS]"
+    index_name: "[#ID_INDEX_NAME]"
+    query_type: "[#ID_QUERY_TYPE]"
+    system_message: ${llm_configuration.response.body[0].value}
+    search_endpoint: "[#ID_SEARCH_ENDPOINT]"
+    completion_endpoint: "[#ID_COMPLETION_ENDPOINT]"
+    chatbot_external_key: "[#ID_CHATBOT_EXTERNAL_KEY]"
+    embedded_endpoint: "[#ID_EMBEDDED_ENDPOINT_AZURE]"
+    chatbot_external_api_key: "[#ID_CHATBOT_EXTERNAL_API_KEY]"
+    chatbot_external_bot_url: "[#ID_CHATBOT_EXTERNAL_BOT_URL]"
+    semantic_configuration: "[#ID_SEMANTIC_CONFIGURATION]"
+    in_scope: "[#ID_IN_SCOPE]"
+    stream: "[#ID_STREAM]"
 
 check_if_bot_is_active:
   switch:
-    - condition: ${[#ID_LLM_ACTIVE] === true}
+    - condition: ${[#ID_ACTIVE] === true}
       next: assign_data_sources
   next: return_skip
 
@@ -108,7 +123,7 @@ check_if_anonymizer_is_active:
   switch:
     - condition: ${[#ANONYMIZER_ENABLED] === true}
       next: checkForPassedDomain
-  next: ask_llm
+  next: detect_intent
 
 checkForPassedDomain:
   switch:
@@ -188,22 +203,22 @@ detect_intent:
     url: ${completion_endpoint}
     headers:
       Content-Type: application/json
+      api-key: "[#ID_CHATBOT_EXTERNAL_API_KEY]"
     body:
       messages: ${messages}
-      options:
-        data_sources: ${data_sources}
-        max_tokens: ${parseInt(max_tokens ?? '1000')}
-        temperature: 0
-        top_p: 1
-        stream: ${stream.toLowerCase() === 'true'}
-        frequency_penalty: 0
-        presence_penalty: 0
+      data_sources: ${data_sources}
+      max_tokens: ${parseInt(max_tokens ?? '1000')}
+      temperature: 0
+      top_p: 1
+      stream: ${stream.toLowerCase() === 'true'}
+      frequency_penalty: 0
+      presence_penalty: 0
   result: llmResponse
   next: check_for_choices
 
 check_for_choices:
   switch:
-    - condition: ${llmResponse.response.body.length > 0}
+    - condition: ${llmResponse.response.body.choices[0]?.message.content !== null}
       next: assign_intent_json
   next: return_skip
 

@@ -2,7 +2,7 @@
   {{#if (filterControlCharacters prompt_message)}}
     {
         "role": "system",
-        "content": "{{filterControlCharacters prompt_message}}"
+        "content": "{{{filterControlCharacters prompt_message}}}"
     }
   {{/if}}
   {{#if new_message}},
