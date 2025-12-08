@@ -12,7 +12,7 @@ import { ROLES } from 'utils/constants';
 import Select from 'react-select';
 import './SettingsUsers.scss';
 import { WDomain } from '../../../types/widgetModels';
-import { isSmaxIntegrationEnabled } from 'constants/config';
+import { isJiraIntegrationEnabled, isSmaxIntegrationEnabled } from 'constants/config';
 
 type UserModalProps = {
   onClose: () => void;
@@ -41,6 +41,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user, domainsList }) => {
       fullName: user?.fullName,
       department: user?.department,
       smaxAccountId: user?.smaxAccountId,
+      jiraAccountId: user?.jiraAccountId,
     },
   });
 
@@ -347,6 +348,13 @@ const UserModal: FC<UserModalProps> = ({ onClose, user, domainsList }) => {
           {...register('department')}
           label={t('settings.users.department')}
         />
+
+        {isJiraIntegrationEnabled && (
+          <FormInput
+            {...register('jiraAccountId')}
+            label={t('settings.users.jiraAccountName')}
+          />
+        )}
       </Track>
     </Dialog>
   );

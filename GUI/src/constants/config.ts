@@ -13,6 +13,7 @@ export const isHiddenFeaturesEnabled =
   import.meta.env.REACT_APP_ENABLE_HIDDEN_FEATURES?.toLowerCase().trim() ==
     'true' ||
   import.meta.env.REACT_APP_ENABLE_HIDDEN_FEATURES?.toLowerCase().trim() == '1';
+export const isJiraIntegrationEnabled = import.meta.env.REACT_APP_JIRA_INTEGRATION_ENABLED?.toLowerCase() === 'true';
 export const isSmaxIntegrationEnabled = import.meta.env.REACT_APP_SMAX_INTEGRATION_ENABLED?.toLowerCase() === 'true';
 export enum CHAT_SESSIONS {
   SESSION_ID_KEY = "tabId",

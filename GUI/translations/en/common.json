@@ -349,6 +349,8 @@
       "userTitle": "User title",
       "email": "E-mail",
       "department": "Department",
+      "connectedToJira": "Connected to Jira",
+      "jiraAccountName": "Jira account name",
       "connectToSmax": "Connect to Smax",
       "connectedToSmax": "Connected to Smax",
       "disconnectFromSmax": "Disconnect from Smax",
