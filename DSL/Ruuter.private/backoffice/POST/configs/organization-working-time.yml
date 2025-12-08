@@ -86,9 +86,6 @@ declaration:
       - field: domainUUID
         type: string
         description: "Body field 'domainUUID'"
-      - field: organizationBotCannotAnswerAskToForwardToCSA
-        type: string
-        description: "Body field 'organizationBotCannotAnswerAskToForwardToCSA'"
       - field: organizationBotCannotAnswerMessage
         type: string
         description: "Body field 'organizationBotCannotAnswerMessage'"  
@@ -123,7 +120,6 @@ extractRequestData:
     organizationNoCsaAvailableMessage: ${incoming.body.organizationNoCsaAvailableMessage}
     organizationOutsideWorkingHoursAskForContacts: ${incoming.body.organizationOutsideWorkingHoursAskForContacts}
     organizationOutsideWorkingHoursMessage: ${incoming.body.organizationOutsideWorkingHoursMessage}
-    organizationBotCannotAnswerAskToForwardToCSA: ${incoming.body.organizationBotCannotAnswerAskToForwardToCSA}
     organizationBotCannotAnswerMessage: ${incoming.body.organizationBotCannotAnswerMessage}
     organizationUseCSA: ${incoming.body.organizationUseCSA}
     domains: ${incoming.body.domainUUID}
@@ -164,7 +160,6 @@ setDomainOrganizationWorkingTime:
       organizationNoCsaAvailableMessage: ${organizationNoCsaAvailableMessage}
       organizationOutsideWorkingHoursAskForContacts: ${organizationOutsideWorkingHoursAskForContacts}
       organizationOutsideWorkingHoursMessage: ${organizationOutsideWorkingHoursMessage}
-      organizationBotCannotAnswerAskToForwardToCSA: ${organizationBotCannotAnswerAskToForwardToCSA}
       organizationBotCannotAnswerMessage: ${organizationBotCannotAnswerMessage}
       organizationUseCSA: ${incoming.body.organizationUseCSA}
       created: ${new Date().toISOString()}
@@ -202,7 +197,6 @@ setOrganizationWorkingTime:
       organizationNoCsaAvailableMessage: ${organizationNoCsaAvailableMessage}
       organizationOutsideWorkingHoursAskForContacts: ${organizationOutsideWorkingHoursAskForContacts}
       organizationOutsideWorkingHoursMessage: ${organizationOutsideWorkingHoursMessage}
-      organizationBotCannotAnswerAskToForwardToCSA: ${organizationBotCannotAnswerAskToForwardToCSA}
       organizationBotCannotAnswerMessage: ${organizationBotCannotAnswerMessage}
       organizationUseCSA: ${organizationUseCSA}
       created: ${new Date().toISOString()}

@@ -430,7 +430,6 @@
       "showIfOrganizationIsOutsideWorkingHours": "Send a notification to the client when the organization is outside working hours",
       "showIfOrganizationIsOutsideWorkingHoursWithContactsRequest": "Send a notification to the client when the organization is outside working hours with a contact request",
       "outsideWorkingHoursMessage": "Outside working hours message",
-      "showIfBotCannotAnswerAskToForwardToCSA": "If Bürokratt cannot answer, ask for a customer service representative",
       "botCannotAnswerMessage": "Notification if Bürokratt cannot answer",
       "organizationUseCSA": "Use customer service",
       "tooltip": {
@@ -445,7 +444,6 @@
         "csaOutOfReach": "This option is linked to the next setting, but the difference is whether the customer's contact information is requested. By selecting \"Yes\", only the message in the \"notification of the absence of a customer service represetative\" field will be sent to the customer. No contact details will be requested from the customer.",
         "csaOutOfReachWithContactDataRequest": "This option is connected to the previous setting, but here the customer's contact details are requested. By selecting \"Yes\", the customer will see a notification message and additional fields such as \"email address\", \"phone number\", and \"describe your question\". The content of the notification is defined in the \"notification of the absence of a customer service represetative\" field. When selecting \"No\", the logic from the previous setting will automatically apply, where no contact information is requested.",
         "allCsaAway": "Text displayed to the customer when all the employees are away or busy. We recommend taking previous settings into account. For example, if contact detail collection is enabled, this should be reflected in the message, such as: \"Currently all our represtatives are busy, you may leave your contact details so we can get back to you later.\"",
-        "bykCouldNotRespondRedirect": "Select \"Yes\" if you want the conversation to be forwarded to an employee when Bürokratt is unable to answer. Select \"No\" if forwarding should not occur. In that case, the conversation will continue in the same window with Bürokratt.",
         "bykCouldNotRespond": "Text displayed when Bürokratt is unable to provide an answer."
       }
     },
