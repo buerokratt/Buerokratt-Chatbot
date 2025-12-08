@@ -31,24 +31,7 @@ extractRequestData:
     holidays: ${incoming.body.holidays}
     holidayNames: ${incoming.body.holidayNames}
     domain: ${incoming.body.domain}
-  next: check_for_intent
-
-check_for_intent:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL]/internal/intent_detection"
-    body:
-      sender: ${chatId}
-      message: ${content}
-      domain: ${domain}
-  result: converted_messages_res
-  next: check_intent_result
-
-check_intent_result:
-  switch:
-    - condition: ${converted_messages_res.response.body === 'skip'}
-      next: check_bot_is_active
-  next: add_bot_message_to_db
+  next: check_bot_is_active
 
 check_bot_is_active:
   call: http.post
@@ -78,8 +61,37 @@ get_bot_name:
 check_if_bot_name_exists:
   switch:
     - condition: ${get_bot_name_result.response.body[0]?.value != null}
-      next: get_chat
+      next: assign_bot_name
   next: return_bot_name_does_not_exist
+
+assign_bot_name:
+  assign:
+    chat_bot_name: ${get_bot_name_result.response.body[0].value}
+  next: check_for_intent
+
+check_for_intent:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL]/internal/intent_detection"
+    body:
+      sender: ${chatId}
+      message: ${content}
+      domain: ${domain}
+  result: llm_service_response
+  next: check_service_result
+
+check_service_result:
+  switch:
+    - condition: ${llm_service_response.response.body.response === 'skip'}
+      next: get_chat
+  next: assign_service_response
+
+assign_service_response:
+  assign:
+    botMsg:
+      - recipient_id: ${chatId}
+        text: ${llm_service_response.response.body.response}
+  next: format_bot_messages
 
 get_chat:
   call: http.post
@@ -93,7 +105,7 @@ get_chat:
 
 check_chat_belongs_to_bot:
   switch:
-    - condition: ${get_chat_result.response.body[0].customerSupportId == get_bot_name_result.response.body[0].value}
+    - condition: ${get_chat_result.response.body[0].customerSupportId == chat_bot_name}
       next: check_for_service
   next: return_chat_does_not_belong_to_bot
 
@@ -146,7 +158,7 @@ trigger_service:
   body:
     message: ${service_content}
     chatId: ${chatId}
-    authorId: ${get_bot_name_result.response.body[0].value}
+    authorId: ${chat_bot_name}
   result: converted_messages_res
   error: return_bot_error
   next: check_for_trigger_service_response
@@ -278,7 +290,7 @@ return_is_a_holiday:
           content: ${org_details.holidayMessage}
           authorTimestamp: ${new Date().toISOString()}
           event: "${base_config.outsideWorkingHoursAskForContacts === 'true' ? 'unavailable_holiday_ask_contacts' : 'unavailable_holiday'}"
-          authorId: ${get_bot_name_result.response.body[0].value}
+          authorId: ${chat_bot_name}
           authorFirstName: ""
           authorLastName: ""
           created: ${new Date().toISOString()}
@@ -295,7 +307,7 @@ return_organization_is_not_available:
           content: ${base_config.outsideWorkingHoursMessage}
           authorTimestamp: ${new Date().toISOString()}
           event: "${base_config.outsideWorkingHoursAskForContacts === 'true' ? 'unavailable_organization_ask_contacts' : 'unavailable_organization'}"
-          authorId: ${get_bot_name_result.response.body[0].value}
+          authorId: ${chat_bot_name}
           authorFirstName: ""
           authorLastName: ""
           created: ${new Date().toISOString()}
@@ -312,7 +324,7 @@ return_organization_does_not_use_csa:
           content: ${base_config.botCannotAnswerMessage}
           authorTimestamp: ${new Date().toISOString()}
           event: "unavailable_organization"
-          authorId: ${get_bot_name_result.response.body[0].value}
+          authorId: ${chat_bot_name}
           authorFirstName: ""
           authorLastName: ""
           created: ${new Date().toISOString()}
@@ -347,7 +359,7 @@ send_csas_not_available_message:
           content: ${base_config.noCsaMessage}
           authorTimestamp: ${new Date().toISOString()}
           event: "${base_config.askForContacts === 'true' ? 'unavailable_csas_ask_contacts' : 'unavailable_csas'}"
-          authorId: ${get_bot_name_result.response.body[0].value}
+          authorId: ${chat_bot_name}
           authorFirstName: ""
           authorLastName: ""
           created: ${new Date().toISOString()}
@@ -392,7 +404,7 @@ format_bot_messages:
         {
           "botMessages": "${botMsg}",
           "chatId": "${chatId}",
-          "authorId": "${get_bot_name_result.response.body[0].value}",
+          "authorId": "${chat_bot_name}",
           "authorFirstName": "",
           "authorLastName": "",
           "authorTimestamp": "${new Date().toISOString()}",
