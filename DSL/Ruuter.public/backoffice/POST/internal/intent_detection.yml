@@ -75,6 +75,7 @@ assign_config:
     semantic_configuration: "[#ID_SEMANTIC_CONFIGURATION]"
     in_scope: "[#ID_IN_SCOPE]"
     stream: "[#ID_STREAM]"
+    entities: ${[]}
 
 check_if_bot_is_active:
   switch:
@@ -218,7 +219,7 @@ detect_intent:
 
 check_for_choices:
   switch:
-    - condition: ${llmResponse.response.body.choices[0]?.message.content !== null}
+    - condition: ${llmResponse.response.body.choices[0]?.message.content !== null && llmResponse.response.body.choices[0]?.message.content.startsWith('{')}
       next: assign_intent_json
   next: return_skip
 
@@ -244,41 +245,43 @@ validate_service:
 check_intent_present:
   switch:
     - condition: ${validated_intent.response.body.length > 0}
-      next: trigger_service
+      next: handleEntities
   next: return_skip
+
+handleEntities:
+  switch:
+    - condition: ${!intentJson.entities}
+      next: trigger_service
+  next: assignNewEntities
+
+assignNewEntities:
+  assign:
+    entities: ${Object.values(intentJson.entities)}
+  next: trigger_service
 
 trigger_service:
   template: "[#CHATBOT_PROJECT_LAYER]/chats/trigger-llm-service"
   requestType: templates
   body:
-    message: ${service_content}
     entities: ${entities}
-    chatId: ${chatId}
+    chatId: ${sender}
     authorId: ${botName}
-  result: converted_messages_res
+    ruuterType: ${validated_intent.response.body[0].ruuterType}
+    serviceType: ${validated_intent.response.body[0].isCommon}
+    serviceName: ${validated_intent.response.body[0].name}
+  result: service_response
   error: return_error
-  next: check_for_trigger_service_response
+  next: check_for_llm_trigger_service_response
 
-check_for_trigger_service_response:
+check_for_llm_trigger_service_response:
   switch:
-    - condition: ${converted_messages_res === 'Service is not approved'}
-      next: return_skip
-  next: add_bot_message_to_db
+    - condition: ${service_response.startsWith('ERROR:')}
+      next: return_error
+  next: return_message
 
-add_bot_message_to_db:
-  switch:
-    - condition: ${converted_messages_res.length > 0}
-      next: do_add_bot_message_to_db
-  next: return_ok
-
-do_add_bot_message_to_db:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RESQL]/insert-bot-message"
-    body:
-      messages: ${converted_messages_res}
-  result: add_bot_message_to_bot_result
-  next: return_message_sent
+return_message:
+  return: ${service_response}
+  next: end
 
 return_result:
   return: "service triggered"
