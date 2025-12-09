@@ -67,8 +67,6 @@ export function getOrganizationTimeData(data: OrganizationWorkingTime) {
       data.organizationOutsideWorkingHoursAskForContacts.toString() === 'true',
     organizationOutsideWorkingHoursMessage:
       data.organizationOutsideWorkingHoursMessage,
-    organizationBotCannotAnswerAskToForwardToCSA:
-      data.organizationBotCannotAnswerAskToForwardToCSA.toString() === 'true',
     organizationBotCannotAnswerMessage: data.organizationBotCannotAnswerMessage,
     organizationUseCSA: data.organizationUseCSA.toString() === 'true',
   };
@@ -98,8 +96,6 @@ export function setOrganizationTimeData(data: OrganizationWorkingTime) {
       data.organizationNoCsaAskForContacts.toString(),
     organizationOutsideWorkingHoursAskForContacts:
       data.organizationOutsideWorkingHoursAskForContacts.toString(),
-    organizationBotCannotAnswerAskToForwardToCSA:
-      data.organizationBotCannotAnswerAskToForwardToCSA.toString(),
     organizationUseCSA: data.organizationUseCSA.toString() ?? true,
   };
 }
@@ -131,7 +127,6 @@ export const getDefaultValues = () :OrganizationWorkingTime => {
     organizationNoCsaAvailableMessage: '',
     organizationOutsideWorkingHoursAskForContacts: false,
     organizationOutsideWorkingHoursMessage: '',
-    organizationBotCannotAnswerAskToForwardToCSA: false,
     organizationBotCannotAnswerMessage: '',
     organizationUseCSA: false
   }

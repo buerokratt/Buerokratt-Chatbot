@@ -14,6 +14,7 @@ export interface User {
   customerSupportStatus: 'online' | 'idle' | 'offline';
   department: string;
   smaxAccountId?: string;
+  jiraAccountId?: string;
   statusComment: string;
 }
 
@@ -32,6 +33,7 @@ export interface UserDTO
     | 'csaEmail'
     | 'department'
     | 'smaxAccountId'
+    | 'jiraAccountId'
   > {}
 
 export interface UserSearchFilters {

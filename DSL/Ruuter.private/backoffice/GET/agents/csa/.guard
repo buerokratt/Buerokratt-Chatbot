@@ -5,7 +5,7 @@ check_for_cookie:
   next: authenticate
 
 authenticate:
-  template: "[#CHATBOT_PROJECT_LAYER]/check-admin-authority"
+  template: "[#CHATBOT_PROJECT_LAYER]/check-csa-authority"
   requestType: templates
   headers:
     cookie: ${incoming.headers.cookie}

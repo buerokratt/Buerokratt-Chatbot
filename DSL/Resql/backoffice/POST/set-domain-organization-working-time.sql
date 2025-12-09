@@ -38,7 +38,6 @@ WHERE
     'organizationNoCsaAvailableMessage',
     'organizationOutsideWorkingHoursAskForContacts',
     'organizationOutsideWorkingHoursMessage',
-    'organizationBotCannotAnswerAskToForwardToCSA',
     'organizationBotCannotAnswerMessage',
     'organizationUseCSA'
     )
@@ -84,7 +83,6 @@ FROM (
     ('organizationNoCsaAvailableMessage',               :organizationNoCsaAvailableMessage),
     ('organizationOutsideWorkingHoursAskForContacts',   :organizationOutsideWorkingHoursAskForContacts),
     ('organizationOutsideWorkingHoursMessage',          :organizationOutsideWorkingHoursMessage),
-    ('organizationBotCannotAnswerAskToForwardToCSA',    :organizationBotCannotAnswerAskToForwardToCSA),
     ('organizationBotCannotAnswerMessage',              :organizationBotCannotAnswerMessage),
     ('organizationUseCSA',                          :organizationUseCSA)
     ) AS v(key, value)

@@ -617,25 +617,6 @@ const SettingsWorkingTime: FC = () => {
             />
           </div>
         )}
-        {isOrganizationUseCSA && (
-          <Controller
-            name="organizationBotCannotAnswerAskToForwardToCSA"
-            control={control}
-            render={({ field }) => (
-              <Switch
-                label={t(
-                  'settings.workingTime.showIfBotCannotAnswerAskToForwardToCSA'
-                )}
-                onLabel={t('global.yes').toString()}
-                offLabel={t('global.no').toString()}
-                onCheckedChange={field.onChange}
-                checked={field.value}
-                tooltip={<InfoTooltip name="settings.workingTime.tooltip.bykCouldNotRespondRedirect" />}
-                {...field}
-              />
-            )}
-          />
-        )}
         <div style={{ paddingRight: '20px' }}>
           <Controller
             name="organizationBotCannotAnswerMessage"

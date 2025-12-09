@@ -27,7 +27,6 @@ WITH last_configuration AS (
      'organizationNoCsaAvailableMessage',
      'organizationOutsideWorkingHoursAskForContacts',
      'organizationOutsideWorkingHoursMessage',
-     'organizationBotCannotAnswerAskToForwardToCSA',
      'organizationBotCannotAnswerMessage',
      'organizationUseCSA')
     AND id IN (SELECT max(id) from configuration GROUP BY key)
@@ -61,7 +60,6 @@ WITH last_configuration AS (
         ('organizationNoCsaAvailableMessage', :organizationNoCsaAvailableMessage),
         ('organizationOutsideWorkingHoursAskForContacts', :organizationOutsideWorkingHoursAskForContacts),
         ('organizationOutsideWorkingHoursMessage', :organizationOutsideWorkingHoursMessage),
-        ('organizationBotCannotAnswerAskToForwardToCSA', :organizationBotCannotAnswerAskToForwardToCSA),
         ('organizationBotCannotAnswerMessage', :organizationBotCannotAnswerMessage),
         ('organizationUseCSA', :organizationUseCSA)
    ) as new_values (key, value)
