@@ -1,5 +1,5 @@
 export const EMERGENCY_NOTICE_LENGTH = 250;
-export const WELCOME_MESSAGE_LENGTH = 250;
+export const WELCOME_MESSAGE_LENGTH = 500;
 export const NO_CSA_MESSAGE_LENGTH = 250;
 export const FEEDBACK_QUESTION_LENGTH = 250;
 export const FEEDBACK_NOTICE_LENGTH = 250;
@@ -13,6 +13,7 @@ export const isHiddenFeaturesEnabled =
   import.meta.env.REACT_APP_ENABLE_HIDDEN_FEATURES?.toLowerCase().trim() ==
     'true' ||
   import.meta.env.REACT_APP_ENABLE_HIDDEN_FEATURES?.toLowerCase().trim() == '1';
+export const isJiraIntegrationEnabled = import.meta.env.REACT_APP_JIRA_INTEGRATION_ENABLED?.toLowerCase() === 'true';
 export const isSmaxIntegrationEnabled = import.meta.env.REACT_APP_SMAX_INTEGRATION_ENABLED?.toLowerCase() === 'true';
 export enum CHAT_SESSIONS {
   SESSION_ID_KEY = "tabId",

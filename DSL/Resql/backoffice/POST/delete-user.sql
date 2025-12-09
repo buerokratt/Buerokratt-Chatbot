@@ -13,7 +13,7 @@ WHERE (1 < (SELECT COUNT(user_id) FROM active_administrators)
         AND :userIdCode NOT IN (SELECT user_id FROM active_administrators)))),
 delete_user AS (
 INSERT
-INTO "user" (login, password_hash, first_name, last_name, id_code, display_name, status, created, csa_title, csa_email, department, smax_account_id)
+INTO "user" (login, password_hash, first_name, last_name, id_code, display_name, status, created, csa_title, csa_email, department, smax_account_id, jira_account_id)
 SELECT login,
        password_hash,
        first_name,
@@ -25,7 +25,8 @@ SELECT login,
        csa_title,
        csa_email,
        department,
-       smax_account_id
+       smax_account_id,
+       jira_account_id
 FROM "user"
 WHERE id_code = :userIdCode
   AND status <> 'deleted'

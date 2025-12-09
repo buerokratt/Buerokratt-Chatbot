@@ -57,6 +57,7 @@ export async function editUser(
     csa_email: userData.csaEmail,
     smaxAccountId: userData.smaxAccountId,
     ...(smaxConnectDisconnect && { smaxConnectDisconnect }),
+    jiraAccountId: userData.jiraAccountId,
     roles:
       authorities.length === 0
         ? Object.values(userData.authorities)

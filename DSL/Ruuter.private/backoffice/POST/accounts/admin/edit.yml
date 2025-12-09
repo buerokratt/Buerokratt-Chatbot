@@ -32,6 +32,9 @@ declaration:
       - field: department
         type: string
         description: "Body field 'department'"
+      - field: jiraAccountId
+        type: string
+        description: "Body field 'jiraAccountId'"
       - field: smaxAccountId
         type: string
         description: "Body field 'smaxAccountId'"
@@ -49,6 +52,7 @@ extractRequestData:
     csa_email: ${incoming.body.csa_email}
     roles: ${incoming.body.roles}
     department: ${incoming.body.department}
+    jira_account_id: ${incoming.body.jiraAccountId}
     domains: ${incoming.body.domains}
     smax_account_id: ${incoming.body.smaxAccountId}
  
@@ -64,8 +68,35 @@ getUser:
 checkIfUserExists:
   switch:
     - condition: "${res.response.body.length > 0}"
-      next: updateUser
+      next: checkJiraAccountId
   next: return_not_exists
+
+checkJiraAccountId:
+  switch:
+    - condition: ${jira_account_id.length > 0}
+      next: getJiraAccountId
+  next: updateUser
+
+getJiraAccountId:
+  call: http.get
+  args:
+    url: "[#JIRA_CLOUD_DOMAIN]/rest/api/2/user?username=${jira_account_id}"
+    headers:
+      Authorization: "Bearer [#JIRA_API_TOKEN]"
+      Accept: "application/json"
+      Content-Type: "application/json"
+  result: jira_user_res
+
+checkJiraUserRes:
+  switch:
+    - condition: ${jira_user_res.response.body?.name === jira_account_id}
+      next: assignJiraAccountId
+  next: return_jira_user_not_exists
+
+assignJiraAccountId:
+  assign:
+    jira_account_id: ${jira_user_res.response.body.name}
+  next: updateUser
 
 updateUser:
   call: http.post
@@ -81,6 +112,7 @@ updateUser:
       csaTitle: ${csaTitle}
       csaEmail: ${csa_email}
       department: ${department}
+      jiraAccountId: ${jira_account_id ?? ""}
       smaxAccountId: ${smax_account_id ?? ""}
   result: add_user_res
   next: checkForDomains
@@ -124,3 +156,7 @@ return_not_exists:
   status: 400
   next: end
 
+return_jira_user_not_exists:
+  return: "error: jira user does not exist"
+  status: 400
+  next: end
