@@ -10,9 +10,9 @@ WITH configuration_values AS (
                   'is_anonymization_before_llm',
                   'is_anonymization_before_global_classifier'
                  )
-      AND id IN (SELECT max(id) FROM configuration GROUP BY KEY)
       AND "domain" = :domainUUID::UUID
       AND NOT deleted
+      ORDER BY key, id DESC
 )
 SELECT
     MAX(CASE WHEN KEY = 'anonymizer_selected_approach' THEN value END) AS anonymizer_selected_approach,
