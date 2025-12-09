@@ -26,7 +26,6 @@ WHERE key IN (
    'organizationNoCsaAvailableMessage',
    'organizationOutsideWorkingHoursAskForContacts',
    'organizationOutsideWorkingHoursMessage',
-   'organizationBotCannotAnswerAskToForwardToCSA',
    'organizationBotCannotAnswerMessage',
    'organizationUseCSA')
   AND id IN (SELECT max(id) from configuration GROUP BY key)

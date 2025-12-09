@@ -22,7 +22,7 @@ import { CustomerSupportActivityDTO } from 'types/customerSupportActivity';
 import useStore from '../../../store';
 import { format } from 'date-fns';
 import { WDomain } from '../../../types/widgetModels';
-import { isSmaxIntegrationEnabled } from 'constants/config';
+import { isJiraIntegrationEnabled, isSmaxIntegrationEnabled } from 'constants/config';
 
 const SettingsUsers: FC = () => {
   const { t } = useTranslation();
@@ -361,6 +361,15 @@ const SettingsUsers: FC = () => {
       columnHelper.accessor('department', {
         header: t('settings.users.department') ?? '',
       }),
+      ...(isJiraIntegrationEnabled
+        ? [
+            columnHelper.accessor('jiraAccountId', {
+              header: t('settings.users.connectedToJira') ?? '',
+              enableColumnFilter: false,
+              cell: (props) => (props.getValue() ? t('global.yes') : t('global.no')),
+            }),
+          ]
+        : []),
       ...(isSmaxIntegrationEnabled
         ? [
         columnHelper.accessor('smaxAccountId', {

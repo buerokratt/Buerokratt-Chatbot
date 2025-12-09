@@ -349,6 +349,8 @@
       "userTitle": "User title",
       "email": "E-mail",
       "department": "Department",
+      "connectedToJira": "Connected to Jira",
+      "jiraAccountName": "Jira account name",
       "connectToSmax": "Connect to Smax",
       "connectedToSmax": "Connected to Smax",
       "disconnectFromSmax": "Disconnect from Smax",
@@ -430,7 +432,6 @@
       "showIfOrganizationIsOutsideWorkingHours": "Send a notification to the client when the organization is outside working hours",
       "showIfOrganizationIsOutsideWorkingHoursWithContactsRequest": "Send a notification to the client when the organization is outside working hours with a contact request",
       "outsideWorkingHoursMessage": "Outside working hours message",
-      "showIfBotCannotAnswerAskToForwardToCSA": "If Bürokratt cannot answer, ask for a customer service representative",
       "botCannotAnswerMessage": "Notification if Bürokratt cannot answer",
       "organizationUseCSA": "Use customer service",
       "tooltip": {
@@ -445,7 +446,6 @@
         "csaOutOfReach": "This option is linked to the next setting, but the difference is whether the customer's contact information is requested. By selecting \"Yes\", only the message in the \"notification of the absence of a customer service represetative\" field will be sent to the customer. No contact details will be requested from the customer.",
         "csaOutOfReachWithContactDataRequest": "This option is connected to the previous setting, but here the customer's contact details are requested. By selecting \"Yes\", the customer will see a notification message and additional fields such as \"email address\", \"phone number\", and \"describe your question\". The content of the notification is defined in the \"notification of the absence of a customer service represetative\" field. When selecting \"No\", the logic from the previous setting will automatically apply, where no contact information is requested.",
         "allCsaAway": "Text displayed to the customer when all the employees are away or busy. We recommend taking previous settings into account. For example, if contact detail collection is enabled, this should be reflected in the message, such as: \"Currently all our represtatives are busy, you may leave your contact details so we can get back to you later.\"",
-        "bykCouldNotRespondRedirect": "Select \"Yes\" if you want the conversation to be forwarded to an employee when Bürokratt is unable to answer. Select \"No\" if forwarding should not occur. In that case, the conversation will continue in the same window with Bürokratt.",
         "bykCouldNotRespond": "Text displayed when Bürokratt is unable to provide an answer."
       }
     },
@@ -493,7 +493,7 @@
         "idleTimout": "Specifies the time after which the user is considered inactive and the chat closing flow is triggered.",
         "showIdleMessage": "Before ending the chat, a warning message can be sent to an inactive user. If \"Yes\" is selected, the warning message will be displayed in the chat shortly before the chat is closed. If \"No\" is selected, the message will not be sent.",
         "idleMessageText": "Before ending the chat, a warning message is sent to the inactive user. Only one option \"Continue\" is displayed below the message, clicking it will allow the user to continue chatting.",
-        "showEndMessage": "When ending the chat, the last sentence from Bürokratt will be visible in the chat window. If \"Yes\" is selected, Bürokratt's closing message will be displayed as the final line in the chat. If \"No\" is selected, the message will not be shown and the chat window will be automatically minimized for the user.",
+        "showEndMessage": "When ending the chat, the last sentence from Bürokratt will be visible in the chat window. If \"Yes\" is selected, Bürokratt's closing message will be displayed as the final line in the chat. If \"No\" is selected, the message will not be shown and the chat window will be automatically minimized for the user. End user will see the message for one minute and then the end message settings will be applied.",
         "endMessageText": "The chat is ended from the user's perspective while keeping the chat window open. The user will see this Bürokratt's message as the final sentence in the chat widget."
       }
     },
