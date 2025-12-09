@@ -432,7 +432,6 @@
       "showIfOrganizationIsOutsideWorkingHours": "Saada kliendile töövälise aja teavitus",
       "showIfOrganizationIsOutsideWorkingHoursWithContactsRequest": "Saada kliendile töövälise aja teavitus koos kontakti päringuga",
       "outsideWorkingHoursMessage": "Töövälise aja teavitus",
-      "showIfBotCannotAnswerAskToForwardToCSA": "Kui Bürokratt ei oska vasta, kas küsida suunamist",
       "botCannotAnswerMessage": "Teavitus, kui Bürokratt ei oska vastata",
       "organizationUseCSA": "Kasutan klienditeenindust",
       "tooltip": {
@@ -447,7 +446,6 @@
         "csaOutOfReach": "See valik on seotud järgmise seadistusega, kuid erinevus seisneb kliendi kontaktandmete küsimises. Kui valida \"Jah\", saadetakse kliendile ainult eemaloleku teavitustekst, mille sisu on määratud väljal \"Klienditeenindaja eemaoleku teavitus\". Kliendilt kontaktandmeid ei küsita.",
         "csaOutOfReachWithContactDataRequest": "See valik on seotud eelmise seadistusega, kuid siin küsitakse kliendilt kontaktandmeid. Kui valida \"Jah\", kuvatakse kliendile eemaloleku teavitustekst ja lisanduvad väljad nagu \"e-posti aadress\", \"telefoninumber\" ja \"täpsusta siin oma küsimust\". Kuvatava teksti sisu on seadistatav väljal \"Klienditeenindaja eemaoleku teavitus\". Kui valida \"Ei\", rakendub automaatselt eelmise teavituse loogika, kus kontaktandmeid ei küsita.",
         "allCsaAway": "Tekst, mida kuvatakse kliendile klienditeenindaja eemaoleku korral. Soovitame arvestada eelnevate seadistustega ehk kui kontakti päring on sisse lülitatud, siis võiks see kajastuda ka tekstis, \"Hetkel on kõik klienditeenindajad eemal, võite jätta meile oma kontaktandmed, et saaksime teiega hiljem ühendust võtta.\"",
-        "bykCouldNotRespondRedirect": "Vali \"Jah\", kui soovid, et vestlus suunatakse töötajale kui Bürokratt ei oska vastata. Vali \"Ei\", kui töötajale suunamist ei toimu, sel juhul vestlus jätkub samas aknas Bürokratiga.",
         "bykCouldNotRespond": "Tekst, mida kuvatakse kui Bürokratt ei oska vastata."
       }
     },
