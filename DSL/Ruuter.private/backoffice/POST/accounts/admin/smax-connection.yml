@@ -32,6 +32,9 @@ declaration:
       - field: department
         type: string
         description: "Body field 'department'"
+      - field: jiraAccountId
+        type: string
+        description: "Body field 'jiraAccountId'"
       - field: smaxAccountId
         type: string
         description: "Body field 'smaxAccountId'"
@@ -49,6 +52,7 @@ extractRequestData:
     csa_email: ${incoming.body.csa_email}
     roles: ${incoming.body.roles}
     department: ${incoming.body.department}
+    jira_account_id: ${incoming.body.jiraAccountId}
     smax_account_id: ${incoming.body.smaxAccountId}
  
 getUser:
@@ -131,6 +135,7 @@ updateUser:
       csaTitle: ${csaTitle}
       csaEmail: ${csa_email}
       department: ${department}
+      jiraAccountId: ${jira_account_id ?? ""}
       smaxAccountId: ${smax_account_id}
   result: add_user_res
   next: updateRoles
