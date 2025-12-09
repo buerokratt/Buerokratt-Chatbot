@@ -8,12 +8,14 @@ import { useTranslation } from 'react-i18next';
 
 type DomainSelector = {
   onChange?: (selected: SelectOption[]) => void;
+  showSelected?: boolean;
 };
 
 type SelectOption = { label: string; value: string; meta?: string };
 
 const DomainSelector: FC<PropsWithChildren<DomainSelector>> = ({
-  onChange
+  onChange,
+  showSelected = false
 }) => {
   const { t } = useTranslation();
 
@@ -50,7 +52,9 @@ const DomainSelector: FC<PropsWithChildren<DomainSelector>> = ({
         const data = await getWidgetData(userInfo.idCode);
         const { options, selectedOptions } = mapDomainSelections(data);
         setOptions(options);
-        setSelectedOptions(selectedOptions);
+        if(showSelected) {
+          setSelectedOptions(selectedOptions);
+        }
         setRenderVersion((prev) => prev + 1);
       } catch (error) {
         console.error('Failed to fetch widget data', error);
