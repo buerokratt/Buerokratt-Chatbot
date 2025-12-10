@@ -436,9 +436,9 @@
       "redirectIfBotCannotAnswerMessage": "Teavitussõnum enne suunamist, kui Bürokratt ei oska vastata",
       "organizationUseCSA": "Kasutan klienditeenindust",
       "tooltip": {
-        "useCsa": "Vali \"Jah\", kui vestlusi võtavad vastu töötajad, sellega avanevad tööaja täpsemad seadistused. Kui töötajaid ei ole, vali \"Ei\" ja tööaega pole vaja määrata.",
+        "useCsa": "Vali \"Jah\", kui vestlusi võtavad vastu töötajad, sellega avanevad tööaja täpsemad seadistused. Juhul kui Bürokratt ei oska vastata, toimub vestluse suunamine klienditeenindajale. Kui töötajaid ei ole, vali \"Ei\" ja tööaega pole vaja määrata. Juhul kui Bürokratt ei oska vastata, saadetakse vestlusesse teavitussõnum ja suunamist ei toimu.",
         "work24/7": "Vali \"Jah\" kui vastajate tööaeg on ööpäevaringne, sh ka riigipühadel. Kui valida \"Ei\", saab valida täpsemaid ajavahemikke ja tingimusi.\n",
-        "workingHolidays": "Riigipühadel käitub vestlus samamoodi nagu töövälisel ajal.",
+        "workingHolidays": "Kui valida \"Jah\" võetakse riigipüha kui töö aega ehk asutuse tööaeg rakendub samamoodi nii riigipühal kui ka tavalisel tööpäeval. Kui valida \"Ei\" ja riigipüha langeb tööpäevale, siis kuvatakse riigipüha kui töövälist aega. Sellisel juhul saadetakse välja töövälise aja teavitus ja suunamist ei toimu.",
         "workingWeekends": "Vali \"Jah\", kui nädalavahetusel pole tööaega. Vali \"Ei\", kui nädalavahetusel on töötunde. Isegi kui ainult ühel päeval nädalavahetusel on töötunde ette nähtud, tuleb seadistuses valida \"Ei\".",
         "workingSameEachDay": "Vali \"Jah\", kui tööaeg on kõigil tööpäevadel samasugune. Vali \"Ei\", kui tööajad erinevad, näiteks E-R on ühine aeg, aga laupäeval teine. See seadistus arvestab ka eelnevalt seadistatud \"Nädalavahetusel suletud\" valikut, kui nädalavahetus ei kuulu tööaja sisse, siis on nähtaval ainult valikud esmaspäevast reedeni.",
         "sendCsa": "See valik on seotud järgmise seadistusega, kuid erinevus seisneb kliendi kontaktandmete küsimises. Kui valida \"Jah\", saadetakse kliendile ainult teavitustekst, mille sisu on määratud väljal \"Töövälise aja teavitus\". Kliendilt kontaktandmeid ei küsita.",
@@ -447,8 +447,8 @@
         "csaOutOfReach": "See valik on seotud järgmise seadistusega, kuid erinevus seisneb kliendi kontaktandmete küsimises. Kui valida \"Jah\", saadetakse kliendile ainult eemaloleku teavitustekst, mille sisu on määratud väljal \"Klienditeenindaja eemaoleku teavitus\". Kliendilt kontaktandmeid ei küsita.",
         "csaOutOfReachWithContactDataRequest": "See valik on seotud eelmise seadistusega, kuid siin küsitakse kliendilt kontaktandmeid. Kui valida \"Jah\", kuvatakse kliendile eemaloleku teavitustekst ja lisanduvad väljad nagu \"e-posti aadress\", \"telefoninumber\" ja \"täpsusta siin oma küsimust\". Kuvatava teksti sisu on seadistatav väljal \"Klienditeenindaja eemaoleku teavitus\". Kui valida \"Ei\", rakendub automaatselt eelmise teavituse loogika, kus kontaktandmeid ei küsita.",
         "allCsaAway": "Tekst, mida kuvatakse kliendile klienditeenindaja eemaoleku korral. Soovitame arvestada eelnevate seadistustega ehk kui kontakti päring on sisse lülitatud, siis võiks see kajastuda ka tekstis, \"Hetkel on kõik klienditeenindajad eemal, võite jätta meile oma kontaktandmed, et saaksime teiega hiljem ühendust võtta.\"",
-        "bykCouldNotRespond": "Tekst, mida kuvatakse kui Bürokratt ei oska vastata.",
-        "redirectIfBykCouldNotRespond": "Tekst, mida kuvatakse kui Bürokratt ei oska vastata."
+        "bykCouldNotRespond": "Tekst, mida kuvatakse kui Bürokratt ei oska vastata kui klienditeenindust ei kasutata.",
+        "redirectIfBykCouldNotRespond": "Tekst, mida kuvatakse kui Bürokratt ei oska vastata ja paralleelselt kasutatakse klienditeenindust. Mis tähendab, et koos selle sõnumiga, pakutakse kliendile ka vestluse suunamist nõustajale."
       }
     },
     "userSession": {
