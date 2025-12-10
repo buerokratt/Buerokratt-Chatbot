@@ -12,7 +12,7 @@ WITH configuration_values AS (
                  )
       AND "domain" = :domainUUID::UUID
       AND NOT deleted
-      ORDER BY key, id DESC
+      AND id IN (SELECT max(id) FROM configuration where "domain" = :domainUUID::UUID GROUP BY KEY)
 )
 SELECT
     MAX(CASE WHEN KEY = 'anonymizer_selected_approach' THEN value END) AS anonymizer_selected_approach,

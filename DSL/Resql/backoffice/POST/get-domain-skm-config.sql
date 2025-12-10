@@ -11,8 +11,8 @@ WITH configuration_values AS (
                   'skm_query_type',
                   'skm_semantic_configuration',
                   'skm_in_scope')
-      AND id IN (SELECT max(id) FROM configuration GROUP BY KEY)
       AND "domain" = :domainUUID::UUID
+      AND id IN (SELECT max(id) FROM configuration where "domain" = :domainUUID::UUID GROUP BY KEY)
       AND NOT deleted
 )
 SELECT
