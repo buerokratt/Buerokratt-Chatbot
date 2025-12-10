@@ -519,31 +519,10 @@ const SettingsWorkingTime: FC = () => {
                 )}
                 onLabel={t('global.yes').toString()}
                 offLabel={t('global.no').toString()}
-                onCheckedChange={(e) => field.onChange(!e)}
-                checked={!field.value}
-                tooltip={
-                  <InfoTooltip name="settings.workingTime.tooltip.sendCsa" />
-                }
-                {...field}
-              />
-            )}
-          />
-        )}
-        {!isOrganizationAvailableAllTime && isOrganizationUseCSA && (
-          <Controller
-            name="organizationOutsideWorkingHoursAskForContacts"
-            control={control}
-            render={({ field }) => (
-              <Switch
-                label={t(
-                  'settings.workingTime.showIfOrganizationIsOutsideWorkingHoursWithContactsRequest'
-                )}
-                onLabel={t('global.yes').toString()}
-                offLabel={t('global.no').toString()}
                 onCheckedChange={field.onChange}
                 checked={field.value}
                 tooltip={
-                  <InfoTooltip name="settings.workingTime.tooltip.sendCsaWithContactDataRequest" />
+                  <InfoTooltip name="settings.workingTime.tooltip.sendCsa" />
                 }
                 {...field}
               />
