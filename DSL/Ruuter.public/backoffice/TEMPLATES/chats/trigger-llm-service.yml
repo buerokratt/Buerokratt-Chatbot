@@ -1,0 +1,87 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'TRIGGER-LLM-SERVICE'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: entities
+        type: object
+        description: "entities field"
+      - field: authorId
+        type: string
+        description: "authorId field"
+      - field: chatId
+        type: string
+        description: "chatId field"
+      - field: serviceMethod
+        type: string
+        description: "serviceMethod field"
+      - field: ruuterType
+        type: string
+        description: "ruuterType field"
+      - field: isCommon
+        type: object
+        description: "serviceType field"
+      - field: serviceName
+        type: string
+        description: "serviceName field"
+
+assign_data:
+  assign:
+    chatId: ${incoming.body.chatId}
+    authorId: ${incoming.body.authorId}
+    isCommon: ${incoming.body.isCommon}
+    serviceMethod: ${incoming.body.ruuterType}
+    serviceName: ${incoming.body.serviceName}
+    servicePath: "${'/services/active' + serviceName}"
+    serviceInput: ${incoming.body.entities}
+    baseUrl: "${isCommon === true ? '[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]' : '[#CHATBOT_RUUTER_PUBLIC_INTERNAL_SERVICE]'}"
+
+check_for_service_method:
+  switch:
+    - condition: ${serviceMethod.toUpperCase() === 'POST'}
+      next: trigger_post_service
+  next: trigger_get_service
+
+trigger_get_service:
+  call: http.get
+  args:
+    url: "${baseUrl}/${servicePath}"
+    query:
+      input: ${serviceInput.join(',')}
+      authorId: ${authorId}
+      chatId: ${chatId}
+  error: return_service_error
+  result: res
+  next: return_result
+
+trigger_post_service:
+  call: http.post
+  args:
+    url: "${baseUrl}/${servicePath}"
+    body:
+      input: ${serviceInput}
+      authorId: ${authorId}
+      chatId: ${chatId}
+  error: return_service_error
+  result: res
+  next: validate_response
+
+validate_response:
+  switch:
+    - condition: ${res.response.body.response[0]?.content}
+      next: return_service_error
+  next: return_result
+
+return_result:
+  return: ${res.response.body.response[0].content}
+  next: end
+
+return_service_error:
+  status: 400
+  return: "ERROR: There was a problem triggering the service"
+  next: end
