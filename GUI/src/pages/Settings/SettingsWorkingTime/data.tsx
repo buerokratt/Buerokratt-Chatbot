@@ -68,6 +68,7 @@ export function getOrganizationTimeData(data: OrganizationWorkingTime) {
     organizationOutsideWorkingHoursMessage:
       data.organizationOutsideWorkingHoursMessage,
     organizationBotCannotAnswerMessage: data.organizationBotCannotAnswerMessage,
+    organizationRedirectIfBotCannotAnswerMessage: data.organizationRedirectIfBotCannotAnswerMessage,
     organizationUseCSA: data.organizationUseCSA.toString() === 'true',
   };
 }
@@ -128,6 +129,7 @@ export const getDefaultValues = () :OrganizationWorkingTime => {
     organizationOutsideWorkingHoursAskForContacts: false,
     organizationOutsideWorkingHoursMessage: '',
     organizationBotCannotAnswerMessage: '',
+    organizationRedirectIfBotCannotAnswerMessage: '',
     organizationUseCSA: false
   }
 }

@@ -28,6 +28,7 @@ WITH last_configuration AS (
      'organizationOutsideWorkingHoursAskForContacts',
      'organizationOutsideWorkingHoursMessage',
      'organizationBotCannotAnswerMessage',
+     'organizationRedirectIfBotCannotAnswerMessage',
      'organizationUseCSA')
     AND id IN (SELECT max(id) from configuration GROUP BY key)
     AND deleted = FALSE
@@ -61,6 +62,7 @@ WITH last_configuration AS (
         ('organizationOutsideWorkingHoursAskForContacts', :organizationOutsideWorkingHoursAskForContacts),
         ('organizationOutsideWorkingHoursMessage', :organizationOutsideWorkingHoursMessage),
         ('organizationBotCannotAnswerMessage', :organizationBotCannotAnswerMessage),
+        ('organizationRedirectIfBotCannotAnswerMessage', :organizationRedirectIfBotCannotAnswerMessage),
         ('organizationUseCSA', :organizationUseCSA)
    ) as new_values (key, value)
 )

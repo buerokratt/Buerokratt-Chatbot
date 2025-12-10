@@ -88,7 +88,10 @@ declaration:
         description: "Body field 'domainUUID'"
       - field: organizationBotCannotAnswerMessage
         type: string
-        description: "Body field 'organizationBotCannotAnswerMessage'"  
+        description: "Body field 'organizationBotCannotAnswerMessage'"
+      - field: organizationRedirectIfBotCannotAnswerMessage
+        type: string
+        description: "Body field 'organizationRedirectIfBotCannotAnswerMessage'"  
       - field: organizationUseCSA
         type: string
         description: "Body field 'organizationUseCSA'"  
@@ -121,6 +124,7 @@ extractRequestData:
     organizationOutsideWorkingHoursAskForContacts: ${incoming.body.organizationOutsideWorkingHoursAskForContacts}
     organizationOutsideWorkingHoursMessage: ${incoming.body.organizationOutsideWorkingHoursMessage}
     organizationBotCannotAnswerMessage: ${incoming.body.organizationBotCannotAnswerMessage}
+    organizationRedirectIfBotCannotAnswerMessage: ${incoming.body.organizationRedirectIfBotCannotAnswerMessage}
     organizationUseCSA: ${incoming.body.organizationUseCSA}
     domains: ${incoming.body.domainUUID}
 
@@ -161,6 +165,7 @@ setDomainOrganizationWorkingTime:
       organizationOutsideWorkingHoursAskForContacts: ${organizationOutsideWorkingHoursAskForContacts}
       organizationOutsideWorkingHoursMessage: ${organizationOutsideWorkingHoursMessage}
       organizationBotCannotAnswerMessage: ${organizationBotCannotAnswerMessage}
+      organizationRedirectIfBotCannotAnswerMessage: ${organizationRedirectIfBotCannotAnswerMessage}
       organizationUseCSA: ${incoming.body.organizationUseCSA}
       created: ${new Date().toISOString()}
       domains: ${JSON.stringify(domains)}
@@ -198,6 +203,7 @@ setOrganizationWorkingTime:
       organizationOutsideWorkingHoursAskForContacts: ${organizationOutsideWorkingHoursAskForContacts}
       organizationOutsideWorkingHoursMessage: ${organizationOutsideWorkingHoursMessage}
       organizationBotCannotAnswerMessage: ${organizationBotCannotAnswerMessage}
+      organizationRedirectIfBotCannotAnswerMessage: ${organizationRedirectIfBotCannotAnswerMessage}
       organizationUseCSA: ${organizationUseCSA}
       created: ${new Date().toISOString()}
   result: setOrganizationWorkingTimeResult
