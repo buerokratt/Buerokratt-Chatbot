@@ -433,6 +433,7 @@
       "showIfOrganizationIsOutsideWorkingHoursWithContactsRequest": "Send a notification to the client when the organization is outside working hours with a contact request",
       "outsideWorkingHoursMessage": "Outside working hours message",
       "botCannotAnswerMessage": "Notification if Bürokratt cannot answer",
+      "redirectIfBotCannotAnswerMessage": "Notification before redirecting, if Bürokratt cannot answer",
       "organizationUseCSA": "Use customer service",
       "tooltip": {
         "useCsa": "Select \"Yes\" if employees can take chat messages, this option will open up the working hours settings. If there are no employees, select \"No\". This will hide the additional settings as there is no need to set working hours.",
@@ -446,7 +447,8 @@
         "csaOutOfReach": "This option is linked to the next setting, but the difference is whether the customer's contact information is requested. By selecting \"Yes\", only the message in the \"notification of the absence of a customer service represetative\" field will be sent to the customer. No contact details will be requested from the customer.",
         "csaOutOfReachWithContactDataRequest": "This option is connected to the previous setting, but here the customer's contact details are requested. By selecting \"Yes\", the customer will see a notification message and additional fields such as \"email address\", \"phone number\", and \"describe your question\". The content of the notification is defined in the \"notification of the absence of a customer service represetative\" field. When selecting \"No\", the logic from the previous setting will automatically apply, where no contact information is requested.",
         "allCsaAway": "Text displayed to the customer when all the employees are away or busy. We recommend taking previous settings into account. For example, if contact detail collection is enabled, this should be reflected in the message, such as: \"Currently all our represtatives are busy, you may leave your contact details so we can get back to you later.\"",
-        "bykCouldNotRespond": "Text displayed when Bürokratt is unable to provide an answer."
+        "bykCouldNotRespond": "Text displayed when Bürokratt is unable to provide an answer.",
+        "redirectIfBykCouldNotRespond": "Text displayed when Bürokratt is unable to provide an answer."
       }
     },
     "userSession": {

@@ -30,6 +30,7 @@ import {
   BOT_CANNOT_ANSWER_MESSAGE_LENGTH,
   NO_CSA_MESSAGE_LENGTH,
   OUTSIDE_WORKING_HOURS_MESSAGE_LENGTH,
+  REDIRECT_IF_BOT_CANNOT_ANSWER_MESSAGE_LENGTH,
 } from 'constants/config';
 import DomainSelector from '../../../components/DomainsSelector';
 import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
@@ -237,7 +238,9 @@ const SettingsWorkingTime: FC = () => {
                   offLabel={t('global.no').toString()}
                   onCheckedChange={field.onChange}
                   checked={field.value}
-                  tooltip={<InfoTooltip name="settings.workingTime.tooltip.useCsa" />}
+                  tooltip={
+                    <InfoTooltip name="settings.workingTime.tooltip.useCsa" />
+                  }
                   {...field}
                 />
               )}
@@ -253,7 +256,9 @@ const SettingsWorkingTime: FC = () => {
                     offLabel={t('global.no').toString()}
                     onCheckedChange={field.onChange}
                     checked={field.value}
-                    tooltip={<InfoTooltip name="settings.workingTime.tooltip.work24/7" />}
+                    tooltip={
+                      <InfoTooltip name="settings.workingTime.tooltip.work24/7" />
+                    }
                     {...field}
                   />
                 )}
@@ -270,7 +275,9 @@ const SettingsWorkingTime: FC = () => {
                     offLabel={t('global.no').toString()}
                     onCheckedChange={field.onChange}
                     checked={field.value}
-                    tooltip={<InfoTooltip name="settings.workingTime.tooltip.workingHolidays" />}
+                    tooltip={
+                      <InfoTooltip name="settings.workingTime.tooltip.workingHolidays" />
+                    }
                     {...field}
                   />
                 )}
@@ -287,7 +294,9 @@ const SettingsWorkingTime: FC = () => {
                     offLabel={t('global.no').toString()}
                     onCheckedChange={field.onChange}
                     checked={field.value}
-                    tooltip={<InfoTooltip name="settings.workingTime.tooltip.workingWeekends" />}
+                    tooltip={
+                      <InfoTooltip name="settings.workingTime.tooltip.workingWeekends" />
+                    }
                     {...field}
                   />
                 )}
@@ -304,7 +313,9 @@ const SettingsWorkingTime: FC = () => {
                     offLabel={t('global.no').toString()}
                     onCheckedChange={field.onChange}
                     checked={field.value}
-                    tooltip={<InfoTooltip name="settings.workingTime.tooltip.workingSameEachDay" />}
+                    tooltip={
+                      <InfoTooltip name="settings.workingTime.tooltip.workingSameEachDay" />
+                    }
                     {...field}
                   />
                 )}
@@ -510,7 +521,9 @@ const SettingsWorkingTime: FC = () => {
                 offLabel={t('global.no').toString()}
                 onCheckedChange={(e) => field.onChange(!e)}
                 checked={!field.value}
-                tooltip={<InfoTooltip name="settings.workingTime.tooltip.sendCsa" />}
+                tooltip={
+                  <InfoTooltip name="settings.workingTime.tooltip.sendCsa" />
+                }
                 {...field}
               />
             )}
@@ -529,7 +542,9 @@ const SettingsWorkingTime: FC = () => {
                 offLabel={t('global.no').toString()}
                 onCheckedChange={field.onChange}
                 checked={field.value}
-                tooltip={<InfoTooltip name="settings.workingTime.tooltip.sendCsaWithContactDataRequest" />}
+                tooltip={
+                  <InfoTooltip name="settings.workingTime.tooltip.sendCsaWithContactDataRequest" />
+                }
                 {...field}
               />
             )}
@@ -541,7 +556,7 @@ const SettingsWorkingTime: FC = () => {
               name="organizationOutsideWorkingHoursMessage"
               control={control}
               render={({ field }) => (
-                <Track gap={10} style={{ width: '100%'}}>
+                <Track gap={10} style={{ width: '100%' }}>
                   <FormTextarea
                     label={t('settings.workingTime.outsideWorkingHoursMessage')}
                     maxLength={OUTSIDE_WORKING_HOURS_MESSAGE_LENGTH}
@@ -569,7 +584,9 @@ const SettingsWorkingTime: FC = () => {
                 offLabel={t('global.no').toString()}
                 onCheckedChange={(e) => field.onChange(!e)}
                 checked={!field.value}
-                tooltip={<InfoTooltip name="settings.workingTime.tooltip.csaOutOfReach" />}
+                tooltip={
+                  <InfoTooltip name="settings.workingTime.tooltip.csaOutOfReach" />
+                }
                 {...field}
               />
             )}
@@ -588,7 +605,9 @@ const SettingsWorkingTime: FC = () => {
                 offLabel={t('global.no').toString()}
                 onCheckedChange={field.onChange}
                 checked={field.value}
-                tooltip={<InfoTooltip name="settings.workingTime.tooltip.csaOutOfReachWithContactDataRequest" />}
+                tooltip={
+                  <InfoTooltip name="settings.workingTime.tooltip.csaOutOfReachWithContactDataRequest" />
+                }
                 {...field}
               />
             )}
@@ -600,7 +619,7 @@ const SettingsWorkingTime: FC = () => {
               name="organizationNoCsaAvailableMessage"
               control={control}
               render={({ field }) => (
-                <Track gap={10} style={{ width: '100%'}}>
+                <Track gap={10} style={{ width: '100%' }}>
                   <FormTextarea
                     label={t('settings.workingTime.noCsaAvailableMessage')}
                     maxLength={NO_CSA_MESSAGE_LENGTH}
@@ -617,27 +636,54 @@ const SettingsWorkingTime: FC = () => {
             />
           </div>
         )}
-        <div style={{ paddingRight: '20px' }}>
-          <Controller
-            name="organizationBotCannotAnswerMessage"
-            control={control}
-            render={({ field }) => (
-              <Track gap={10} style={{ width: '100%'}}>
-                <FormTextarea
-                  label={t('settings.workingTime.botCannotAnswerMessage')}
-                  maxLength={BOT_CANNOT_ANSWER_MESSAGE_LENGTH}
-                  showMaxLength
-                  maxLengthBottom
-                  onChange={field.onChange}
-                  defaultValue={field.value}
-                  name="label"
-                  useRichText
-                />
-                <InfoTooltip name="settings.workingTime.tooltip.bykCouldNotRespond" />
-              </Track>
-            )}
-          />
-        </div>
+        {isOrganizationUseCSA && (
+          <div style={{ paddingRight: '20px' }}>
+            <Controller
+              name="organizationRedirectIfBotCannotAnswerMessage"
+              control={control}
+              render={({ field }) => (
+                <Track gap={10} style={{ width: '100%' }}>
+                  <FormTextarea
+                    label={t(
+                      'settings.workingTime.redirectIfBotCannotAnswerMessage'
+                    )}
+                    maxLength={REDIRECT_IF_BOT_CANNOT_ANSWER_MESSAGE_LENGTH}
+                    showMaxLength
+                    maxLengthBottom
+                    onChange={field.onChange}
+                    defaultValue={field.value}
+                    name="label"
+                    useRichText
+                  />
+                  <InfoTooltip name="settings.workingTime.tooltip.redirectIfBykCouldNotRespond" />
+                </Track>
+              )}
+            />
+          </div>
+        )}
+        {!isOrganizationUseCSA && (
+          <div style={{ paddingRight: '20px' }}>
+            <Controller
+              name="organizationBotCannotAnswerMessage"
+              control={control}
+              render={({ field }) => (
+                <Track gap={10} style={{ width: '100%' }}>
+                  <FormTextarea
+                    label={t('settings.workingTime.botCannotAnswerMessage')}
+                    maxLength={BOT_CANNOT_ANSWER_MESSAGE_LENGTH}
+                    showMaxLength
+                    maxLengthBottom
+                    onChange={field.onChange}
+                    defaultValue={field.value}
+                    name="label"
+                    useRichText
+                  />
+                  <InfoTooltip name="settings.workingTime.tooltip.bykCouldNotRespond" />
+                </Track>
+              )}
+            />
+          </div>
+        )}
       </Card>
     </>
   );
