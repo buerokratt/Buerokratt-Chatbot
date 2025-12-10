@@ -582,31 +582,10 @@ const SettingsWorkingTime: FC = () => {
                 label={t('settings.workingTime.showIfCSAIsNotAvailable')}
                 onLabel={t('global.yes').toString()}
                 offLabel={t('global.no').toString()}
-                onCheckedChange={(e) => field.onChange(!e)}
-                checked={!field.value}
-                tooltip={
-                  <InfoTooltip name="settings.workingTime.tooltip.csaOutOfReach" />
-                }
-                {...field}
-              />
-            )}
-          />
-        )}
-        {isOrganizationUseCSA && (
-          <Controller
-            name="organizationNoCsaAskForContacts"
-            control={control}
-            render={({ field }) => (
-              <Switch
-                label={t(
-                  'settings.workingTime.showIfCSAIsNotAvailableWithContactsRequest'
-                )}
-                onLabel={t('global.yes').toString()}
-                offLabel={t('global.no').toString()}
                 onCheckedChange={field.onChange}
                 checked={field.value}
                 tooltip={
-                  <InfoTooltip name="settings.workingTime.tooltip.csaOutOfReachWithContactDataRequest" />
+                  <InfoTooltip name="settings.workingTime.tooltip.csaOutOfReach" />
                 }
                 {...field}
               />
