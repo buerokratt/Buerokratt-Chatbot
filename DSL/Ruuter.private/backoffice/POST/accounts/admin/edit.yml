@@ -39,7 +39,7 @@ declaration:
         type: string
         description: "Body field 'smaxAccountId'"
       - field: domains
-        type: array
+        type: object
         description: "Body field 'domains'"
 
 extractRequestData:
@@ -115,12 +115,6 @@ updateUser:
       jiraAccountId: ${jira_account_id ?? ""}
       smaxAccountId: ${smax_account_id ?? ""}
   result: add_user_res
-  next: checkForDomains
-
-checkForDomains:
-  switch:
-    - condition: ${domains && domains.length > 0}
-      next: updateRolesWithDomains
   next: updateRoles
 
 updateRoles:
@@ -132,19 +126,29 @@ updateRoles:
       roles: ${roles}
       created: ${new Date().toISOString()}
   result: add_roles_res
-  next: return_result
+  next: checkForDomains
 
-updateRolesWithDomains:
+checkForDomains:
+  switch:
+    - condition: ${!domains}
+      next: return_result
+  next: updateUserDomains
+
+updateUserDomains:
   call: http.post
   args:
     url: "[#CHATBOT_RESQL]/insert-user-role-domains"
     body:
       userIdCode: ${userIdCode}
-      roles: ${roles}
-      created: ${new Date().toISOString()}
       domains: ${domains}
-  result: add_roles_res
-  next: return_result
+  result: add_domains_res
+#  next: return_result
+
+checkVVV:
+  log: ${domains}
+
+checkVV:
+  log: ${add_domains_res}
 
 return_result:
   return: "User updated successfully"
