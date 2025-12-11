@@ -234,7 +234,7 @@ assign_back_office_event:
   assign:
     correct_value:
       - recipient_id: ${sender}
-        text: ${bot_answer_config.askToForwardToCsaMessage}
+        text: ${base_config.redirectIfBotCannotAnswerMessage}
         context: ${context}
     event: "${isOrgAvailable === true ? 'ask_to_forward_to_csa' : ''}"
   next: format_messages

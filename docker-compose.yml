@@ -159,6 +159,25 @@ services:
     networks:
       - bykstack
 
+  resql_service:
+    container_name: resql-service
+    image: resql
+    environment:
+      - sqlms.datasources.[0].name=byk
+      - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://171.22.247.13:5435/services_db
+      - sqlms.datasources.[0].username=byk
+      - sqlms.datasources.[0].password=01234
+      - logging.level.org.springframework.boot=INFO
+      - server.port=8084
+    ports:
+      - 8084:8084
+    volumes:
+      - ./DSL/Resql:/DSL
+    networks:
+      - bykstack
+    cpus: "0.5"
+    mem_limit: "1G"
+
   gui:
     container_name: gui
     environment:

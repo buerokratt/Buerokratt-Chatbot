@@ -1,0 +1,296 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: Description placeholder for 'INTENT_DETECTION'
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: message
+        type: string
+        description: "Body field 'message'"
+      - field: sender
+        type: string
+        description: "Body field 'sender'"
+      - field: domain
+        type: string
+        description: "Body field 'domain'"
+
+get_bot_name:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-configuration"
+    body:
+      key: "bot_institution_id"
+    error: return_error
+  result: get_bot_name_result
+  next: check_if_bot_name_exists
+
+check_if_bot_name_exists:
+  switch:
+    - condition: ${get_bot_name_result.response.body[0]?.value != null}
+      next: assignParameters
+  next: return_skip
+
+assignParameters:
+  assign:
+    currentDate: ${new Date().toISOString().split('T')[0]}
+    sender: ${incoming.body.sender}
+    domain: ${incoming.body.domain}
+    message: ${incoming.body.message ?? ''}
+    botName: ${get_bot_name_result.response.body[0].value}
+
+get_system_input:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-configuration"
+    body:
+      key: "id_system_message"
+    error: return_error
+  result: llm_configuration
+  next: check_system_input
+
+check_system_input:
+  switch:
+    - condition: ${llm_configuration.response.body[0]?.value != null}
+      next: assign_config
+  next: return_skip
+
+assign_config:
+  assign:
+    strictness: "[#ID_STRICTNESS]"
+    max_tokens: "[#ID_MAX_TOKENS]"
+    documents: "[#ID_DOCUMENTS]"
+    index_name: "[#ID_INDEX_NAME]"
+    query_type: "[#ID_QUERY_TYPE]"
+    system_message: ${llm_configuration.response.body[0].value}
+    search_endpoint: "[#ID_SEARCH_ENDPOINT]"
+    completion_endpoint: "[#ID_COMPLETION_ENDPOINT]"
+    chatbot_external_key: "[#ID_CHATBOT_EXTERNAL_KEY]"
+    embedded_endpoint: "[#ID_EMBEDDED_ENDPOINT_AZURE]"
+    chatbot_external_api_key: "[#ID_CHATBOT_EXTERNAL_API_KEY]"
+    chatbot_external_bot_url: "[#ID_CHATBOT_EXTERNAL_BOT_URL]"
+    semantic_configuration: "[#ID_SEMANTIC_CONFIGURATION]"
+    in_scope: "[#ID_IN_SCOPE]"
+    stream: "[#ID_STREAM]"
+    entities: ${[]}
+
+check_if_bot_is_active:
+  switch:
+    - condition: ${[#ID_ACTIVE] === true}
+      next: assign_data_sources
+  next: return_skip
+
+assign_data_sources:
+  assign:
+    data_sources:
+      - type: azure_search
+        parameters:
+          endpoint: ${search_endpoint}
+          index_name: ${index_name}
+          semantic_configuration: ${semantic_configuration}
+          query_type: ${query_type}
+          in_scope: ${in_scope.toLowerCase() === 'true'}
+          strictness: ${parseInt(strictness ?? '3')}
+          top_n_documents: ${parseInt(documents ?? '5')}
+          authentication:
+            type: api_key
+            key: ${chatbot_external_key}
+          embedding_dependency:
+            type: endpoint
+            endpoint: ${embedded_endpoint}
+            authentication:
+              type: api_key
+              key: ${chatbot_external_api_key}
+
+prepare_messages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_HBS]/intent_detection_message"
+    headers:
+      type: json
+    body:
+      prompt_message: "${system_message} The current date is ${currentDate}"
+      new_message: ${message}
+  result: prepare_messages_res
+
+assign_messages:
+  assign:
+    messages: ${prepare_messages_res.response.body}
+
+check_if_anonymizer_is_active:
+  switch:
+    - condition: ${[#ANONYMIZER_ENABLED] === true}
+      next: checkForPassedDomain
+  next: detect_intent
+
+checkForPassedDomain:
+  switch:
+    - condition: ${domain === 'none'}
+      next: getAnonymizerConfig
+  next: getDomainAnonymizerConfig
+
+getAnonymizerConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-anonymizer-config"
+  result: anonymizer_configs_res
+  next: assignAnonymizerConfigs
+
+getDomainAnonymizerConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-anonymizer-config"
+    body:
+      domainUUID: ${domain}
+  result: anonymizer_configs_res
+  next: assignAnonymizerConfigs
+
+assignAnonymizerConfigs:
+  assign:
+    anonymizer_configs: ${anonymizer_configs_res.response.body[0]}
+  next: check_if_anonymize_before_llm
+
+check_if_anonymize_before_llm:
+  switch:
+    - condition: ${anonymizer_configs.isAnonymizationBeforeLlm === 'true'}
+      next: prepareAnonymizerConfig
+  next: trigger_ai_stream
+
+prepareAnonymizerConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_HBS]/prepare_anonymizer_config"
+    headers:
+      type: json
+    body:
+      texts: ${messages.filter(i => i.role === 'user').map(i => i.content)}
+      approach: ${anonymizer_configs.anonymizerSelectedApproach}
+      entities: ${anonymizer_configs.anonymizerSelectedEntities.split(',')}
+      allowlist: ${anonymizer_configs.anonymizerAllowlist.split(',')}
+      denylist: ${anonymizer_configs.anonymizerDenylist.split(',')}
+      hash_type: "[#ANONYMIZER_HASH_TYPE]"
+  result: preparedAnonymizerConfigs
+  next: assignPreparedAnonymizerConfigs
+
+assignPreparedAnonymizerConfigs:
+  assign:
+    preparedAnonymizerConfigs: ${preparedAnonymizerConfigs.response.body}
+  next: anonymizeText
+
+anonymizeText:
+  call: http.post
+  args:
+    url: "[#CHATBOT_ANONYMIZER]/anonymize"
+    body:
+      texts: ${preparedAnonymizerConfigs.texts}
+      anonymizers: ${preparedAnonymizerConfigs.anonymizers}
+      entities: ${preparedAnonymizerConfigs.entities}
+      allowlist: ${preparedAnonymizerConfigs.allowlist}
+      denylist: ${preparedAnonymizerConfigs.denylist}
+  result: anonymize_res
+  next: assign_anonymized_messages
+
+assign_anonymized_messages:
+  assign:
+    anonymizedMessages: ${anonymize_res.response.body.results}
+    messages: "$=messages.map((m, i) => m.role === 'user' ? {...m, content: anonymizedMessages[messages.slice(0, i).filter(msg => msg.role === 'user').length].text} : m)="
+
+detect_intent:
+  call: http.post
+  args:
+    url: ${completion_endpoint}
+    headers:
+      Content-Type: application/json
+      api-key: "[#ID_CHATBOT_EXTERNAL_API_KEY]"
+    body:
+      messages: ${messages}
+      data_sources: ${data_sources}
+      max_tokens: ${parseInt(max_tokens ?? '1000')}
+      temperature: 0
+      top_p: 1
+      stream: ${stream.toLowerCase() === 'true'}
+      frequency_penalty: 0
+      presence_penalty: 0
+  result: llmResponse
+  next: check_for_choices
+
+check_for_choices:
+  switch:
+    - condition: ${llmResponse.response.body.choices[0]?.message.content !== null && llmResponse.response.body.choices[0]?.message.content.startsWith('{')}
+      next: assign_intent_json
+  next: return_skip
+
+assign_intent_json:
+  assign:
+    intentJson: ${JSON.parse(llmResponse.response.body.choices[0].message.content)}
+
+check_for_intent:
+  switch:
+    - condition: ${intentJson.intent === 'OOD'}
+      next: return_skip
+  next: validate_service
+
+validate_service:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/get-active-service-by-name"
+    body:
+      service_name: ${intentJson.intent}
+  result: validated_intent
+  next: check_intent_present
+
+check_intent_present:
+  switch:
+    - condition: ${validated_intent.response.body.length > 0}
+      next: handleEntities
+  next: return_skip
+
+handleEntities:
+  switch:
+    - condition: ${!intentJson.entities}
+      next: trigger_service
+  next: assignNewEntities
+
+assignNewEntities:
+  assign:
+    entities: ${Object.values(intentJson.entities)}
+  next: trigger_service
+
+trigger_service:
+  template: "[#CHATBOT_PROJECT_LAYER]/chats/trigger-llm-service"
+  requestType: templates
+  body:
+    entities: ${entities}
+    chatId: ${sender}
+    authorId: ${botName}
+    ruuterType: ${validated_intent.response.body[0].ruuterType}
+    serviceType: ${validated_intent.response.body[0].isCommon}
+    serviceName: ${validated_intent.response.body[0].name}
+  result: service_response
+  error: return_error
+  next: check_for_llm_trigger_service_response
+
+check_for_llm_trigger_service_response:
+  switch:
+    - condition: ${service_response.startsWith('ERROR:')}
+      next: return_error
+  next: return_message
+
+return_message:
+  return: ${service_response}
+  next: end
+
+return_result:
+  return: "service triggered"
+  next: end
+
+return_skip:
+  return: "skip"
+  next: end
+
+return_error:
+  status: 409
+  return: "Error calling llm"

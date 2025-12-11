@@ -9,6 +9,7 @@ WITH configuration_values AS (
                   'organizationOutsideWorkingHoursAskForContacts',
                   'organizationOutsideWorkingHoursMessage',
                   'organizationBotCannotAnswerMessage',
+                  'organizationRedirectIfBotCannotAnswerMessage',
                   'organizationUseCSA')
       AND id IN (SELECT max(id) FROM configuration GROUP BY KEY)
       AND NOT deleted
@@ -20,5 +21,6 @@ SELECT
     MAX(CASE WHEN KEY = 'organizationOutsideWorkingHoursAskForContacts' THEN value END) AS outside_working_hours_ask_for_contacts,
     MAX(CASE WHEN KEY = 'organizationOutsideWorkingHoursMessage' THEN value END) AS outside_working_hours_message,
     MAX(CASE WHEN KEY = 'organizationBotCannotAnswerMessage' THEN value END) AS bot_cannot_answer_message,
+    MAX(CASE WHEN KEY = 'organizationRedirectIfBotCannotAnswerMessage' THEN value END) AS redirect_if_bot_cannot_answer_message,
     MAX(CASE WHEN KEY = 'organizationUseCSA' THEN value END) AS is_organization_use_csa
 FROM configuration_values;

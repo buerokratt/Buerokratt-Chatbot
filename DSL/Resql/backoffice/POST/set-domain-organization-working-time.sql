@@ -39,6 +39,7 @@ WHERE
     'organizationOutsideWorkingHoursAskForContacts',
     'organizationOutsideWorkingHoursMessage',
     'organizationBotCannotAnswerMessage',
+    'organizationRedirectIfBotCannotAnswerMessage',
     'organizationUseCSA'
     )
   AND c.deleted = FALSE
@@ -84,6 +85,7 @@ FROM (
     ('organizationOutsideWorkingHoursAskForContacts',   :organizationOutsideWorkingHoursAskForContacts),
     ('organizationOutsideWorkingHoursMessage',          :organizationOutsideWorkingHoursMessage),
     ('organizationBotCannotAnswerMessage',              :organizationBotCannotAnswerMessage),
+    ('organizationRedirectIfBotCannotAnswerMessage',    :organizationRedirectIfBotCannotAnswerMessage),
     ('organizationUseCSA',                          :organizationUseCSA)
     ) AS v(key, value)
     )
