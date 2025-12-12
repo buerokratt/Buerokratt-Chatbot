@@ -84,7 +84,7 @@ declaration:
         type: string
         description: "Body field 'organizationOutsideWorkingHoursMessage'"
       - field: domainUUID
-        type: string
+        type: object
         description: "Body field 'domainUUID'"
       - field: organizationBotCannotAnswerMessage
         type: string

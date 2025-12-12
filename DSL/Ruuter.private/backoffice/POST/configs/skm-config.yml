@@ -32,6 +32,9 @@ declaration:
       - field: inScope
         type: string
         description: "Body field 'inScope'"
+      - field: domainUUID
+        type: object
+        description: "Body field 'domainUUID'"
 
 extractRequestData:
   assign:
@@ -43,6 +46,31 @@ extractRequestData:
     skm_query_type: ${incoming.body.queryType}
     skm_semantic_configuration: ${incoming.body.semanticConfiguration}
     skm_in_scope: ${incoming.body.inScope}
+    domains: ${incoming.body.domainUUID}
+
+checkForDomains:
+  switch:
+    - condition: ${domains.length > 0}
+      next: setDomainSkmConfig
+  next: setSkmConfig
+
+setDomainSkmConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-domain-skm-config"
+    body:
+      skm_range: ${skm_range}
+      skm_documents: ${skm_documents}
+      skm_system_message: ${skm_system_message}
+      skm_max_tokens: ${skm_max_tokens}
+      skm_index_name: ${skm_index_name}
+      skm_query_type: ${skm_query_type}
+      skm_semantic_configuration: ${skm_semantic_configuration}
+      skm_in_scope: ${skm_in_scope}
+      created: ${new Date().toISOString()}
+      domains: ${JSON.stringify(domains)}
+  result: skm_result
+  next: return_result
 
 setSkmConfig:
   call: http.post
@@ -58,7 +86,8 @@ setSkmConfig:
       skm_semantic_configuration: ${skm_semantic_configuration}
       skm_in_scope: ${skm_in_scope}
       created: ${new Date().toISOString()}
-  result: return_result
+  result: skm_result
+  next: return_result
 
 return_result:
   return: 'Skm configurations changed successfully'

@@ -30,7 +30,7 @@ declaration:
         type: boolean
         description: "Body field 'isAnonymizationBeforeGlobalClassifier'" 
       - field: domainUUID
-        type: string
+        type: object
         description: "Body field 'domainUUID'"
 
 extractRequestData:

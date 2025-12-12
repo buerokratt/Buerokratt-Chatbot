@@ -62,6 +62,7 @@ getSkmConfig:
   args:
     url: "[#CHATBOT_RESQL]/get-skm-config"
   result: skm_res
+  next: assignSkmConfig
 
 assignSkmConfig:
   assign:
