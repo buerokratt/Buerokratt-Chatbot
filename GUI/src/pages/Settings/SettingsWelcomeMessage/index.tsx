@@ -27,12 +27,14 @@ const SettingsWelcomeMessage: FC = () => {
     import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
   const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
   const [loadingComplete, setLoadingComplete] = useState<boolean>(false);
+  const [key, setKey] = useState<number>(0);
 
   const [welcomeMessageActive, setWelcomeMessageActive] = useState<
     boolean | undefined
   >(undefined);
 
   useEffect(() => {
+    resetSettingsToDefault();
     if(multiDomainEnabled) {
       setLoadingComplete(true)
     } else {
@@ -48,8 +50,15 @@ const SettingsWelcomeMessage: FC = () => {
           selectedDomain
         );
 
-      setWelcomeMessageActive(data.response.isActive);
-      setWelcomeMessage(data.response.est);
+      const res = data.response;
+
+      if (res) {
+        setWelcomeMessageActive(res.isActive);
+        setWelcomeMessage(res.est);
+        setKey(key + 1);
+      } else {
+        resetSettingsToDefault();
+      }
       setLoadingComplete(true)
     } catch (error) {
       console.error('Failed to fetch greeting message', error);
@@ -143,6 +152,7 @@ const SettingsWelcomeMessage: FC = () => {
             onCheckedChange={setWelcomeMessageActive}
           />
           <FormTextarea
+            key={key}
             label={t('settings.welcomeMessage.welcomeMessage')}
             minRows={4}
             maxLength={WELCOME_MESSAGE_LENGTH}

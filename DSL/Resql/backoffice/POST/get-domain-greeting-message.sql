@@ -1,6 +1,7 @@
 WITH grouped_configurations AS (
     SELECT max(id) maxId
     FROM configuration
+    WHERE "domain" = :domainUUID::UUID
     GROUP BY key
     )
 SELECT

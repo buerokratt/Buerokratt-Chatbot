@@ -21,7 +21,7 @@ WHERE ((
     'idle_message',
     'show_auto_close_text',
     'auto_close_text')))
-  AND id IN (SELECT max (id) FROM configuration GROUP BY key)
+  AND id IN (SELECT max (id) FROM configuration where "domain" = :domainUUID::UUID GROUP BY key)
   AND NOT deleted
     )
 SELECT MAX(CASE WHEN key = 'widgetProactiveSeconds' THEN value END)            AS widget_proactive_seconds,

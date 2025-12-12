@@ -24,7 +24,7 @@ declaration:
         type: string
         description: "Body field 'isEditChatVisible'"
       - field: domainUUID
-        type: string
+        type: object
         description: "Body field 'domainUUID'"
 
 extractRequestData:
