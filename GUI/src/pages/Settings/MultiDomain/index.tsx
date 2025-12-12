@@ -1,5 +1,5 @@
-import { FC, useRef, useState } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { FC, useCallback, useEffect, useRef, useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { AxiosError } from 'axios';
@@ -25,6 +25,7 @@ const MultiDomain: FC = () => {
     },
   });
   const [initialDomains, setInitialDomains] = useState<WDomain[]>([]);
+  const [trackKey, setTrackKey] = useState<number>(0);
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -37,6 +38,7 @@ const MultiDomain: FC = () => {
         widgetDomains: JSON.stringify(data),
       }),
     onSuccess: () => {
+      setTrackKey(trackKey + 1);
       toast.open({
         type: 'success',
         title: t('global.notification'),
@@ -52,39 +54,70 @@ const MultiDomain: FC = () => {
     },
   });
 
-  useQuery({
-    queryKey: ['configs/widget-domains', 'prod'],
-    onSuccess: (data: any) => {
-      const initialData = data.response ?? [];
+  const fetchData = useCallback(async () => {
+    try {
+      const response = await apiDev.get<{response: WDomain[]}>('configs/widget-domains');
+      const domains = response.data.response ?? [];
+
       if (!hasRendered.current) {
-        setInitialDomains(initialData);
-        reset({ widgetDomains: initialData });
+        setInitialDomains(domains);
         hasRendered.current = true;
+        reset({ widgetDomains: domains });
+        return;
       }
-    },
-  });
+
+      setInitialDomains(domains);
+      reset({ widgetDomains: domains });
+
+    } catch (error) {
+      console.error('Failed to fetch domains', error);
+    }
+  }, [reset]);
 
   const handleFormSubmit = handleSubmit((data) => {
     widgetDomainsMutation.mutate(convertDomains(data.widgetDomains));
   });
 
-  const convertDomains = (newWidgets: WDomain[]) => {
-    const isSame = (a: WDomain, b: WDomain) =>
-      a.name === b.name && a.url === b.url;
+  useEffect(() => {
+    fetchData();
+  }, [fetchData, trackKey]);
 
+  const convertDomains = (newWidgets: WDomain[]) => {
     const result: WDomain[] = [];
 
-    for (const a of initialDomains) {
-      const matchInB = newWidgets.find((b) => isSame(a, b));
-      if (!matchInB) {
-        result.push({ ...a, active: false });
+    const findById = (arr: WDomain[], id: string) =>
+      arr.find((x) => x.domainId === id);
+
+    const normalizeUrl = (url: string) => (url.endsWith('/') ? url : url + '/');
+
+    for (const oldItem of initialDomains) {
+      const match = findById(newWidgets, oldItem.domainId);
+      if (!match) {
+        result.push({ ...oldItem, active: false });
       }
     }
 
-    for (const b of newWidgets) {
-      const matchInA = initialDomains.find((a) => isSame(a, b));
-      if (!matchInA) {
-        result.push({ ...b, active: true });
+    for (const newItem of newWidgets) {
+      const oldMatch = findById(initialDomains, newItem.domainId);
+
+      if (!oldMatch) {
+        result.push({
+          ...newItem,
+          url: normalizeUrl(newItem.url),
+          active: true,
+        });
+        continue;
+      }
+
+      const changed =
+        oldMatch.name !== newItem.name || oldMatch.url !== newItem.url;
+
+      if (changed) {
+        result.push({
+          ...newItem,
+          url: normalizeUrl(newItem.url),
+          active: true,
+        });
       }
     }
 
@@ -102,7 +135,10 @@ const MultiDomain: FC = () => {
           <Track gap={8} justify="end" align={'right'}>
             <Button
               appearance="secondary"
-              onClick={() => append({ name: '', url: '' , domainId: crypto.randomUUID()})}>
+              onClick={() =>
+                append({ name: '', url: '', domainId: crypto.randomUUID() })
+              }
+            >
               {t('multiDomains.addNew')}
             </Button>
             <Button onClick={handleSubmit(handleFormSubmit)}>

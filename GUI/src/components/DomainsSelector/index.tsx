@@ -22,6 +22,7 @@ const DomainSelector: FC<PropsWithChildren<DomainSelector>> = ({
   const [renderVersion, setRenderVersion] = useState(0);
   const [options, setOptions] = useState<SelectOption[]>([]);
   const [selectedOptions, setSelectedOptions] = useState<SelectOption[]>([]);
+  const reflectDomains = import.meta.env.REACT_APP_REFLECT_DOMAINS?.toLowerCase() === 'true';
 
   function mapDomainSelections(domains: DomainSelection[]): {
     options: SelectOption[];
@@ -70,7 +71,7 @@ const DomainSelector: FC<PropsWithChildren<DomainSelector>> = ({
             key={renderVersion}
             mode={'static'}
             required={false}
-            selectedOptions={selectedOptions || []}
+            selectedOptions={reflectDomains ? selectedOptions || [] : []}
             options={options || []}
             isMulti={true}
             placeholder={t('global.choose')}

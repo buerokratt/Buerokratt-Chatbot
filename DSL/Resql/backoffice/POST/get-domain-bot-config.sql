@@ -3,15 +3,15 @@ WITH configuration_values AS (
            KEY,
            value
     FROM configuration
-    WHERE KEY IN ('is_bot_active', 
-                  'is_burokratt_active', 
+    WHERE KEY IN ('is_bot_active',
+                  'is_burokratt_active',
                   'is_csa_name_visible',
                   'is_csa_title_visible',
                   'is_edit_chat_visible'
                  )
-      AND id IN (SELECT max(id) FROM configuration GROUP BY KEY)
       AND "domain" = :domainUUID::UUID
       AND NOT deleted
+      AND id IN (SELECT max(id) FROM configuration where "domain" = :domainUUID::UUID GROUP BY KEY)
 )
 SELECT
     MAX(CASE WHEN KEY = 'is_bot_active' THEN value END) AS is_bot_active,

@@ -21,7 +21,7 @@ declaration:
         type: string
         description: "Body field 'isEmergencyNoticeVisible'"
       - field: domainUUID
-        type: string
+        type: object
         description: "Body field 'domainUUID'"
 
 extractRequestData:
