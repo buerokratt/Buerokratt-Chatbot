@@ -147,10 +147,10 @@ const MultiDomain: FC = () => {
           </Track>
         }
       >
-        {fields.map((_, index) => (
+        {fields.map((field, index) => (
           <Track
             gap={10}
-            key={index}
+            key={field.id}
             direction="horizontal"
             justify="start"
             style={{ marginBottom: '15px' }}
