@@ -68,7 +68,7 @@ check_value:
     - condition: ${correct_value === 'ERROR'}
       next: return_value
     - condition: ${correct_value.map((item) => item.text)[0] === '$backoffice' || correct_value.map((item) => item.text)[0].startsWith('$backoffice')}
-      next: get_organization_base_config
+      next: check_base_config_domain
     - condition: ${correct_value.map((item) => item.text)[0].startsWith('$validate_')}
       next: assign_validation_event
     - condition: ${correct_value.map((item) => item.text)[0] === '$general_knowledge' || correct_value.map((item) => item.text)[0].startsWith('$general_knowledge')}
@@ -86,6 +86,36 @@ trigger_bgk_bot:
   result: bgk_bot_response
   error: return_bad_request
   next: end
+
+check_base_config_domain:
+  switch:
+    - condition: ${domain === 'none'}
+      next: get_organization_base_config
+  next: getDomainUUID
+
+getDomainUUID:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-uuid"
+    body:
+      domainUrl: ${domain + '%'}
+  result: domainUuid
+  next: validate_domain_res
+
+validate_domain_res:
+  switch:
+    - condition: ${domainUuid.response.body.length > 0}
+      next: get_domain_organization_base_config
+  next: get_organization_base_config
+
+get_domain_organization_base_config:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-organization-base-config"
+    body:
+      domainUUID: ${domainUuid.response.body[0].domainId}
+  result: org_base_config_res
+  next: assign_organization_base_config
 
 get_organization_base_config:
   call: http.post
@@ -109,7 +139,31 @@ check_if_organization_is_available_all_time:
   switch:
     - condition: ${base_config.isAvailableAllTime === 'true'}
       next: get_all_available_csas
+  next: check_domain_organization_working_hours
+
+check_domain_organization_working_hours:
+  switch:
+    - condition: ${domain === 'none'}
+      next: get_organization_working_details
+  next: validate_domain
+
+validate_domain:
+  switch:
+    - condition: ${domainUuid.response.body.length > 0}
+      next: get_domain_organization_working_details
   next: get_organization_working_details
+
+get_domain_organization_working_details:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-is-domain-organization-available"
+    body:
+      holidays: ${holidays}
+      holiday_names: ${holidayNames}
+      current_timestamp: ${new Date().toISOString()}
+      domain: ${domainUuid.response.body[0].domainId}
+  result: org_res
+  next: assign_organization_details
 
 get_organization_working_details:
   call: http.post
