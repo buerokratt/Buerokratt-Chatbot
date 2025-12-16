@@ -131,6 +131,7 @@ const MultiDomain: FC = () => {
       <h1 style={{ paddingBottom: 16 }}>{t('multiDomains.title')}</h1>
 
       <Card
+        isScrollable={true}
         footer={
           <Track gap={8} justify="end" align={'right'}>
             <Button
@@ -162,7 +163,7 @@ const MultiDomain: FC = () => {
                 <FormInput
                   label={`${index + 1}. ${t('multiDomains.domainName')}`}
                   className="inline-form"
-                  style={{ width: '500px' }}
+                  style={{ maxWidth: '500px' }}
                   {...field}
                 />
               )}
@@ -174,7 +175,7 @@ const MultiDomain: FC = () => {
                 <FormInput
                   label="URL"
                   className="inline-form"
-                  style={{ width: '500px' }}
+                  style={{ maxWidth: '500px' }}
                   {...field}
                 />
               )}
