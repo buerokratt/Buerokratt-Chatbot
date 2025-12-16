@@ -136,13 +136,13 @@ check_if_bot_is_unable_to_reply:
     - condition: ${post_message_to_bot_result.response.body?.[0]?.text == 'UNKNOWN'}
       next: check_if_client_bot_is_active
     - condition: ${post_message_to_bot_result.response.body?.[0]?.text == 'Suunan teid klienditeenindajale. Varuge natukene kannatust.'}
-      next: get_organization_base_config
+      next: check_base_config_domain
     - condition: ${post_message_to_bot_result.response.body?.[0]?.text == 'Suunan vestluse nõustajale. Palun oodake.'}
-      next: get_organization_base_config
+      next: check_base_config_domain
     - condition: ${post_message_to_bot_result.response.body?.[0]?.text == 'Suunan teid klienditeenindajale. Palun oodake.'}
-      next: get_organization_base_config
+      next: check_base_config_domain
     - condition: ${post_message_to_bot_result.response.body?.[0]?.text == 'Suunan teid riigiinfo konsultandile. Varuge natukene kannatust.'}
-      next: get_organization_base_config
+      next: check_base_config_domain
     - condition: ${post_message_to_bot_result.response.body?.[0]?.text.startsWith("#common_service") || post_message_to_bot_result.response.body?.[0]?.text.startsWith("#service")}
       next: assign_service_content_from_bot_response
   next: extract_bot_responses
@@ -230,6 +230,36 @@ check_if_user_wants_csa:
   result: post_message_to_bot_result
   next: check_for_post_message_to_bot_result
 
+check_base_config_domain:
+  switch:
+    - condition: ${domain === 'none'}
+      next: get_organization_base_config
+  next: getDomainUUID
+
+getDomainUUID:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-uuid"
+    body:
+      domainUrl: ${domain + '%'}
+  result: domainUuid
+  next: validate_domain_res
+
+validate_domain_res:
+  switch:
+    - condition: ${domainUuid.response.body.length > 0}
+      next: get_domain_organization_base_config
+  next: get_organization_base_config
+
+get_domain_organization_base_config:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-organization-base-config"
+    body:
+      domainUUID: ${domainUuid.response.body[0].domainId}
+  result: org_base_config_res
+  next: assign_organization_base_config
+
 get_organization_base_config:
   call: http.post
   args:
@@ -252,7 +282,31 @@ check_if_organization_is_available_all_time:
   switch:
     - condition: ${base_config.isAvailableAllTime === 'true'}
       next: get_all_available_csas
+  next: check_domain_organization_working_hours
+
+check_domain_organization_working_hours:
+  switch:
+    - condition: ${domain === 'none'}
+      next: get_organization_working_details
+  next: validate_domain
+
+validate_domain:
+  switch:
+    - condition: ${domainUuid.response.body.length > 0}
+      next: get_domain_organization_working_details
   next: get_organization_working_details
+
+get_domain_organization_working_details:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-is-organization-available"
+    body:
+      holidays: ${holidays}
+      holiday_names: ${holidayNames}
+      current_timestamp: ${new Date().toISOString()}
+      domain: ${domainUuid.response.body[0].domainId}
+  result: org_res
+  next: assign_organization_details
 
 get_organization_working_details:
   call: http.post
