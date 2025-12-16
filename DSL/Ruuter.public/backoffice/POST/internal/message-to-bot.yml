@@ -299,7 +299,7 @@ validate_domain:
 get_domain_organization_working_details:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/get-is-organization-available"
+    url: "[#CHATBOT_RESQL]/get-is-domain-organization-available"
     body:
       holidays: ${holidays}
       holiday_names: ${holidayNames}
