@@ -25,7 +25,7 @@ jobs:
       - name: Install dependencies
         run: |
           cd ${{ inputs.working_directory }}
-          npm ci
+          npm ci --legacy-peer-deps
       # Use env var to prevent script injection
       - name: Run command
         env:
