@@ -23,11 +23,11 @@ jobs:
           cache: npm
           cache-dependency-path: ${{ inputs.working_directory }}/package-lock.json
       - name: Install dependencies
-        run: |
-          cd ${{ inputs.working_directory }}
-          npm ci --legacy-peer-deps
+        run: npm ci --legacy-peer-deps
+        working-directory: ${{ inputs.working_directory }}
       # Use env var to prevent script injection
       - name: Run command
         env:
           COMMAND: ${{ inputs.command }}
-        run: cd ${{ inputs.working_directory }} && $COMMAND
+        run: $COMMAND
+        working-directory: ${{ inputs.working_directory }}
