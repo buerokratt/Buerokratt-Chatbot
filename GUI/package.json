@@ -94,6 +94,10 @@
     "vite-plugin-transform": "^2.0.1",
     "vite-tsconfig-paths": "^4.0.3"
   },
+  "engines": {
+    "node": "^22.18.0",
+    "npm": "^10.9.3"
+  },
   "browserslist": {
     "production": [
       ">0.2%",
