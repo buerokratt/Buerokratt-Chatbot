@@ -5,6 +5,10 @@ on:
       command:
         required: true
         type: string
+      working_directory:
+        required: true
+        type: string
+        description: 'Working directory (e.g., GUI, notification-server)'
 
 jobs:
   run-check:
@@ -15,12 +19,15 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version-file: "GUI/package.json"
+          node-version-file: '${{ inputs.working_directory }}/package.json'
           cache: npm
-          cache-dependency-path: GUI/package-lock.json
-      - run: cd GUI && npm ci --legacy-peer-deps
+          cache-dependency-path: ${{ inputs.working_directory }}/package-lock.json
+      - name: Install dependencies
+        run: |
+          cd ${{ inputs.working_directory }}
+          npm ci
       # Use env var to prevent script injection
       - name: Run command
         env:
           COMMAND: ${{ inputs.command }}
-        run: cd GUI && $COMMAND
+        run: cd ${{ inputs.working_directory }} && $COMMAND

@@ -4,11 +4,13 @@ on:
     branches: [main, dev]
     paths:
       - "GUI/**"
+      - "notification-server/**"
       - ".github/**"
   pull_request:
     types: [opened, ready_for_review, reopened, synchronize]
     paths:
       - "GUI/**"
+      - "notification-server/**"
       - ".github/**"
 concurrency:
   group: ${{ github.ref }}-checks
@@ -18,21 +20,25 @@ jobs:
   frontend-format:
     uses: ./.github/workflows/run-check.yml
     with:
+      working_directory: GUI
       command: npm run format
 
   frontend-lint:
     uses: ./.github/workflows/run-check.yml
     with:
+      working_directory: GUI
       command: npm run lint
 
   frontend-test:
     uses: ./.github/workflows/run-check.yml
     with:
+      working_directory: GUI
       command: npm run test:run
 
   frontend-typecheck:
     uses: ./.github/workflows/run-check.yml
     with:
+      working_directory: GUI
       command: npm run typecheck
 
   frontend-build:
@@ -42,3 +48,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: cd GUI && docker image build .
+
+  notification-server-format:
+    uses: ./.github/workflows/run-check.yml
+    with:
+      working_directory: notification-server
+      command: npm run format
+
+  notification-server-lint:
+    uses: ./.github/workflows/run-check.yml
+    with:
+      working_directory: notification-server
+      command: npm run lint
+
+  notification-server-test:
+    uses: ./.github/workflows/run-check.yml
+    with:
+      working_directory: notification-server
+      command: npm run test:run
