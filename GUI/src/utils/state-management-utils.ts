@@ -1,5 +1,5 @@
-import { CHAT_EVENTS } from "types/chat";
-import { Message } from "types/message";
+import { CHAT_EVENTS } from 'types/chat';
+import { Message } from 'types/message';
 
 export const isStateChangingEventMessage = (msg: Message): boolean =>
   msg.event === CHAT_EVENTS.GREETING ||

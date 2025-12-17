@@ -3,70 +3,32 @@ import { dateToLocalExcludingDST, dateToUTCExcludingDST } from 'utils/convert-da
 
 export function getOrganizationTimeData(data: OrganizationWorkingTime) {
   return {
-    organizationMondayWorkingTimeStartISO: dateToLocalExcludingDST(
-      data.organizationMondayWorkingTimeStartISO
-    ),
-    organizationMondayWorkingTimeEndISO: dateToLocalExcludingDST(
-      data.organizationMondayWorkingTimeEndISO
-    ),
-    organizationTuesdayWorkingTimeStartISO: dateToLocalExcludingDST(
-      data.organizationTuesdayWorkingTimeStartISO
-    ),
-    organizationTuesdayWorkingTimeEndISO: dateToLocalExcludingDST(
-      data.organizationTuesdayWorkingTimeEndISO
-    ),
-    organizationWednesdayWorkingTimeStartISO: dateToLocalExcludingDST(
-      data.organizationWednesdayWorkingTimeStartISO
-    ),
-    organizationWednesdayWorkingTimeEndISO: dateToLocalExcludingDST(
-      data.organizationWednesdayWorkingTimeEndISO
-    ),
-    organizationThursdayWorkingTimeStartISO: dateToLocalExcludingDST(
-      data.organizationThursdayWorkingTimeStartISO
-    ),
-    organizationThursdayWorkingTimeEndISO: dateToLocalExcludingDST(
-      data.organizationThursdayWorkingTimeEndISO
-    ),
-    organizationFridayWorkingTimeStartISO: dateToLocalExcludingDST(
-      data.organizationFridayWorkingTimeStartISO
-    ),
-    organizationFridayWorkingTimeEndISO: dateToLocalExcludingDST(
-      data.organizationFridayWorkingTimeEndISO
-    ),
-    organizationSaturdayWorkingTimeStartISO: dateToLocalExcludingDST(
-      data.organizationSaturdayWorkingTimeStartISO
-    ),
-    organizationSaturdayWorkingTimeEndISO: dateToLocalExcludingDST(
-      data.organizationSaturdayWorkingTimeEndISO
-    ),
-    organizationSundayWorkingTimeStartISO: dateToLocalExcludingDST(
-      data.organizationSundayWorkingTimeStartISO
-    ),
-    organizationSundayWorkingTimeEndISO: dateToLocalExcludingDST(
-      data.organizationSundayWorkingTimeEndISO
-    ),
-    organizationAllWeekdaysTimeStartISO: dateToLocalExcludingDST(
-      data.organizationAllWeekdaysTimeStartISO
-    ),
-    organizationAllWeekdaysTimeEndISO: dateToLocalExcludingDST(
-      data.organizationAllWeekdaysTimeEndISO
-    ),
-    organizationClosedOnWeekEnds:
-      data.organizationClosedOnWeekEnds.toString() === 'true',
-    organizationTheSameOnAllWorkingDays:
-      data.organizationTheSameOnAllWorkingDays.toString() === 'true',
-    organizationWorkingTimeNationalHolidays:
-      data.organizationWorkingTimeNationalHolidays.toString() === 'true',
+    organizationMondayWorkingTimeStartISO: dateToLocalExcludingDST(data.organizationMondayWorkingTimeStartISO),
+    organizationMondayWorkingTimeEndISO: dateToLocalExcludingDST(data.organizationMondayWorkingTimeEndISO),
+    organizationTuesdayWorkingTimeStartISO: dateToLocalExcludingDST(data.organizationTuesdayWorkingTimeStartISO),
+    organizationTuesdayWorkingTimeEndISO: dateToLocalExcludingDST(data.organizationTuesdayWorkingTimeEndISO),
+    organizationWednesdayWorkingTimeStartISO: dateToLocalExcludingDST(data.organizationWednesdayWorkingTimeStartISO),
+    organizationWednesdayWorkingTimeEndISO: dateToLocalExcludingDST(data.organizationWednesdayWorkingTimeEndISO),
+    organizationThursdayWorkingTimeStartISO: dateToLocalExcludingDST(data.organizationThursdayWorkingTimeStartISO),
+    organizationThursdayWorkingTimeEndISO: dateToLocalExcludingDST(data.organizationThursdayWorkingTimeEndISO),
+    organizationFridayWorkingTimeStartISO: dateToLocalExcludingDST(data.organizationFridayWorkingTimeStartISO),
+    organizationFridayWorkingTimeEndISO: dateToLocalExcludingDST(data.organizationFridayWorkingTimeEndISO),
+    organizationSaturdayWorkingTimeStartISO: dateToLocalExcludingDST(data.organizationSaturdayWorkingTimeStartISO),
+    organizationSaturdayWorkingTimeEndISO: dateToLocalExcludingDST(data.organizationSaturdayWorkingTimeEndISO),
+    organizationSundayWorkingTimeStartISO: dateToLocalExcludingDST(data.organizationSundayWorkingTimeStartISO),
+    organizationSundayWorkingTimeEndISO: dateToLocalExcludingDST(data.organizationSundayWorkingTimeEndISO),
+    organizationAllWeekdaysTimeStartISO: dateToLocalExcludingDST(data.organizationAllWeekdaysTimeStartISO),
+    organizationAllWeekdaysTimeEndISO: dateToLocalExcludingDST(data.organizationAllWeekdaysTimeEndISO),
+    organizationClosedOnWeekEnds: data.organizationClosedOnWeekEnds.toString() === 'true',
+    organizationTheSameOnAllWorkingDays: data.organizationTheSameOnAllWorkingDays.toString() === 'true',
+    organizationWorkingTimeNationalHolidays: data.organizationWorkingTimeNationalHolidays.toString() === 'true',
     organizationWorkingTimeWeekdays: data.organizationWorkingTimeWeekdays ?? [],
-    organizationWorkingAllTime:
-      data.organizationWorkingAllTime.toString() === 'true',
-    organizationNoCsaAskForContacts:
-      data.organizationNoCsaAskForContacts.toString() === 'true',
+    organizationWorkingAllTime: data.organizationWorkingAllTime.toString() === 'true',
+    organizationNoCsaAskForContacts: data.organizationNoCsaAskForContacts.toString() === 'true',
     organizationNoCsaAvailableMessage: data.organizationNoCsaAvailableMessage,
     organizationOutsideWorkingHoursAskForContacts:
       data.organizationOutsideWorkingHoursAskForContacts.toString() === 'true',
-    organizationOutsideWorkingHoursMessage:
-      data.organizationOutsideWorkingHoursMessage,
+    organizationOutsideWorkingHoursMessage: data.organizationOutsideWorkingHoursMessage,
     organizationBotCannotAnswerMessage: data.organizationBotCannotAnswerMessage,
     organizationRedirectIfBotCannotAnswerMessage: data.organizationRedirectIfBotCannotAnswerMessage,
     organizationUseCSA: data.organizationUseCSA.toString() === 'true',
@@ -87,21 +49,17 @@ export function setOrganizationTimeData(data: OrganizationWorkingTime) {
   return {
     ...adjustedTimeFields,
     organizationClosedOnWeekEnds: data.organizationClosedOnWeekEnds.toString(),
-    organizationTheSameOnAllWorkingDays:
-      data.organizationTheSameOnAllWorkingDays.toString() ?? false,
-    organizationWorkingTimeNationalHolidays:
-      data.organizationWorkingTimeNationalHolidays.toString(),
+    organizationTheSameOnAllWorkingDays: data.organizationTheSameOnAllWorkingDays.toString() ?? false,
+    organizationWorkingTimeNationalHolidays: data.organizationWorkingTimeNationalHolidays.toString(),
     organizationWorkingTimeWeekdays: data.organizationWorkingTimeWeekdays ?? ['monday'],
     organizationWorkingAllTime: data.organizationWorkingAllTime.toString() ?? false,
-    organizationNoCsaAskForContacts:
-      data.organizationNoCsaAskForContacts.toString(),
-    organizationOutsideWorkingHoursAskForContacts:
-      data.organizationOutsideWorkingHoursAskForContacts.toString(),
+    organizationNoCsaAskForContacts: data.organizationNoCsaAskForContacts.toString(),
+    organizationOutsideWorkingHoursAskForContacts: data.organizationOutsideWorkingHoursAskForContacts.toString(),
     organizationUseCSA: data.organizationUseCSA.toString() ?? true,
   };
 }
 
-export const getDefaultValues = () :OrganizationWorkingTime => {
+export const getDefaultValues = (): OrganizationWorkingTime => {
   return {
     organizationMondayWorkingTimeStartISO: new Date(),
     organizationMondayWorkingTimeEndISO: new Date(),
@@ -130,6 +88,6 @@ export const getDefaultValues = () :OrganizationWorkingTime => {
     organizationOutsideWorkingHoursMessage: '',
     organizationBotCannotAnswerMessage: '',
     organizationRedirectIfBotCannotAnswerMessage: '',
-    organizationUseCSA: false
-  }
-}
+    organizationUseCSA: false,
+  };
+};

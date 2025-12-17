@@ -1,10 +1,8 @@
+import { Track } from 'components';
+import withAuthorization from 'hoc/with-authorization';
 import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import withAuthorization from 'hoc/with-authorization';
-
 import { ROLES } from 'utils/constants';
-
-import { Track } from 'components';
 
 const LandingPage: FC = () => {
   const { t } = useTranslation();

@@ -17,7 +17,7 @@
     background-color: get-color(black-coral-6);
     position: relative;
 
-    &[aria-checked=true] {
+    &[aria-checked='true'] {
       background-color: get-color(sapphire-blue-4);
 
       #{$self} {
@@ -40,6 +40,6 @@
     left: 0;
     top: 50%;
     transform: translateY(-50%);
-    transition: all .25s ease-out;
+    transition: all 0.25s ease-out;
   }
 }

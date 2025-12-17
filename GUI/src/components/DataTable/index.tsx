@@ -1,35 +1,29 @@
-import React, { CSSProperties, FC, ReactNode, useId } from 'react';
-import {
-  ColumnDef,
-  useReactTable,
-  getCoreRowModel,
-  flexRender,
-  getSortedRowModel,
-  SortingState,
-  FilterFn,
-  getFilteredRowModel,
-  VisibilityState,
-  getPaginationRowModel,
-  PaginationState,
-  TableMeta,
-  Row,
-  RowData,
-  ColumnFiltersState,
-  ColumnPinningState,
-} from '@tanstack/react-table';
 import { RankingInfo, rankItem } from '@tanstack/match-sorter-utils';
 import {
-  MdUnfoldMore,
-  MdExpandMore,
-  MdExpandLess,
-  MdOutlineEast,
-  MdOutlineWest,
-} from 'react-icons/md';
+  ColumnDef,
+  ColumnFiltersState,
+  ColumnPinningState,
+  FilterFn,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  PaginationState,
+  Row,
+  RowData,
+  SortingState,
+  TableMeta,
+  useReactTable,
+  VisibilityState,
+} from '@tanstack/react-table';
 import clsx from 'clsx';
-import { Link, useSearchParams } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-
 import { Icon, Track } from 'components';
+import React, { CSSProperties, FC, ReactNode, useId } from 'react';
+import { useTranslation } from 'react-i18next';
+import { MdExpandLess, MdExpandMore, MdOutlineEast, MdOutlineWest, MdUnfoldMore } from 'react-icons/md';
+import { Link, useSearchParams } from 'react-router-dom';
+
 import Filter from './Filter';
 import './DataTable.scss';
 
@@ -171,10 +165,7 @@ const DataTable: FC<DataTableProps> = ({
     const pageOffset = 2;
     const currentPage = table.getState().pagination.pageIndex;
     const startPage = Math.max(0, currentPage - pageOffset);
-    const endPage = Math.min(
-      table.getPageCount() - 1,
-      currentPage + pageOffset
-    );
+    const endPage = Math.min(table.getPageCount() - 1, currentPage + pageOffset);
     const pages = [];
     for (let i = startPage; i <= endPage; i++) {
       pages.push(i);
@@ -188,9 +179,7 @@ const DataTable: FC<DataTableProps> = ({
 
   return (
     <>
-      <div className="data-table__scrollWrapper"
-           style={{ overflowX: noOverflowX ? "hidden" : "auto" }}
-      >
+      <div className="data-table__scrollWrapper" style={{ overflowX: noOverflowX ? 'hidden' : 'auto' }}>
         <table className="data-table">
           {!disableHead && (
             <thead>
@@ -201,9 +190,7 @@ const DataTable: FC<DataTableProps> = ({
                       key={header.id}
                       style={{
                         width: header.column.columnDef.meta?.size,
-                        position: header.column.columnDef.meta?.sticky
-                          ? 'sticky'
-                          : undefined,
+                        position: header.column.columnDef.meta?.sticky ? 'sticky' : undefined,
                         left:
                           header.column.columnDef.meta?.sticky === 'left'
                             ? `${header.column.getAfter('left') * 0.675}px`
@@ -219,34 +206,16 @@ const DataTable: FC<DataTableProps> = ({
                       {header.isPlaceholder ? null : (
                         <Track gap={8}>
                           {sortable && header.column.getCanSort() && (
-                            <button
-                              onClick={header.column.getToggleSortingHandler()}
-                            >
+                            <button onClick={header.column.getToggleSortingHandler()}>
                               {{
-                                asc: (
-                                  <Icon
-                                    icon={<MdExpandMore fontSize={20} />}
-                                    size="medium"
-                                  />
-                                ),
-                                desc: (
-                                  <Icon
-                                    icon={<MdExpandLess fontSize={20} />}
-                                    size="medium"
-                                  />
-                                ),
+                                asc: <Icon icon={<MdExpandMore fontSize={20} />} size="medium" />,
+                                desc: <Icon icon={<MdExpandLess fontSize={20} />} size="medium" />,
                               }[header.column.getIsSorted() as string] ?? (
-                                <Icon
-                                  icon={<MdUnfoldMore fontSize={22} />}
-                                  size="medium"
-                                />
+                                <Icon icon={<MdUnfoldMore fontSize={22} />} size="medium" />
                               )}
                             </button>
                           )}
-                          {flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          {flexRender(header.column.columnDef.header, header.getContext())}
                           {filterable && header.column.getCanFilter() && (
                             <Filter column={header.column} table={table} />
                           )}
@@ -271,9 +240,7 @@ const DataTable: FC<DataTableProps> = ({
                     key={cell.id}
                     className={selectedRow?.(row) ? 'highlighted' : 'default'}
                     style={{
-                      position: cell.column.columnDef.meta?.sticky
-                        ? 'sticky'
-                        : undefined,
+                      position: cell.column.columnDef.meta?.sticky ? 'sticky' : undefined,
                       left:
                         cell.column.columnDef.meta?.sticky === 'left'
                           ? `${cell.column.getAfter('left') * 0.675}px`
@@ -295,18 +262,14 @@ const DataTable: FC<DataTableProps> = ({
       </div>
       {pagination && (
         <div className="data-table__pagination-wrapper">
-          {table.getPageCount() * table.getState().pagination.pageSize >
-            table.getState().pagination.pageSize && (
+          {table.getPageCount() * table.getState().pagination.pageSize > table.getState().pagination.pageSize && (
             <div className="data-table__pagination">
               <button
                 className="previous"
                 onClick={() => {
                   table.previousPage();
                   setSearchParams((params) => {
-                    params.set(
-                      'page',
-                      String(Number(searchParams.get('page') ?? '1') - 1)
-                    );
+                    params.set('page', String(Number(searchParams.get('page') ?? '1') - 1));
                     return params;
                   });
                 }}
@@ -314,10 +277,7 @@ const DataTable: FC<DataTableProps> = ({
               >
                 <MdOutlineWest />
               </button>
-              <nav
-                role="navigation"
-                aria-label={t('global.paginationNavigation') ?? ''}
-              >
+              <nav role="navigation" aria-label={t('global.paginationNavigation') ?? ''}>
                 <ul className="links">
                   {pageIndexes[0] > 0 && (
                     <>
@@ -332,9 +292,7 @@ const DataTable: FC<DataTableProps> = ({
                             });
                           }}
                           aria-label={t('global.gotoPage') + 0}
-                          aria-current={
-                            table.getState().pagination.pageIndex === 0
-                          }
+                          aria-current={table.getState().pagination.pageIndex === 0}
                         >
                           1
                         </Link>
@@ -350,24 +308,18 @@ const DataTable: FC<DataTableProps> = ({
                       })}
                     >
                       <Link
-                        to={`?page=${
-                          index + 1
-                        }&${searchParamsWithoutPage.toString()}`}
+                        to={`?page=${index + 1}&${searchParamsWithoutPage.toString()}`}
                         onClick={() => table.setPageIndex(index)}
                         aria-label={t('global.gotoPage') + index}
-                        aria-current={
-                          table.getState().pagination.pageIndex === index
-                        }
+                        aria-current={table.getState().pagination.pageIndex === index}
                       >
                         {index + 1}
                       </Link>
                     </li>
                   ))}
-                  {pageIndexes[pageIndexes.length - 1] <
-                    table.getPageCount() - 1 && (
+                  {pageIndexes[pageIndexes.length - 1] < table.getPageCount() - 1 && (
                     <>
-                      {pageIndexes[pageIndexes.length - 1] <
-                        table.getPageCount() - 2 && <li>...</li>}
+                      {pageIndexes[pageIndexes.length - 1] < table.getPageCount() - 2 && <li>...</li>}
                       <li key={`${id}-${table.getPageCount() - 1}`}>
                         <Link
                           to={`?page=${table.getPageCount()}&${searchParamsWithoutPage.toString()}`}
@@ -378,13 +330,8 @@ const DataTable: FC<DataTableProps> = ({
                               return params;
                             });
                           }}
-                          aria-label={
-                            t('global.gotoPage') + (table.getPageCount() - 1)
-                          }
-                          aria-current={
-                            table.getState().pagination.pageIndex ===
-                            table.getPageCount() - 1
-                          }
+                          aria-label={t('global.gotoPage') + (table.getPageCount() - 1)}
+                          aria-current={table.getState().pagination.pageIndex === table.getPageCount() - 1}
                         >
                           {table.getPageCount()}
                         </Link>
@@ -398,10 +345,7 @@ const DataTable: FC<DataTableProps> = ({
                 onClick={() => {
                   table.nextPage();
                   setSearchParams((params) => {
-                    params.set(
-                      'page',
-                      String(Number(searchParams.get('page') ?? '1') + 1)
-                    );
+                    params.set('page', String(Number(searchParams.get('page') ?? '1') + 1));
                     return params;
                   });
                 }}

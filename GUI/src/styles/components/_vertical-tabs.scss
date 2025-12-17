@@ -23,7 +23,7 @@
     display: flex;
     flex-direction: column;
 
-    &[data-state="inactive"] {
+    &[data-state='inactive'] {
       display: none;
     }
   }
@@ -68,7 +68,7 @@
     color: get-color(sapphire-blue-20);
 
     &.active {
-      background-color: #FCEEEE;
+      background-color: #fceeee;
       box-shadow: inset 0 0 0 1px get-color(jasper-10);
       animation: blink-animation 0.5s steps(100, start) 3;
       -webkit-animation: blink-animation 0.5s steps(100, start) 3;
@@ -79,12 +79,12 @@
       }
       @-webkit-keyframes blink-animation {
         to {
-          background: #FCEEEE;
+          background: #fceeee;
         }
       }
     }
 
-    &[aria-selected=true] {
+    &[aria-selected='true'] {
       color: get-color(sapphire-blue-10);
       background-color: get-color(white);
 

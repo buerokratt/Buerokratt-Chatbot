@@ -47,8 +47,6 @@ export const usersData = [
     lastName: null,
     idCode: 'EE49209110848',
     displayName: 'Janina',
-    authorities: [
-      'ROLE_ADMINISTRATOR',
-    ],
+    authorities: ['ROLE_ADMINISTRATOR'],
   },
 ];
