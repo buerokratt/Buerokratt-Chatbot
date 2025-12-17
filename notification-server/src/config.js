@@ -5,7 +5,7 @@ module.exports = {
     notificationIndex: 'notifications',
     chatQueueIndex: 'chatqueue',
     ssl: {
-      rejectUnauthorized: false 
+      rejectUnauthorized: false,
     },
     getUrl: () => {
       const protocol = process.env.OPENSEARCH_PROTOCOL || 'https';
@@ -13,8 +13,8 @@ module.exports = {
       const password = process.env.OPENSEARCH_PASSWORD || 'admin';
       const host = process.env.OPENSEARCH_HOST || 'host.docker.internal';
       const port = process.env.OPENSEARCH_PORT || '9200';
-            
-      return `${protocol}://${username}:${password}@${host}:${port}`
+
+      return `${protocol}://${username}:${password}@${host}:${port}`;
     },
     retry_on_conflict: 6,
   },
@@ -24,5 +24,3 @@ module.exports = {
     queueRefreshInterval: process.env.QUEUE_REFRESH_INTERVAL || 2000,
   },
 };
-
-
