@@ -33,7 +33,6 @@ import SettingsFeedback from 'pages/Settings/SettingsFeedback';
 
 import { getWidgetData } from './services/users';
 
-
 const App: FC = () => {
   const multiDomainEnabled = import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
 
