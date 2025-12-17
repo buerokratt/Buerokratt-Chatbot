@@ -1,0 +1,22 @@
+name: Run check
+on:
+  workflow_call:
+    inputs:
+      command:
+        required: true
+        type: string
+
+jobs:
+  run-check:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: "GUI/package.json"
+          cache: npm
+          cache-dependency-path: GUI/package-lock.json
+      - run: cd GUI && npm ci --legacy-peer-deps
+      - run: cd GUI && ${{ inputs.command }}
