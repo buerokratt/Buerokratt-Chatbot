@@ -15,4 +15,6 @@ const Box = forwardRef<HTMLDivElement, PropsWithChildren<BoxProps>>(({ color = '
   );
 });
 
+Box.displayName = 'Box';
+
 export default Box;
