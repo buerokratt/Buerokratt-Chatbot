@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 const config = require('./config.js');
 
 describe('config', () => {

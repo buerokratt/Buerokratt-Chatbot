@@ -1,6 +1,7 @@
 const { Client } = require('@opensearch-project/opensearch');
-const { openSearchConfig } = require('./config');
+
 const { streamAzureOpenAIResponse } = require('./azureOpenAI');
+const { openSearchConfig } = require('./config');
 const { activeConnections } = require('./connectionManager');
 const streamQueue = require('./streamQueue');
 

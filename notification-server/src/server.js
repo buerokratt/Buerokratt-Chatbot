@@ -1,16 +1,17 @@
-const express = require('express');
-const cors = require('cors');
-const { buildSSEResponse } = require('./sseUtil');
-const { serverConfig } = require('./config');
-const { buildNotificationSearchInterval, buildQueueCounter } = require('./addOns');
-const { enqueueChatId, dequeueChatId, sendBulkNotification, createAzureOpenAIStreamRequest } = require('./openSearch');
-const { addToTerminationQueue, removeFromTerminationQueue } = require('./terminationQueue');
-const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
+const cors = require('cors');
 const csurf = require('csurf');
+const express = require('express');
+const helmet = require('helmet');
+
+const { buildNotificationSearchInterval, buildQueueCounter } = require('./addOns');
 const { initializeAzureOpenAI } = require('./azureOpenAI');
-const streamQueue = require('./streamQueue');
+const { serverConfig } = require('./config');
 const { addToLogoutQueue, removeFromLogoutQueue } = require('./logoutQueue');
+const { enqueueChatId, dequeueChatId, sendBulkNotification, createAzureOpenAIStreamRequest } = require('./openSearch');
+const { buildSSEResponse } = require('./sseUtil');
+const streamQueue = require('./streamQueue');
+const { addToTerminationQueue, removeFromTerminationQueue } = require('./terminationQueue');
 
 const app = express();
 
