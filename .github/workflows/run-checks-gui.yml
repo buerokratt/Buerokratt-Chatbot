@@ -1,19 +1,19 @@
-name: Run checks
+name: Run GUI checks
 on:
   push:
     branches: [main, dev]
     paths:
       - "GUI/**"
-      - "notification-server/**"
-      - ".github/**"
+      - ".github/workflows/run-check.yml"
+      - ".github/workflows/run-checks-gui.yml"
   pull_request:
     types: [opened, ready_for_review, reopened, synchronize]
     paths:
       - "GUI/**"
-      - "notification-server/**"
-      - ".github/**"
+      - ".github/workflows/run-check.yml"
+      - ".github/workflows/run-checks-gui.yml"
 concurrency:
-  group: ${{ github.ref }}-checks
+  group: ${{ github.ref }}-checks-gui
   cancel-in-progress: true
 
 jobs:
@@ -47,22 +47,5 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - run: cd GUI && docker image build .
-
-  notification-server-format:
-    uses: ./.github/workflows/run-check.yml
-    with:
-      working_directory: notification-server
-      command: npm run format
-
-  notification-server-lint:
-    uses: ./.github/workflows/run-check.yml
-    with:
-      working_directory: notification-server
-      command: npm run lint
-
-  notification-server-test:
-    uses: ./.github/workflows/run-check.yml
-    with:
-      working_directory: notification-server
-      command: npm run test:run
+      - run: docker image build .
+        working-directory: GUI
