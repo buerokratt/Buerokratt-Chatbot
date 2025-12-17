@@ -19,4 +19,8 @@ jobs:
           cache: npm
           cache-dependency-path: GUI/package-lock.json
       - run: cd GUI && npm ci --legacy-peer-deps
-      - run: cd GUI && ${{ inputs.command }}
+      # Use env var to prevent script injection
+      - name: Run command
+        env:
+          COMMAND: ${{ inputs.command }}
+        run: cd GUI && $COMMAND
