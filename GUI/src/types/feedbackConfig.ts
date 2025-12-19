@@ -3,4 +3,5 @@ export interface FeedbackConfig {
   feedbackQuestion: string;
   feedbackNoticeActive: boolean;
   feedbackNotice: string;
+  domainUUID?: string[];
 }
