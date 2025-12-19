@@ -1,7 +1,5 @@
-import { FC, useEffect, useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import { useTranslation } from 'react-i18next';
-
 import {
   Button,
   Card,
@@ -13,18 +11,17 @@ import {
   IconSwitch,
   Track,
 } from 'components';
-import { useMutation } from '@tanstack/react-query';
-import { useToast } from 'hooks/useToast';
-import { apiDev } from 'services/api';
 import withAuthorization from 'hoc/with-authorization';
+import { useToast } from 'hooks/useToast';
+import { FC, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { apiDev } from 'services/api';
+import { AnonymizerConfig, AnonymizerConfigResponse } from 'types/anonymizerConfig';
 import { ROLES } from 'utils/constants';
+
 import DomainSelector from '../../../components/DomainsSelector';
-import { fetchConfigurationFromDomain } from '../../../services/configurations';
 import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
-import {
-  AnonymizerConfig,
-  AnonymizerConfigResponse,
-} from 'types/anonymizerConfig';
+import { fetchConfigurationFromDomain } from '../../../services/configurations';
 
 type SelectOption = { label: string; value: string; meta?: string };
 
@@ -33,8 +30,7 @@ const Anonymizer: FC = () => {
   const toast = useToast();
   const [inputText, setInputText] = useState('');
   const [outputText, setOutputText] = useState('');
-  const multiDomainEnabled =
-    import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
+  const multiDomainEnabled = import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
   const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
   const [anonymizerConfig, setAnonymizerConfig] = useState<AnonymizerConfig>();
   const [loadingComplete, setLoadingComplete] = useState<boolean>(false);
@@ -71,11 +67,10 @@ const Anonymizer: FC = () => {
 
   const fetchData = async (selectedDomain: string) => {
     try {
-      const data: AnonymizerConfigResponse =
-        await fetchConfigurationFromDomain<AnonymizerConfigResponse>(
-          'configs/anonymizer',
-          selectedDomain
-        );
+      const data: AnonymizerConfigResponse = await fetchConfigurationFromDomain<AnonymizerConfigResponse>(
+        'configs/anonymizer',
+        selectedDomain,
+      );
 
       const res = data.response;
       if (res) {
@@ -99,8 +94,7 @@ const Anonymizer: FC = () => {
 
   const anonymizeText = () => {
     setIsAnonymizingText(true);
-    const isThereSelectedDomain =
-      selectedDomains.length === 1 ? selectedDomains[0] : 'none';
+    const isThereSelectedDomain = selectedDomains.length === 1 ? selectedDomains[0] : 'none';
     anonymizeTextMutation.mutate({
       text: inputText.trim(),
       domain: multiDomainEnabled ? isThereSelectedDomain : 'none',
@@ -132,8 +126,7 @@ const Anonymizer: FC = () => {
   });
 
   const anonymizerSettingsMutation = useMutation({
-    mutationFn: (data: AnonymizerConfig) =>
-      apiDev.post('configs/anonymizer', data),
+    mutationFn: (data: AnonymizerConfig) => apiDev.post('configs/anonymizer', data),
     onSuccess: () => {
       setIsSavingSettings(false);
       toast.open({
@@ -165,11 +158,7 @@ const Anonymizer: FC = () => {
     });
   };
 
-  const handleDomainSelection = useDomainSelectionHandler(
-    setSelectedDomains,
-    fetchData,
-    resetSettingsToDefault
-  );
+  const handleDomainSelection = useDomainSelectionHandler(setSelectedDomains, fetchData, resetSettingsToDefault);
 
   if (!loadingComplete) {
     return <>Loading...</>;
@@ -198,9 +187,7 @@ const Anonymizer: FC = () => {
         footer={
           <Track justify="end">
             <Button
-              disabled={
-                (multiDomainEnabled && selectedDomains.length === 0) || false
-              }
+              disabled={(multiDomainEnabled && selectedDomains.length === 0) || false}
               onClick={saveSettings}
               appearance={isSavingSettings ? 'loading' : 'primary'}
             >
@@ -212,9 +199,7 @@ const Anonymizer: FC = () => {
         <Track gap={16} direction="vertical" align="left">
           <p>{t('settings.anonymizer.approach')}</p>
           <FormSelect
-            placeholder={t(
-              'settings.anonymizer.approachOptionsPlaceholder'
-            ).toString()}
+            placeholder={t('settings.anonymizer.approachOptionsPlaceholder').toString()}
             placeholderColor="#686B78"
             options={anonymizationApproaches}
             defaultValue={anonymizerConfig?.anonymizerSelectedApproach ?? ''}
@@ -224,7 +209,7 @@ const Anonymizer: FC = () => {
                   prev && {
                     ...prev,
                     anonymizerSelectedApproach: selection?.value ?? '',
-                  }
+                  },
               )
             }
           />
@@ -236,9 +221,7 @@ const Anonymizer: FC = () => {
             headerBackgroundColor={'transparent'}
             headerColor="#005AA3"
           >
-            <p style={{ color: '#686B78', fontSize: '14px' }}>
-              {t('settings.anonymizer.entitiesDescription')}
-            </p>
+            <p style={{ color: '#686B78', fontSize: '14px' }}>{t('settings.anonymizer.entitiesDescription')}</p>
 
             <div
               style={{
@@ -260,11 +243,7 @@ const Anonymizer: FC = () => {
                         label: t(`settings.anonymizer.entitiesList.${entity.toLowerCase()}`),
                         value: entity,
                       }}
-                      checked={
-                        anonymizerConfig?.anonymizerSelectedEntities
-                          .split(',')
-                          .includes(entityId) ?? false
-                      }
+                      checked={anonymizerConfig?.anonymizerSelectedEntities.split(',').includes(entityId) ?? false}
                       onChange={(e) => {
                         const isChecked = e.target.checked;
                         setAnonymizerConfig((prev) => {
@@ -287,8 +266,7 @@ const Anonymizer: FC = () => {
                           }
                           return {
                             ...prev,
-                            anonymizerSelectedEntities:
-                              updatedEntities.join(','),
+                            anonymizerSelectedEntities: updatedEntities.join(','),
                           };
                         });
                       }}
@@ -316,11 +294,7 @@ const Anonymizer: FC = () => {
           >
             <Track direction="vertical" gap={8} align="left">
               <FormTagInput
-                tags={
-                  anonymizerConfig?.anonymizerAllowlist
-                    ? anonymizerConfig.anonymizerAllowlist.split(',')
-                    : []
-                }
+                tags={anonymizerConfig?.anonymizerAllowlist ? anonymizerConfig.anonymizerAllowlist.split(',') : []}
                 onChange={(tags) => {
                   setAnonymizerConfig((prev) => {
                     if (!prev) return prev;
@@ -330,13 +304,9 @@ const Anonymizer: FC = () => {
                     };
                   });
                 }}
-                placeholder={t(
-                  'settings.anonymizer.allowListPlaceholder'
-                ).toString()}
+                placeholder={t('settings.anonymizer.allowListPlaceholder').toString()}
               />
-              <p style={{ color: '#686B78', fontSize: '14px' }}>
-                {t('settings.anonymizer.allowListDescription')}
-              </p>
+              <p style={{ color: '#686B78', fontSize: '14px' }}>{t('settings.anonymizer.allowListDescription')}</p>
             </Track>
           </Collapsible>
           <Collapsible
@@ -349,11 +319,7 @@ const Anonymizer: FC = () => {
           >
             <Track direction="vertical" gap={8} align="left">
               <FormTagInput
-                tags={
-                  anonymizerConfig?.anonymizerDenylist
-                    ? anonymizerConfig.anonymizerDenylist.split(',')
-                    : []
-                }
+                tags={anonymizerConfig?.anonymizerDenylist ? anonymizerConfig.anonymizerDenylist.split(',') : []}
                 onChange={(tags) => {
                   setAnonymizerConfig((prev) => {
                     if (!prev) return prev;
@@ -363,28 +329,19 @@ const Anonymizer: FC = () => {
                     };
                   });
                 }}
-                placeholder={t(
-                  'settings.anonymizer.denyListPlaceholder'
-                ).toString()}
+                placeholder={t('settings.anonymizer.denyListPlaceholder').toString()}
               />
-              <p style={{ color: '#686B78', fontSize: '14px' }}>
-                {t('settings.anonymizer.denyListDescription')}
-              </p>
+              <p style={{ color: '#686B78', fontSize: '14px' }}>{t('settings.anonymizer.denyListDescription')}</p>
             </Track>
           </Collapsible>
           <Track gap={8} align="center">
             <IconSwitch
               checked={anonymizerConfig?.isAnonymizationBeforeLlm ?? false}
               onCheckedChange={(checked) =>
-                setAnonymizerConfig(
-                  (prev) =>
-                    prev && { ...prev, isAnonymizationBeforeLlm: checked }
-                )
+                setAnonymizerConfig((prev) => prev && { ...prev, isAnonymizationBeforeLlm: checked })
               }
             />
-            <label style={{ cursor: 'default' }}>
-              {t('settings.anonymizer.anonymizationBeforeLLM')}
-            </label>
+            <label style={{ cursor: 'default' }}>{t('settings.anonymizer.anonymizationBeforeLLM')}</label>
           </Track>
           {/* To be added when the global classifier feature is available */}
           {/* <Track gap={8} align="center">
@@ -411,14 +368,10 @@ const Anonymizer: FC = () => {
       <h1>{t('settings.anonymizer.testingTitle')}</h1>
       <Card>
         <Track gap={16} direction="vertical" align="left">
-          <p style={{ color: '#686B78', fontSize: '16px' }}>
-            {t('settings.anonymizer.testingDescription')}
-          </p>
+          <p style={{ color: '#686B78', fontSize: '16px' }}>{t('settings.anonymizer.testingDescription')}</p>
           <p>{t('settings.anonymizer.inputText')}</p>
           <FormTextarea
-            placeholder={t(
-              'settings.anonymizer.inputTextPlaceholder'
-            ).toString()}
+            placeholder={t('settings.anonymizer.inputTextPlaceholder').toString()}
             value={inputText}
             onChange={(e) => {
               setInputText(e.target.value);
@@ -434,25 +387,19 @@ const Anonymizer: FC = () => {
               appearance="secondary"
               style={{
                 color: inputText.trim() === '' ? undefined : '#005aa3',
-                boxShadow:
-                  inputText.trim() === '' ? undefined : '0 0 0 2px #005aa3',
+                boxShadow: inputText.trim() === '' ? undefined : '0 0 0 2px #005aa3',
               }}
               disabled={inputText.trim() === ''}
             >
               {t('settings.anonymizer.clear')}
             </Button>
-            <Button
-              onClick={anonymizeText}
-              appearance={isAnonymizingText ? 'loading' : 'primary'}
-            >
+            <Button onClick={anonymizeText} appearance={isAnonymizingText ? 'loading' : 'primary'}>
               {t('settings.anonymizer.anonymize')}
             </Button>
           </Track>
           <p>{t('settings.anonymizer.outputText')}</p>
           <FormTextarea
-            placeholder={t(
-              'settings.anonymizer.outputTextPlaceholder'
-            ).toString()}
+            placeholder={t('settings.anonymizer.outputTextPlaceholder').toString()}
             value={outputText}
             minRows={5}
             maxRows={5}

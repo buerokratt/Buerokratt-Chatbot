@@ -1,23 +1,24 @@
+import { userStore as useHeaderStore } from '@buerokratt-ria/header';
+import * as Tabs from '@radix-ui/react-tabs';
+import clsx from 'clsx';
+import { Button, Chat, Dialog, FormRadios, Track } from 'components';
+import withAuthorization from 'hoc/with-authorization';
+import { useToast } from 'hooks/useToast';
 import { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import * as Tabs from '@radix-ui/react-tabs';
-import { useQuery } from '@tanstack/react-query';
-import { Chat, Dialog, Button, FormRadios, Track } from 'components';
-import { Chat as ChatType, CHAT_EVENTS, CHAT_STATUS } from 'types/chat';
-import useStore from 'store';
-import { userStore as useHeaderStore } from '@buerokratt-ria/header';
-import { User } from 'types/user';
-import { useToast } from 'hooks/useToast';
+import { useLocation } from 'react-router-dom';
 import { apiDev } from 'services/api';
+import useStore from 'store';
+import { CHAT_EVENTS, CHAT_STATUS, Chat as ChatType } from 'types/chat';
+import { User } from 'types/user';
+import { v4 as uuidv4 } from 'uuid';
+
 import ForwardToColleaugeModal from '../ForwardToColleaugeModal';
 import ForwardToEstablishmentModal from '../ForwardToEstablishmentModal';
-import clsx from 'clsx';
 import StartAServiceModal from '../StartAServiceModal';
 import ChatTrigger from './ChatTrigger';
-import { v4 as uuidv4 } from 'uuid';
-import { useLocation } from 'react-router-dom';
+
 import './ChatActive.scss';
-import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';
 
 const CSAchatStatuses = [
@@ -33,20 +34,12 @@ const ChatActive: FC = () => {
   const userInfo = useStore((state) => state.userInfo);
   const toast = useToast();
   const [endChatModal, setEndChatModal] = useState<ChatType | null>(null);
-  const [forwardToColleaugeModal, setForwardToColleaugeModal] =
-    useState<ChatType | null>(null);
-  const [forwardToEstablishmentModal, setForwardToEstablishmentModal] =
-    useState<ChatType | null>(null);
-  const [sendToEmailModal, setSendToEmailModal] = useState<ChatType | null>(
-    null
-  );
-  const [startAServiceModal, setStartAServiceModal] = useState<ChatType | null>(
-    null
-  );
+  const [forwardToColleaugeModal, setForwardToColleaugeModal] = useState<ChatType | null>(null);
+  const [forwardToEstablishmentModal, setForwardToEstablishmentModal] = useState<ChatType | null>(null);
+  const [sendToEmailModal, setSendToEmailModal] = useState<ChatType | null>(null);
+  const [startAServiceModal, setStartAServiceModal] = useState<ChatType | null>(null);
 
-  const [selectedEndChatStatus, setSelectedEndChatStatus] = useState<
-    string | null
-  >(null);
+  const [selectedEndChatStatus, setSelectedEndChatStatus] = useState<string | null>(null);
 
   const loadActiveChats = useHeaderStore((state) => state.loadActiveChats);
   const selectedChat = useHeaderStore((state) => state.selectedChat());
@@ -66,7 +59,7 @@ const ChatActive: FC = () => {
         csaTitle: user?.csaTitle ?? '',
         forwardedByUser: userInfo?.displayName ?? '',
         forwardedFromCsa: userInfo?.displayName ?? '',
-        forwardedToCsa: user?.displayName ?? ''
+        forwardedToCsa: user?.displayName ?? '',
       });
       setForwardToColleaugeModal(null);
       loadActiveChats();
@@ -84,10 +77,7 @@ const ChatActive: FC = () => {
     }
   };
 
-  const handleEstablishmentForward = (
-    chat: ChatType,
-    establishment: string
-  ) => {
+  const handleEstablishmentForward = (chat: ChatType, establishment: string) => {
     // To be added: Add endpoint for chat forwarding
     setForwardToEstablishmentModal(null);
     toast.open({
@@ -142,9 +132,7 @@ const ChatActive: FC = () => {
         >
           <div className="vertical-tabs__group-header">
             <p>{`${t('chat.active.myChats')} ${
-              (activeChats?.myChats?.length ?? 0) == 0
-                ? ''
-                : `(${activeChats?.myChats?.length ?? 0})`
+              (activeChats?.myChats?.length ?? 0) == 0 ? '' : `(${activeChats?.myChats?.length ?? 0})`
             }`}</p>
           </div>
           {activeChats?.myChats?.map((chat) => (
@@ -235,10 +223,7 @@ const ChatActive: FC = () => {
           onClose={() => setSendToEmailModal(null)}
           footer={
             <>
-              <Button
-                appearance="secondary"
-                onClick={() => setSendToEmailModal(null)}
-              >
+              <Button appearance="secondary" onClick={() => setSendToEmailModal(null)}>
                 {t('global.no')}
               </Button>
               <Button
@@ -255,10 +240,7 @@ const ChatActive: FC = () => {
       )}
 
       {startAServiceModal !== null && (
-        <StartAServiceModal
-          chat={startAServiceModal}
-          onModalClose={() => setStartAServiceModal(null)}
-        />
+        <StartAServiceModal chat={startAServiceModal} onModalClose={() => setStartAServiceModal(null)} />
       )}
 
       {endChatModal && (
@@ -267,10 +249,7 @@ const ChatActive: FC = () => {
           onClose={() => setEndChatModal(null)}
           footer={
             <>
-              <Button
-                appearance="secondary"
-                onClick={() => setEndChatModal(null)}
-              >
+              <Button appearance="secondary" onClick={() => setEndChatModal(null)}>
                 {t('global.cancel')}
               </Button>
               <Button appearance="success" onClick={handleChatEnd}>
@@ -294,7 +273,4 @@ const ChatActive: FC = () => {
   );
 };
 
-export default withAuthorization(ChatActive, [
-  ROLES.ROLE_ADMINISTRATOR,
-  ROLES.ROLE_CUSTOMER_SUPPORT_AGENT,
-]);
+export default withAuthorization(ChatActive, [ROLES.ROLE_ADMINISTRATOR, ROLES.ROLE_CUSTOMER_SUPPORT_AGENT]);

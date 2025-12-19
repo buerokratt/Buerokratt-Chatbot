@@ -2,12 +2,12 @@ export interface UseSendAttachment {
   successCb?: (data: any) => void;
   errorCb?: (error: any) => void;
   data: {
-    chatId: string,
-    name: string,
-    type: string,
-    size: string,
-    base64: string,
-  }
+    chatId: string;
+    name: string;
+    type: string;
+    size: string;
+    base64: string;
+  };
 }
 
 export interface Attachment {

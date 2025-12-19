@@ -1,7 +1,7 @@
 const { v4: uuidv4 } = require('uuid');
-const streamQueue = require("./streamQueue");
-const { createAzureOpenAIStreamRequest } = require("./openSearch");
-const { activeConnections } = require("./connectionManager");
+const streamQueue = require('./streamQueue');
+const { createAzureOpenAIStreamRequest } = require('./openSearch');
+const { activeConnections } = require('./connectionManager');
 
 function buildSSEResponse({ res, req, buildCallbackFunction, channelId }) {
   addSSEHeader(req, res);
@@ -23,7 +23,7 @@ function buildSSEResponse({ res, req, buildCallbackFunction, channelId }) {
 
   const cleanUp = buildCallbackFunction({ connectionId, sender });
 
-  req.on("close", () => {
+  req.on('close', () => {
     console.log(`Client disconnected from SSE for channel ${channelId}`);
     activeConnections.delete(connectionId);
     cleanUp?.();
@@ -36,10 +36,10 @@ function addSSEHeader(req, res) {
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
-    'Connection': 'keep-alive',
+    Connection: 'keep-alive',
     'Access-Control-Allow-Origin': origin,
     'Access-Control-Allow-Credentials': true,
-    'Access-Control-Expose-Headers': 'Origin, X-Requested-With, Content-Type, Cache-Control, Connection, Accept'
+    'Access-Control-Expose-Headers': 'Origin, X-Requested-With, Content-Type, Cache-Control, Connection, Accept',
   });
 }
 
@@ -62,13 +62,13 @@ function generateConnectionID() {
 function buildSender(res) {
   return (data) => {
     try {
-      const formattedData = typeof data === "string" ? data : JSON.stringify(data);
+      const formattedData = typeof data === 'string' ? data : JSON.stringify(data);
       res.write(`data: ${formattedData}\n\n`);
-      if (typeof res.flush === "function") {
+      if (typeof res.flush === 'function') {
         res.flush();
       }
     } catch (error) {
-      console.error("SSE write error:", error);
+      console.error('SSE write error:', error);
     }
   };
 }

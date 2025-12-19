@@ -1,51 +1,39 @@
-import { FC, useEffect, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
-import { AxiosError } from 'axios';
-import { useTranslation } from 'react-i18next';
-
-import {
-  Button,
-  Card,
-  FormDatepicker,
-  FormTextarea,
-  Switch,
-  Track,
-} from 'components';
 import { EMERGENCY_NOTICE_LENGTH } from 'constants/config';
-import {
-  EmergencyNotice,
-  EmergencyNoticeResponse,
-} from 'types/emergencyNotice';
+
 import { useMutation } from '@tanstack/react-query';
-import { useToast } from 'hooks/useToast';
-import { apiDev } from 'services/api';
+import { AxiosError } from 'axios';
+import { Button, Card, FormDatepicker, FormTextarea, Switch, Track } from 'components';
 import { format, parse } from 'date-fns';
 import withAuthorization from 'hoc/with-authorization';
+import { useToast } from 'hooks/useToast';
+import { FC, useEffect, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { apiDev } from 'services/api';
+import { EmergencyNotice, EmergencyNoticeResponse } from 'types/emergencyNotice';
 import { ROLES } from 'utils/constants';
+
 import DomainSelector from '../../../components/DomainsSelector';
-import { fetchConfigurationFromDomain } from '../../../services/configurations';
 import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
+import { fetchConfigurationFromDomain } from '../../../services/configurations';
 
 const SettingsEmergencyNotices: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
-  const { register, control, handleSubmit, reset, setValue } =
-    useForm<EmergencyNotice>({
-      defaultValues: {
-        emergencyNoticeStartISO: new Date(),
-        emergencyNoticeEndISO: new Date(),
-        emergencyNoticeText: '',
-        isEmergencyNoticeVisible: 'false',
-        domainUUID: [],
-      },
-    });
-  const [isEmergencyNoticeVisible, setIsEmergencyNoticeVisible] =
-    useState(false);
+  const { register, control, handleSubmit, reset, setValue } = useForm<EmergencyNotice>({
+    defaultValues: {
+      emergencyNoticeStartISO: new Date(),
+      emergencyNoticeEndISO: new Date(),
+      emergencyNoticeText: '',
+      isEmergencyNoticeVisible: 'false',
+      domainUUID: [],
+    },
+  });
+  const [isEmergencyNoticeVisible, setIsEmergencyNoticeVisible] = useState(false);
   const [loadingComplete, setLoadingComplete] = useState<boolean>(false);
   const [emergencyNoticeText, setEmergencyNoticeText] = useState('');
 
-  const multiDomainEnabled =
-    import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
+  const multiDomainEnabled = import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
   const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
 
   useEffect(() => {
@@ -58,29 +46,21 @@ const SettingsEmergencyNotices: FC = () => {
 
   const fetchData = async (selectedDomain: string) => {
     try {
-      const data: EmergencyNoticeResponse =
-        await fetchConfigurationFromDomain<EmergencyNoticeResponse>(
-          'configs/emergency-notice',
-          selectedDomain
-        );
+      const data: EmergencyNoticeResponse = await fetchConfigurationFromDomain<EmergencyNoticeResponse>(
+        'configs/emergency-notice',
+        selectedDomain,
+      );
 
-      const {
-        isEmergencyNoticeVisible,
-        emergencyNoticeStartISO,
-        emergencyNoticeEndISO,
-        emergencyNoticeText,
-      } = data.response;
+      const { isEmergencyNoticeVisible, emergencyNoticeStartISO, emergencyNoticeEndISO, emergencyNoticeText } =
+        data.response;
 
       if (emergencyNoticeStartISO === '') return;
 
-      const isEmergencyNoticeVisibleBoolean =
-        isEmergencyNoticeVisible === 'true';
+      const isEmergencyNoticeVisibleBoolean = isEmergencyNoticeVisible === 'true';
       setIsEmergencyNoticeVisible(isEmergencyNoticeVisibleBoolean);
       setEmergencyNoticeText(emergencyNoticeText ?? '');
       reset({
-        emergencyNoticeStartISO: isEmergencyNoticeVisibleBoolean
-          ? new Date(emergencyNoticeStartISO)
-          : new Date(),
+        emergencyNoticeStartISO: isEmergencyNoticeVisibleBoolean ? new Date(emergencyNoticeStartISO) : new Date(),
         emergencyNoticeEndISO: new Date(emergencyNoticeEndISO ?? '0'),
         emergencyNoticeText,
         isEmergencyNoticeVisible,
@@ -99,8 +79,7 @@ const SettingsEmergencyNotices: FC = () => {
   };
 
   const emergencyNoticeMutation = useMutation({
-    mutationFn: (data: EmergencyNotice) =>
-      apiDev.post<EmergencyNotice>('configs/emergency-notice', data),
+    mutationFn: (data: EmergencyNotice) => apiDev.post<EmergencyNotice>('configs/emergency-notice', data),
     onSuccess: () => {
       toast.open({
         type: 'success',
@@ -149,11 +128,7 @@ const SettingsEmergencyNotices: FC = () => {
     });
   };
 
-  const handleDomainSelection = useDomainSelectionHandler(
-    setSelectedDomains,
-    fetchData,
-    resetSettingsToDefault
-  );
+  const handleDomainSelection = useDomainSelectionHandler(setSelectedDomains, fetchData, resetSettingsToDefault);
 
   if (!loadingComplete) return <>Loading...</>;
 
@@ -172,12 +147,7 @@ const SettingsEmergencyNotices: FC = () => {
       <Card
         footer={
           <Track justify="end">
-            <Button
-              disabled={
-                (multiDomainEnabled && selectedDomains.length === 0) || false
-              }
-              onClick={handleFormSubmit}
-            >
+            <Button disabled={(multiDomainEnabled && selectedDomains.length === 0) || false} onClick={handleFormSubmit}>
               {t('global.save')}
             </Button>
           </Track>
@@ -206,9 +176,7 @@ const SettingsEmergencyNotices: FC = () => {
             onChange={(e) => setEmergencyNoticeText(e.target.value)}
           />
           <Track gap={8}>
-            <p style={{ flex: '0 0 185px' }}>
-              {t('settings.emergencyNotices.displayPeriod')}
-            </p>
+            <p style={{ flex: '0 0 185px' }}>{t('settings.emergencyNotices.displayPeriod')}</p>
             <Track gap={16}>
               <Controller
                 name="emergencyNoticeStartISO"
@@ -218,11 +186,7 @@ const SettingsEmergencyNotices: FC = () => {
                     label={t('global.startDate')}
                     hideLabel
                     {...field}
-                    value={parse(
-                      format(field.value as Date, 'yyyy-MM-dd'),
-                      'yyyy-MM-dd',
-                      new Date()
-                    )}
+                    value={parse(format(field.value as Date, 'yyyy-MM-dd'), 'yyyy-MM-dd', new Date())}
                   />
                 )}
               />
@@ -235,13 +199,7 @@ const SettingsEmergencyNotices: FC = () => {
                     label={t('global.endDate')}
                     hideLabel
                     {...field}
-                    value={
-                      parse(
-                        format(field.value as Date, 'yyyy-MM-dd'),
-                        'yyyy-MM-dd',
-                        new Date()
-                      ) ?? new Date('0')
-                    }
+                    value={parse(format(field.value as Date, 'yyyy-MM-dd'), 'yyyy-MM-dd', new Date()) ?? new Date('0')}
                   />
                 )}
               />
@@ -253,6 +211,4 @@ const SettingsEmergencyNotices: FC = () => {
   );
 };
 
-export default withAuthorization(SettingsEmergencyNotices, [
-  ROLES.ROLE_ADMINISTRATOR,
-]);
+export default withAuthorization(SettingsEmergencyNotices, [ROLES.ROLE_ADMINISTRATOR]);

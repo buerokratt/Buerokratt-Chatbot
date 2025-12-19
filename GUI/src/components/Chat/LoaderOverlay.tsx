@@ -5,10 +5,7 @@ interface LoaderOverlayProps {
   currentPercent: number;
 }
 
-const LoaderOverlay: React.FC<LoaderOverlayProps> = ({
-  maxPercent,
-  currentPercent,
-}) => {
+const LoaderOverlay: React.FC<LoaderOverlayProps> = ({ maxPercent, currentPercent }) => {
   const overlayStyle: React.CSSProperties = {
     position: 'absolute',
     top: 0,

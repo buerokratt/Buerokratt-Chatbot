@@ -172,8 +172,7 @@
           color: get-color(white);
 
           :any-link {
-            background: url('../../static/icons/link-external-blue.svg')
-              no-repeat right center;
+            background: url('../../static/icons/link-external-blue.svg') no-repeat right center;
             padding-right: 1.25em;
             color: blue;
             text-decoration: underline;
@@ -212,8 +211,7 @@
           color: get-color(white);
 
           :any-link {
-            background: url('../../static/icons/link-external-white.svg')
-              no-repeat right center;
+            background: url('../../static/icons/link-external-white.svg') no-repeat right center;
             padding-right: 1.25em;
             color: white;
             text-decoration: underline;
@@ -327,8 +325,7 @@
     }
 
     :any-link {
-      background: url('../../static/icons/link-external-blue.svg') no-repeat
-        right center;
+      background: url('../../static/icons/link-external-blue.svg') no-repeat right center;
       padding-right: 1.25em;
       color: blue;
       text-decoration: underline;

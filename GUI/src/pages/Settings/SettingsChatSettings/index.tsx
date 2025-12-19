@@ -1,14 +1,14 @@
-import { FC, useEffect, useRef, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
 import { AxiosError } from 'axios';
-
 import { Button, Card, Dialog, Switch, Track } from 'components';
-import { useToast } from 'hooks/useToast';
-import { apiDev } from 'services/api';
 import withAuthorization from 'hoc/with-authorization';
-import { ROLES } from 'utils/constants';
+import { useToast } from 'hooks/useToast';
+import { FC, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { apiDev } from 'services/api';
 import { BotConfigResponse } from 'types/botConfig';
+import { ROLES } from 'utils/constants';
+
 import DomainSelector from '../../../components/DomainsSelector';
 import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
 import { fetchConfigurationFromDomain } from '../../../services/configurations';
@@ -17,31 +17,16 @@ const SettingsChatSettings: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
   const hasRendered = useRef<boolean>();
-  const multiDomainEnabled =
-    import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
+  const multiDomainEnabled = import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
   const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
-  const [isBotActive, setIsBotActive] = useState<boolean | undefined>(
-    undefined
-  );
-  const [currentIsBurokrattActive, setCurrentIsBurokrattActive] = useState<
-    boolean | undefined
-  >(undefined);
-  const [isBurokrattActive, setIsBurokrattActive] = useState<
-    boolean | undefined
-  >(undefined);
-  const [isNameVisible, setIsNameVisible] = useState<boolean | undefined>(
-    undefined
-  );
-  const [isTitleVisible, setIsTitleVisible] = useState<boolean | undefined>(
-    undefined
-  );
-  const [isEditChatVisible, setIsEditChatVisible] = useState<
-    boolean | undefined
-  >(undefined);
+  const [isBotActive, setIsBotActive] = useState<boolean | undefined>(undefined);
+  const [currentIsBurokrattActive, setCurrentIsBurokrattActive] = useState<boolean | undefined>(undefined);
+  const [isBurokrattActive, setIsBurokrattActive] = useState<boolean | undefined>(undefined);
+  const [isNameVisible, setIsNameVisible] = useState<boolean | undefined>(undefined);
+  const [isTitleVisible, setIsTitleVisible] = useState<boolean | undefined>(undefined);
+  const [isEditChatVisible, setIsEditChatVisible] = useState<boolean | undefined>(undefined);
   const queryClient = useQueryClient();
-  const [burokrattConfirmationModal, setBurokrattConfirmationModal] = useState<
-    boolean | null
-  >(null);
+  const [burokrattConfirmationModal, setBurokrattConfirmationModal] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (multiDomainEnabled) {
@@ -54,11 +39,10 @@ const SettingsChatSettings: FC = () => {
 
   const fetchData = async (selectedDomain: string) => {
     try {
-      const data: BotConfigResponse =
-        await fetchConfigurationFromDomain<BotConfigResponse>(
-          'configs/bot-config',
-          selectedDomain
-        );
+      const data: BotConfigResponse = await fetchConfigurationFromDomain<BotConfigResponse>(
+        'configs/bot-config',
+        selectedDomain,
+      );
 
       const res = data.response;
 
@@ -136,11 +120,7 @@ const SettingsChatSettings: FC = () => {
     setIsEditChatVisible(false);
   };
 
-  const handleDomainSelection = useDomainSelectionHandler(
-    setSelectedDomains,
-    fetchData,
-    resetSettingsToDefault
-  );
+  const handleDomainSelection = useDomainSelectionHandler(setSelectedDomains, fetchData, resetSettingsToDefault);
 
   if (!hasRendered) {
     return <>Loading...</>;
@@ -259,6 +239,4 @@ const SettingsChatSettings: FC = () => {
   );
 };
 
-export default withAuthorization(SettingsChatSettings, [
-  ROLES.ROLE_ADMINISTRATOR,
-]);
+export default withAuthorization(SettingsChatSettings, [ROLES.ROLE_ADMINISTRATOR]);

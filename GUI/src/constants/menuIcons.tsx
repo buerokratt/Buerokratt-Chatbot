@@ -1,4 +1,4 @@
-import { MdOutlineForum, MdOutlineAdb, MdOutlineEqualizer, MdSettings, MdOutlineMonitorWeight } from 'react-icons/md';
+import { MdOutlineAdb, MdOutlineEqualizer, MdOutlineForum, MdOutlineMonitorWeight, MdSettings } from 'react-icons/md';
 
 export const menuIcons = [
   {

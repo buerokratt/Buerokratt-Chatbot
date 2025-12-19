@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
 import Markdown from 'markdown-to-jsx';
+import React, { useState } from 'react';
 import './Chat.scss';
 
 interface MarkdownifyProps {
@@ -41,19 +41,15 @@ const LinkPreview: React.FC<{
   );
 };
 
-const hasSpecialFormat = (m: string) => m.includes("\n\n") && m.indexOf(".") > 0 && m.indexOf(":") > m.indexOf(".");
+const hasSpecialFormat = (m: string) => m.includes('\n\n') && m.indexOf('.') > 0 && m.indexOf(':') > m.indexOf('.');
 
 function formatMessage(message?: string): string {
   if (!message) return '';
 
   return message
-    .replace(/&#x([0-9A-Fa-f]+);/g, (_, hex) =>
-      String.fromCharCode(parseInt(hex, 16))
-    )
+    .replace(/&#x([0-9A-Fa-f]+);/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
     .replace(/(^|\n)(\d{4})\.\s/g, (match, prefix, year) => {
-      const remainingText = message.substring(
-        message.indexOf(match) + match.length
-      );
+      const remainingText = message.substring(message.indexOf(match) + match.length);
       const sentenceEnd = remainingText.indexOf('\n\n');
       if (sentenceEnd !== -1) {
         const currentSentence = remainingText.substring(0, sentenceEnd);
@@ -66,10 +62,7 @@ function formatMessage(message?: string): string {
     .replace(/(?<=\n)\d+\.\s/g, hasSpecialFormat(message) ? '\n\n$&' : '$&');
 }
 
-const Markdownify: React.FC<MarkdownifyProps> = ({
-  message,
-  sanitizeLinks = false,
-}) => (
+const Markdownify: React.FC<MarkdownifyProps> = ({ message, sanitizeLinks = false }) => (
   <div className={'reset'}>
     <Markdown
       options={{

@@ -1,10 +1,10 @@
 import { FC, PropsWithChildren, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
+import { getWidgetData } from '../../services/users';
 import useStore from '../../store';
 import { DomainSelection } from '../../types/domainsModels';
-import { getWidgetData } from '../../services/users';
 import { FormMultiselect } from '../FormElements';
-import { useTranslation } from 'react-i18next';
 
 type DomainSelector = {
   onChange?: (selected: SelectOption[]) => void;
@@ -12,9 +12,7 @@ type DomainSelector = {
 
 type SelectOption = { label: string; value: string; meta?: string };
 
-const DomainSelector: FC<PropsWithChildren<DomainSelector>> = ({
-  onChange
-}) => {
+const DomainSelector: FC<PropsWithChildren<DomainSelector>> = ({ onChange }) => {
   const { t } = useTranslation();
 
   const userInfo = useStore((state) => state.userInfo);
@@ -37,7 +35,7 @@ const DomainSelector: FC<PropsWithChildren<DomainSelector>> = ({
     const selectedOptions = options.filter((opt) =>
       domains.find((d) => {
         return d.id === opt.value && d.selected;
-      })
+      }),
     );
 
     return { options, selectedOptions };

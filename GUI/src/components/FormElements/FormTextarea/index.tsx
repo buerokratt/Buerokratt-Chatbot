@@ -1,13 +1,7 @@
-import {ChangeEvent, forwardRef, useEffect, useId, useState} from 'react';
-import TextareaAutosize, {
-  TextareaAutosizeProps,
-} from 'react-textarea-autosize';
-import {
-  createRegexRenderer,
-  RichTextarea,
-  RichTextareaProps,
-} from 'rich-textarea';
 import clsx from 'clsx';
+import { ChangeEvent, forwardRef, useEffect, useId, useState } from 'react';
+import TextareaAutosize, { TextareaAutosizeProps } from 'react-textarea-autosize';
+import { createRegexRenderer, RichTextarea, RichTextareaProps } from 'rich-textarea';
 
 import './FormTextarea.scss';
 
@@ -40,17 +34,15 @@ const FormTextarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       onChange,
       ...rest
     },
-    ref
+    ref,
   ) => {
     const id = useId();
     const [initial, setInitial] = useState<boolean>(true);
-    const [currentLength, setCurrentLength] = useState(
-      (typeof defaultValue === 'string' && defaultValue.length) || 0
-    );
+    const [currentLength, setCurrentLength] = useState((typeof defaultValue === 'string' && defaultValue.length) || 0);
     const textareaClasses = clsx(
       'textarea',
       disabled && 'textarea--disabled',
-      showMaxLength && 'textarea--maxlength-shown'
+      showMaxLength && 'textarea--maxlength-shown',
     );
 
     const handleOnChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
@@ -60,11 +52,11 @@ const FormTextarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     };
 
     useEffect(() => {
-        if(!initial) return;
-        if(showMaxLength && defaultValue && typeof defaultValue === 'string') {
-            setInitial(false);
-            setCurrentLength(defaultValue.toString().length)
-        }
+      if (!initial) return;
+      if (showMaxLength && defaultValue && typeof defaultValue === 'string') {
+        setInitial(false);
+        setCurrentLength(defaultValue.toString().length);
+      }
     }, [defaultValue]);
 
     return (
@@ -89,10 +81,7 @@ const FormTextarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
                 handleOnChange(e);
               }}
               onFocus={(e) =>
-                e.currentTarget.setSelectionRange(
-                  e.currentTarget.value.length,
-                  e.currentTarget.value.length
-                )
+                e.currentTarget.setSelectionRange(e.currentTarget.value.length, e.currentTarget.value.length)
               }
             >
               {createRegexRenderer([
@@ -108,6 +97,7 @@ const FormTextarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
                       key={key}
                       href={value}
                       target="_blank"
+                      rel="noreferrer"
                     >
                       {children}
                     </a>
@@ -131,28 +121,19 @@ const FormTextarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
               }}
               {...rest}
               onFocus={(e) =>
-                e.currentTarget.setSelectionRange(
-                  e.currentTarget.value.length,
-                  e.currentTarget.value.length
-                )
+                e.currentTarget.setSelectionRange(e.currentTarget.value.length, e.currentTarget.value.length)
               }
             />
           )}
           {showMaxLength && (
-            <div
-              className={
-                maxLengthBottom
-                  ? 'textarea__max-length-bottom'
-                  : 'textarea__max-length-top'
-              }
-            >
+            <div className={maxLengthBottom ? 'textarea__max-length-bottom' : 'textarea__max-length-top'}>
               {currentLength}/{maxLength}
             </div>
           )}
         </div>
       </div>
     );
-  }
+  },
 );
 
 export default FormTextarea;

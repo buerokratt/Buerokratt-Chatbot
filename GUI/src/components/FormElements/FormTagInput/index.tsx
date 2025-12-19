@@ -1,7 +1,7 @@
-import { FC, KeyboardEvent, useState } from 'react';
-import { MdOutlineClose } from 'react-icons/md';
 import clsx from 'clsx';
 import { Icon } from 'components';
+import { FC, KeyboardEvent, useState } from 'react';
+import { MdOutlineClose } from 'react-icons/md';
 import './FormTagInput.scss';
 
 type FormTagInputProps = {
@@ -12,13 +12,7 @@ type FormTagInputProps = {
   disabled?: boolean;
 };
 
-const FormTagInput: FC<FormTagInputProps> = ({
-  tags,
-  onChange,
-  placeholder,
-  className,
-  disabled = false,
-}) => {
+const FormTagInput: FC<FormTagInputProps> = ({ tags, onChange, placeholder, className, disabled = false }) => {
   const [inputValue, setInputValue] = useState('');
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -76,12 +70,7 @@ const FormTagInput: FC<FormTagInputProps> = ({
           />
         </div>
         {tags.length > 0 && !disabled && (
-          <button
-            type="button"
-            className="tag-input__clear-all"
-            onClick={handleClearAll}
-            aria-label="Clear all tags"
-          >
+          <button type="button" className="tag-input__clear-all" onClick={handleClearAll} aria-label="Clear all tags">
             <Icon icon={<MdOutlineClose fontSize={20} />} size="medium" />
           </button>
         )}
@@ -91,4 +80,3 @@ const FormTagInput: FC<FormTagInputProps> = ({
 };
 
 export default FormTagInput;
-

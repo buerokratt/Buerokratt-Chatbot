@@ -1,17 +1,18 @@
-import { FC, useMemo } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
-import { AxiosError } from 'axios';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-
+import { AxiosError } from 'axios';
 import { Button, Dialog, FormInput, Track } from 'components';
-import { User, UserDTO } from 'types/user';
-import { checkIfUserExists, createUser, editUser } from 'services/users';
 import { useToast } from 'hooks/useToast';
-import { ROLES } from 'utils/constants';
+import { FC, useMemo } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import Select from 'react-select';
+import { checkIfUserExists, createUser, editUser } from 'services/users';
+import { User, UserDTO } from 'types/user';
+import { ROLES } from 'utils/constants';
+
 import './SettingsUsers.scss';
 import { WDomain } from '../../../types/widgetModels';
+
 import { isJiraIntegrationEnabled, isSmaxIntegrationEnabled } from 'constants/config';
 
 type UserModalProps = {
@@ -62,33 +63,31 @@ const UserModal: FC<UserModalProps> = ({ onClose, user, domainsList }) => {
       },
       { label: t('roles.ROLE_ANALYST'), value: ROLES.ROLE_ANALYST },
     ],
-    []
+    [],
   );
 
-  const mapUserDomains = (domainIds: string[], allDomains: WDomain[]): {label: string, value: string}[] => {
+  const mapUserDomains = (domainIds: string[], allDomains: WDomain[]): { label: string; value: string }[] => {
     return allDomains
-      .filter(domain => domainIds.includes(domain.domainId))
-      .map(domain => ({
+      .filter((domain) => domainIds.includes(domain.domainId))
+      .map((domain) => ({
         label: domain.name,
-        value: domain.domainId
+        value: domain.domainId,
       }));
-  }
+  };
 
-  const domainOptions = useMemo(() =>
-      domainsList?.map(domain => ({
+  const domainOptions = useMemo(
+    () =>
+      domainsList?.map((domain) => ({
         label: domain.name,
         value: domain.domainId,
       })),
-    [domainsList]
+    [domainsList],
   );
 
   const userCreateMutation = useMutation({
     mutationFn: (data: UserDTO) => createUser(data),
     onSuccess: async () => {
-      await queryClient.invalidateQueries([
-        'accounts/customer-support-agents',
-        'prod',
-      ]);
+      await queryClient.invalidateQueries(['accounts/customer-support-agents', 'prod']);
       toast.open({
         type: 'success',
         title: t('global.notification'),
@@ -116,10 +115,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user, domainsList }) => {
       smaxConnectDisconnect?: boolean;
     }) => editUser(id, userData, smaxConnectDisconnect),
     onSuccess: async () => {
-      await queryClient.invalidateQueries([
-        'accounts/customer-support-agents',
-        'prod',
-      ]);
+      await queryClient.invalidateQueries(['accounts/customer-support-agents', 'prod']);
       toast.open({
         type: 'success',
         title: t('global.notification'),
@@ -137,8 +133,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user, domainsList }) => {
   });
 
   const checkIfUserExistsMutation = useMutation({
-    mutationFn: ({ userData }: { userData: UserDTO }) =>
-      checkIfUserExists(userData),
+    mutationFn: ({ userData }: { userData: UserDTO }) => checkIfUserExists(userData),
     onSuccess: async (data) => {
       if (data.response === 'true') {
         toast.open({
@@ -196,9 +191,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user, domainsList }) => {
           </Button>
           {user && isSmaxIntegrationEnabled && (
             <Button onClick={handleSmaxConnection}>
-              {user.smaxAccountId
-                ? t('settings.users.disconnectFromSmax')
-                : t('settings.users.connectToSmax')}
+              {user.smaxAccountId ? t('settings.users.disconnectFromSmax') : t('settings.users.connectToSmax')}
             </Button>
           )}
           <Button onClick={handleUserSubmit}>
@@ -209,17 +202,11 @@ const UserModal: FC<UserModalProps> = ({ onClose, user, domainsList }) => {
     >
       <Track direction="vertical" gap={16} align="right">
         <FormInput
-          defaultValue={`${user?.firstName ?? ''} ${
-            user?.lastName ?? ''
-          }`.trim()}
+          defaultValue={`${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim()}
           {...register('fullName', { required: requiredText })}
           label={t('settings.users.fullName')}
         />
-        {errors.fullName && (
-          <span style={{ color: '#f00', marginTop: '-1rem' }}>
-            {errors.fullName.message}
-          </span>
-        )}
+        {errors.fullName && <span style={{ color: '#f00', marginTop: '-1rem' }}>{errors.fullName.message}</span>}
 
         {!user && (
           <FormInput
@@ -233,18 +220,12 @@ const UserModal: FC<UserModalProps> = ({ onClose, user, domainsList }) => {
             label={t('settings.users.idCode')}
           >
             <div>
-              <label style={{ fontSize: '14.7px', color: '#9799a4' }}>
-                {t('settings.users.idCodePlaceholder')}
-              </label>
+              <label style={{ fontSize: '14.7px', color: '#9799a4' }}>{t('settings.users.idCodePlaceholder')}</label>
             </div>
           </FormInput>
         )}
 
-        {!user && errors.idCode && (
-          <span style={{ color: '#f00', marginTop: '-1rem' }}>
-            {errors.idCode.message}
-          </span>
-        )}
+        {!user && errors.idCode && <span style={{ color: '#f00', marginTop: '-1rem' }}>{errors.idCode.message}</span>}
 
         <Controller
           control={control}
@@ -252,9 +233,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user, domainsList }) => {
           rules={{ required: requiredText }}
           render={({ field: { onChange, onBlur, name, ref } }) => (
             <div className="multiSelect">
-              <label className="multiSelect__label">
-                {t('settings.users.userRoles')}
-              </label>
+              <label className="multiSelect__label">{t('settings.users.userRoles')}</label>
               <div className="multiSelect__wrapper">
                 <Select
                   name={name}
@@ -275,40 +254,36 @@ const UserModal: FC<UserModalProps> = ({ onClose, user, domainsList }) => {
           )}
         />
 
-        {errors.authorities && (
-          <span style={{ color: '#f00', marginTop: '-1rem' }}>
-            {errors.authorities.message}
-          </span>
-        )}
+        {errors.authorities && <span style={{ color: '#f00', marginTop: '-1rem' }}>{errors.authorities.message}</span>}
 
-        {import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN.toLowerCase() === 'true' && (<Controller
-          control={control}
-          name="domains"
-          rules={{}}
-          render={({ field: { onChange, onBlur, name, ref } }) => (
-            <div className="multiSelect">
-              <label className="multiSelect__label">
-                {t('multiDomains.title')}
-              </label>
-              <div className="multiSelect__wrapper">
-                <Select
-                  name={name}
-                  maxMenuHeight={165}
-                  ref={ref}
-                  onBlur={onBlur}
-                  required={false}
-                  options={domainOptions}
-                  defaultValue={mapUserDomains(user?.domains ?? [], domainsList ?? [])}
-                  isMulti={true}
-                  placeholder={t('global.choose')}
-                  onChange={(val) => {
-                    onChange(val || []);
-                  }}
-                />
+        {import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN.toLowerCase() === 'true' && (
+          <Controller
+            control={control}
+            name="domains"
+            rules={{}}
+            render={({ field: { onChange, onBlur, name, ref } }) => (
+              <div className="multiSelect">
+                <label className="multiSelect__label">{t('multiDomains.title')}</label>
+                <div className="multiSelect__wrapper">
+                  <Select
+                    name={name}
+                    maxMenuHeight={165}
+                    ref={ref}
+                    onBlur={onBlur}
+                    required={false}
+                    options={domainOptions}
+                    defaultValue={mapUserDomains(user?.domains ?? [], domainsList ?? [])}
+                    isMulti={true}
+                    placeholder={t('global.choose')}
+                    onChange={(val) => {
+                      onChange(val || []);
+                    }}
+                  />
+                </div>
               </div>
-            </div>
-          )}
-        />)}
+            )}
+          />
+        )}
 
         <FormInput
           {...register('displayName', {
@@ -316,16 +291,9 @@ const UserModal: FC<UserModalProps> = ({ onClose, user, domainsList }) => {
           })}
           label={t('settings.users.displayName')}
         />
-        {errors.displayName && (
-          <span style={{ color: '#f00', marginTop: '-1rem' }}>
-            {errors.displayName.message}
-          </span>
-        )}
+        {errors.displayName && <span style={{ color: '#f00', marginTop: '-1rem' }}>{errors.displayName.message}</span>}
 
-        <FormInput
-          {...register('csaTitle')}
-          label={t('settings.users.userTitle')}
-        />
+        <FormInput {...register('csaTitle')} label={t('settings.users.userTitle')} />
 
         <FormInput
           {...register('csaEmail', {
@@ -338,22 +306,12 @@ const UserModal: FC<UserModalProps> = ({ onClose, user, domainsList }) => {
           label={t('settings.users.email')}
           type="email"
         />
-        {errors.csaEmail && (
-          <span style={{ color: '#f00', marginTop: '-1rem' }}>
-            {errors.csaEmail.message}
-          </span>
-        )}
+        {errors.csaEmail && <span style={{ color: '#f00', marginTop: '-1rem' }}>{errors.csaEmail.message}</span>}
 
-        <FormInput
-          {...register('department')}
-          label={t('settings.users.department')}
-        />
+        <FormInput {...register('department')} label={t('settings.users.department')} />
 
         {isJiraIntegrationEnabled && (
-          <FormInput
-            {...register('jiraAccountId')}
-            label={t('settings.users.jiraAccountName')}
-          />
+          <FormInput {...register('jiraAccountId')} label={t('settings.users.jiraAccountName')} />
         )}
       </Track>
     </Dialog>

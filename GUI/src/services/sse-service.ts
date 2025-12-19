@@ -5,9 +5,7 @@ const sse = <T>(url: string, onMessage: (data: T) => void): EventSource => {
     console.error('Notification node url is not defined');
     throw new Error('Notification node url is not defined');
   }
-  const eventSource = new EventSource(
-    `${notificationNodeUrl}/sse/notifications${url}`
-  );
+  const eventSource = new EventSource(`${notificationNodeUrl}/sse/notifications${url}`);
 
   eventSource.onmessage = (event: MessageEvent) => {
     if (event.data != undefined && event.data != 'undefined') {
