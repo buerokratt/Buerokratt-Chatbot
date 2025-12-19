@@ -119,7 +119,7 @@ const SettingsFeedback: FC = () => {
               <Switch
                 label={t('settings.feedback.feedbackActive')}
                 onCheckedChange={field.onChange}
-                checked={field.value}
+                checked={Boolean(field.value)}
                 {...field}
               />
             )}
@@ -148,7 +148,7 @@ const SettingsFeedback: FC = () => {
               <Switch
                 label={t('settings.feedback.noticeActive')}
                 onCheckedChange={field.onChange}
-                checked={field.value}
+                checked={Boolean(field.value)}
                 {...field}
               />
             )}

@@ -74,6 +74,7 @@ const FormTextarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
               maxLength={maxLength === -1 ? undefined : maxLength}
               ref={ref}
               disabled={disabled}
+              value={defaultValue ?? ''}
               defaultValue={defaultValue ?? ''}
               aria-label={hideLabel ? label : undefined}
               onChange={(e) => {
@@ -112,6 +113,7 @@ const FormTextarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
               minRows={minRows}
               maxRows={maxRows === -1 ? undefined : maxRows}
               ref={ref}
+              value={defaultValue}
               defaultValue={defaultValue}
               aria-label={hideLabel ? label : undefined}
               disabled={disabled}
