@@ -385,7 +385,7 @@ const SettingsUsers: FC = () => {
         return mapped.map((d) => d.name);
       },
       {
-        header: t('multiDomains.title') ?? '',
+        header: t('multiDomains.domains') ?? '',
         cell: (props) => props.getValue().join(', '),
         filterFn: (row, _, filterValue) => {
           const mapped = mapUserDomains(row.original.domains ?? [], widgetDomains);
