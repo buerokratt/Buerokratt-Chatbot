@@ -1,5 +1,5 @@
-const { searchNotification, findChatIdOrder } = require('./openSearch');
 const { serverConfig } = require('./config');
+const { searchNotification, findChatIdOrder } = require('./openSearch');
 
 function buildNotificationSearchInterval({ channelId, interval = serverConfig.refreshInterval }) {
   return ({ connectionId, sender }) => {
