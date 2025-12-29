@@ -68,13 +68,11 @@ return_success:
   next: end
 
 return_error:
-  return:
-    error: "Failed to fetch CentOps client list"
+  return: "Failed to fetch CentOps client list"
   status: 500
   next: end
 
 return_connection_error:
-  return:
-    error: "CentOps service is unavailable. Please try again later."
+  return: "CentOps service is unavailable. Please try again later."
   status: 503
   next: end
