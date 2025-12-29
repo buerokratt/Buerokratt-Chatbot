@@ -1,0 +1,27 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Check if CentOps is configured"
+  method: get
+  accepts: json
+  returns: json
+  namespace: backoffice
+
+check_centops_config:
+  switch:
+    - condition: ${"[#CENTOPS_URL]" !== "" && "[#CENTOPS_API_KEY]" !== "" && "[#CENTOPS_API_SECRET]" !== ""}
+      next: return_configured
+  next: return_not_configured
+
+return_configured:
+  return:
+    configured: true
+  status: 200
+  next: end
+
+return_not_configured:
+  return:
+    configured: false
+  status: 200
+  next: end
+
