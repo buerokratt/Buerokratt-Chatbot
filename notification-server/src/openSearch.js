@@ -307,6 +307,7 @@ function handleError(e) {
 }
 
 module.exports = {
+  client,
   searchNotification,
   enqueueChatId,
   dequeueChatId,
