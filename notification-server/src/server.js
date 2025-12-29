@@ -1,16 +1,18 @@
-const express = require('express');
-const cors = require('cors');
-const { buildSSEResponse } = require('./sseUtil');
-const { serverConfig } = require('./config');
-const { buildNotificationSearchInterval, buildQueueCounter } = require('./addOns');
-const { enqueueChatId, dequeueChatId, sendBulkNotification, createAzureOpenAIStreamRequest } = require('./openSearch');
-const { addToTerminationQueue, removeFromTerminationQueue } = require('./terminationQueue');
-const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
+const cors = require('cors');
 const csurf = require('csurf');
+const express = require('express');
+const helmet = require('helmet');
+
+const { buildNotificationSearchInterval, buildQueueCounter } = require('./addOns');
 const { initializeAzureOpenAI } = require('./azureOpenAI');
-const streamQueue = require('./streamQueue');
+const { serverConfig } = require('./config');
+const { stoppedChannels } = require('./connectionManager');
 const { addToLogoutQueue, removeFromLogoutQueue } = require('./logoutQueue');
+const { enqueueChatId, dequeueChatId, sendBulkNotification, createAzureOpenAIStreamRequest } = require('./openSearch');
+const { buildSSEResponse } = require('./sseUtil');
+const streamQueue = require('./streamQueue');
+const { addToTerminationQueue, removeFromTerminationQueue } = require('./terminationQueue');
 
 const app = express();
 
@@ -181,6 +183,24 @@ app.post('/channels/:channelId/stream', async (req, res) => {
     } else {
       res.status(500).json({ error: 'Failed to start streaming' });
     }
+  }
+});
+
+app.post('/channels/:channelId/stream/stop', async (req, res) => {
+  try {
+    const { channelId } = req.params;
+
+    stoppedChannels.add(channelId);
+    streamQueue.clearChannelQueue(channelId);
+
+    setTimeout(() => {
+      stoppedChannels.delete(channelId);
+    }, 1000);
+
+    res.status(200).json();
+  } catch (error) {
+    console.error(`Error stopping stream for channel ${req.params.channelId}:`, error);
+    res.status(200).json();
   }
 });
 
