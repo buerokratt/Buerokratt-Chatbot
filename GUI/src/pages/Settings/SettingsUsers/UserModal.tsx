@@ -263,7 +263,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user, domainsList }) => {
             rules={{}}
             render={({ field: { onChange, onBlur, name, ref } }) => (
               <div className="multiSelect">
-                <label className="multiSelect__label">{t('multiDomains.title')}</label>
+                <label className="multiSelect__label">{t('multiDomains.domains')}</label>
                 <div className="multiSelect__wrapper">
                   <Select
                     name={name}
