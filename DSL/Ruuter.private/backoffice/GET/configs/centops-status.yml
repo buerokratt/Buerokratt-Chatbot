@@ -24,4 +24,3 @@ return_not_configured:
     configured: false
   status: 200
   next: end
-
