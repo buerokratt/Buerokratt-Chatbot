@@ -2,7 +2,6 @@ WITH
     domain_list AS (
         SELECT (jsonb_array_elements_text(:domains::jsonb))::uuid AS domain
     ),
-
     last_configuration AS (
 SELECT
     c.domain,
@@ -31,7 +30,6 @@ WHERE
   AND c2.key    = c.key
     )
     ),
-
     new_configuration AS (
 SELECT
     v.key,
