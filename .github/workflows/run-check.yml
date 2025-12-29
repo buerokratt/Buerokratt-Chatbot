@@ -1,0 +1,33 @@
+name: Run check
+on:
+  workflow_call:
+    inputs:
+      command:
+        required: true
+        type: string
+      working_directory:
+        required: true
+        type: string
+        description: 'Working directory (e.g., GUI, notification-server)'
+
+jobs:
+  run-check:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '${{ inputs.working_directory }}/package.json'
+          cache: npm
+          cache-dependency-path: ${{ inputs.working_directory }}/package-lock.json
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+        working-directory: ${{ inputs.working_directory }}
+      # Use env var to prevent script injection
+      - name: Run command
+        env:
+          COMMAND: ${{ inputs.command }}
+        run: $COMMAND
+        working-directory: ${{ inputs.working_directory }}

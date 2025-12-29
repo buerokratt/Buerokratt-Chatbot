@@ -1,78 +1,109 @@
-import { FC, useEffect, useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { AxiosError } from 'axios';
-import { useTranslation } from 'react-i18next';
+import { FEEDBACK_NOTICE_LENGTH, FEEDBACK_QUESTION_LENGTH } from 'constants/config';
 
-import {
-  Button,
-  Card,
-  FormTextarea,
-  Switch,
-  Track,
-} from 'components';
-import {
-  FEEDBACK_QUESTION_LENGTH,
-  FEEDBACK_NOTICE_LENGTH,
-} from 'constants/config';
 import { useMutation } from '@tanstack/react-query';
-import { useToast } from 'hooks/useToast';
-import { apiDev } from 'services/api';
+import { AxiosError } from 'axios';
+import { Button, Card, FormTextarea, Switch, Track } from 'components';
 import withAuthorization from 'hoc/with-authorization';
-import { ROLES } from 'utils/constants';
+import { useToast } from 'hooks/useToast';
+import { FC, useEffect, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { apiDev } from 'services/api';
 import { FeedbackConfig } from 'types/feedbackConfig';
-import { getFeedbackConfigData, setFeedbackData } from './data';
+import { ROLES } from 'utils/constants';
+
+import { setFeedbackData } from './data';
+import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
+import DomainSelector from '../../../components/DomainsSelector';
+import { fetchConfigurationFromDomain } from '../../../services/configurations';
 
 const SettingsFeedback: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
   const { control, handleSubmit, reset } = useForm<FeedbackConfig>();
-  const [key, setKey] = useState(0);
   const [feedbackConfig, setFeedbackConfig] = useState<FeedbackConfig | undefined>(undefined);
+  const multiDomainEnabled = import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
+  const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
 
-  const getFeedbackConfig = async () => {
-      const res = await apiDev.get<{response: FeedbackConfig}>('configs/feedback');
-      reset(getFeedbackConfigData(res.data.response));
-      setFeedbackConfig(res.data.response);
-      setKey(key + 1);
+  useEffect(() => {
+    resetSettingsToDefault();
+    if (multiDomainEnabled) {
+      resetSettingsToDefault();
+    } else {
+      fetchData('none');
     }
-  
-    useEffect(() => {
-      getFeedbackConfig();
-    }, []);
+  }, []);
 
-    const feedbackConfigMutation = useMutation({
-      mutationFn: (data: FeedbackConfig) =>
-        apiDev.post<FeedbackConfig>(
-          'configs/feedback',
-          setFeedbackData(data)
-        ),
-      onSuccess: () => {
-        toast.open({
-          type: 'success',
-          title: t('global.notification'),
-          message: t('toast.success.updateSuccess'),
-        });
-      },
-      onError: (error: AxiosError) => {
-        toast.open({
-          type: 'error',
-          title: t('global.notificationError'),
-          message: error.message,
-        });
-      },
-    });
+  const fetchData = async (selectedDomain: string) => {
+    try {
+      const data: { response: FeedbackConfig } = await fetchConfigurationFromDomain<{ response: FeedbackConfig }>(
+        'configs/feedback',
+        selectedDomain,
+      );
+      const res = data.response;
 
-    const handleFormSubmit = handleSubmit((data) => {
-      feedbackConfigMutation.mutate(data);
-    });
+      console.log('res', res, data)
 
-    if (!feedbackConfig) {
-      return <>Loading...</>;
+      reset(res);
+      setFeedbackConfig(res);
+    } catch (error) {
+      console.error('Failed to fetch feedback', error);
     }
+  };
+
+  const feedbackConfigMutation = useMutation({
+    mutationFn: (data: FeedbackConfig) => apiDev.post<FeedbackConfig>('configs/feedback', setFeedbackData(data)),
+    onSuccess: () => {
+      toast.open({
+        type: 'success',
+        title: t('global.notification'),
+        message: t('toast.success.updateSuccess'),
+      });
+    },
+    onError: (error: AxiosError) => {
+      toast.open({
+        type: 'error',
+        title: t('global.notificationError'),
+        message: error.message,
+      });
+    },
+  });
+
+  const handleFormSubmit = handleSubmit((data) => {
+    data.domainUUID = multiDomainEnabled ? selectedDomains : [];
+    feedbackConfigMutation.mutate(data);
+  });
+
+  const resetSettingsToDefault = () => {
+    const feedbackConfig = {
+      feedbackActive: false,
+      feedbackQuestion: '',
+      feedbackNoticeActive: false,
+      feedbackNotice: ''
+    };
+    setFeedbackConfig(feedbackConfig);
+    reset(feedbackConfig);
+  };
+
+  const handleDomainSelection = useDomainSelectionHandler(setSelectedDomains, fetchData, resetSettingsToDefault);
+
+  if (!feedbackConfig) {
+    return <>Loading...</>;
+  }
 
   return (
     <>
       <h1>{t('settings.feedback.title')}</h1>
+
+      {multiDomainEnabled && (
+        <DomainSelector
+          disabled={(multiDomainEnabled && selectedDomains.length === 0) || false}
+          onChange={(selected) => {
+            handleDomainSelection(selected);
+          }}
+        />
+      )}
+
       <Card
         footer={
           <Track justify="end">
@@ -88,7 +119,7 @@ const SettingsFeedback: FC = () => {
               <Switch
                 label={t('settings.feedback.feedbackActive')}
                 onCheckedChange={field.onChange}
-                checked={field.value}
+                checked={Boolean(field.value)}
                 {...field}
               />
             )}
@@ -102,7 +133,7 @@ const SettingsFeedback: FC = () => {
                 minRows={4}
                 maxLength={FEEDBACK_QUESTION_LENGTH}
                 onChange={field.onChange}
-                defaultValue={field.value}
+                defaultValue={field.value ?? ''}
                 name="label"
                 showMaxLength
                 maxLengthBottom
@@ -117,7 +148,7 @@ const SettingsFeedback: FC = () => {
               <Switch
                 label={t('settings.feedback.noticeActive')}
                 onCheckedChange={field.onChange}
-                checked={field.value}
+                checked={Boolean(field.value)}
                 {...field}
               />
             )}
@@ -131,7 +162,7 @@ const SettingsFeedback: FC = () => {
                 minRows={4}
                 maxLength={FEEDBACK_NOTICE_LENGTH}
                 onChange={field.onChange}
-                defaultValue={field.value}
+                defaultValue={field.value ?? ''}
                 name="label"
                 showMaxLength
                 maxLengthBottom
@@ -145,6 +176,4 @@ const SettingsFeedback: FC = () => {
   );
 };
 
-export default withAuthorization(SettingsFeedback, [
-  ROLES.ROLE_ADMINISTRATOR,
-]);
+export default withAuthorization(SettingsFeedback, [ROLES.ROLE_ADMINISTRATOR]);

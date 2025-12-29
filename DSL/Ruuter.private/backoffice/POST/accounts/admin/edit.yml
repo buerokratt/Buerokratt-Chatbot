@@ -142,13 +142,7 @@ updateUserDomains:
       userIdCode: ${userIdCode}
       domains: ${domains}
   result: add_domains_res
-#  next: return_result
-
-checkVVV:
-  log: ${domains}
-
-checkVV:
-  log: ${add_domains_res}
+  next: return_result
 
 return_result:
   return: "User updated successfully"

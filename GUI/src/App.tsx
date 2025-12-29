@@ -1,36 +1,37 @@
-import { FC } from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-
-import { Layout } from 'components';
-import useStore from 'store';
 import { userStore as useHeaderStore } from '@buerokratt-ria/header';
-import { UserInfo } from 'types/userInfo';
-
+import { useQuery } from '@tanstack/react-query';
+import { Layout } from 'components';
+import LandingPage from 'pages';
 import ChatActive from 'pages/Chat/ChatActive';
 import ChatHistory from 'pages/Chat/ChatHistory';
-
-import SettingsUsers from 'pages/Settings/SettingsUsers';
-import SettingsChatSettings from 'pages/Settings/SettingsChatSettings';
-import SettingsEmergencyNotices from 'pages/Settings/SettingsEmergencyNotices';
-import SettingsAppearance from 'pages/Settings/SettingsAppearance';
-import SettingsWorkingTime from 'pages/Settings/SettingsWorkingTime';
-
+import ChatPending from 'pages/Chat/ChatPending';
 import ChatUnanswered from 'pages/Chat/ChatUnanswered';
 import MonitoringUptime from 'pages/Monitoring/MonitoringUptime';
-import SettingsWelcomeMessage from 'pages/Settings/SettingsWelcomeMessage';
-import SettingsSessionLength from 'pages/Settings/SettingsSessionLength';
-import './locale/et_EE';
-import ChatPending from 'pages/Chat/ChatPending';
-import DeleteConversations from './pages/Settings/DeleteConversations';
-import ValidationRequests from './pages/Chat/ValidationRequests';
-import SettingsSkmConfiguration from 'pages/Settings/SettingsSkmConfiguration';
-import LandingPage from 'pages';
-import MultiDomain from './pages/Settings/MultiDomain';
-import SettingsFeedback from 'pages/Settings/SettingsFeedback';
-import { getWidgetData } from './services/users';
-import useTabCloseEffect from './hooks/useTabCloseEffects';
 import Anonymizer from 'pages/Settings/Anonymizer';
+import SettingsAppearance from 'pages/Settings/SettingsAppearance';
+import SettingsChatSettings from 'pages/Settings/SettingsChatSettings';
+import SettingsEmergencyNotices from 'pages/Settings/SettingsEmergencyNotices';
+import SettingsSessionLength from 'pages/Settings/SettingsSessionLength';
+import SettingsUsers from 'pages/Settings/SettingsUsers';
+import SettingsWelcomeMessage from 'pages/Settings/SettingsWelcomeMessage';
+import SettingsWorkingTime from 'pages/Settings/SettingsWorkingTime';
+import { FC } from 'react';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import useStore from 'store';
+import { UserInfo } from 'types/userInfo';
+import './locale/et_EE';
+
+import useTabCloseEffect from './hooks/useTabCloseEffects';
+import ValidationRequests from './pages/Chat/ValidationRequests';
+import DeleteConversations from './pages/Settings/DeleteConversations';
+
+import SettingsSkmConfiguration from 'pages/Settings/SettingsSkmConfiguration';
+
+import MultiDomain from './pages/Settings/MultiDomain';
+
+import SettingsFeedback from 'pages/Settings/SettingsFeedback';
+
+import { getWidgetData } from './services/users';
 
 const App: FC = () => {
   const multiDomainEnabled = import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
@@ -46,8 +47,8 @@ const App: FC = () => {
         getWidgetData(res.response.idCode)
           .then((domains) => {
             const selectedDomains = domains
-              .filter(d => d.selected)
-              .map(d => d.url)
+              .filter((d) => d.selected)
+              .map((d) => d.url)
               .filter(Boolean);
 
             useStore.getState().setUserDomains(selectedDomains);
@@ -77,22 +78,13 @@ const App: FC = () => {
         <Route path="/pending" element={<ChatPending />} />
         <Route path="/users" element={<SettingsUsers />} />
         <Route path="/chatbot/settings" element={<SettingsChatSettings />} />
-        <Route
-          path="/chatbot/welcome-message"
-          element={<SettingsWelcomeMessage />}
-        />
-        <Route
-          path="/chatbot/emergency-notices"
-          element={<SettingsEmergencyNotices />}
-        />
+        <Route path="/chatbot/welcome-message" element={<SettingsWelcomeMessage />} />
+        <Route path="/chatbot/emergency-notices" element={<SettingsEmergencyNotices />} />
         <Route path="/chatbot/appearance" element={<SettingsAppearance />} />
         <Route path="/chatbot/feedback" element={<SettingsFeedback />} />
         <Route path="/working-time" element={<SettingsWorkingTime />} />
         <Route path="/session-length" element={<SettingsSessionLength />} />
-        <Route
-          path="/skm-configuration"
-          element={<SettingsSkmConfiguration />}
-        />
+        <Route path="/skm-configuration" element={<SettingsSkmConfiguration />} />
         <Route path="/skm-configuration" element={<SettingsSkmConfiguration />} />
         <Route path="/multi-domains" element={<MultiDomain />} />
         <Route path="/anonymizer" element={<Anonymizer />} />

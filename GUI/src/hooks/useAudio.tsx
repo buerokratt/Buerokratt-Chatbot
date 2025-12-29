@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
 import { Howl } from 'howler';
+import { useEffect, useState } from 'react';
+
 import ding from '../assets/ding.mp3';
 import newMessageSound from '../assets/newMessageSound.mp3';
 
@@ -15,16 +16,16 @@ export const useAudio = (audiosrc: string) => {
 
     return () => {
       howl.unload();
-    }
+    };
   }, []);
 
   return [audio] as const;
-}
+};
 
 export const useDing = () => {
   return useAudio(ding);
-}
+};
 
 export const useNewMessageSound = () => {
   return useAudio(newMessageSound);
-}
+};

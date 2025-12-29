@@ -20,6 +20,9 @@ declaration:
       - field: feedbackNotice
         type: string
         description: "Body field 'feedbackNotice'"
+      - field: domainUUID
+        type: object
+        description: "Body field 'domainUUID'"
     
 extractRequestData:
   assign:
@@ -27,8 +30,29 @@ extractRequestData:
     feedbackQuestion: ${incoming.body.feedbackQuestion}
     feedbackNoticeActive: ${incoming.body.feedbackNoticeActive}
     feedbackNotice: ${incoming.body.feedbackNotice}
+    domains: ${incoming.body.domainUUID}
 
-setSkmConfig:
+checkForDomains:
+  switch:
+    - condition: ${domains.length > 0}
+      next: setDomainFeedbackConfig
+  next: setFeedbackConfig
+
+setDomainFeedbackConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-domain-feedback-config"
+    body:
+      feedbackActive: ${feedbackActive}
+      feedbackQuestion: ${feedbackQuestion}
+      feedbackNoticeActive: ${feedbackNoticeActive}
+      feedbackNotice: ${feedbackNotice}
+      created: ${new Date().toISOString()}
+      domains: ${JSON.stringify(domains)}
+  result: updated_feedback
+  next: return_result
+
+setFeedbackConfig:
   call: http.post
   args:
     url: "[#CHATBOT_RESQL]/set-feedback-config"
@@ -38,7 +62,8 @@ setSkmConfig:
       feedbackNoticeActive: ${feedbackNoticeActive}
       feedbackNotice: ${feedbackNotice}
       created: ${new Date().toISOString()}
-  result: return_result
+  result: updated_feedback
+  next: return_result
 
 return_result:
   return: 'Feedback configurations changed successfully'

@@ -5,7 +5,7 @@ type SelectOption = { label: string; value: string; meta?: string };
 export const useDomainSelectionHandler = (
   setSelectedDomains: (ids: string[]) => void,
   fetchData: (domainId: string) => void,
-  resetSettingsToDefault: () => void
+  resetSettingsToDefault: () => void,
 ) => {
   const mapDomainSelection = useCallback((selectedDomains: SelectOption[]) => {
     if (!selectedDomains || selectedDomains.length === 0) return [];
@@ -24,7 +24,7 @@ export const useDomainSelectionHandler = (
         resetSettingsToDefault();
       }
     },
-    [fetchData, resetSettingsToDefault, setSelectedDomains, mapDomainSelection]
+    [fetchData, resetSettingsToDefault, setSelectedDomains, mapDomainSelection],
   );
 
   return handleDomainSelection;

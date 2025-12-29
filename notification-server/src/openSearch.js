@@ -1,8 +1,9 @@
-const { Client } = require("@opensearch-project/opensearch");
-const { openSearchConfig } = require("./config");
-const { streamAzureOpenAIResponse } = require("./azureOpenAI");
-const { activeConnections } = require("./connectionManager");
-const streamQueue = require("./streamQueue");
+const { Client } = require('@opensearch-project/opensearch');
+
+const { streamAzureOpenAIResponse } = require('./azureOpenAI');
+const { openSearchConfig } = require('./config');
+const { activeConnections, stoppedChannels } = require('./connectionManager');
+const streamQueue = require('./streamQueue');
 
 let client = buildClient();
 
@@ -18,7 +19,7 @@ async function searchNotification({ channelId, connectionId, sender }) {
               must_not: { match: { sentTo: connectionId } },
             },
           },
-          sort: { timestamp: { order: "asc" } },
+          sort: { timestamp: { order: 'asc' } },
         },
       })
       .catch(handleError);
@@ -31,8 +32,8 @@ async function searchNotification({ channelId, connectionId, sender }) {
       await markAsSent(hit, connectionId);
     }
   } catch (e) {
-    console.error("processing notification error:", e);
-    await sender({ error: "Notification processing failed" });
+    console.error('processing notification error:', e);
+    await sender({ error: 'Notification processing failed' });
   }
 }
 
@@ -40,8 +41,10 @@ async function createAzureOpenAIStreamRequest({ channelId, messages, options = {
   const { stream = true } = options;
 
   try {
+    stoppedChannels.delete(channelId);
+
     const connections = Array.from(activeConnections.entries()).filter(
-      ([_, connData]) => connData.channelId === channelId
+      ([_, connData]) => connData.channelId === channelId,
     );
 
     if (connections.length === 0) {
@@ -59,23 +62,26 @@ async function createAzureOpenAIStreamRequest({ channelId, messages, options = {
           return;
         }
 
-        const openAIFallback1 = "The requested information is not found in the retrieved data. Please try another query or topic.";
-        const openAIFallback2 = "The requested information is not available in the retrieved data. Please try another query or topic.";
-        const estonianFallback = "Mulle kättesaadavates andmetes puudub teie küsimusele vastav info. Palun täpsustage oma küsimust.";
+        const openAIFallback1 =
+          'The requested information is not found in the retrieved data. Please try another query or topic.';
+        const openAIFallback2 =
+          'The requested information is not available in the retrieved data. Please try another query or topic.';
+        const estonianFallback =
+          'Mulle kättesaadavates andmetes puudub teie küsimusele vastav info. Palun täpsustage oma küsimust.';
 
         if (stream) {
           sender({
-            type: "stream_start",
+            type: 'stream_start',
             streamId: channelId,
             channelId,
           });
 
           let context;
-          let cumulative = "";
+          let cumulative = '';
           let startedStreaming = false;
 
           for await (const part of response) {
-            if (!activeConnections.has(connectionId)) break;
+            if (!activeConnections.has(connectionId) || stoppedChannels.has(channelId)) break;
 
             const choice = part.choices?.[0];
             if (!choice) continue;
@@ -92,18 +98,18 @@ async function createAzureOpenAIStreamRequest({ channelId, messages, options = {
               const isPrefixOfT2 = openAIFallback2.startsWith(cumulative);
 
               if (isPrefixOfT1 || isPrefixOfT2) continue;
-              
+
               startedStreaming = true;
 
               sender({
-                type: "stream_chunk",
+                type: 'stream_chunk',
                 channelId,
                 content: cumulative,
                 isComplete: false,
               });
             } else {
               sender({
-                type: "stream_chunk",
+                type: 'stream_chunk',
                 channelId,
                 content,
                 isComplete: false,
@@ -111,12 +117,12 @@ async function createAzureOpenAIStreamRequest({ channelId, messages, options = {
             }
           }
 
-          if (activeConnections.has(connectionId)) {
+          if (activeConnections.has(connectionId) && !stoppedChannels.has(channelId)) {
             if (!startedStreaming) {
               const trimmed = cumulative.trim();
               if (trimmed === openAIFallback1 || trimmed === openAIFallback2) {
                 sender({
-                  type: "stream_chunk",
+                  type: 'stream_chunk',
                   channelId,
                   content: estonianFallback,
                   isComplete: false,
@@ -125,24 +131,24 @@ async function createAzureOpenAIStreamRequest({ channelId, messages, options = {
             }
 
             sender({
-              type: "stream_complete",
+              type: 'stream_complete',
               channelId,
-              content: "",
+              content: '',
               context: context || {},
               isComplete: true,
             });
           }
         } else {
-          let content = response.choices[0]?.message?.content || "";
+          let content = response.choices[0]?.message?.content || '';
           const context = response.choices[0]?.message?.context || {};
 
           const trimmed = content.trim();
           const isDefaultMessage = trimmed === openAIFallback1 || trimmed === openAIFallback2;
 
           if (isDefaultMessage) content = estonianFallback;
-          
+
           sender({
-            type: "complete_response",
+            type: 'complete_response',
             channelId,
             content: content,
             context,
@@ -151,9 +157,9 @@ async function createAzureOpenAIStreamRequest({ channelId, messages, options = {
         }
       } catch (error) {
         if (activeConnections.has(connectionId)) {
-          const errorMessage = `Failed to ${stream ? "stream" : "generate"} response: ${error.message}`;
+          const errorMessage = `Failed to ${stream ? 'stream' : 'generate'} response: ${error.message}`;
           sender({
-            type: stream ? "stream_error" : "response_error",
+            type: stream ? 'stream_error' : 'response_error',
             channelId,
             content: errorMessage,
             isComplete: true,
@@ -169,7 +175,7 @@ async function createAzureOpenAIStreamRequest({ channelId, messages, options = {
       success: true,
       channelId,
       connectionsCount: connections.length,
-      message: `Azure OpenAI ${stream ? "streaming" : "response"} completed for all connections`,
+      message: `Azure OpenAI ${stream ? 'streaming' : 'response'} completed for all connections`,
     };
   } catch (error) {
     console.error(`Error in createAzureOpenAIStreamRequest (stream=${stream}):`, error);
@@ -193,7 +199,7 @@ async function markAsSent({ _index, _id }, connectionId) {
         } else {
           ctx._source.sentTo.add(params.connectionId);
         }`,
-        lang: "painless",
+        lang: 'painless',
         params: { connectionId },
       },
     },
@@ -203,49 +209,55 @@ async function markAsSent({ _index, _id }, connectionId) {
 async function enqueueChatId(chatId) {
   if (await findChatId(chatId)) return;
 
-  await client.index({
-    index: openSearchConfig.chatQueueIndex,
-    body: {
-      chatId,
-      timestamp: Date.now(),
-    },
-    refresh: true,
-  }).catch(handleError);
+  await client
+    .index({
+      index: openSearchConfig.chatQueueIndex,
+      body: {
+        chatId,
+        timestamp: Date.now(),
+      },
+      refresh: true,
+    })
+    .catch(handleError);
 }
 
 async function dequeueChatId(chatId) {
-  await client.deleteByQuery({
-    index: openSearchConfig.chatQueueIndex,
-    body: {
-      query: {
-        match: {
-          chatId: {
-            query: chatId,
+  await client
+    .deleteByQuery({
+      index: openSearchConfig.chatQueueIndex,
+      body: {
+        query: {
+          match: {
+            chatId: {
+              query: chatId,
+            },
           },
         },
       },
-    },
-    refresh: true,
-    conflicts: "proceed",
-  }).catch(handleError);
+      refresh: true,
+      conflicts: 'proceed',
+    })
+    .catch(handleError);
 }
 
 async function findChatId(chatId) {
   const found = await isQueueIndexExists();
   if (!found) return null;
 
-  const response = await client.search({
-    index: openSearchConfig.chatQueueIndex,
-    body: {
-      query: {
-        match: {
-          chatId: {
-            query: chatId,
+  const response = await client
+    .search({
+      index: openSearchConfig.chatQueueIndex,
+      body: {
+        query: {
+          match: {
+            chatId: {
+              query: chatId,
+            },
           },
         },
       },
-    },
-  }).catch(handleError);
+    })
+    .catch(handleError);
 
   if (response.body.hits.hits.length == 0) return null;
 
@@ -253,9 +265,11 @@ async function findChatId(chatId) {
 }
 
 async function isQueueIndexExists() {
-  const res = await client.indices.exists({
-    index: openSearchConfig.chatQueueIndex,
-  }).catch(handleError);
+  const res = await client.indices
+    .exists({
+      index: openSearchConfig.chatQueueIndex,
+    })
+    .catch(handleError);
   return res.body;
 }
 
@@ -263,19 +277,21 @@ async function findChatIdOrder(chatId) {
   const found = await findChatId(chatId);
   if (!found) return 0;
 
-  const response = await client.search({
-    index: openSearchConfig.chatQueueIndex,
-    body: {
-      query: {
-        range: {
-          timestamp: {
-            lt: found.timestamp,
+  const response = await client
+    .search({
+      index: openSearchConfig.chatQueueIndex,
+      body: {
+        query: {
+          range: {
+            timestamp: {
+              lt: found.timestamp,
+            },
           },
         },
+        size: 0,
       },
-      size: 0,
-    },
-  }).catch(handleError);
+    })
+    .catch(handleError);
 
   return response.body.hits.total.value + 1;
 }
@@ -288,12 +304,12 @@ function buildClient() {
 }
 
 function handleError(e) {
-  if(e.name === 'ConnectionError')
-    client = buildClient();
+  if (e.name === 'ConnectionError') client = buildClient();
   throw e;
 }
 
 module.exports = {
+  client,
   searchNotification,
   enqueueChatId,
   dequeueChatId,

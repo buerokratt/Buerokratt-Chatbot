@@ -1,14 +1,9 @@
-import { FC, useMemo, useState } from 'react';
-import {
-  createColumnHelper,
-  PaginationState,
-  SortingState,
-} from '@tanstack/react-table';
 import { useQuery } from '@tanstack/react-query';
+import { createColumnHelper, PaginationState, SortingState } from '@tanstack/react-table';
+import { Button, DataTable, Dialog, FormInput, Icon, Track } from 'components';
+import { FC, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdOutlineArrowForward } from 'react-icons/md';
-
-import { Button, DataTable, Dialog, FormInput, Icon, Track } from 'components';
 import { Chat } from 'types/chat';
 import { Establishment } from 'types/establishment';
 
@@ -18,11 +13,7 @@ type ForwardToEstablishmentModalProps = {
   onForward: (chat: Chat, establishment: string) => void;
 };
 
-const ForwardToEstablishmentModal: FC<ForwardToEstablishmentModalProps> = ({
-  chat,
-  onModalClose,
-  onForward,
-}) => {
+const ForwardToEstablishmentModal: FC<ForwardToEstablishmentModalProps> = ({ chat, onModalClose, onForward }) => {
   const { t } = useTranslation();
   const [filter, setFilter] = useState('');
   const [pagination, setPagination] = useState<PaginationState>({
@@ -30,18 +21,14 @@ const ForwardToEstablishmentModal: FC<ForwardToEstablishmentModalProps> = ({
     pageSize: 10,
   });
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [establishmentsList, setEstablishmentsList] = useState<Establishment[]>(
-    []
-  );
+  const [establishmentsList, setEstablishmentsList] = useState<Establishment[]>([]);
   const { data: establishments } = useQuery<Establishment[]>({
     queryKey: ['chats/establishments', 'prod'],
     onSuccess(res: any) {
       setEstablishmentsList(
-        (res.data.format_data.establishments as string[]).map(
-          (name: string, id): Establishment => {
-            return { id, name };
-          }
-        )
+        (res.data.format_data.establishments as string[]).map((name: string, id): Establishment => {
+          return { id, name };
+        }),
       );
     },
   });
@@ -49,10 +36,7 @@ const ForwardToEstablishmentModal: FC<ForwardToEstablishmentModalProps> = ({
   const columnHelper = createColumnHelper<Establishment>();
 
   const forwardView = (props: any) => (
-    <Button
-      appearance="text"
-      onClick={() => onForward(chat, props.row.original.name)}
-    >
+    <Button appearance="text" onClick={() => onForward(chat, props.row.original.name)}>
       <Icon icon={<MdOutlineArrowForward color="rgba(0, 0, 0, 0.54)" />} />
       {t('global.forward')}
     </Button>
@@ -72,15 +56,11 @@ const ForwardToEstablishmentModal: FC<ForwardToEstablishmentModalProps> = ({
         },
       }),
     ],
-    []
+    [],
   );
 
   return (
-    <Dialog
-      title={t('chat.active.forwardChat')}
-      onClose={onModalClose}
-      size="large"
-    >
+    <Dialog title={t('chat.active.forwardChat')} onClose={onModalClose} size="large">
       <Track
         direction="vertical"
         gap={8}

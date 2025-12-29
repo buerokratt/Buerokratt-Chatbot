@@ -1,17 +1,17 @@
-import { FC, useState } from 'react';
-import * as RadixToast from '@radix-ui/react-toast';
-import {
-  MdOutlineClose,
-  MdOutlineInfo,
-  MdCheckCircleOutline,
-  MdOutlineWarningAmber,
-  MdErrorOutline,
-} from 'react-icons/md';
-import clsx from 'clsx';
+import { POPUP_DURATION } from 'constants/config';
 
+import * as RadixToast from '@radix-ui/react-toast';
+import clsx from 'clsx';
 import { Icon } from 'components';
 import type { ToastType } from 'context/ToastContext';
-import { POPUP_DURATION } from 'constants/config';
+import { FC, useState } from 'react';
+import {
+  MdCheckCircleOutline,
+  MdErrorOutline,
+  MdOutlineClose,
+  MdOutlineInfo,
+  MdOutlineWarningAmber,
+} from 'react-icons/md';
 
 import './Toast.scss';
 
@@ -44,9 +44,7 @@ const Toast: FC<ToastProps> = ({ toast, close }) => {
         <Icon icon={toastIcons[toast.type]} />
         {toast.title}
       </RadixToast.Title>
-      <RadixToast.Description className="toast__content">
-        {toast.message}
-      </RadixToast.Description>
+      <RadixToast.Description className="toast__content">{toast.message}</RadixToast.Description>
       <RadixToast.Close onClick={close} className="toast__close">
         <Icon icon={<MdOutlineClose />} size="medium" />
       </RadixToast.Close>

@@ -1,21 +1,21 @@
+import { userStore as useHeaderStore } from '@buerokratt-ria/header';
+import * as Tabs from '@radix-ui/react-tabs';
+import clsx from 'clsx';
+import { Button, Chat, Dialog, FormRadios } from 'components';
+import withAuthorization from 'hoc/with-authorization';
+import { useToast } from 'hooks/useToast';
 import { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import * as Tabs from '@radix-ui/react-tabs';
-import { useQuery } from '@tanstack/react-query';
-
-import { Chat, Dialog, Button, FormRadios } from 'components';
-import { CHAT_EVENTS, CHAT_STATUS, Chat as ChatType } from 'types/chat';
-import { userStore as useHeaderStore } from '@buerokratt-ria/header';
-import useStore from 'store';
-import { User } from 'types/user';
-import { useToast } from 'hooks/useToast';
 import { apiDev } from 'services/api';
+import useStore from 'store';
+import { CHAT_EVENTS, CHAT_STATUS, Chat as ChatType } from 'types/chat';
+import { User } from 'types/user';
+
 import ChatTrigger from '../ChatActive/ChatTrigger';
-import clsx from 'clsx';
 import ForwardToColleaugeModal from '../ForwardToColleaugeModal';
 import ForwardToEstablishmentModal from '../ForwardToEstablishmentModal';
+
 import './ChatUnanswered.scss';
-import withAuthorization from 'hoc/with-authorization';
 import { ROLES } from 'utils/constants';
 
 const ChatUnanswered: FC = () => {
@@ -23,14 +23,10 @@ const ChatUnanswered: FC = () => {
   const userInfo = useStore((state) => state.userInfo);
   const toast = useToast();
   const [endChatModal, setEndChatModal] = useState<ChatType | null>(null);
-  const [forwardToColleaugeModal, setForwardToColleaugeModal] =
-    useState<ChatType | null>(null);
-  const [forwardToEstablishmentModal, setForwardToEstablishmentModal] =
-    useState<ChatType | null>(null);
+  const [forwardToColleaugeModal, setForwardToColleaugeModal] = useState<ChatType | null>(null);
+  const [forwardToEstablishmentModal, setForwardToEstablishmentModal] = useState<ChatType | null>(null);
 
-  const [selectedEndChatStatus, setSelectedEndChatStatus] = useState<
-    string | null
-  >(null);
+  const [selectedEndChatStatus, setSelectedEndChatStatus] = useState<string | null>(null);
   const CSAchatStatuses = [
     CHAT_EVENTS.ACCEPTED,
     CHAT_EVENTS.HATE_SPEECH,
@@ -38,9 +34,7 @@ const ChatUnanswered: FC = () => {
     CHAT_EVENTS.RESPONSE_SENT_TO_CLIENT_EMAIL,
   ];
 
-  const groupedUnansweredChats = useHeaderStore((state) =>
-    state.getGroupedUnansweredChats()
-  );
+  const groupedUnansweredChats = useHeaderStore((state) => state.getGroupedUnansweredChats());
 
   const selectedChatId = useHeaderStore((state) => state.selectedChatId);
   const selectedChat = useHeaderStore((state) => state.selectedChat());
@@ -77,10 +71,7 @@ const ChatUnanswered: FC = () => {
     }
   };
 
-  const handleEstablishmentForward = (
-    chat: ChatType,
-    establishment: string
-  ) => {
+  const handleEstablishmentForward = (chat: ChatType, establishment: string) => {
     // To be added: Add endpoint for chat forwarding
     setForwardToEstablishmentModal(null);
     toast.open({
@@ -126,11 +117,7 @@ const ChatUnanswered: FC = () => {
       onValueChange={useHeaderStore.getState().setSelectedChatId}
       style={{ height: '100%', overflow: 'hidden' }}
     >
-      <Tabs.List
-        className="vertical-tabs__list"
-        aria-label={t('chat.active.list') ?? ''}
-        style={{ overflow: 'auto' }}
-      >
+      <Tabs.List className="vertical-tabs__list" aria-label={t('chat.active.list') ?? ''} style={{ overflow: 'auto' }}>
         <div className="vertical-tabs__group-header">
           <p>{`${t('chat.unansweredChats')} ${
             (groupedUnansweredChats?.myChats?.length ?? 0) == 0
@@ -198,10 +185,7 @@ const ChatUnanswered: FC = () => {
           onClose={() => setEndChatModal(null)}
           footer={
             <>
-              <Button
-                appearance="secondary"
-                onClick={() => setEndChatModal(null)}
-              >
+              <Button appearance="secondary" onClick={() => setEndChatModal(null)}>
                 {t('global.cancel')}
               </Button>
               <Button appearance="success" onClick={handleChatEnd}>
@@ -225,7 +209,4 @@ const ChatUnanswered: FC = () => {
   );
 };
 
-export default withAuthorization(ChatUnanswered, [
-  ROLES.ROLE_ADMINISTRATOR,
-  ROLES.ROLE_CUSTOMER_SUPPORT_AGENT,
-]);
+export default withAuthorization(ChatUnanswered, [ROLES.ROLE_ADMINISTRATOR, ROLES.ROLE_CUSTOMER_SUPPORT_AGENT]);

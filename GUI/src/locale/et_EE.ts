@@ -7,7 +7,7 @@ import * as timeago from 'timeago.js';
 
 function locale(number: number, index: number, totalSec: number | undefined) {
   const days = Math.round(Math.round(totalSec ?? 0) / (3600 * 24));
-  const monthRemainingDays = days - (number * 30);
+  const monthRemainingDays = days - number * 30;
   const isDaysPlural = monthRemainingDays != 1 ? 'a' : '';
   const isDaysAvailable = monthRemainingDays != 0 ? `${monthRemainingDays} päev${isDaysPlural}` : '';
   return [

@@ -1,0 +1,45 @@
+name: Run notification-server checks
+on:
+  push:
+    branches: [main, dev]
+    paths:
+      - "notification-server/**"
+      - ".github/workflows/run-check.yml"
+      - ".github/workflows/run-checks-notification-server.yml"
+  pull_request:
+    types: [opened, ready_for_review, reopened, synchronize]
+    paths:
+      - "notification-server/**"
+      - ".github/workflows/run-check.yml"
+      - ".github/workflows/run-checks-notification-server.yml"
+concurrency:
+  group: ${{ github.ref }}-checks-notification-server
+  cancel-in-progress: true
+
+jobs:
+  notification-server-format:
+    uses: ./.github/workflows/run-check.yml
+    with:
+      working_directory: notification-server
+      command: npm run format
+
+  notification-server-lint:
+    uses: ./.github/workflows/run-check.yml
+    with:
+      working_directory: notification-server
+      command: npm run lint
+
+  notification-server-test:
+    uses: ./.github/workflows/run-check.yml
+    with:
+      working_directory: notification-server
+      command: npm run test:run
+
+  notification-server-build:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker image build .
+        working-directory: notification-server

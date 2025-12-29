@@ -1,9 +1,8 @@
-import { FC, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-
 import { Card, Tooltip, Track } from 'components';
 import { format, sub } from 'date-fns';
 import withAuthorization from 'hoc/with-authorization';
+import { FC, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ROLES } from 'utils/constants';
 
 type ComponentHealth = {
@@ -45,20 +44,11 @@ const MonitoringUptime: FC = () => {
     <>
       <h1>{t('monitoring.uptime.title')}</h1>
       {uptimeData?.map((component) => (
-        <Card
-          key={component.name}
-          header={<h2 className="h5">{component.name}</h2>}
-        >
+        <Card key={component.name} header={<h2 className="h5">{component.name}</h2>}>
           <Track direction="vertical" align="left" gap={8}>
             <Track gap={5} justify="between" style={{ width: '100%' }}>
               {Array.from({ length: 90 }, (v, i) => i).map((bar) => (
-                <Tooltip
-                  key={bar}
-                  content={format(
-                    sub(new Date(), { days: 90 - bar - 1 }),
-                    'dd.MM.yyyy'
-                  )}
-                >
+                <Tooltip key={bar} content={format(sub(new Date(), { days: 90 - bar - 1 }), 'dd.MM.yyyy')}>
                   <div
                     style={{
                       flex: 1,

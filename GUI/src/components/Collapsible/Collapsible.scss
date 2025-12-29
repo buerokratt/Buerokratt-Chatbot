@@ -17,7 +17,7 @@
     background-color: get-color(extra-light);
     border-radius: 4px;
 
-    &[aria-expanded=true] {
+    &[aria-expanded='true'] {
       border-bottom: 1px solid get-color(black-coral-2);
       border-radius: 4px 4px 0 0;
     }
