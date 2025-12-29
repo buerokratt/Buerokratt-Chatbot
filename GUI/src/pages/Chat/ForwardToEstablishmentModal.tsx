@@ -13,6 +13,7 @@ type ForwardToEstablishmentModalProps = {
   onForward: (chat: Chat, establishment: string) => void;
 };
 
+// todo igor fe modal
 const ForwardToEstablishmentModal: FC<ForwardToEstablishmentModalProps> = ({ chat, onModalClose, onForward }) => {
   const { t } = useTranslation();
   const [filter, setFilter] = useState('');

@@ -10,6 +10,7 @@ declaration:
 getEstablishments:
   call: http.post
   args:
+    # todo igor remove and all related too
     url: "[#CHATBOT_RESQL]/get-all-establishments"
   result: res
 
