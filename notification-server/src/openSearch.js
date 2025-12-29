@@ -1,8 +1,9 @@
-const { Client } = require("@opensearch-project/opensearch");
-const { openSearchConfig } = require("./config");
-const { streamAzureOpenAIResponse } = require("./azureOpenAI");
-const { activeConnections, stoppedChannels } = require("./connectionManager");
-const streamQueue = require("./streamQueue");
+const { Client } = require('@opensearch-project/opensearch');
+
+const { streamAzureOpenAIResponse } = require('./azureOpenAI');
+const { openSearchConfig } = require('./config');
+const { activeConnections, stoppedChannels } = require('./connectionManager');
+const streamQueue = require('./streamQueue');
 
 let client = buildClient();
 

@@ -1,7 +1,8 @@
 const { v4: uuidv4 } = require('uuid');
-const streamQueue = require('./streamQueue');
-const { createAzureOpenAIStreamRequest } = require('./openSearch');
+
 const { activeConnections } = require('./connectionManager');
+const { createAzureOpenAIStreamRequest } = require('./openSearch');
+const streamQueue = require('./streamQueue');
 
 function buildSSEResponse({ res, req, buildCallbackFunction, channelId }) {
   addSSEHeader(req, res);

@@ -1,17 +1,18 @@
-const express = require('express');
-const cors = require('cors');
-const { buildSSEResponse } = require('./sseUtil');
-const { serverConfig } = require('./config');
-const { buildNotificationSearchInterval, buildQueueCounter } = require('./addOns');
-const { enqueueChatId, dequeueChatId, sendBulkNotification, createAzureOpenAIStreamRequest } = require('./openSearch');
-const { addToTerminationQueue, removeFromTerminationQueue } = require('./terminationQueue');
-const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
+const cors = require('cors');
 const csurf = require('csurf');
+const express = require('express');
+const helmet = require('helmet');
+
+const { buildNotificationSearchInterval, buildQueueCounter } = require('./addOns');
 const { initializeAzureOpenAI } = require('./azureOpenAI');
-const streamQueue = require('./streamQueue');
+const { serverConfig } = require('./config');
+const { stoppedChannels } = require('./connectionManager');
 const { addToLogoutQueue, removeFromLogoutQueue } = require('./logoutQueue');
-const { stoppedChannels } = require("./connectionManager");
+const { enqueueChatId, dequeueChatId, sendBulkNotification, createAzureOpenAIStreamRequest } = require('./openSearch');
+const { buildSSEResponse } = require('./sseUtil');
+const streamQueue = require('./streamQueue');
+const { addToTerminationQueue, removeFromTerminationQueue } = require('./terminationQueue');
 
 const app = express();
 
@@ -185,7 +186,7 @@ app.post('/channels/:channelId/stream', async (req, res) => {
   }
 });
 
-app.post("/channels/:channelId/stream/stop", async (req, res) => {
+app.post('/channels/:channelId/stream/stop', async (req, res) => {
   try {
     const { channelId } = req.params;
 
