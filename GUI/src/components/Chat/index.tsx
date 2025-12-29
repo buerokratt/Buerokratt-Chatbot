@@ -23,23 +23,23 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { apiDev } from 'services/api';
 import useStore from 'store';
+import { BotConfig } from 'types/botConfig';
 import { BACKOFFICE_NAME, CHAT_EVENTS, CHAT_STATUS, Chat as ChatType } from 'types/chat';
+import { DomainSelection } from 'types/domainsModels';
 import { AttachmentTypes, Message } from 'types/message';
+import { useInterval } from 'usehooks-ts';
 import { AUTHOR_ROLES, MESSAGE_FILE_SIZE_LIMIT, ROLES } from 'utils/constants';
 
-import ChatMessage from './ChatMessage';
 import ChatEvent from '../ChatEvent';
+import ChatMessage from './ChatMessage';
 import ChatTextArea from './ChatTextArea';
+import { ForwardToEstablishmentButton } from './ForwardToEstablishmentButton';
 import LoaderOverlay from './LoaderOverlay';
 import PreviewMessage from './PreviewMessage';
 import sse from '../../services/sse-service';
+import { getWidgetData } from '../../services/users';
 
 import './Chat.scss';
-import { useInterval } from 'usehooks-ts';
-import { BotConfig } from 'types/botConfig';
-
-import { getWidgetData } from '../../services/users';
-import { DomainSelection } from '../../types/domainsModels';
 
 type ChatProps = {
   chat: ChatType;
@@ -1003,11 +1003,7 @@ const Chat: FC<ChatProps> = ({
               <Button appearance="secondary" disabled={!chatCsaActive} onClick={forwardToColleague()}>
                 {t('chat.active.forwardToColleague')}
               </Button>
-              {isHiddenFeaturesEnabled && (
-                <Button appearance="secondary" disabled={!chatCsaActive} onClick={forwardToEstablishment()}>
-                  {t('chat.active.forwardToOrganization')}
-                </Button>
-              )}
+              <ForwardToEstablishmentButton disabled={!chatCsaActive} onClick={forwardToEstablishment()} />
               {isHiddenFeaturesEnabled && (
                 <Button
                   appearance="secondary"

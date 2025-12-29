@@ -13,15 +13,14 @@ check_centops_config:
       next: return_configured
   next: return_not_configured
 
-# todo looks fishy
 return_configured:
   assign:
-    result: '$={"configured": true}='
+    result: {"configured": true}
   next: return_result
 
 return_not_configured:
   assign:
-    result: '$={"configured": false}='
+    result: {"configured": false}
   next: return_result
 
 return_result:
