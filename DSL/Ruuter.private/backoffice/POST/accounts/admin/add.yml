@@ -32,6 +32,9 @@ declaration:
       - field: department
         type: string
         description: "Body field 'department'"
+      - field: domains
+        type: object
+        description: "Body field 'domains'"
 
 extractRequestData:
   assign:
@@ -43,6 +46,7 @@ extractRequestData:
     csa_email: ${incoming.body.csa_email}
     roles: ${incoming.body.roles}
     department: ${incoming.body.department}
+    domains: ${incoming.body.domains}
 
 getUser:
   call: http.post
@@ -114,6 +118,22 @@ setUserProfileSettings:
       newChatEmailNotifications: false
       useAutocorrect: true
   result: set_user_profile_settings_res
+  next: checkForDomains
+
+checkForDomains:
+  switch:
+    - condition: ${!domains}
+      next: return_result
+  next: updateUserDomains
+
+updateUserDomains:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-user-role-domains"
+    body:
+      userIdCode: ${userIdCode}
+      domains: ${domains}
+  result: add_domains_res
   next: return_result
 
 return_result:
