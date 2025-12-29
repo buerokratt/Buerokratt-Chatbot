@@ -1,10 +1,10 @@
-version: "3.9"
+version: '3.9'
 services:
   buerokratt_chatbot:
     container_name: buerokratt_chatbot
     build:
       context: .
       target: web
-    entrypoint: "/opt/buerokratt-chatbot/rebuild.sh"
+    entrypoint: '/opt/buerokratt-chatbot/rebuild.sh'
     ports:
       - '3001:3001'

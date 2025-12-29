@@ -13,6 +13,6 @@ export function setFeedbackData(data: FeedbackConfig) {
   return {
     ...data,
     feedbackActive: data.feedbackActive.toString(),
-    feedbackNoticeActive: data.feedbackNoticeActive.toString()
+    feedbackNoticeActive: data.feedbackNoticeActive.toString(),
   };
 }

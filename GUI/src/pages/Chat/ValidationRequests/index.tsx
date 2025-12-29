@@ -1,25 +1,21 @@
-import React, { useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+import { userStore as useHeaderStore } from '@buerokratt-ria/header';
 import * as Tabs from '@radix-ui/react-tabs';
 import { Chat } from 'components';
 import withAuthorization from 'hoc/with-authorization';
+import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ROLES } from 'utils/constants';
-import { useQuery } from '@tanstack/react-query';
-import { userStore as useHeaderStore } from '@buerokratt-ria/header';
 import './ValidationRequests.scss';
 import clsx from 'clsx';
+
 import ChatTrigger from '../ChatActive/ChatTrigger';
 
 const ValidationRequests: React.FC = () => {
   const { t } = useTranslation();
   const selectedChatId = useHeaderStore((state) => state.selectedChatId);
-  const selectedChat = useHeaderStore((state) =>
-    state.selectedValidationChat()
-  );
+  const selectedChat = useHeaderStore((state) => state.selectedValidationChat());
 
-  const loadValidationRequests = useHeaderStore(
-    (state) => state.loadValidationChats
-  );
+  const loadValidationRequests = useHeaderStore((state) => state.loadValidationChats);
 
   useEffect(() => {
     useHeaderStore.getState().loadValidationChats();
@@ -36,16 +32,10 @@ const ValidationRequests: React.FC = () => {
       onValueChange={useHeaderStore.getState().setSelectedChatId}
       style={{ height: '100%', overflow: 'hidden' }}
     >
-      <Tabs.List
-        className="vertical-tabs__list"
-        aria-label={t('chat.active.list') ?? ''}
-        style={{ overflow: 'auto' }}
-      >
+      <Tabs.List className="vertical-tabs__list" aria-label={t('chat.active.list') ?? ''} style={{ overflow: 'auto' }}>
         <div className="vertical-tabs__group-header">
           <p>{`${t('chat.validations.title')} ${
-            (validationChats?.length ?? 0) == 0
-              ? ''
-              : `(${validationChats?.length ?? 0})`
+            (validationChats?.length ?? 0) == 0 ? '' : `(${validationChats?.length ?? 0})`
           }`}</p>
         </div>
         {validationChats?.map((chat) => (
@@ -84,7 +74,4 @@ const ValidationRequests: React.FC = () => {
   );
 };
 
-export default withAuthorization(ValidationRequests, [
-  ROLES.ROLE_ADMINISTRATOR,
-  ROLES.ROLE_CUSTOMER_SUPPORT_AGENT,
-]);
+export default withAuthorization(ValidationRequests, [ROLES.ROLE_ADMINISTRATOR, ROLES.ROLE_CUSTOMER_SUPPORT_AGENT]);

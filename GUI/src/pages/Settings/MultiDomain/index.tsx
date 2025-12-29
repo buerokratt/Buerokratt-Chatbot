@@ -1,15 +1,15 @@
-import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
-import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { AxiosError } from 'axios';
-
 import { Button, Card, FormInput, Icon, Track } from 'components';
-import { useToast } from 'hooks/useToast';
-import { apiDev } from 'services/api';
 import withAuthorization from 'hoc/with-authorization';
-import { ROLES } from 'utils/constants';
+import { useToast } from 'hooks/useToast';
+import { FC, useCallback, useEffect, useRef, useState } from 'react';
+import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { MdDeleteOutline } from 'react-icons/md';
+import { apiDev } from 'services/api';
+import { ROLES } from 'utils/constants';
+
 import './MultiDomain.scss';
 import { WDomain } from '../../../types/widgetModels';
 
@@ -56,7 +56,7 @@ const MultiDomain: FC = () => {
 
   const fetchData = useCallback(async () => {
     try {
-      const response = await apiDev.get<{response: WDomain[]}>('configs/widget-domains');
+      const response = await apiDev.get<{ response: WDomain[] }>('configs/widget-domains');
       const domains = response.data.response ?? [];
 
       if (!hasRendered.current) {
@@ -68,7 +68,6 @@ const MultiDomain: FC = () => {
 
       setInitialDomains(domains);
       reset({ widgetDomains: domains });
-
     } catch (error) {
       console.error('Failed to fetch domains', error);
     }
@@ -85,8 +84,7 @@ const MultiDomain: FC = () => {
   const convertDomains = (newWidgets: WDomain[]) => {
     const result: WDomain[] = [];
 
-    const findById = (arr: WDomain[], id: string) =>
-      arr.find((x) => x.domainId === id);
+    const findById = (arr: WDomain[], id: string) => arr.find((x) => x.domainId === id);
 
     const normalizeUrl = (url: string) => (url.endsWith('/') ? url : url + '/');
 
@@ -109,8 +107,7 @@ const MultiDomain: FC = () => {
         continue;
       }
 
-      const changed =
-        oldMatch.name !== newItem.name || oldMatch.url !== newItem.url;
+      const changed = oldMatch.name !== newItem.name || oldMatch.url !== newItem.url;
 
       if (changed) {
         result.push({
@@ -134,28 +131,15 @@ const MultiDomain: FC = () => {
         isScrollable={true}
         footer={
           <Track gap={8} justify="end" align={'right'}>
-            <Button
-              appearance="secondary"
-              onClick={() =>
-                append({ name: '', url: '', domainId: crypto.randomUUID() })
-              }
-            >
+            <Button appearance="secondary" onClick={() => append({ name: '', url: '', domainId: crypto.randomUUID() })}>
               {t('multiDomains.addNew')}
             </Button>
-            <Button onClick={handleSubmit(handleFormSubmit)}>
-              {t('global.save')}
-            </Button>
+            <Button onClick={handleSubmit(handleFormSubmit)}>{t('global.save')}</Button>
           </Track>
         }
       >
         {fields.map((field, index) => (
-          <Track
-            gap={10}
-            key={field.id}
-            direction="horizontal"
-            justify="start"
-            style={{ marginBottom: '15px' }}
-          >
+          <Track gap={10} key={field.id} direction="horizontal" justify="start" style={{ marginBottom: '15px' }}>
             <Controller
               name={`widgetDomains.${index}.name`}
               control={control}
@@ -172,20 +156,11 @@ const MultiDomain: FC = () => {
               name={`widgetDomains.${index}.url`}
               control={control}
               render={({ field }) => (
-                <FormInput
-                  label="URL"
-                  className="inline-form"
-                  style={{ maxWidth: '500px' }}
-                  {...field}
-                />
+                <FormInput label="URL" className="inline-form" style={{ maxWidth: '500px' }} {...field} />
               )}
             />
             <Track gap={8} justify="between">
-              <Button
-                appearance="error"
-                disabled={fields.length === 1}
-                onClick={() => remove(index)}
-              >
+              <Button appearance="error" disabled={fields.length === 1} onClick={() => remove(index)}>
                 <Icon icon={<MdDeleteOutline color="white" />} />
               </Button>
             </Track>

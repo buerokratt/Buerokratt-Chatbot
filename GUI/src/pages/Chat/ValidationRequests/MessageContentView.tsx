@@ -2,7 +2,7 @@ import { FormTextarea, Icon, Track } from 'components';
 import { useToast } from 'hooks/useToast';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AiOutlineEdit, AiOutlineCheck, AiOutlineClose } from 'react-icons/ai';
+import { AiOutlineCheck, AiOutlineClose, AiOutlineEdit } from 'react-icons/ai';
 import { apiDev } from 'services/api';
 
 const MessageContentView = (props: any) => {
@@ -46,9 +46,7 @@ const MessageContentView = (props: any) => {
       {!isEditing && (
         <Icon
           style={{ cursor: 'pointer' }}
-          icon={
-            <AiOutlineEdit fontSize={22} onClick={() => setIsEditing(true)} />
-          }
+          icon={<AiOutlineEdit fontSize={22} onClick={() => setIsEditing(true)} />}
           size="medium"
         />
       )}

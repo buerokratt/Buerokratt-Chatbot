@@ -1,35 +1,24 @@
-import { FC, useEffect, useRef, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
-import { Controller, useForm, useWatch } from 'react-hook-form';
-import { motion } from 'framer-motion';
-import { AxiosError } from 'axios';
-
-import {
-  Button,
-  Card,
-  FormInput,
-  FormSelect,
-  Icon,
-  Switch,
-  Track,
-} from 'components';
-import { useToast } from 'hooks/useToast';
 import bykLogo from 'assets/logo-white.svg';
-import './SettingsAppearance.scss';
+import { AxiosError } from 'axios';
 import clsx from 'clsx';
-import { apiDev } from 'services/api';
-import { ChromePicker } from 'react-color';
-import { MdOutlinePalette } from 'react-icons/md';
+import { Button, Card, FormInput, FormSelect, Icon, Switch, Track } from 'components';
+import { motion } from 'framer-motion';
 import withAuthorization from 'hoc/with-authorization';
+import { useToast } from 'hooks/useToast';
+import { FC, useEffect, useRef, useState } from 'react';
+import { ChromePicker } from 'react-color';
+import { Controller, useForm, useWatch } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import './SettingsAppearance.scss';
+import { MdOutlinePalette } from 'react-icons/md';
+import { apiDev } from 'services/api';
 import { ROLES } from 'utils/constants';
+
 import DomainSelector from '../../../components/DomainsSelector';
-import { fetchConfigurationFromDomain } from '../../../services/configurations';
-import {
-  WidgetAppearance,
-  WidgetAppearanceResponse,
-} from '../../../types/widgetAppearance';
 import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
+import { fetchConfigurationFromDomain } from '../../../services/configurations';
+import { WidgetAppearance, WidgetAppearanceResponse } from '../../../types/widgetAppearance';
 
 const variants = {
   initial: {
@@ -44,13 +33,11 @@ const SettingsAppearance: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
   const hasRendered = useRef<boolean>();
-  const { register, control, handleSubmit, reset, setValue } =
-    useForm<WidgetAppearance>();
+  const { register, control, handleSubmit, reset, setValue } = useForm<WidgetAppearance>();
   const [showPreview, setShowPreview] = useState(false);
   const [showColorPalette, setShowColorPalette] = useState(false);
   const [delayFinished, setDelayFinished] = useState(false);
-  const multiDomainEnabled =
-    import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
+  const multiDomainEnabled = import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
   const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
 
   useEffect(() => {
@@ -64,15 +51,14 @@ const SettingsAppearance: FC = () => {
 
   const fetchData = async (selectedDomain: string) => {
     try {
-      const data: WidgetAppearanceResponse =
-        await fetchConfigurationFromDomain<WidgetAppearanceResponse>(
-          'configs/widget',
-          selectedDomain
-        );
+      const data: WidgetAppearanceResponse = await fetchConfigurationFromDomain<WidgetAppearanceResponse>(
+        'configs/widget',
+        selectedDomain,
+      );
 
       const res = data.response;
 
-      if(res.isWidgetActive === null) {
+      if (res.isWidgetActive === null) {
         resetSettingsToDefault();
         hasRendered.current = true;
         return;
@@ -81,8 +67,7 @@ const SettingsAppearance: FC = () => {
       reset({
         ...res,
         isWidgetActive: res.isWidgetActive === 'true',
-        widgetAnimation:
-          res.widgetAnimation?.length === 0 ? 'shockwave' : res.widgetAnimation,
+        widgetAnimation: res.widgetAnimation?.length === 0 ? 'shockwave' : res.widgetAnimation,
       });
 
       hasRendered.current = true;
@@ -111,8 +96,7 @@ const SettingsAppearance: FC = () => {
   const widgetAnimation = useWatch({ control, name: 'widgetAnimation' });
 
   const widgetConfigMutation = useMutation({
-    mutationFn: (data: WidgetAppearance) =>
-      apiDev.post<WidgetAppearance>('configs/widget', data),
+    mutationFn: (data: WidgetAppearance) => apiDev.post<WidgetAppearance>('configs/widget', data),
     onSuccess: () => {
       toast.open({
         type: 'success',
@@ -143,10 +127,7 @@ const SettingsAppearance: FC = () => {
   }, []);
 
   const handleClickOutside = (event: MouseEvent) => {
-    if (
-      colorComponentRef.current &&
-      !colorComponentRef.current.contains(event.target as Node)
-    ) {
+    if (colorComponentRef.current && !colorComponentRef.current.contains(event.target as Node)) {
       setShowColorPalette(false);
     }
   };
@@ -182,11 +163,7 @@ const SettingsAppearance: FC = () => {
     });
   };
 
-  const handleDomainSelection = useDomainSelectionHandler(
-    setSelectedDomains,
-    fetchData,
-    resetSettingsToDefault
-  );
+  const handleDomainSelection = useDomainSelectionHandler(setSelectedDomains, fetchData, resetSettingsToDefault);
 
   if (hasRendered.current === undefined) return <>Loading...</>;
 
@@ -207,12 +184,7 @@ const SettingsAppearance: FC = () => {
       <Card
         footer={
           <Track gap={8} justify="end">
-            <Button
-              disabled={
-                (multiDomainEnabled && selectedDomains.length === 0) || false
-              }
-              onClick={handleFormSubmit}
-            >
+            <Button disabled={(multiDomainEnabled && selectedDomains.length === 0) || false} onClick={handleFormSubmit}>
               {t('global.save')}
             </Button>
             <Button appearance="secondary" onClick={handlePreview}>
@@ -265,14 +237,7 @@ const SettingsAppearance: FC = () => {
                   }}
                   onClick={() => setShowColorPalette(!showColorPalette)}
                 >
-                  <Icon
-                    icon={
-                      <MdOutlinePalette
-                        fontSize={20}
-                        color="rgba(0,0,0,0.54)"
-                      />
-                    }
-                  />
+                  <Icon icon={<MdOutlinePalette fontSize={20} color="rgba(0,0,0,0.54)" />} />
                 </button>
                 {showColorPalette && (
                   <div style={{ position: 'absolute', zIndex: '2' }}>
@@ -292,9 +257,7 @@ const SettingsAppearance: FC = () => {
             render={({ field }) => (
               <FormSelect
                 {...field}
-                onSelectionChange={(selection) =>
-                  field.onChange(selection?.value)
-                }
+                onSelectionChange={(selection) => field.onChange(selection?.value)}
                 label={t('settings.appearance.widgetAnimation')}
                 defaultValue={field.value}
                 options={[
@@ -317,7 +280,7 @@ const SettingsAppearance: FC = () => {
                 'profile--shockwave': widgetAnimation === 'shockwave',
                 'profile--jump': widgetAnimation === 'jump',
                 'profile--wiggle': widgetAnimation === 'wiggle',
-              }
+              },
             )}
             variants={variants}
             initial="initial"
@@ -344,6 +307,4 @@ const SettingsAppearance: FC = () => {
   );
 };
 
-export default withAuthorization(SettingsAppearance, [
-  ROLES.ROLE_ADMINISTRATOR,
-]);
+export default withAuthorization(SettingsAppearance, [ROLES.ROLE_ADMINISTRATOR]);

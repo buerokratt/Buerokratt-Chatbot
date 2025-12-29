@@ -1,37 +1,26 @@
-import { FC, useEffect, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
 import { useMutation } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import { useTranslation } from 'react-i18next';
+import { Button, Card, FormDatepicker, FormTextarea, Switch, Track } from 'components';
 import { format, parse } from 'date-fns';
-import {
-  Button,
-  Card,
-  FormDatepicker,
-  FormTextarea,
-  Switch,
-  Track,
-} from 'components';
-import {
-  OrganizationWorkingTime,
-  OrganizationWorkingTimeResponse,
-} from 'types/organizationWorkingTime';
-import { useToast } from 'hooks/useToast';
-import { apiDev } from 'services/api';
-import './SettingsWorkingTime.scss';
-import {
-  getDefaultValues,
-  getOrganizationTimeData,
-  setOrganizationTimeData,
-} from './data';
 import withAuthorization from 'hoc/with-authorization';
+import { useToast } from 'hooks/useToast';
+import { FC, useEffect, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { apiDev } from 'services/api';
+import { OrganizationWorkingTime, OrganizationWorkingTimeResponse } from 'types/organizationWorkingTime';
+import './SettingsWorkingTime.scss';
 import { ROLES } from 'utils/constants';
+
+import { getDefaultValues, getOrganizationTimeData, setOrganizationTimeData } from './data';
+
 import {
   BOT_CANNOT_ANSWER_MESSAGE_LENGTH,
   NO_CSA_MESSAGE_LENGTH,
   OUTSIDE_WORKING_HOURS_MESSAGE_LENGTH,
   REDIRECT_IF_BOT_CANNOT_ANSWER_MESSAGE_LENGTH,
 } from 'constants/config';
+
 import DomainSelector from '../../../components/DomainsSelector';
 import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
 import { fetchConfigurationFromDomain } from '../../../services/configurations';
@@ -42,27 +31,17 @@ type FieldDateNames = {
   end: string;
 };
 
-const weekdaysOptions = [
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
-  'Sunday',
-];
+const weekdaysOptions = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 const SettingsWorkingTime: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
-  const { control, getValues, handleSubmit, reset, watch } =
-    useForm<OrganizationWorkingTime>({
-      defaultValues: getDefaultValues(),
-    });
+  const { control, getValues, handleSubmit, reset, watch } = useForm<OrganizationWorkingTime>({
+    defaultValues: getDefaultValues(),
+  });
   const [loadingCompleted, setLoadingCompleted] = useState<boolean>(false);
   const [key, setKey] = useState(0);
-  const multiDomainEnabled =
-    import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
+  const multiDomainEnabled = import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
   const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
 
   const resetSettingsToDefault = () => {
@@ -81,20 +60,15 @@ const SettingsWorkingTime: FC = () => {
 
   const isOrganizationAvailableAllTime = watch('organizationWorkingAllTime');
   const isOrganizationClosedOnWeekEnds = watch('organizationClosedOnWeekEnds');
-  const isOrganizationTheSameOnAllWorkingDays = watch(
-    'organizationTheSameOnAllWorkingDays'
-  );
-  const organizationWorkingTimeWeekdays = watch(
-    'organizationWorkingTimeWeekdays'
-  );
+  const isOrganizationTheSameOnAllWorkingDays = watch('organizationTheSameOnAllWorkingDays');
+  const organizationWorkingTimeWeekdays = watch('organizationWorkingTimeWeekdays');
   const isOrganizationUseCSA = watch('organizationUseCSA');
   const fetchData = async (selectedDomain: string) => {
     try {
-      const data: OrganizationWorkingTimeResponse =
-        await fetchConfigurationFromDomain<OrganizationWorkingTimeResponse>(
-          'configs/organization-working-time',
-          selectedDomain
-        );
+      const data: OrganizationWorkingTimeResponse = await fetchConfigurationFromDomain<OrganizationWorkingTimeResponse>(
+        'configs/organization-working-time',
+        selectedDomain,
+      );
       const res = data.response;
 
       reset(getOrganizationTimeData(res));
@@ -107,10 +81,7 @@ const SettingsWorkingTime: FC = () => {
 
   const workingTimeMutation = useMutation({
     mutationFn: (data: OrganizationWorkingTime) =>
-      apiDev.post<OrganizationWorkingTime>(
-        'configs/organization-working-time',
-        setOrganizationTimeData(data)
-      ),
+      apiDev.post<OrganizationWorkingTime>('configs/organization-working-time', setOrganizationTimeData(data)),
     onSuccess: () => {
       toast.open({
         type: 'success',
@@ -159,11 +130,7 @@ const SettingsWorkingTime: FC = () => {
   };
 
   const adjustTimeGap = (date: any, isStart: boolean) => {
-    const convertedDate = parse(
-      format(getValues(date) as Date, 'HH:mm:ss'),
-      'HH:mm:ss',
-      new Date()
-    );
+    const convertedDate = parse(format(getValues(date) as Date, 'HH:mm:ss'), 'HH:mm:ss', new Date());
     let adjustedTime = new Date(convertedDate);
     if (isStart) {
       adjustedTime.setMinutes(adjustedTime.getMinutes() + 15);
@@ -191,11 +158,7 @@ const SettingsWorkingTime: FC = () => {
     return { start: startingTime, end: endingTime };
   };
 
-  const handleDomainSelection = useDomainSelectionHandler(
-    setSelectedDomains,
-    fetchData,
-    resetSettingsToDefault
-  );
+  const handleDomainSelection = useDomainSelectionHandler(setSelectedDomains, fetchData, resetSettingsToDefault);
 
   if (!loadingCompleted) {
     return <>Loading...</>;
@@ -238,9 +201,7 @@ const SettingsWorkingTime: FC = () => {
                   offLabel={t('global.no').toString()}
                   onCheckedChange={field.onChange}
                   checked={field.value}
-                  tooltip={
-                    <InfoTooltip name="settings.workingTime.tooltip.useCsa" />
-                  }
+                  tooltip={<InfoTooltip name="settings.workingTime.tooltip.useCsa" />}
                   {...field}
                 />
               )}
@@ -256,9 +217,7 @@ const SettingsWorkingTime: FC = () => {
                     offLabel={t('global.no').toString()}
                     onCheckedChange={field.onChange}
                     checked={field.value}
-                    tooltip={
-                      <InfoTooltip name="settings.workingTime.tooltip.work24/7" />
-                    }
+                    tooltip={<InfoTooltip name="settings.workingTime.tooltip.work24/7" />}
                     {...field}
                   />
                 )}
@@ -275,9 +234,7 @@ const SettingsWorkingTime: FC = () => {
                     offLabel={t('global.no').toString()}
                     onCheckedChange={field.onChange}
                     checked={field.value}
-                    tooltip={
-                      <InfoTooltip name="settings.workingTime.tooltip.workingHolidays" />
-                    }
+                    tooltip={<InfoTooltip name="settings.workingTime.tooltip.workingHolidays" />}
                     {...field}
                   />
                 )}
@@ -294,9 +251,7 @@ const SettingsWorkingTime: FC = () => {
                     offLabel={t('global.no').toString()}
                     onCheckedChange={field.onChange}
                     checked={field.value}
-                    tooltip={
-                      <InfoTooltip name="settings.workingTime.tooltip.workingWeekends" />
-                    }
+                    tooltip={<InfoTooltip name="settings.workingTime.tooltip.workingWeekends" />}
                     {...field}
                   />
                 )}
@@ -313,9 +268,7 @@ const SettingsWorkingTime: FC = () => {
                     offLabel={t('global.no').toString()}
                     onCheckedChange={field.onChange}
                     checked={field.value}
-                    tooltip={
-                      <InfoTooltip name="settings.workingTime.tooltip.workingSameEachDay" />
-                    }
+                    tooltip={<InfoTooltip name="settings.workingTime.tooltip.workingSameEachDay" />}
                     {...field}
                   />
                 )}
@@ -324,92 +277,70 @@ const SettingsWorkingTime: FC = () => {
           </Track>
         }
       >
-        {isOrganizationTheSameOnAllWorkingDays &&
-          !isOrganizationAvailableAllTime &&
-          isOrganizationUseCSA && (
-            <Track>
-              <label className="Label">
-                {t(
-                  `${
-                    isOrganizationClosedOnWeekEnds
-                      ? 'settings.workingTime.allWeekdaysExceptWeekend'
-                      : 'settings.workingTime.allWeekdays'
-                  }`
-                )}
-              </label>
-              <Controller
-                name={'organizationAllWeekdaysTimeStartISO'}
-                control={control}
-                render={({ field }) => {
-                  const { maxTime } = getStartEndTimeValues(field, true);
-                  return (
-                    <div className="startTime">
-                      <FormDatepicker
-                        {...field}
-                        timePicker
-                        hideLabel
-                        direction="row"
-                        label=""
-                        value={
-                          parse(
-                            format(field.value as Date, 'HH:mm:ss'),
-                            'HH:mm:ss',
-                            new Date()
-                          ) ?? new Date('0')
-                        }
-                        onChange={(date) => handleTime(field, date, true)}
-                        maxTime={maxTime}
-                      />
-                    </div>
-                  );
-                }}
-              />
-              <label>{t('settings.workingTime.until')}</label>
-              <Controller
-                name={'organizationAllWeekdaysTimeEndISO'}
-                control={control}
-                render={({ field }) => {
-                  const { minTime } = getStartEndTimeValues(field, false);
-                  return (
-                    <div className="endTime">
-                      <FormDatepicker
-                        {...field}
-                        timePicker
-                        hideLabel
-                        direction="row"
-                        label=""
-                        value={
-                          parse(
-                            format(field.value as Date, 'HH:mm:ss'),
-                            'HH:mm:ss',
-                            new Date()
-                          ) ?? new Date('0')
-                        }
-                        onChange={(date) => handleTime(field, date, false)}
-                        minTime={minTime}
-                      />
-                    </div>
-                  );
-                }}
-              />
-            </Track>
-          )}
+        {isOrganizationTheSameOnAllWorkingDays && !isOrganizationAvailableAllTime && isOrganizationUseCSA && (
+          <Track>
+            <label className="Label">
+              {t(
+                `${
+                  isOrganizationClosedOnWeekEnds
+                    ? 'settings.workingTime.allWeekdaysExceptWeekend'
+                    : 'settings.workingTime.allWeekdays'
+                }`,
+              )}
+            </label>
+            <Controller
+              name={'organizationAllWeekdaysTimeStartISO'}
+              control={control}
+              render={({ field }) => {
+                const { maxTime } = getStartEndTimeValues(field, true);
+                return (
+                  <div className="startTime">
+                    <FormDatepicker
+                      {...field}
+                      timePicker
+                      hideLabel
+                      direction="row"
+                      label=""
+                      value={parse(format(field.value as Date, 'HH:mm:ss'), 'HH:mm:ss', new Date()) ?? new Date('0')}
+                      onChange={(date) => handleTime(field, date, true)}
+                      maxTime={maxTime}
+                    />
+                  </div>
+                );
+              }}
+            />
+            <label>{t('settings.workingTime.until')}</label>
+            <Controller
+              name={'organizationAllWeekdaysTimeEndISO'}
+              control={control}
+              render={({ field }) => {
+                const { minTime } = getStartEndTimeValues(field, false);
+                return (
+                  <div className="endTime">
+                    <FormDatepicker
+                      {...field}
+                      timePicker
+                      hideLabel
+                      direction="row"
+                      label=""
+                      value={parse(format(field.value as Date, 'HH:mm:ss'), 'HH:mm:ss', new Date()) ?? new Date('0')}
+                      onChange={(date) => handleTime(field, date, false)}
+                      minTime={minTime}
+                    />
+                  </div>
+                );
+              }}
+            />
+          </Track>
+        )}
         {!isOrganizationTheSameOnAllWorkingDays &&
           !isOrganizationAvailableAllTime &&
           isOrganizationUseCSA &&
           weekdaysOptions
-            .filter(
-              (d) =>
-                !(
-                  isOrganizationClosedOnWeekEnds &&
-                  (d === 'Saturday' || d === 'Sunday')
-                )
-            )
+            .filter((d) => !(isOrganizationClosedOnWeekEnds && (d === 'Saturday' || d === 'Sunday')))
             .map((d) => (
               <Track key={d}>
-                <label className="Label switch">
-                  {t(`settings.weekdays.${d}`.toLowerCase())}
-                </label>
+                <label className="Label switch">{t(`settings.weekdays.${d}`.toLowerCase())}</label>
                 <Controller
                   name="organizationWorkingTimeWeekdays"
                   control={control}
@@ -422,14 +353,8 @@ const SettingsWorkingTime: FC = () => {
                         onCheckedChange={(value) => {
                           field.onChange(
                             value
-                              ? sortAndJoin([
-                                  ...field.value.toString().split(','),
-                                  d.toLowerCase(),
-                                ])
-                              : filterAndJoin(
-                                  field.value.toString().split(','),
-                                  d
-                                )
+                              ? sortAndJoin([...field.value.toString().split(','), d.toLowerCase()])
+                              : filterAndJoin(field.value.toString().split(','), d),
                           );
                         }}
                         checked={field.value?.includes(d.toLowerCase())}
@@ -441,9 +366,7 @@ const SettingsWorkingTime: FC = () => {
                 {organizationWorkingTimeWeekdays.includes(d.toLowerCase()) && (
                   <Track>
                     <Controller
-                      name={
-                        `organization${d}WorkingTimeStartISO` as keyof OrganizationWorkingTime
-                      }
+                      name={`organization${d}WorkingTimeStartISO` as keyof OrganizationWorkingTime}
                       control={control}
                       render={({ field }) => {
                         const { maxTime } = getStartEndTimeValues(field, true);
@@ -456,11 +379,7 @@ const SettingsWorkingTime: FC = () => {
                               direction="row"
                               label=""
                               value={
-                                parse(
-                                  format(field.value as Date, 'HH:mm:ss'),
-                                  'HH:mm:ss',
-                                  new Date()
-                                ) ?? new Date('0')
+                                parse(format(field.value as Date, 'HH:mm:ss'), 'HH:mm:ss', new Date()) ?? new Date('0')
                               }
                               onChange={(date) => handleTime(field, date, true)}
                               maxTime={maxTime}
@@ -471,9 +390,7 @@ const SettingsWorkingTime: FC = () => {
                     />
                     <label>{t('settings.workingTime.until')}</label>
                     <Controller
-                      name={
-                        `organization${d}WorkingTimeEndISO` as keyof OrganizationWorkingTime
-                      }
+                      name={`organization${d}WorkingTimeEndISO` as keyof OrganizationWorkingTime}
                       control={control}
                       render={({ field }) => {
                         const { minTime } = getStartEndTimeValues(field, false);
@@ -486,19 +403,11 @@ const SettingsWorkingTime: FC = () => {
                               direction="row"
                               label=""
                               value={
-                                parse(
-                                  format(field.value as Date, 'HH:mm:ss'),
-                                  'HH:mm:ss',
-                                  new Date()
-                                ) ?? new Date('0')
+                                parse(format(field.value as Date, 'HH:mm:ss'), 'HH:mm:ss', new Date()) ?? new Date('0')
                               }
-                              onChange={(date) =>
-                                handleTime(field, date, false)
-                              }
+                              onChange={(date) => handleTime(field, date, false)}
                               minTime={minTime}
-                              filterTime={(date: any) =>
-                                filterTime(date, false, minTime)
-                              }
+                              filterTime={(date: any) => filterTime(date, false, minTime)}
                             />
                           </div>
                         );
@@ -514,16 +423,12 @@ const SettingsWorkingTime: FC = () => {
             control={control}
             render={({ field }) => (
               <Switch
-                label={t(
-                  'settings.workingTime.showIfOrganizationIsOutsideWorkingHours'
-                )}
+                label={t('settings.workingTime.showIfOrganizationIsOutsideWorkingHours')}
                 onLabel={t('global.yes').toString()}
                 offLabel={t('global.no').toString()}
                 onCheckedChange={field.onChange}
                 checked={field.value}
-                tooltip={
-                  <InfoTooltip name="settings.workingTime.tooltip.sendCsa" />
-                }
+                tooltip={<InfoTooltip name="settings.workingTime.tooltip.sendCsa" />}
                 {...field}
               />
             )}
@@ -563,9 +468,7 @@ const SettingsWorkingTime: FC = () => {
                 offLabel={t('global.no').toString()}
                 onCheckedChange={field.onChange}
                 checked={field.value}
-                tooltip={
-                  <InfoTooltip name="settings.workingTime.tooltip.csaOutOfReach" />
-                }
+                tooltip={<InfoTooltip name="settings.workingTime.tooltip.csaOutOfReach" />}
                 {...field}
               />
             )}
@@ -602,9 +505,7 @@ const SettingsWorkingTime: FC = () => {
               render={({ field }) => (
                 <Track gap={10} style={{ width: '100%' }}>
                   <FormTextarea
-                    label={t(
-                      'settings.workingTime.redirectIfBotCannotAnswerMessage'
-                    )}
+                    label={t('settings.workingTime.redirectIfBotCannotAnswerMessage')}
                     maxLength={REDIRECT_IF_BOT_CANNOT_ANSWER_MESSAGE_LENGTH}
                     showMaxLength
                     maxLengthBottom
@@ -647,6 +548,4 @@ const SettingsWorkingTime: FC = () => {
   );
 };
 
-export default withAuthorization(SettingsWorkingTime, [
-  ROLES.ROLE_ADMINISTRATOR,
-]);
+export default withAuthorization(SettingsWorkingTime, [ROLES.ROLE_ADMINISTRATOR]);
