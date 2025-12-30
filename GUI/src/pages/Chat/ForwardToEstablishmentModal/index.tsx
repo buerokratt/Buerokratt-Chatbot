@@ -3,6 +3,7 @@ import { DataTable, Dialog, FormInput, Track } from 'components';
 import { FC, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Chat } from 'types/chat';
+import { useDebouncedCallback } from 'use-debounce';
 
 import { createEstablishmentColumns } from './establishment-columns';
 import { useEstablishments } from './use-establishments';
@@ -16,13 +17,23 @@ type ForwardToEstablishmentModalProps = {
 const ForwardToEstablishmentModal: FC<ForwardToEstablishmentModalProps> = ({ chat, onModalClose, onForward }) => {
   const { t } = useTranslation();
   const [filter, setFilter] = useState('');
+  const [debouncedFilter, setDebouncedFilter] = useState('');
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
   });
   const [sorting, setSorting] = useState<SortingState>([]);
 
-  const { establishmentsList, totalPages, errorMessage, isLoading } = useEstablishments(pagination, filter, sorting);
+  const debouncedSetFilter = useDebouncedCallback((value: string) => {
+    setDebouncedFilter(value);
+    setPagination({ pageIndex: 0, pageSize: pagination.pageSize });
+  }, 300);
+
+  const { establishmentsList, totalPages, errorMessage, isLoading } = useEstablishments(
+    pagination,
+    debouncedFilter,
+    sorting,
+  );
 
   const establishmentsColumns = useMemo(() => createEstablishmentColumns(chat, onForward, t), [chat, onForward, t]);
 
@@ -74,7 +85,12 @@ const ForwardToEstablishmentModal: FC<ForwardToEstablishmentModalProps> = ({ cha
             name="search"
             placeholder={t('chat.active.searchByEstablishmentName') + '...'}
             hideLabel
-            onChange={(e) => setFilter(e.target.value)}
+            value={filter}
+            onChange={(e) => {
+              const value = e.target.value;
+              setFilter(value);
+              debouncedSetFilter(value);
+            }}
           />
         </Track>
         {establishmentsList.length > 0 && (
