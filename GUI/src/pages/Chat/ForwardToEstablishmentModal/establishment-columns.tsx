@@ -27,7 +27,7 @@ export const createEstablishmentColumns = (
       id: 'forward',
       cell: forwardView,
       meta: {
-        size: '1%',
+        size: '10%',
       },
     }),
   ];

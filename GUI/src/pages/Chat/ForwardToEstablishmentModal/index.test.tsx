@@ -2,10 +2,9 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
 import { FC, ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-
 import { apiDev } from 'services/api';
 import { Chat, CHAT_STATUS } from 'types/chat';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import ForwardToEstablishmentModal from './index';
 
@@ -119,25 +118,6 @@ describe('ForwardToEstablishmentModal', () => {
     });
   });
 
-  it('should render search input', async () => {
-    const mockData = {
-      response: {
-        items: [{ name: 'Establishment 1' }],
-        totalPages: 1,
-      },
-    };
-
-    vi.mocked(apiDev.get).mockResolvedValue({ data: mockData });
-
-    render(<ForwardToEstablishmentModal chat={mockChat} onModalClose={mockOnModalClose} onForward={mockOnForward} />, {
-      wrapper: createWrapper(),
-    });
-
-    await waitFor(() => {
-      expect(screen.getByPlaceholderText('chat.active.searchByEstablishmentName...')).toBeInTheDocument();
-    });
-  });
-
   it('should update filter when typing in search input', async () => {
     const mockData = {
       response: {
@@ -156,7 +136,6 @@ describe('ForwardToEstablishmentModal', () => {
       expect(screen.getByPlaceholderText('chat.active.searchByEstablishmentName...')).toBeInTheDocument();
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
     const searchInput = screen.getByPlaceholderText('chat.active.searchByEstablishmentName...') as HTMLInputElement;
     searchInput.value = 'test';
     searchInput.dispatchEvent(new Event('change', { bubbles: true }));
@@ -206,30 +185,6 @@ describe('ForwardToEstablishmentModal', () => {
 
     await waitFor(() => {
       expect(screen.queryByRole('table')).not.toBeInTheDocument();
-    });
-  });
-
-  it('should fetch data with correct pagination parameters', async () => {
-    const mockData = {
-      response: {
-        items: [{ name: 'Establishment 1' }],
-        totalPages: 1,
-      },
-    };
-
-    vi.mocked(apiDev.get).mockResolvedValue({ data: mockData });
-
-    render(<ForwardToEstablishmentModal chat={mockChat} onModalClose={mockOnModalClose} onForward={mockOnForward} />, {
-      wrapper: createWrapper(),
-    });
-
-    await waitFor(() => {
-      expect(apiDev.get).toHaveBeenCalledWith('/configs/centops-establishments', {
-        params: {
-          page: 1,
-          pageSize: 10,
-        },
-      });
     });
   });
 });

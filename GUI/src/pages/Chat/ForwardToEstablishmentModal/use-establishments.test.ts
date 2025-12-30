@@ -1,9 +1,8 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react';
 import { createElement, FC, ReactNode } from 'react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-
 import { apiDev } from 'services/api';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useEstablishments } from './use-establishments';
 
@@ -40,20 +39,16 @@ describe('useEstablishments', () => {
   it('should fetch establishments successfully', async () => {
     const mockData = {
       response: {
-        items: [
-          { name: 'Establishment 1' },
-          { name: 'Establishment 2' },
-        ],
+        items: [{ name: 'Establishment 1' }, { name: 'Establishment 2' }],
         totalPages: 2,
       },
     };
 
     vi.mocked(apiDev.get).mockResolvedValue({ data: mockData });
 
-    const { result } = renderHook(
-      () => useEstablishments({ pageIndex: 0, pageSize: 10 }),
-      { wrapper: createWrapper() },
-    );
+    const { result } = renderHook(() => useEstablishments({ pageIndex: 0, pageSize: 10 }, '', []), {
+      wrapper: createWrapper(),
+    });
 
     expect(result.current.isLoading).toBe(true);
 
@@ -69,10 +64,9 @@ describe('useEstablishments', () => {
   it('should handle API errors', async () => {
     vi.mocked(apiDev.get).mockRejectedValue(new Error('API Error'));
 
-    const { result } = renderHook(
-      () => useEstablishments({ pageIndex: 0, pageSize: 10 }),
-      { wrapper: createWrapper() },
-    );
+    const { result } = renderHook(() => useEstablishments({ pageIndex: 0, pageSize: 10 }, '', []), {
+      wrapper: createWrapper(),
+    });
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);
@@ -92,16 +86,41 @@ describe('useEstablishments', () => {
 
     vi.mocked(apiDev.get).mockResolvedValue({ data: mockData });
 
-    renderHook(
-      () => useEstablishments({ pageIndex: 2, pageSize: 20 }),
-      { wrapper: createWrapper() },
-    );
+    renderHook(() => useEstablishments({ pageIndex: 2, pageSize: 20 }, '', []), { wrapper: createWrapper() });
 
     await waitFor(() => {
       expect(apiDev.get).toHaveBeenCalledWith('/configs/centops-establishments', {
         params: {
           page: 3,
           pageSize: 20,
+          sortOrder: 'asc',
+          filter: '',
+        },
+      });
+    });
+  });
+
+  it('should call API with correct filter and sorting parameters', async () => {
+    const mockData = {
+      response: {
+        items: [],
+        totalPages: 0,
+      },
+    };
+
+    vi.mocked(apiDev.get).mockResolvedValue({ data: mockData });
+
+    renderHook(() => useEstablishments({ pageIndex: 0, pageSize: 10 }, 'test filter', [{ id: 'name', desc: true }]), {
+      wrapper: createWrapper(),
+    });
+
+    await waitFor(() => {
+      expect(apiDev.get).toHaveBeenCalledWith('/configs/centops-establishments', {
+        params: {
+          page: 1,
+          pageSize: 10,
+          sortOrder: 'desc',
+          filter: 'test filter',
         },
       });
     });
@@ -125,7 +144,7 @@ describe('useEstablishments', () => {
     vi.mocked(apiDev.get).mockResolvedValueOnce({ data: mockData1 });
 
     const { result, rerender } = renderHook(
-      ({ pageIndex, pageSize }) => useEstablishments({ pageIndex, pageSize }),
+      ({ pageIndex, pageSize }) => useEstablishments({ pageIndex, pageSize }, '', []),
       {
         wrapper: createWrapper(),
         initialProps: { pageIndex: 0, pageSize: 10 },
@@ -149,7 +168,7 @@ describe('useEstablishments', () => {
     vi.mocked(apiDev.get).mockRejectedValueOnce(new Error('API Error'));
 
     const { result, rerender } = renderHook(
-      ({ pageIndex, pageSize }) => useEstablishments({ pageIndex, pageSize }),
+      ({ pageIndex, pageSize }) => useEstablishments({ pageIndex, pageSize }, '', []),
       {
         wrapper: createWrapper(),
         initialProps: { pageIndex: 0, pageSize: 10 },
@@ -177,4 +196,3 @@ describe('useEstablishments', () => {
     });
   });
 });
-

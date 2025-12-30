@@ -116,6 +116,6 @@ describe('createEstablishmentColumns', () => {
     const columns = createEstablishmentColumns(mockChat, mockOnForward, mockT);
     const forwardColumn = columns[1];
 
-    expect(forwardColumn.meta).toEqual({ size: '1%' });
+    expect(forwardColumn.meta).toEqual({ size: '10%' });
   });
 });
