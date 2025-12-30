@@ -4,8 +4,9 @@ import { Button, DataTable, Dialog, FormInput, Icon, Track } from 'components';
 import { FC, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdOutlineArrowForward } from 'react-icons/md';
+import { apiDev } from 'services/api';
 import { Chat } from 'types/chat';
-import { Establishment } from 'types/establishment';
+import { Establishment, EstablishmentsResponse } from 'types/establishment';
 
 type ForwardToEstablishmentModalProps = {
   chat: Chat;
@@ -13,7 +14,7 @@ type ForwardToEstablishmentModalProps = {
   onForward: (chat: Chat, establishment: string) => void;
 };
 
-// todo igor fe modal
+// todo 1663 igor fe modal
 const ForwardToEstablishmentModal: FC<ForwardToEstablishmentModalProps> = ({ chat, onModalClose, onForward }) => {
   const { t } = useTranslation();
   const [filter, setFilter] = useState('');
@@ -23,16 +24,23 @@ const ForwardToEstablishmentModal: FC<ForwardToEstablishmentModalProps> = ({ cha
   });
   const [sorting, setSorting] = useState<SortingState>([]);
   const [establishmentsList, setEstablishmentsList] = useState<Establishment[]>([]);
-  // todo this needs an MSW mock
-  // todo endpoint is wrong
-  const { data: establishments } = useQuery<Establishment[]>({
-    queryKey: ['chats/establishments', 'prod'],
-    onSuccess(res: any) {
-      setEstablishmentsList(
-        (res.data.format_data.establishments as string[]).map((name: string, id): Establishment => {
-          return { id, name };
-        }),
-      );
+  const [totalPages, setTotalPages] = useState(0);
+
+  // todo 1663 this needs an MSW mock
+  const { data: establishments } = useQuery<EstablishmentsResponse>({
+    queryKey: ['configs/centops-establishments', pagination.pageIndex + 1, pagination.pageSize],
+    queryFn: async () => {
+      const { data } = await apiDev.get<EstablishmentsResponse>('/configs/centops-establishments', {
+        params: {
+          page: pagination.pageIndex + 1,
+          pageSize: pagination.pageSize,
+        },
+      });
+      return data;
+    },
+    onSuccess(res: EstablishmentsResponse) {
+      setEstablishmentsList(res.response.items);
+      setTotalPages(res.response.totalPages);
     },
   });
 
@@ -92,6 +100,8 @@ const ForwardToEstablishmentModal: FC<ForwardToEstablishmentModalProps> = ({ cha
           setPagination={setPagination}
           sorting={sorting}
           setSorting={setSorting}
+          pagesCount={totalPages}
+          isClientSide={false}
         />
       )}
     </Dialog>
