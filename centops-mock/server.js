@@ -243,13 +243,33 @@ const server = http.createServer((req, res) => {
   if (pathname === endpoint && req.method === 'GET') {
     const page = Number.parseInt(parsedUrl.query.page) || 1;
     const pageSize = Number.parseInt(parsedUrl.query.pageSize) || 10;
+    const sortOrder = parsedUrl.query.sortOrder || 'asc';
+    const filterByName = parsedUrl.query.filterByName || '';
 
-    console.log(`[${new Date().toISOString()}] GET ${pathname} - page: ${page}, pageSize: ${pageSize}`);
+    console.log(`[${new Date().toISOString()}] GET ${pathname} - page: ${page}, pageSize: ${pageSize}, sortOrder: ${sortOrder}, filterByName: ${filterByName}`);
 
+    // Filter by name (case-insensitive partial match)
+    let filteredData = establishmentsData;
+    if (filterByName) {
+      const filterLower = filterByName.toLowerCase();
+      filteredData = establishmentsData.filter(item =>
+        item.name.toLowerCase().includes(filterLower)
+      );
+    }
+
+    // Sort by name
+    const sortedData = [...filteredData].sort((a, b) => {
+      if (sortOrder === 'desc') {
+        return b.name.localeCompare(a.name);
+      }
+      return a.name.localeCompare(b.name);
+    });
+
+    // Paginate
     const startIndex = (page - 1) * pageSize;
     const endIndex = startIndex + pageSize;
-    const paginatedItems = establishmentsData.slice(startIndex, endIndex);
-    const totalPages = Math.ceil(establishmentsData.length / pageSize);
+    const paginatedItems = sortedData.slice(startIndex, endIndex);
+    const totalPages = Math.ceil(sortedData.length / pageSize);
 
     const response = {
       response: {
