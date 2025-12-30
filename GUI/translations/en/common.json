@@ -172,7 +172,8 @@
       "ContactedUser": "Contacted User",
       "couldNotReachUser": "Could Not Reach User",
       "messageSendingFailed": "Message sending failed!",
-      "sendAgain": "Send again"
+      "sendAgain": "Send again",
+      "establishmentListError": "Error getting establishment list. Please try again later."
     },
     "history": {
       "title": "History",

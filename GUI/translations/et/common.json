@@ -172,7 +172,8 @@
       "ContactedUser": "Kasutajaga ühendust võetud",
       "couldNotReachUser": "Kasutajaga ei õnnestunud ühendust saada",
       "messageSendingFailed": "Sõnumi saatmine ebaõnnestus!",
-      "sendAgain": "Saada uuesti"
+      "sendAgain": "Saada uuesti",
+      "establishmentListError": "Viga asutuste nimekirja laadimisel. Palun proovige hiljem uuesti."
     },
     "history": {
       "title": "Ajalugu",
