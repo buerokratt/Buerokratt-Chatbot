@@ -6,6 +6,17 @@ declaration:
   accepts: json
   returns: json
   namespace: backoffice
+  allowlist:
+  params:
+    - field: page
+      type: number
+    - field: pageSize
+      type: number
+
+assign_parameters:
+  assign:
+    page: ${incoming.params.page ?? 1}
+    pageSize: ${incoming.params.pageSize ?? 10}
 
 check_centops_config:
   switch:
@@ -41,7 +52,8 @@ fetch_client_list:
   args:
     url: "[#CENTOPS_URL]/centops/integration/clients"
     params:
-      pageSize: 100
+      page: ${page}
+      pageSize: ${pageSize}
     headers:
       Authorization: ${base64_result.response.body.cipher}
   result: centops_response
