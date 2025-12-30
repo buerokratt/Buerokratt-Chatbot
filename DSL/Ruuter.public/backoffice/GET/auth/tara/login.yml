@@ -139,4 +139,5 @@ return_value:
 
 return_not_exists:
   return: "User does not exist"
+  status: 401
   next: end
