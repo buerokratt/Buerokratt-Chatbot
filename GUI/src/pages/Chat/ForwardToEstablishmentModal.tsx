@@ -15,6 +15,7 @@ type ForwardToEstablishmentModalProps = {
 };
 
 // todo 1663 tests
+// todo 1663 strings like in figma
 const ForwardToEstablishmentModal: FC<ForwardToEstablishmentModalProps> = ({ chat, onModalClose, onForward }) => {
   const { t } = useTranslation();
   const [filter, setFilter] = useState('');
