@@ -30,7 +30,11 @@ const ForwardToEstablishmentModal: FC<ForwardToEstablishmentModalProps> = ({ cha
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // todo 1663 this needs an MSW mock
-  const { data: establishments, isError } = useQuery({
+  const {
+    data: establishments,
+    isError,
+    isLoading,
+  } = useQuery({
     queryKey: ['configs/centops-establishments', pagination.pageIndex + 1, pagination.pageSize],
     queryFn: async () => {
       const { data } = await apiDev.get<EstablishmentsResponse>('/configs/centops-establishments', {
@@ -41,7 +45,6 @@ const ForwardToEstablishmentModal: FC<ForwardToEstablishmentModalProps> = ({ cha
       });
       return data;
     },
-    retry: false,
   });
 
   useEffect(() => {
@@ -87,9 +90,9 @@ const ForwardToEstablishmentModal: FC<ForwardToEstablishmentModalProps> = ({ cha
     [columnHelper, forwardView, t],
   );
 
-  return (
-    <Dialog title={t('chat.active.forwardChat')} onClose={onModalClose} size="large">
-      {errorMessage ? (
+  const renderContent = () => {
+    if (errorMessage) {
+      return (
         <div
           style={{
             padding: '32px',
@@ -101,42 +104,65 @@ const ForwardToEstablishmentModal: FC<ForwardToEstablishmentModalProps> = ({ cha
         >
           {errorMessage}
         </div>
-      ) : (
-        <>
-          <Track
-            direction="vertical"
-            gap={8}
-            style={{
-              margin: '-16px -16px 0',
-              padding: '16px',
-              borderBottom: '1px solid #D2D3D8',
-            }}
-          >
-            <FormInput
-              label={t('chat.active.searchByEstablishmentName')}
-              name="search"
-              placeholder={t('chat.active.searchByEstablishmentName') + '...'}
-              hideLabel
-              onChange={(e) => setFilter(e.target.value)}
-            />
-          </Track>
-          {establishments && (
-            <DataTable
-              data={establishmentsList}
-              columns={establishmentsColumns}
-              globalFilter={filter}
-              setGlobalFilter={setFilter}
-              sortable
-              pagination={pagination}
-              setPagination={setPagination}
-              sorting={sorting}
-              setSorting={setSorting}
-              pagesCount={totalPages}
-              isClientSide={false}
-            />
-          )}
-        </>
-      )}
+      );
+    }
+
+    if (isLoading) {
+      return (
+        <div
+          style={{
+            padding: '32px',
+            textAlign: 'center',
+            fontSize: '16px',
+            fontWeight: 500,
+          }}
+        >
+          {t('global.loading')}
+        </div>
+      );
+    }
+
+    return (
+      <>
+        <Track
+          direction="vertical"
+          gap={8}
+          style={{
+            margin: '-16px -16px 0',
+            padding: '16px',
+            borderBottom: '1px solid #D2D3D8',
+          }}
+        >
+          <FormInput
+            label={t('chat.active.searchByEstablishmentName')}
+            name="search"
+            placeholder={t('chat.active.searchByEstablishmentName') + '...'}
+            hideLabel
+            onChange={(e) => setFilter(e.target.value)}
+          />
+        </Track>
+        {establishments && (
+          <DataTable
+            data={establishmentsList}
+            columns={establishmentsColumns}
+            globalFilter={filter}
+            setGlobalFilter={setFilter}
+            sortable
+            pagination={pagination}
+            setPagination={setPagination}
+            sorting={sorting}
+            setSorting={setSorting}
+            pagesCount={totalPages}
+            isClientSide={false}
+          />
+        )}
+      </>
+    );
+  };
+
+  return (
+    <Dialog title={t('chat.active.forwardChat')} onClose={onModalClose} size="large">
+      {renderContent()}
     </Dialog>
   );
 };
