@@ -1,8 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { createColumnHelper, PaginationState, SortingState } from '@tanstack/react-table';
-import { AxiosError } from 'axios';
 import { Button, DataTable, Dialog, FormInput, Icon, Track } from 'components';
-import { FC, useCallback, useMemo, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdOutlineArrowForward } from 'react-icons/md';
 import { apiDev } from 'services/api';
@@ -31,7 +30,7 @@ const ForwardToEstablishmentModal: FC<ForwardToEstablishmentModalProps> = ({ cha
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // todo 1663 this needs an MSW mock
-  const { data: establishments } = useQuery<EstablishmentsResponse>({
+  const { data: establishments, isError } = useQuery({
     queryKey: ['configs/centops-establishments', pagination.pageIndex + 1, pagination.pageSize],
     queryFn: async () => {
       const { data } = await apiDev.get<EstablishmentsResponse>('/configs/centops-establishments', {
@@ -42,15 +41,22 @@ const ForwardToEstablishmentModal: FC<ForwardToEstablishmentModalProps> = ({ cha
       });
       return data;
     },
-    onSuccess(res: EstablishmentsResponse) {
-      setEstablishmentsList(res.response.items);
-      setTotalPages(res.response.totalPages);
-      setErrorMessage(null);
-    },
-    onError: (_error: AxiosError<{ response?: string }>) => {
-      setErrorMessage(t('chat.active.establishmentListError'));
-    },
+    retry: false,
   });
+
+  useEffect(() => {
+    if (establishments) {
+      setEstablishmentsList(establishments.response.items);
+      setTotalPages(establishments.response.totalPages);
+      setErrorMessage(null);
+    }
+  }, [establishments]);
+
+  useEffect(() => {
+    if (isError) {
+      setErrorMessage(t('chat.active.establishmentListError'));
+    }
+  }, [isError, t]);
 
   const columnHelper = createColumnHelper<Establishment>();
 
