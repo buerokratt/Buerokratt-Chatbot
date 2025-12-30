@@ -1,6 +1,16 @@
-import { Establishment } from '../types/establishment';
+#!/usr/bin/env node
 
-export const establishmentsData: Establishment[] = [
+// Mock server for CentOps integration clients endpoint
+// Using this instead of mocking in front-end, since MSW does not work with GUI
+
+const http = require('node:http');
+const url = require('node:url');
+
+const port = 8090;
+const endpoint = '/centops/integration/clients';
+
+// Mock establishments data
+const establishmentsData = [
   {
     clientId: 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d',
     name: 'Ministry of Finance',
@@ -212,3 +222,74 @@ export const establishmentsData: Establishment[] = [
     updatedAt: null,
   },
 ];
+
+const server = http.createServer((req, res) => {
+  // Enable CORS
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    res.writeHead(200);
+    res.end();
+    return;
+  }
+
+  const parsedUrl = url.parse(req.url, true);
+  const pathname = parsedUrl.pathname;
+
+  // Handle the establishments endpoint
+  if (pathname === endpoint && req.method === 'GET') {
+    const page = Number.parseInt(parsedUrl.query.page) || 1;
+    const pageSize = Number.parseInt(parsedUrl.query.pageSize) || 10;
+
+    console.log(`[${new Date().toISOString()}] GET ${pathname} - page: ${page}, pageSize: ${pageSize}`);
+
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedItems = establishmentsData.slice(startIndex, endIndex);
+    const totalPages = Math.ceil(establishmentsData.length / pageSize);
+
+    const response = {
+      response: {
+        items: paginatedItems,
+        page,
+        pageSize,
+        totalPages,
+      },
+    };
+
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(response));
+  } else {
+    // Handle 404
+    console.log(`[${new Date().toISOString()}] ${req.method} ${pathname} - 404 Not Found`);
+    res.writeHead(404, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Not Found' }));
+  }
+});
+
+server.listen(port, () => {
+  console.log(`Mock server running on http://localhost:${port}`);
+  console.log(`Endpoint: http://localhost:${port}${endpoint}`);
+  console.log(`Total establishments: ${establishmentsData.length}`);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('\nShutting down gracefully...');
+  server.close(() => {
+    console.log('Server closed');
+    process.exit(0);
+  });
+});
+
+process.on('SIGINT', () => {
+  console.log('\nShutting down gracefully...');
+  server.close(() => {
+    console.log('Server closed');
+    process.exit(0);
+  });
+});
+

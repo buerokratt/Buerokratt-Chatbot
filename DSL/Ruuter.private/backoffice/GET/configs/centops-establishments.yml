@@ -51,7 +51,7 @@ fetch_client_list:
   call: http.get
   args:
     url: "[#CENTOPS_URL]/centops/integration/clients"
-    params:
+    query:
       page: ${page}
       pageSize: ${pageSize}
     headers:
@@ -75,7 +75,7 @@ log_response_error:
   next: return_error
 
 return_success:
-  return: ${centops_response.response.body}
+  return: ${centops_response.response.body.response}
   status: 200
   next: end
 
