@@ -244,14 +244,14 @@ const server = http.createServer((req, res) => {
     const page = Number.parseInt(parsedUrl.query.page) || 1;
     const pageSize = Number.parseInt(parsedUrl.query.pageSize) || 10;
     const sortOrder = parsedUrl.query.sortOrder || 'asc';
-    const filterByName = parsedUrl.query.filterByName || '';
+    const filter = parsedUrl.query.filter || '';
 
-    console.log(`[${new Date().toISOString()}] GET ${pathname} - page: ${page}, pageSize: ${pageSize}, sortOrder: ${sortOrder}, filterByName: ${filterByName}`);
+    console.log(`[${new Date().toISOString()}] GET ${pathname} - page: ${page}, pageSize: ${pageSize}, sortOrder: ${sortOrder}, filterByName: ${filter}`);
 
     // Filter by name (case-insensitive partial match)
     let filteredData = establishmentsData;
-    if (filterByName) {
-      const filterLower = filterByName.toLowerCase();
+    if (filter) {
+      const filterLower = filter.toLowerCase();
       filteredData = establishmentsData.filter(item =>
         item.name.toLowerCase().includes(filterLower)
       );
