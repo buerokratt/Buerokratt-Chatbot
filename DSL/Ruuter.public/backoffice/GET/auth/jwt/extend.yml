@@ -22,6 +22,7 @@ extend_cookie:
     plaintext: 
       "chatJwt"
   result: cookie_result
+  error: return_extend_fail_public
   next: assign_cookie
 
 assign_cookie:
@@ -39,3 +40,8 @@ return_value:
     Set-Cookie: ${setCookie}
   return: ${cookie_result.response.body.token}
   next: end 
+
+return_extend_fail_public:
+  return: "Failed to extend JWT Cookie"
+  status: 400
+  next: end
