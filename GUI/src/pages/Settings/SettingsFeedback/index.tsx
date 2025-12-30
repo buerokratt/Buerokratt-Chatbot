@@ -12,25 +12,44 @@ import { apiDev } from 'services/api';
 import { FeedbackConfig } from 'types/feedbackConfig';
 import { ROLES } from 'utils/constants';
 
-import { getFeedbackConfigData, setFeedbackData } from './data';
+import { setFeedbackData } from './data';
+import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
+import DomainSelector from '../../../components/DomainsSelector';
+import { fetchConfigurationFromDomain } from '../../../services/configurations';
 
 const SettingsFeedback: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
   const { control, handleSubmit, reset } = useForm<FeedbackConfig>();
-  const [key, setKey] = useState(0);
   const [feedbackConfig, setFeedbackConfig] = useState<FeedbackConfig | undefined>(undefined);
-
-  const getFeedbackConfig = async () => {
-    const res = await apiDev.get<{ response: FeedbackConfig }>('configs/feedback');
-    reset(getFeedbackConfigData(res.data.response));
-    setFeedbackConfig(res.data.response);
-    setKey(key + 1);
-  };
+  const multiDomainEnabled = import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
+  const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
 
   useEffect(() => {
-    getFeedbackConfig();
+    resetSettingsToDefault();
+    if (multiDomainEnabled) {
+      resetSettingsToDefault();
+    } else {
+      fetchData('none');
+    }
   }, []);
+
+  const fetchData = async (selectedDomain: string) => {
+    try {
+      const data: { response: FeedbackConfig } = await fetchConfigurationFromDomain<{ response: FeedbackConfig }>(
+        'configs/feedback',
+        selectedDomain,
+      );
+      const res = data.response;
+
+      console.log('res', res, data)
+
+      reset(res);
+      setFeedbackConfig(res);
+    } catch (error) {
+      console.error('Failed to fetch feedback', error);
+    }
+  };
 
   const feedbackConfigMutation = useMutation({
     mutationFn: (data: FeedbackConfig) => apiDev.post<FeedbackConfig>('configs/feedback', setFeedbackData(data)),
@@ -51,8 +70,22 @@ const SettingsFeedback: FC = () => {
   });
 
   const handleFormSubmit = handleSubmit((data) => {
+    data.domainUUID = multiDomainEnabled ? selectedDomains : [];
     feedbackConfigMutation.mutate(data);
   });
+
+  const resetSettingsToDefault = () => {
+    const feedbackConfig = {
+      feedbackActive: false,
+      feedbackQuestion: '',
+      feedbackNoticeActive: false,
+      feedbackNotice: ''
+    };
+    setFeedbackConfig(feedbackConfig);
+    reset(feedbackConfig);
+  };
+
+  const handleDomainSelection = useDomainSelectionHandler(setSelectedDomains, fetchData, resetSettingsToDefault);
 
   if (!feedbackConfig) {
     return <>Loading...</>;
@@ -61,6 +94,16 @@ const SettingsFeedback: FC = () => {
   return (
     <>
       <h1>{t('settings.feedback.title')}</h1>
+
+      {multiDomainEnabled && (
+        <DomainSelector
+          disabled={(multiDomainEnabled && selectedDomains.length === 0) || false}
+          onChange={(selected) => {
+            handleDomainSelection(selected);
+          }}
+        />
+      )}
+
       <Card
         footer={
           <Track justify="end">
@@ -76,7 +119,7 @@ const SettingsFeedback: FC = () => {
               <Switch
                 label={t('settings.feedback.feedbackActive')}
                 onCheckedChange={field.onChange}
-                checked={field.value}
+                checked={Boolean(field.value)}
                 {...field}
               />
             )}
@@ -90,7 +133,7 @@ const SettingsFeedback: FC = () => {
                 minRows={4}
                 maxLength={FEEDBACK_QUESTION_LENGTH}
                 onChange={field.onChange}
-                defaultValue={field.value}
+                defaultValue={field.value ?? ''}
                 name="label"
                 showMaxLength
                 maxLengthBottom
@@ -105,7 +148,7 @@ const SettingsFeedback: FC = () => {
               <Switch
                 label={t('settings.feedback.noticeActive')}
                 onCheckedChange={field.onChange}
-                checked={field.value}
+                checked={Boolean(field.value)}
                 {...field}
               />
             )}
@@ -119,7 +162,7 @@ const SettingsFeedback: FC = () => {
                 minRows={4}
                 maxLength={FEEDBACK_NOTICE_LENGTH}
                 onChange={field.onChange}
-                defaultValue={field.value}
+                defaultValue={field.value ?? ''}
                 name="label"
                 showMaxLength
                 maxLengthBottom

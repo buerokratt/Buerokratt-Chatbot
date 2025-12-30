@@ -70,6 +70,7 @@
   "multiDomains": {
     "addNew": "Add new",
     "title": "Multidomains",
+    "domains": "Domains",
     "domainName": "Domain name",
     "selectDomains": "Select Domains",
     "noDomains": "No domains available. Please contact your system administrator."

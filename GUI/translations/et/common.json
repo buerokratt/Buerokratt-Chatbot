@@ -70,6 +70,7 @@
   "multiDomains": {
     "addNew": "Lisa uus",
     "title": "Multidomeenid",
+    "domains": "Domeenid",
     "domainName": "Domeeni nimi",
     "selectDomains": "Vali Domeenid",
     "noDomains": "Domeene ei ole saadaval. Palun võtke ühendust süsteemiadministraatoriga."

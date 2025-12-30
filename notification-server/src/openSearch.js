@@ -2,7 +2,7 @@ const { Client } = require('@opensearch-project/opensearch');
 
 const { streamAzureOpenAIResponse } = require('./azureOpenAI');
 const { openSearchConfig } = require('./config');
-const { activeConnections } = require('./connectionManager');
+const { activeConnections, stoppedChannels } = require('./connectionManager');
 const streamQueue = require('./streamQueue');
 
 let client = buildClient();
@@ -41,6 +41,8 @@ async function createAzureOpenAIStreamRequest({ channelId, messages, options = {
   const { stream = true } = options;
 
   try {
+    stoppedChannels.delete(channelId);
+
     const connections = Array.from(activeConnections.entries()).filter(
       ([_, connData]) => connData.channelId === channelId,
     );
@@ -79,7 +81,7 @@ async function createAzureOpenAIStreamRequest({ channelId, messages, options = {
           let startedStreaming = false;
 
           for await (const part of response) {
-            if (!activeConnections.has(connectionId)) break;
+            if (!activeConnections.has(connectionId) || stoppedChannels.has(channelId)) break;
 
             const choice = part.choices?.[0];
             if (!choice) continue;
@@ -115,7 +117,7 @@ async function createAzureOpenAIStreamRequest({ channelId, messages, options = {
             }
           }
 
-          if (activeConnections.has(connectionId)) {
+          if (activeConnections.has(connectionId) && !stoppedChannels.has(channelId)) {
             if (!startedStreaming) {
               const trimmed = cumulative.trim();
               if (trimmed === openAIFallback1 || trimmed === openAIFallback2) {
