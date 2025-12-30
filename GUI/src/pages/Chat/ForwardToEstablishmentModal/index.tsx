@@ -22,7 +22,7 @@ const ForwardToEstablishmentModal: FC<ForwardToEstablishmentModalProps> = ({ cha
   });
   const [sorting, setSorting] = useState<SortingState>([]);
 
-  const { establishmentsList, totalPages, errorMessage, isLoading } = useEstablishments(pagination);
+  const { establishmentsList, totalPages, errorMessage, isLoading } = useEstablishments(pagination, filter, sorting);
 
   const establishmentsColumns = useMemo(() => createEstablishmentColumns(chat, onForward, t), [chat, onForward, t]);
 
