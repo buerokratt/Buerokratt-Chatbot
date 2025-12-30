@@ -1,12 +1,11 @@
-import { useQuery } from '@tanstack/react-query';
-import { createColumnHelper, PaginationState, SortingState } from '@tanstack/react-table';
-import { Button, DataTable, Dialog, FormInput, Icon, Track } from 'components';
-import { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import { PaginationState, SortingState } from '@tanstack/react-table';
+import { DataTable, Dialog, FormInput, Track } from 'components';
+import { FC, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MdOutlineArrowForward } from 'react-icons/md';
-import { apiDev } from 'services/api';
 import { Chat } from 'types/chat';
-import { Establishment, EstablishmentsResponse } from 'types/establishment';
+
+import { createEstablishmentColumns } from './establishment-columns';
+import { useEstablishments } from './use-establishments';
 
 type ForwardToEstablishmentModalProps = {
   chat: Chat;
@@ -14,8 +13,6 @@ type ForwardToEstablishmentModalProps = {
   onForward: (chat: Chat, establishment: string) => void;
 };
 
-// todo 1663 tests
-// todo 1663 strings like in figma
 const ForwardToEstablishmentModal: FC<ForwardToEstablishmentModalProps> = ({ chat, onModalClose, onForward }) => {
   const { t } = useTranslation();
   const [filter, setFilter] = useState('');
@@ -24,69 +21,10 @@ const ForwardToEstablishmentModal: FC<ForwardToEstablishmentModalProps> = ({ cha
     pageSize: 10,
   });
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [establishmentsList, setEstablishmentsList] = useState<Establishment[]>([]);
-  const [totalPages, setTotalPages] = useState(0);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const {
-    data: establishments,
-    isError,
-    isLoading,
-  } = useQuery({
-    queryKey: ['configs/centops-establishments', pagination.pageIndex + 1, pagination.pageSize],
-    queryFn: async () => {
-      const { data } = await apiDev.get<EstablishmentsResponse>('/configs/centops-establishments', {
-        params: {
-          page: pagination.pageIndex + 1,
-          pageSize: pagination.pageSize,
-        },
-      });
-      return data;
-    },
-  });
+  const { establishmentsList, totalPages, errorMessage, isLoading } = useEstablishments(pagination);
 
-  useEffect(() => {
-    if (establishments) {
-      setEstablishmentsList(establishments.response.items);
-      setTotalPages(establishments.response.totalPages);
-      setErrorMessage(null);
-    }
-  }, [establishments]);
-
-  useEffect(() => {
-    if (isError) {
-      setErrorMessage(t('chat.active.establishmentListError'));
-    }
-  }, [isError, t]);
-
-  const columnHelper = createColumnHelper<Establishment>();
-
-  const forwardView = useCallback(
-    (props: { row: { original: Establishment } }) => (
-      <Button appearance="text" onClick={() => onForward(chat, props.row.original.name)}>
-        <Icon icon={<MdOutlineArrowForward color="rgba(0, 0, 0, 0.54)" />} />
-        {t('global.forward')}
-      </Button>
-    ),
-    [chat, onForward, t],
-  );
-
-  const establishmentsColumns = useMemo(
-    () => [
-      columnHelper.accessor('name', {
-        header: t('chat.active.establishment') ?? '',
-        cell: (props) => props.getValue(),
-      }),
-      columnHelper.display({
-        id: 'forward',
-        cell: forwardView,
-        meta: {
-          size: '1%',
-        },
-      }),
-    ],
-    [columnHelper, forwardView, t],
-  );
+  const establishmentsColumns = useMemo(() => createEstablishmentColumns(chat, onForward, t), [chat, onForward, t]);
 
   const renderContent = () => {
     if (errorMessage) {
@@ -139,7 +77,7 @@ const ForwardToEstablishmentModal: FC<ForwardToEstablishmentModalProps> = ({ cha
             onChange={(e) => setFilter(e.target.value)}
           />
         </Track>
-        {establishments && (
+        {establishmentsList.length > 0 && (
           <DataTable
             data={establishmentsList}
             columns={establishmentsColumns}
