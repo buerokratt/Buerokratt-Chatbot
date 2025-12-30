@@ -14,9 +14,7 @@ type ForwardToEstablishmentModalProps = {
   onForward: (chat: Chat, establishment: string) => void;
 };
 
-// todo 1663 igor fe modal
 // todo 1663 tests
-// todo 1663 linter
 const ForwardToEstablishmentModal: FC<ForwardToEstablishmentModalProps> = ({ chat, onModalClose, onForward }) => {
   const { t } = useTranslation();
   const [filter, setFilter] = useState('');
@@ -29,7 +27,6 @@ const ForwardToEstablishmentModal: FC<ForwardToEstablishmentModalProps> = ({ cha
   const [totalPages, setTotalPages] = useState(0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // todo 1663 this needs an MSW mock
   const {
     data: establishments,
     isError,
