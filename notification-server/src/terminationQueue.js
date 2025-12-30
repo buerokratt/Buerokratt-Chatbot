@@ -1,7 +1,8 @@
 const abortQueue = [];
 const timeouts = new Map();
+const terminationDelay = proccess.env.TERMINATION_TIMEOUT || 10;
 
-function addToTerminationQueue(id, timeout = 10, callback) {
+function addToTerminationQueue(id, timeout = terminationDelay, callback) {
   if (timeouts.has(id)) {
     clearTimeout(timeouts.get(id));
   }
