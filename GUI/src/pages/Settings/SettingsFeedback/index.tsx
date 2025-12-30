@@ -42,7 +42,7 @@ const SettingsFeedback: FC = () => {
       );
       const res = data.response;
 
-      console.log('res', res, data)
+      console.log('res', res, data);
 
       reset(res);
       setFeedbackConfig(res);
@@ -79,7 +79,7 @@ const SettingsFeedback: FC = () => {
       feedbackActive: false,
       feedbackQuestion: '',
       feedbackNoticeActive: false,
-      feedbackNotice: ''
+      feedbackNotice: '',
     };
     setFeedbackConfig(feedbackConfig);
     reset(feedbackConfig);
