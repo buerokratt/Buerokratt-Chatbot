@@ -49,7 +49,8 @@
     "statusClarification": "Status clarification",
     "selectAll": "Select all",
     "displayText": "Display message",
-    "test": "Test"
+    "test": "Test",
+    "loading": "Loading..."
   },
   "files": {
     "download_xlsx": "Download XLSX"
@@ -173,7 +174,8 @@
       "ContactedUser": "Contacted User",
       "couldNotReachUser": "Could Not Reach User",
       "messageSendingFailed": "Message sending failed!",
-      "sendAgain": "Send again"
+      "sendAgain": "Send again",
+      "establishmentListError": "Error getting organization list. Please try again later."
     },
     "history": {
       "title": "History",

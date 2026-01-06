@@ -1,0 +1,100 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Get CentOps client list"
+  method: get
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+  params:
+    - field: page
+      type: number
+    - field: pageSize
+      type: number
+    - field: sortOrder
+      type: string
+      description: "Sort order for name: 'asc' or 'desc'"
+    - field: filter
+      type: string
+      description: "Filter clients by name (partial match)"
+
+assign_parameters:
+  assign:
+    page: ${incoming.params.page ?? 1}
+    pageSize: ${incoming.params.pageSize ?? 10}
+    sortOrder: ${incoming.params.sortOrder ?? 'asc'}
+    filter: ${incoming.params.filter ?? ''}
+
+check_centops_config:
+  switch:
+    - condition: ${"[#CENTOPS_URL]" !== "" && "[#CENTOPS_API_KEY]" !== "" && "[#CENTOPS_API_SECRET]" !== ""}
+      next: prepare_auth_token
+  next: log_config_missing
+
+log_config_missing:
+  log: "CentOps configuration not found. Please configure CENTOPS_URL, CENTOPS_API_KEY, and CENTOPS_API_SECRET in constants.ini"
+  next: return_connection_error
+
+prepare_auth_token:
+  assign:
+    authToken: ${"[#CENTOPS_API_KEY]" + ":" + "[#CENTOPS_API_SECRET]"}
+  next: encode_auth_header
+
+encode_auth_header:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/encryption/base64"
+    body:
+      content: ${authToken}
+  result: base64_result
+  error: log_encoding_error
+  next: fetch_client_list
+
+log_encoding_error:
+  log: "Failed to encode authentication credentials. DataMapper service is unavailable or failed to encode base64"
+  next: return_error
+
+fetch_client_list:
+  call: http.get
+  args:
+    url: "[#CENTOPS_URL]/centops/integration/clients"
+    query:
+      page: ${page}
+      pageSize: ${pageSize} 
+      sortOrder: ${sortOrder}
+      filter: ${filter}
+    headers:
+      Authorization: ${base64_result.response.body.cipher}
+  result: centops_response
+  error: log_connection_error
+  next: check_response
+
+log_connection_error:
+  log: "Failed to connect to CentOps service. URL: [#CENTOPS_URL]/centops/integration/clients - Connection timed out or service is unavailable"
+  next: return_connection_error
+
+check_response:
+  switch:
+    - condition: ${200 <= centops_response.response.statusCodeValue && centops_response.response.statusCodeValue < 300}
+      next: return_success
+  next: log_response_error
+
+log_response_error:
+  log: "CentOps returned error status: ${centops_response.response.statusCodeValue}. Response body: ${JSON.stringify(centops_response.response.body)}"
+  next: return_error
+
+return_success:
+  return: ${centops_response.response.body.response}
+  status: 200
+  next: end
+
+return_error:
+  return: "Failed to fetch CentOps client list"
+  status: 500
+  next: end
+
+return_connection_error:
+  return: "CentOps service is unavailable. Please try again later."
+  status: 503
+  next: end

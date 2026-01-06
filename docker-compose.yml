@@ -311,10 +311,22 @@ services:
     networks:
       - bykstack
 
+  centops-mock:
+    container_name: centops-mock
+    build:
+      context: ./centops-mock
+      dockerfile: Dockerfile
+    ports:
+      - "8090:8090"
+    networks:
+      - bykstack
+    cpus: "0.25"
+    mem_limit: "128M"
+
 volumes:
   opensearch-data:
   spacy_models:
-  
+
 networks:
   bykstack:
     name: bykstack
