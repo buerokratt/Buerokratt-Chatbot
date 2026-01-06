@@ -22,7 +22,7 @@ This repo will primarily contain:
 - Clone [Chat Widget](https://github.com/buerokratt/Chat-Widget)
 - build chat widget image `docker build -f Dockerfile.dev -t chat-widget .`
 - Clone [Authentication Layer](https://github.com/buerokratt/Authentication-layer)
-- build chat widget image `docker build -f Dockerfile.dev -t authentication-layer .`
+- build authentication layer image `docker build -f Dockerfile.dev -t authentication-layer .`
 - Clone [RASA](https://github.com/buerokratt/Rasa-for-Buerokratt)
 - choose dev branch and run `docker build -t rasa .`
 - Clone [Anonymizer](https://github.com/buerokratt/Presidio-Anonymizer)
