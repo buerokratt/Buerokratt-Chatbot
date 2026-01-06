@@ -22,6 +22,8 @@ extend_cookie:
     plaintext: 
       "customJwtCookie"
   result: cookie_result
+  error: return_extend_fail_private
+  next: assign_cookie
 
 assign_cookie:
   assign:
@@ -36,3 +38,8 @@ return_result:
   headers:
     Set-Cookie: ${setCookie}
   return: ${cookie_result.response.body.token}
+
+return_extend_fail_private:
+  return: "Failed to extend JWT Cookie"
+  status: 400
+  next: end
