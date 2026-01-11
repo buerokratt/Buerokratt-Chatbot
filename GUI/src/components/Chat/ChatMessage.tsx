@@ -72,15 +72,16 @@ const ChatMessage: FC<ChatMessageProps> = ({ message, onSelect, selected, editab
 
   return (
     <div className={clsx('active-chat__messageContainer')}>
-      <div
-        className={clsx('active-chat__message', {
-          'active-chat__message--selected': selected,
-        })}
-      >
-        {(message.event === CHAT_EVENTS.GREETING ||
-          message.event === CHAT_EVENTS.WAITING_VALIDATION ||
-          message.event === CHAT_EVENTS.APPROVED_VALIDATION ||
-          !message.event) && (
+      {message.event !== CHAT_EVENTS.READ && (
+        <div
+          className={clsx('active-chat__message', {
+            'active-chat__message--selected': selected,
+          })}
+        >
+          {(message.event === CHAT_EVENTS.GREETING ||
+            message.event === CHAT_EVENTS.WAITING_VALIDATION ||
+            message.event === CHAT_EVENTS.APPROVED_VALIDATION ||
+            !message.event) && (
           <>
             <button className={clsx('active-chat__message-text')} ref={messageRef} onClick={() => onSelect(message)}>
               <Track direction={isEditing ? 'vertical' : 'horizontal'}>
@@ -209,7 +210,8 @@ const ChatMessage: FC<ChatMessageProps> = ({ message, onSelect, selected, editab
             )}
           </>
         )}
-      </div>
+        </div>
+      )}
       {message.event === CHAT_EVENTS.WAITING_VALIDATION && (
         <Button
           appearance="success"
