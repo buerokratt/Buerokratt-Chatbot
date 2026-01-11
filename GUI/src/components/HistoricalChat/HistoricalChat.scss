@@ -107,12 +107,13 @@
         &__group-header {
           display: flex;
           justify-content: flex-end;
+          align-items: center;
         }
       }
 
       &__group-initials {
         background-color: get-color(sapphire-blue-10);
-        position: absolute !important;
+        position: relative !important;
         right: 0px !important;
       }
 
@@ -207,6 +208,9 @@
     line-height: $veera-line-height-500;
     font-weight: $veera-font-weight-delta;
     color: get-color(black-coral-6);
+    position: absolute;
+    right: 0;
+    top: 0;
   }
 
   &__group-initials {
@@ -223,6 +227,8 @@
     line-height: $veera-line-height-500;
     font-weight: $veera-font-weight-delta;
     text-transform: capitalize;
+    margin-left: 10rem;
+    margin-right: 3rem;
     text-align: right;
     white-space: nowrap;
     overflow: hidden;
