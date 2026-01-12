@@ -77,7 +77,7 @@ const SettingsFeedback: FC = () => {
       feedbackQuestion: '',
       feedbackNoticeActive: false,
       isFiveRatingScale: undefined,
-      feedbackNotice: ''
+      feedbackNotice: '',
     };
     setFeedbackConfig(feedbackConfig);
     reset(feedbackConfig);
