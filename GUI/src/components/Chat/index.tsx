@@ -710,22 +710,24 @@ const Chat: FC<ChatProps> = ({
                 <ChatEvent message={group.messages[0]} />
               ) : (
                 <>
-                  <div className="active-chat__group-initials">
-                    {group.type === 'buerokratt' || group.type === 'chatbot' ? (
-                      <BykLogoWhite height={24} />
-                    ) : (
-                      <>
-                        {group.name
-                          .split(' ')
-                          .map((n) => n[0])
-                          .join('')
-                          .toUpperCase()}
-                      </>
-                    )}
-                  </div>
-                  <div className="active-chat__group-name">
-                    {group.name}
-                    {group.title.length > 0 && <div className="title">{group.title}</div>}
+                  <div className="active-chat__group-header">
+                    <div className="active-chat__group-initials">
+                      {group.type === 'buerokratt' || group.type === 'chatbot' ? (
+                        <BykLogoWhite height={24} />
+                      ) : (
+                        <>
+                          {group.name
+                            .split(' ')
+                            .map((n) => n[0])
+                            .join('')
+                            .toUpperCase()}
+                        </>
+                      )}
+                    </div>
+                    <div className="active-chat__group-name">
+                      {group.name}
+                      {group.title.length > 0 && <div className="title">{group.title}</div>}
+                    </div>
                   </div>
 
                   <div ref={containerRef} className="active-chat__messages">

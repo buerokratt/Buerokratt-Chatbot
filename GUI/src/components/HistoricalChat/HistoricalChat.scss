@@ -51,8 +51,8 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
-    padding-left: 56px;
     position: relative;
+    padding-left: 0px !important;
 
     &:not(:last-child) {
       margin-bottom: 8px;
@@ -61,10 +61,13 @@
     &--buerokratt,
     &--chatbot {
       #{$self} {
+        &__group-header {
+          align-items: center;
+        }
+
         &__group-initials {
           background-color: get-color(sapphire-blue-10);
-          left: 0;
-          top: 0;
+          position: relative;
         }
 
         &__group-name {
@@ -72,6 +75,7 @@
           text-align: left;
           margin-left: 0;
           font-size: $veera-font-size-100;
+          padding-top: 0;
         }
 
         &__messages {
@@ -79,6 +83,7 @@
           flex-direction: column;
           gap: 4px;
           align-items: flex-start;
+          padding-left: 50px;
         }
 
         &__message-text {
@@ -97,25 +102,73 @@
       }
     }
 
+    &--end-user {
+      #{$self} {
+        &__group-header {
+          display: flex;
+          justify-content: flex-end;
+          align-items: center;
+        }
+      }
+
+      &__group-initials {
+        background-color: get-color(sapphire-blue-10);
+        position: relative !important;
+        right: 0px !important;
+      }
+
+      &__messages {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        align-items: flex-end;
+        padding-left: 50px !important;
+      }
+
+      &__message-text {
+        background-color: get-color(black-coral-10);
+        color: get-color(white);
+
+        :any-link {
+          background: url('../../static/icons/link-external-white.svg') no-repeat right center;
+          padding-right: 1.25em;
+          color: white;
+          text-decoration: underline;
+        }
+
+        &:hover {
+          background-color: #535665;
+        }
+      }
+    }
+
     &--backoffice-user {
       #{$self} {
+        &__group-header {
+          display: flex;
+          justify-content: flex-end;
+          align-items: center;
+        }
+
         &__group-initials {
           background-color: get-color(black-coral-10);
           color: get-color(white);
-          left: 0;
+          position: relative;
         }
 
         &__group-name {
           text-align: left;
           margin-left: 0;
           font-size: $veera-font-size-100;
+          padding-top: 0;
         }
 
         &__messages {
           display: flex;
           flex-direction: column;
           gap: 4px;
-          align-items: flex-start;
+          align-items: flex-end;
+          padding-left: 50px;
         }
 
         &__message-text {
@@ -135,7 +188,15 @@
     }
   }
 
-  &__group-initials {
+  &__group-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    min-height: 40px;
+  }
+
+  &__group-initials,
+  &__group-event-initials {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -152,7 +213,16 @@
     top: 0;
   }
 
-  &__group-name {
+  &__group-initials {
+    top: 0;
+  }
+
+  &__group-event-initials {
+    bottom: 23px;
+  }
+
+  &__group-name,
+  &__group-event-name {
     font-size: $veera-font-size-100;
     line-height: $veera-line-height-500;
     font-weight: $veera-font-weight-delta;
@@ -160,7 +230,14 @@
     margin-left: 10rem;
     margin-right: 3rem;
     text-align: right;
-    padding-top: 7px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  &__group-event-name {
+    padding-bottom: 4px;
   }
 
   &__messages {
@@ -168,6 +245,7 @@
     flex-direction: column;
     gap: 4px;
     align-items: flex-end;
+    padding-left: 50px;
   }
 
   &__message {
@@ -184,8 +262,10 @@
     border-radius: 8px 8px 8px 4px;
     font-size: $veera-font-size-100;
     line-height: $veera-line-height-500;
-    transition: all 0.25s ease-out;
+    transition: all .25s ease-out;
     cursor: pointer;
+    word-break: break-word;
+    white-space: pre-wrap;
 
     :any-link {
       text-decoration: underline;
@@ -214,7 +294,7 @@
 .header-link {
   text-decoration: none;
   padding: 15px 35px;
-  font-family: Roboto, sans-serif;
+  font-family: Roboto , sans-serif;
   font-weight: 400;
 }
 
