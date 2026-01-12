@@ -11,7 +11,8 @@ WHERE key IN (
     'feedbackActive',
     'feedbackQuestion',
     'feedbackNoticeActive',
-    'feedbackNotice'
+    'feedbackNotice',
+    'isFiveRatingScale'
     )
   AND deleted = FALSE
 ORDER BY key, domain, created DESC
@@ -28,7 +29,8 @@ FROM domain_list d
     ('feedbackActive', :feedbackActive),
     ('feedbackQuestion', :feedbackQuestion),
     ('feedbackNoticeActive', :feedbackNoticeActive),
-    ('feedbackNotice', :feedbackNotice)
+    ('feedbackNotice', :feedbackNotice),
+    ('isFiveRatingScale', :isFiveRatingScale)
     ) AS v(key, value)
     )
 INSERT INTO configuration (key, value, domain, created)

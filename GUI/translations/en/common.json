@@ -401,7 +401,10 @@
       "feedbackActive": "Feedback active",
       "feedbackQuestion": "Feedback question",
       "noticeActive": "Notice active",
-      "notice": "Notice"
+      "notice": "Notice",
+      "feedbackScale": "Feedback scale:",
+      "tenPoints": "10 points",
+      "fivePoints": "5 points"
     },
     "appearance": {
       "title": "Appearance and behavior",
