@@ -1,5 +1,5 @@
 -- liquibase formatted sql
--- changeset ahmedyasser:20260153791922
+-- changeset ahmedyasser:20260153791923
 ALTER TABLE user_profile_settings 
 DROP CONSTRAINT IF EXISTS user_profile_settings_pkey;
 
