@@ -54,7 +54,7 @@ function formatMessage(message?: string): string {
   return filteredMessage
     .replaceAll(/&#x([0-9A-Fa-f]+);/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
     .replaceAll(/(^|\n)(\d{4})\.\s/g, (match, prefix, year) => {
-      const remainingText = message.substring(message.indexOf(match) + match.length);
+      const remainingText = filteredMessage.substring(filteredMessage.indexOf(match) + match.length);
       const sentenceEnd = remainingText.indexOf('\n\n');
       if (sentenceEnd !== -1) {
         const currentSentence = remainingText.substring(0, sentenceEnd);
@@ -64,7 +64,7 @@ function formatMessage(message?: string): string {
       }
       return `${prefix}${year}\\. `;
     })
-    .replace(/(?<=\n)\d+\.\s/g, hasSpecialFormat(message) ? '\n\n$&' : '$&');
+    .replace(/(?<=\n)\d+\.\s/g, hasSpecialFormat(filteredMessage) ? '\n\n$&' : '$&');
 }
 
 const Markdownify: React.FC<MarkdownifyProps> = ({ message, sanitizeLinks = false }) => (
