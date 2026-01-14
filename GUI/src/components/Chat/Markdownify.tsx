@@ -52,7 +52,7 @@ function formatMessage(message?: string): string {
     .replaceAll(/\\?\$g\w*/g, '');
 
   return filteredMessage
-    .replaceAll(/&#x([0-9A-Fa-f]+);/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
+    .replaceAll(/&#x([0-9A-Fa-f]+);/g, (_, hex: string) => String.fromCharCode(parseInt(hex, 16)))
     .replaceAll(/(^|\n)(\d{4})\.\s/g, (match, prefix, year) => {
       const remainingText = filteredMessage.substring(filteredMessage.indexOf(match) + match.length);
       const sentenceEnd = remainingText.indexOf('\n\n');
