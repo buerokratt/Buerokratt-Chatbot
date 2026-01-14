@@ -46,9 +46,14 @@ const hasSpecialFormat = (m: string) => m.includes('\n\n') && m.indexOf('.') > 0
 function formatMessage(message?: string): string {
   if (!message) return '';
 
-  return message
-    .replace(/&#x([0-9A-Fa-f]+);/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
-    .replace(/(^|\n)(\d{4})\.\s/g, (match, prefix, year) => {
+  const filteredMessage = message
+    .replaceAll(/\\?\$b\w*/g, '')
+    .replaceAll(/\\?\$v\w*/g, '')
+    .replaceAll(/\\?\$g\w*/g, '');
+
+  return filteredMessage
+    .replaceAll(/&#x([0-9A-Fa-f]+);/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
+    .replaceAll(/(^|\n)(\d{4})\.\s/g, (match, prefix, year) => {
       const remainingText = message.substring(message.indexOf(match) + match.length);
       const sentenceEnd = remainingText.indexOf('\n\n');
       if (sentenceEnd !== -1) {
