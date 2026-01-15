@@ -25,6 +25,7 @@ const SettingsChatSettings: FC = () => {
   const [isNameVisible, setIsNameVisible] = useState<boolean | undefined>(undefined);
   const [isTitleVisible, setIsTitleVisible] = useState<boolean | undefined>(undefined);
   const [isEditChatVisible, setIsEditChatVisible] = useState<boolean | undefined>(undefined);
+  const [instantlyOpenChatWidget, setInstantlyOpenChatWidget] = useState<boolean | undefined>(undefined);
   const queryClient = useQueryClient();
   const [burokrattConfirmationModal, setBurokrattConfirmationModal] = useState<boolean | null>(null);
 
@@ -52,6 +53,7 @@ const SettingsChatSettings: FC = () => {
       setIsNameVisible(res.isCsaNameVisible === 'true');
       setIsTitleVisible(res.isCsaTitleVisible === 'true');
       setIsEditChatVisible(res.isEditChatVisible === 'true');
+      setInstantlyOpenChatWidget(res.instantlyOpenChatWidget === 'true');
 
       hasRendered.current = true;
     } catch (error) {
@@ -66,6 +68,7 @@ const SettingsChatSettings: FC = () => {
       is_csa_name_visible: boolean;
       is_csa_title_visible: boolean;
       is_edit_chat_visible: boolean;
+      instantly_open_chat_widget: boolean;
       domainUUID: string[];
     }) => {
       return apiDev.post(`configs/bot-config`, {
@@ -74,6 +77,7 @@ const SettingsChatSettings: FC = () => {
         isCsaNameVisible: data.is_csa_name_visible.toString(),
         isCsaTitleVisible: data.is_csa_title_visible.toString(),
         isEditChatVisible: data.is_edit_chat_visible.toString(),
+        instantlyOpenChatWidget: data.instantly_open_chat_widget.toString(),
         domainUUID: data.domainUUID,
       });
     },
@@ -107,6 +111,7 @@ const SettingsChatSettings: FC = () => {
       is_csa_name_visible: isNameVisible ?? true,
       is_csa_title_visible: isTitleVisible ?? true,
       is_edit_chat_visible: isEditChatVisible ?? true,
+      instantly_open_chat_widget: instantlyOpenChatWidget ?? false,
       domainUUID: multiDomainEnabled ? selectedDomains : [],
     });
   };
@@ -118,6 +123,7 @@ const SettingsChatSettings: FC = () => {
     setIsNameVisible(false);
     setIsTitleVisible(false);
     setIsEditChatVisible(false);
+    setInstantlyOpenChatWidget(false);
   };
 
   const handleDomainSelection = useDomainSelectionHandler(setSelectedDomains, fetchData, resetSettingsToDefault);
@@ -146,7 +152,7 @@ const SettingsChatSettings: FC = () => {
             {isBotActive != undefined && (
               <Switch
                 name="is_bot_active"
-                label={t('settings.chat.chatActive')}
+                label={t('settings.chat.chatActive').toString()}
                 checked={isBotActive}
                 onCheckedChange={setIsBotActive}
               />
@@ -154,9 +160,17 @@ const SettingsChatSettings: FC = () => {
             {isBurokrattActive != undefined && (
               <Switch
                 name="is_burokratt_active"
-                label={t('settings.chat.burokrattActive')}
+                label={t('settings.chat.burokrattActive').toString()}
                 checked={isBurokrattActive}
                 onCheckedChange={setIsBurokrattActive}
+              />
+            )}
+            {instantlyOpenChatWidget != undefined && (
+              <Switch
+                name="instantly_open_chat_widget"
+                label={t('settings.chat.instantlyOpenChatWidget').toString()}
+                checked={instantlyOpenChatWidget}
+                onCheckedChange={setInstantlyOpenChatWidget}
               />
             )}
           </Track>
@@ -171,7 +185,7 @@ const SettingsChatSettings: FC = () => {
           {isNameVisible != undefined && (
             <Switch
               name="is_csa_name_visible"
-              label={t('settings.chat.showSupportName')}
+              label={t('settings.chat.showSupportName').toString()}
               checked={isNameVisible}
               onCheckedChange={setIsNameVisible}
             />
@@ -179,7 +193,7 @@ const SettingsChatSettings: FC = () => {
           {isTitleVisible != undefined && (
             <Switch
               name="is_csa_title_visible"
-              label={t('settings.chat.showSupportTitle')}
+              label={t('settings.chat.showSupportTitle').toString()}
               checked={isTitleVisible}
               onCheckedChange={setIsTitleVisible}
             />
@@ -187,7 +201,7 @@ const SettingsChatSettings: FC = () => {
           {isEditChatVisible != undefined && (
             <Switch
               name="is_edit_chat_visible"
-              label={t('settings.chat.editActiveChat')}
+              label={t('settings.chat.editActiveChat').toString()}
               checked={isEditChatVisible}
               onCheckedChange={setIsEditChatVisible}
             />
@@ -217,6 +231,7 @@ const SettingsChatSettings: FC = () => {
                     is_csa_name_visible: isNameVisible ?? true,
                     is_csa_title_visible: isTitleVisible ?? true,
                     is_edit_chat_visible: isEditChatVisible ?? true,
+                    instantly_open_chat_widget: instantlyOpenChatWidget ?? false,
                     domainUUID: multiDomainEnabled ? selectedDomains : [],
                   });
                 }}

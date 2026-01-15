@@ -385,6 +385,7 @@
       "showSupportName": "Kuva nõustaja nimi",
       "showSupportTitle": "Kuva nõustaja tiitel",
       "editActiveChat": "Aktiivsete vestluste muutmine",
+      "instantlyOpenChatWidget": "Koheselt avatud vestlusaken",
       "showBurokrattConfirmation": "Kas soovid Bürokrati veebilehel nähtavaks teha?",
       "hideBurokrattConfirmation": "Kas soovid Bürokrati veebilehel ära peita?"
     },

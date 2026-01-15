@@ -385,6 +385,7 @@
       "showSupportName": "Show support name",
       "showSupportTitle": "Show support title",
       "editActiveChat": "Editing active chats",
+      "instantlyOpenChatWidget": "Instantly open chat widget",
       "showBurokrattConfirmation": "Do you want to make Bürokrat visible on the website?",
       "hideBurokrattConfirmation": "Do you want to hide the Bureaucrat on the website?"
     },
