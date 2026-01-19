@@ -82,134 +82,134 @@ const ChatMessage: FC<ChatMessageProps> = ({ message, onSelect, selected, editab
             message.event === CHAT_EVENTS.WAITING_VALIDATION ||
             message.event === CHAT_EVENTS.APPROVED_VALIDATION ||
             !message.event) && (
-          <>
-            <button className={clsx('active-chat__message-text')} ref={messageRef} onClick={() => onSelect(message)}>
-              <Track direction={isEditing ? 'vertical' : 'horizontal'}>
-                {message.event === CHAT_EVENTS.WAITING_VALIDATION && isEditing && (
-                  <FormTextarea
-                    name={''}
-                    label={''}
-                    minRows={1}
-                    maxRows={-1}
-                    maxLength={-1}
-                    style={{
-                      backgroundColor: 'transparent',
-                      border: 'none',
-                      width: '400px',
-                    }}
-                    defaultValue={content}
-                    onChange={(e) => {
-                      setInputContent(e.target.value);
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                    }}
-                    autoFocus
-                  />
-                )}
-                {!isEditing && <Markdownify message={content} sanitizeLinks={message.authorRole === 'end-user'} />}
-                {!message.content && options.length > 0 && 'ok'}
-                {editableMessage && !isEditing && <MdOutlineCreate className="active-chat__edit-icon" />}
-                {message.event === CHAT_EVENTS.WAITING_VALIDATION && (
-                  <button
-                    style={{
-                      color: 'white',
-                      alignSelf: 'end',
-                      paddingTop: '0.3rem',
-                    }}
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      setMessageHeight(messageRef?.current?.clientHeight ?? 0);
-                      setIsEditing(true);
-                    }}
+            <>
+              <button className={clsx('active-chat__message-text')} ref={messageRef} onClick={() => onSelect(message)}>
+                <Track direction={isEditing ? 'vertical' : 'horizontal'}>
+                  {message.event === CHAT_EVENTS.WAITING_VALIDATION && isEditing && (
+                    <FormTextarea
+                      name={''}
+                      label={''}
+                      minRows={1}
+                      maxRows={-1}
+                      maxLength={-1}
+                      style={{
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        width: '400px',
+                      }}
+                      defaultValue={content}
+                      onChange={(e) => {
+                        setInputContent(e.target.value);
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }}
+                      autoFocus
+                    />
+                  )}
+                  {!isEditing && <Markdownify message={content} sanitizeLinks={message.authorRole === 'end-user'} />}
+                  {!message.content && options.length > 0 && 'ok'}
+                  {editableMessage && !isEditing && <MdOutlineCreate className="active-chat__edit-icon" />}
+                  {message.event === CHAT_EVENTS.WAITING_VALIDATION && (
+                    <button
+                      style={{
+                        color: 'white',
+                        alignSelf: 'end',
+                        paddingTop: '0.3rem',
+                      }}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        setMessageHeight(messageRef?.current?.clientHeight ?? 0);
+                        setIsEditing(true);
+                      }}
+                    >
+                      <Icon icon={<HiOutlinePencil fontSize={18} />} size="medium" />
+                    </button>
+                  )}
+                </Track>
+              </button>
+              <Track
+                direction="horizontal"
+                style={{
+                  height: messageHeight,
+                  justifyContent: 'center',
+                }}
+              >
+                <div>
+                  <time
+                    dateTime={message.created ?? message.authorTimestamp}
+                    className="active-chat__message-date"
+                    style={{ alignSelf: 'center' }}
                   >
-                    <Icon icon={<HiOutlinePencil fontSize={18} />} size="medium" />
-                  </button>
+                    {format(new Date(message.created ?? message.authorTimestamp), 'HH:mm:ss')}
+                  </time>
+                </div>
+                {message.event === CHAT_EVENTS.WAITING_VALIDATION && isEditing && (
+                  <Track
+                    style={{
+                      position: 'absolute',
+                      bottom: 0,
+                    }}
+                    gap={2}
+                  >
+                    <Icon
+                      style={{ cursor: 'pointer' }}
+                      icon={
+                        <MdCheck
+                          fontSize={22}
+                          color="#308653"
+                          onClick={async () => {
+                            if (inputContent.length === 0) return;
+                            try {
+                              await apiDev.post('chats/messages/edit', {
+                                chatId: message.chatId,
+                                messageId: message.id ?? '',
+                                content: inputContent,
+                              });
+                              setIsEditing(false);
+                              setContent(inputContent);
+                              toast.open({
+                                type: 'success',
+                                title: t('global.notification'),
+                                message: t('chat.validations.messageChanged'),
+                              });
+                            } catch (error) {
+                              console.error(error);
+                              toast.open({
+                                type: 'error',
+                                title: t('global.notificationError'),
+                                message: t('chat.validations.messageChangeFailed'),
+                              });
+                            }
+                          }}
+                        />
+                      }
+                      size="medium"
+                    />
+                    <Icon
+                      style={{ cursor: 'pointer' }}
+                      icon={
+                        <MdClose
+                          fontSize={22}
+                          color="#D73E3E"
+                          onClick={() => {
+                            setIsEditing(false);
+                            setInputContent(content ?? '');
+                          }}
+                        />
+                      }
+                      size="medium"
+                    />
+                  </Track>
                 )}
               </Track>
-            </button>
-            <Track
-              direction="horizontal"
-              style={{
-                height: messageHeight,
-                justifyContent: 'center',
-              }}
-            >
-              <div>
-                <time
-                  dateTime={message.created ?? message.authorTimestamp}
-                  className="active-chat__message-date"
-                  style={{ alignSelf: 'center' }}
-                >
-                  {format(new Date(message.created ?? message.authorTimestamp), 'HH:mm:ss')}
-                </time>
-              </div>
-              {message.event === CHAT_EVENTS.WAITING_VALIDATION && isEditing && (
-                <Track
-                  style={{
-                    position: 'absolute',
-                    bottom: 0,
-                  }}
-                  gap={2}
-                >
-                  <Icon
-                    style={{ cursor: 'pointer' }}
-                    icon={
-                      <MdCheck
-                        fontSize={22}
-                        color="#308653"
-                        onClick={async () => {
-                          if (inputContent.length === 0) return;
-                          try {
-                            await apiDev.post('chats/messages/edit', {
-                              chatId: message.chatId,
-                              messageId: message.id ?? '',
-                              content: inputContent,
-                            });
-                            setIsEditing(false);
-                            setContent(inputContent);
-                            toast.open({
-                              type: 'success',
-                              title: t('global.notification'),
-                              message: t('chat.validations.messageChanged'),
-                            });
-                          } catch (error) {
-                            console.error(error);
-                            toast.open({
-                              type: 'error',
-                              title: t('global.notificationError'),
-                              message: t('chat.validations.messageChangeFailed'),
-                            });
-                          }
-                        }}
-                      />
-                    }
-                    size="medium"
-                  />
-                  <Icon
-                    style={{ cursor: 'pointer' }}
-                    icon={
-                      <MdClose
-                        fontSize={22}
-                        color="#D73E3E"
-                        onClick={() => {
-                          setIsEditing(false);
-                          setInputContent(content ?? '');
-                        }}
-                      />
-                    }
-                    size="medium"
-                  />
-                </Track>
+              {selected && (
+                <div className="active-chat__selection-icon">
+                  <MdOutlineCheck />
+                </div>
               )}
-            </Track>
-            {selected && (
-              <div className="active-chat__selection-icon">
-                <MdOutlineCheck />
-              </div>
-            )}
-          </>
-        )}
+            </>
+          )}
         </div>
       )}
       {message.event === CHAT_EVENTS.WAITING_VALIDATION && (

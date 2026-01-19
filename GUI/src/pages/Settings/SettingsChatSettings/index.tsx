@@ -35,7 +35,7 @@ const SettingsChatSettings: FC = () => {
     instantly_open_chat_widget: t('settings.chat.tooltip.instantlyOpenChatWidget'),
     is_csa_name_visible: t('settings.chat.tooltip.isCsaNameVisible'),
     is_csa_title_visible: t('settings.chat.tooltip.isCsaTitleVisible'),
-    is_edit_chat_visible: t('settings.chat.tooltip.isEditChatVisible')
+    is_edit_chat_visible: t('settings.chat.tooltip.isEditChatVisible'),
   };
 
   useEffect(() => {
@@ -175,9 +175,9 @@ const SettingsChatSettings: FC = () => {
 
       <Card
         header={
-          <Track direction="vertical" gap={8} align='left'>
+          <Track direction="vertical" gap={8} align="left">
             {isBotActive != undefined && (
-              <Track gap={10} >
+              <Track gap={10}>
                 <Switch
                   name="is_bot_active"
                   label={t('settings.chat.chatActive').toString()}
