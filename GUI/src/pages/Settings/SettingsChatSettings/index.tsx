@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import { Button, Card, Dialog, Switch, Track } from 'components';
+import { Button, Card, Dialog, Icon, Switch, Tooltip, Track } from 'components';
 import withAuthorization from 'hoc/with-authorization';
 import { useToast } from 'hooks/useToast';
 import { FC, useEffect, useRef, useState } from 'react';
@@ -12,6 +12,7 @@ import { ROLES } from 'utils/constants';
 import DomainSelector from '../../../components/DomainsSelector';
 import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
 import { fetchConfigurationFromDomain } from '../../../services/configurations';
+import { AiOutlineInfoCircle } from 'react-icons/ai';
 
 const SettingsChatSettings: FC = () => {
   const { t } = useTranslation();
@@ -28,6 +29,14 @@ const SettingsChatSettings: FC = () => {
   const [instantlyOpenChatWidget, setInstantlyOpenChatWidget] = useState<boolean | undefined>(undefined);
   const queryClient = useQueryClient();
   const [burokrattConfirmationModal, setBurokrattConfirmationModal] = useState<boolean | null>(null);
+  const tooltips = {
+    is_bot_active: t('settings.chat.tooltip.isBotActive'),
+    is_burokratt_active: t('settings.chat.tooltip.isBurokrattActive'),
+    instantly_open_chat_widget: t('settings.chat.tooltip.instantlyOpenChatWidget'),
+    is_csa_name_visible: t('settings.chat.tooltip.isCsaNameVisible'),
+    is_csa_title_visible: t('settings.chat.tooltip.isCsaTitleVisible'),
+    is_edit_chat_visible: t('settings.chat.tooltip.isEditChatVisible')
+  };
 
   useEffect(() => {
     if (multiDomainEnabled) {
@@ -128,6 +137,24 @@ const SettingsChatSettings: FC = () => {
 
   const handleDomainSelection = useDomainSelectionHandler(setSelectedDomains, fetchData, resetSettingsToDefault);
 
+  function getTooltip(
+    name:
+      | 'is_bot_active'
+      | 'is_burokratt_active'
+      | 'instantly_open_chat_widget'
+      | 'is_csa_name_visible'
+      | 'is_csa_title_visible'
+      | 'is_edit_chat_visible',
+  ) {
+    return (
+      <Tooltip content={tooltips[name]}>
+        <span>
+          <Icon icon={<AiOutlineInfoCircle fontSize={20} color="#005aa3" />} size="medium" />
+        </span>
+      </Tooltip>
+    );
+  }
+
   if (!hasRendered) {
     return <>Loading...</>;
   }
@@ -148,30 +175,39 @@ const SettingsChatSettings: FC = () => {
 
       <Card
         header={
-          <Track direction="vertical" gap={8}>
+          <Track direction="vertical" gap={8} align='left'>
             {isBotActive != undefined && (
-              <Switch
-                name="is_bot_active"
-                label={t('settings.chat.chatActive').toString()}
-                checked={isBotActive}
-                onCheckedChange={setIsBotActive}
-              />
+              <Track gap={10} >
+                <Switch
+                  name="is_bot_active"
+                  label={t('settings.chat.chatActive').toString()}
+                  checked={isBotActive}
+                  onCheckedChange={setIsBotActive}
+                />
+                {getTooltip('is_bot_active')}
+              </Track>
             )}
             {isBurokrattActive != undefined && (
-              <Switch
-                name="is_burokratt_active"
-                label={t('settings.chat.burokrattActive').toString()}
-                checked={isBurokrattActive}
-                onCheckedChange={setIsBurokrattActive}
-              />
+              <Track gap={10}>
+                <Switch
+                  name="is_burokratt_active"
+                  label={t('settings.chat.burokrattActive').toString()}
+                  checked={isBurokrattActive}
+                  onCheckedChange={setIsBurokrattActive}
+                />
+                {getTooltip('is_burokratt_active')}
+              </Track>
             )}
             {instantlyOpenChatWidget != undefined && (
-              <Switch
-                name="instantly_open_chat_widget"
-                label={t('settings.chat.instantlyOpenChatWidget').toString()}
-                checked={instantlyOpenChatWidget}
-                onCheckedChange={setInstantlyOpenChatWidget}
-              />
+              <Track gap={10}>
+                <Switch
+                  name="instantly_open_chat_widget"
+                  label={t('settings.chat.instantlyOpenChatWidget').toString()}
+                  checked={instantlyOpenChatWidget}
+                  onCheckedChange={setInstantlyOpenChatWidget}
+                />
+                {getTooltip('instantly_open_chat_widget')}
+              </Track>
             )}
           </Track>
         }
@@ -183,28 +219,37 @@ const SettingsChatSettings: FC = () => {
       >
         <Track gap={8} direction="vertical" align="left">
           {isNameVisible != undefined && (
-            <Switch
-              name="is_csa_name_visible"
-              label={t('settings.chat.showSupportName').toString()}
-              checked={isNameVisible}
-              onCheckedChange={setIsNameVisible}
-            />
+            <Track gap={10}>
+              <Switch
+                name="is_csa_name_visible"
+                label={t('settings.chat.showSupportName').toString()}
+                checked={isNameVisible}
+                onCheckedChange={setIsNameVisible}
+              />
+              {getTooltip('is_csa_name_visible')}
+            </Track>
           )}
           {isTitleVisible != undefined && (
-            <Switch
-              name="is_csa_title_visible"
-              label={t('settings.chat.showSupportTitle').toString()}
-              checked={isTitleVisible}
-              onCheckedChange={setIsTitleVisible}
-            />
+            <Track gap={10}>
+              <Switch
+                name="is_csa_title_visible"
+                label={t('settings.chat.showSupportTitle').toString()}
+                checked={isTitleVisible}
+                onCheckedChange={setIsTitleVisible}
+              />
+              {getTooltip('is_csa_title_visible')}
+            </Track>
           )}
           {isEditChatVisible != undefined && (
-            <Switch
-              name="is_edit_chat_visible"
-              label={t('settings.chat.editActiveChat').toString()}
-              checked={isEditChatVisible}
-              onCheckedChange={setIsEditChatVisible}
-            />
+            <Track gap={10}>
+              <Switch
+                name="is_edit_chat_visible"
+                label={t('settings.chat.editActiveChat').toString()}
+                checked={isEditChatVisible}
+                onCheckedChange={setIsEditChatVisible}
+              />
+              {getTooltip('is_edit_chat_visible')}
+            </Track>
           )}
         </Track>
       </Card>

@@ -387,7 +387,15 @@
       "editActiveChat": "Aktiivsete vestluste muutmine",
       "instantlyOpenChatWidget": "Koheselt avatud vestlusaken",
       "showBurokrattConfirmation": "Kas soovid Bürokrati veebilehel nähtavaks teha?",
-      "hideBurokrattConfirmation": "Kas soovid Bürokrati veebilehel ära peita?"
+      "hideBurokrattConfirmation": "Kas soovid Bürokrati veebilehel ära peita?",
+      "tooltip": {
+        "isBotActive": "Valides sees, vastab Bürokratt automaatselt kliendile kasutades tehisintellektil põhinevat vestluslahendust (vastavalt tehnilisele lahendusele kas keelemudelit, RAG või RASA lahendust). Valides väljas, suunatakse vestlus automaatselt nõustajale.",
+        "isBurokrattActive": "Valides sees, on Bürokratt veebilehel nähtav. Valides väljas, peidetakse veebilehelt Bürokratt ära.",
+        "instantlyOpenChatWidget": "Valides sees, avatakse vestlusaken automaatselt, kui kasutaja veebilehele maandub. Valides väljas, on Bürokratt minimeeritud ning vestlemiseks peab kasutaja ise vestlusakna avama. Seadistus töötab ainult arvutivaatest ja ei ole rakendu mobiilivaates!",
+        "isCsaNameVisible": "Kui seadistus on sees, kuvatakse vestlusaknas vasakul oleva vestleja pildi kohal nõustaja nime. Kui seadistus on väljas, siis profiili kohal ei kuvata nõustaja nime.",
+        "isCsaTitleVisible": "Kui seadistus on sees, kuvatakse nõustaja tiitlit vestlusaknas. Kui seadistus on väljas, siis nõustaja tiitlit vestlusaknas ei kuvata.",
+        "isEditChatVisible": "Kui valida sees, siis on ainult nõustajal võimalik oma viimati saadetud vastust korrigeerida. Valides väljas, ei saa nõustaja tagant järgi viimast sõnumit muuta."
+      }
     },
     "emergencyNotices": {
       "title": "Erakorralised teated",
