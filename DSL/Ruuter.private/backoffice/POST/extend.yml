@@ -38,6 +38,7 @@ return_result:
   headers:
     Set-Cookie: ${setCookie}
   return: ${cookie_result.response.body.token}
+  next: end
 
 return_extend_fail_private:
   return: "Failed to extend JWT Cookie"
