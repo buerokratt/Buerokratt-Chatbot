@@ -211,6 +211,7 @@ SELECT
         THEN c.feedback_rating_five
         ELSE c.feedback_rating
     END AS feedback_rating,
+    is_five_rating_scale,
     c.test as isTest,
     nps,
     CSAFullNames.all_csa_names AS all_csa,
