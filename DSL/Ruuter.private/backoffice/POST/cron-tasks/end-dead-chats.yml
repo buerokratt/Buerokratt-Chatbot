@@ -26,7 +26,7 @@ getIdleTimeConfiguration:
 
 extractRequestData:
   assign:
-    idleTime: ${Number(idle_config_res.response.body[0].value ?? 5)}
+    idleTime: ${idle_config_res.response.body[0].value ?? 5}
     inactivityTime: ${incoming.body.inactivityTime ?? 5}
   next: getDeadChats
 

@@ -17,8 +17,8 @@ ChatsWithDeadTime AS (
         lc.base_id,
         COALESCE(lmt.last_message_updated, lc.updated) AS last_activity_time,
         COALESCE(lmt.last_message_updated, lc.updated) + 
-            (COALESCE(:idleTime, 5)::text || ' minutes')::INTERVAL +
-            (COALESCE(:inactivityTime, 5)::text || ' minutes')::INTERVAL AS dead_time
+            (COALESCE(:idleTime::integer, 5) || ' minutes')::INTERVAL +
+            (COALESCE(:inactivityTime::integer, 5) || ' minutes')::INTERVAL AS dead_time
     FROM LatestChats lc
     LEFT JOIN LatestMessageTime lmt ON lc.base_id = lmt.chat_base_id
     WHERE lc.status IS NOT NULL
