@@ -2,11 +2,15 @@ declaration:
   call: declare
   version: 0.1
   description: "Decription placeholder for 'GET'"
-  method: get
+  method: post
   accepts: json
   returns: json
   namespace: backoffice
   allowlist:
+    body:
+      - field: chatId
+        type: string
+        description: "Body field 'chatId'"
     header:
       - field: cookie
         type: string
@@ -22,17 +26,21 @@ get_chat_info:
    plaintext:
       "chatJwt"
   result: infoRes
-  next: check_chat_info_response
 
-check_chat_info_response:
+check_info_response:
   switch:
-    - condition: ${200 <= infoRes.response.statusCodeValue && infoRes.response.statusCodeValue < 300}
-      next: assignChatId
-  next: return_bad_request
+    - condition: ${infoRes.response.body}
+      next: assignInfoChatId
+  next: assignChatId
+
+assignInfoChatId:
+  assign:
+    chatId: ${infoRes.response.body.chatId}
+  next: getChat
 
 assignChatId:
   assign:
-    chatId: ${infoRes.response.body.chatId}
+    chatId: ${incoming.body.chatId}
   next: getChat
 
 getChat:
@@ -48,7 +56,7 @@ checkIfChatIsEnded:
   switch:
     - condition: ${res.response.body[0].status == "ENDED"}
       next: unassign_cookie
-  next:  return_result
+  next: return_result
 
 unassign_cookie:
   assign:
