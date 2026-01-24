@@ -1,7 +1,7 @@
 const { Client } = require('@opensearch-project/opensearch');
 
-const { streamAzureOpenAIResponse } = require('./azureOpenAI');
 const { sendAzureAgenticRequest } = require('./azureAgenticRequest');
+const { streamAzureOpenAIResponse } = require('./azureOpenAI');
 const { openSearchConfig } = require('./config');
 const { activeConnections, stoppedChannels } = require('./connectionManager');
 const streamQueue = require('./streamQueue');
@@ -38,7 +38,14 @@ async function searchNotification({ channelId, connectionId, sender }) {
   }
 }
 
-async function createAzureOpenAIStreamRequest({ channelId, messages, options = {}, use_agentic = false, agent_name, agent_type }) {
+async function createAzureOpenAIStreamRequest({
+  channelId,
+  messages,
+  options = {},
+  use_agentic = false,
+  agent_name,
+  agent_type,
+}) {
   const { stream = true } = options;
 
   try {
@@ -58,13 +65,13 @@ async function createAzureOpenAIStreamRequest({ channelId, messages, options = {
 
       try {
         let response;
-        
+
         if (use_agentic) {
           response = await sendAzureAgenticRequest(messages, {
             ...options,
             stream,
             agent_name,
-            agent_type
+            agent_type,
           });
         } else {
           response = await streamAzureOpenAIResponse(messages, options);
