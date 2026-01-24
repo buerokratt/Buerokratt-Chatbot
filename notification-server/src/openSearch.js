@@ -1,6 +1,7 @@
 const { Client } = require('@opensearch-project/opensearch');
 
 const { streamAzureOpenAIResponse } = require('./azureOpenAI');
+const { sendAzureAgenticRequest } = require('./azureAgenticRequest');
 const { openSearchConfig } = require('./config');
 const { activeConnections, stoppedChannels } = require('./connectionManager');
 const streamQueue = require('./streamQueue');
@@ -37,7 +38,7 @@ async function searchNotification({ channelId, connectionId, sender }) {
   }
 }
 
-async function createAzureOpenAIStreamRequest({ channelId, messages, options = {} }) {
+async function createAzureOpenAIStreamRequest({ channelId, messages, options = {}, use_agentic = false, agent_name, agent_type }) {
   const { stream = true } = options;
 
   try {
@@ -48,7 +49,7 @@ async function createAzureOpenAIStreamRequest({ channelId, messages, options = {
     );
 
     if (connections.length === 0) {
-      const requestId = streamQueue.addToQueue(channelId, { messages, options });
+      const requestId = streamQueue.addToQueue(channelId, { messages, options, use_agentic, agent_name, agent_type });
       console.log(`No active connections for channel ${channelId}, queued request ${requestId}`);
     }
 
@@ -56,7 +57,18 @@ async function createAzureOpenAIStreamRequest({ channelId, messages, options = {
       const { sender } = connData;
 
       try {
-        const response = await streamAzureOpenAIResponse(messages, options);
+        let response;
+        
+        if (use_agentic) {
+          response = await sendAzureAgenticRequest(messages, {
+            ...options,
+            stream,
+            agent_name,
+            agent_type
+          });
+        } else {
+          response = await streamAzureOpenAIResponse(messages, options);
+        }
 
         if (!activeConnections.has(connectionId)) {
           return;
@@ -83,37 +95,56 @@ async function createAzureOpenAIStreamRequest({ channelId, messages, options = {
           for await (const part of response) {
             if (!activeConnections.has(connectionId) || stoppedChannels.has(channelId)) break;
 
-            const choice = part.choices?.[0];
-            if (!choice) continue;
+            let content = '';
 
-            if (!context && choice.delta?.context) context = choice.delta.context;
+            if (use_agentic) {
+              if (part.type === 'response.output_text.delta') {
+                content = part.delta || '';
+              }
+            } else {
+              const choice = part.choices?.[0];
+              if (!choice) continue;
+              if (!context && choice.delta?.context) context = choice.delta.context;
+              content = choice.delta?.content || '';
+            }
 
-            const content = choice.delta?.content;
             if (!content) continue;
 
-            cumulative += content;
-
-            if (!startedStreaming) {
-              const isPrefixOfT1 = openAIFallback1.startsWith(cumulative);
-              const isPrefixOfT2 = openAIFallback2.startsWith(cumulative);
-
-              if (isPrefixOfT1 || isPrefixOfT2) continue;
-
-              startedStreaming = true;
-
-              sender({
-                type: 'stream_chunk',
-                channelId,
-                content: cumulative,
-                isComplete: false,
-              });
-            } else {
+            if (use_agentic) {
+              if (!startedStreaming) {
+                startedStreaming = true;
+              }
               sender({
                 type: 'stream_chunk',
                 channelId,
                 content,
                 isComplete: false,
               });
+            } else {
+              cumulative += content;
+
+              if (startedStreaming) {
+                sender({
+                  type: 'stream_chunk',
+                  channelId,
+                  content,
+                  isComplete: false,
+                });
+              } else {
+                const isPrefixOfT1 = openAIFallback1.startsWith(cumulative);
+                const isPrefixOfT2 = openAIFallback2.startsWith(cumulative);
+
+                if (isPrefixOfT1 || isPrefixOfT2) continue;
+
+                startedStreaming = true;
+
+                sender({
+                  type: 'stream_chunk',
+                  channelId,
+                  content: cumulative,
+                  isComplete: false,
+                });
+              }
             }
           }
 
@@ -139,13 +170,21 @@ async function createAzureOpenAIStreamRequest({ channelId, messages, options = {
             });
           }
         } else {
-          let content = response.choices[0]?.message?.content || '';
-          const context = response.choices[0]?.message?.context || {};
+          let content = '';
+          let context = {};
+
+          if (use_agentic) {
+            const messageOutput = response.output?.find((item) => item.type === 'message');
+            content = messageOutput?.content?.[0]?.text || '';
+          } else {
+            content = response.choices?.[0]?.message?.content || '';
+            context = response.choices?.[0]?.message?.context || {};
+          }
 
           const trimmed = content.trim();
           const isDefaultMessage = trimmed === openAIFallback1 || trimmed === openAIFallback2;
 
-          if (isDefaultMessage) content = estonianFallback;
+          if (isDefaultMessage && !use_agentic) content = estonianFallback;
 
           sender({
             type: 'complete_response',
