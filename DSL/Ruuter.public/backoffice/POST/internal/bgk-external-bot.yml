@@ -188,7 +188,7 @@ trigger_ai_stream:
       agent_type: ${agent_type}
       messages: ${messages}
       options:
-        # data_sources: ${data_sources}
+        data_sources: ${data_sources}
         max_tokens: ${parseInt(max_tokens ?? '1000')}
         temperature: 0
         top_p: 1
