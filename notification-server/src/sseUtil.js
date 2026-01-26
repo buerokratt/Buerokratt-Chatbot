@@ -82,6 +82,9 @@ function processPendingStreamsForChannel(channelId) {
       if (streamQueue.shouldRetry(requestData)) {
         try {
           await createAzureOpenAIStreamRequest({
+            use_agentic: requestData.use_agentic,
+            agent_name: requestData.agent_name,
+            agent_type: requestData.agent_type,
             channelId,
             messages: requestData.messages,
             options: requestData.options,
