@@ -159,7 +159,7 @@ app.post('/remove-chat-from-termination-queue', express.json(), express.text(), 
 app.post('/channels/:channelId/stream', async (req, res) => {
   try {
     const { channelId } = req.params;
-    const { messages, options = {} } = req.body;
+    const { messages, options = {}, use_agentic = false, agent_name, agent_type } = req.body;
 
     if (!messages || !Array.isArray(messages)) {
       return res.status(400).json({ error: 'Messages array is required' });
@@ -169,6 +169,9 @@ app.post('/channels/:channelId/stream', async (req, res) => {
       channelId,
       messages,
       options,
+      use_agentic,
+      agent_name,
+      agent_type,
     });
 
     res.status(200).json(result);
