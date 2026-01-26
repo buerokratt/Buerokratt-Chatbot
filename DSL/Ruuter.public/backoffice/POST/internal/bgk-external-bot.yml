@@ -40,6 +40,9 @@ assignBgkConfig:
     semantic_configuration: "[#BGK_SEMANTIC_CONFIGURATION]"
     in_scope: "[#BGK_IN_SCOPE]"
     stream: "[#BGK_STREAM]"
+    use_agentic: "[#BGK_USE_AGENTIC]"
+    agent_name: "[#AZURE_AGENT_NAME]"
+    agent_type: "[#AZURE_AGENT_TYPE]"
     domain: ${incoming.body.domain}
     message: ${incoming.body.message ?? ''}
 
@@ -180,6 +183,9 @@ trigger_ai_stream:
     headers:
       Content-Type: application/json
     body:
+      use_agentic: ${use_agentic.toLowerCase() === 'true'}
+      agent_name: ${agent_name}
+      agent_type: ${agent_type}
       messages: ${messages}
       options:
         data_sources: ${data_sources}

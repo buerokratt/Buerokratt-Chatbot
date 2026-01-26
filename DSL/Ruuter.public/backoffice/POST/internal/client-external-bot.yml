@@ -25,6 +25,9 @@ extract_data:
     sender: ${incoming.body.sender}
     domain: ${incoming.body.domain}
     stream: "[#SKM_STREAM]"
+    use_agentic: "[#SKM_USE_AGENTIC]"
+    agent_name: "[#AZURE_AGENT_NAME]"
+    agent_type: "[#AZURE_AGENT_TYPE]"
     message: ${incoming.body.message ?? ''}
 
 checkForDomain:
@@ -200,6 +203,9 @@ trigger_ai_stream:
       Content-Type: application/json
       api-key: "[#CHATBOT_EXTERNAL_API_KEY]"
     body:
+      use_agentic: ${use_agentic.toLowerCase() === 'true'}
+      agent_name: ${agent_name}
+      agent_type: ${agent_type}
       messages: ${messages}
       options:
         data_sources: ${data_sources}
