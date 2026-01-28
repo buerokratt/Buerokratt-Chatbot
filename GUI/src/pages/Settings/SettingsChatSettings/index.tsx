@@ -161,7 +161,7 @@ const SettingsChatSettings: FC = () => {
       | 'is_csa_title_visible'
       | 'is_edit_chat_visible'
       | 'show_sub_title'
-      | 'sub_title'
+      | 'sub_title',
   ) {
     return (
       <Tooltip content={tooltips[name]}>
