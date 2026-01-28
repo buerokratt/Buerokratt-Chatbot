@@ -18,7 +18,8 @@ WITH configuration_values AS (
                   'feedbackActive',
                   'feedbackQuestion',
                   'feedbackNoticeActive',
-                  'feedbackNotice')
+                  'feedbackNotice',
+                  'instantly_open_chat_widget')
       AND id IN (SELECT max(id) FROM configuration GROUP BY KEY)
       AND NOT deleted
 )
@@ -38,5 +39,6 @@ SELECT
     MAX(CASE WHEN KEY = 'feedbackActive' THEN value END) AS feedback_active,
     MAX(CASE WHEN KEY = 'feedbackQuestion' THEN value END) AS feedback_question,
     MAX(CASE WHEN KEY = 'feedbackNoticeActive' THEN value END) AS feedback_notice_active,
-    MAX(CASE WHEN KEY = 'feedbackNotice' THEN value END) AS feedback_notice
+    MAX(CASE WHEN KEY = 'feedbackNotice' THEN value END) AS feedback_notice,
+    MAX(CASE WHEN KEY = 'instantly_open_chat_widget' THEN value END) AS instantly_open_chat_widget
 FROM configuration_values;
