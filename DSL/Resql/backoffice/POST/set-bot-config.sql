@@ -7,7 +7,9 @@ WITH last_configuration AS (
      'is_csa_name_visible',
      'is_csa_title_visible',
      'is_edit_chat_visible',
-     'instantly_open_chat_widget')
+     'instantly_open_chat_widget',
+     'show_sub_title',
+     'sub_title')
     AND id IN (SELECT max(id) from configuration GROUP BY key)
     AND deleted = FALSE
 ), new_configuration as (
@@ -19,7 +21,9 @@ WITH last_configuration AS (
         ('is_csa_name_visible', :is_csa_name_visible),
         ('is_csa_title_visible', :is_csa_title_visible),
         ('is_edit_chat_visible', :is_edit_chat_visible),
-        ('instantly_open_chat_widget', :instantly_open_chat_widget)
+        ('instantly_open_chat_widget', :instantly_open_chat_widget),
+        ('show_sub_title', :show_sub_title),
+        ('sub_title', :sub_title)
    ) as new_values (key, value)
 )
 INSERT INTO configuration (key, value, created)

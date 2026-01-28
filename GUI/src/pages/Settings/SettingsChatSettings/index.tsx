@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import { Button, Card, Dialog, Icon, Switch, Tooltip, Track } from 'components';
+import { Button, Card, Dialog, FormTextarea, Icon, Switch, Tooltip, Track } from 'components';
 import withAuthorization from 'hoc/with-authorization';
 import { useToast } from 'hooks/useToast';
 import { FC, useEffect, useRef, useState } from 'react';
@@ -13,6 +13,7 @@ import DomainSelector from '../../../components/DomainsSelector';
 import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
 import { fetchConfigurationFromDomain } from '../../../services/configurations';
 import { AiOutlineInfoCircle } from 'react-icons/ai';
+import { SUB_TITLE_LENGTH } from 'constants/config';
 
 const SettingsChatSettings: FC = () => {
   const { t } = useTranslation();
@@ -27,6 +28,8 @@ const SettingsChatSettings: FC = () => {
   const [isTitleVisible, setIsTitleVisible] = useState<boolean | undefined>(undefined);
   const [isEditChatVisible, setIsEditChatVisible] = useState<boolean | undefined>(undefined);
   const [instantlyOpenChatWidget, setInstantlyOpenChatWidget] = useState<boolean | undefined>(undefined);
+  const [showSubTitle, setShowSubTitle] = useState<boolean | undefined>(undefined);
+  const [subTitle, setSubTitle] = useState<string>('');
   const queryClient = useQueryClient();
   const [burokrattConfirmationModal, setBurokrattConfirmationModal] = useState<boolean | null>(null);
   const tooltips = {
@@ -36,6 +39,8 @@ const SettingsChatSettings: FC = () => {
     is_csa_name_visible: t('settings.chat.tooltip.isCsaNameVisible'),
     is_csa_title_visible: t('settings.chat.tooltip.isCsaTitleVisible'),
     is_edit_chat_visible: t('settings.chat.tooltip.isEditChatVisible'),
+    show_sub_title: t('settings.chat.tooltip.showSubTitle'),
+    sub_title: t('settings.chat.tooltip.subTitle'),
   };
 
   useEffect(() => {
@@ -63,6 +68,8 @@ const SettingsChatSettings: FC = () => {
       setIsTitleVisible(res.isCsaTitleVisible === 'true');
       setIsEditChatVisible(res.isEditChatVisible === 'true');
       setInstantlyOpenChatWidget(res.instantlyOpenChatWidget === 'true');
+      setShowSubTitle(res.showSubTitle === 'true');
+      setSubTitle(res.subTitle);
 
       hasRendered.current = true;
     } catch (error) {
@@ -78,6 +85,8 @@ const SettingsChatSettings: FC = () => {
       is_csa_title_visible: boolean;
       is_edit_chat_visible: boolean;
       instantly_open_chat_widget: boolean;
+      show_sub_title: boolean;
+      sub_title: string;
       domainUUID: string[];
     }) => {
       return apiDev.post(`configs/bot-config`, {
@@ -87,6 +96,8 @@ const SettingsChatSettings: FC = () => {
         isCsaTitleVisible: data.is_csa_title_visible.toString(),
         isEditChatVisible: data.is_edit_chat_visible.toString(),
         instantlyOpenChatWidget: data.instantly_open_chat_widget.toString(),
+        showSubTitle: data.show_sub_title.toString(),
+        subTitle: data.sub_title,
         domainUUID: data.domainUUID,
       });
     },
@@ -121,6 +132,8 @@ const SettingsChatSettings: FC = () => {
       is_csa_title_visible: isTitleVisible ?? true,
       is_edit_chat_visible: isEditChatVisible ?? true,
       instantly_open_chat_widget: instantlyOpenChatWidget ?? false,
+      show_sub_title: showSubTitle ?? false,
+      sub_title: subTitle ?? '',
       domainUUID: multiDomainEnabled ? selectedDomains : [],
     });
   };
@@ -133,6 +146,8 @@ const SettingsChatSettings: FC = () => {
     setIsTitleVisible(false);
     setIsEditChatVisible(false);
     setInstantlyOpenChatWidget(false);
+    setShowSubTitle(false);
+    setSubTitle('');
   };
 
   const handleDomainSelection = useDomainSelectionHandler(setSelectedDomains, fetchData, resetSettingsToDefault);
@@ -144,7 +159,9 @@ const SettingsChatSettings: FC = () => {
       | 'instantly_open_chat_widget'
       | 'is_csa_name_visible'
       | 'is_csa_title_visible'
-      | 'is_edit_chat_visible',
+      | 'is_edit_chat_visible'
+      | 'show_sub_title'
+      | 'sub_title'
   ) {
     return (
       <Tooltip content={tooltips[name]}>
@@ -207,6 +224,32 @@ const SettingsChatSettings: FC = () => {
                   onCheckedChange={setInstantlyOpenChatWidget}
                 />
                 {getTooltip('instantly_open_chat_widget')}
+              </Track>
+            )}
+            {showSubTitle != undefined && (
+              <Track gap={10}>
+                <Switch
+                  name="show_sub_title"
+                  label={t('settings.chat.showSubTitle').toString()}
+                  checked={showSubTitle}
+                  onCheckedChange={setShowSubTitle}
+                />
+                {getTooltip('show_sub_title')}
+              </Track>
+            )}
+            {subTitle != undefined && showSubTitle !== undefined && showSubTitle === true && (
+              <Track gap={10}>
+                <FormTextarea
+                  label={t('settings.chat.subTitle').toString()}
+                  minRows={4}
+                  maxLength={SUB_TITLE_LENGTH}
+                  showMaxLength={true}
+                  maxLengthBottom
+                  onChange={(e) => setSubTitle(e.target.value)}
+                  defaultValue={subTitle}
+                  name="sub_title"
+                />
+                {getTooltip('sub_title')}
               </Track>
             )}
           </Track>
@@ -277,6 +320,8 @@ const SettingsChatSettings: FC = () => {
                     is_csa_title_visible: isTitleVisible ?? true,
                     is_edit_chat_visible: isEditChatVisible ?? true,
                     instantly_open_chat_widget: instantlyOpenChatWidget ?? false,
+                    show_sub_title: showSubTitle ?? false,
+                    sub_title: subTitle ?? '',
                     domainUUID: multiDomainEnabled ? selectedDomains : [],
                   });
                 }}

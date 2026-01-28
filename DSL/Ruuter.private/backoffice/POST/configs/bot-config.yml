@@ -25,7 +25,13 @@ declaration:
         description: "Body field 'isEditChatVisible'"
       - field: instantlyOpenChatWidget
         type: string
-        description: "Body field 'instantlyOpenChatWidget'"  
+        description: "Body field 'instantlyOpenChatWidget'"
+      - field: showSubTitle
+        type: string
+        description: "Body field 'showSubTitle'"
+      - field: subTitle
+        type: string
+        description: "Body field 'subTitle'"
       - field: domainUUID
         type: object
         description: "Body field 'domainUUID'"
@@ -38,6 +44,8 @@ extractRequestData:
     is_csa_title_visible: ${incoming.body.isCsaTitleVisible}
     is_edit_chat_visible: ${incoming.body.isEditChatVisible}
     instantly_open_chat_widget: ${incoming.body.instantlyOpenChatWidget}
+    show_sub_title: ${incoming.body.showSubTitle}
+    sub_title: ${incoming.body.subTitle}
     domains: ${incoming.body.domainUUID}
 
 checkForDomains:
@@ -57,6 +65,8 @@ setDomainBotConfig:
       is_csa_title_visible: ${is_csa_title_visible}
       is_edit_chat_visible: ${is_edit_chat_visible}
       instantly_open_chat_widget: ${instantly_open_chat_widget}
+      show_sub_title: ${show_sub_title}
+      sub_title: ${sub_title}
       created: ${new Date().toISOString()}
       domains: ${JSON.stringify(domains)}
   result: set_bot_config_res
@@ -73,6 +83,8 @@ setBotConfig:
       is_csa_title_visible: ${is_csa_title_visible}
       is_edit_chat_visible: ${is_edit_chat_visible}
       instantly_open_chat_widget: ${instantly_open_chat_widget}
+      show_sub_title: ${show_sub_title}
+      sub_title: ${sub_title}
       created: ${new Date().toISOString()}
   result: set_bot_config_res
 

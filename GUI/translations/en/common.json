@@ -386,6 +386,8 @@
       "showSupportTitle": "Show support title",
       "editActiveChat": "Editing active chats",
       "instantlyOpenChatWidget": "Instantly open chat widget",
+      "showSubTitle": "Show chat window subtitle",
+      "subTitle": "Chat window subtitle",
       "showBurokrattConfirmation": "Do you want to make Bürokrat visible on the website?",
       "hideBurokrattConfirmation": "Do you want to hide Bürokrat on the website?",
       "tooltip": {
@@ -394,7 +396,9 @@
         "instantlyOpenChatWidget": "If on is selected, the chat window will open automatically when the user lands on the website. If off is selected, Bürokratt will be minimized and the user must open the chat window themselves. This setting works only in the desktop view and does not apply to the mobile view!",
         "isCsaNameVisible": "If the setting is enabled, the advisor's name is displayed on the left side of the chat window above the chat participant's picture . If the setting is disabled, the name will not be shown.",
         "isCsaTitleVisible": "If the setting is enabled, the advisor's title will be displayed in the chat window. If the setting is disabled, the advisor's title will not be displayed.",
-        "isEditChatVisible": "If on is selected, only the advisor is able to edit their most recently sent response. If off is selected, the advisor cannot modify their last message after it has been sent."
+        "isEditChatVisible": "If on is selected, only the advisor is able to edit their most recently sent response. If off is selected, the advisor cannot modify their last message after it has been sent.",
+        "showSubTitle": "By selecting Yes, in addition to the Bürokrati title, a subtitle will also be displayed in the chat window. The settings for the subtitle text can be found below. By selecting No, the subtitle will not be shown, but the Bürokrati title will still remain visible.",
+        "subTitle": "Enter the subtitle text here."
       }
     },
     "emergencyNotices": {

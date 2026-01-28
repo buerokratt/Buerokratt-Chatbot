@@ -5,6 +5,8 @@ export interface BotConfig {
   isCsaTitleVisible: string;
   isEditChatVisible: string;
   instantlyOpenChatWidget: string;
+  showSubTitle: string;
+  subTitle: string;
 }
 
 export interface BotConfigResponse {
