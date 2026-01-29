@@ -23,4 +23,16 @@ module.exports = {
     refreshInterval: process.env.REFRESH_INTERVAL || 1000,
     queueRefreshInterval: process.env.QUEUE_REFRESH_INTERVAL || 2000,
   },
+  azureAgenticAuthConfig: {
+    grantType: process.env.AZURE_GRANT_TYPE,
+    tenantId: process.env.AZURE_TENANT_ID,
+    clientId: process.env.AZURE_CLIENT_ID,
+    clientSecret: process.env.AZURE_CLIENT_SECRET,
+    scope: process.env.AZURE_SCOPE,
+  },
+  azureAgenticConfig: {
+    endpoint: process.env.AZURE_AGENTIC_ENDPOINT,
+    apiVersion: process.env.AZURE_AGENTIC_API_VERSION,
+    projectName: process.env.AZURE_AGENTIC_PROJECT_NAME,
+  },
 };

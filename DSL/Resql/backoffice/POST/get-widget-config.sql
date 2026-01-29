@@ -19,7 +19,11 @@ WITH configuration_values AS (
                   'feedbackQuestion',
                   'feedbackNoticeActive',
                   'feedbackNotice',
-                  'isFiveRatingScale')
+                  'isFiveRatingScale',
+                  'instantly_open_chat_widget',
+                  'show_sub_title',
+                  'sub_title'
+                  )
       AND id IN (SELECT max(id) FROM configuration GROUP BY KEY)
       AND NOT deleted
 )
@@ -40,5 +44,8 @@ SELECT
     MAX(CASE WHEN KEY = 'feedbackQuestion' THEN value END) AS feedback_question,
     MAX(CASE WHEN KEY = 'feedbackNoticeActive' THEN value END) AS feedback_notice_active,
     MAX(CASE WHEN KEY = 'feedbackNotice' THEN value END) AS feedback_notice,
-    MAX(CASE WHEN KEY = 'isFiveRatingScale' THEN value END) AS is_five_rating_scale
+    MAX(CASE WHEN KEY = 'isFiveRatingScale' THEN value END) AS is_five_rating_scale,
+    MAX(CASE WHEN KEY = 'instantly_open_chat_widget' THEN value END) AS instantly_open_chat_widget,
+    MAX(CASE WHEN KEY = 'show_sub_title' THEN value END) AS show_sub_title,
+    MAX(CASE WHEN KEY = 'sub_title' THEN value END) AS sub_title
 FROM configuration_values;
