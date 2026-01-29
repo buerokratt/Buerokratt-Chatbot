@@ -385,8 +385,21 @@
       "showSupportName": "Kuva nõustaja nimi",
       "showSupportTitle": "Kuva nõustaja tiitel",
       "editActiveChat": "Aktiivsete vestluste muutmine",
+      "instantlyOpenChatWidget": "Koheselt avatud vestlusaken",
+      "showSubTitle": "Kuva vestlusakna alampealkiri",
+      "subTitle": "Vestlusakna alampealkiri",
       "showBurokrattConfirmation": "Kas soovid Bürokrati veebilehel nähtavaks teha?",
-      "hideBurokrattConfirmation": "Kas soovid Bürokrati veebilehel ära peita?"
+      "hideBurokrattConfirmation": "Kas soovid Bürokrati veebilehel ära peita?",
+      "tooltip": {
+        "isBotActive": "Valides sees, vastab Bürokratt automaatselt kliendile kasutades tehisintellektil põhinevat vestluslahendust (vastavalt tehnilisele lahendusele kas keelemudelit, RAG või RASA lahendust). Valides väljas, suunatakse vestlus automaatselt nõustajale.",
+        "isBurokrattActive": "Valides sees, on Bürokratt veebilehel nähtav. Valides väljas, peidetakse veebilehelt Bürokratt ära.",
+        "instantlyOpenChatWidget": "Valides sees, avatakse vestlusaken automaatselt, kui kasutaja veebilehele maandub. Valides väljas, on Bürokratt minimeeritud ning vestlemiseks peab kasutaja ise vestlusakna avama. Seadistus töötab ainult arvutivaatest ja ei ole rakendu mobiilivaates!",
+        "isCsaNameVisible": "Kui seadistus on sees, kuvatakse vestlusaknas vasakul oleva vestleja pildi kohal nõustaja nime. Kui seadistus on väljas, siis profiili kohal ei kuvata nõustaja nime.",
+        "isCsaTitleVisible": "Kui seadistus on sees, kuvatakse nõustaja tiitlit vestlusaknas. Kui seadistus on väljas, siis nõustaja tiitlit vestlusaknas ei kuvata.",
+        "isEditChatVisible": "Kui valida sees, siis on ainult nõustajal võimalik oma viimati saadetud vastust korrigeerida. Valides väljas, ei saa nõustaja tagant järgi viimast sõnumit muuta.",
+        "showSubTitle": "Valides jah, näidatakse vestlusaknas lisaks Bürokrati pealkirjale ka alampealkirja. Alampealkirja teksti seadistuse leiab allpoolt. Valides ei, alampealkirja ei kuvata, aga Bürokrati pealkiri jääb endiselt nähtavale.",
+        "subTitle": "Sisesta lahtrisse alampealkirja sisutekst."
+      }
     },
     "emergencyNotices": {
       "title": "Erakorralised teated",
@@ -401,7 +414,10 @@
       "feedbackActive": "Tagasiside aktiivne",
       "feedbackQuestion": "Tagasiside küsimus",
       "noticeActive": "Teade aktiivne",
-      "notice": "Teade"
+      "notice": "Teade",
+      "feedbackScale": "Tagasiside skaala:",
+      "tenPoints": "10 punkti",
+      "fivePoints": "5 punkti"
     },
     "appearance": {
       "title": "Välimus ja käitumine",

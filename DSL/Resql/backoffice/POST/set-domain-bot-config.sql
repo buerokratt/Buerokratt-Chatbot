@@ -15,6 +15,9 @@ FROM
             ('is_burokratt_active',   :is_burokratt_active),
             ('is_csa_name_visible',     :is_csa_name_visible),
             ('is_csa_title_visible',  :is_csa_title_visible),
-            ('is_edit_chat_visible',  :is_edit_chat_visible)
+            ('is_edit_chat_visible',  :is_edit_chat_visible),
+            ('instantly_open_chat_widget',  :instantly_open_chat_widget),
+            ('show_sub_title',  :show_sub_title),
+            ('sub_title',  :sub_title)
             ) AS v(key, value)
         RETURNING key, value, domain;

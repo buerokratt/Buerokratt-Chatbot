@@ -5,7 +5,8 @@ WITH last_configuration AS (
      'feedbackActive',
      'feedbackQuestion',
      'feedbackNoticeActive',
-     'feedbackNotice')
+     'feedbackNotice',
+     'isFiveRatingScale')
     AND id IN (SELECT max(id) from configuration GROUP BY key)
     AND deleted = FALSE
 ), new_configuration as (
@@ -15,7 +16,8 @@ WITH last_configuration AS (
         ('feedbackActive', :feedbackActive),
         ('feedbackQuestion', :feedbackQuestion),
         ('feedbackNoticeActive', :feedbackNoticeActive),
-        ('feedbackNotice', :feedbackNotice)
+        ('feedbackNotice', :feedbackNotice),
+        ('isFiveRatingScale', :isFiveRatingScale)
    ) as new_values (key, value)
 )
 INSERT INTO configuration (key, value, created)
