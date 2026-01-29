@@ -50,7 +50,7 @@ async function* parseSSEStream(response) {
 }
 
 async function sendAzureAgenticRequest(messages, options = {}) {
-  const { max_output_tokens = 4000, stream = false, agent_name, agent_type } = options;
+  const { stream = false, agent_name, agent_type } = options;
 
   if (!azureAgenticConfig.endpoint || !azureAgenticConfig.projectName) {
     throw new Error('Azure Agentic endpoint and project name are required');
@@ -76,7 +76,7 @@ async function sendAzureAgenticRequest(messages, options = {}) {
         type: agent_type,
       },
       stream: stream,
-      max_output_tokens: max_output_tokens,
+      max_output_tokens: parseInt(azureAgenticConfig.maxOutputTokens) ?? 4000,
     };
 
     const fetchOptions = {

@@ -34,5 +34,6 @@ module.exports = {
     endpoint: process.env.AZURE_AGENTIC_ENDPOINT,
     apiVersion: process.env.AZURE_AGENTIC_API_VERSION,
     projectName: process.env.AZURE_AGENTIC_PROJECT_NAME,
+    maxOutputTokens: process.env.AZURE_AGENTIC_MAX_OUTPUT_TOKENS,
   },
 };
