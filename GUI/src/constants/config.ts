@@ -6,6 +6,7 @@ export const FEEDBACK_NOTICE_LENGTH = 250;
 export const BOT_CANNOT_ANSWER_MESSAGE_LENGTH = 250;
 export const REDIRECT_IF_BOT_CANNOT_ANSWER_MESSAGE_LENGTH = 250;
 export const OUTSIDE_WORKING_HOURS_MESSAGE_LENGTH = 250;
+export const SUB_TITLE_LENGTH = 70;
 export const USER_IDLE_STATUS_TIMEOUT = 300000; // milliseconds
 export const CHAT_INPUT_LENGTH = 3000; // characters
 export const POPUP_DURATION = 5; // seconds
