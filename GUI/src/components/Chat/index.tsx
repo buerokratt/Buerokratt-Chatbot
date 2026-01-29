@@ -71,6 +71,9 @@ const Chat: FC<ChatProps> = ({
   const userInfo = useStore((state) => state.userInfo);
   const chatRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const scrollableContainerRef = useRef<HTMLDivElement>(null);
+  const userHasScrolledUp = useRef(false);
+  const lastScrollTop = useRef(0);
 
   const [messageGroups, setMessageGroups] = useState<GroupedMessage[]>([]);
   const messageGroupsRef = useRef(messageGroups);
@@ -148,10 +151,12 @@ const Chat: FC<ChatProps> = ({
 
   useEffect(() => {
     localStorage.setItem('focused_chat', chat.id);
+    userHasScrolledUp.current = false;
+    lastScrollTop.current = 0;
     return () => {
       localStorage.removeItem('focused_chat');
     };
-  }, []);
+  }, [chat.id]);
 
   useLayoutEffect(() => {
     document.addEventListener('visibilitychange', onVisibilityChange);
@@ -526,9 +531,41 @@ const Chat: FC<ChatProps> = ({
   }, [messagesList, endUserFullName]);
 
   useEffect(() => {
+    const scrollableElement = scrollableContainerRef.current;
+    if (!scrollableElement) return;
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = scrollableElement;
+
+      if (scrollTop < lastScrollTop.current) {
+        userHasScrolledUp.current = true;
+      }
+
+      if (scrollHeight - scrollTop <= clientHeight + 2) {
+        userHasScrolledUp.current = false;
+      }
+
+      lastScrollTop.current = scrollTop;
+    };
+
+    scrollableElement.addEventListener('scroll', handleScroll);
+
+    return () => {
+      scrollableElement.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  useEffect(() => {
     if (!chatRef.current || !messageGroups) return;
-    if (isCsaAtEnd) {
-      chatRef.current.scrollIntoView({ block: 'end', inline: 'end' });
+
+    if (!userHasScrolledUp.current) {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          if (chatRef.current) {
+            chatRef.current.scrollIntoView({ block: 'end', inline: 'end' });
+          }
+        });
+      });
     }
   }, [messageGroups, previewTypingMessage]);
 
@@ -700,7 +737,7 @@ const Chat: FC<ChatProps> = ({
           </Track>
         </div>
 
-        <div className="active-chat__group-wrapper">
+        <div ref={scrollableContainerRef} className="active-chat__group-wrapper">
           {messageGroups?.map((group, index) => (
             <div
               className={clsx(['active-chat__group', `active-chat__group--${group.type}`])}

@@ -1,3 +1,17 @@
+WITH rating_config AS (
+    SELECT value AS is_five_rating_scale
+    FROM configuration
+    WHERE key = 'isFiveRatingScale'
+      AND id IN (SELECT max(id) FROM configuration WHERE key = 'isFiveRatingScale' GROUP BY key)
+      AND NOT deleted
+),
+csa_title_config AS (
+    SELECT value
+    FROM configuration
+    WHERE key = 'is_csa_title_visible'
+      AND id IN (SELECT max(id) FROM configuration WHERE key = 'is_csa_title_visible' GROUP BY key)
+      AND deleted = false
+)
 SELECT c.base_id AS id,
        c.customer_support_id,
        c.customer_support_display_name,
@@ -6,7 +20,11 @@ SELECT c.base_id AS id,
        c.end_user_last_name,
        c.status,
        c.feedback_text,
-       c.feedback_rating,
+       CASE 
+           WHEN (SELECT COALESCE(is_five_rating_scale, 'false') = 'true' FROM rating_config) 
+           THEN c.feedback_rating_five
+           ELSE c.feedback_rating
+       END AS feedback_rating,
        c.end_user_email,
        c.end_user_phone,
        c.end_user_os,
@@ -19,8 +37,10 @@ SELECT c.base_id AS id,
        c.received_from_name,
        c.forwarded_to_name,
        c.forwarded_to,
-       (CASE WHEN (SELECT value FROM configuration WHERE key = 'is_csa_title_visible' AND configuration.id IN (SELECT max(id) from configuration GROUP BY key) AND deleted = false) = 'true'
-                 THEN c.csa_title ELSE '' END) AS csa_title,          
+       (CASE WHEN (SELECT COALESCE(value, 'false') FROM csa_title_config) = 'true'
+             THEN c.csa_title 
+             ELSE '' 
+        END) AS csa_title,          
        m.content AS last_message,
        m.updated AS last_message_timestamp
 FROM (
@@ -34,6 +54,7 @@ FROM (
     status,
     feedback_text,
     feedback_rating,
+    feedback_rating_five,
     end_user_email,
     end_user_phone,
     end_user_os,

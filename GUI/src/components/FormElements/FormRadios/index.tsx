@@ -11,9 +11,10 @@ type FormRadiosType = {
     value: string;
   }[];
   onChange: (selectedValue: string) => void;
+  value?: string;
 };
 
-const FormRadios: FC<FormRadiosType> = ({ label, name, hideLabel, items, onChange }) => {
+const FormRadios: FC<FormRadiosType> = ({ label, name, hideLabel, items, onChange, value }) => {
   const id = useId();
 
   return (
@@ -27,6 +28,7 @@ const FormRadios: FC<FormRadiosType> = ({ label, name, hideLabel, items, onChang
               name={name}
               id={`${id}-${item.value}`}
               value={item.value}
+              checked={value === item.value}
               onChange={(event) => {
                 onChange(event.target.value);
               }}

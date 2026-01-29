@@ -1,0 +1,67 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'END DEAD CHATS'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: training
+  allowlist:
+    header:
+      - field: x-ruuter-nonce
+        type: string
+        description: "Nonce field"
+    body:
+      - field: inactivityTime
+        type: number
+        description: "Inactivity time in minutes (default: 5)"
+
+getIdleTimeConfiguration:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-configuration"
+    body:
+      key: "chat_active_duration"
+  result: idle_config_res        
+
+extractRequestData:
+  assign:
+    idleTime: ${idle_config_res.response.body[0].value ?? 5}
+    inactivityTime: ${incoming.body.inactivityTime ?? 5}
+  next: getDeadChats
+
+getDeadChats:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-dead-chat-ids"
+    body:
+      idleTime: ${idleTime}
+      inactivityTime: ${inactivityTime}
+  result: res
+
+validateDeadChats:
+  switch:
+    - condition: ${res.response.body[0].deadChats && res.response.body[0].deadChats.length > 0}
+      next: assign_dead_chats
+  next: return_empty_array  
+
+assign_dead_chats:
+  assign:
+    deadChats: ${res.response.body[0].deadChats.map(chatStr => JSON.parse(chatStr))}
+    baseIds: ${deadChats.map(chat => chat.base_id)}
+
+checkTimIds:
+  call: http.post
+  args:
+    url: "[#CHATBOT_TIM]/sessionkey/keysString"
+    body:
+      keys: ${baseIds.join(',')}
+  result: deadKeys
+
+returnSuccess:
+  return: ${deadChats}
+  next: end
+
+return_empty_array:
+  return: ${[]}
+  next: end
