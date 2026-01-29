@@ -3,5 +3,6 @@ export interface FeedbackConfig {
   feedbackQuestion: string;
   feedbackNoticeActive: boolean;
   feedbackNotice: string;
+  isFiveRatingScale?: boolean;
   domainUUID?: string[];
 }

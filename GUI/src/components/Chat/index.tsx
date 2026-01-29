@@ -557,7 +557,7 @@ const Chat: FC<ChatProps> = ({
 
   useEffect(() => {
     if (!chatRef.current || !messageGroups) return;
-    
+
     if (!userHasScrolledUp.current) {
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {

@@ -2,7 +2,7 @@ import { FEEDBACK_NOTICE_LENGTH, FEEDBACK_QUESTION_LENGTH } from 'constants/conf
 
 import { useMutation } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import { Button, Card, FormTextarea, Switch, Track } from 'components';
+import { Button, Card, FormRadios, FormTextarea, Switch, Track } from 'components';
 import withAuthorization from 'hoc/with-authorization';
 import { useToast } from 'hooks/useToast';
 import { FC, useEffect, useState } from 'react';
@@ -12,7 +12,7 @@ import { apiDev } from 'services/api';
 import { FeedbackConfig } from 'types/feedbackConfig';
 import { ROLES } from 'utils/constants';
 
-import { setFeedbackData } from './data';
+import { getFeedbackConfigData, setFeedbackData } from './data';
 import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
 import DomainSelector from '../../../components/DomainsSelector';
 import { fetchConfigurationFromDomain } from '../../../services/configurations';
@@ -41,11 +41,8 @@ const SettingsFeedback: FC = () => {
         selectedDomain,
       );
       const res = data.response;
-
-      console.log('res', res, data);
-
       reset(res);
-      setFeedbackConfig(res);
+      setFeedbackConfig(getFeedbackConfigData(res));
     } catch (error) {
       console.error('Failed to fetch feedback', error);
     }
@@ -79,6 +76,7 @@ const SettingsFeedback: FC = () => {
       feedbackActive: false,
       feedbackQuestion: '',
       feedbackNoticeActive: false,
+      isFiveRatingScale: undefined,
       feedbackNotice: '',
     };
     setFeedbackConfig(feedbackConfig);
@@ -123,6 +121,32 @@ const SettingsFeedback: FC = () => {
                 {...field}
               />
             )}
+          />
+          <Controller
+            name="isFiveRatingScale"
+            control={control}
+            render={({ field }) => {
+              return (
+                <FormRadios
+                  label={t('settings.feedback.feedbackScale')}
+                  name={field.name}
+                  items={[
+                    {
+                      label: t('settings.feedback.tenPoints'),
+                      value: 'false',
+                    },
+                    {
+                      label: t('settings.feedback.fivePoints'),
+                      value: 'true',
+                    },
+                  ]}
+                  onChange={(value) => {
+                    field.onChange(value === 'true');
+                  }}
+                  value={field.value?.toString() ?? undefined}
+                />
+              );
+            }}
           />
           <Controller
             name="feedbackQuestion"

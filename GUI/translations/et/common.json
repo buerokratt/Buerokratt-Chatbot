@@ -414,7 +414,10 @@
       "feedbackActive": "Tagasiside aktiivne",
       "feedbackQuestion": "Tagasiside küsimus",
       "noticeActive": "Teade aktiivne",
-      "notice": "Teade"
+      "notice": "Teade",
+      "feedbackScale": "Tagasiside skaala:",
+      "tenPoints": "10 punkti",
+      "fivePoints": "5 punkti"
     },
     "appearance": {
       "title": "Välimus ja käitumine",
