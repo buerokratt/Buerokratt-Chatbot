@@ -20,6 +20,10 @@ declaration:
       - field: id
         type: string
         description: "Body field 'id'"
+    header:
+      - field: cookie
+        type: string
+        description: "Cookie field"    
 
 extractRequestData:
   assign:
@@ -28,6 +32,27 @@ extractRequestData:
     customerSupportDisplayName: ${incoming.body.customerSupportDisplayName}
     csaTitle: ${incoming.body.csaTitle}
 
+get_cookie_info:
+  call: http.post
+  args:
+    url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
+    contentType: plaintext
+    headers:
+      cookie: ${incoming.headers.cookie}
+    plaintext: "customJwtCookie"
+  result: info_res
+  next: check_cookie_info_response
+
+check_cookie_info_response:
+  switch:
+    - condition: ${200 <= info_res.response.statusCodeValue && info_res.response.statusCodeValue < 300}
+      next: assign_role
+  next: return_bad_request
+
+assign_role:
+  assign:
+    isAdmin: ${info_res.response.body.authorities.includes("ROLE_ADMINISTRATOR")}
+
 getActiveChatById:
   call: http.post
   args:
@@ -35,7 +60,7 @@ getActiveChatById:
     body:
       id: ${id}
   result: activeChatRes
-  next: checkActiveChatResult 
+  next: checkActiveChatResult
 
 checkActiveChatResult:
   switch:
@@ -46,6 +71,11 @@ checkActiveChatResult:
 assignChat:
   assign:
     activeChat: ${activeChatRes.response.body[0]}
+
+check_role:
+  switch:
+    - condition: ${isAdmin == false && activeChat.customerSupportId != ''}
+      next: return_claimed_by_another_agent
   next: claimChat
 
 claimChat:
@@ -154,3 +184,13 @@ return_chat_ended:
   return: "Chat Has Ended"
   status: 400
   next: end  
+
+return_claimed_by_another_agent:
+  return: "Chat has already been claimed by another agent"
+  status: 400
+  next: end  
+
+return_bad_request:
+  return: "Could not fetch user info"
+  status: 400
+  next: end
