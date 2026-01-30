@@ -28,7 +28,10 @@ declaration:
         description: "Body field 'isAnonymizationBeforeLlm'"
       - field: isAnonymizationBeforeGlobalClassifier
         type: boolean
-        description: "Body field 'isAnonymizationBeforeGlobalClassifier'" 
+        description: "Body field 'isAnonymizationBeforeGlobalClassifier'"
+      - field: recordConversationsAnonymously
+        type: boolean
+        description: "Body field 'recordConversationsAnonymously'"
       - field: domainUUID
         type: object
         description: "Body field 'domainUUID'"
@@ -42,6 +45,7 @@ extractRequestData:
     anonymizer_denylist: ${incoming.body.anonymizerDenylist}
     is_anonymization_before_llm: ${incoming.body.isAnonymizationBeforeLlm}
     is_anonymization_before_global_classifier: ${incoming.body.isAnonymizationBeforeGlobalClassifier}
+    record_conversations_anonymously: ${incoming.body.recordConversationsAnonymously}
     domains: ${incoming.body.domainUUID}
 
 checkForDomains:
@@ -61,6 +65,7 @@ setDomainAnonymizerConfig:
       anonymizer_denylist: ${anonymizer_denylist}
       is_anonymization_before_llm: ${is_anonymization_before_llm.toString()}
       is_anonymization_before_global_classifier: ${is_anonymization_before_global_classifier.toString()}
+      record_conversations_anonymously: ${record_conversations_anonymously.toString()}
       created: ${new Date().toISOString()}
       domains: ${JSON.stringify(domains)}
   result: set_domain_anonymizer_config_res
@@ -77,6 +82,7 @@ setAnonymizerConfig:
       anonymizer_denylist: ${anonymizer_denylist}
       is_anonymization_before_llm: ${is_anonymization_before_llm.toString()}
       is_anonymization_before_global_classifier: ${is_anonymization_before_global_classifier.toString()}
+      record_conversations_anonymously: ${record_conversations_anonymously.toString()}
       created: ${new Date().toISOString()}
   result: set_anonymizer_config_res
 

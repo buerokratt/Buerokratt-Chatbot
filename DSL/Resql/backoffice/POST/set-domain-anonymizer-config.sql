@@ -16,6 +16,7 @@ FROM
             ('anonymizer_allowlist',     :anonymizer_allowlist),
             ('anonymizer_denylist',  :anonymizer_denylist),
             ('is_anonymization_before_llm',  :is_anonymization_before_llm),
-            ('is_anonymization_before_global_classifier',  :is_anonymization_before_global_classifier)
+            ('is_anonymization_before_global_classifier',  :is_anonymization_before_global_classifier),
+            ('record_conversations_anonymously',  :record_conversations_anonymously)
             ) AS v(key, value)
         RETURNING key, value, domain;
