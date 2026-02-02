@@ -8,7 +8,9 @@ import {
   FormSelect,
   FormTagInput,
   FormTextarea,
+  Icon,
   IconSwitch,
+  Tooltip,
   Track,
 } from 'components';
 import withAuthorization from 'hoc/with-authorization';
@@ -22,6 +24,7 @@ import { ROLES } from 'utils/constants';
 import DomainSelector from '../../../components/DomainsSelector';
 import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
 import { fetchConfigurationFromDomain } from '../../../services/configurations';
+import { AiOutlineInfoCircle } from 'react-icons/ai';
 
 type SelectOption = { label: string; value: string; meta?: string };
 
@@ -155,6 +158,7 @@ const Anonymizer: FC = () => {
       anonymizerDenylist: '',
       isAnonymizationBeforeLlm: false,
       isAnonymizationBeforeGlobalClassifier: false,
+      recordConversationsAnonymously: false,
     });
   };
 
@@ -342,6 +346,20 @@ const Anonymizer: FC = () => {
               }
             />
             <label style={{ cursor: 'default' }}>{t('settings.anonymizer.anonymizationBeforeLLM')}</label>
+          </Track>
+          <Track gap={8} align="center" style={{ alignItems: 'start' }}>
+            <IconSwitch
+              checked={anonymizerConfig?.recordConversationsAnonymously ?? false}
+              onCheckedChange={(checked) =>
+                setAnonymizerConfig((prev) => prev && { ...prev, recordConversationsAnonymously: checked })
+              }
+            />
+            <label style={{ cursor: 'default' }}>{t('settings.anonymizer.recordConversationsAnonymously')}</label>
+            <Tooltip content={t('settings.anonymizer.tooltip.recordConversationsAnonymously')}>
+              <span>
+                <Icon icon={<AiOutlineInfoCircle fontSize={20} color="#005aa3" />} size="medium" />
+              </span>
+            </Tooltip>
           </Track>
           {/* To be added when the global classifier feature is available */}
           {/* <Track gap={8} align="center">
