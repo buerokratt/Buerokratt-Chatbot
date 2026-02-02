@@ -559,6 +559,7 @@
       "denyListPlaceholder": "Sisestage sõna ja vajutage Enter, et lisada keelatute nimekirja",
       "anonymizationBeforeLLM": "Anonümiseerimine enne SKM-i",
       "anonymizationBeforeGlobalClassifier": "Anonümiseerimine enne klassifitseerijat",
+      "recordConversationsAnonymously": "Salvesta vestlused anonüümitult",
       "saveSettings": "Salvesta seaded",
       "testingTitle": "Anonümiseerija testimine",
       "testingDescription": "Anonümiseerija seadistuse testimiseks sisestage tekst ja vajutage \"Anonümiseeri\"",
@@ -587,6 +588,9 @@
         "person": "ISIK",
         "gpe": "RIIK_VÕI_LINN",
         "crypto": "KRÜPTORAHAKOTT"
+      },
+      "tooltip": {
+        "recordConversationsAnonymously": "Sisselülitamisel anonümiseeritakse vestlused enne andmebaasi salvestamist. Kasutajale kuvatakse vestluse ajal ja vestlusajaloos ainult anonümiseeritud sõnumid. Algseid, anonümiseerimata sõnumeid, ei säilitata ega ole võimalik hiljem taastada."
       }
     }
   },

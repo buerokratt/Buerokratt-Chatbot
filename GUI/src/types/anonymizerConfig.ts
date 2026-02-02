@@ -6,6 +6,7 @@ export interface AnonymizerConfig {
   anonymizerDenylist: string;
   isAnonymizationBeforeLlm: boolean;
   isAnonymizationBeforeGlobalClassifier: boolean;
+  recordConversationsAnonymously: boolean;
   domainUUID?: string[];
 }
 
