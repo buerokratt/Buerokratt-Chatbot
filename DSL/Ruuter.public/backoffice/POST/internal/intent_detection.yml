@@ -42,22 +42,6 @@ assignParameters:
     message: ${incoming.body.message ?? ''}
     botName: ${get_bot_name_result.response.body[0].value}
 
-get_system_input:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RESQL]/get-configuration"
-    body:
-      key: "id_system_message"
-    error: return_error
-  result: llm_configuration
-  next: check_system_input
-
-check_system_input:
-  switch:
-    - condition: ${llm_configuration.response.body[0]?.value != null}
-      next: assign_config
-  next: return_skip
-
 assign_config:
   assign:
     strictness: "[#ID_STRICTNESS]"
@@ -65,7 +49,7 @@ assign_config:
     documents: "[#ID_DOCUMENTS]"
     index_name: "[#ID_INDEX_NAME]"
     query_type: "[#ID_QUERY_TYPE]"
-    system_message: ${llm_configuration.response.body[0].value}
+    system_message: "[#ID_BGK_SYSTEM_MESSAGE]"
     search_endpoint: "[#ID_SEARCH_ENDPOINT]"
     completion_endpoint: "[#ID_COMPLETION_ENDPOINT]"
     chatbot_external_key: "[#ID_CHATBOT_EXTERNAL_KEY]"
