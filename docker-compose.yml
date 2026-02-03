@@ -296,22 +296,6 @@ services:
     networks:
       - bykstack
 
-  anonymizer:
-    container_name: anonymizer
-    image: anonymizer
-    ports:
-      - "8089:8089"
-    environment:
-      - FLASK_ENV=production
-      - LOG_LEVEL=info
-      - HOST=0.0.0.0
-      - PORT=8089
-      - PYTHONUNBUFFERED=1
-    volumes:
-      - ./anonymizer/config:/app/config:ro
-    networks:
-      - bykstack
-
 volumes:
   opensearch-data:
   spacy_models:
