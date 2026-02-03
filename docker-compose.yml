@@ -117,9 +117,9 @@ services:
       - users_db
     environment:
       - sqlms.datasources.[0].name=byk
-      - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://171.22.247.13:5433/byk?sslmode=require
+      - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://users_db:5432/byk
       - sqlms.datasources.[0].username=byk
-      - sqlms.datasources.[0].password=2nH09n6Gly
+      - sqlms.datasources.[0].password=01234
       - logging.level.org.springframework.boot=INFO
     ports:
       - 8082:8082
@@ -135,21 +135,25 @@ services:
       - POSTGRES_USER=byk
       - POSTGRES_PASSWORD=01234
       - POSTGRES_DB=byk
+      - POSTGRES_MULTIPLE_DATABASES=train_db,services_db
     ports:
       - 5433:5432
     volumes:
       - ./data:/var/lib/postgresql/data
+      - ./init-databases.sh:/docker-entrypoint-initdb.d/init-databases.sh
     networks:
       - bykstack
 
   resql_training:
     container_name: resql-training
     image: resql
+    depends_on:
+      - users_db
     environment:
       - sqlms.datasources.[0].name=byk
-      - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://171.22.247.13:5434/train_db
-      - sqlms.datasources.[0].username=byk
-      - sqlms.datasources.[0].password=01234
+      - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://users_db:5432/train_db
+      - sqlms.datasources.[0].username=train_db
+      - sqlms.datasources.[0].password=
       - logging.level.org.springframework.boot=INFO
       - server.port=8083
     ports:
@@ -162,11 +166,13 @@ services:
   resql_service:
     container_name: resql-service
     image: resql
+    depends_on:
+      - users_db
     environment:
       - sqlms.datasources.[0].name=byk
-      - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://171.22.247.13:5435/services_db
-      - sqlms.datasources.[0].username=byk
-      - sqlms.datasources.[0].password=01234
+      - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://users_db:5432/services_db
+      - sqlms.datasources.[0].username=services_db
+      - sqlms.datasources.[0].password=
       - logging.level.org.springframework.boot=INFO
       - server.port=8084
     ports:
@@ -296,9 +302,44 @@ services:
     networks:
       - bykstack
 
+  storage-ferry:
+    container_name: storage-ferry
+    build:
+      context: ../storage-ferry
+      dockerfile: Dockerfile
+    ports:
+      - 3005:3000
+    environment:
+      - S3_ENDPOINT_URL=http://localstack-s3:4566
+      - S3_ACCESS_KEY_ID=test
+      - S3_SECRET_ACCESS_KEY=test
+      - S3_REGION=us-east-1
+      - S3_BUCKET_NAME=attachments
+      - MAX_FILE_SIZE=10485760
+      - NODE_ENV=development
+    depends_on:
+      - localstack-s3
+    networks:
+      - bykstack
+
+  localstack-s3:
+    container_name: localstack-s3
+    image: localstack/localstack:3.3.0
+    ports:
+      - 4566:4566
+    environment:
+      - SERVICES=s3:4566
+      - DEBUG=1
+    volumes:
+      - ./scripts/localstack-attachments-init.sh:/etc/localstack/init/ready.d/init.sh
+      - localstack-data:/var/lib/localstack
+    networks:
+      - bykstack
+
 volumes:
   opensearch-data:
   spacy_models:
+  localstack-data:
   
 networks:
   bykstack:
