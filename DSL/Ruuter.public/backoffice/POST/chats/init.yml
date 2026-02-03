@@ -121,7 +121,7 @@ generate_cookie:
     body:
       JWTName: "chatJwt"
       expirationInMinutes: ${session_result.response.body[0]?.value ?? '120'}
-      content: { "chatId": "${chatUuid}", "forwardTo": "" }
+      content: { "chatId": "${chatUuid}", "forwardTo": "csa" }
   result: cookie_result
   next: assign_cookie
 
@@ -192,25 +192,21 @@ insertChat:
       receivedFrom: ""
       receivedFromName: ""
   result: insertMessageResult
-  next: postMessageToBot
+  next: forwardToBackoffice
 
-postMessageToBot:
+forwardToBackoffice:
   call: http.post
   args:
-    url: "[#CHATBOT_RUUTER_PUBLIC]/internal/message-to-bot"
+    url: "[#CHATBOT_RUUTER_PUBLIC]/chats/forwards/forward-to-backoffice"
     body:
-      chatId: ${chatUuid}
-      content: ${content}
+      message:
+        chatId: ${chatUuid}
+        id: ${messageUuid}
+        event: "forward_to_csa"
+        authorRole: ${authorRole}
       holidays: ${holidays}
       holidayNames: ${holidayNames}
-      domain: ${domain}
-  result: message_to_bot_result
-  next: check_for_post_message_to_bot_result
-
-check_for_post_message_to_bot_result:
-  switch:
-    - condition: ${message_to_bot_result.response.body.response === 'Bot error'}
-      next: return_bot_error
+  result: forward_to_backoffice_result
   next: getChat
 
 getChat:
@@ -244,9 +240,4 @@ return_result:
   headers:
     Set-Cookie: ${setCookie}
   return: ${chat_result.response.body[0]}
-  next: end
-
-return_bot_error:
-  status: 420
-  return: "Bot error"
   next: end
