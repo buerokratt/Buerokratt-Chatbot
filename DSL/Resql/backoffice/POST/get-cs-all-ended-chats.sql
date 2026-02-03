@@ -330,5 +330,6 @@ ORDER BY
         )
     END DESC NULLS LAST,
     CASE WHEN :sorting = 'id asc' THEN c.base_id END ASC,
-    CASE WHEN :sorting = 'id desc' THEN c.base_id END DESC
+    CASE WHEN :sorting = 'id desc' THEN c.base_id END DESC,
+    c.base_id ASC
 OFFSET ((GREATEST(:page, 1) - 1) * :page_size) LIMIT :page_size;
