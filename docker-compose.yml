@@ -344,11 +344,15 @@ services:
     ports:
       - 3005:3000
     environment:
+      - API_CORS_ORIGIN=*
+      - API_DOCUMENTATION_ENABLED=true
       - S3_ENDPOINT_URL=http://localstack-s3:4566
+      - S3_PUBLIC_ENDPOINT_URL=http://localhost:4566
       - S3_ACCESS_KEY_ID=test
       - S3_SECRET_ACCESS_KEY=test
       - S3_REGION=us-east-1
-      - S3_BUCKET_NAME=attachments
+      - S3_DATA_BUCKET_NAME=attachments
+      - S3_DATA_BUCKET_PATH=/
       - MAX_FILE_SIZE=10485760
       - NODE_ENV=development
     depends_on:

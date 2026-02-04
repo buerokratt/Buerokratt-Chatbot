@@ -1,0 +1,117 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Initialize attachment download - verify JWT and generate signed URL"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    headers:
+      - field: cookie
+        type: string
+        description: "Cookie field for JWT"
+    body:
+      - field: attachmentId
+        type: string
+        description: "Attachment base ID"
+
+extractRequestData:
+  assign:
+    attachmentId: ${incoming.body.attachmentId}
+  next: verifyJwt
+
+verifyJwt:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/hbs/verify-jwt"
+    headers:
+      cookie: ${incoming.headers.cookie}
+    body:
+      jwtEncryptionKey: "[#JWT_ENCRYPTION_KEY]"
+  result: jwtVerifyResult
+  next: checkJwtValidity
+
+checkJwtValidity:
+  switch:
+    - condition: ${jwtVerifyResult.response.statusCodeValue !== 200}
+      next: returnUnauthorized
+  next: extractUserInfo
+
+extractUserInfo:
+  assign:
+    userId: ${jwtVerifyResult.response.body.data.personalCode}
+    userRole: "$=jwtVerifyResult.response.body.data.authorities[0] === 'ROLE_ADMINISTRATOR' ? 'chatbot_representative' : 'end_user'="
+  next: getAttachment
+
+getAttachment:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get_attachment_by_id"
+    body:
+      baseId: ${attachmentId}
+  result: attachmentResult
+  next: validateAttachment
+
+validateAttachment:
+  switch:
+    - condition: ${attachmentResult.response.body.length === 0}
+      next: returnAttachmentNotFound
+  assign:
+    chatId: ${attachmentResult.response.body[0].chat_base_id}
+    storagePath: ${attachmentResult.response.body[0].storage_path}
+    fileName: ${attachmentResult.response.body[0].file_name}
+  next: checkChatMembership
+
+checkChatMembership:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-chat-by-id"
+    body:
+      chatId: ${chatId}
+  result: chatResult
+  next: validateChatMembership
+
+validateChatMembership:
+  switch:
+    - condition: ${chatResult.response.body.length === 0}
+      next: returnChatNotFound
+    - condition: ${userRole === 'chatbot_representative' && chatResult.response.body[0].customer_support_id !== userId}
+      next: returnForbidden
+    - condition: ${userRole === 'end_user' && chatResult.response.body[0].end_user_id !== userId}
+      next: returnForbidden
+  next: requestSignedUrl
+
+requestSignedUrl:
+  call: http.post
+  args:
+    url: "[#CHATBOT_STORAGE_FERRY]/v1/files/signed-url/download"
+    body:
+      fileName: ${storagePath}
+  result: signedUrlResult
+  next: returnSuccess
+
+returnSuccess:
+  status: 200
+  return: "$=({attachmentId: attachmentId, signedUrl: signedUrlResult.response.body.url, fileName: fileName})="
+  next: end
+
+returnUnauthorized:
+  status: 401
+  return: "Unauthorized - invalid JWT"
+  next: end
+
+returnAttachmentNotFound:
+  status: 404
+  return: "Attachment not found"
+  next: end
+
+returnChatNotFound:
+  status: 404
+  return: "Chat not found"
+  next: end
+
+returnForbidden:
+  status: 403
+  return: "Forbidden - user not member of chat"
+  next: end
