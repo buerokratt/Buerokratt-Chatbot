@@ -19,33 +19,41 @@ declaration:
 extractRequestData:
   assign:
     attachmentId: ${incoming.body.attachmentId}
-  next: verifyJwt
+    cookie: ${incoming.headers.cookie}
+  next: validateInput
 
-verifyJwt:
+validateInput:
+  switch:
+    - condition: ${!attachmentId}
+      next: returnBadRequest
+    - condition: ${cookie == null || cookie == ""}
+      next: returnUnauthorized
+  next: getChatInfo
+
+getChatInfo:
   call: http.post
   args:
-    url: "[#CHATBOT_DMAPPER]/hbs/verify-jwt"
+    url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
+    contentType: plaintext
     headers:
-      cookie: ${incoming.headers.cookie}
-    body:
-      jwtEncryptionKey: "[#JWT_ENCRYPTION_KEY]"
-  result: jwtVerifyResult
-  next: checkJwtValidity
+      cookie: ${cookie}
+    plaintext: "chatJwt"
+  result: infoRes
+  next: checkChatInfoResponse
 
-checkJwtValidity:
+checkChatInfoResponse:
   switch:
-    - condition: ${jwtVerifyResult.response.statusCodeValue !== 200}
-      next: returnUnauthorized
-  next: extractUserInfo
+    - condition: ${200 <= infoRes.response.statusCodeValue && infoRes.response.statusCodeValue < 300}
+      next: assignChatId
+  next: returnUnauthorized
 
-extractUserInfo:
+assignChatId:
   assign:
-    userId: ${jwtVerifyResult.response.body.data.personalCode}
-    userRole: "$=jwtVerifyResult.response.body.data.authorities[0] === 'ROLE_ADMINISTRATOR' ? 'chatbot_representative' : 'end_user'="
+    chatId: ${infoRes.response.body.chatId}
   next: logAuthSuccess
 
 logAuthSuccess:
-  log: $= "[POC-ATTACHMENTS] User authenticated for download - " + userId + " - " + userRole =
+  log: $= "[POC-ATTACHMENTS] User authenticated for download - chat " + chatId =
   next: getAttachment
 
 getAttachment:
@@ -55,6 +63,10 @@ getAttachment:
     body:
       baseId: ${attachmentId}
   result: attachmentResult
+  next: logAttachmentResult
+
+logAttachmentResult:
+  log: ${attachmentResult}
   next: validateAttachment
 
 validateAttachment:
@@ -62,27 +74,18 @@ validateAttachment:
     - condition: ${attachmentResult.response.body.length === 0}
       next: returnAttachmentNotFound
   assign:
-    chatId: ${attachmentResult.response.body[0].chat_base_id}
-    storagePath: ${attachmentResult.response.body[0].storage_path}
-    fileName: ${attachmentResult.response.body[0].file_name}
-  next: checkChatMembership
+    attachmentChatId: ${attachmentResult.response.body[0].chatBaseId}
+    storagePath: ${attachmentResult.response.body[0].storagePath}
+    fileName: ${attachmentResult.response.body[0].fileName}
+  next: logChatComparison
 
-checkChatMembership:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RESQL]/get-chat-by-id"
-    body:
-      chatId: ${chatId}
-  result: chatResult
+logChatComparison:
+  log: $= "[POC-ATTACHMENTS] Comparing - attachmentChatId " + attachmentChatId + " vs chatId " + chatId =
   next: validateChatMembership
 
 validateChatMembership:
   switch:
-    - condition: ${chatResult.response.body.length === 0}
-      next: returnChatNotFound
-    - condition: ${userRole === 'chatbot_representative' && chatResult.response.body[0].customer_support_id !== userId}
-      next: returnForbidden
-    - condition: ${userRole === 'end_user' && chatResult.response.body[0].end_user_id !== userId}
+    - condition: ${attachmentChatId !== chatId}
       next: returnForbidden
   next: logAccessGranted
 
@@ -108,22 +111,22 @@ returnSuccess:
   return: "$=({attachmentId: attachmentId, signedUrl: signedUrlResult.response.body.url, fileName: fileName})="
   next: end
 
+returnBadRequest:
+  status: 400
+  return: "Error: Invalid request"
+  next: end
+
 returnUnauthorized:
   status: 401
-  return: "Unauthorized - invalid JWT"
+  return: "Error: Unauthorized"
   next: end
 
 returnAttachmentNotFound:
   status: 404
-  return: "Attachment not found"
-  next: end
-
-returnChatNotFound:
-  status: 404
-  return: "Chat not found"
+  return: "Error: Attachment not found"
   next: end
 
 returnForbidden:
   status: 403
-  return: "Forbidden - user not member of chat"
+  return: "Error: Forbidden - attachment not in your chat"
   next: end
