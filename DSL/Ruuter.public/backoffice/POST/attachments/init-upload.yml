@@ -32,22 +32,6 @@ extractRequestData:
     mimeType: ${incoming.body.mimeType}
     messageId: ${incoming.body.messageId ?? null}
     cookie: ${incoming.headers.cookie}
-  next: logIncomingRequest
-
-logIncomingRequest:
-  log: ${fileName}
-  next: logFileSize
-
-logFileSize:
-  log: ${fileSize}
-  next: logMimeType
-
-logMimeType:
-  log: ${mimeType}
-  next: logCookie
-
-logCookie:
-  log: ${cookie}
   next: validateInput
 
 validateInput:
@@ -80,10 +64,10 @@ checkChatInfoResponse:
 assignChatId:
   assign:
     chatId: ${infoRes.response.body.chatId}
-  next: logChatId
+  next: logAuthSuccess
 
-logChatId:
-  log: ${chatId}
+logAuthSuccess:
+  log: $= "[POC-ATTACHMENTS] User authenticated - chatId: " + chatId =
   next: getAttachmentUuid
 
 getAttachmentUuid:
@@ -98,10 +82,6 @@ getAttachmentUuid:
 assignUuid:
   assign:
     attachmentId: ${uuid_result.response.body.uuid}
-  next: logAttachmentId
-
-logAttachmentId:
-  log: ${attachmentId}
   next: getActiveChatById
 
 getActiveChatById:
@@ -122,30 +102,6 @@ checkActiveChatResult:
 generateStoragePath:
   assign:
     storagePath: $= "attachments/" + attachmentId + "/" + fileName =
-  next: logStoragePath
-
-logStoragePath:
-  log: ${storagePath}
-  next: logAttachmentIdBeforeInsert
-
-logAttachmentIdBeforeInsert:
-  log: ${attachmentId}
-  next: logChatIdBeforeInsert
-
-logChatIdBeforeInsert:
-  log: ${chatId}
-  next: logFileNameBeforeInsert
-
-logFileNameBeforeInsert:
-  log: ${fileName}
-  next: logFileSizeBeforeInsert
-
-logFileSizeBeforeInsert:
-  log: ${fileSize}
-  next: logMimeTypeBeforeInsert
-
-logMimeTypeBeforeInsert:
-  log: ${mimeType}
   next: insertAttachment
 
 insertAttachment:
@@ -163,6 +119,10 @@ insertAttachment:
       uploadedBy: ""
       uploadedByRole: "end_user"
   result: insertResult
+  next: logAttachmentCreated
+
+logAttachmentCreated:
+  log: $= "[POC-ATTACHMENTS] Attachment record created - attachmentId: " + attachmentId + ", fileName: " + fileName =
   next: requestSignedUrl
 
 requestSignedUrl:
@@ -179,8 +139,12 @@ requestSignedUrl:
 checkSignedUrlResult:
   switch:
     - condition: ${200 <= signedUrlResult.response.statusCodeValue && signedUrlResult.response.statusCodeValue < 300}
-      next: returnSuccess
+      next: logSignedUrlSuccess
   next: returnStorageError
+
+logSignedUrlSuccess:
+  log: $= "[POC-ATTACHMENTS] Signed URL generated - attachmentId: " + attachmentId =
+  next: returnSuccess
 
 returnSuccess:
   status: 200

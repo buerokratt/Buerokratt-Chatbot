@@ -42,6 +42,10 @@ extractUserInfo:
   assign:
     userId: ${jwtVerifyResult.response.body.data.personalCode}
     userRole: "$=jwtVerifyResult.response.body.data.authorities[0] === 'ROLE_ADMINISTRATOR' ? 'chatbot_representative' : 'end_user'="
+  next: logAuthSuccess
+
+logAuthSuccess:
+  log: $= "[POC-ATTACHMENTS] User authenticated for download - userId: " + userId + ", role: " + userRole =
   next: getAttachment
 
 getAttachment:
@@ -80,6 +84,10 @@ validateChatMembership:
       next: returnForbidden
     - condition: ${userRole === 'end_user' && chatResult.response.body[0].end_user_id !== userId}
       next: returnForbidden
+  next: logAccessGranted
+
+logAccessGranted:
+  log: $= "[POC-ATTACHMENTS] Access granted for attachmentId: " + attachmentId =
   next: requestSignedUrl
 
 requestSignedUrl:
@@ -89,6 +97,10 @@ requestSignedUrl:
     body:
       fileName: ${storagePath}
   result: signedUrlResult
+  next: logSignedUrlSuccess
+
+logSignedUrlSuccess:
+  log: $= "[POC-ATTACHMENTS] Download signed URL generated - attachmentId: " + attachmentId + ", fileName: " + fileName =
   next: returnSuccess
 
 returnSuccess:
