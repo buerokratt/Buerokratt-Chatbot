@@ -100,7 +100,7 @@ check_if_organization_is_available:
       next: return_is_a_holiday
     - condition: ${org_details.isWithinWorkingTime === true && org_details.isWithinWorkingDays === true && org_details.isAllowedToWorkAtHolidays === false && org_details.isHoliday == false}
       next: get_all_available_csas
-  next: return_organization_is_not_available  
+  next: return_organization_is_not_available
 
 return_is_a_holiday:
   call: http.post
@@ -204,29 +204,33 @@ add_chat_id_to_queue_notification_node:
     body:
       id: ${chatId}
   result: add_chat_id_to_queue_notification_node_res
-  next: insert_chat_to_back_office_message
+  next: notify_chats # Skip duplicate message insert - message already inserted in init.yml
 
-insert_chat_to_back_office_message:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RESQL]/insert-message"
-    body:
-      messageId: ${messageId}
-      chatId: ${chatId}
-      authorId: ${get_bot_name_result.response.body[0].value}
-      authorTimestamp: ${new Date().toISOString()}
-      authorFirstName: ""
-      authorLastName: ""
-      authorRole: ${authorRole}
-      created: ${new Date().toISOString()}
-      content: ""
-      event: ${event}
-      forwardedByUser: ""
-      forwardedFromCsa: ""
-      forwardedToCsa: ""
-      rating: ""
-  result: insert_chat_to_back_office_message_result
-  next: notify_chats
+# TODO: temporary workaround to get all chats forwarded to CSA immediately
+# The message is already inserted in chats/init.yml with correct content
+# This was inserting the same messageId again with empty content, causing widget to show empty first message
+#
+# insert_chat_to_back_office_message:
+#   call: http.post
+#   args:
+#     url: "[#CHATBOT_RESQL]/insert-message"
+#     body:
+#       messageId: ${messageId}
+#       chatId: ${chatId}
+#       authorId: ${get_bot_name_result.response.body[0].value}
+#       authorTimestamp: ${new Date().toISOString()}
+#       authorFirstName: ""
+#       authorLastName: ""
+#       authorRole: ${authorRole}
+#       created: ${new Date().toISOString()}
+#       content: ""
+#       event: ${event}
+#       forwardedByUser: ""
+#       forwardedFromCsa: ""
+#       forwardedToCsa: ""
+#       rating: ""
+#   result: insert_chat_to_back_office_message_result
+#   next: notify_chats
 
 notify_chats:
   template: "[#CHATBOT_PROJECT_LAYER]/chats/notify"
