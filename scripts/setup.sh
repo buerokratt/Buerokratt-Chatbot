@@ -21,7 +21,7 @@ until docker-compose ps users_db | grep -q "healthy"; do
     sleep 2
 done
 
-echo "Restoring database from remote dump..."
+echo "Restoring database from dump..."
 docker-compose up db_restore
 
 echo ""

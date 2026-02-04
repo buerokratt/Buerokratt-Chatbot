@@ -155,10 +155,10 @@ services:
     environment:
       PGPASSWORD: "01234"
     volumes:
-      - ./scripts/remote_db_dump.sql:/dump.sql
+      - ./scripts/dump.sql:/dump.sql
     command: >
       sh -c "
-      echo 'Restoring database from remote dump...' &&
+      echo 'Restoring database from dump...' &&
       psql -h users_db -p 5432 -U byk -d byk -f /dump.sql &&
       echo 'Database restored successfully!' &&
       echo 'Checking data...' &&
