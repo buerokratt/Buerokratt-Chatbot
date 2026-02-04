@@ -19,9 +19,16 @@ extractRequestData:
   assign:
     chatId: ${incoming.body.chatId}
     timeout: ${incoming.body.timeout}
-  next: return_success
 
-return_success:
-  status: 200
-  return: "Key operation completed"
+addKeyToTim:
+  call: http.post
+  args:
+    url: "[#CHATBOT_TIM]/sessionkey/add"
+    body:
+      sessionKey: ${chatId}
+      sessionLength: ${timeout}
+  result: addedKey
+
+return_result:
+  return: "Key added to the tim sadly"
   next: end

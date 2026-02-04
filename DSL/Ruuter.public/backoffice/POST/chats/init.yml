@@ -192,24 +192,21 @@ insertChat:
       receivedFrom: ""
       receivedFromName: ""
   result: insertMessageResult
-  next: remove_bot_from_chat
+  next: forwardToBackoffice
 
-remove_bot_from_chat:
+forwardToBackoffice:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/remove_cs_agent_from_chat"
+    url: "[#CHATBOT_RUUTER_PUBLIC]/chats/forwards/forward-to-backoffice"
     body:
-      chatId: ${chatUuid}
-  result: remove_bot_result
-  next: add_to_notification_queue
-
-add_to_notification_queue:
-  call: http.post
-  args:
-    url: "[#CHATBOT_NOTIFICATIONS]/enqueue"
-    body:
-      id: ${chatUuid}
-  result: enqueue_result
+      message:
+        chatId: ${chatUuid}
+        id: ${messageUuid}
+        event: "forward_to_csa"
+        authorRole: ${authorRole}
+      holidays: ${holidays}
+      holidayNames: ${holidayNames}
+  result: forward_to_backoffice_result
   next: getChat
 
 getChat:
