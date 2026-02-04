@@ -311,6 +311,12 @@ services:
       - 9600:9600
     networks:
       - bykstack
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 60s
 
   notifications-node:
     container_name: notifications-node
@@ -320,7 +326,8 @@ services:
     ports:
       - 4040:4040
     depends_on:
-      - opensearch-node
+      opensearch-node:
+        condition: service_healthy
     environment:
       OPENSEARCH_PROTOCOL: http
       OPENSEARCH_HOST: opensearch-node
