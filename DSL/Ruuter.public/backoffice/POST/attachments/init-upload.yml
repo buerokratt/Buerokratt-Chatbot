@@ -38,7 +38,7 @@ validateInput:
   switch:
     - condition: ${!fileName || !fileSize || !mimeType}
       next: returnBadRequest
-    - condition: ${fileSize <= 0 || fileSize > 10485760}
+    - condition: "$=fileSize <= 0 || fileSize > [#MAX_ATTACHMENT_FILE_SIZE]="
       next: returnFileSizeExceeded
     - condition: ${cookie == null || cookie == ""}
       next: returnUnauthorized
@@ -168,7 +168,7 @@ returnBadRequest:
 
 returnFileSizeExceeded:
   status: 400
-  return: "Error: File size exceeds maximum allowed size of 10MB"
+  return: "$=\"Error: File size exceeds maximum allowed size of \" + ([#MAX_ATTACHMENT_FILE_SIZE] / 1048576) + \"MB\"="
   next: end
 
 returnStorageError:
