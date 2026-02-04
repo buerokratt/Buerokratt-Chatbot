@@ -45,7 +45,7 @@ extractUserInfo:
   next: logAuthSuccess
 
 logAuthSuccess:
-  log: $= "[POC-ATTACHMENTS] User authenticated for download - userId: " + userId + ", role: " + userRole =
+  log: $= "[POC-ATTACHMENTS] User authenticated for download - " + userId + " - " + userRole =
   next: getAttachment
 
 getAttachment:
@@ -87,7 +87,7 @@ validateChatMembership:
   next: logAccessGranted
 
 logAccessGranted:
-  log: $= "[POC-ATTACHMENTS] Access granted for attachmentId: " + attachmentId =
+  log: $= "[POC-ATTACHMENTS] Access granted for attachment " + attachmentId =
   next: requestSignedUrl
 
 requestSignedUrl:
@@ -100,7 +100,7 @@ requestSignedUrl:
   next: logSignedUrlSuccess
 
 logSignedUrlSuccess:
-  log: $= "[POC-ATTACHMENTS] Download signed URL generated - attachmentId: " + attachmentId + ", fileName: " + fileName =
+  log: $= "[POC-ATTACHMENTS] Download signed URL generated for " + fileName =
   next: returnSuccess
 
 returnSuccess:
