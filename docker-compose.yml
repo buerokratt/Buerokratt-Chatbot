@@ -140,7 +140,45 @@ services:
       - 5433:5432
     volumes:
       - ./data:/var/lib/postgresql/data
-      - ./init-databases.sh:/docker-entrypoint-initdb.d/init-databases.sh
+      - ./scripts/init-databases.sh:/docker-entrypoint-initdb.d/init-databases.sh
+    networks:
+      - bykstack
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U byk -d byk"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  db_migrations:
+    container_name: db_migrations
+    image: liquibase/liquibase
+    volumes:
+      - ./DSL/Liquibase/changelog:/liquibase/changelog
+      - ./DSL/Liquibase/master.yml:/liquibase/master.yml
+      - ./DSL/Liquibase/data:/liquibase/data
+    command:
+      - --changelog-file=master.yml
+      - --url=jdbc:postgresql://users_db:5432/byk
+      - --username=byk
+      - --password=01234
+      - update
+    depends_on:
+      users_db:
+        condition: service_healthy
+    networks:
+      - bykstack
+
+  db_seed:
+    container_name: db_seed
+    image: postgres:14.1
+    environment:
+      PGPASSWORD: "01234"
+    volumes:
+      - ./scripts/seed-data.sql:/seed-data.sql
+    command: psql -h users_db -p 5432 -U byk -d byk -f /seed-data.sql
+    depends_on:
+      db_migrations:
+        condition: service_completed_successfully
     networks:
       - bykstack
 
