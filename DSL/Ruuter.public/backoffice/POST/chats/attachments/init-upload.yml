@@ -1,0 +1,147 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Initialize file upload and get signed URL"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    headers:
+      - field: cookie
+        type: string
+        description: "Cookie field"
+    body:
+      - field: fileName
+        type: string
+        description: "Name of the file to upload"
+      - field: fileSize
+        type: number
+        description: "Size of the file in bytes"
+      - field: mimeType
+        type: string
+        description: "MIME type of the file"
+
+extractRequestData:
+  assign:
+    fileName: ${incoming.body.fileName}
+    fileSize: ${incoming.body.fileSize}
+    mimeType: ${incoming.body.mimeType}
+    cookie: ${incoming.headers.cookie}
+  next: get_chat_info
+
+get_chat_info:
+  call: http.post
+  args:
+    url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
+    contentType: plaintext
+    headers:
+      cookie: ${cookie}
+    plaintext: "chatJwt"
+  result: jwt_res
+  next: check_chat_info_response
+
+check_chat_info_response:
+  switch:
+    - condition: ${200 <= jwt_res.response.statusCodeValue && jwt_res.response.statusCodeValue < 300}
+      next: assignChatIdAndUserInfo
+  next: return_unauthorized
+
+assignChatIdAndUserInfo:
+  assign:
+    chatId: ${jwt_res.response.body.chatId}
+  next: getActiveChatById
+
+getActiveChatById:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-active-chat-by-id"
+    body:
+      id: ${chatId}
+  result: activeChatRes
+  next: checkActiveChatResult
+
+checkActiveChatResult:
+  switch:
+    - condition: ${activeChatRes.response.body.length > 0}
+      next: generate_attachment_id
+  next: return_chat_ended
+
+generate_attachment_id:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_HBS]/return_uuid"
+    headers:
+      type: json
+  result: uuid_result
+  next: assign_attachment_id
+
+assign_attachment_id:
+  assign:
+    attachmentId: ${uuid_result.response.body.uuid}
+    s3Key: ${chatId + '/' + attachmentId + '/' + fileName}
+  next: get_signed_upload_url
+
+get_signed_upload_url:
+  call: http.post
+  args:
+    url: "[#CHATBOT_STORAGE_FERRY]/v1/files/signed-url/upload"
+    body:
+      fileName: ${s3Key}
+      fileSize: ${fileSize}
+      mimeType: ${mimeType}
+      bucket: "quarantine"
+  result: signed_url_result
+  next: check_signed_url_response
+
+check_signed_url_response:
+  switch:
+    - condition: ${200 <= signed_url_result.response.statusCodeValue && signed_url_result.response.statusCodeValue < 300}
+      next: insert_attachment_record
+  next: return_storage_error
+
+insert_attachment_record:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-attachment"
+    body:
+      baseId: ${attachmentId}
+      chatId: ${chatId}
+      messageId: ""
+      fileName: ${fileName}
+      fileSize: ${fileSize}
+      mimeType: ${mimeType}
+      s3Bucket: "quarantine"
+      s3Key: ${s3Key}
+      uploadedByUserId: ""
+      uploadedByRole: "end-user"
+      status: "pending"
+      created: ${new Date().toISOString()}
+      updated: ${new Date().toISOString()}
+  result: insert_result
+  next: prepare_success_response
+
+prepare_success_response:
+  assign:
+    successResponse: "$= ({ attachmentId: \"${attachmentId}\", uploadUrl: \"${signed_url_result.response.body.url}\", expiresAt: \"${signed_url_result.response.body.expiresAt}\" }) ="
+  next: return_success
+
+return_success:
+  status: 200
+  return: ${successResponse}
+  next: end
+
+return_unauthorized:
+  status: 401
+  return: "Unauthorized: Invalid or missing JWT"
+  next: end
+
+return_chat_ended:
+  status: 400
+  return: "Chat has ended or does not exist"
+  next: end
+
+return_storage_error:
+  status: 500
+  return: "Failed to generate upload URL"
+  next: end
