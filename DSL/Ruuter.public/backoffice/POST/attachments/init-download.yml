@@ -99,6 +99,7 @@ requestSignedUrl:
     url: "[#CHATBOT_STORAGE_FERRY]/v1/files/signed-url/download"
     body:
       fileName: ${storagePath}
+      bucket: "quarantine"
   result: signedUrlResult
   next: logSignedUrlSuccess
 
