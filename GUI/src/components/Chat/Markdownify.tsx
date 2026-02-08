@@ -82,14 +82,14 @@ function formatMessage(message?: string): string {
     .replaceAll(/\\?\$v\w*/g, '')
     .replaceAll(/\\?\$g\w*/g, '');
 
-  const dataImagePattern = /((?:^|\s))(data:image\/[a-zA-Z0-9+]+;[^)\s]+)/gi;
+  const dataImagePattern = /((?:^|\s))(data:image\/[a-z0-9+]+;[^)\s]+)/gi;
   const finalMessage = filteredMessage.replaceAll(
     dataImagePattern,
     (_, prefix, dataUrl) => `${prefix}[image](${dataUrl})`,
   );
 
   return finalMessage
-    .replaceAll(/&#x([0-9A-Fa-f]+);/g, (_, hex: string) => String.fromCharCode(parseInt(hex, 16)))
+    .replaceAll(/&#x([0-9A-F]+);/gi, (_, hex: string) => String.fromCharCode(parseInt(hex, 16)))
     .replaceAll('&amp;', '&')
     .replaceAll('&gt;', '>')
     .replaceAll('&lt;', '<')
