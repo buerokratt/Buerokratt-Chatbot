@@ -6,25 +6,26 @@ INSERT INTO
         file_name,
         file_size,
         mime_type,
-        storage_path,
-        uploaded_by,
+        s3_bucket,
+        s3_key,
+        uploaded_by_user_id,
         uploaded_by_role,
         status,
-        created
+        created,
+        updated
     )
 VALUES (
 :baseId,
-:chatBaseId,
-        NULLIF(:messageBaseId, ''),
+:chatId,
+        NULLIF(:messageId, ''),
 :fileName,
 :fileSize::bigint,
 :mimeType,
-:storagePath,
-        COALESCE(
-            NULLIF(:uploadedBy, ''),
-            'anonymous'
-        ),
+:s3Bucket,
+:s3Key,
+:uploadedByUserId,
 :uploadedByRole,
-        'available',
-        NOW()
+:status,
+:created::timestamp with time zone,
+:updated::timestamp with time zone
     );

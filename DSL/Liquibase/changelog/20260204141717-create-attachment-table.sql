@@ -16,7 +16,10 @@ CREATE TABLE IF NOT EXISTS attachment (
     updated TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_attachment_chat_base_id ON attachment(chat_base_id);
-CREATE INDEX idx_attachment_base_id ON attachment(base_id);
-CREATE INDEX idx_attachment_status ON attachment(status);
-CREATE INDEX idx_attachment_created ON attachment(created);
+CREATE INDEX idx_attachment_chat_base_id ON attachment (chat_base_id);
+
+CREATE INDEX idx_attachment_base_id ON attachment (base_id);
+
+CREATE INDEX idx_attachment_status ON attachment (status);
+
+CREATE INDEX idx_attachment_created ON attachment (created);

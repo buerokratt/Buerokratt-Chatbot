@@ -1,0 +1,128 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Initialize file download and get signed URL"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    headers:
+      - field: cookie
+        type: string
+        description: "Cookie field"
+    body:
+      - field: attachmentId
+        type: string
+        description: "ID of the attachment to download"
+
+extractRequestData:
+  assign:
+    attachmentId: ${incoming.body.attachmentId}
+    cookie: ${incoming.headers.cookie}
+  next: get_chat_info
+
+get_chat_info:
+  call: http.post
+  args:
+    url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
+    contentType: plaintext
+    headers:
+      cookie: ${cookie}
+    plaintext: "chatJwt"
+  result: jwt_res
+  next: check_chat_info_response
+
+check_chat_info_response:
+  switch:
+    - condition: ${200 <= jwt_res.response.statusCodeValue && jwt_res.response.statusCodeValue < 300}
+      next: assignChatIdAndUserInfo
+  next: return_unauthorized
+
+assignChatIdAndUserInfo:
+  assign:
+    chatId: ${jwt_res.response.body.chatId}
+  next: get_attachment_by_id
+
+get_attachment_by_id:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-attachment-by-id"
+    body:
+      baseId: ${attachmentId}
+  result: attachment_result
+  next: check_attachment_exists
+
+check_attachment_exists:
+  switch:
+    - condition: ${attachment_result.response.body.length > 0}
+      next: assign_attachment_data
+  next: return_not_found
+
+assign_attachment_data:
+  assign:
+    attachment: ${attachment_result.response.body[0]}
+  next: verify_chat_membership
+
+verify_chat_membership:
+  switch:
+    - condition: ${attachment.chat_base_id == chatId}
+      next: check_attachment_status
+  next: return_forbidden
+
+check_attachment_status:
+  switch:
+    - condition: ${attachment.status == 'available' || attachment.status == 'uploaded'}
+      next: get_signed_download_url
+  next: return_not_available
+
+get_signed_download_url:
+  call: http.post
+  args:
+    url: "[#CHATBOT_STORAGE_FERRY]/v1/files/signed-url/download"
+    body:
+      fileName: ${attachment.s3_key}
+      bucket: ${attachment.s3_bucket}
+  result: signed_url_result
+  next: check_signed_url_response
+
+check_signed_url_response:
+  switch:
+    - condition: ${200 <= signed_url_result.response.statusCodeValue && signed_url_result.response.statusCodeValue < 300}
+      next: prepare_success_response
+  next: return_storage_error
+
+prepare_success_response:
+  assign:
+    successResponse: '$= ({ attachmentId: "${attachmentId}", downloadUrl: "${signed_url_result.response.body.url}", expiresAt: "${signed_url_result.response.body.expiresAt}", fileName: "${attachment.file_name}", fileSize: ${attachment.file_size}, mimeType: "${attachment.mime_type}" }) ='
+  next: return_success
+
+return_success:
+  status: 200
+  return: ${successResponse}
+  next: end
+
+return_unauthorized:
+  status: 401
+  return: "Unauthorized: Invalid or missing JWT"
+  next: end
+
+return_not_found:
+  status: 404
+  return: "Attachment not found"
+  next: end
+
+return_forbidden:
+  status: 403
+  return: "Access denied: Attachment does not belong to this chat"
+  next: end
+
+return_not_available:
+  status: 400
+  return: "Attachment not available for download"
+  next: end
+
+return_storage_error:
+  status: 500
+  return: "Failed to generate download URL"
+  next: end
