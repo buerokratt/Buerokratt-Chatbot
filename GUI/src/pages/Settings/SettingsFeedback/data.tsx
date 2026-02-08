@@ -6,6 +6,7 @@ export function getFeedbackConfigData(data: FeedbackConfig) {
     feedbackQuestion: data.feedbackQuestion,
     feedbackNoticeActive: data.feedbackNoticeActive.toString() === 'true',
     feedbackNotice: data.feedbackNotice,
+    isFiveRatingScale: data.isFiveRatingScale?.toString() === 'true',
   };
 }
 
@@ -14,5 +15,6 @@ export function setFeedbackData(data: FeedbackConfig) {
     ...data,
     feedbackActive: data.feedbackActive.toString(),
     feedbackNoticeActive: data.feedbackNoticeActive.toString(),
+    isFiveRatingScale: data.isFiveRatingScale?.toString(),
   };
 }

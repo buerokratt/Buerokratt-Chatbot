@@ -7,7 +7,8 @@ WITH last_configuration AS (
      'anonymizer_allowlist',
      'anonymizer_denylist',
      'is_anonymization_before_llm',
-     'is_anonymization_before_global_classifier')
+     'is_anonymization_before_global_classifier',
+     'record_conversations_anonymously')
     AND id IN (SELECT max(id) from configuration GROUP BY key)
     AND deleted = FALSE
 ), new_configuration as (
@@ -19,7 +20,8 @@ WITH last_configuration AS (
         ('anonymizer_allowlist', :anonymizer_allowlist),
         ('anonymizer_denylist', :anonymizer_denylist),
         ('is_anonymization_before_llm', :is_anonymization_before_llm),
-        ('is_anonymization_before_global_classifier', :is_anonymization_before_global_classifier)
+        ('is_anonymization_before_global_classifier', :is_anonymization_before_global_classifier),
+        ('record_conversations_anonymously', :record_conversations_anonymously)
    ) as new_values (key, value)
 )
 INSERT INTO configuration (key, value, created)

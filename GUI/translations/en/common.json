@@ -385,8 +385,21 @@
       "showSupportName": "Show support name",
       "showSupportTitle": "Show support title",
       "editActiveChat": "Editing active chats",
+      "instantlyOpenChatWidget": "Instantly open chat widget",
+      "showSubTitle": "Show chat window subtitle",
+      "subTitle": "Chat window subtitle",
       "showBurokrattConfirmation": "Do you want to make Bürokrat visible on the website?",
-      "hideBurokrattConfirmation": "Do you want to hide the Bureaucrat on the website?"
+      "hideBurokrattConfirmation": "Do you want to hide Bürokrat on the website?",
+      "tooltip": {
+        "isBotActive": "If on is selected, Bürokratt will automatically respond to the client using an AI-based conversational solution (depending on the technical setup, either LLM, RAG, or RASA solution). If off is selected, the conversation will be automatically forwarded to an advisor.",
+        "isBurokrattActive": "If on is selected, Bürokratt will be visible on the website. If off is selected, Bürokratt will be hidden from the website.",
+        "instantlyOpenChatWidget": "If on is selected, the chat window will open automatically when the user lands on the website. If off is selected, Bürokratt will be minimized and the user must open the chat window themselves. This setting works only in the desktop view and does not apply to the mobile view!",
+        "isCsaNameVisible": "If the setting is enabled, the advisor's name is displayed on the left side of the chat window above the chat participant's picture . If the setting is disabled, the name will not be shown.",
+        "isCsaTitleVisible": "If the setting is enabled, the advisor's title will be displayed in the chat window. If the setting is disabled, the advisor's title will not be displayed.",
+        "isEditChatVisible": "If on is selected, only the advisor is able to edit their most recently sent response. If off is selected, the advisor cannot modify their last message after it has been sent.",
+        "showSubTitle": "By selecting Yes, in addition to the Bürokrati title, a subtitle will also be displayed in the chat window. The settings for the subtitle text can be found below. By selecting No, the subtitle will not be shown, but the Bürokrati title will still remain visible.",
+        "subTitle": "Enter the subtitle text here."
+      }
     },
     "emergencyNotices": {
       "title": "Emergency notices",
@@ -401,7 +414,10 @@
       "feedbackActive": "Feedback active",
       "feedbackQuestion": "Feedback question",
       "noticeActive": "Notice active",
-      "notice": "Notice"
+      "notice": "Notice",
+      "feedbackScale": "Feedback scale:",
+      "tenPoints": "10 points",
+      "fivePoints": "5 points"
     },
     "appearance": {
       "title": "Appearance and behavior",
@@ -543,6 +559,7 @@
       "denyListPlaceholder": "Enter a word and press Enter to add to the denylist",
       "anonymizationBeforeLLM": "Anonymization before LLM",
       "anonymizationBeforeGlobalClassifier": "Anonymization before Global classifier",
+      "recordConversationsAnonymously": "Record conversations anonymously",
       "saveSettings": "Save Settings",
       "testingTitle": "Anonymizer Testing",
       "testingDescription": "To test your anonymizer configuration, enter the input text and press \"Anonymize\"",
@@ -571,6 +588,9 @@
         "person": "PERSON",
         "gpe": "GPE",
         "crypto": "CRYPTO"
+      },
+      "tooltip": {
+        "recordConversationsAnonymously": "When enabled, all messages are anonymized before being saved. Users will see only anonymized messages during the conversation and in chat history. Original messages are not stored or retrievable."
       }
     }
   },
