@@ -45,7 +45,12 @@ SELECT fm.base_id      AS id,
        fm.rating,
        fm.created,
        fm.updated,
-       u.csa_title
+       u.csa_title,
+       a.base_id AS attachment_id,
+       a.file_name AS attachment_file_name,
+       a.file_size AS attachment_file_size,
+       a.mime_type AS attachment_mime_type
 FROM FilteredMessages fm
 LEFT JOIN LatestActiveUser u ON fm.author_id = u.id_code
+LEFT JOIN attachment a ON a.message_base_id = fm.base_id AND a.status = 'available'
 ORDER BY fm.created ASC;

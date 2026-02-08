@@ -39,6 +39,10 @@ extractRequestData:
     cookie: ${incoming.headers.cookie}
     silent: ${incoming.body.silent}
     domain: ${incoming.body.domain}
+    hasFile: ${incoming.body.message.file != null}
+    fileName: ${incoming.body.message.file?.name ?? ""}
+    fileSize: ${incoming.body.message.file?.size ?? 0}
+    fileMimeType: ${incoming.body.message.file?.type ?? ""}
   next: checkContentLength
 
 checkContentLength:
@@ -119,7 +123,68 @@ insertMessage:
       forwardedFromCsa: ""
       forwardedToCsa: ""
   result: insertMessageResult
+  next: checkIfHasFile
+
+checkIfHasFile:
+  switch:
+    - condition: ${hasFile === true}
+      next: validateFileSize
   next: check_skip_bot
+
+validateFileSize:
+  switch:
+    - condition: ${fileSize > [#MAX_ATTACHMENT_FILE_SIZE]}
+      next: return_file_size_exceeded
+  next: generateAttachmentId
+
+generateAttachmentId:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_HBS]/return_uuid"
+    headers:
+      type: json
+  result: attachmentIdResult
+  next: assignAttachmentId
+
+assignAttachmentId:
+  assign:
+    attachmentId: ${attachmentIdResult.response.body.uuid}
+    storagePath: $= "attachments/" + attachmentIdResult.response.body.uuid + "/" + fileName =
+  next: insertAttachment
+
+insertAttachment:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert_attachment"
+    body:
+      baseId: ${attachmentId}
+      chatBaseId: ${chatId}
+      messageBaseId: ${uuid}
+      fileName: ${fileName}
+      fileSize: ${fileSize}
+      mimeType: ${fileMimeType}
+      storagePath: ${storagePath}
+      uploadedBy: "anonymous"
+      uploadedByRole: "end_user"
+  result: insertAttachmentResult
+  next: requestSignedUploadUrl
+
+requestSignedUploadUrl:
+  call: http.post
+  args:
+    url: "[#CHATBOT_STORAGE_FERRY]/v1/files/signed-url/upload"
+    body:
+      fileName: ${storagePath}
+      fileSize: ${fileSize}
+      mimeType: ${fileMimeType}
+  result: signedUrlResult
+  next: checkSignedUrlResult
+
+checkSignedUrlResult:
+  switch:
+    - condition: ${200 <= signedUrlResult.response.statusCodeValue && signedUrlResult.response.statusCodeValue < 300}
+      next: check_skip_bot
+  next: return_storage_error
 
 check_skip_bot:
   switch:
@@ -165,7 +230,7 @@ notify_messages:
   next: return_result
 
 return_result:
-  return: "Message Sent Successfully"
+  return: "$=({message: 'Message Sent Successfully', signedUploadUrl: (hasFile === true ? signedUrlResult.response.body.url : null), attachmentId: (hasFile === true ? attachmentId : null)})="
   next: end
 
 return_chat_ended:
@@ -181,6 +246,16 @@ return_bad_request:
 return_content_length_exceeded:
   status: 400
   return: "Error: Your input exceeds the maximum allowed length of 1000 characters"
+  next: end
+
+return_file_size_exceeded:
+  status: 400
+  return: "Error: File size exceeded"
+  next: end
+
+return_storage_error:
+  status: 500
+  return: "Error: Storage service error"
   next: end
 
 return_bot_error:
