@@ -152,7 +152,7 @@ const Anonymizer: FC = () => {
     setAnonymizerConfig({
       anonymizerSelectedApproach: '',
       entities:
-        'GPE,CAR_NUMBER,DATE_TIME,EE_PERSONAL_CODE,PERSON,IBAN_CODE,ORGANIZATION,CREDIT_CARD,IP_ADDRESS,EST_ID_DOC,MEDICAL_LICENSE,URL,LOCATION,EMAIL_ADDRESS,CRYPTO,PHONE_NUMBER',
+        'GPE,CAR_NUMBER,DATE_TIME,EE_PERSONAL_CODE,PERSON,IBAN_CODE,ORGANIZATION,CREDIT_CARD,IP_ADDRESS,EST_ID_DOC,URL,LOCATION,EMAIL_ADDRESS,CRYPTO,PHONE_NUMBER',
       anonymizerSelectedEntities: '',
       anonymizerAllowlist: '',
       anonymizerDenylist: '',
