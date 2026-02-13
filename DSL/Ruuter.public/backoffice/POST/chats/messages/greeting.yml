@@ -14,11 +14,45 @@ declaration:
       - field: clientTimestamp
         type: string
         description: "Body field 'clientTimestamp'"
+      - field: domain
+        type: string
+        description: "Body field 'domain'"  
 
 extractRequestData:
   assign:
     chatId: "${incoming.body.chatId}"
     clientTimestamp: "${incoming.body.clientTimestamp}"
+    domain: "${incoming.body.domain}"
+
+checkForDomain:
+  switch:
+    - condition: ${domain === 'none'}
+      next: getGreetingMessage
+  next: getDomainUUID
+
+getDomainUUID:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-uuid"
+    body:
+      domainUrl: ${domain + '%'}
+  result: domainUuid
+  next: validate_domain_res
+
+validate_domain_res:
+  switch:
+    - condition: ${domainUuid.response.body.length > 0}
+      next: getDomainGreetingMessage
+  next: getGreetingMessage
+
+getDomainGreetingMessage:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-greeting-message"
+    body:
+      domainUUID: ${domainUuid.response.body[0].domainId}
+  result: greeting_result
+  next: getUuid
 
 getGreetingMessage:
   call: http.post

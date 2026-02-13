@@ -220,6 +220,7 @@ postGreetingMessage:
     body:
       chatId: ${chatUuid}
       authorTimestamp: ${authorTimestamp}
+      domain: ${domain}
   result: greeting_result
   next: postClientMessage
 
