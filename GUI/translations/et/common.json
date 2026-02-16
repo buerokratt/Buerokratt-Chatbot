@@ -620,5 +620,19 @@
   },
   "landing": {
     "title": "Tere tulemast Bürokratti"
+  },
+  "errors": {
+    "claimed_by_another_agent": "Vestlus on juba teise nõustaja poolt üle võetud.",
+    "chat_has_ended": "See vestlus on juba lõppenud.",
+    "could_not_fetch_user_info": "Kasutaja info hankimine ebaõnnestus.",
+    "message_editing_not_allowed": "Sõnumi redigeerimine ei ole lubatud.",
+    "chat_not_found": "Vestlust ei leitud.",
+    "bad_request": "Vigane päring.",
+    "not_found": "Ei leitud.",
+    "user_not_found": "Kasutajat ei leitud.",
+    "user_already_exists": "Kasutaja on juba olemas.",
+    "jira_user_not_found": "Jira kasutajat ei leitud.",
+    "unauthorized": "Volitamata.",
+    "csa_is_offline": "Klienditugi on võrguühenduseta"
   }
 }

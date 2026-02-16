@@ -150,11 +150,11 @@ return_result:
   next: end
 
 return_not_exists:
-  return: "error: user does not exist"
+  return: "user_not_found"
   status: 400
   next: end
 
 return_jira_user_not_exists:
-  return: "error: jira user does not exist"
+  return: "jira_user_not_found"
   status: 400
   next: end

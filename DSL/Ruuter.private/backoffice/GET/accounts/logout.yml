@@ -85,6 +85,6 @@ return_result:
   next: end
 
 return_bad_request:
-  return: "error: bad request"
+  return: "bad_request"
   status: 400
   next: end

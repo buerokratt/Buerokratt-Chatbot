@@ -620,5 +620,19 @@
   },
   "landing": {
     "title": "Welcome to Bürokratt"
+  },
+  "errors": {
+    "claimed_by_another_agent": "This chat has already been claimed by another agent.",
+    "chat_has_ended": "This chat has already ended.",
+    "could_not_fetch_user_info": "Could not fetch user info.",
+    "message_editing_not_allowed": "Message editing is not allowed.",
+    "chat_not_found": "Chat not found.",
+    "bad_request": "Bad request.",
+    "not_found": "Not found.",
+    "user_not_found": "User not found.",
+    "user_already_exists": "User already exists.",
+    "jira_user_not_found": "Jira user not found.",
+    "unauthorized": "Unauthorized.",
+    "csa_is_offline": "Customer support is offline"
   }
 }

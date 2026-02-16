@@ -58,8 +58,5 @@ return_result:
   next: end
 
 returnInvalidBody:
-  return: "error: invalid body"
+  return: "bad_request"
   next: end
-
-
-

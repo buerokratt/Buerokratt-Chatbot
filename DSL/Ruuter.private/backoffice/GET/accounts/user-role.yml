@@ -49,5 +49,5 @@ returnSuccess:
   next: end
 
 returnNotFound:
-  return: "error: not found"
+  return: "user_not_found"
   next: end
