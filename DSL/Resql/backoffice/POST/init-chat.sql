@@ -13,24 +13,12 @@ INSERT INTO chat(base_id, customer_support_id, customer_support_display_name, en
                  feedback_text, feedback_rating, feedback_rating_five,
                  external_id, forwarded_to, forwarded_to_name, received_from, received_from_name, csa_title)
 VALUES (:id,
-        (CASE
-             WHEN ((SELECT value
-                    FROM configuration
-                    WHERE key = (select isBotActive from consts)
-                      AND id IN (SELECT max(id) from configuration GROUP BY key)
-                      AND deleted = FALSE) = 'true') THEN (SELECT value
-                                                           FROM configuration
-                                                           WHERE key = 'bot_institution_id'
-                                                             AND id IN (SELECT max(id) from configuration GROUP BY key)
-                                                             AND deleted = FALSE)
-             ELSE '' END),
-        (CASE
-             WHEN ((SELECT value
-                    FROM configuration
-                    WHERE key = (select isBotActive from consts)
-                      AND id IN (SELECT max(id) from configuration GROUP BY key)
-                      AND deleted = FALSE) = 'true') THEN 'Bürokratt'
-             ELSE '' END),
+        (SELECT value
+            FROM configuration
+            WHERE key = 'bot_institution_id'
+            AND id IN (SELECT max(id) from configuration GROUP BY key)
+            AND deleted = FALSE),
+        'Bürokratt',
         :endUserId, :endUserFirstName, :endUserLastName, :status, :created::timestamp with time zone,
         (CASE
              WHEN (:ended = '') THEN null
