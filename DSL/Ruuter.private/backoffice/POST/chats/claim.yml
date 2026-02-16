@@ -181,16 +181,16 @@ return_result:
   next: end
 
 return_chat_ended:
-  return: "Chat Has Ended"
+  return: "Vestlus on lõppenud"
   status: 400
   next: end  
 
 return_claimed_by_another_agent:
-  return: "Chat has already been claimed by another agent"
+  return: "Vestlus on juba teise nõustaja poolt üle võetud."
   status: 400
   next: end  
 
 return_bad_request:
-  return: "Could not fetch user info"
+  return: "Kasutaja info hankimine ebaõnnestus"
   status: 400
   next: end
