@@ -31,22 +31,6 @@ extractRequestData:
     holidays: ${incoming.body.holidays}
     holidayNames: ${incoming.body.holidayNames}
     domain: ${incoming.body.domain}
-  next: check_bot_is_active
-
-check_bot_is_active:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RESQL]/get-configuration"
-    body:
-      key: "is_bot_active"
-  result: is_bot_active_result
-  next: check_bot_activity_result
-
-check_bot_activity_result:
-  switch:
-    - condition: ${is_bot_active_result.response.body[0]?.value === 'true'}
-      next: get_bot_name
-  next: return_bot_is_not_active
 
 get_bot_name:
   call: http.post
@@ -67,7 +51,33 @@ check_if_bot_name_exists:
 assign_bot_name:
   assign:
     chat_bot_name: ${get_bot_name_result.response.body[0].value}
-  next: check_for_intent
+  next: check_bot_is_active  
+
+check_bot_is_active:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-configuration"
+    body:
+      key: "is_bot_active"
+  result: is_bot_active_result
+  next: check_bot_activity_result
+
+check_bot_activity_result:
+  switch:
+    - condition: ${is_bot_active_result.response.body[0]?.value === 'true'}
+      next: check_for_intent
+  next: assign_bot_not_active_response
+
+assign_bot_not_active_response:
+  assign:
+    post_message_to_bot_result: { 
+      "response": { "body": [
+        { 
+         "recipient_id" : "${chatId}",
+         "text" : "Suunan teid klienditeenindajale. Varuge natukene kannatust."
+        }
+      ]}}
+  next: check_if_bot_is_unable_to_reply
 
 check_for_intent:
   call: http.post
@@ -520,11 +530,6 @@ return_message_sent:
 return_chat_does_not_belong_to_bot:
   status: 200
   return: "Chat does not belong to bot"
-  next: end
-
-return_bot_is_not_active:
-  status: 200
-  return: "Bot is not active"
   next: end
 
 return_bot_name_does_not_exist:
