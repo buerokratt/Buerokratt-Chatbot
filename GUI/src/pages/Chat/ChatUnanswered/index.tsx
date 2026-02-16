@@ -182,10 +182,19 @@ const ChatUnanswered: FC = () => {
       {endChatModal && (
         <Dialog
           title={t('chat.active.chooseChatStatus')}
-          onClose={() => setEndChatModal(null)}
+          onClose={() => {
+            setEndChatModal(null);
+            setSelectedEndChatStatus(null);
+          }}
           footer={
             <>
-              <Button appearance="secondary" onClick={() => setEndChatModal(null)}>
+              <Button
+                appearance="secondary"
+                onClick={() => {
+                  setEndChatModal(null);
+                  setSelectedEndChatStatus(null);
+                }}
+              >
                 {t('global.cancel')}
               </Button>
               <Button appearance="success" onClick={handleChatEnd}>
@@ -202,6 +211,7 @@ const ChatUnanswered: FC = () => {
               value: status,
             }))}
             onChange={setSelectedEndChatStatus}
+            value={selectedEndChatStatus ?? undefined}
           />
         </Dialog>
       )}
