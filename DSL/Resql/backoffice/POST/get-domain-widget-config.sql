@@ -14,7 +14,11 @@ WHERE ((
     'feedbackQuestion',
     'feedbackNoticeActive',
     'feedbackNotice',
-    'isFiveRatingScale'))
+    'isFiveRatingScale',
+    'instantly_open_chat_widget',
+    'show_sub_title',
+    'sub_title'
+))
    OR ("domain" IS NULL
   AND key IN (
     'chat_active_duration',
@@ -41,5 +45,8 @@ SELECT MAX(CASE WHEN key = 'widgetProactiveSeconds' THEN value END)            A
        MAX(CASE WHEN key = 'feedbackQuestion' THEN value END)                  AS feedback_question,
        MAX(CASE WHEN key = 'feedbackNoticeActive' THEN value END)              AS feedback_notice_active,
        MAX(CASE WHEN key = 'feedbackNotice' THEN value END)                    AS feedback_notice,
-       MAX(CASE WHEN key = 'isFiveRatingScale' THEN value END)                 AS is_five_rating_scale
+       MAX(CASE WHEN key = 'isFiveRatingScale' THEN value END)                 AS is_five_rating_scale,
+       MAX(CASE WHEN key = 'instantly_open_chat_widget' THEN value END)       AS instantly_open_chat_widget,
+       MAX(CASE WHEN key = 'show_sub_title' THEN value END)                   AS show_sub_title,
+       MAX(CASE WHEN key = 'sub_title' THEN value END)                        AS sub_title
 FROM configuration_values;

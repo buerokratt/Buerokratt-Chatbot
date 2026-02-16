@@ -47,6 +47,84 @@ extractRequestData:
     holidayNames: ${incoming.body.holidayNames}
     domain: ${incoming.body.domain}
 
+check_if_anonymizer_is_active:
+  switch:
+    - condition: ${[#ANONYMIZER_ENABLED] === true}
+      next: checkForPassedDomain
+  next: checkIncomingCookie
+
+checkForPassedDomain:
+  switch:
+    - condition: ${domain === 'none'}
+      next: getAnonymizerConfig
+  next: getDomainAnonymizerConfig
+
+getAnonymizerConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-anonymizer-config"
+  result: anonymizer_configs_res
+  next: assignAnonymizerConfigs
+
+getDomainAnonymizerConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-anonymizer-config"
+    body:
+      domainUUID: ${domain}
+  result: anonymizer_configs_res
+  next: assignAnonymizerConfigs
+
+assignAnonymizerConfigs:
+  assign:
+    anonymizer_configs: ${anonymizer_configs_res.response.body[0]}
+  next: check_if_content_needs_anonymization
+
+check_if_content_needs_anonymization:
+  switch:
+    - condition: ${anonymizer_configs.recordConversationsAnonymously === 'true'}
+      next: prepareAnonymizerConfig
+  next: checkIncomingCookie
+
+prepareAnonymizerConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_HBS]/prepare_anonymizer_config"
+    headers:
+      type: json
+    body:
+      texts: ${[content]}
+      approach: ${anonymizer_configs.anonymizerSelectedApproach}
+      entities: ${anonymizer_configs.anonymizerSelectedEntities.split(',')}
+      allowlist: ${anonymizer_configs.anonymizerAllowlist.split(',')}
+      denylist: ${anonymizer_configs.anonymizerDenylist.split(',')}
+      hash_type: "[#ANONYMIZER_HASH_TYPE]"
+  result: preparedAnonymizerConfigs
+  next: assignPreparedAnonymizerConfigs
+
+assignPreparedAnonymizerConfigs:
+  assign:
+    preparedAnonymizerConfigs: ${preparedAnonymizerConfigs.response.body}
+  next: anonymizeText
+
+anonymizeText:
+  call: http.post
+  args:
+    url: "[#CHATBOT_ANONYMIZER]/anonymize"
+    body:
+      texts: ${preparedAnonymizerConfigs.texts}
+      anonymizers: ${preparedAnonymizerConfigs.anonymizers}
+      entities: ${preparedAnonymizerConfigs.entities}
+      allowlist: ${preparedAnonymizerConfigs.allowlist}
+      denylist: ${preparedAnonymizerConfigs.denylist}
+  result: anonymize_res
+  next: assign_anonymized_content
+
+assign_anonymized_content:
+  assign:
+    content: ${anonymize_res.response.body.results[0].text ?? ''}
+  next: checkIncomingCookie
+
 checkIncomingCookie:
   switch:
     - condition: ${incoming.headers.cookie == null}
@@ -142,6 +220,7 @@ postGreetingMessage:
     body:
       chatId: ${chatUuid}
       authorTimestamp: ${authorTimestamp}
+      domain: ${domain}
   result: greeting_result
   next: postClientMessage
 
