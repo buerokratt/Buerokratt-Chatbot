@@ -51,7 +51,23 @@ check_if_bot_name_exists:
 assign_bot_name:
   assign:
     chat_bot_name: ${get_bot_name_result.response.body[0].value}
-  next: check_bot_is_active  
+  next: get_chat  
+
+get_chat:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-chat-by-id"
+    body:
+      id: ${chatId}
+  result: get_chat_result
+  error: return_bad_request
+  next: check_chat_belongs_to_bot 
+
+check_chat_belongs_to_bot:
+  switch:
+    - condition: ${get_chat_result.response.body[0].customerSupportId == chat_bot_name}
+      next: check_bot_is_active
+  next: return_chat_does_not_belong_to_bot
 
 check_bot_is_active:
   call: http.post
@@ -93,7 +109,7 @@ check_for_intent:
 check_service_result:
   switch:
     - condition: ${llm_service_response.response.body.response === 'skip'}
-      next: get_chat
+      next: check_for_service
   next: assign_service_response
 
 assign_service_response:
@@ -102,22 +118,6 @@ assign_service_response:
       - recipient_id: ${chatId}
         text: ${llm_service_response.response.body.response}
   next: format_bot_messages
-
-get_chat:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RESQL]/get-chat-by-id"
-    body:
-      id: ${chatId}
-  result: get_chat_result
-  error: return_bad_request
-  next: check_chat_belongs_to_bot
-
-check_chat_belongs_to_bot:
-  switch:
-    - condition: ${get_chat_result.response.body[0].customerSupportId == chat_bot_name}
-      next: check_for_service
-  next: return_chat_does_not_belong_to_bot
 
 check_for_service:
   switch:
