@@ -15,7 +15,8 @@ export async function createUser(userData: UserDTO) {
     csa_email: userData.csaEmail,
     roles: authorities.length === 0 ? Object.values(userData.authorities) : authorities,
     department: userData.department,
-    domains: userData.domains.length === 0 || userData.domains[0] === null ? [] : userData.domains.map((d) => d.value ?? d),
+    domains:
+      userData.domains.length === 0 || userData.domains[0] === null ? [] : userData.domains.map((d) => d.value ?? d),
   });
   return data;
 }
@@ -45,7 +46,8 @@ export async function editUser(id: string | number, userData: UserDTO, smaxConne
     jiraAccountId: userData.jiraAccountId,
     roles: authorities.length === 0 ? Object.values(userData.authorities) : authorities,
     department: userData.department,
-    domains: userData.domains.length === 0 || userData.domains[0] === null ? [] : userData.domains.map((d) => d.value ?? d),
+    domains:
+      userData.domains.length === 0 || userData.domains[0] === null ? [] : userData.domains.map((d) => d.value ?? d),
   });
   return data;
 }
