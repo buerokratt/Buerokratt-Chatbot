@@ -141,7 +141,7 @@ getDomainAnonymizerConfig:
   args:
     url: "[#CHATBOT_RESQL]/get-domain-anonymizer-config"
     body:
-      domainUUID: ${domain}
+      domainUUID: ${domainUuid.response.body[0].domainId}
   result: anonymizer_configs_res
   next: assignAnonymizerConfigs
 
