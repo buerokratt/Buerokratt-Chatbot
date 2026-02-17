@@ -114,7 +114,22 @@ checkForPassedDomain:
   switch:
     - condition: ${domain === 'none'}
       next: getAnonymizerConfig
-  next: getDomainAnonymizerConfig
+  next: getDomainUUID
+
+getDomainUUID:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-uuid"
+    body:
+      domainUrl: ${domain + '%'}
+  result: domainUuid
+  next: validate_domain_res
+
+validate_domain_res:
+  switch:
+    - condition: ${domainUuid.response.body.length > 0}
+      next: getDomainAnonymizerConfig
+  next: getAnonymizerConfig
 
 getAnonymizerConfig:
   call: http.post
@@ -128,7 +143,7 @@ getDomainAnonymizerConfig:
   args:
     url: "[#CHATBOT_RESQL]/get-domain-anonymizer-config"
     body:
-      domainUUID: ${domain}
+      domainUUID: ${domainUuid.response.body[0].domainId}
   result: anonymizer_configs_res
   next: assignAnonymizerConfigs
 
