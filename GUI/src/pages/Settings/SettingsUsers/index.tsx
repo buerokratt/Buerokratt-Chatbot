@@ -7,7 +7,7 @@ import { Button, Card, DataTable, Dialog, Icon, Tooltip, Track } from 'component
 import { format } from 'date-fns';
 import withAuthorization from 'hoc/with-authorization';
 import { useToast } from 'hooks/useToast';
-import { FC, useEffect, useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdOutlineDeleteOutline, MdOutlineEdit } from 'react-icons/md';
 import { apiDev } from 'services/api';
@@ -18,7 +18,35 @@ import { ROLES } from 'utils/constants';
 
 import UserModal from './UserModal';
 import useStore from '../../../store';
+
+import './SettingsUsers.scss';
 import { WDomain } from '../../../types/widgetModels';
+
+const TruncateCellWithTooltip: FC<{ text: string; maxWidth: number }> = ({ text, maxWidth }) => {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [isTruncated, setIsTruncated] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    setIsTruncated(el.scrollWidth > el.clientWidth);
+  }, [text, maxWidth]);
+  if (!text) return <></>;
+  const span = (
+    <span
+      ref={ref}
+      style={{
+        maxWidth,
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+        display: 'block',
+      }}
+    >
+      {text}
+    </span>
+  );
+  return isTruncated ? <Tooltip content={text}>{span}</Tooltip> : span;
+};
 
 const SettingsUsers: FC = () => {
   const { t } = useTranslation();
@@ -271,6 +299,10 @@ const SettingsUsers: FC = () => {
     );
   };
 
+  const truncateCellWithTooltip = (text: string, maxWidth: number = 180) => (
+    <TruncateCellWithTooltip text={text} maxWidth={maxWidth} />
+  );
+
   const statusCommentView = (props: any) => {
     const value = props.getValue();
     const statusTimeStamp = format(new Date(props.row.original.statusCommentTimeStamp), 'HH:mm:ss');
@@ -294,9 +326,10 @@ const SettingsUsers: FC = () => {
 
   const usersColumns = useMemo(() => {
     const baseColumns = [
-      columnHelper.accessor((row) => `${row.firstName ?? ''} ${row.lastName ?? ''}`, {
+      columnHelper.accessor((row) => `${row.firstName ?? ''} ${row.lastName ?? ''}`.trim(), {
         id: `name`,
         header: t('settings.users.name') ?? '',
+        cell: (props) => truncateCellWithTooltip(props.getValue() ?? '', 160),
       }),
       columnHelper.accessor('idCode', {
         header: t('settings.users.idCode') ?? '',
@@ -311,7 +344,7 @@ const SettingsUsers: FC = () => {
         },
         {
           header: t('settings.users.role') ?? '',
-          cell: (props) => props.getValue().join(', '),
+          cell: (props) => truncateCellWithTooltip(props.getValue().join(', '), 200),
           filterFn: (row: Row<User>, _, filterValue) => {
             const rowAuthorities: string[] = [];
             row.original.authorities.map((role) => {
@@ -326,9 +359,11 @@ const SettingsUsers: FC = () => {
       ),
       columnHelper.accessor('displayName', {
         header: t('settings.users.displayName') ?? '',
+        cell: (props) => truncateCellWithTooltip(props.getValue() ?? '', 140),
       }),
       columnHelper.accessor('csaTitle', {
         header: t('settings.users.userTitle') ?? '',
+        cell: (props) => truncateCellWithTooltip(props.getValue() ?? '', 140),
       }),
       columnHelper.accessor('customerSupportStatus', {
         header: t('global.status') ?? '',
@@ -341,9 +376,11 @@ const SettingsUsers: FC = () => {
       }),
       columnHelper.accessor('csaEmail', {
         header: t('settings.users.email') ?? '',
+        cell: (props) => truncateCellWithTooltip(props.getValue() ?? '', 180),
       }),
       columnHelper.accessor('department', {
         header: t('settings.users.department') ?? '',
+        cell: (props) => truncateCellWithTooltip(props.getValue() ?? '', 140),
       }),
       ...(isJiraIntegrationEnabled
         ? [
@@ -386,7 +423,7 @@ const SettingsUsers: FC = () => {
       },
       {
         header: t('multiDomains.domains') ?? '',
-        cell: (props) => props.getValue().join(', '),
+        cell: (props) => truncateCellWithTooltip(props.getValue().join(', '), 160),
         filterFn: (row, _, filterValue) => {
           const mapped = mapUserDomains(row.original.domains ?? [], widgetDomains);
           return mapped.some((d) => d.name.toLowerCase().includes(filterValue.toLowerCase()));
