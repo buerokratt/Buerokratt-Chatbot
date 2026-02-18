@@ -2,7 +2,8 @@ WITH rating_config AS (
     SELECT value AS is_five_rating_scale
     FROM configuration
     WHERE key = 'isFiveRatingScale'
-      AND id IN (SELECT max(id) FROM configuration WHERE key = 'isFiveRatingScale' GROUP BY key)
+      AND "domain" IS NULL
+      AND id IN (SELECT max(id) FROM configuration WHERE key = 'isFiveRatingScale' AND "domain" IS NULL)
       AND NOT deleted
 ),
 csa_title_config AS (

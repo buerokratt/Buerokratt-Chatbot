@@ -1,14 +1,16 @@
 WITH last_configuration AS (
     SELECT key, value
     FROM configuration
-    WHERE key IN (
-     'feedbackActive',
-     'feedbackQuestion',
-     'feedbackNoticeActive',
-     'feedbackNotice',
-     'isFiveRatingScale')
-    AND id IN (SELECT max(id) from configuration GROUP BY key)
-    AND deleted = FALSE
+    WHERE key IN ('feedbackActive', 'feedbackQuestion', 'feedbackNoticeActive', 'feedbackNotice')
+      AND id IN (SELECT max(id) FROM configuration GROUP BY key)
+      AND deleted = FALSE
+    UNION
+    SELECT key, value
+    FROM configuration
+    WHERE key = 'isFiveRatingScale'
+      AND "domain" IS NULL
+      AND id IN (SELECT max(id) FROM configuration WHERE key = 'isFiveRatingScale' AND "domain" IS NULL)
+      AND deleted = FALSE
 ), new_configuration as (
   SELECT new_values.key, new_values.value, :created::timestamp with time zone as created
   FROM (

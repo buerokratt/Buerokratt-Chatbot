@@ -14,7 +14,6 @@ WITH configuration_values AS (
             'feedbackQuestion',
             'feedbackNoticeActive',
             'feedbackNotice',
-            'isFiveRatingScale',
             'instantly_open_chat_widget',
             'show_sub_title',
             'sub_title'
@@ -25,12 +24,13 @@ WITH configuration_values AS (
             'show_idle_warning',
             'idle_message',
             'show_auto_close_text',
-            'auto_close_text'
+            'auto_close_text',
+            'isFiveRatingScale'
         ))
     )
     AND id IN (
-        SELECT max(id) 
-        FROM configuration 
+        SELECT max(id)
+        FROM configuration
         WHERE ("domain" = :domainUUID::UUID OR "domain" IS NULL)
           AND key IN (
             'widgetProactiveSeconds',
@@ -44,7 +44,6 @@ WITH configuration_values AS (
             'feedbackQuestion',
             'feedbackNoticeActive',
             'feedbackNotice',
-            'isFiveRatingScale',
             'instantly_open_chat_widget',
             'show_sub_title',
             'sub_title',
@@ -52,9 +51,10 @@ WITH configuration_values AS (
             'show_idle_warning',
             'idle_message',
             'show_auto_close_text',
-            'auto_close_text'
+            'auto_close_text',
+            'isFiveRatingScale'
         )
-        GROUP BY key
+        GROUP BY key, "domain"
     )
     AND NOT deleted
 )
