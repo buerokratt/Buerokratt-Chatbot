@@ -5,7 +5,8 @@ rating_config AS (
     SELECT value AS is_five_rating_scale
     FROM configuration
     WHERE key = 'isFiveRatingScale'
-      AND id IN (SELECT max(id) FROM configuration WHERE key = 'isFiveRatingScale' GROUP BY key)
+      AND "domain" IS NULL
+      AND id IN (SELECT max(id) FROM configuration WHERE key = 'isFiveRatingScale' AND "domain" IS NULL)
       AND NOT deleted
 )
 INSERT INTO chat(base_id, customer_support_id, customer_support_display_name, end_user_id, end_user_first_name,
