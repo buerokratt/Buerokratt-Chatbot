@@ -47,7 +47,7 @@ check_cookie_info_response:
   switch:
     - condition: ${200 <= info_res.response.statusCodeValue && info_res.response.statusCodeValue < 300}
       next: assign_role
-  next: return_bad_request
+  next: return_could_not_fetch_user_info
 
 assign_role:
   assign:
@@ -181,16 +181,16 @@ return_result:
   next: end
 
 return_chat_ended:
-  return: "Vestlus on lõppenud"
+  return: "chat_has_ended"
   status: 400
   next: end  
 
 return_claimed_by_another_agent:
-  return: "Vestlus on juba teise nõustaja poolt üle võetud."
+  return: "claimed_by_another_agent"
   status: 400
-  next: end  
+  next: end
 
-return_bad_request:
-  return: "Kasutaja info hankimine ebaõnnestus"
+return_could_not_fetch_user_info:
+  return: "could_not_fetch_user_info"
   status: 400
   next: end

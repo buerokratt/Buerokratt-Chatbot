@@ -137,6 +137,6 @@ return_result:
   next: end
 
 return_chat_found:
-  return: "Chat Not Found"
+  return: "chat_not_found"
   status: 400
   next: end  

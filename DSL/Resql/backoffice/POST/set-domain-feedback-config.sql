@@ -18,20 +18,17 @@ WHERE key IN (
 ORDER BY key, domain, created DESC
     ),
     new_configuration AS (
-SELECT
-    v.key,
-    v.value,
-    d.domain,
-    :created::timestamptz AS created
+SELECT v.key, v.value, d.domain, :created::timestamptz AS created
 FROM domain_list d
-    CROSS JOIN LATERAL (
+CROSS JOIN LATERAL (
     VALUES
     ('feedbackActive', :feedbackActive),
     ('feedbackQuestion', :feedbackQuestion),
     ('feedbackNoticeActive', :feedbackNoticeActive),
-    ('feedbackNotice', :feedbackNotice),
-    ('isFiveRatingScale', :isFiveRatingScale)
-    ) AS v(key, value)
+    ('feedbackNotice', :feedbackNotice)
+) AS v(key, value)
+UNION ALL
+SELECT 'isFiveRatingScale'::text, :isFiveRatingScale::text, NULL::uuid, :created::timestamptz
     )
 INSERT INTO configuration (key, value, domain, created)
 SELECT

@@ -157,11 +157,11 @@ return_result:
   next: end
 
 return_not_exists:
-  return: "error: user does not exist"
+  return: "user_not_found"
   status: 400
   next: end
 
 return_unauthorized:
   status: 401
-  return: "error: unauthorized"
+  return: "unauthorized"
   next: end

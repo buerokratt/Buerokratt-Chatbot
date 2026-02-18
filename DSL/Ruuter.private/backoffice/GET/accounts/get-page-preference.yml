@@ -41,5 +41,5 @@ returnSuccess:
   next: end
 
 return_not_found:
-  return: "error: not found"
+  return: "not_found"
   next: end

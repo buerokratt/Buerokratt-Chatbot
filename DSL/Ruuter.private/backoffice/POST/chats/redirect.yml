@@ -170,11 +170,11 @@ return_result:
   next: end
 
 return_csa_is_offline:
-  return: "Customer support is offline"
+  return: "csa_is_offline"
   status: 400
   next: end       
 
 return_chat_ended:
-  return: "Chat Has Ended"
+  return: "chat_has_ended"
   status: 400
   next: end
