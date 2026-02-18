@@ -161,7 +161,7 @@ get_domain_organization_working_details:
       holidays: ${holidays}
       holiday_names: ${holidayNames}
       current_timestamp: ${new Date().toISOString()}
-      domain: ${domainUuid.response.body[0].domainId}
+      domainUUID: ${domainUuid.response.body[0].domainId}
   result: org_res
   next: assign_organization_details
 
