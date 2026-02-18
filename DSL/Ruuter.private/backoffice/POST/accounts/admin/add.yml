@@ -141,6 +141,6 @@ return_result:
   next: end
 
 return_exists:
-  return: "error: user already exists"
+  return: "user_already_exists"
   status: 400
   next: end

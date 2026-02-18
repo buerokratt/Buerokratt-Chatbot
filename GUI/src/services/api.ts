@@ -47,7 +47,9 @@ const AxiosInterceptor = ({ children }) => {
 
       let message = t('global.notificationErrorMsg');
 
-      return Promise.reject(new Error(message));
+      return Promise.reject(
+        new Error(t(`errors.${error.response?.data?.response}`, { defaultValue: message }) ?? message),
+      );
     };
 
     const apiInterceptor = api.interceptors.response.use(resInterceptor, errInterceptor);
