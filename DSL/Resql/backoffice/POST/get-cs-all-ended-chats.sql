@@ -207,12 +207,12 @@ SELECT
     ContactsMessage.content AS contacts_message,
     m.updated AS last_message_timestamp,
     c.feedback_text,
+    COALESCE(c.feedback_rating_five, c.feedback_rating) AS feedback_rating,
     CASE 
-        WHEN (SELECT COALESCE(is_five_rating_scale, 'false') = 'true' FROM rating_config) 
-        THEN c.feedback_rating_five
-        ELSE c.feedback_rating
-    END AS feedback_rating,
-    is_five_rating_scale,
+        WHEN c.feedback_rating_five IS NOT NULL THEN 'true'
+        WHEN c.feedback_rating IS NOT NULL THEN 'false'
+        ELSE NULL
+    END AS is_five_rating_scale,
     c.test as isTest,
     nps,
     CSAFullNames.all_csa_names AS all_csa,
@@ -228,7 +228,6 @@ LEFT JOIN ContactsMessage ON ContactsMessage.chat_base_id = c.base_id
 LEFT JOIN CSAFullNames ON CSAFullNames.base_id = c.base_id
 CROSS JOIN TitleVisibility
 CROSS JOIN NPS
-CROSS JOIN rating_config rc
 WHERE (
     (
         COALESCE(:customerSupportIds, '') = ''
@@ -298,20 +297,8 @@ ORDER BY
                 ELSE m.event
             END
     END DESC NULLS LAST,
-    CASE WHEN :sorting = 'feedbackRating desc' THEN 
-        CASE 
-            WHEN rc.is_five_rating_scale = 'true' 
-            THEN c.feedback_rating_five 
-            ELSE c.feedback_rating 
-        END 
-    END DESC NULLS LAST,
-    CASE WHEN :sorting = 'feedbackRating asc' THEN 
-        CASE 
-            WHEN rc.is_five_rating_scale = 'true' 
-            THEN c.feedback_rating_five 
-            ELSE c.feedback_rating 
-        END 
-    END ASC NULLS LAST,
+    CASE WHEN :sorting = 'feedbackRating desc' THEN COALESCE(c.feedback_rating_five, c.feedback_rating) END DESC NULLS LAST,
+    CASE WHEN :sorting = 'feedbackRating asc' THEN COALESCE(c.feedback_rating_five, c.feedback_rating) END ASC NULLS LAST,
     CASE WHEN :sorting = 'customerSupportFullName asc' THEN
         COALESCE(
             NULLIF(array_to_string(CSAFullNames.all_csa_names, ', '), ''),
