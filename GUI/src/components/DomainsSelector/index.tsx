@@ -65,7 +65,7 @@ const DomainSelector: FC<PropsWithChildren<DomainSelector>> = ({ onChange }) => 
         <div className="multiSelect_wrapper">
           <FormMultiselect
             name={name}
-            label={t("multiDomains.selectDomains")}
+            label={t('multiDomains.selectDomains')}
             key={renderVersion}
             mode={'static'}
             required={false}
