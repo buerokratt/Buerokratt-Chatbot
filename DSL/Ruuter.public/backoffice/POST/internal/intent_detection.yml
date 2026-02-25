@@ -156,7 +156,7 @@ check_if_anonymize_before_llm:
   switch:
     - condition: ${anonymizer_configs.isAnonymizationBeforeLlm === 'true'}
       next: prepareAnonymizerConfig
-  next: trigger_ai_stream
+  next: detect_intent
 
 prepareAnonymizerConfig:
   call: http.post
