@@ -117,7 +117,7 @@ postChat:
       endUserLastName: ${chat.endUserLastName}
       status: "ENDED"
       created: ${chat.created}
-      ended: ${new Date().toISOString()}
+      ended: ${chat.ended ?? new Date().toISOString()}
       feedbackRating: ${chat.feedbackRating ?? ""}
       feedbackText: ${chat.feedbackText ?? ""}
       endUserEmail: ${chat.endUserEmail}
