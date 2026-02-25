@@ -37,7 +37,7 @@ assign_data:
     isCommon: ${incoming.body.isCommon}
     serviceMethod: ${incoming.body.ruuterType}
     serviceName: ${incoming.body.serviceName}
-    servicePath: "${'/services/active' + serviceName}"
+    servicePath: "${'/services/active/' + serviceName}"
     serviceInput: ${incoming.body.entities}
     baseUrl: "${isCommon === true ? '[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]' : '[#CHATBOT_RUUTER_PUBLIC_INTERNAL_SERVICE]'}"
 
