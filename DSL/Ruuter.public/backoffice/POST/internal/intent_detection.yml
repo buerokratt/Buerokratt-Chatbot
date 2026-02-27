@@ -96,7 +96,7 @@ prepare_messages:
     headers:
       type: json
     body:
-      prompt_message: "${system_message} The current date is ${currentDate}"
+      prompt_message: ${system_message}
       new_message: ${message}
   result: prepare_messages_res
 
