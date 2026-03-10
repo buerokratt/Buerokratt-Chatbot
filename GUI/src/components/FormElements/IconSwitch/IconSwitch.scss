@@ -1,0 +1,153 @@
+@import 'src/styles/tools/spacing';
+@import 'src/styles/tools/color';
+@import 'src/styles/settings/variables/other';
+@import 'src/styles/settings/variables/typography';
+
+.icon-switch {
+  $self: &;
+  display: flex;
+  align-items: center;
+  gap: get-spacing(paldiski);
+
+  &__label {
+    flex: 0 0 185px;
+    font-size: $veera-font-size-100;
+    line-height: 24px;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  &__button {
+    position: relative;
+    width: 44px;
+    height: 26px;
+    border-radius: 13px;
+    background-color: get-color(white);
+    border: 1px solid get-color(black-coral-2);
+    padding: 0;
+    cursor: pointer;
+    transition:
+      background-color 0.25s ease-out,
+      border-color 0.25s ease-out;
+
+    &[aria-checked='true'] {
+      background-color: get-color(sapphire-blue-10);
+      border-color: get-color(sapphire-blue-10);
+
+      #{$self} {
+        &__thumb {
+          transform: translate(16px, -50%);
+          background-color: get-color(white);
+        }
+
+        &__off-icon {
+          opacity: 0;
+        }
+
+        &__on-icon {
+          opacity: 1;
+          color: get-color(sapphire-blue-10);
+        }
+
+        &__checkmark {
+          opacity: 1;
+          color: get-color(sapphire-blue-10);
+        }
+      }
+    }
+
+    &:not([aria-checked='true']) {
+      #{$self} {
+        &__off-icon {
+          opacity: 1;
+        }
+
+        &__on-icon {
+          opacity: 0;
+        }
+      }
+    }
+
+    &[aria-disabled='true'] {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    &:focus-visible {
+      outline: 2px solid get-color(sapphire-blue-10);
+      outline-offset: 2px;
+    }
+  }
+
+  &__thumb {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: get-color(black-coral-6);
+    top: 50%;
+    left: 4px;
+    transform: translateY(-50%);
+    transition:
+      transform 0.25s ease-out,
+      background-color 0.25s ease-out;
+    pointer-events: none;
+
+    > * {
+      opacity: 0;
+      transition: opacity 0.25s ease-out;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 12px;
+      height: 12px;
+      flex-shrink: 0;
+    }
+
+    > svg {
+      width: 12px;
+      height: 12px;
+    }
+  }
+
+  &__off-icon,
+  &__on-icon {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 12px;
+    height: 12px;
+    transition: opacity 0.25s ease-out;
+
+    > * {
+      width: 12px;
+      height: 12px;
+    }
+
+    > svg {
+      width: 12px;
+      height: 12px;
+    }
+  }
+
+  &__off-icon {
+    opacity: 1;
+    color: get-color(black-coral-12);
+  }
+
+  &__on-icon {
+    opacity: 0;
+  }
+
+  &__checkmark {
+    opacity: 0;
+    width: 12px;
+    height: 12px;
+    transition: opacity 0.25s ease-out;
+    color: get-color(sapphire-blue-10);
+  }
+}

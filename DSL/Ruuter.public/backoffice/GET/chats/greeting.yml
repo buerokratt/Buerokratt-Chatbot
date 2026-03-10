@@ -1,0 +1,56 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'GREETING'"
+  method: get
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    params:
+      - field: domain
+        type: string
+        description: "Body field 'domain'"
+
+assignValues:
+  assign:
+    domain: ${incoming.params.domain}
+
+checkForDomain:
+  switch:
+    - condition: ${domain === 'none'}
+      next: getGreetingMessage
+  next: getDomainUUID
+
+getDomainUUID:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-uuid"
+    body:
+      domainUrl: ${domain + '%'}
+  result: domainUuid
+  next: validate_domain_res
+
+validate_domain_res:
+  switch:
+    - condition: ${domainUuid.response.body.length > 0}
+      next: getDomainGreetingMessage
+  next: getGreetingMessage
+
+getDomainGreetingMessage:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-greeting-message"
+    body:
+      domainUUID: ${domainUuid.response.body[0].domainId}
+  result: res
+  next: return_result
+
+getGreetingMessage:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-greeting-message"
+  result: res
+
+return_result:
+  return: ${res.response.body[0]}

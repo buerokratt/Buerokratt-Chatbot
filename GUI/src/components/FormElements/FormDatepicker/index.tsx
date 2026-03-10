@@ -1,16 +1,10 @@
+import clsx from 'clsx';
+import { Icon } from 'components';
+import { et } from 'date-fns/locale';
 import { forwardRef, useId } from 'react';
 import ReactDatePicker, { registerLocale } from 'react-datepicker';
-import clsx from 'clsx';
-import { et } from 'date-fns/locale';
 import { ControllerRenderProps } from 'react-hook-form';
-import {
-  MdChevronRight,
-  MdChevronLeft,
-  MdOutlineToday,
-  MdOutlineSchedule,
-} from 'react-icons/md';
-
-import { Icon } from 'components';
+import { MdChevronLeft, MdChevronRight, MdOutlineSchedule, MdOutlineToday } from 'react-icons/md';
 import 'react-datepicker/dist/react-datepicker.css';
 import './FormDatepicker.scss';
 
@@ -21,6 +15,8 @@ type FormDatepickerProps = ControllerRenderProps & {
   name: string;
   hideLabel?: boolean;
   disabled?: boolean;
+  minTime?: Date;
+  maxTime?: Date;
   placeholder?: string;
   timePicker?: boolean;
   direction?: 'row' | 'column';
@@ -28,25 +24,30 @@ type FormDatepickerProps = ControllerRenderProps & {
 
 const FormDatepicker = forwardRef<any, FormDatepickerProps>(
   (
-    {
-      label,
-      name,
-      hideLabel,
-      disabled,
-      placeholder,
-      timePicker,
-      direction = 'column',
-      ...rest
-    },
-    ref
+    { label, name, hideLabel, maxTime, minTime, disabled, placeholder, timePicker, direction = 'column', ...rest },
+    ref,
   ) => {
     const id = useId();
     const { value, onChange } = rest;
 
-    const datepickerClasses = clsx(
-      'datepicker',
-      disabled && 'datepicker--disabled'
-    );
+    const datepickerClasses = clsx('datepicker', disabled && 'datepicker--disabled');
+
+    const validMinTime = minTime ? new Date(minTime) : new Date().setHours(0, 0, 0);
+    const validMaxTime = maxTime ? new Date(maxTime) : new Date().setHours(23, 45, 0);
+
+    const handleChange = (date: Date) => {
+      if (timePicker) {
+        if (date < validMinTime) {
+          onChange(validMinTime);
+        } else if (date > validMaxTime) {
+          onChange(validMaxTime);
+        } else {
+          onChange(date);
+        }
+      } else {
+        onChange(date);
+      }
+    };
 
     return (
       <div className={datepickerClasses}>
@@ -55,13 +56,7 @@ const FormDatepicker = forwardRef<any, FormDatepickerProps>(
             {label}
           </label>
         )}
-        <div
-          className={
-            direction === 'column'
-              ? 'datepicker__wrapper_column'
-              : 'datepicker__wrapper_row'
-          }
-        >
+        <div className={direction === 'column' ? 'datepicker__wrapper_column' : 'datepicker__wrapper_row'}>
           <ReactDatePicker
             selected={new Date(value)}
             dateFormat={timePicker ? 'HH:mm:ss' : 'dd.MM.yyyy'}
@@ -75,9 +70,12 @@ const FormDatepicker = forwardRef<any, FormDatepickerProps>(
             timeIntervals={15}
             timeFormat="HH:mm:ss"
             timeInputLabel=""
+            minTime={validMinTime}
+            maxTime={validMaxTime}
             portalId="overlay-root"
+            disabled={disabled}
             {...rest}
-            onChange={onChange}
+            onChange={handleChange}
           />
           <Icon
             icon={
@@ -92,7 +90,7 @@ const FormDatepicker = forwardRef<any, FormDatepickerProps>(
         </div>
       </div>
     );
-  }
+  },
 );
 
 export default FormDatepicker;

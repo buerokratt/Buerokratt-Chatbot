@@ -1,0 +1,90 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'Anonymizer'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: entities
+        type: string
+        description: "Body field 'entities'"
+      - field: anonymizerSelectedApproach
+        type: string
+        description: "Body field 'anonymizerSelectedApproach'"
+      - field: anonymizerSelectedEntities
+        type: string
+        description: "Body field 'anonymizerSelectedEntities'"
+      - field: anonymizerAllowlist
+        type: string
+        description: "Body field 'anonymizerAllowlist'"
+      - field: anonymizerDenylist
+        type: string
+        description: "Body field 'anonymizerDenylist'"
+      - field: isAnonymizationBeforeLlm
+        type: boolean
+        description: "Body field 'isAnonymizationBeforeLlm'"
+      - field: isAnonymizationBeforeGlobalClassifier
+        type: boolean
+        description: "Body field 'isAnonymizationBeforeGlobalClassifier'"
+      - field: recordConversationsAnonymously
+        type: boolean
+        description: "Body field 'recordConversationsAnonymously'"
+      - field: domainUUID
+        type: object
+        description: "Body field 'domainUUID'"
+
+extractRequestData:
+  assign:
+    entities: ${incoming.body.entities}
+    anonymizer_selected_approach: ${incoming.body.anonymizerSelectedApproach}
+    anonymizer_selected_entities: ${incoming.body.anonymizerSelectedEntities}
+    anonymizer_allowlist: ${incoming.body.anonymizerAllowlist}
+    anonymizer_denylist: ${incoming.body.anonymizerDenylist}
+    is_anonymization_before_llm: ${incoming.body.isAnonymizationBeforeLlm}
+    is_anonymization_before_global_classifier: ${incoming.body.isAnonymizationBeforeGlobalClassifier}
+    record_conversations_anonymously: ${incoming.body.recordConversationsAnonymously}
+    domains: ${incoming.body.domainUUID}
+
+checkForDomains:
+  switch:
+    - condition: ${domains.length > 0}
+      next: setDomainAnonymizerConfig
+  next: setAnonymizerConfig
+
+setDomainAnonymizerConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-domain-anonymizer-config"
+    body:
+      anonymizer_selected_approach: ${anonymizer_selected_approach}
+      anonymizer_selected_entities: ${anonymizer_selected_entities}
+      anonymizer_allowlist: ${anonymizer_allowlist}
+      anonymizer_denylist: ${anonymizer_denylist}
+      is_anonymization_before_llm: ${is_anonymization_before_llm.toString()}
+      is_anonymization_before_global_classifier: ${is_anonymization_before_global_classifier.toString()}
+      record_conversations_anonymously: ${record_conversations_anonymously.toString()}
+      created: ${new Date().toISOString()}
+      domains: ${JSON.stringify(domains)}
+  result: set_domain_anonymizer_config_res
+  next: return_result
+
+setAnonymizerConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-anonymizer-config"
+    body:
+      anonymizer_selected_approach: ${anonymizer_selected_approach}
+      anonymizer_selected_entities: ${anonymizer_selected_entities}
+      anonymizer_allowlist: ${anonymizer_allowlist}
+      anonymizer_denylist: ${anonymizer_denylist}
+      is_anonymization_before_llm: ${is_anonymization_before_llm.toString()}
+      is_anonymization_before_global_classifier: ${is_anonymization_before_global_classifier.toString()}
+      record_conversations_anonymously: ${record_conversations_anonymously.toString()}
+      created: ${new Date().toISOString()}
+  result: set_anonymizer_config_res
+
+return_result:
+  return: "Anonymizer configurations changed successfully"

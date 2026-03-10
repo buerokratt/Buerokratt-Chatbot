@@ -1,5 +1,6 @@
 {
   "global": {
+    "email": "Email",
     "save": "Save",
     "add": "Add",
     "edit": "Edit",
@@ -13,6 +14,7 @@
     "search": "Search",
     "notification": "Notification",
     "notificationError": "Error",
+    "notificationErrorMsg": "An error occurred",
     "active": "Active",
     "activate": "Activate",
     "deactivate": "Deactivate",
@@ -43,13 +45,34 @@
     "today": "Today",
     "forward": "Forward",
     "chosen": "Chosen",
-    "read": "Read"
+    "read": "Read",
+    "statusClarification": "Status clarification",
+    "selectAll": "Select all",
+    "displayText": "Display message",
+    "test": "Test"
+  },
+  "files": {
+    "download_xlsx": "Download XLSX"
+  },
+  "sorting": {
+    "desc": "descending",
+    "asc": "ascending",
+    "sorting": "Sorting"
   },
   "mainMenu": {
     "menuLabel": "Main navigation",
     "closeMenu": "Close menu",
+    "openMenu": "Open menu",
     "openIcon": "Open menu icon",
     "closeIcon": "Close menu icon"
+  },
+  "multiDomains": {
+    "addNew": "Add new",
+    "title": "Multidomains",
+    "domains": "Domains",
+    "domainName": "Domain name",
+    "selectDomains": "Select Domains",
+    "noDomains": "No domains available. Please contact your system administrator."
   },
   "menu": {
     "conversations": "Conversations",
@@ -59,7 +82,7 @@
     "training": "Training",
     "themes": "Themes",
     "answers": "Answers",
-    "userStories": "User Stories",
+    "rules": "Rules",
     "configuration": "Configuration",
     "forms": "Forms",
     "slots": "Slots",
@@ -90,10 +113,15 @@
     "workingHours": "Working hours"
   },
   "chat": {
+    "userTyping": "User Typing",
+    "chatForwardedTo": "Chat forwarded to",
+    "chatEnded": "Chat ended",
     "reply": "Reply",
+    "newMessage": "New message!",
     "unansweredChats": "Unanswered chats",
     "unanswered": "Unanswered",
     "forwarded": "Forwarded",
+    "pending": "Pending",
     "endUser": "End user name",
     "endUserId": "End user id",
     "csaName": "Client support name",
@@ -113,6 +141,10 @@
     },
     "chatStatus": "Chat status",
     "changeStatus": "Change status",
+    "waiting_validation": "Waiting for validation",
+    "approved_validation": "Approved Validation",
+    "changingMessage": "Changing the message",
+    "messageEdited": "The message has been changed! {{date}}",
     "active": {
       "list": "Active chat list",
       "myChats": "My chats",
@@ -139,7 +171,9 @@
       "start": "Start",
       "service": "Service",
       "ContactedUser": "Contacted User",
-      "couldNotReachUser": "Could Not Reach User"
+      "couldNotReachUser": "Could Not Reach User",
+      "messageSendingFailed": "Message sending failed!",
+      "sendAgain": "Send again"
     },
     "history": {
       "title": "History",
@@ -154,7 +188,13 @@
       "forwarded": "Forwarded",
       "addACommentToTheConversation": "Add a comment to the conversation",
       "rating": "Rating",
-      "feedback": "Feedback"
+      "feedback": "Feedback",
+      "commentAuthor": "Commenter",
+      "commentAddedDate": "Comment added date",
+      "statusAdder": "Status adder",
+      "statusAddedDate": "Status added date",
+      "chosenCsa": "Chosen csa(s)",
+      "chosenColumn": "Chosen column(s)"
     },
     "plainEvents": {
       "answered": "Answered",
@@ -186,12 +226,19 @@
       "inactive-chat-ended": "Ended cue to inactivity",
       "contact-information-skipped": "Contact Information Skipped",
       "unavailable-contact-information-fulfilled": "Contact information provided",
-      "unavailable_organization": "Organization Unavailable",
-      "unavailable_csas": "CSA's Unavailable",
+      "unavailable_organization": "Organization is unavailable",
+      "unavailable_organization_ask_contacts": "Organization is unavailable and asked for contacts",
+      "unavailable_csas": "Advisors are not available",
+      "unavailable_csas_ask_contacts": "Advisors are not available and asked for contacts",
       "unavailable_holiday": "Holiday",
+      "unavailable_holiday_ask_contacts": "Holiday and asked for contacts",
       "message-read": "Read",
       "user-reached": "User contacted",
-      "user-not-reached": "User could not be reached"
+      "user-not-reached": "User could not be reached",
+      "user-authenticated": "{{name}} is authenticated {{date}}",
+      "ask_to_forward_to_csa": "Asked to forward the conversation to a customer service agent",
+      "forwarded_to_backoffice": "Conversation forwarded to back office",
+      "continue_chatting_with_bot": "Continue conversation with bürokratt"
     },
     "events": {
       "answered": "Answered {{date}}",
@@ -221,15 +268,63 @@
       "requested-chat-forward-accepted": "Requested chat forward accepted {{date}}",
       "requested-chat-forward-rejected": "Requested chat forward rejected {{date}}",
       "message-read": "Read",
+      "read": "Read {{ date }}",
       "contact-information-skipped": "Contact Information Skipped",
       "unavailable-contact-information-fulfilled": "Contact information provided",
-      "unavailable_organization": "Organization Unavailable",
-      "unavailable_csas": "CSA's Unavailable",
+      "unavailable_organization": "Organization is unavailable",
+      "unavailable_organization_ask_contacts": "Organization is unavailable and asked for contacts",
+      "unavailable_csas": "Advisors are not available",
+      "unavailable_csas_ask_contacts": "Advisors are not available and asked for contacts",
       "unavailable_holiday": "Holiday",
+      "unavailable_holiday_ask_contacts": "Holiday and asked for contacts",
       "pending-assigned": "{{name}} assigned to contact user",
       "user-reached": "{{name}} contacted the user",
       "user-not-reached": "{{name}} could not reach the user",
-      "user-authenticated": "{{name}} is authenticated {{date}}"
+      "user-authenticated": "{{name}} is authenticated {{date}}",
+      "taken-over": "A human took the conversation over",
+      "ask_to_forward_to_csa": "Asked to forward the conversation to a customer service agent",
+      "forwarded_to_backoffice": "Conversation forwarded to back office",
+      "continue_chatting_with_bot": "Continue conversation with bürokratt"
+    },
+    "validations": {
+      "title": "Validations",
+      "description": "Responses from the chatbot that require validation before being sent to the end user are displayed here",
+      "messageChanged": "Message changed successfully",
+      "messageApproved": "Message approved successfully",
+      "messageChangeFailed": "Message change failed",
+      "confirmAnswer": "Confirm Answer",
+      "header": {
+        "id": "Id",
+        "chatId": "Chat Id",
+        "message": "Message",
+        "requestedAt": "Requested At",
+        "approve": "Approve"
+      }
+    }
+  },
+  "deleteConversation": {
+    "deletionTime": "Deletion time",
+    "deletionAnonNote": "Defines the time after which anonymous messages are automatically deleted.",
+    "deletionAuthNote": "Defines the time after which authenticated messages are automatically deleted.",
+    "conversationDeleting": "Conversation deletion",
+    "generateCsv": "Generate CSV",
+    "periodConversations": "Conversations in period",
+    "expiringConversationsRules": "Automatic expiration and deletion rules",
+    "showExpiring": "Show expiring conversations",
+    "authConversationsRemoval": "Authenticated conversations removal",
+    "anonymConversationsDelete": "Anonymous conversations removal",
+    "period": "Period",
+    "days": "days",
+    "oneDay": "1 day",
+    "sevenDays": "7 days",
+    "thirtyOneDay": "31 day",
+    "ninetyDays": "90 days",
+    "tooltip": {
+      "removeAuth": "Select \"Yes\" if you want authenticated conversations to be deleted. The period selection will open automatically. Select \"No\" if you do not want the conversations to be deleted.",
+      "removeAnon": "Select \"Yes\" if you want anonymous conversations to be deleted. The period selection will open automatically. Select \"No\" if you do not want the conversations to be deleted.",
+      "days": "Set the time by the number of days",
+      "removalTime": "Time setting that specifies the exact hour on the final day when the conversation will be deleted.\n",
+      "displayExpiringConversations": "Select a time period to see which conversations are scheduled for deletion in the near future.\n"
     }
   },
   "roles": {
@@ -242,6 +337,10 @@
   },
   "settings": {
     "title": "Settings",
+    "autoClose": "Close chat automatically",
+    "idleWarningText": "Idle warning message",
+    "showAutoCloseText": "Show end message",
+    "autoCloseText": "End message",
     "users": {
       "title": "Users",
       "name": "Name",
@@ -250,6 +349,12 @@
       "displayName": "Display Name",
       "userTitle": "User title",
       "email": "E-mail",
+      "department": "Department",
+      "connectedToJira": "Connected to Jira",
+      "jiraAccountName": "Jira account name",
+      "connectToSmax": "Connect to Smax",
+      "connectedToSmax": "Connected to Smax",
+      "disconnectFromSmax": "Disconnect from Smax",
       "addUser": "Add user",
       "editUser": "Edit user",
       "deleteUser": "Delete user",
@@ -260,26 +365,59 @@
       "soundNotifications": "Sound notifications",
       "popupNotifications": "Popup notifications",
       "newUnansweredChat": "New unanswered chat",
+      "newForwardedChatTitle": "Forwarded chat",
+      "newForwardedChatMessage": "You have new forwarded chat!",
       "newForwardedChat": "New forwarded chat",
+      "newValidationMessage": "New message to validate",
       "useAutocorrect": "Text auto corrector",
       "required": "Required",
       "invalidemail": "Invalid email",
       "invalidIdCode": "Invalid Id Code",
       "idCodePlaceholder": "The personal identification number must start with a country prefix, (eg.EE12345678910)",
       "choose": "Choose",
-      "userExists": "User Exists"
+      "userExists": "User Exists",
+      "userChangeStatusMessage": "Do you want to change the user status to away?",
+      "statusCommentUpdated": "Status clarification updated"
     },
     "chat": {
       "chatActive": "Chatbot active",
+      "burokrattActive": "Bürokratt active",
       "showSupportName": "Show support name",
-      "showSupportTitle": "Show support title"
+      "showSupportTitle": "Show support title",
+      "editActiveChat": "Editing active chats",
+      "instantlyOpenChatWidget": "Instantly open chat widget",
+      "showSubTitle": "Show chat window subtitle",
+      "subTitle": "Chat window subtitle",
+      "showBurokrattConfirmation": "Do you want to make Bürokrat visible on the website?",
+      "hideBurokrattConfirmation": "Do you want to hide Bürokrat on the website?",
+      "tooltip": {
+        "isBotActive": "If on is selected, Bürokratt will automatically respond to the client using an AI-based conversational solution (depending on the technical setup, either LLM, RAG, or RASA solution). If off is selected, the conversation will be automatically forwarded to an advisor.",
+        "isBurokrattActive": "If on is selected, Bürokratt will be visible on the website. If off is selected, Bürokratt will be hidden from the website.",
+        "instantlyOpenChatWidget": "If on is selected, the chat window will open automatically when the user lands on the website. If off is selected, Bürokratt will be minimized and the user must open the chat window themselves. This setting works only in the desktop view and does not apply to the mobile view!",
+        "isCsaNameVisible": "If the setting is enabled, the advisor's name is displayed on the left side of the chat window above the chat participant's picture . If the setting is disabled, the name will not be shown.",
+        "isCsaTitleVisible": "If the setting is enabled, the advisor's title will be displayed in the chat window. If the setting is disabled, the advisor's title will not be displayed.",
+        "isEditChatVisible": "If on is selected, only the advisor is able to edit their most recently sent response. If off is selected, the advisor cannot modify their last message after it has been sent.",
+        "showSubTitle": "By selecting Yes, in addition to the Bürokrati title, a subtitle will also be displayed in the chat window. The settings for the subtitle text can be found below. By selecting No, the subtitle will not be shown, but the Bürokrati title will still remain visible.",
+        "subTitle": "Enter the subtitle text here."
+      }
     },
     "emergencyNotices": {
       "title": "Emergency notices",
       "noticeActive": "Notice active",
       "notice": "Notice",
       "displayPeriod": "Display period",
-      "noticeChanged": "Emergency notice settings changed successfully"
+      "noticeChanged": "Emergency notice settings changed successfully",
+      "endDateError": "End date must be greater than start date"
+    },
+    "feedback": {
+      "title": "Feedback",
+      "feedbackActive": "Feedback active",
+      "feedbackQuestion": "Feedback question",
+      "noticeActive": "Notice active",
+      "notice": "Notice",
+      "feedbackScale": "Feedback scale:",
+      "tenPoints": "10 points",
+      "fivePoints": "5 points"
     },
     "appearance": {
       "title": "Appearance and behavior",
@@ -294,7 +432,7 @@
       "description": "After the end of the working hours, if the chatbot cannot answer the customer's questions by itself, it will ask for the customer's contact details.",
       "openFrom": "Open from",
       "openUntil": "Open until",
-      "publicHolidays": "Consider public holidays",
+      "publicHolidays": "Available on national holidays",
       "consider": "Consider",
       "dontConsider": "Don't Consider",
       "closedOnWeekends": "Closed on weekends",
@@ -303,7 +441,28 @@
       "closed": "Closed",
       "until": "Until",
       "allWeekdaysExceptWeekend": "M-F",
-      "allWeekdays": "M-S"
+      "allWeekdays": "M-S",
+      "availableAllTime": "Working hours are 24/7",
+      "showIfCSAIsNotAvailable": "Send a notification of absence to the client. Will we ask the clients contact information?",
+      "noCsaAvailableMessage": "Notification of the absence of a customer service representative",
+      "showIfOrganizationIsOutsideWorkingHours": "Send a notification of outside office hours to the client. Will we ask the clients contact information?",
+      "outsideWorkingHoursMessage": "Outside working hours message",
+      "botCannotAnswerMessage": "Notification if Bürokratt cannot answer",
+      "redirectIfBotCannotAnswerMessage": "Notification before redirecting, if Bürokratt cannot answer",
+      "organizationUseCSA": "Use customer service",
+      "tooltip": {
+        "useCsa": "Select \"Yes\" if employees can take chat messages, this option will open up the working hours settings. In case Bürokratt does not know how to answer, the conversation will be redirected to customer service. If there are no employees, select \"No\". This will hide the additional settings as there is no need to set working hours. In case Bürokratt does not know how to answer, a notification message will be sent but the conversation will not be redirected.",
+        "work24/7": "Select \"Yes\" if employees are available 24/7, even during public holidays. Select \"No\" if time periods need to be customized depending on your organization's working hours.",
+        "workingHolidays": "By selecting \"Yes\" a holiday is taken as a working day and working hours apply the same way as they are intended on a regular working day. By selecting \"No\" and the holiday is on a working day then the holiday is set as an out-of-office day. The outside working hours message is sent and the chat will not be redirected.",
+        "workingWeekends": "Select \"Yes\" if there are no working hours on weekends. Select \"No\" if there are working hours on weekends. Keep in mind to select \"No\" even if working hours are scheduled for only one weekend day.",
+        "workingSameEachDay": "Select \"Yes\" if the working hours are the same on all weekdays. Select \"No\" if the hours differ. For example, select \"No\" when Monday to Friday have the same hours, but Saturday is different. This setting also considers the previously configured \"Closed on weekends\" option, if weekends are not part of the working hours, only Monday to Friday will be shown.",
+        "sendCsa": "By selecting \"Yes\", the customer will see an outside working hours notification message and additional fields such as \"email address\", \"phone number\", and \"describe your question\" can be filled in. The content of the notification is defined in the \"Outside working hours message\" field. When selecting \"No\", only the outside working hours message is sent as a chat message and no contact information is requested.",
+        "outOfWorkingHoursText": "Text displayed to the customer during out-of-office hours. We recommend taking previous settings into account. For example, if contact detail collection is enabled, this should be reflected in the message, such as: \"It is currently outside of our working hours, you may leave your contact details so we can get back to you later.\"",
+        "csaOutOfReach": "By selecting \"Yes\", the customer will see a notification message and additional fields such as \"email address\", \"phone number\", and \"describe your question\". The content of the notification is defined in the \"notification of the absence of a customer service represetative\" field. When selecting \"No\", no contact information is requested and the absence message is sent as a chat message.",
+        "allCsaAway": "Text displayed to the customer when all the employees are away or busy. We recommend taking previous settings into account. For example, if contact detail collection is enabled, this should be reflected in the message, such as: \"Currently all our represtatives are busy, you may leave your contact details so we can get back to you later.\"",
+        "bykCouldNotRespond": "Text displayed when Bürokratt is unable to provide an answer when customer service is not used.",
+        "redirectIfBykCouldNotRespond": "Text that is displayed when Bürokratt is unable to provide an answer but customer service is used. In addition, when showing this message, a chat redirection option is offered to the customer."
+      }
     },
     "userSession": {
       "title": "User session",
@@ -313,7 +472,14 @@
       "minutes": "Minutes",
       "sessionChanged": "Session length changed successfully",
       "emptySession": "Session length can't be empty",
-      "invalidSession": "Session length must be between 30 and 480 minuites"
+      "invalidSession": "Session length must be between 30 and 480 minutes"
+    },
+    "chatDuration": {
+      "description": "When the time expires, the conversation will end automatically.",
+      "duration": "Time for user to respond",
+      "minutes": "minutes",
+      "rule": "Session length is allowed between 5 min - 480 min (8h)",
+      "invalidSession": "Conversation timeout duration must be between 5 and 480 minutes"
     },
     "greeting": {
       "title": "Greeting message"
@@ -335,6 +501,97 @@
       "greetingActive": "Greeting Active",
       "messageChanged": "Welcome message changed successfully",
       "emptyMessage": "Welcome message can't be empty"
+    },
+    "sessionLength": {
+      "tooltip": {
+        "sessionLength": "This field defines how long a back-office user can remain inactive before being automatically logged out. The setting applies only to back office users.",
+        "idleTimout": "Specifies the time after which the user is considered inactive and the chat closing flow is triggered.",
+        "showIdleMessage": "Before ending the chat, a warning message can be sent to an inactive user. If \"Yes\" is selected, the warning message will be displayed in the chat shortly before the chat is closed. If \"No\" is selected, the message will not be sent.",
+        "idleMessageText": "Before ending the chat, a warning message is sent to the inactive user. Only one option \"Continue\" is displayed below the message, clicking it will allow the user to continue chatting.",
+        "showEndMessage": "When ending the chat, the last sentence from Bürokratt will be visible in the chat window. If \"Yes\" is selected, Bürokratt's closing message will be displayed as the final line in the chat. If \"No\" is selected, the message will not be shown and the chat window will be automatically minimized for the user. End user will see the message for one minute and then the end message settings will be applied.",
+        "endMessageText": "The chat is ended from the user's perspective while keeping the chat window open. The user will see this Bürokratt's message as the final sentence in the chat widget."
+      }
+    },
+    "skmConfiguration": {
+      "title": "SKM Configuration",
+      "description": "Here it is possible to set SKM parameters.",
+      "range": "Strictness",
+      "documents": "Found Documents",
+      "systemMessage": "System Instruction",
+      "maxTokens": "Maximum Number Of Tokens",
+      "indexName": "Index",
+      "queryType": "Search Type",
+      "semantic": "Semantic",
+      "vector": "Vector",
+      "simple": "Keyword",
+      "vectorSimpleHybrid": "Hybrid (keyword + vector)",
+      "vectorSemanticHybrid": "Hybrid + Semantic",
+      "semanticConfiguration": "Semantic Configuration",
+      "inScope": "Limit bot responses to your data",
+      "tooltip": {
+        "range": "Range defines the threshold at which documents are considered relevant to your queries. Increasing the stringency means a higher relevance threshold and filtering out more less relevant documents. However, a very high stringency may cause answers to fail to be generated because there are too few documents available. The default severity level is 3.Possible values: 1 - 5",
+        "documents": "This determines the number of highest-scoring documents to use to build answers from your data index. It's worth increasing this value if you have short documents or want to provide more context. The default value is 5.Possible values: 1 - 20",
+        "systemMessage": "Give the model instructions and context about how it should behave.",
+        "maxTokens": "Set a limit on the number of tokens used in a model response.Possible values: 1 - 2000",
+        "indexName": "The name of the index created in Azure.",
+        "queryType": "Choose a search type.",
+        "semanticConfiguration": "Semantic configuration of an index created in Azure",
+        "inScope": "When the search service returns 0 chunks from the data, the user query is not sent on to the LLM (when 'Yes' is selected) and a predefined response is sent to the user straight from the search service"
+      },
+      "validation": {
+        "range": "Range must be between 1 and 5",
+        "documents": "Documents must be between 1 and 20",
+        "maxTokens": "Maxmimum number of tokens must be between 1 and 2000",
+        "systemMessage": "System message can't be empty"
+      }
+    },
+    "anonymizer": {
+      "settingsTitle": "Anonymizer Settings",
+      "approach": "Anonymization approach",
+      "approachOptionsPlaceholder": "- Select option -",
+      "entities": "Entities to anonymize",
+      "entitiesDescription": "Select the types of entities you want to anonymize in the conversations with the user.",
+      "allowList": "Add words to the allowlist",
+      "allowListDescription": "Allowlist contains words that should not be anonymized",
+      "allowListPlaceholder": "Enter a word and press Enter to add to the allowlist",
+      "denyList": "Add words to the denylist",
+      "denyListDescription": "Denylist contains words that should be anonymized",
+      "denyListPlaceholder": "Enter a word and press Enter to add to the denylist",
+      "anonymizationBeforeLLM": "Anonymization before LLM",
+      "anonymizationBeforeGlobalClassifier": "Anonymization before Global classifier",
+      "recordConversationsAnonymously": "Record conversations anonymously",
+      "saveSettings": "Save Settings",
+      "testingTitle": "Anonymizer Testing",
+      "testingDescription": "To test your anonymizer configuration, enter the input text and press \"Anonymize\"",
+      "inputText": "Input text",
+      "inputTextPlaceholder": "Enter text to be anonymized",
+      "clear": "Clear",
+      "anonymize": "Anonymize",
+      "outputText": "Output text de-identified",
+      "outputTextPlaceholder": "Anonymized text will appear here",
+      "savedSettingsSuccessfully": "Anonymizer settings saved successfully",
+      "textAnonymized": "Text anonymized successfully",
+      "entitiesList": {
+        "car_number": "CAR_NUMBER",
+        "url": "URL",
+        "phone_number": "PHONE_NUMBER",
+        "medical_license": "MEDICAL_LICENSE",
+        "ip_address": "IP_ADDRESS",
+        "organization": "ORGANIZATION",
+        "iban_code": "IBAN_CODE",
+        "email_address": "EMAIL_ADDRESS",
+        "location": "LOCATION",
+        "date_time": "DATE_TIME",
+        "est_id_doc": "EST_ID_DOC",
+        "ee_personal_code": "EE_PERSONAL_CODE",
+        "credit_card": "CREDIT_CARD",
+        "person": "PERSON",
+        "gpe": "GPE",
+        "crypto": "CRYPTO"
+      },
+      "tooltip": {
+        "recordConversationsAnonymously": "When enabled, all messages are anonymized before being saved. Users will see only anonymized messages during the conversation and in chat history. Original messages are not stored or retrievable."
+      }
     }
   },
   "monitoring": {
@@ -345,6 +602,7 @@
     }
   },
   "toast": {
+    "copied": "Copied to clipboard",
     "success": {
       "updateSuccess": "Updated Successfully",
       "messageToUserEmail": "Message sent to user email",
@@ -355,5 +613,26 @@
       "newUserAdded": "New user added",
       "userUpdated": "User updated"
     }
+  },
+  "notification": {
+    "title": "Bürokratt",
+    "newMessage": "New message."
+  },
+  "landing": {
+    "title": "Welcome to Bürokratt"
+  },
+  "errors": {
+    "claimed_by_another_agent": "This chat has already been claimed by another agent.",
+    "chat_has_ended": "This chat has already ended.",
+    "could_not_fetch_user_info": "Could not fetch user info.",
+    "message_editing_not_allowed": "Message editing is not allowed.",
+    "chat_not_found": "Chat not found.",
+    "bad_request": "Bad request.",
+    "not_found": "Not found.",
+    "user_not_found": "User not found.",
+    "user_already_exists": "User already exists.",
+    "jira_user_not_found": "Jira user not found.",
+    "unauthorized": "Unauthorized.",
+    "csa_is_offline": "Customer support is offline"
   }
 }

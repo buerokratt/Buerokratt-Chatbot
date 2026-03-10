@@ -1,44 +1,32 @@
-import { forwardRef, useId } from 'react';
 import * as RadixSwitch from '@radix-ui/react-switch';
-import { useTranslation } from 'react-i18next';
+import { forwardRef, ReactNode, useId } from 'react';
 import { ControllerRenderProps } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import './Switch.scss';
 
 type SwitchProps = Partial<ControllerRenderProps> & {
-  onLabel?: string;
-  offLabel?: string;
+  onLabel?: string | React.ReactNode;
+  offLabel?: string | React.ReactNode;
   onColor?: string;
   name?: string;
-  label: string;
+  label?: string;
   checked?: boolean;
   defaultChecked?: boolean;
   hideLabel?: boolean;
   onCheckedChange?: (checked: boolean) => void;
+  tooltip?: ReactNode;
 };
 
 const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
-  (
-    {
-      onLabel,
-      offLabel,
-      onColor,
-      name,
-      label,
-      checked,
-      hideLabel,
-      onCheckedChange,
-      defaultChecked,
-    },
-    ref
-  ) => {
+  ({ onLabel, offLabel, onColor, name, label, checked, hideLabel, onCheckedChange, defaultChecked, tooltip }, ref) => {
     const id = useId();
     const { t } = useTranslation();
     const onValueLabel = onLabel || t('global.on');
     const offValueLabel = offLabel || t('global.off');
 
     return (
-      <div className="switch" style={{  [`${'--active-color'}`]: onColor }}>
+      <div className="switch" style={{ [`${'--active-color'}`]: onColor }}>
         {label && !hideLabel && (
           <label htmlFor={id} className="switch__label">
             {label}
@@ -57,9 +45,10 @@ const Switch = forwardRef<HTMLButtonElement, SwitchProps>(
           <span className="switch__on">{onValueLabel}</span>
           <span className="switch__off">{offValueLabel}</span>
         </RadixSwitch.Root>
+        {tooltip && <span className="switch__tooltip">{tooltip}</span>}
       </div>
     );
-  }
+  },
 );
 
 export default Switch;

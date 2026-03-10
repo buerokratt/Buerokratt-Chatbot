@@ -1,0 +1,62 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'IS-ACTIVE'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: isActive
+        type: string
+        description: "Body field 'isActive'"
+      - field: est
+        type: string
+        description: "Body field 'est'"
+      - field: domainUUID
+        type: object
+        description: "Body field 'domainUUID'"
+
+extractRequestData:
+  assign:
+    isActive: ${incoming.body.isActive}
+    message: ${incoming.body.est}
+    domains: ${incoming.body.domainUUID}
+
+checkForDomains:
+  switch:
+    - condition: ${domains.length > 0}
+      next: setDomainGreetingsMessage
+  next: setGreetingsMessage
+
+setDomainGreetingsMessage:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-domain-greetings-message-config"
+    body:
+      isActive: ${isActive}
+      message: ${message}
+      created: ${new Date().toISOString()}
+      domains: ${JSON.stringify(domains)}
+  result: res
+  next: return_result
+
+setGreetingsMessage:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-greetings-message-config"
+    body:
+      isActive: ${isActive}
+      message: ${message}
+      created: ${new Date().toISOString()}
+  result: res
+  next: return_result
+
+return_result:
+  return: ${res.response.body}
+  next: end
+
+returnInvalidBody:
+  return: "bad_request"
+  next: end

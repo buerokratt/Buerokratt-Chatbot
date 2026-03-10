@@ -1,0 +1,217 @@
+---
+declaration:
+  call: declare
+  version: 0.1
+  description: Description placeholder for 'BGK-BOT'
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: message
+        type: string
+        description: Body field 'message'
+      - field: sender
+        type: string
+        description: Body field 'sender'  
+      - field: domain
+        type: string
+        description: "Body field 'domain'"  
+
+extract_data:
+  assign:
+    currentDate: ${new Date().toISOString().split('T')[0]}
+    sender: ${incoming.body.sender}
+
+assignBgkConfig:
+  assign:
+    strictness: "[#BGK_STRICTNESS]"
+    max_tokens: "[#BGK_MAX_TOKENS]"
+    documents: "[#BGK_DOCUMENTS]"
+    index_name: "[#BGK_INDEX_NAME]"
+    query_type: "[#BGK_QUERY_TYPE]"
+    system_message: "[#BGK_SYSTEM_MESSAGE]"
+    search_endpoint: "[#BGK_SEARCH_ENDPOINT]"
+    chatbot_external_key: "[#BGK_CHATBOT_EXTERNAL_KEY]"
+    embedded_endpoint: "[#BGK_EMBEDDED_ENDPOINT_AZURE]"
+    chatbot_external_api_key: "[#BGK_CHATBOT_EXTERNAL_API_KEY]"
+    chatbot_external_bot_url: "[#BGK_CHATBOT_EXTERNAL_BOT_URL]"
+    semantic_configuration: "[#BGK_SEMANTIC_CONFIGURATION]"
+    in_scope: "[#BGK_IN_SCOPE]"
+    stream: "[#BGK_STREAM]"
+    use_agentic: "[#BGK_USE_AGENTIC]"
+    agent_name: "[#AZURE_AGENT_NAME]"
+    agent_type: "[#AZURE_AGENT_TYPE]"
+    domain: ${incoming.body.domain}
+    message: ${incoming.body.message ?? ''}
+
+check_if_client_bot_is_active:
+  switch:
+    - condition: ${[#BGK_ACTIVE] === true}
+      next: assign_data_sources
+  next: get_organization_base_config
+
+assign_data_sources:
+  assign:
+    data_sources:
+      - type: azure_search
+        parameters:
+          endpoint: ${search_endpoint}
+          index_name: ${index_name}
+          semantic_configuration: ${semantic_configuration}
+          query_type: ${query_type}
+          in_scope: ${in_scope.toLowerCase() === 'true'}
+          strictness: ${parseInt(strictness ?? '3')}
+          top_n_documents: ${parseInt(documents ?? '5')}
+          authentication:
+            type: api_key
+            key: ${chatbot_external_key}
+          embedding_dependency:
+            type: endpoint
+            endpoint: ${embedded_endpoint}
+            authentication:
+              type: api_key
+              key: ${chatbot_external_api_key}
+
+get_chat_messages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-llm-chat-messages"
+    body:
+      chatId: ${sender}
+  result: chat_messages_res
+
+prepare_messages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_HBS]/prepare-llm-messages"
+    headers:
+      type: json
+    body:
+      prompt_message: "${system_message} The current date is ${currentDate}"
+      messages: ${chat_messages_res.response.body}
+      new_message: ${message}
+  result: prepare_messages_res
+
+assign_messages:
+  assign:
+    messages: ${prepare_messages_res.response.body}
+
+check_if_anonymizer_is_active:
+  switch:
+    - condition: ${[#ANONYMIZER_ENABLED] === true}
+      next: checkForPassedDomain
+  next: trigger_ai_stream
+
+checkForPassedDomain:
+  switch:
+    - condition: ${domain === 'none'}
+      next: getAnonymizerConfig
+  next: getDomainUUID
+
+getDomainUUID:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-uuid"
+    body:
+      domainUrl: ${domain + '%'}
+  result: domainUuid
+  next: validate_domain_res
+
+validate_domain_res:
+  switch:
+    - condition: ${domainUuid.response.body.length > 0}
+      next: getDomainAnonymizerConfig
+  next: getAnonymizerConfig
+
+getAnonymizerConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-anonymizer-config"
+  result: anonymizer_configs_res
+  next: assignAnonymizerConfigs
+
+getDomainAnonymizerConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-anonymizer-config"
+    body:
+      domainUUID: ${domainUuid.response.body[0].domainId}
+  result: anonymizer_configs_res
+  next: assignAnonymizerConfigs
+
+assignAnonymizerConfigs:
+  assign:
+    anonymizer_configs: ${anonymizer_configs_res.response.body[0]}
+  next: check_if_anonymize_before_llm
+
+check_if_anonymize_before_llm:
+  switch:
+    - condition: ${anonymizer_configs.isAnonymizationBeforeLlm === 'true'}
+      next: prepareAnonymizerConfig
+  next: trigger_ai_stream
+
+prepareAnonymizerConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_HBS]/prepare_anonymizer_config"
+    headers:
+      type: json
+    body:
+      texts: ${messages.filter(i => i.role === 'user').map(i => i.content)}
+      approach: ${anonymizer_configs.anonymizerSelectedApproach}
+      entities: ${anonymizer_configs.anonymizerSelectedEntities.split(',')}
+      allowlist: ${anonymizer_configs.anonymizerAllowlist.split(',')}
+      denylist: ${anonymizer_configs.anonymizerDenylist.split(',')}
+      hash_type: "[#ANONYMIZER_HASH_TYPE]"
+  result: preparedAnonymizerConfigs
+  next: assignPreparedAnonymizerConfigs
+
+assignPreparedAnonymizerConfigs:
+  assign:
+    preparedAnonymizerConfigs: ${preparedAnonymizerConfigs.response.body}
+  next: anonymizeText
+
+anonymizeText:
+  call: http.post
+  args:
+    url: "[#CHATBOT_ANONYMIZER]/anonymize"
+    body:
+      texts: ${preparedAnonymizerConfigs.texts}
+      anonymizers: ${preparedAnonymizerConfigs.anonymizers}
+      entities: ${preparedAnonymizerConfigs.entities}
+      allowlist: ${preparedAnonymizerConfigs.allowlist}
+      denylist: ${preparedAnonymizerConfigs.denylist}
+  result: anonymize_res
+  next: assign_anonymized_messages
+
+assign_anonymized_messages:
+  assign:
+    anonymizedMessages: ${anonymize_res.response.body.results}
+    messages: "$=messages.map((m, i) => m.role === 'user' ? {...m, content: anonymizedMessages[messages.slice(0, i).filter(msg => msg.role === 'user').length].text} : m)="
+
+trigger_ai_stream:
+  call: http.post
+  args:
+    url: "[#CHATBOT_NOTIFICATIONS]/channels/${sender}/stream"
+    headers:
+      Content-Type: application/json
+    body:
+      use_agentic: ${use_agentic.toLowerCase() === 'true'}
+      agent_name: ${agent_name}
+      agent_type: ${agent_type}
+      messages: ${messages}
+      options:
+        data_sources: ${data_sources}
+        max_tokens: ${parseInt(max_tokens ?? '1000')}
+        temperature: 0
+        top_p: 1
+        stream: ${stream.toLowerCase() === 'true'}
+        frequency_penalty: 0
+        presence_penalty: 0
+  result: stream_response
+
+return_result:
+  return: "stream triggered"
+  next: end

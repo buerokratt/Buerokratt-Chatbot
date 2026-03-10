@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+
+    <changeSet id="20250120125650" author="ahmedyasser">
+        <insert tableName="configuration">
+            <column name="key" value="feedbackActive"/>
+            <column name="value" value="true"/>
+        </insert>
+        <insert tableName="configuration">
+            <column name="key" value="feedbackQuestion"/>
+            <column name="value" value="Kuidas jäite rahule antud vastuse või lahendusega?"/>
+        </insert>
+        <insert tableName="configuration">
+            <column name="key" value="feedbackNoticeActive"/>
+            <column name="value" value="true"/>
+        </insert>
+        <insert tableName="configuration">
+            <column name="key" value="feedbackNotice"/>
+            <column name="value" value="Oleme tänulikud, kui annate teada, mida saaksime edaspidi paremini teha."/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

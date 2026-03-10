@@ -1,13 +1,12 @@
-import { FC, ReactNode, SelectHTMLAttributes, useId, useState } from 'react';
-import { useSelect } from 'downshift';
 import clsx from 'clsx';
+import { Icon } from 'components';
+import { useSelect } from 'downshift';
+import { FC, ReactNode, SelectHTMLAttributes, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdArrowDropDown } from 'react-icons/md';
-
-import { Icon } from 'components';
 import './FormSelect.scss';
 
-type SelectOption = { label: string, value: string };
+type SelectOption = { label: string; value: string };
 
 type FormMultiselectProps = SelectHTMLAttributes<HTMLSelectElement> & {
   label: ReactNode;
@@ -19,30 +18,21 @@ type FormMultiselectProps = SelectHTMLAttributes<HTMLSelectElement> & {
   onSelectionChange?: (selection: SelectOption[] | null) => void;
 };
 
-const FormMultiselect: FC<FormMultiselectProps> = (
-  {
-    label,
-    hideLabel,
-    options,
-    disabled,
-    placeholder,
-    defaultValue,
-    selectedOptions,
-    onSelectionChange,
-    ...rest
-  },
-) => {
+const FormMultiselect: FC<FormMultiselectProps> = ({
+  label,
+  hideLabel,
+  options,
+  disabled,
+  placeholder,
+  defaultValue,
+  selectedOptions,
+  onSelectionChange,
+  ...rest
+}) => {
   const id = useId();
   const { t } = useTranslation();
   const [selectedItems, setSelectedItems] = useState<SelectOption[]>(selectedOptions ?? []);
-  const {
-    isOpen,
-    getToggleButtonProps,
-    getLabelProps,
-    getMenuProps,
-    highlightedIndex,
-    getItemProps,
-  } = useSelect({
+  const { isOpen, getToggleButtonProps, getLabelProps, getMenuProps, highlightedIndex, getItemProps } = useSelect({
     items: options,
     stateReducer: (state, actionAndChanges) => {
       const { changes, type } = actionAndChanges;
@@ -53,7 +43,7 @@ const FormMultiselect: FC<FormMultiselectProps> = (
           highlightedIndex: state.highlightedIndex,
         };
       } else {
-         return changes;
+        return changes;
       }
     },
     selectedItem: null,
@@ -64,10 +54,7 @@ const FormMultiselect: FC<FormMultiselectProps> = (
       const index = selectedItems.findIndex((item) => item.value === selectedItem.value);
       const items = [];
       if (index > 0) {
-        items.push(
-          ...selectedItems.slice(0, index),
-          ...selectedItems.slice(index + 1)
-        );
+        items.push(...selectedItems.slice(0, index), ...selectedItems.slice(index + 1));
       } else if (index === 0) {
         items.push(...selectedItems.slice(1));
       } else {
@@ -78,23 +65,26 @@ const FormMultiselect: FC<FormMultiselectProps> = (
     },
   });
 
-  const selectClasses = clsx(
-    'select',
-    disabled && 'select--disabled',
-  );
+  const selectClasses = clsx('select', disabled && 'select--disabled');
 
   const placeholderValue = placeholder || t('global.choose');
 
   return (
     <div className={selectClasses} style={rest.style}>
-      {label && !hideLabel && <label htmlFor={id} className='select__label' {...getLabelProps()}>{label}</label>}
-      <div className='select__wrapper'>
-        <div className='select__trigger' {...getToggleButtonProps()}>
-          {selectedItems.length > 0 ? `${t('global.chosen')} (${selectedItems.length})` : placeholderValue}
-          <Icon label='Dropdown icon' size='medium' icon={<MdArrowDropDown color='#5D6071' />} />
+      {label && !hideLabel && (
+        <label htmlFor={id} className="select__label" {...getLabelProps()}>
+          {label}
+        </label>
+      )}
+      <div className="select__wrapper">
+        <div className="select__trigger" {...getToggleButtonProps()}>
+          {selectedItems.length > 0
+            ? `${placeholder ?? t('global.chosen')} (${selectedItems.length})`
+            : placeholderValue}
+          <Icon label="Dropdown icon" size="medium" icon={<MdArrowDropDown color="#5D6071" />} />
         </div>
 
-        <ul className='select__menu' {...getMenuProps()}>
+        <ul className="select__menu" {...getMenuProps()}>
           {isOpen &&
             options.map((item, index) => (
               <li
@@ -106,7 +96,7 @@ const FormMultiselect: FC<FormMultiselectProps> = (
                 })}
               >
                 <input
-                  type='checkbox'
+                  type="checkbox"
                   checked={selectedItems.map((s) => s.value).includes(item.value)}
                   value={item.value}
                   onChange={() => null}
@@ -119,6 +109,5 @@ const FormMultiselect: FC<FormMultiselectProps> = (
     </div>
   );
 };
-
 
 export default FormMultiselect;

@@ -1,0 +1,82 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'WIDGET-CONFIG'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: isWidgetActive
+        type: string
+        description: "Body field 'isWidgetActive'"
+      - field: widgetAnimation
+        type: string
+        description: "Body field 'widgetAnimation'"
+      - field: widgetBubbleMessageText
+        type: string
+        description: "Body field 'widgetBubbleMessageText'"
+      - field: widgetColor
+        type: string
+        description: "Body field 'widgetColor'"
+      - field: widgetDisplayBubbleMessageSeconds
+        type: string
+        description: "Body field 'widgetDisplayBubbleMessageSeconds'"
+      - field: widgetProactiveSeconds
+        type: string
+        description: "Body field 'widgetProactiveSeconds'"
+      - field: domainUUID
+        type: object
+        description: "Body field 'domainUUID'"
+
+extractRequestData:
+  assign:
+    widgetAnimation: ${incoming.body.widgetAnimation}
+    widgetProactiveSeconds: ${incoming.body.widgetProactiveSeconds}
+    widgetDisplayBubbleMessageSeconds: ${incoming.body.widgetDisplayBubbleMessageSeconds}
+    widgetBubbleMessageText: ${incoming.body.widgetBubbleMessageText}
+    widgetColor: ${incoming.body.widgetColor}
+    isWidgetActive: ${incoming.body.isWidgetActive}
+    domains: ${incoming.body.domainUUID}
+
+checkForDomains:
+  switch:
+    - condition: ${domains.length > 0}
+      next: setDomainWidgetConfig
+  next: setWidgetConfig
+
+setDomainWidgetConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-domain-widget-config"
+    body:
+      widgetProactiveSeconds: ${widgetProactiveSeconds.toString()}
+      widgetDisplayBubbleMessageSeconds: ${widgetDisplayBubbleMessageSeconds.toString()}
+      widgetBubbleMessageText: ${widgetBubbleMessageText}
+      widgetColor: ${widgetColor}
+      isWidgetActive: ${isWidgetActive.toString()}
+      widgetAnimation: ${widgetAnimation}
+      created: ${new Date().toISOString()}
+      domains: ${JSON.stringify(domains)}
+  result: res
+  next: return_result
+
+setWidgetConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-widget-config"
+    body:
+      widgetProactiveSeconds: ${widgetProactiveSeconds}
+      widgetDisplayBubbleMessageSeconds: ${widgetDisplayBubbleMessageSeconds}
+      widgetBubbleMessageText: ${widgetBubbleMessageText}
+      widgetColor: ${widgetColor}
+      isWidgetActive: ${isWidgetActive}
+      widgetAnimation: ${widgetAnimation}
+      created: ${new Date().toISOString()}
+  result: res
+  next: return_result
+
+return_result:
+  return: ${res.response.body}
+  next: end

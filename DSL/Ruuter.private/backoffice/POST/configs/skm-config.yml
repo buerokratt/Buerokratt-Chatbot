@@ -1,0 +1,93 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'SKM-CONFIG'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: range
+        type: string
+        description: "Body field 'range'"
+      - field: documents
+        type: string
+        description: "Body field 'documents'"
+      - field: systemMessage
+        type: string
+        description: "Body field 'systemMessage'"
+      - field: maxTokens
+        type: string
+        description: "Body field 'maxTokens'"
+      - field: indexName
+        type: string
+        description: "Body field 'indexName'"
+      - field: queryType
+        type: string
+        description: "Body field 'queryType'"  
+      - field: semanticConfiguration
+        type: string
+        description: "Body field 'semanticConfiguration'"    
+      - field: inScope
+        type: string
+        description: "Body field 'inScope'"
+      - field: domainUUID
+        type: object
+        description: "Body field 'domainUUID'"
+
+extractRequestData:
+  assign:
+    skm_range: ${incoming.body.range}
+    skm_documents: ${incoming.body.documents}
+    skm_system_message: ${incoming.body.systemMessage}
+    skm_max_tokens: ${incoming.body.maxTokens}
+    skm_index_name: ${incoming.body.indexName}
+    skm_query_type: ${incoming.body.queryType}
+    skm_semantic_configuration: ${incoming.body.semanticConfiguration}
+    skm_in_scope: ${incoming.body.inScope}
+    domains: ${incoming.body.domainUUID}
+
+checkForDomains:
+  switch:
+    - condition: ${domains.length > 0}
+      next: setDomainSkmConfig
+  next: setSkmConfig
+
+setDomainSkmConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-domain-skm-config"
+    body:
+      skm_range: ${skm_range}
+      skm_documents: ${skm_documents}
+      skm_system_message: ${skm_system_message}
+      skm_max_tokens: ${skm_max_tokens}
+      skm_index_name: ${skm_index_name}
+      skm_query_type: ${skm_query_type}
+      skm_semantic_configuration: ${skm_semantic_configuration}
+      skm_in_scope: ${skm_in_scope}
+      created: ${new Date().toISOString()}
+      domains: ${JSON.stringify(domains)}
+  result: skm_result
+  next: return_result
+
+setSkmConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-skm-config"
+    body:
+      skm_range: ${skm_range}
+      skm_documents: ${skm_documents}
+      skm_system_message: ${skm_system_message}
+      skm_max_tokens: ${skm_max_tokens}
+      skm_index_name: ${skm_index_name}
+      skm_query_type: ${skm_query_type}
+      skm_semantic_configuration: ${skm_semantic_configuration}
+      skm_in_scope: ${skm_in_scope}
+      created: ${new Date().toISOString()}
+  result: skm_result
+  next: return_result
+
+return_result:
+  return: 'Skm configurations changed successfully'

@@ -1,0 +1,42 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'FEEDBACK'"
+  method: get
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    params:
+      - field: domain
+        type: string
+        description: "Body field 'domain'"
+
+assignValues:
+  assign:
+    domain: ${incoming.params.domain}
+
+checkForDomain:
+  switch:
+    - condition: ${domain === 'none'}
+      next: getFeedbackConfig
+  next: getDomainFeedbackConfig
+
+getDomainFeedbackConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-feedback-config"
+    body:
+      domainUUID: ${domain}
+  result: res
+  next: return_result
+
+getFeedbackConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-feedback-config"
+  result: res
+  next: return_result
+
+return_result:
+  return: ${res.response.body[0]}

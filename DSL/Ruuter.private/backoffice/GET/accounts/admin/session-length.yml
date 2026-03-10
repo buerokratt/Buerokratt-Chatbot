@@ -1,0 +1,18 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'SESSION-LENGTH'"
+  method: get
+  accepts: json
+  returns: json
+  namespace: backoffice
+
+getConfigurationValue:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-session-length-config"
+  result: res
+
+return_result:
+  return: ${res.response.body}
+  status: 200

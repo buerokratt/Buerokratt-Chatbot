@@ -1,0 +1,78 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'CUSTOMER-SUPPORT-AGENTS'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: page
+        type: number
+        description: "Body field 'page'"
+      - field: page_size
+        type: number
+        description: "Body field 'page_size'"
+      - field: search_display_name_and_csa_title
+        type: string
+        description: "Body field 'search_display_name_and_csa_title'"
+      - field: search_full_name_and_csa_title
+        type: string
+        description: "Body field 'search_full_name_and_csa_title'"
+      - field: sorting
+        type: string
+        description: "Body field 'sorting'"
+      - field: show_active_only
+        type: boolean
+        description: "Body field 'show_active_only'"
+
+extractRequestData:
+  assign:
+    page: ${incoming.body.page ?? 1}
+    page_size: ${incoming.body.page_size ?? 10}
+    sorting: ${incoming.body.sorting ?? 'name asc'}
+    show_active_only: ${incoming.body.show_active_only ?? false}
+    search_full_name: ${incoming.body.search_full_name ?? ""}
+    search_id_code: ${incoming.body.search_id_code ?? ""}
+    search_display_name: ${incoming.body.search_display_name ?? ""}
+    search_csa_title: ${incoming.body.search_csa_title ?? ""}
+    search_csa_email: ${incoming.body.search_csa_email ?? ""}
+    search_authority: ${incoming.body.search_authority ?? ""}
+    search_display_name_and_csa_title: ${incoming.body.search_display_name_and_csa_title ?? ""}
+    search_full_name_and_csa_title: ${incoming.body.search_full_name_and_csa_title ?? ""}
+    search_department: ${incoming.body.search_department ?? ""}
+    current_user_id: ${incoming.body.current_user_id ?? ""}
+
+getCustomerSupportAgents:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-users-with-roles-by-role"
+    body:
+      page: ${page}
+      page_size: ${page_size}
+      sorting: ${sorting}
+      show_active_only: ${show_active_only}
+      search_full_name: ${search_full_name}
+      search_id_code: ${search_id_code}
+      search_display_name: ${search_display_name}
+      search_csa_title: ${search_csa_title}
+      search_csa_email: ${search_csa_email}
+      search_authority: ${search_authority}
+      search_display_name_and_csa_title: ${search_display_name_and_csa_title}
+      search_full_name_and_csa_title: ${search_full_name_and_csa_title}
+      search_department: ${search_department}
+      excluded_users: ${current_user_id}
+      roles:
+        [
+          "ROLE_ADMINISTRATOR",
+          "ROLE_CUSTOMER_SUPPORT_AGENT",
+          "ROLE_SERVICE_MANAGER",
+          "ROLE_CHATBOT_TRAINER",
+          "ROLE_ANALYST",
+        ]
+  result: res
+
+return_result:
+  return: ${res.response.body}
+  next: end

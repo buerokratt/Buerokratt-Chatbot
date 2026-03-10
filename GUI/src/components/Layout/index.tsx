@@ -1,20 +1,23 @@
-import { FC } from 'react';
+import { Header, useMenuCountConf } from '@buerokratt-ria/header';
+import { MainNavigation } from '@buerokratt-ria/menu';
+import React, { FC } from 'react';
 import { Outlet } from 'react-router-dom';
 import useStore from 'store';
-import { MainNavigation } from '@buerokratt-ria/menu';
-import { Header } from '@buerokratt-ria/header';
-import './Layout.scss';
+
 import { useToast } from '../../hooks/useToast';
+import './Layout.scss';
 
 const Layout: FC = () => {
+  const menuCountConf = useMenuCountConf();
   return (
     <div className="layout">
-      <MainNavigation
-        serviceId={import.meta.env.REACT_APP_SERVICE_ID.split(',')}
-        items={[]}
-      />
+      <MainNavigation countConf={menuCountConf} />
       <div className="layout__wrapper">
-        <Header toastContext={useToast()} user={useStore.getState().userInfo} />
+        <Header
+          toastContext={useToast()}
+          user={useStore.getState().userInfo}
+          setUserDomains={useStore.getState().setUserDomains}
+        />
         <main className="layout__main">
           <Outlet />
         </main>

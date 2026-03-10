@@ -1,0 +1,145 @@
+# Complete configuration for Microsoft Presidio with stanza NLP Engine + tartuNLP/EstBERT_NER
+
+# Basic analyzer configuration
+supported_languages:
+  - et  # multi-language support
+
+default_score_threshold: 0.9
+
+# stanza NLP Engine Configuration
+nlp_configuration:
+  nlp_engine_name: stanza
+  models:
+    - lang_code: et
+      model_name: et  
+      processors: tokenize,mwt,pos,lemma
+    
+
+
+
+# EstBERT NER Model Configuration
+estbert_configuration:
+  model_name: "tartuNLP/EstBERT_NER_v2"
+  supported_language: et
+  entity_mapping:
+    # Map EstBERT Estonian labels to Presidio entities
+    LOC: LOCATION           # Locations -> Location
+    ORG: ORGANIZATION       # Organizations -> Organization
+    PER: PERSON             # Personal names -> Person
+    GPE: GPE
+
+# Entities to detect (used in analysis calls)
+entities_to_detect:
+  # EstBERT entities
+  - PERSON
+  - ORGANIZATION
+  - LOCATION
+  - GPE
+  
+  # Built-in Presidio entities (language-agnostic)
+  - EMAIL_ADDRESS
+  - URL
+  - IP_ADDRESS
+  - IBAN_CODE
+  - DATE_TIME
+  - CRYPTO
+  - CREDIT_CARD
+
+  # Custom Estonian entities
+  - CAR_NUMBER
+  - EE_PERSONAL_CODE
+  - PHONE_NUMBER
+  - EST_ID_DOC
+  
+
+# Custom Estonian recognizers (pattern-based)
+recognizers:
+  # Estonian Personal ID (Isikukood)
+  - name: EstonianPersonalCode
+    supported_language: et
+    supported_entity: EE_PERSONAL_CODE
+    patterns:
+      - name: isikukood_pattern
+        regex: "(?:^|(?<=[.|,|;|:|\\s|!|?]))[1-6][0-9]{2}(01|02|03|04|05|06|07|08|09|10|11|12)(01|02|03|04|05|06|07|08|09|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24|25|26|27|28|29|30|31)[0-9]{3}[0-9](?=[.|,|;|:|\\s|!|?]|$)"
+        score: 0.95
+
+  - name: EstonianDocumentNumber
+    supported_language: et
+    supported_entity: EST_ID_DOC
+    patterns:
+      - name: est_id_doc_pattern
+        regex: "(?:^|(?<=[.|,|;|:|\\s|!|?]))(AA|AB|AC|EA|EB|EC|N|NA|N|UA|PB|PC|BD|BE|FB|FC|FD|FE|KD|KE|KF|VD|VE|VF|MD|ME|MF|SD|SE|SF|RD|RE|RF|CD|CF)[0-9]{7}(?=[.|,|;|:|\\s|!|?]|$)"
+        score: 0.90
+
+  - name: EstonianCarNumber
+    supported_language: et
+    supported_entity: CAR_NUMBER
+    patterns:
+      - name: car_number_pattern
+        regex: "(?:^|(?<=[±|.|,|;|:|\\s|!|?|\\W)|(]))([0-9]{2,3}\\s{0,1}[a-zA-Z]{3}?)(?=[.|,|;|:|\\s|!|?]|$)"
+        score: 0.85
+
+  - name: EstonianPhoneNumbers 
+    supported_language: et
+    supported_entity: PHONE_NUMBER
+    patterns:
+      - name: phone_number_pattern
+        regex: "(?:^|(?<=[±|.|,|;|:|\\s|!|?|\\W)|(]))((\\+?\\s?359|\\+?\\s?372|\\+?\\s?79|\\+?\\s?49|\\+?\\s?46|\\+?\\s?358|\\+?\\s?44|\\+?\\s?52)\\s|\\+?\\s?372|\\+?\\s?79|\\+?\\s?49|\\+?\\s?358|\\+?\\s?44|\\+?\\s?52|\\+?\\s?46)?[5|6|7|4|8|1|0][0-9\\s-]{4,13}[0-9](?=[.|,|;|:|\\s|!|?|)|(]|$)"
+        score: 0.85
+  
+  - name: IBANCode
+    supported_language: et
+    supported_entity: IBAN_CODE
+    patterns:
+      - name: iban_pattern
+        regex: "(?:^|(?<=[.|,|;|:|\\s|!|?]))[A-Za-z]{2}[0-9]{18,}(?=[.|,|;|:|\\s|!|?]|$)"
+        score: 0.85
+  
+  - name: CreditCard 
+    supported_language: et
+    supported_entity: CREDIT_CARD
+    patterns:
+      - name: credit_card_pattern
+        regex: "(?:^|(?<=[.|,|;|:|\\s|!|?]))(5018|5020|5038|5612|5893|6304|6759|6761|6762|6763|0604|6390|6759)\\s?[0-9]{4}\\s?[0-9]{4}\\s?[0-9]{4}(?=[.|,|;|:|\\s|!|?]|$)"
+        score: 0.85
+      - name: credit_card_pattern_2
+        regex: "(?:^|(?<=[.|,|;|:|\\s|!|?]))[0-9]{4}\\s?[0-9]{4}\\s?[0-9]{4}\\s?[0-9]{4}(?=[.|,|;|:|\\s|!|?]|$)"
+        score: 0.85
+
+  - name: DateTime 
+    supported_language: et
+    supported_entity: DATE_TIME
+    patterns:
+      - name: date_pattern
+        regex: "(?:^|(?<=[.|,|;|:|\\s|!|?]))(0[1-9]|[12][0-9]|3[01])[.\\-/](0[1-9]|1[0-2])[.\\-/]([0-9]{4}|[0-9]{2})(?=[.|,|;|:|\\s|!|?]|$)"
+        score: 0.80
+      - name: date_pattern_2
+        regex: "(?:^|(?<=[.|,|;|:|\\s|!|?]))(0[1-9]|[12][0-9]|3[01])[ ](jaanuar|veebruar|märts|aprill|mai|juuni|juuli|august|september|oktoober|november|detsember)[ ]([0-9]{4}|[0-9]{2})(?=[.|,|;|:|\\s|!|?]|$)"
+        score: 0.80
+      - name: date_pattern_3
+        regex: "(?:^|(?<=[.|,|;|:|\\s|!|?]))(0[1-9]|[12][0-9]|3[01])[ ](jaanuaril|veebruaril|märtsil|aprillil|mail|juunil|juulil|augustil|septembril|oktoobril|novembril|detsembril)[ ]([0-9]{4}|[0-9]{2})(?=[.|,|;|:|\\s|!|?]|$)"
+        score: 0.80
+      - name: time_pattern
+        regex: "(?:^|(?<=[.|,|;|:|\\s|!|?]))([01]?[0-9]|2[0-3]):[0-5][0-9](?=[.|,|;|:|\\s|!|?]|$)"
+        score: 0.80
+  
+
+
+# Anonymization configuration
+anonymization_config:
+  default_operators:
+    PERSON: "[ISIK]"
+    ORGANIZATION: "[ORGANISATSIOON]"
+    LOCATION: "[ASUKOHT]"
+    DATE_TIME: "[KUUPÄEV]"
+    EMAIL_ADDRESS: "[E-POST]"
+    URL: "[VEEBILEHT]"
+    IP_ADDRESS: "[IP-AADRESS]"
+    IBAN_CODE: "[PANGAKONTO]"
+    EE_PERSONAL_CODE: "[ISIKUKOOD]"
+    CAR_NUMBER: "[AUTONUMBER]"
+    PHONE_NUMBER: "[TELEFON]"
+    EST_ID_DOC: "[EST-DOKUMENDINR]"
+    CREDIT_CARD: "[PANGAKAART]"
+    CRYPTO: "[KRÜPTO-ID]"
+    GPE: "[GEOPOLIITILINE-ENTITEET]"

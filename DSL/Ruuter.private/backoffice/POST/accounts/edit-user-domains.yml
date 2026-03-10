@@ -1,0 +1,46 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'EDIT-USER-DOMAINS'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: userId
+        type: string
+        description: "Body field 'userId'"
+      - field: userDomains
+        type: string
+        description: "Body field 'userDomains'"
+      - field: selectedDomains
+        type: string
+        description: "Body field 'selectedDomains'"
+
+
+checkV:
+  log: ${incoming.body}
+
+extractRequestData:
+  assign:
+    userId: ${incoming.body.userId}
+    domains: ${incoming.body.userDomains}
+    selected: ${incoming.body.selectedDomains}
+
+updateUserSelection:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-user-widget-domains"
+    body:
+      created: ${new Date().toISOString()}
+      userId: ${userId}
+      domains: ${domains}
+      selected: ${selected}
+  result: updatedUser
+
+return_result:
+  return: "User selection updated successfully"
+  status: 200
+  next: end
+

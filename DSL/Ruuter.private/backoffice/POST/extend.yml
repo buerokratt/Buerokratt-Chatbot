@@ -1,0 +1,46 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'EXTEND'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    header:
+      - field: cookie
+        type: string
+        description: "Cookie field"
+
+extend_cookie:
+  call: http.post
+  args:
+    url: "[#CHATBOT_TIM]/jwt/custom-jwt-extend"
+    contentType: plaintext
+    headers:
+      cookie: ${incoming.headers.cookie}
+    plaintext: 
+      "customJwtCookie"
+  result: cookie_result
+  error: return_extend_fail_private
+  next: assign_cookie
+
+assign_cookie:
+  assign:
+    setCookie:
+      customJwtCookie: ${cookie_result.response.body.token}
+      Domain: "[#DOMAIN]"
+      Secure: true
+      HttpOnly: true
+      SameSite: "[#COOKIE_SAME_SITE]"
+
+return_result:
+  headers:
+    Set-Cookie: ${setCookie}
+  return: ${cookie_result.response.body.token}
+  next: end
+
+return_extend_fail_private:
+  return: "Failed to extend JWT Cookie"
+  status: 400
+  next: end

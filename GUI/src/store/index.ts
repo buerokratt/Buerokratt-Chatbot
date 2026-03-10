@@ -1,12 +1,7 @@
-import { create } from 'zustand';
+import { apiDev } from 'services/api';
+import { CHAT_STATUS, Chat as ChatType, GroupedChat, GroupedPendingChat } from 'types/chat';
 import { UserInfo } from 'types/userInfo';
-import {
-  CHAT_STATUS,
-  Chat as ChatType,
-  GroupedChat,
-  GroupedPendingChat,
-} from 'types/chat';
-import apiDev from 'services/api-dev';
+import { create } from 'zustand';
 
 interface StoreState {
   userInfo: UserInfo | null;
@@ -31,12 +26,15 @@ interface StoreState {
   getGroupedUnansweredChats: () => GroupedChat;
   loadPendingChats: () => Promise<void>;
   getGroupedPendingChats: () => GroupedPendingChat;
+  userDomains: string[];
+  setUserDomains: (domains: string[]) => void;
 }
 
 const useStore = create<StoreState>((set, get, store) => ({
   userInfo: null,
   userId: '',
   activeChats: [],
+  userDomains: [],
   pendingChats: [],
   selectedChatId: null,
   chatCsaActive: false,
@@ -44,6 +42,7 @@ const useStore = create<StoreState>((set, get, store) => ({
   setPendingChats: (chats) => set({ pendingChats: chats }),
   setUserInfo: (data) => set({ userInfo: data, userId: data?.idCode || '' }),
   setSelectedChatId: (id) => set({ selectedChatId: id }),
+  setUserDomains: (data: string[]) => set({ userDomains: data }),
   setChatCsaActive: (active) => {
     set({
       chatCsaActive: active,
@@ -65,10 +64,7 @@ const useStore = create<StoreState>((set, get, store) => ({
   forwordedChats: () => {
     const userId = get().userId;
     return (
-      get().activeChats?.filter(
-        (c) =>
-          c.status === CHAT_STATUS.REDIRECTED && c.customerSupportId === userId
-      ) || []
+      get().activeChats?.filter((c) => c.status === CHAT_STATUS.REDIRECTED && c.customerSupportId === userId) || []
     );
   },
   unansweredChatsLength: () => get().unansweredChats().length,
@@ -78,9 +74,7 @@ const useStore = create<StoreState>((set, get, store) => ({
     const res = await apiDev.get('agents/chats/active');
     const chats: ChatType[] = res.data.response ?? [];
     const selectedChatId = get().selectedChatId;
-    const isChatStillExists = chats?.filter(
-      (e: any) => e.id === selectedChatId
-    );
+    const isChatStillExists = chats?.filter((e: any) => e.id === selectedChatId);
     if (isChatStillExists.length === 0 && get().activeChats.length > 0) {
       setTimeout(() => get().setActiveChats(chats), 3000);
     } else {
@@ -91,9 +85,7 @@ const useStore = create<StoreState>((set, get, store) => ({
     const res = await apiDev.get('agents/chats/pending');
     const chats: ChatType[] = res.data.response ?? [];
     const selectedChatId = get().selectedChatId;
-    const isChatStillExists = chats?.filter(
-      (e: any) => e.id === selectedChatId
-    );
+    const isChatStillExists = chats?.filter((e: any) => e.id === selectedChatId);
     if (isChatStillExists.length === 0 && get().pendingChats.length > 0) {
       setTimeout(() => get().setPendingChats(chats), 3000);
     } else {
@@ -112,10 +104,7 @@ const useStore = create<StoreState>((set, get, store) => ({
 
     if (!activeChats) return grouped;
 
-    if (
-      chatCsaActive === false &&
-      !userInfo?.authorities.includes('ROLE_ADMINISTRATOR')
-    ) {
+    if (chatCsaActive === false && !userInfo?.authorities.includes('ROLE_ADMINISTRATOR')) {
       if (get().selectedChatId !== null) {
         get().setSelectedChatId(null);
       }
@@ -128,9 +117,7 @@ const useStore = create<StoreState>((set, get, store) => ({
         return;
       }
 
-      const groupIndex = grouped.otherChats.findIndex(
-        (x) => x.groupId === c.customerSupportId
-      );
+      const groupIndex = grouped.otherChats.findIndex((x) => x.groupId === c.customerSupportId);
 
       if (c.customerSupportId !== '') {
         if (groupIndex === -1) {
@@ -169,18 +156,13 @@ const useStore = create<StoreState>((set, get, store) => ({
       });
     } else {
       activeChats.forEach((c) => {
-        if (
-          c.customerSupportId === userInfo?.idCode ||
-          c.customerSupportId === ''
-        ) {
+        if (c.customerSupportId === userInfo?.idCode || c.customerSupportId === '') {
           grouped.myChats.push(c);
           return;
         }
 
         grouped.myChats.sort((a, b) => a.created.localeCompare(b.created));
-        const groupIndex = grouped.otherChats.findIndex(
-          (x) => x.groupId === c.customerSupportId
-        );
+        const groupIndex = grouped.otherChats.findIndex((x) => x.groupId === c.customerSupportId);
         if (c.customerSupportId !== '') {
           if (groupIndex === -1) {
             grouped.otherChats.push({
@@ -229,9 +211,7 @@ const useStore = create<StoreState>((set, get, store) => ({
         }
 
         grouped.myChats.sort((a, b) => a.created.localeCompare(b.created));
-        const groupIndex = grouped.otherChats.findIndex(
-          (x) => x.groupId === c.customerSupportId
-        );
+        const groupIndex = grouped.otherChats.findIndex((x) => x.groupId === c.customerSupportId);
         if (c.customerSupportId !== '') {
           if (groupIndex === -1) {
             grouped.otherChats.push({

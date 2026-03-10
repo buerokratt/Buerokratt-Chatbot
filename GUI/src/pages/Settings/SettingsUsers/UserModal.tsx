@@ -1,23 +1,27 @@
-import { FC, useMemo } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
-import { AxiosError } from 'axios';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-
+import { AxiosError } from 'axios';
 import { Button, Dialog, FormInput, Track } from 'components';
-import { User, UserDTO } from 'types/user';
-import { checkIfUserExists, createUser, editUser } from 'services/users';
 import { useToast } from 'hooks/useToast';
-import { ROLES } from 'utils/constants';
+import { FC, useMemo } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import Select from 'react-select';
+import { checkIfUserExists, createUser, editUser } from 'services/users';
+import { User, UserDTO } from 'types/user';
+import { ROLES } from 'utils/constants';
+
 import './SettingsUsers.scss';
+import { WDomain } from '../../../types/widgetModels';
+
+import { isJiraIntegrationEnabled, isSmaxIntegrationEnabled } from 'constants/config';
 
 type UserModalProps = {
   onClose: () => void;
   user?: User;
+  domainsList?: WDomain[];
 };
 
-const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
+const UserModal: FC<UserModalProps> = ({ onClose, user, domainsList }) => {
   const { t } = useTranslation();
   const toast = useToast();
   const queryClient = useQueryClient();
@@ -31,10 +35,14 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
       login: user?.login,
       idCode: user?.idCode,
       authorities: user?.authorities,
+      domains: user?.domains || [],
       displayName: user?.displayName,
       csaTitle: user?.csaTitle,
       csaEmail: user?.csaEmail,
       fullName: user?.fullName,
+      department: user?.department,
+      smaxAccountId: user?.smaxAccountId,
+      jiraAccountId: user?.jiraAccountId,
     },
   });
 
@@ -55,16 +63,31 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
       },
       { label: t('roles.ROLE_ANALYST'), value: ROLES.ROLE_ANALYST },
     ],
-    []
+    [],
+  );
+
+  const mapUserDomains = (domainIds: string[], allDomains: WDomain[]): { label: string; value: string }[] => {
+    return allDomains
+      .filter((domain) => domainIds.includes(domain.domainId))
+      .map((domain) => ({
+        label: domain.name,
+        value: domain.domainId,
+      }));
+  };
+
+  const domainOptions = useMemo(
+    () =>
+      domainsList?.map((domain) => ({
+        label: domain.name,
+        value: domain.domainId,
+      })),
+    [domainsList],
   );
 
   const userCreateMutation = useMutation({
     mutationFn: (data: UserDTO) => createUser(data),
     onSuccess: async () => {
-      await queryClient.invalidateQueries([
-        'accounts/customer-support-agents',
-        'prod',
-      ]);
+      await queryClient.invalidateQueries(['accounts/customer-support-agents', 'prod']);
       toast.open({
         type: 'success',
         title: t('global.notification'),
@@ -85,15 +108,14 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
     mutationFn: ({
       id,
       userData,
+      smaxConnectDisconnect = false,
     }: {
       id: string | number;
       userData: UserDTO;
-    }) => editUser(id, userData),
+      smaxConnectDisconnect?: boolean;
+    }) => editUser(id, userData, smaxConnectDisconnect),
     onSuccess: async () => {
-      await queryClient.invalidateQueries([
-        'accounts/customer-support-agents',
-        'prod',
-      ]);
+      await queryClient.invalidateQueries(['accounts/customer-support-agents', 'prod']);
       toast.open({
         type: 'success',
         title: t('global.notification'),
@@ -111,8 +133,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
   });
 
   const checkIfUserExistsMutation = useMutation({
-    mutationFn: ({ userData }: { userData: UserDTO }) =>
-      checkIfUserExists(userData),
+    mutationFn: ({ userData }: { userData: UserDTO }) => checkIfUserExists(userData),
     onSuccess: async (data) => {
       if (data.response === 'true') {
         toast.open({
@@ -145,6 +166,18 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
     }
   });
 
+  const handleSmaxConnection = handleSubmit((data) => {
+    if (user) {
+      userEditMutation.mutate({
+        id: user.idCode,
+        userData: data,
+        smaxConnectDisconnect: true,
+      });
+    } else {
+      checkIfUserExistsMutation.mutate({ userData: data });
+    }
+  });
+
   const requiredText = t('settings.users.required') ?? '*';
 
   return (
@@ -156,6 +189,11 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
           <Button appearance="secondary" onClick={onClose}>
             {t('global.cancel')}
           </Button>
+          {user && isSmaxIntegrationEnabled && (
+            <Button onClick={handleSmaxConnection}>
+              {user.smaxAccountId ? t('settings.users.disconnectFromSmax') : t('settings.users.connectToSmax')}
+            </Button>
+          )}
           <Button onClick={handleUserSubmit}>
             {user ? t('settings.users.editUser') : t('settings.users.addUser')}
           </Button>
@@ -164,17 +202,11 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
     >
       <Track direction="vertical" gap={16} align="right">
         <FormInput
-          defaultValue={`${user?.firstName ?? ''} ${
-            user?.lastName ?? ''
-          }`.trim()}
+          defaultValue={`${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim()}
           {...register('fullName', { required: requiredText })}
           label={t('settings.users.fullName')}
         />
-        {errors.fullName && (
-          <span style={{ color: '#f00', marginTop: '-1rem' }}>
-            {errors.fullName.message}
-          </span>
-        )}
+        {errors.fullName && <span style={{ color: '#f00', marginTop: '-1rem' }}>{errors.fullName.message}</span>}
 
         {!user && (
           <FormInput
@@ -188,18 +220,12 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
             label={t('settings.users.idCode')}
           >
             <div>
-              <label style={{ fontSize: '14.7px', color: '#9799a4' }}>
-                {t('settings.users.idCodePlaceholder')}
-              </label>
+              <label style={{ fontSize: '14.7px', color: '#9799a4' }}>{t('settings.users.idCodePlaceholder')}</label>
             </div>
           </FormInput>
         )}
 
-        {!user && errors.idCode && (
-          <span style={{ color: '#f00', marginTop: '-1rem' }}>
-            {errors.idCode.message}
-          </span>
-        )}
+        {!user && errors.idCode && <span style={{ color: '#f00', marginTop: '-1rem' }}>{errors.idCode.message}</span>}
 
         <Controller
           control={control}
@@ -207,9 +233,7 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
           rules={{ required: requiredText }}
           render={({ field: { onChange, onBlur, name, ref } }) => (
             <div className="multiSelect">
-              <label className="multiSelect__label">
-                {t('settings.users.userRoles')}
-              </label>
+              <label className="multiSelect__label">{t('settings.users.userRoles')}</label>
               <div className="multiSelect__wrapper">
                 <Select
                   name={name}
@@ -230,27 +254,46 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
           )}
         />
 
-        {errors.authorities && (
-          <span style={{ color: '#f00', marginTop: '-1rem' }}>
-            {errors.authorities.message}
-          </span>
+        {errors.authorities && <span style={{ color: '#f00', marginTop: '-1rem' }}>{errors.authorities.message}</span>}
+
+        {import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN.toLowerCase() === 'true' && (
+          <Controller
+            control={control}
+            name="domains"
+            rules={{}}
+            render={({ field: { onChange, onBlur, name, ref } }) => (
+              <div className="multiSelect">
+                <label className="multiSelect__label">{t('multiDomains.domains')}</label>
+                <div className="multiSelect__wrapper">
+                  <Select
+                    name={name}
+                    maxMenuHeight={165}
+                    ref={ref}
+                    onBlur={onBlur}
+                    required={false}
+                    options={domainOptions}
+                    defaultValue={mapUserDomains(user?.domains ?? [], domainsList ?? [])}
+                    isMulti={true}
+                    placeholder={t('global.choose')}
+                    onChange={(val) => {
+                      onChange(val || []);
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+          />
         )}
+
         <FormInput
           {...register('displayName', {
             required: requiredText,
           })}
           label={t('settings.users.displayName')}
         />
-        {errors.displayName && (
-          <span style={{ color: '#f00', marginTop: '-1rem' }}>
-            {errors.displayName.message}
-          </span>
-        )}
+        {errors.displayName && <span style={{ color: '#f00', marginTop: '-1rem' }}>{errors.displayName.message}</span>}
 
-        <FormInput
-          {...register('csaTitle')}
-          label={t('settings.users.userTitle')}
-        />
+        <FormInput {...register('csaTitle')} label={t('settings.users.userTitle')} />
 
         <FormInput
           {...register('csaEmail', {
@@ -263,10 +306,12 @@ const UserModal: FC<UserModalProps> = ({ onClose, user }) => {
           label={t('settings.users.email')}
           type="email"
         />
-        {errors.csaEmail && (
-          <span style={{ color: '#f00', marginTop: '-1rem' }}>
-            {errors.csaEmail.message}
-          </span>
+        {errors.csaEmail && <span style={{ color: '#f00', marginTop: '-1rem' }}>{errors.csaEmail.message}</span>}
+
+        <FormInput {...register('department')} label={t('settings.users.department')} />
+
+        {isJiraIntegrationEnabled && (
+          <FormInput {...register('jiraAccountId')} label={t('settings.users.jiraAccountName')} />
         )}
       </Track>
     </Dialog>

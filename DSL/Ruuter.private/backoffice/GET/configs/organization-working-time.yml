@@ -1,0 +1,63 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'ORGANIZATION-WORKING-TIME'"
+  method: get
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    params:
+      - field: domain
+        type: string
+        description: "Body field 'domain'"
+
+assignValues:
+  assign:
+    domain: ${incoming.params.domain}
+
+checkForDomain:
+  switch:
+    - condition: ${domain === 'none'}
+      next: getOrganizationWorkingTime
+  next: getDomainOrganizationWorkingTime
+
+getDomainOrganizationWorkingTime:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-organization-working-time"
+    body:
+      domainUUID: ${domain}
+  result: getOrganizationWorkingTimeValueResult
+  next: validateOrganizationWorkingTimeExists
+
+getOrganizationWorkingTime:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-organization-working-time"
+  result: getOrganizationWorkingTimeValueResult
+
+validateOrganizationWorkingTimeExists:
+  switch:
+    - condition: "${getOrganizationWorkingTimeValueResult.response.body.length > 0}"
+      next: mapWorkingTimeData
+  next: returnNotFound
+
+mapWorkingTimeData:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_HBS]/return_organization_working_time"
+    headers:
+      type: json
+    body:
+      configurationArray: ${getOrganizationWorkingTimeValueResult.response.body}
+  result: workingTimeData
+  next: return_result
+
+return_result:
+  return: ${workingTimeData.response.body}
+  next: end
+
+returnNotFound:
+  return: "not_found"
+  next: end

@@ -1,23 +1,22 @@
+import * as Tabs from '@radix-ui/react-tabs';
+import clsx from 'clsx';
+import { Button, Chat, Dialog, FormRadios, Track } from 'components';
+import withAuthorization from 'hoc/with-authorization';
+import { useToast } from 'hooks/useToast';
 import { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import * as Tabs from '@radix-ui/react-tabs';
-import { useQuery } from '@tanstack/react-query';
-
-import { Chat, Dialog, Button, FormRadios, Track } from 'components';
+import { apiDev } from 'services/api';
+import useStore from 'store';
 import { CHAT_EVENTS, CHAT_STATUS, Chat as ChatType } from 'types/chat';
 import { User } from 'types/user';
-import { useToast } from 'hooks/useToast';
-import apiDev from 'services/api-dev';
+import { v4 as uuidv4 } from 'uuid';
+
 import ChatTrigger from '../ChatActive/ChatTrigger';
-import clsx from 'clsx';
 import ForwardToColleaugeModal from '../ForwardToColleaugeModal';
 import ForwardToEstablishmentModal from '../ForwardToEstablishmentModal';
-import sse from 'services/sse-service';
-import { v4 as uuidv4 } from 'uuid';
+
 import './ChatPending.scss';
-import useHeaderStore from '@buerokratt-ria/header/src/header/store/store';
-import useStore from 'store';
-import withAuthorization from 'hoc/with-authorization';
+import { userStore as useHeaderStore } from '@buerokratt-ria/header';
 import { ROLES } from 'utils/constants';
 
 const ChatPending: FC = () => {
@@ -25,14 +24,10 @@ const ChatPending: FC = () => {
   const userInfo = useStore((state) => state.userInfo);
   const toast = useToast();
   const [endChatModal, setEndChatModal] = useState<ChatType | null>(null);
-  const [forwardToColleaugeModal, setForwardToColleaugeModal] =
-    useState<ChatType | null>(null);
-  const [forwardToEstablishmentModal, setForwardToEstablishmentModal] =
-    useState<ChatType | null>(null);
+  const [forwardToColleaugeModal, setForwardToColleaugeModal] = useState<ChatType | null>(null);
+  const [forwardToEstablishmentModal, setForwardToEstablishmentModal] = useState<ChatType | null>(null);
 
-  const [selectedEndChatStatus, setSelectedEndChatStatus] = useState<
-    string | null
-  >(null);
+  const [selectedEndChatStatus, setSelectedEndChatStatus] = useState<string | null>(null);
   const CSAchatStatuses = [
     CHAT_EVENTS.ACCEPTED,
     CHAT_EVENTS.HATE_SPEECH,
@@ -49,22 +44,7 @@ const ChatPending: FC = () => {
     useHeaderStore.getState().loadPendingChats();
   }, []);
 
-  useEffect(() => {
-    const events = sse(`/chat-list`, loadPendingChats);
-    return () => events.close();
-  }, []);
-
-  const { data: csaNameVisiblity } = useQuery<{ isVisible: boolean }>({
-    queryKey: ['agents/name-visibility', 'prod'],
-  });
-
-  const { data: csaTitleVisibility } = useQuery<{ isVisible: boolean }>({
-    queryKey: ['agents/title-visibility', 'prod'],
-  });
-
-  const groupedPendingChats = useHeaderStore((state) =>
-    state.getGroupedPendingChats()
-  );
+  const groupedPendingChats = useHeaderStore((state) => state.getGroupedPendingChats());
 
   const handleCsaForward = async (chat: ChatType, user: User) => {
     try {
@@ -82,27 +62,24 @@ const ChatPending: FC = () => {
       toast.open({
         type: 'success',
         title: t('global.notification'),
-        message: `Chat forwarded to ${user.displayName}`,
+        message: `${t('chat.chatForwardedTo')} ${user.displayName}`,
       });
     } catch (error) {
       toast.open({
         type: 'warning',
         title: t('global.notificationError'),
-        message: `Chat ended`,
+        message: t('chat.chatEnded'),
       });
     }
   };
 
-  const handleEstablishmentForward = (
-    chat: ChatType,
-    establishment: string
-  ) => {
+  const handleEstablishmentForward = (chat: ChatType, establishment: string) => {
     // To be added: Add endpoint for chat forwarding
     setForwardToEstablishmentModal(null);
     toast.open({
       type: 'success',
       title: t('global.notification'),
-      message: `Chat forwarded to ${establishment}`,
+      message: `${t('chat.chatForwardedTo')} ${establishment}`,
     });
   };
 
@@ -122,13 +99,13 @@ const ChatPending: FC = () => {
       toast.open({
         type: 'success',
         title: t('global.notification'),
-        message: `Chat ended`,
+        message: t('chat.chatEnded'),
       });
     } catch (error) {
       toast.open({
         type: 'warning',
         title: t('global.notificationError'),
-        message: `Chat ended`,
+        message: t('chat.chatEnded'),
       });
     }
     setEndChatModal(null);
@@ -142,16 +119,10 @@ const ChatPending: FC = () => {
       onValueChange={useHeaderStore.getState().setSelectedChatId}
       style={{ height: '100%', overflow: 'hidden' }}
     >
-      <Tabs.List
-        className="vertical-tabs__list"
-        aria-label={t('chat.active.list') ?? ''}
-        style={{ overflow: 'auto' }}
-      >
+      <Tabs.List className="vertical-tabs__list" aria-label={t('chat.active.list') ?? ''} style={{ overflow: 'auto' }}>
         <div className="vertical-tabs__group-header">
           <p>{`${t('chat.new')} ${
-            (groupedPendingChats?.newChats?.length ?? 0) == 0
-              ? ''
-              : `(${groupedPendingChats?.newChats?.length ?? 0})`
+            (groupedPendingChats?.newChats?.length ?? 0) == 0 ? '' : `(${groupedPendingChats?.newChats?.length ?? 0})`
           }`}</p>
         </div>
         {groupedPendingChats?.newChats?.map((chat) => (
@@ -176,9 +147,7 @@ const ChatPending: FC = () => {
           <Tabs.Trigger
             key={chat.id}
             className={clsx('vertical-tabs__trigger', {
-              active:
-                chat.status === CHAT_STATUS.REDIRECTED &&
-                chat.customerSupportId === userInfo?.idCode,
+              active: chat.status === CHAT_STATUS.REDIRECTED && chat.customerSupportId === userInfo?.idCode,
             })}
             value={chat.id}
             style={{ borderBottom: '1px solid #D2D3D8' }}
@@ -198,9 +167,7 @@ const ChatPending: FC = () => {
                 <Tabs.Trigger
                   key={chat.id + i}
                   className={clsx('vertical-tabs__trigger', {
-                    active:
-                      chat.status === CHAT_STATUS.REDIRECTED &&
-                      chat.customerSupportId === userInfo?.idCode,
+                    active: chat.status === CHAT_STATUS.REDIRECTED && chat.customerSupportId === userInfo?.idCode,
                   })}
                   value={chat.id}
                   style={{ borderBottom: '1px solid #D2D3D8' }}
@@ -218,8 +185,6 @@ const ChatPending: FC = () => {
           {selectedChat && (
             <Chat
               chat={selectedChat}
-              isCsaNameVisible={csaNameVisiblity?.isVisible ?? false}
-              isCsaTitleVisible={csaTitleVisibility?.isVisible ?? false}
               onChatEnd={setEndChatModal}
               onForwardToColleauge={setForwardToColleaugeModal}
               onForwardToEstablishment={setForwardToEstablishmentModal}
@@ -255,12 +220,18 @@ const ChatPending: FC = () => {
       {endChatModal && (
         <Dialog
           title={t('chat.active.chooseChatStatus')}
-          onClose={() => setEndChatModal(null)}
+          onClose={() => {
+            setEndChatModal(null);
+            setSelectedEndChatStatus(null);
+          }}
           footer={
             <>
               <Button
                 appearance="secondary"
-                onClick={() => setEndChatModal(null)}
+                onClick={() => {
+                  setEndChatModal(null);
+                  setSelectedEndChatStatus(null);
+                }}
               >
                 {t('global.cancel')}
               </Button>
@@ -278,6 +249,7 @@ const ChatPending: FC = () => {
               value: status,
             }))}
             onChange={setSelectedEndChatStatus}
+            value={selectedEndChatStatus ?? undefined}
           />
         </Dialog>
       )}
@@ -285,7 +257,4 @@ const ChatPending: FC = () => {
   );
 };
 
-export default withAuthorization(ChatPending, [
-  ROLES.ROLE_ADMINISTRATOR,
-  ROLES.ROLE_CUSTOMER_SUPPORT_AGENT,
-]);
+export default withAuthorization(ChatPending, [ROLES.ROLE_ADMINISTRATOR, ROLES.ROLE_CUSTOMER_SUPPORT_AGENT]);

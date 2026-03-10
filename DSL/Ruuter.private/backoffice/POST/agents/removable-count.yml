@@ -1,0 +1,34 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'ENDED-CHATS-COUNT'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: authDate
+        type: string
+        description: "Body field 'authDate'"
+      - field: anonDate
+        type: string
+        description: "Body field 'anonDate'"
+
+extractRequestData:
+  assign:
+    authDate: "${incoming.body.authDate}"
+    anonDate: "${incoming.body.anonDate}"
+
+getEndedChats:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-chats-to-be-removed-count"
+    body:
+      auth_date: ${authDate}
+      anon_date: ${anonDate}
+  result: res
+
+returnSuccess:
+  return: ${res.response.body}
+  next: end

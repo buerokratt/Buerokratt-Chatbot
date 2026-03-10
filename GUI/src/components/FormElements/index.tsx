@@ -1,12 +1,14 @@
+import FormCheckbox from './FormCheckbox';
+import FormCheckboxes from './FormCheckboxes';
+import FormDatepicker from './FormDatepicker';
 import FormInput from './FormInput';
-import FormTextarea from './FormTextarea';
+import FormRadios from './FormRadios';
 import FormSelect from './FormSelect';
 import FormMultiselect from './FormSelect/FormMultiselect';
+import FormTagInput from './FormTagInput';
+import FormTextarea from './FormTextarea';
+import IconSwitch from './IconSwitch';
 import Switch from './Switch';
-import FormCheckboxes from './FormCheckboxes';
-import FormRadios from './FormRadios';
-import FormCheckbox from './FormCheckbox';
-import FormDatepicker from './FormDatepicker';
 import SwitchBox from './SwitchBox';
 
 export {
@@ -20,4 +22,6 @@ export {
   FormCheckbox,
   FormDatepicker,
   SwitchBox,
+  FormTagInput,
+  IconSwitch,
 };

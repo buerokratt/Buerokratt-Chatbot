@@ -1,29 +1,24 @@
-import { FC, useEffect, useRef, useState } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
-import { useForm, Controller, useWatch } from 'react-hook-form';
-import { motion } from 'framer-motion';
-import { AxiosError } from 'axios';
-
-import {
-  Button,
-  Card,
-  FormInput,
-  FormSelect,
-  Icon,
-  Switch,
-  Track,
-} from 'components';
-import { WidgetConfig } from 'types/widgetConfig';
-import { useToast } from 'hooks/useToast';
+import { useMutation } from '@tanstack/react-query';
 import bykLogo from 'assets/logo-white.svg';
-import './SettingsAppearance.scss';
+import { AxiosError } from 'axios';
 import clsx from 'clsx';
-import apiDev from 'services/api-dev';
-import { ChromePicker } from 'react-color';
-import { MdOutlinePalette } from 'react-icons/md';
+import { Button, Card, FormInput, FormSelect, Icon, Switch, Track } from 'components';
+import { motion } from 'framer-motion';
 import withAuthorization from 'hoc/with-authorization';
+import { useToast } from 'hooks/useToast';
+import { FC, useEffect, useRef, useState } from 'react';
+import { ChromePicker } from 'react-color';
+import { Controller, useForm, useWatch } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import './SettingsAppearance.scss';
+import { MdOutlinePalette } from 'react-icons/md';
+import { apiDev } from 'services/api';
 import { ROLES } from 'utils/constants';
+
+import DomainSelector from '../../../components/DomainsSelector';
+import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
+import { fetchConfigurationFromDomain } from '../../../services/configurations';
+import { WidgetAppearance, WidgetAppearanceResponse } from '../../../types/widgetAppearance';
 
 const variants = {
   initial: {
@@ -38,28 +33,53 @@ const SettingsAppearance: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
   const hasRendered = useRef<boolean>();
-  const { register, control, handleSubmit, reset, setValue } =
-    useForm<WidgetConfig>();
+  const { register, control, handleSubmit, reset, setValue } = useForm<WidgetAppearance>();
   const [showPreview, setShowPreview] = useState(false);
   const [showColorPalette, setShowColorPalette] = useState(false);
   const [delayFinished, setDelayFinished] = useState(false);
-  useQuery<WidgetConfig>({
-    queryKey: ['configs/widget', 'prod'],
-    onSuccess: (data: any) => {
-      const res = data.response;
-      if (!hasRendered.current) {
-        reset({
-          ...res,
-          widgetAnimation:
-            res.widgetAnimation.length === 0
-              ? 'shockwave'
-              : res.widgetAnimation,
-        });
-        hasRendered.current = true;
-      }
-    },
-  });
+  const multiDomainEnabled = import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
+  const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
 
+  useEffect(() => {
+    if (multiDomainEnabled) {
+      hasRendered.current = true;
+      resetSettingsToDefault();
+    } else {
+      fetchData('none');
+    }
+  }, []);
+
+  const fetchData = async (selectedDomain: string) => {
+    try {
+      const data: WidgetAppearanceResponse = await fetchConfigurationFromDomain<WidgetAppearanceResponse>(
+        'configs/widget',
+        selectedDomain,
+      );
+
+      const res = data.response;
+
+      if (res.isWidgetActive === null) {
+        resetSettingsToDefault();
+        hasRendered.current = true;
+        return;
+      }
+
+      reset({
+        ...res,
+        isWidgetActive: res.isWidgetActive === 'true',
+        widgetAnimation: res.widgetAnimation?.length === 0 ? 'shockwave' : res.widgetAnimation,
+      });
+
+      hasRendered.current = true;
+    } catch (error) {
+      console.error('Failed to fetch appearance', error);
+    }
+  };
+
+  const isWidgetActive = useWatch({
+    control,
+    name: 'isWidgetActive',
+  });
   const widgetProactiveSeconds = useWatch({
     control,
     name: 'widgetProactiveSeconds',
@@ -76,8 +96,7 @@ const SettingsAppearance: FC = () => {
   const widgetAnimation = useWatch({ control, name: 'widgetAnimation' });
 
   const widgetConfigMutation = useMutation({
-    mutationFn: (data: WidgetConfig) =>
-      apiDev.post<WidgetConfig>('configs/widget', data),
+    mutationFn: (data: WidgetAppearance) => apiDev.post<WidgetAppearance>('configs/widget', data),
     onSuccess: () => {
       toast.open({
         type: 'success',
@@ -108,15 +127,13 @@ const SettingsAppearance: FC = () => {
   }, []);
 
   const handleClickOutside = (event: MouseEvent) => {
-    if (
-      colorComponentRef.current &&
-      !colorComponentRef.current.contains(event.target as Node)
-    ) {
+    if (colorComponentRef.current && !colorComponentRef.current.contains(event.target as Node)) {
       setShowColorPalette(false);
     }
   };
 
   const handleFormSubmit = handleSubmit((data) => {
+    data.domainUUID = multiDomainEnabled ? selectedDomains : [];
     widgetConfigMutation.mutate(data);
   });
 
@@ -135,16 +152,41 @@ const SettingsAppearance: FC = () => {
     });
   };
 
+  const resetSettingsToDefault = () => {
+    reset({
+      widgetProactiveSeconds: 2,
+      widgetDisplayBubbleMessageSeconds: 2,
+      widgetBubbleMessageText: '',
+      widgetColor: '#27ff00',
+      isWidgetActive: false,
+      widgetAnimation: 'shockwave',
+    });
+  };
+
+  const handleDomainSelection = useDomainSelectionHandler(setSelectedDomains, fetchData, resetSettingsToDefault);
+
   if (hasRendered.current === undefined) return <>Loading...</>;
 
   return (
     <div ref={colorComponentRef}>
       <h1 style={{ paddingBottom: 16 }}>{t('settings.appearance.title')}</h1>
 
+      {multiDomainEnabled && (
+        <div style={{ marginBottom: '11px' }}>
+          <DomainSelector
+            onChange={(selected) => {
+              handleDomainSelection(selected);
+            }}
+          />
+        </div>
+      )}
+
       <Card
         footer={
           <Track gap={8} justify="end">
-            <Button onClick={handleFormSubmit}>{t('global.save')}</Button>
+            <Button disabled={(multiDomainEnabled && selectedDomains.length === 0) || false} onClick={handleFormSubmit}>
+              {t('global.save')}
+            </Button>
             <Button appearance="secondary" onClick={handlePreview}>
               {t('global.preview')}
             </Button>
@@ -195,14 +237,7 @@ const SettingsAppearance: FC = () => {
                   }}
                   onClick={() => setShowColorPalette(!showColorPalette)}
                 >
-                  <Icon
-                    icon={
-                      <MdOutlinePalette
-                        fontSize={20}
-                        color="rgba(0,0,0,0.54)"
-                      />
-                    }
-                  />
+                  <Icon icon={<MdOutlinePalette fontSize={20} color="rgba(0,0,0,0.54)" />} />
                 </button>
                 {showColorPalette && (
                   <div style={{ position: 'absolute', zIndex: '2' }}>
@@ -222,9 +257,7 @@ const SettingsAppearance: FC = () => {
             render={({ field }) => (
               <FormSelect
                 {...field}
-                onSelectionChange={(selection) =>
-                  field.onChange(selection?.value)
-                }
+                onSelectionChange={(selection) => field.onChange(selection?.value)}
                 label={t('settings.appearance.widgetAnimation')}
                 defaultValue={field.value}
                 options={[
@@ -247,7 +280,7 @@ const SettingsAppearance: FC = () => {
                 'profile--shockwave': widgetAnimation === 'shockwave',
                 'profile--jump': widgetAnimation === 'jump',
                 'profile--wiggle': widgetAnimation === 'wiggle',
-              }
+              },
             )}
             variants={variants}
             initial="initial"
@@ -259,7 +292,7 @@ const SettingsAppearance: FC = () => {
           >
             <img src={bykLogo} alt="Buerokratt logo" width={45} />
           </motion.div>
-          {control._formValues.isWidgetActive && (
+          {isWidgetActive && (
             <div
               className={clsx('profile__greeting-message', {
                 'profile__greeting-message--active': delayFinished,

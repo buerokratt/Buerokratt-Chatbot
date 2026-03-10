@@ -1,0 +1,75 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'FEEDBACK'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: feedbackActive
+        type: string
+        description: "Body field 'feedbackActive'"
+      - field: feedbackQuestion
+        type: string
+        description: "Body field 'feedbackQuestion'"
+      - field: feedbackNoticeActive
+        type: string
+        description: "Body field 'feedbackNoticeActive'"
+      - field: feedbackNotice
+        type: string
+        description: "Body field 'feedbackNotice'"
+      - field: isFiveRatingScale
+        type: string
+        description: "Body field 'isFiveRatingScale'"  
+      - field: domainUUID
+        type: object
+        description: "Body field 'domainUUID'"
+    
+extractRequestData:
+  assign:
+    feedbackActive: ${incoming.body.feedbackActive}
+    feedbackQuestion: ${incoming.body.feedbackQuestion}
+    feedbackNoticeActive: ${incoming.body.feedbackNoticeActive}
+    feedbackNotice: ${incoming.body.feedbackNotice}
+    isFiveRatingScale: ${incoming.body.isFiveRatingScale}
+    domains: ${incoming.body.domainUUID}
+
+checkForDomains:
+  switch:
+    - condition: ${domains.length > 0}
+      next: setDomainFeedbackConfig
+  next: setFeedbackConfig
+
+setDomainFeedbackConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-domain-feedback-config"
+    body:
+      feedbackActive: ${feedbackActive}
+      feedbackQuestion: ${feedbackQuestion}
+      feedbackNoticeActive: ${feedbackNoticeActive}
+      feedbackNotice: ${feedbackNotice}
+      isFiveRatingScale: ${isFiveRatingScale}
+      created: ${new Date().toISOString()}
+      domains: ${JSON.stringify(domains)}
+  result: updated_feedback
+  next: return_result
+
+setFeedbackConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-feedback-config"
+    body:
+      feedbackActive: ${feedbackActive}
+      feedbackQuestion: ${feedbackQuestion}
+      feedbackNoticeActive: ${feedbackNoticeActive}
+      feedbackNotice: ${feedbackNotice}
+      isFiveRatingScale: ${isFiveRatingScale}
+      created: ${new Date().toISOString()}
+  result: updated_feedback
+  next: return_result
+
+return_result:
+  return: 'Feedback configurations changed successfully'

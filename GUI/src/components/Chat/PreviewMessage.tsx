@@ -1,7 +1,6 @@
-import { FC } from 'react';
 import clsx from 'clsx';
-import Linkifier from './linkifier';
 import Track from 'components/Track';
+import { FC } from 'react';
 import './Typing.scss';
 
 type PreviewMessageProps = {
@@ -11,20 +10,24 @@ type PreviewMessageProps = {
 const PreviewMessage: FC<PreviewMessageProps> = ({ preview }) => {
   return (
     <div className={clsx('active-chat__messageContainer')}>
-      {!!preview && preview && (
-        <div className={clsx('active-chat__message-preview')}>
-          {!!preview && (
-            <Track>
-              <Linkifier message={decodeURIComponent(preview ?? '')} />
-              <div className="typing">
-                <span></span>
-                <span></span>
-                <span></span>
-              </div>
-            </Track>
-          )}
-        </div>
-      )}
+      <Track gap={10}>
+        {!!preview && preview && (
+          <div className={clsx('active-chat__message-preview')}>
+            {!!preview && (
+              <Track>
+                {/* Commented out as per request in task -1024- */}
+                {/* <Markdownify message={preview ?? ''} /> */}
+                <div className="typing">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </Track>
+            )}
+          </div>
+        )}
+        <label className="active-chat__message-date">{'00:00:00'}</label>
+      </Track>
     </div>
   );
 };

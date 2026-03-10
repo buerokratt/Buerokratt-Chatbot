@@ -1,8 +1,13 @@
-import { FC } from 'react';
+import ButtonMessage from 'components/ButtonMessage';
+import Markdownify from 'components/Chat/Markdownify';
+import OptionMessage from 'components/OptionMessage';
 import { format } from 'date-fns';
-
+import { FC, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Message } from 'types/message';
-import Linkifier from 'components/Chat/linkifier';
+import { parseButtons, parseOptions } from 'utils/parse-utils';
+
+import { useToast } from '../../hooks/useToast';
 
 type ChatMessageProps = {
   message: Message;
@@ -10,21 +15,49 @@ type ChatMessageProps = {
 };
 
 const ChatMessage: FC<ChatMessageProps> = ({ message, onMessageClick }) => {
+  const buttons = useMemo(() => parseButtons(message), [message.buttons]);
+  const options = useMemo(() => parseOptions(message), [message.options]);
+  const { t } = useTranslation();
+  const toast = useToast();
+
+  const handleContextMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    const content = message.content ?? '';
+    navigator.clipboard
+      .writeText(content)
+      .then(() => {
+        toast.open({
+          type: 'success',
+          title: t('global.notification'),
+          message: t('toast.copied'),
+        });
+      })
+      .catch((err) => {
+        toast.open({
+          type: 'error',
+          title: t('global.notification'),
+          message: err?.message,
+        });
+      });
+  };
+
   return (
-    <div className="historical-chat__message">
-      <button
-        className="historical-chat__message-text"
-        onClick={onMessageClick ? () => onMessageClick(message) : undefined}
-      >
-        <Linkifier message={decodeURIComponent(message.content ?? '')} />
-      </button>
-      <time
-        dateTime={message.authorTimestamp}
-        className="historical-chat__message-date"
-      >
-        {format(new Date(message.authorTimestamp), 'HH:mm:ss')}
-      </time>
-    </div>
+    <>
+      <div className="historical-chat__message">
+        <button
+          className="historical-chat__message-text"
+          onClick={onMessageClick ? () => onMessageClick(message) : undefined}
+          onContextMenu={handleContextMenu}
+        >
+          <Markdownify message={message.content ?? ''} sanitizeLinks={message.authorRole === 'end-user'} />
+        </button>
+        <time dateTime={message.created} className="historical-chat__message-date">
+          {format(new Date(message.created), 'HH:mm:ss')}
+        </time>
+      </div>
+      {buttons.length > 0 && <ButtonMessage buttons={buttons} />}
+      {options.length > 0 && <OptionMessage options={options} />}
+    </>
   );
 };
 

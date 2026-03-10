@@ -1,0 +1,49 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'WIDGET-DATA'"
+  method: get
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    params:
+      - field: user_id
+        type: string
+        description: "Body field 'user_id'"
+
+checkV:
+  log: ${incoming.params}
+
+extractRequestData:
+  assign:
+    user_id: ${incoming.params.user_id}
+
+getDomains:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-widget-domains"
+  result: domains
+
+getUserDomains:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-user-domains"
+    body:
+      user_login: ${user_id}
+  result: user_domains
+
+mapDomainsData:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/utils/map-domains-data"
+    body:
+      domains: ${domains.response.body}
+      userDomains: ${user_domains.response.body[0]}
+  result: mappedDomains
+
+returnSuccess:
+  return: ${mappedDomains.response.body}
+  wrapper: false
+  next: end
+  

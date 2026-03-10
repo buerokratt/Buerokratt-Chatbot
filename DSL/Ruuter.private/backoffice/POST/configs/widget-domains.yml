@@ -1,0 +1,29 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'WIDGET-DOMAINS'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: widgetDomains
+        type: object
+        description: "Body field 'widget-domains'"
+
+extractRequestData:
+  assign:
+    widgetDomains: ${incoming.body.widgetDomains}
+
+setWidgetDomains:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-widget-domains"
+    body:
+      domains: ${widgetDomains}
+  result: res
+
+return_result:
+  return: ${res.response.body}
+  next: end

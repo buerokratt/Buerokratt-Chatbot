@@ -1,10 +1,9 @@
-import { ChangeEvent, forwardRef, useId, useState } from 'react';
-import TextareaAutosize, {
-  TextareaAutosizeProps,
-} from 'react-textarea-autosize';
 import clsx from 'clsx';
+import { ChangeEvent, forwardRef, useId, useState } from 'react';
+import TextareaAutosize, { TextareaAutosizeProps } from 'react-textarea-autosize';
 
 import './ChatTextArea.scss';
+import { useTranslation } from 'react-i18next';
 
 type TextareaProps = TextareaAutosizeProps & {
   label: string;
@@ -31,16 +30,15 @@ const ChatTextArea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       onSubmit,
       ...rest
     },
-    ref
+    ref,
   ) => {
     const id = useId();
-    const [currentLength, setCurrentLength] = useState(
-      (typeof defaultValue === 'string' && defaultValue.length) || 0
-    );
+    const { i18n } = useTranslation();
+    const [currentLength, setCurrentLength] = useState((typeof defaultValue === 'string' && defaultValue.length) || 0);
     const textareaClasses = clsx(
       'textarea',
       disabled && 'textarea--disabled',
-      showMaxLength && 'textarea--maxlength-shown'
+      showMaxLength && 'textarea--maxlength-shown',
     );
 
     const handleOnChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
@@ -62,6 +60,8 @@ const ChatTextArea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             maxLength={maxLength}
             minRows={minRows}
             maxRows={maxRows}
+            lang={i18n.language === 'et' ? 'et' : 'en'}
+            spellCheck={'true'}
             ref={ref}
             onKeyDownCapture={(e) => {
               if (e.key === 'Enter') {
@@ -78,20 +78,14 @@ const ChatTextArea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             {...rest}
           />
           {showMaxLength && (
-            <div
-              className={
-                maxLengthBottom
-                  ? 'textarea__max-length-bottom'
-                  : 'textarea__max-length-top'
-              }
-            >
+            <div className={maxLengthBottom ? 'textarea__max-length-bottom' : 'textarea__max-length-top'}>
               {currentLength}/{maxLength}
             </div>
           )}
         </div>
       </div>
     );
-  }
+  },
 );
 
 export default ChatTextArea;

@@ -1,0 +1,80 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'Anonymize'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: text
+        type: string
+        description: "Body field 'text'"
+      - field: domain
+        type: string
+        description: "Body field 'domain'"
+
+assignValues:
+  assign:
+    text: ${incoming.body.text}
+    domain: ${incoming.body.domain}
+
+checkForDomain:
+  switch:
+    - condition: ${domain === 'none'}
+      next: getAnonymizerConfig
+  next: getDomainAnonymizerConfig
+
+getDomainAnonymizerConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-anonymizer-config"
+    body:
+      domainUUID: ${domain}
+  result: res
+  next: assignConfigs
+
+getAnonymizerConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-anonymizer-config"
+  result: res
+
+assignConfigs:
+  assign:
+    configs: ${res.response.body[0]}
+
+prepareAnonymizerConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_HBS]/prepare_anonymizer_config"
+    headers:
+      type: json
+    body:
+      texts: ${[text]}
+      approach: ${configs.anonymizerSelectedApproach}
+      entities: ${configs.anonymizerSelectedEntities.split(',')}
+      allowlist: ${configs.anonymizerAllowlist.split(',')}
+      denylist: ${configs.anonymizerDenylist.split(',')}
+      hash_type: "[#ANONYMIZER_HASH_TYPE]"
+  result: preparedConfigs
+
+assignPreparedConfigs:
+  assign:
+    preparedConfigs: ${preparedConfigs.response.body}
+  
+anonoymizeText:
+  call: http.post
+  args:
+    url: "[#CHATBOT_ANONYMIZER]/anonymize"
+    body:
+      texts: ${preparedConfigs.texts}
+      anonymizers: ${preparedConfigs.anonymizers}
+      entities: ${preparedConfigs.entities}
+      allowlist: ${preparedConfigs.allowlist}
+      denylist: ${preparedConfigs.denylist}
+  result: anonymize_res
+
+return_result:
+  return: "${anonymize_res.response.body.results[0].text}"

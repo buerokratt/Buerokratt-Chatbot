@@ -1,9 +1,8 @@
+import { format } from 'date-fns';
 import { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-
-import { Message } from 'types/message';
 import { CHAT_EVENTS } from 'types/chat';
-import { format } from 'date-fns';
+import { Message } from 'types/message';
 import './Chat.scss';
 
 type ChatEventProps = {
@@ -12,13 +11,7 @@ type ChatEventProps = {
 
 const ChatEvent: FC<ChatEventProps> = ({ message }) => {
   const { t } = useTranslation();
-  const {
-    event,
-    authorTimestamp,
-    forwardedByUser,
-    forwardedFromCsa,
-    forwardedToCsa,
-  } = message;
+  const { event, authorTimestamp, forwardedByUser, forwardedFromCsa, forwardedToCsa } = message;
 
   let EVENT_PARAMS;
 
@@ -188,10 +181,13 @@ const ChatEvent: FC<ChatEventProps> = ({ message }) => {
       break;
     case CHAT_EVENTS.USER_AUTHENTICATED:
       EVENT_PARAMS = t('chat.events.user-authenticated', {
-        name: `${message.authorFirstName ?? ''} ${
-          message.authorLastName ?? ''
-        }`,
+        name: `${message.authorFirstName ?? ''} ${message.authorLastName ?? ''}`,
         date: format(new Date(message.authorTimestamp), 'dd.MM.yyyy HH:mm:ss'),
+      });
+      break;
+    case CHAT_EVENTS.READ:
+      EVENT_PARAMS = t('chat.events.read', {
+        date: format(new Date(authorTimestamp), 'dd.MM.yyyy HH:mm:ss'),
       });
       break;
     default:

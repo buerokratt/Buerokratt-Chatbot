@@ -1,4 +1,4 @@
-FROM node:22.0.0-alpine
+FROM node:22.5.1-alpine
 
 WORKDIR /app
 
@@ -10,4 +10,4 @@ COPY . /app/
 
 EXPOSE 4040
 
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "start"]

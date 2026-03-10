@@ -19,4 +19,17 @@ export interface OrganizationWorkingTime {
   organizationWorkingTimeNationalHolidays: boolean;
   organizationClosedOnWeekEnds: boolean;
   organizationTheSameOnAllWorkingDays: boolean;
+  organizationWorkingAllTime: boolean;
+  organizationNoCsaAskForContacts: boolean;
+  organizationNoCsaAvailableMessage: string;
+  organizationOutsideWorkingHoursAskForContacts: boolean;
+  organizationOutsideWorkingHoursMessage: string;
+  organizationBotCannotAnswerMessage: string;
+  organizationRedirectIfBotCannotAnswerMessage: string;
+  organizationUseCSA: boolean;
+  domainUUID?: string[];
+}
+
+export interface OrganizationWorkingTimeResponse {
+  response: OrganizationWorkingTime;
 }
