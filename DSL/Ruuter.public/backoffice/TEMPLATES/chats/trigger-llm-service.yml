@@ -78,7 +78,7 @@ validate_response:
   next: return_result
 
 return_result:
-  return: ${res.response.body.response[0].content}
+  return: ${res.response.body.response[0]}
   next: end
 
 return_service_error:

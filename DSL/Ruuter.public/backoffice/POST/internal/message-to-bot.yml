@@ -110,9 +110,39 @@ check_service_result:
   switch:
     - condition: ${llm_service_response.response.body.response === 'skip'}
       next: check_for_service
-  next: assign_service_response
+    - condition: ${llm_service_response.response.body.response?.content}
+      next: assign_simple_response
+  next: assign_object_response
 
-assign_service_response:
+assign_object_response:
+  assign:
+    responseContent: ${llm_service_response.response.body.response.content}
+    responseButtons: ${llm_service_response.response.body.response.buttons}
+  next: check_if_buttons_exist
+
+check_if_buttons_exist:
+  switch:
+    - condition: ${responseButtons != null && responseButtons != '[]'}
+      next: assign_with_parsed_buttons
+  next: assign_without_buttons
+
+assign_with_parsed_buttons:
+  assign:
+    botMsg:
+      - recipient_id: ${chatId}
+        text: ${responseContent}
+        buttons: ${JSON.parse(responseButtons)}
+  next: format_bot_messages
+
+assign_without_buttons:
+  assign:
+    botMsg:
+      - recipient_id: ${chatId}
+        text: ${responseContent}
+        buttons: []
+  next: format_bot_messages
+
+assign_simple_response:
   assign:
     botMsg:
       - recipient_id: ${chatId}
