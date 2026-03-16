@@ -274,7 +274,7 @@ trigger_service:
 
 check_for_llm_trigger_service_response:
   switch:
-    - condition: ${service_response.startsWith('ERROR:')}
+    - condition: ${(service_response?.content ?? (service_response + '')).startsWith('ERROR:')}
       next: return_error
   next: return_message
 
