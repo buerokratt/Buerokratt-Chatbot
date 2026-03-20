@@ -72,6 +72,16 @@ const LinkPreview: React.FC<{
 
 const hasSpecialFormat = (m: string) => m.includes('\n\n') && m.indexOf('.') > 0 && m.indexOf(':') > m.indexOf('.');
 
+const htmlLinkToMarkdown = (value: string): string =>
+  value.replaceAll(
+    /<a\s+[^>]*href\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))[^>]*>([\s\S]*?)<\/a>/gi,
+    (_, href1: string, href2: string, href3: string, label: string) => {
+      const href = (href1 ?? href2 ?? href3 ?? '').trim();
+      const text = sanitizeHtml(label ?? '', { allowedTags: [], allowedAttributes: {} }).trim() || href;
+      return href ? `[${text}](${href})` : text;
+    },
+  );
+
 function formatMessage(message?: string): string {
   const sanitizedMessage = sanitizeHtml(message ?? '');
 
@@ -87,8 +97,9 @@ function formatMessage(message?: string): string {
     dataImagePattern,
     (_, prefix, dataUrl) => `${prefix}[image](${dataUrl})`,
   );
+  const markdownLinksMessage = htmlLinkToMarkdown(finalMessage);
 
-  return finalMessage
+  return markdownLinksMessage
     .replaceAll(/&#x([0-9A-F]+);/gi, (_, hex: string) => String.fromCharCode(parseInt(hex, 16)))
     .replaceAll('&amp;', '&')
     .replaceAll('&gt;', '>')
