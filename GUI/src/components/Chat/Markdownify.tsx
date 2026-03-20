@@ -100,7 +100,7 @@ function formatMessage(message?: string): string {
   const markdownLinksMessage = htmlLinkToMarkdown(finalMessage);
 
   return markdownLinksMessage
-    .replaceAll(/&#x([0-9A-F]+);/gi, (_, hex: string) => String.fromCharCode(parseInt(hex, 16)))
+    .replaceAll(/&#x([0-9A-F]+);/gi, (_, hex: string) => String.fromCodePoint(Number.parseInt(hex, 16)))
     .replaceAll('&amp;', '&')
     .replaceAll('&gt;', '>')
     .replaceAll('&lt;', '<')
@@ -116,7 +116,7 @@ function formatMessage(message?: string): string {
           return `${prefix}${year}. `;
         }
       }
-      return `${prefix}${year}\\. `;
+      return String.raw`${prefix}${year}\. `;
     })
     .replaceAll(/(?<=\n)\d+\.\s/g, hasSpecialFormat(finalMessage) ? '\n\n$&' : '$&')
     .replaceAll(/^(\s+)/g, (match) => match.replaceAll(' ', '&nbsp;'));
