@@ -72,15 +72,21 @@ const LinkPreview: React.FC<{
 
 const hasSpecialFormat = (m: string) => m.includes('\n\n') && m.indexOf('.') > 0 && m.indexOf(':') > m.indexOf('.');
 
-const htmlLinkToMarkdown = (value: string): string =>
-  value.replaceAll(
-    /<a\s+[^>]*href\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))[^>]*>([\s\S]*?)<\/a>/gi,
-    (_, href1: string, href2: string, href3: string, label: string) => {
-      const href = (href1 ?? href2 ?? href3 ?? '').trim();
-      const text = sanitizeHtml(label ?? '', { allowedTags: [], allowedAttributes: {} }).trim() || href;
-      return href ? `[${text}](${href})` : text;
-    },
-  );
+const htmlLinkToMarkdown = (value: string): string => {
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = value;
+  const links = tempDiv.querySelectorAll('a');
+  
+  let result = value;
+  links.forEach((link) => {
+    const href = link.getAttribute('href') || '';
+    const text = link.textContent || href;
+    const markdown = href ? `[${text}](${href})` : text;
+    result = result.replace(link.outerHTML, markdown);
+  });
+  
+  return result;
+};
 
 function formatMessage(message?: string): string {
   const sanitizedMessage = sanitizeHtml(message ?? '');
