@@ -21,9 +21,10 @@ jobs:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
-      # -------------------------
-      # DEBUG — List all project fields
-      # -------------------------
+
+      # ----------------------------------------------------------------------
+      # DEBUG STEP: LIST ALL PROJECT FIELDS (useful to confirm field IDs)
+      # ----------------------------------------------------------------------
       - name: DEBUG — List all project fields
         uses: actions/github-script@v8
         with:
@@ -37,24 +38,13 @@ jobs:
                   ... on ProjectV2 {
                     fields(first: 50) {
                       nodes {
-                        ... on ProjectV2FieldCommon {
-                          id
-                          name
-                          dataType
-                        }
-                        ... on ProjectV2IterationField {
-                          id
-                          name
-                          dataType
-                        }
+                        ... on ProjectV2FieldCommon { id name dataType }
+                        ... on ProjectV2IterationField { id name dataType }
                         ... on ProjectV2SingleSelectField {
                           id
                           name
                           dataType
-                          options {
-                            id
-                            name
-                          }
+                          options { id name }
                         }
                       }
                     }
@@ -64,30 +54,28 @@ jobs:
             `);
 
             console.log("PROJECT FIELDS:");
-            for (const f of fields.node.fields.nodes) {
-              console.log(`${f.name} | ${f.dataType} | ${f.id}`);
-            }
+            console.log(fields.node.fields.nodes);
 
-      # -------------------------
-      # MAIN UPDATE STEP
-      # -------------------------
+      # ----------------------------------------------------------------------
+      # MAIN WORKFLOW STEP
+      # ----------------------------------------------------------------------
       - name: Update project fields
         uses: actions/github-script@v8
         with:
           github-token: ${{ secrets.PROJECT_TOKEN }}
           script: |
-            // -------------------------------
-            // CONFIG
-            // -------------------------------
+            // ======================================================================
+            // CONFIGURATION
+            // ======================================================================
             const projectId = "PVT_kwDOBXrl9M4AToqt";
-            const fieldCreatedBy = "PVTF_lADOBXrl9M4AToqtzhAIhu4";
-            const fieldCreatedDate = "PVTF_lADOBXrl9M4AToqtzhAIh1w";
-            const fieldLastModifiedBy = "PVTF_lADOBXrl9M4AToqtzhAIiE4";
-            const fieldLastUpdated = "PVTF_lADOBXrl9M4AToqtzhAIh_o"; // your correct ID
+            const fieldCreatedBy       = "PVTF_lADOBXrl9M4AToqtzhAIhu4";
+            const fieldCreatedDate     = "PVTF_lADOBXrl9M4AToqtzhAIh1w";
+            const fieldLastModifiedBy  = "PVTF_lADOBXrl9M4AToqtzhAIiE4";
+            const fieldLastUpdated     = "PVTF_lADOBXrl9M4AToqtzhAIh_o";
 
-            // -------------------------------
-            // PAGINATION FUNCTION
-            // -------------------------------
+            // ======================================================================
+            // SAFE PAGINATION (prevents infinite loops)
+            // ======================================================================
             async function getAllProjectItems() {
               let items = [];
               let cursor = null;
@@ -103,15 +91,11 @@ jobs:
                             id
                             content {
                               ... on Issue {
-                                id
-                                number
-                                createdAt
+                                id number createdAt
                                 author { login }
                               }
                               ... on PullRequest {
-                                id
-                                number
-                                createdAt
+                                id number createdAt
                                 author { login }
                               }
                             }
@@ -127,38 +111,55 @@ jobs:
                 `, { cursor });
 
                 const page = result.node.items;
-                items = items.concat(page.nodes);
+
+                // SAFETY: Empty page => stop
+                if (!page.nodes || page.nodes.length === 0) {
+                  console.log("Reached empty page — stopping pagination.");
+                  break;
+                }
+
+                // SAFETY: Filter ghost items
+                const validNodes = page.nodes.filter(n => n && n.content);
+                items = items.concat(validNodes);
+
+                const prevCursor = cursor;
                 cursor = page.pageInfo.endCursor;
+
+                // SAFETY: Cursor stops moving => stop
+                if (!cursor || cursor === prevCursor) {
+                  console.log("Cursor did not advance — stopping pagination.");
+                  break;
+                }
+
                 hasNextPage = page.pageInfo.hasNextPage;
               }
 
+              console.log(`Pagination complete. Items collected: ${items.length}`);
               return items;
             }
 
-            // -------------------------------
-            // CHECK CONTEXT
-            // -------------------------------
+            // ======================================================================
+            // EVENT CONTEXT
+            // ======================================================================
             const isIssue = !!context.payload.issue;
             const item = isIssue ? context.payload.issue : context.payload.pull_request;
 
-            // -------------------------------
-            // MANUAL RUN → REFRESH ALL ITEMS
-            // -------------------------------
+            // ======================================================================
+            // MANUAL RUN — FULL REFRESH
+            // ======================================================================
             if (!item) {
-              console.log("Manual run detected — refreshing ALL project items…");
+              console.log("Manual run detected → refreshing ALL project items…");
 
               const allItems = await getAllProjectItems();
-              console.log(`Found ${allItems.length} total project items`);
+              console.log(`Found ${allItems.length} items total.`);
 
               for (const node of allItems) {
-                if (!node.content) continue;
-
                 const createdBy = node.content.author?.login ?? "unknown";
                 const createdAt = node.content.createdAt;
                 const itemId = node.id;
                 const updatedAt = new Date().toISOString();
 
-                console.log("Updating item:", node.content.number);
+                console.log(`Updating item #${node.content.number}`);
 
                 // Created By
                 await github.graphql(`
@@ -202,7 +203,7 @@ jobs:
                   }
                 `);
 
-                // Last Modified
+                // Last Modified By
                 await github.graphql(`
                   mutation {
                     updateProjectV2ItemFieldValue(input: {
@@ -217,13 +218,13 @@ jobs:
                 `);
               }
 
-              console.log("Full refresh complete!");
+              console.log("FULL REFRESH COMPLETE.");
               return;
             }
 
-            // -------------------------------
+            // ======================================================================
             // EVENT-BASED UPDATE
-            // -------------------------------
+            // ======================================================================
             const contentNodeId = item.node_id;
             const createdBy = item.user.login;
             const createdAt = item.created_at;
@@ -234,7 +235,7 @@ jobs:
             const projectItem = allItems.find(i => i.content?.id === contentNodeId);
 
             if (!projectItem) {
-              console.log("Item not in project — stopping.");
+              console.log("Item not found in project — stopping.");
               return;
             }
 
@@ -248,9 +249,7 @@ jobs:
                   itemId: "${itemId}",
                   fieldId: "${fieldLastModifiedBy}",
                   value: { text: "${lastModifiedBy}" }
-                }) {
-                  projectV2Item { id }
-                }
+                }) { projectV2Item { id } }
               }
             `);
 
@@ -262,14 +261,12 @@ jobs:
                   itemId: "${itemId}",
                   fieldId: "${fieldLastUpdated}",
                   value: { date: "${updatedAt}" }
-                }) {
-                  projectV2Item { id }
-                }
+                }) { projectV2Item { id } }
               }
             `);
 
+            // Created fields only on "opened"
             if (context.payload.action === "opened") {
-              // Created By
               await github.graphql(`
                 mutation {
                   updateProjectV2ItemFieldValue(input: {
@@ -277,13 +274,10 @@ jobs:
                     itemId: "${itemId}",
                     fieldId: "${fieldCreatedBy}",
                     value: { text: "${createdBy}" }
-                  }) {
-                    projectV2Item { id }
-                  }
+                  }) { projectV2Item { id } }
                 }
               `);
 
-              // Created Date
               await github.graphql(`
                 mutation {
                   updateProjectV2ItemFieldValue(input: {
@@ -291,11 +285,9 @@ jobs:
                     itemId: "${itemId}",
                     fieldId: "${fieldCreatedDate}",
                     value: { date: "${createdAt}" }
-                  }) {
-                    projectV2Item { id }
-                  }
+                  }) { projectV2Item { id } }
                 }
               `);
             }
 
-            console.log("Update complete.");
+            console.log("EVENT-BASED UPDATE COMPLETE.");
