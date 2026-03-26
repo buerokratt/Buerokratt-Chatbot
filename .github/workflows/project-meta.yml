@@ -1,6 +1,7 @@
-name: Update Project Metadata — Event
+name: Update Project Metadata
 
 on:
+  workflow_dispatch:   # ← This enables the "Run workflow" button
   issues:
     types: [opened, edited, reopened, closed]
   pull_request:
@@ -13,103 +14,67 @@ permissions:
   repository-projects: write
 
 jobs:
-  update-item:
+  update-project-fields:
     runs-on: ubuntu-latest
+
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
     steps:
-      - name: Update Project Metadata
+      # -------------------------
+      # DEBUG — List all project fields
+      # -------------------------
+      - name: DEBUG — List all project fields
         uses: actions/github-script@v8
         with:
           github-token: ${{ secrets.PROJECT_TOKEN }}
           script: |
-            const projectId = "PVT_kwDOBXrl9M4AToqt"; // Bürokratt Sprint
-            const fieldCreatedBy = "PVTF_lADOBXrl9M4AToqtzhAIhu4";
-            const fieldCreatedDate = "PVTF_lADOBXrl9M4AToqtzhAIh1w";
-            const fieldLastModifiedBy = "PVTF_lADOBXrl9M4AToqtzhAIiE4";
-            const fieldLastUpdated = "PVTF_lADOBXrl9M4AToqtzhAIh_o";
+            const projectId = "PVT_kwDOBXrl9M4AToqt"; // replace with your project ID
 
-            const item = context.payload.issue ?? context.payload.pull_request;
-            if (!item) {
-              console.log("No issue or PR found in payload. Skipping.");
-              return;
-            }
-
-            const itemId = await (async () => {
-              const items = await github.graphql(`
-                query($cursor: String) {
-                  node(id: "${projectId}") {
-                    ... on ProjectV2 {
-                      items(first: 100, after: $cursor) {
-                        nodes {
+            const fields = await github.graphql(`
+              query {
+                node(id: "${projectId}") {
+                  ... on ProjectV2 {
+                    fields(first: 50) {
+                      nodes {
+                        ... on ProjectV2FieldCommon {
                           id
-                          content { id }
+                          name
+                          dataType
                         }
-                        pageInfo { endCursor hasNextPage }
+                        ... on ProjectV2IterationField {
+                          id
+                          name
+                          dataType
+                        }
+                        ... on ProjectV2SingleSelectField {
+                          id
+                          name
+                          dataType
+                          options {
+                            id
+                            name
+                          }
+                        }
                       }
                     }
                   }
                 }
-              `);
-              const found = items.node.items.nodes.find(i => i.content?.id === item.node_id);
-              return found?.id;
-            })();
-
-            if (!itemId) {
-              console.log("Item not in project. Skipping.");
-              return;
-            }
-
-            const updatedAt = new Date().toISOString();
-            const lastModifiedBy = context.payload.sender.login;
-            const createdBy = item.user.login;
-            const createdAt = item.created_at;
-
-            // LastModified
-            await github.graphql(`
-              mutation {
-                updateProjectV2ItemFieldValue(input: {
-                  projectId: "${projectId}",
-                  itemId: "${itemId}",
-                  fieldId: "${fieldLastModifiedBy}",
-                  value: { text: "${lastModifiedBy}" }
-                }) { projectV2Item { id } }
               }
             `);
 
-            // LastUpdated
-            await github.graphql(`
-              mutation {
-                updateProjectV2ItemFieldValue(input: {
-                  projectId: "${projectId}",
-                  itemId: "${itemId}",
-                  fieldId: "${fieldLastUpdated}",
-                  value: { date: "${updatedAt}" }
-                }) { projectV2Item { id } }
-              }
-            `);
-
-            if (context.payload.action === "opened") {
-              // CreatedBy
-              await github.graphql(`
-                mutation {
-                  updateProjectV2ItemFieldValue(input: {
-                    projectId: "${projectId}",
-                    itemId: "${itemId}",
-                    fieldId: "${fieldCreatedBy}",
-                    value: { text: "${createdBy}" }
-                  }) { projectV2Item { id } }
-                }
-              `);
-              // CreatedDate
-              await github.graphql(`
-                mutation {
-                  updateProjectV2ItemFieldValue(input: {
-                    projectId: "${projectId}",
-                    itemId: "${itemId}",
-                    fieldId: "${fieldCreatedDate}",
-                    value: { date: "${createdAt}" }
-                  }) { projectV2Item { id } }
-                }
-              `);
+            console.log("PROJECT FIELDS:");
+            for (const f of fields.node.fields.nodes) {
+              console.log(`${f.name} | ${f.dataType} | ${f.id}`);
             }
 
-            console.log("Update complete.");
+      # -------------------------
+      # MAIN UPDATE STEP
+      # -------------------------
+      - name: Update project fields
+        uses: actions/github-script@v8
+        with:
+          github-token: ${{ secrets.PROJECT_TOKEN }}
+          script: |
+            // your full update script here (pagination + updating fields)
+            // same as before
