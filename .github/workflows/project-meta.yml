@@ -12,9 +12,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Trigger org workflow
-        uses: peter-evans/workflow-dispatch@v1
+        uses: peter-evans/workflow-dispatch@v2
         with:
-          token: ${{ secrets.PROJECT_TOKEN }} 
+          token: ${{ secrets.PROJECT_TOKEN }}
           repository: buerokratt/.github
           workflow: project-meta.yml
           ref: main
