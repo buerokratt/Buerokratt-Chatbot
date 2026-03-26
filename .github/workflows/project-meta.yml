@@ -1,7 +1,6 @@
-name: Update Project Metadata
+name: Update Project Metadata — Event
 
 on:
-  workflow_dispatch:
   issues:
     types: [opened, edited, reopened, closed]
   pull_request:
@@ -14,234 +13,57 @@ permissions:
   repository-projects: write
 
 jobs:
-  update-project-fields:
+  update-item:
     runs-on: ubuntu-latest
-
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
     steps:
-
-      # ----------------------------------------------------------------------
-      # DEBUG STEP: LIST ALL PROJECT FIELDS (useful to confirm field IDs)
-      # ----------------------------------------------------------------------
-      - name: DEBUG — List all project fields
+      - name: Update Project Metadata
         uses: actions/github-script@v8
         with:
           github-token: ${{ secrets.PROJECT_TOKEN }}
           script: |
-            const projectId = "PVT_kwDOBXrl9M4AToqt";
+            const projectId = "PVT_kwDOBXrl9M4AToqt"; // Bürokratt Sprint
+            const fieldCreatedBy = "PVTF_lADOBXrl9M4AToqtzhAIhu4";
+            const fieldCreatedDate = "PVTF_lADOBXrl9M4AToqtzhAIh1w";
+            const fieldLastModifiedBy = "PVTF_lADOBXrl9M4AToqtzhAIiE4";
+            const fieldLastUpdated = "PVTF_lADOBXrl9M4AToqtzhAIh_o";
 
-            const fields = await github.graphql(`
-              query {
-                node(id: "${projectId}") {
-                  ... on ProjectV2 {
-                    fields(first: 50) {
-                      nodes {
-                        ... on ProjectV2FieldCommon { id name dataType }
-                        ... on ProjectV2IterationField { id name dataType }
-                        ... on ProjectV2SingleSelectField {
-                          id
-                          name
-                          dataType
-                          options { id name }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            `);
-
-            console.log("PROJECT FIELDS:");
-            console.log(fields.node.fields.nodes);
-
-      # ----------------------------------------------------------------------
-      # MAIN WORKFLOW STEP
-      # ----------------------------------------------------------------------
-      - name: Update project fields
-        uses: actions/github-script@v8
-        with:
-          github-token: ${{ secrets.PROJECT_TOKEN }}
-          script: |
-            // ======================================================================
-            // CONFIGURATION
-            // ======================================================================
-            const projectId = "PVT_kwDOBXrl9M4AToqt";
-            const fieldCreatedBy       = "PVTF_lADOBXrl9M4AToqtzhAIhu4";
-            const fieldCreatedDate     = "PVTF_lADOBXrl9M4AToqtzhAIh1w";
-            const fieldLastModifiedBy  = "PVTF_lADOBXrl9M4AToqtzhAIiE4";
-            const fieldLastUpdated     = "PVTF_lADOBXrl9M4AToqtzhAIh_o";
-
-            // ======================================================================
-            // SAFE PAGINATION (prevents infinite loops)
-            // ======================================================================
-            async function getAllProjectItems() {
-              let items = [];
-              let cursor = null;
-              let hasNextPage = true;
-
-              while (hasNextPage) {
-                const result = await github.graphql(`
-                  query($cursor: String) {
-                    node(id: "${projectId}") {
-                      ... on ProjectV2 {
-                        items(first: 100, after: $cursor) {
-                          nodes {
-                            id
-                            content {
-                              ... on Issue {
-                                id number createdAt
-                                author { login }
-                              }
-                              ... on PullRequest {
-                                id number createdAt
-                                author { login }
-                              }
-                            }
-                          }
-                          pageInfo {
-                            endCursor
-                            hasNextPage
-                          }
-                        }
-                      }
-                    }
-                  }
-                `, { cursor });
-
-                const page = result.node.items;
-
-                // SAFETY: Empty page => stop
-                if (!page.nodes || page.nodes.length === 0) {
-                  console.log("Reached empty page — stopping pagination.");
-                  break;
-                }
-
-                // SAFETY: Filter ghost items
-                const validNodes = page.nodes.filter(n => n && n.content);
-                items = items.concat(validNodes);
-
-                const prevCursor = cursor;
-                cursor = page.pageInfo.endCursor;
-
-                // SAFETY: Cursor stops moving => stop
-                if (!cursor || cursor === prevCursor) {
-                  console.log("Cursor did not advance — stopping pagination.");
-                  break;
-                }
-
-                hasNextPage = page.pageInfo.hasNextPage;
-              }
-
-              console.log(`Pagination complete. Items collected: ${items.length}`);
-              return items;
-            }
-
-            // ======================================================================
-            // EVENT CONTEXT
-            // ======================================================================
-            const isIssue = !!context.payload.issue;
-            const item = isIssue ? context.payload.issue : context.payload.pull_request;
-
-            // ======================================================================
-            // MANUAL RUN — FULL REFRESH
-            // ======================================================================
+            const item = context.payload.issue ?? context.payload.pull_request;
             if (!item) {
-              console.log("Manual run detected → refreshing ALL project items…");
-
-              const allItems = await getAllProjectItems();
-              console.log(`Found ${allItems.length} items total.`);
-
-              for (const node of allItems) {
-                const createdBy = node.content.author?.login ?? "unknown";
-                const createdAt = node.content.createdAt;
-                const itemId = node.id;
-                const updatedAt = new Date().toISOString();
-
-                console.log(`Updating item #${node.content.number}`);
-
-                // Created By
-                await github.graphql(`
-                  mutation {
-                    updateProjectV2ItemFieldValue(input: {
-                      projectId: "${projectId}",
-                      itemId: "${itemId}",
-                      fieldId: "${fieldCreatedBy}",
-                      value: { text: "${createdBy}" }
-                    }) {
-                      projectV2Item { id }
-                    }
-                  }
-                `);
-
-                // Created Date
-                await github.graphql(`
-                  mutation {
-                    updateProjectV2ItemFieldValue(input: {
-                      projectId: "${projectId}",
-                      itemId: "${itemId}",
-                      fieldId: "${fieldCreatedDate}",
-                      value: { date: "${createdAt}" }
-                    }) {
-                      projectV2Item { id }
-                    }
-                  }
-                `);
-
-                // Last Updated
-                await github.graphql(`
-                  mutation {
-                    updateProjectV2ItemFieldValue(input: {
-                      projectId: "${projectId}",
-                      itemId: "${itemId}",
-                      fieldId: "${fieldLastUpdated}",
-                      value: { date: "${updatedAt}" }
-                    }) {
-                      projectV2Item { id }
-                    }
-                  }
-                `);
-
-                // Last Modified By
-                await github.graphql(`
-                  mutation {
-                    updateProjectV2ItemFieldValue(input: {
-                      projectId: "${projectId}",
-                      itemId: "${itemId}",
-                      fieldId: "${fieldLastModifiedBy}",
-                      value: { text: "${createdBy}" }
-                    }) {
-                      projectV2Item { id }
-                    }
-                  }
-                `);
-              }
-
-              console.log("FULL REFRESH COMPLETE.");
+              console.log("No issue or PR found in payload. Skipping.");
               return;
             }
 
-            // ======================================================================
-            // EVENT-BASED UPDATE
-            // ======================================================================
-            const contentNodeId = item.node_id;
+            const itemId = await (async () => {
+              const items = await github.graphql(`
+                query($cursor: String) {
+                  node(id: "${projectId}") {
+                    ... on ProjectV2 {
+                      items(first: 100, after: $cursor) {
+                        nodes {
+                          id
+                          content { id }
+                        }
+                        pageInfo { endCursor hasNextPage }
+                      }
+                    }
+                  }
+                }
+              `);
+              const found = items.node.items.nodes.find(i => i.content?.id === item.node_id);
+              return found?.id;
+            })();
+
+            if (!itemId) {
+              console.log("Item not in project. Skipping.");
+              return;
+            }
+
+            const updatedAt = new Date().toISOString();
+            const lastModifiedBy = context.payload.sender.login;
             const createdBy = item.user.login;
             const createdAt = item.created_at;
-            const lastModifiedBy = context.payload.sender.login;
-            const updatedAt = new Date().toISOString();
 
-            const allItems = await getAllProjectItems();
-            const projectItem = allItems.find(i => i.content?.id === contentNodeId);
-
-            if (!projectItem) {
-              console.log("Item not found in project — stopping.");
-              return;
-            }
-
-            const itemId = projectItem.id;
-
-            // Last Modified
+            // LastModified
             await github.graphql(`
               mutation {
                 updateProjectV2ItemFieldValue(input: {
@@ -253,7 +75,7 @@ jobs:
               }
             `);
 
-            // Last Updated
+            // LastUpdated
             await github.graphql(`
               mutation {
                 updateProjectV2ItemFieldValue(input: {
@@ -265,8 +87,8 @@ jobs:
               }
             `);
 
-            // Created fields only on "opened"
             if (context.payload.action === "opened") {
+              // CreatedBy
               await github.graphql(`
                 mutation {
                   updateProjectV2ItemFieldValue(input: {
@@ -277,7 +99,7 @@ jobs:
                   }) { projectV2Item { id } }
                 }
               `);
-
+              // CreatedDate
               await github.graphql(`
                 mutation {
                   updateProjectV2ItemFieldValue(input: {
@@ -290,4 +112,4 @@ jobs:
               `);
             }
 
-            console.log("EVENT-BASED UPDATE COMPLETE.");
+            console.log("Update complete.");
