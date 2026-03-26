@@ -44,38 +44,46 @@ jobs:
         run: |
           awk -v branch="${{ env.BRANCH }}" ' /^[0-9a-zA-Z]+$/ { current_branch = $0; } current_branch == branch && /^[A-Z_]+=/{ print $0; }' release.env >> $GITHUB_ENV
 
-      - name: Set repo
+      - name: Set repo and Docker tag
         run: |
-           LOWER_CASE_GITHUB_REPOSITORY=$(echo $GITHUB_REPOSITORY | tr '[:upper:]' '[:lower:]')
-           echo "DOCKER_TAG_CUSTOM=ghcr.io/${LOWER_CASE_GITHUB_REPOSITORY}:v${{ env.MAJOR }}.${{ env.MINOR }}.${{ env.PATCH }}" >> $GITHUB_ENV
-           echo "$GITHUB_ENV"
-      
-      - name: Build Docker image
-        run: |
-          echo "Building Docker image for branch: ${{ env.BRANCH }} major: ${{ env.MAJOR }} minor: ${{ env.MINOR }} patch: ${{ env.PATCH }}"
-          cd GUI && docker image build --tag $DOCKER_TAG_CUSTOM --no-cache .
-        if: ${{ env.BRANCH == 'test' }}
+          LOWER_CASE_GITHUB_REPOSITORY=$(echo $GITHUB_REPOSITORY | tr '[:upper:]' '[:lower:]')
 
-      - name: Build Notification image
+          if [ "${{ env.BRANCH }}" == "test" ]; then
+            TAG_SUFFIX=""
+          elif [ "${{ env.BRANCH }}" == "stage" ]; then
+            TAG_SUFFIX="-stage"
+          else
+            TAG_SUFFIX=""
+          fi
+          echo "DOCKER_TAG_CUSTOM=ghcr.io/${LOWER_CASE_GITHUB_REPOSITORY}:v${{ env.MAJOR }}.${{ env.MINOR }}.${{ env.PATCH }}${TAG_SUFFIX}" >> $GITHUB_ENV
+          echo "$GITHUB_ENV"
+
+      - name: Build GUI Docker image
         run: |
-          echo "Building Docker image for branch: ${{ env.BRANCH }} major: ${{ env.MAJOR }} minor: ${{ env.MINOR }} patch: ${{ env.PATCH }}"
+          echo "Building GUI Docker image for branch: ${{ env.BRANCH }} version: v${{ env.MAJOR }}.${{ env.MINOR }}.${{ env.PATCH }}"
+          cd GUI && docker image build --tag $DOCKER_TAG_CUSTOM --no-cache .
+        if: ${{ env.BRANCH == 'test' || env.BRANCH == 'stage' }}
+
+      - name: Build Notification Docker image
+        run: |
+          echo "Building Notification Docker image for branch: ${{ env.BRANCH }} version: v${{ env.MAJOR }}.${{ env.MINOR }}.${{ env.PATCH }}"
           cd notification-server && docker image build --tag $DOCKER_TAG_CUSTOM-notification-node --no-cache .
-        if: ${{ env.BRANCH == 'test' }}
+        if: ${{ env.BRANCH == 'test' || env.BRANCH == 'stage' }}
 
       - name: Log in to GitHub container registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
 
-      - name: Push Docker image to GitHub Packages
+      - name: Push GUI Docker image to GitHub Packages
         run: |
-          echo "Pushing Docker image to GitHub Packages"
+          echo "Pushing GUI Docker image to GitHub Packages"
           docker push $DOCKER_TAG_CUSTOM
-        if: ${{ env.BRANCH == 'test' }}
+        if: ${{ env.BRANCH == 'test' || env.BRANCH == 'stage' }}
 
-      - name: Push Notification image to GitHub Packages
+      - name: Push Notification Docker image to GitHub Packages
         run: |
-          echo "Pushing Docker image to GitHub Packages"
+          echo "Pushing Notification Docker image to GitHub Packages"
           docker push $DOCKER_TAG_CUSTOM-notification-node
-        if: ${{ env.BRANCH == 'test' }}
+        if: ${{ env.BRANCH == 'test' || env.BRANCH == 'stage' }}
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
