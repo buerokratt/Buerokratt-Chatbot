@@ -6,122 +6,122 @@ on:
 jobs:
   update-meta:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Update all project items
+      - name: Run update
         uses: actions/github-script@v8
         with:
           github-token: ${{ secrets.PROJECT_TOKEN }}
           script: |
             const projectId = "PVT_kwDOBXrl9M4AToqt"; // Bürokratt Sprint
 
-            // Replace these with your field IDs
-            const FIELD_CREATED_BY = "PVTF_lADOBXrl9M4AToqtzhAIhu4";
-            const FIELD_CREATED_AT = "PVTF_lADOBXrl9M4AToqtzhAIh1w";
-            const FIELD_LAST_UPDATED = "PVTF_lADOBXrl9M4AToqtzhAIh_o";
-            const FIELD_LAST_MODIFIED_BY = "PVTF_lADOBXrl9M4AToqtzhAIiE4";
+            // Field IDs (replace with your ProjectV2 field IDs)
+            const fields = {
+              createdAt: "PVTF_lADOBXrl9M4AToqtzhAIh1w",
+              createdBy: "PVTF_lADOBXrl9M4AToqtzhAIhu4",
+              lastUpdated: "PVTF_lADOBXrl9M4AToqtzhAIh_o",
+              lastModifiedBy: "PVTF_lADOBXrl9M4AToqtzhAIiE4"
+            };
 
             console.log("Manual refresh — updating ALL project items");
 
-            // Helper: fetch items with pagination
-            async function fetchAllItems(cursor = null, accumulated = []) {
-              const query = `
-                query($projectId: ID!, $after: String) {
-                  node(id: $projectId) {
-                    ... on ProjectV2 {
-                      items(first: 100, after: $after) {
-                        pageInfo { hasNextPage endCursor }
-                        nodes {
-                          id
-                          type
-                          content {
-                            ... on Issue {
-                              number
-                              repository { name }
-                              createdAt
-                              updatedAt
-                              author { login }
-                              editor { login }
-                              comments(last: 1) { nodes { author { login } createdAt } }
-                            }
-                            ... on PullRequest {
-                              number
-                              repository { name }
-                              createdAt
-                              updatedAt
-                              author { login }
-                              editor { login }
-                              comments(last: 1) { nodes { author { login } createdAt } }
+            // Pagination function to handle >100 items
+            async function getAllItems(projectId) {
+              let items = [];
+              let hasNext = true;
+              let after = null;
+
+              while (hasNext) {
+                const query = `
+                  query($projectId: ID!, $after: String) {
+                    node(id: $projectId) {
+                      ... on ProjectV2 {
+                        items(first: 100, after: $after) {
+                          pageInfo { hasNextPage endCursor }
+                          nodes {
+                            id
+                            type
+                            content {
+                              ... on Issue {
+                                number
+                                repository { name }
+                                createdAt
+                                updatedAt
+                                author { login }
+                                editor { login }
+                                comments(last: 1) {
+                                  nodes { author { login } createdAt }
+                                }
+                              }
+                              ... on PullRequest {
+                                number
+                                repository { name }
+                                createdAt
+                                updatedAt
+                                author { login }
+                                editor { login }
+                                comments(last: 1) {
+                                  nodes { author { login } createdAt }
+                                }
+                              }
                             }
                           }
                         }
                       }
                     }
                   }
-                }
-              `;
-
-              const result = await github.graphql(query, { projectId, after: cursor });
-              const items = result.node.items.nodes;
-              accumulated.push(...items);
-
-              const pageInfo = result.node.items.pageInfo;
-              if (pageInfo.hasNextPage) {
-                return fetchAllItems(pageInfo.endCursor, accumulated);
-              } else {
-                return accumulated;
+                `;
+                const result = await github.graphql(query, { projectId, after });
+                const page = result.node.items;
+                items.push(...page.nodes);
+                hasNext = page.pageInfo.hasNextPage;
+                after = page.pageInfo.endCursor;
               }
+
+              return items;
             }
 
-            const items = await fetchAllItems();
+            const items = await getAllItems(projectId);
             console.log(`Total items in project: ${items.length}`);
 
             for (const item of items) {
               const content = item.content;
               if (!content || !content.repository) continue;
 
-              const number = content.number;
-              const repoName = content.repository.name;
+              // Compute field values
+              const createdAt = content.createdAt;
+              const createdBy = content.author?.login || "unknown";
+              const lastUpdated = content.comments?.nodes?.[0]?.createdAt || content.updatedAt;
+              const lastModifiedBy = content.comments?.nodes?.[0]?.author?.login || content.editor?.login || "unknown";
 
-              console.log(`Updating item #${number} (repo=${repoName})`);
-
-              // --- Compute Last Updated and Last Modified By ---
-              let lastUpdated = new Date(content.updatedAt);
-              let lastModifier = content.editor?.login || content.author?.login;
-
-              if (content.comments?.nodes?.length > 0) {
-                const lastComment = content.comments.nodes[0];
-                const commentDate = new Date(lastComment.createdAt);
-                if (commentDate > lastUpdated) {
-                  lastUpdated = commentDate;
-                  lastModifier = lastComment.author?.login || lastModifier;
-                }
-              }
-
-              // --- Prepare values ---
-              const createdAtStr = new Date(content.createdAt).toISOString();
-              const lastUpdatedStr = lastUpdated.toISOString();
-              const createdByStr = content.author?.login || "unknown";
-              const lastModifiedByStr = lastModifier || "unknown";
-
-              // --- Update fields ---
-              async function updateField(fieldId, value) {
+              // Helper to update a field
+              async function updateField(fieldId, value, isDate=false) {
                 try {
                   await github.graphql(`
-                    mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $value: ProjectV2FieldValueInput!) {
+                    mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!) {
                       updateProjectV2ItemFieldValue(
-                        input: { projectId: $projectId, itemId: $itemId, fieldId: $fieldId, value: $value }
-                      ) { projectV2Item { id } }
+                        input: {
+                          projectId: $projectId,
+                          itemId: $itemId,
+                          fieldId: $fieldId,
+                          value: ${isDate ? `{ date: "${value}" }` : `{ text: "${value}" }`}
+                        }
+                      ) {
+                        projectV2Item { id }
+                      }
                     }
-                  `, { projectId, itemId: item.id, fieldId, value });
+                  `, { projectId, itemId: item.id, fieldId });
                 } catch (err) {
-                  console.log(`❌ Failed to update #${number} field ${fieldId}: ${err.message}`);
+                  console.log(`❌ Failed to update #${content.number} field ${fieldId}: ${err.message}`);
                 }
               }
 
-              await updateField(FIELD_CREATED_AT, { date: createdAtStr });
-              await updateField(FIELD_CREATED_BY, { text: createdByStr });
-              await updateField(FIELD_LAST_UPDATED, { date: lastUpdatedStr });
-              await updateField(FIELD_LAST_MODIFIED_BY, { text: lastModifiedByStr });
+              console.log(`Updating item #${content.number} (repo=${content.repository.name})`);
+
+              await updateField(fields.createdAt, createdAt, true);
+              await updateField(fields.createdBy, createdBy);
+              await updateField(fields.lastUpdated, lastUpdated, true);
+              await updateField(fields.lastModifiedBy, lastModifiedBy);
             }
 
-            console.log("Done.");
+            console.log("Done updating all project items.");
