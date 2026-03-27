@@ -11,7 +11,7 @@ jobs:
       - name: Run update
         uses: actions/github-script@v8
         with:
-          github-token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+          token: ${{ secrets.PROJECT_TOKEN }}   # ← NOW CORRECT
           script: |
             const targetRepo = "Buerokratt-Chatbot";
             const projectId = "PVT_kwDOBXrl9M4AToqt"; // Bürokratt Sprint
