@@ -112,10 +112,7 @@ jobs:
               const content = item.content;
               if (!content || !content.repository) continue;
 
-              if (content.repository.name !== targetRepo) {
-                console.log(`Skipping #${content.number} (repo=${content.repository.name})`);
-                continue;
-              }
+              console.log(`Updating all project items across all repos`);
 
               console.log(`Updating item #${content.number}`);
 
