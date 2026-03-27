@@ -1,7 +1,7 @@
 name: Update Project Metadata
 
 on:
-  workflow_dispatch:   # ← This enables the "Run workflow" button
+  workflow_dispatch:
   issues:
     types: [opened, edited, reopened, closed]
   pull_request:
@@ -9,72 +9,192 @@ on:
 
 permissions:
   contents: read
-  issues: write
-  pull-requests: write
+  issues: read
+  pull-requests: read
   repository-projects: write
 
 jobs:
-  update-project-fields:
+  update-project:
     runs-on: ubuntu-latest
 
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
-      # -------------------------
-      # DEBUG — List all project fields
-      # -------------------------
-      - name: DEBUG — List all project fields
+      - name: Update ProjectV2 fields
         uses: actions/github-script@v8
         with:
           github-token: ${{ secrets.PROJECT_TOKEN }}
           script: |
-            const projectId = "PVT_kwDOBXrl9M4AToqt"; // replace with your project ID
+            // -------------------------------
+            // CONFIG
+            // -------------------------------
+            const TARGET_REPO = "Buerokratt-Chatbot";
+            const projectId = "PVT_kwDOBXrl9M4AToqt";
 
-            const fields = await github.graphql(`
-              query {
-                node(id: "${projectId}") {
-                  ... on ProjectV2 {
-                    fields(first: 50) {
-                      nodes {
-                        ... on ProjectV2FieldCommon {
-                          id
-                          name
-                          dataType
-                        }
-                        ... on ProjectV2IterationField {
-                          id
-                          name
-                          dataType
-                        }
-                        ... on ProjectV2SingleSelectField {
-                          id
-                          name
-                          dataType
-                          options {
+            // Field IDs
+            const F_CREATED_BY = "PVTF_lADOBXrl9M4AToqtzhAIhu4";
+            const F_CREATED_DATE = "PVTF_lADOBXrl9M4AToqtzhAIh1w";
+            const F_LAST_MODIFIED_BY = "PVTF_lADOBXrl9M4AToqtzhAIiE4";
+            const F_LAST_UPDATED = "PVTF_lADOBXrl9M4AToqtzhAIh_o";
+
+            // -------------------------------
+            // QUERY ALL ITEMS (with repo name!)
+            // -------------------------------
+            async function getAllItems() {
+              let all = [];
+              let cursor = null;
+              let hasNext = true;
+
+              while (hasNext) {
+                const res = await github.graphql(
+                  `
+                  query($cursor: String) {
+                    node(id: "${projectId}") {
+                      ... on ProjectV2 {
+                        items(first: 100, after: $cursor) {
+                          nodes {
                             id
-                            name
+                            content {
+                              __typename
+                              ... on Issue {
+                                id
+                                number
+                                createdAt
+                                author { login }
+                                repository { name }
+                              }
+                              ... on PullRequest {
+                                id
+                                number
+                                createdAt
+                                author { login }
+                                repository { name }
+                              }
+                            }
+                          }
+                          pageInfo {
+                            endCursor
+                            hasNextPage
                           }
                         }
                       }
                     }
                   }
-                }
-              }
-            `);
+                  `,
+                  { cursor }
+                );
 
-            console.log("PROJECT FIELDS:");
-            for (const f of fields.node.fields.nodes) {
-              console.log(`${f.name} | ${f.dataType} | ${f.id}`);
+                const page = res.node.items;
+                all = all.concat(page.nodes);
+                cursor = page.pageInfo.endCursor;
+                hasNext = page.pageInfo.hasNextPage;
+              }
+              return all;
             }
 
-      # -------------------------
-      # MAIN UPDATE STEP
-      # -------------------------
-      - name: Update project fields
-        uses: actions/github-script@v8
-        with:
-          github-token: ${{ secrets.PROJECT_TOKEN }}
-          script: |
-            // your full update script here (pagination + updating fields)
-            // same as before
+            // -------------------------------
+            // MUTATION WRAPPER WITH RETRY
+            // -------------------------------
+            async function updateField(itemId, fieldId, value) {
+              try {
+                await github.graphql(`
+                  mutation {
+                    updateProjectV2ItemFieldValue(input: {
+                      projectId: "${projectId}",
+                      itemId: "${itemId}",
+                      fieldId: "${fieldId}",
+                      value: ${JSON.stringify(value)}
+                    }) {
+                      projectV2Item { id }
+                    }
+                  }
+                `);
+              } catch (err) {
+                console.log("⚠ Mutation failed, retrying:", err.message);
+                await new Promise(r => setTimeout(r, 300));
+                await github.graphql(`
+                  mutation {
+                    updateProjectV2ItemFieldValue(input: {
+                      projectId: "${projectId}",
+                      itemId: "${itemId}",
+                      fieldId: "${fieldId}",
+                      value: ${JSON.stringify(value)}
+                    }) {
+                      projectV2Item { id }
+                    }
+                  }
+                `);
+              }
+            }
+
+            // -------------------------------
+            // MANUAL RUN → APPLY TO ALL ITEMS
+            // -------------------------------
+            if (!context.payload.issue && !context.payload.pull_request) {
+              console.log("Manual refresh — updating ONLY Buerokratt-Chatbot items");
+
+              const items = await getAllItems();
+              let count = 0;
+
+              for (const it of items) {
+                const c = it.content;
+                if (!c) continue;
+                if (c.repository?.name !== TARGET_REPO) {
+                  console.log(`Skipping ${c.number} (repo=${c.repository?.name})`);
+                  continue;
+                }
+
+                count++;
+                console.log(`Updating item #${c.number}`);
+
+                const updatedAt = new Date().toISOString();
+
+                await updateField(it.id, F_CREATED_BY, { text: c.author?.login ?? "unknown" });
+                await updateField(it.id, F_CREATED_DATE, { date: c.createdAt });
+                await updateField(it.id, F_LAST_MODIFIED_BY, { text: c.author?.login ?? "unknown" });
+                await updateField(it.id, F_LAST_UPDATED, { date: updatedAt });
+
+                await new Promise(r => setTimeout(r, 150)); // anti rate-limit
+              }
+
+              console.log(`Manual refresh complete. Updated ${count} items.`);
+              return;
+            }
+
+            // -------------------------------
+            // EVENT UPDATE (single issue/PR)
+            // -------------------------------
+            const item = context.payload.issue || context.payload.pull_request;
+            const itemNodeId = item.node_id;
+
+            const items = await getAllItems();
+            const projectItem = items.find(n => n.content?.id === itemNodeId);
+
+            if (!projectItem) {
+              console.log("Item is not in this project — stopping");
+              return;
+            }
+
+            if (projectItem.content.repository.name !== TARGET_REPO) {
+              console.log("Event item is NOT from Buerokratt-Chatbot — stopping");
+              return;
+            }
+
+            const c = projectItem.content;
+            const updatedAt = new Date().toISOString();
+
+            await updateField(projectItem.id, F_LAST_MODIFIED_BY, {
+              text: context.payload.sender.login
+            });
+
+            await updateField(projectItem.id, F_LAST_UPDATED, {
+              date: updatedAt
+            });
+
+            if (context.payload.action === "opened") {
+              await updateField(projectItem.id, F_CREATED_BY, { text: c.author?.login ?? "unknown" });
+              await updateField(projectItem.id, F_CREATED_DATE, { date: c.createdAt });
+            }
+
+            console.log("Event update complete.");
