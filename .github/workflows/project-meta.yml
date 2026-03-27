@@ -1,200 +1,93 @@
-name: Update Project Metadata
+name: Update Project Meta
 
 on:
   workflow_dispatch:
-  issues:
-    types: [opened, edited, reopened, closed]
-  pull_request:
-    types: [opened, edited, reopened, closed]
-
-permissions:
-  contents: read
-  issues: read
-  pull-requests: read
-  repository-projects: write
 
 jobs:
-  update-project:
+  update-meta:
     runs-on: ubuntu-latest
 
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
     steps:
-      - name: Update ProjectV2 fields
+      - name: Run update
         uses: actions/github-script@v8
         with:
-          github-token: ${{ secrets.PROJECT_TOKEN }}
+          github-token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
           script: |
-            // -------------------------------
-            // CONFIG
-            // -------------------------------
-            const TARGET_REPO = "Buerokratt-Chatbot";
-            const projectId = "PVT_kwDOBXrl9M4AToqt";
+            const targetRepo = "Buerokratt-Chatbot";
+            const projectId = "PVT_kwDOBXrl9M4AToqt"; // Bürokratt Sprint
+            const fieldId = "PVTF_lADOBXrl9M4AToqtzhAIhu4"; // Created by (TEXT)
+            const newValue = "turnerrainer";
 
-            // Field IDs
-            const F_CREATED_BY = "PVTF_lADOBXrl9M4AToqtzhAIhu4";
-            const F_CREATED_DATE = "PVTF_lADOBXrl9M4AToqtzhAIh1w";
-            const F_LAST_MODIFIED_BY = "PVTF_lADOBXrl9M4AToqtzhAIiE4";
-            const F_LAST_UPDATED = "PVTF_lADOBXrl9M4AToqtzhAIh_o";
+            console.log(`Updating ONLY issues from repo: ${targetRepo}`);
 
-            // -------------------------------
-            // QUERY ALL ITEMS (with repo name!)
-            // -------------------------------
-            async function getAllItems() {
-              let all = [];
-              let cursor = null;
-              let hasNext = true;
-
-              while (hasNext) {
-                const res = await github.graphql(
-                  `
-                  query($cursor: String) {
-                    node(id: "${projectId}") {
-                      ... on ProjectV2 {
-                        items(first: 100, after: $cursor) {
-                          nodes {
-                            id
-                            content {
-                              __typename
-                              ... on Issue {
-                                id
-                                number
-                                createdAt
-                                author { login }
-                                repository { name }
-                              }
-                              ... on PullRequest {
-                                id
-                                number
-                                createdAt
-                                author { login }
-                                repository { name }
-                              }
-                            }
+            // 1. Get project items
+            const query = `
+              query($projectId: ID!) {
+                node(id: $projectId) {
+                  ... on ProjectV2 {
+                    items(first: 200) {
+                      nodes {
+                        id
+                        type
+                        content {
+                          ... on Issue {
+                            number
+                            repository { name }
                           }
-                          pageInfo {
-                            endCursor
-                            hasNextPage
+                          ... on PullRequest {
+                            number
+                            repository { name }
                           }
                         }
                       }
                     }
                   }
-                  `,
-                  { cursor }
-                );
-
-                const page = res.node.items;
-                all = all.concat(page.nodes);
-                cursor = page.pageInfo.endCursor;
-                hasNext = page.pageInfo.hasNextPage;
-              }
-              return all;
-            }
-
-            // -------------------------------
-            // MUTATION WRAPPER WITH RETRY
-            // -------------------------------
-            async function updateField(itemId, fieldId, value) {
-              try {
-                await github.graphql(`
-                  mutation {
-                    updateProjectV2ItemFieldValue(input: {
-                      projectId: "${projectId}",
-                      itemId: "${itemId}",
-                      fieldId: "${fieldId}",
-                      value: ${JSON.stringify(value)}
-                    }) {
-                      projectV2Item { id }
-                    }
-                  }
-                `);
-              } catch (err) {
-                console.log("⚠ Mutation failed, retrying:", err.message);
-                await new Promise(r => setTimeout(r, 300));
-                await github.graphql(`
-                  mutation {
-                    updateProjectV2ItemFieldValue(input: {
-                      projectId: "${projectId}",
-                      itemId: "${itemId}",
-                      fieldId: "${fieldId}",
-                      value: ${JSON.stringify(value)}
-                    }) {
-                      projectV2Item { id }
-                    }
-                  }
-                `);
-              }
-            }
-
-            // -------------------------------
-            // MANUAL RUN → APPLY TO ALL ITEMS
-            // -------------------------------
-            if (!context.payload.issue && !context.payload.pull_request) {
-              console.log("Manual refresh — updating ONLY Buerokratt-Chatbot items");
-
-              const items = await getAllItems();
-              let count = 0;
-
-              for (const it of items) {
-                const c = it.content;
-                if (!c) continue;
-                if (c.repository?.name !== TARGET_REPO) {
-                  console.log(`Skipping ${c.number} (repo=${c.repository?.name})`);
-                  continue;
                 }
+              }
+            `;
 
-                count++;
-                console.log(`Updating item #${c.number}`);
+            const result = await github.graphql(query, { projectId });
 
-                const updatedAt = new Date().toISOString();
+            const items = result.node.items.nodes;
 
-                await updateField(it.id, F_CREATED_BY, { text: c.author?.login ?? "unknown" });
-                await updateField(it.id, F_CREATED_DATE, { date: c.createdAt });
-                await updateField(it.id, F_LAST_MODIFIED_BY, { text: c.author?.login ?? "unknown" });
-                await updateField(it.id, F_LAST_UPDATED, { date: updatedAt });
+            for (const item of items) {
+              const content = item.content;
+              if (!content || !content.repository) continue;
 
-                await new Promise(r => setTimeout(r, 150)); // anti rate-limit
+              const repoName = content.repository.name;
+
+              if (repoName !== targetRepo) {
+                console.log(`Skipping ${content.number} (repo=${repoName})`);
+                continue;
               }
 
-              console.log(`Manual refresh complete. Updated ${count} items.`);
-              return;
+              console.log(`Updating item #${content.number}`);
+
+              const mutation = `
+                mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $text: String!) {
+                  updateProjectV2ItemFieldValue(
+                    input: {
+                      projectId: $projectId,
+                      itemId: $itemId,
+                      fieldId: $fieldId,
+                      value: { text: $text }
+                    }
+                  ) {
+                    projectV2Item { id }
+                  }
+                }
+              `;
+
+              try {
+                await github.graphql(mutation, {
+                  projectId,
+                  itemId: item.id,
+                  fieldId,
+                  text: newValue
+                });
+              } catch (err) {
+                console.log(`❌ Failed for #${content.number}: ${err.message}`);
+              }
             }
 
-            // -------------------------------
-            // EVENT UPDATE (single issue/PR)
-            // -------------------------------
-            const item = context.payload.issue || context.payload.pull_request;
-            const itemNodeId = item.node_id;
-
-            const items = await getAllItems();
-            const projectItem = items.find(n => n.content?.id === itemNodeId);
-
-            if (!projectItem) {
-              console.log("Item is not in this project — stopping");
-              return;
-            }
-
-            if (projectItem.content.repository.name !== TARGET_REPO) {
-              console.log("Event item is NOT from Buerokratt-Chatbot — stopping");
-              return;
-            }
-
-            const c = projectItem.content;
-            const updatedAt = new Date().toISOString();
-
-            await updateField(projectItem.id, F_LAST_MODIFIED_BY, {
-              text: context.payload.sender.login
-            });
-
-            await updateField(projectItem.id, F_LAST_UPDATED, {
-              date: updatedAt
-            });
-
-            if (context.payload.action === "opened") {
-              await updateField(projectItem.id, F_CREATED_BY, { text: c.author?.login ?? "unknown" });
-              await updateField(projectItem.id, F_CREATED_DATE, { date: c.createdAt });
-            }
-
-            console.log("Event update complete.");
+            console.log("Done.");
