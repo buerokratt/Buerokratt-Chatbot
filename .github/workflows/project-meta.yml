@@ -8,23 +8,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Run update on Buerokratt-Chatbot issues
+      - name: Run update for Buerokratt-Chatbot items
         uses: actions/github-script@v8
         with:
           github-token: ${{ secrets.PROJECT_TOKEN }}
           script: |
-            const targetRepo = "Buerokratt-Chatbot";
             const projectId = "PVT_kwDOBXrl9M4AToqt"; // Bürokratt Sprint
-            const fieldCreatedBy = "PVTF_lADOBXrl9M4AToqtzhAIhu4"; // Created by (TEXT)
-            const fieldCreatedDate = "PVTF_lADOBXrl9M4AToqtzhAIh1w"; // Created date (DATE)
-            const fieldLastUpdated = "PVTF_lADOBXrl9M4AToqtzhAIh_o"; // Last updated (DATE)
-            const fieldLastModifiedBy = "PVTF_lADOBXrl9M4AToqtzhAIiE4"; // Last modified by (TEXT)
+            const targetRepo = "Buerokratt-Chatbot";
+
+            // Field IDs
+            const fieldCreatedBy = "PVTF_lADOBXrl9M4AToqtzhAIhu4"; // Created By (TEXT)
+            const fieldCreatedDate = "PVTF_lADOBXrl9M4AToqtzhAIh1w"; // Created Date (DATE)
+            const fieldLastUpdated = "PVTF_lADOBXrl9M4AToqtzhAIh_o"; // Last Updated (DATE)
+            const fieldLastModifiedBy = "PVTF_lADOBXrl9M4AToqtzhAIiE4"; // Last Modified By (TEXT)
 
             console.log(`Manual refresh — updating ONLY ${targetRepo} items`);
 
-            // 1. Fetch all project items
-            async function getProjectItems() {
-              const items = [];
+            // -------------------------
+            // Get all project items
+            // -------------------------
+            async function getAllProjectItems() {
+              let items = [];
               let cursor = null;
               let hasNextPage = true;
 
@@ -38,7 +42,12 @@ jobs:
                             id
                             content {
                               ... on Issue {
-                                id
+                                number
+                                repository { name }
+                                author { login }
+                                createdAt
+                              }
+                              ... on PullRequest {
                                 number
                                 repository { name }
                                 author { login }
@@ -54,7 +63,7 @@ jobs:
                 `, { projectId, cursor });
 
                 const page = result.node.items;
-                items.push(...page.nodes);
+                items = items.concat(page.nodes);
                 cursor = page.pageInfo.endCursor;
                 hasNextPage = page.pageInfo.hasNextPage;
               }
@@ -62,9 +71,43 @@ jobs:
               return items;
             }
 
-            const allItems = await getProjectItems();
+            const allItems = await getAllProjectItems();
             console.log(`Total items in project: ${allItems.length}`);
 
+            // -------------------------
+            // Helper to update a field
+            // -------------------------
+            async function updateField(itemId, fieldId, value, type) {
+              const mutation = `
+                mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $value: ProjectV2FieldValue!) {
+                  updateProjectV2ItemFieldValue(input: {
+                    projectId: $projectId,
+                    itemId: $itemId,
+                    fieldId: $fieldId,
+                    value: $value
+                  }) {
+                    projectV2Item { id }
+                  }
+                }
+              `;
+
+              const graphqlValue = type === "text" ? { text: value } : { date: value };
+
+              try {
+                await github.graphql(mutation, {
+                  projectId,
+                  itemId,
+                  fieldId,
+                  value: graphqlValue
+                });
+              } catch (err) {
+                console.log(`❌ Failed to update field ${fieldId} on item ${itemId}: ${err.message}`);
+              }
+            }
+
+            // -------------------------
+            // Update only targetRepo items
+            // -------------------------
             for (const item of allItems) {
               const content = item.content;
               if (!content || !content.repository) continue;
@@ -76,42 +119,14 @@ jobs:
 
               console.log(`Updating item #${content.number}`);
 
-              const updatedAt = new Date().toISOString();
               const author = content.author?.login ?? "unknown";
               const createdAt = content.createdAt;
+              const updatedAt = new Date().toISOString();
 
-              // Helper to update a field
-              async function updateField(fieldId, value) {
-                const type = typeof value === "string" ? "text" : "date";
-                const mutation = `
-                  mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $value: ${type.toUpperCase()}!) {
-                    updateProjectV2ItemFieldValue(input: {
-                      projectId: $projectId,
-                      itemId: $itemId,
-                      fieldId: $fieldId,
-                      value: { ${type}: $value }
-                    }) {
-                      projectV2Item { id }
-                    }
-                  }
-                `;
-                try {
-                  await github.graphql(mutation, {
-                    projectId,
-                    itemId: item.id,
-                    fieldId,
-                    value
-                  });
-                } catch (err) {
-                  console.log(`❌ Failed to update #${content.number} field ${fieldId}: ${err.message}`);
-                }
-              }
-
-              // Update fields
-              await updateField(fieldCreatedBy, author);
-              await updateField(fieldCreatedDate, createdAt);
-              await updateField(fieldLastUpdated, updatedAt);
-              await updateField(fieldLastModifiedBy, author);
+              await updateField(item.id, fieldCreatedBy, author, "text");
+              await updateField(item.id, fieldCreatedDate, createdAt, "date");
+              await updateField(item.id, fieldLastUpdated, updatedAt, "date");
+              await updateField(item.id, fieldLastModifiedBy, author, "text");
             }
 
-            console.log("✅ Update complete for Buerokratt-Chatbot items.");
+            console.log("Done updating all Buerokratt-Chatbot items.");
