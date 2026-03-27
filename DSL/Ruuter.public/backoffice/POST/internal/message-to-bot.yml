@@ -132,7 +132,7 @@ assign_with_parsed_buttons:
       - recipient_id: ${chatId}
         text: ${responseContent}
         buttons: ${JSON.parse(responseButtons)}
-  next: format_bot_messages
+  next: normalize_html_links_in_bot_messages
 
 assign_without_buttons:
   assign:
@@ -140,14 +140,14 @@ assign_without_buttons:
       - recipient_id: ${chatId}
         text: ${responseContent}
         buttons: []
-  next: format_bot_messages
+  next: normalize_html_links_in_bot_messages
 
 assign_simple_response:
   assign:
     botMsg:
       - recipient_id: ${chatId}
         text: ${llm_service_response.response.body.response}
-  next: format_bot_messages
+  next: normalize_html_links_in_bot_messages
 
 check_for_service:
   switch:
@@ -479,12 +479,17 @@ add_chat_id_to_queue_notification_node:
 extract_bot_responses_after_redirect_to_back_office:
   assign:
     botMsg: ${post_message_to_bot_result.response.body}
-  next: format_bot_messages
+  next: normalize_html_links_in_bot_messages
 
 extract_bot_responses:
   assign:
     botMsg: ${post_message_to_bot_result.response.body}
     botMsgTxt: ${post_message_to_bot_result.response.body?.[0]?.text}
+  next: normalize_html_links_in_bot_messages
+
+normalize_html_links_in_bot_messages:
+  assign:
+    botMsg: '$=botMsg.map(m => { const cvt = v => (v||"").replace(/<a\s[^>]*href="([^"]+)"[^>]*>([\s\S]*?)(?:<\/a>|$)/gi, (_, u, l) => "[" + l.replace(/<[^>]+>/g,"").trim() + "](" + u + ")"); return {...m, text: cvt(m.text), result: cvt(m.result)}; })='
   next: format_bot_messages
 
 format_bot_messages:
