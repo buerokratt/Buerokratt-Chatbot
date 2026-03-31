@@ -1,0 +1,22 @@
+name: Trigger Project Metadata Refresh
+
+on:
+  workflow_dispatch:
+  issues:
+    types: [opened, edited, reopened, closed]
+  pull_request:
+    types: [opened, edited, reopened, closed]
+
+jobs:
+  trigger-org-workflow:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger org workflow
+        uses: peter-evans/workflow-dispatch@v1
+        with:
+          token: ${{ secrets.PROJECT_TOKEN }} 
+          repository: buerokratt/.github
+          workflow: project-meta.yml
+          ref: main
+          inputs: |
+            repo: Buerokratt-Chatbot

@@ -72,6 +72,22 @@ const LinkPreview: React.FC<{
 
 const hasSpecialFormat = (m: string) => m.includes('\n\n') && m.indexOf('.') > 0 && m.indexOf(':') > m.indexOf('.');
 
+const htmlLinkToMarkdown = (value: string): string => {
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = value;
+  const links = tempDiv.querySelectorAll('a');
+  
+  let result = value;
+  links.forEach((link) => {
+    const href = link.getAttribute('href') || '';
+    const text = link.textContent || href;
+    const markdown = href ? `[${text}](${href})` : text;
+    result = result.replace(link.outerHTML, markdown);
+  });
+  
+  return result;
+};
+
 function formatMessage(message?: string): string {
   const sanitizedMessage = sanitizeHtml(message ?? '');
 
@@ -87,9 +103,10 @@ function formatMessage(message?: string): string {
     dataImagePattern,
     (_, prefix, dataUrl) => `${prefix}[image](${dataUrl})`,
   );
+  const markdownLinksMessage = htmlLinkToMarkdown(finalMessage);
 
-  return finalMessage
-    .replaceAll(/&#x([0-9A-F]+);/gi, (_, hex: string) => String.fromCharCode(parseInt(hex, 16)))
+  return markdownLinksMessage
+    .replaceAll(/&#x([0-9A-F]+);/gi, (_, hex: string) => String.fromCodePoint(Number.parseInt(hex, 16)))
     .replaceAll('&amp;', '&')
     .replaceAll('&gt;', '>')
     .replaceAll('&lt;', '<')
@@ -105,7 +122,7 @@ function formatMessage(message?: string): string {
           return `${prefix}${year}. `;
         }
       }
-      return `${prefix}${year}\\. `;
+      return String.raw`${prefix}${year}\. `;
     })
     .replaceAll(/(?<=\n)\d+\.\s/g, hasSpecialFormat(finalMessage) ? '\n\n$&' : '$&')
     .replaceAll(/^(\s+)/g, (match) => match.replaceAll(' ', '&nbsp;'));
