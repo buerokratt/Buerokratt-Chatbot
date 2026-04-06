@@ -489,7 +489,7 @@ extract_bot_responses:
 
 normalize_html_links_in_bot_messages:
   assign:
-    botMsg: '$=botMsg.map(m => { const cvt = v => (v||"").replace(/<a\s[^>]*href="([^"]+)"[^>]*>([\s\S]*?)(?:<\/a>|$)/gi, (_, u, l) => "[" + l.replace(/<[^>]+>/g,"").trim() + "](" + u + ")"); return {...m, text: cvt(m.text), result: cvt(m.result)}; })='
+    botMsg: '$=botMsg.map(m => { const cvt = v => (v||"").replace(/<a\s[^>]*href="([^"]+)"[^>]*>([\s\S]*?)(?:<\/a>|$)/gi, (_, u, l) => { const abs = /^[a-zA-Z][a-zA-Z\d+\-.]*:\/\//i.test(u) || u.startsWith("//") ? u : "https://" + u; return "[" + l.replace(/<[^>]+>/g,"").trim() + "](" + abs + ")"; }); return {...m, text: cvt(m.text), result: cvt(m.result)}; })='
   next: format_bot_messages
 
 format_bot_messages:
