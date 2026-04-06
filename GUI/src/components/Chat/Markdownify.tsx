@@ -29,7 +29,7 @@ const isValidImageUrl = (s: string): boolean => {
 };
 
 const ensureAbsoluteUrl = (href: string): string => {
-  if (/^[a-zA-Z][a-zA-Z\d+\-.]*:\/\//i.test(href) || href.startsWith('//')) {
+  if (/^[a-z][a-z\d+\-.]*:\/\//i.test(href) || href.startsWith('//')) {
     return href;
   }
   return `https://${href}`;
