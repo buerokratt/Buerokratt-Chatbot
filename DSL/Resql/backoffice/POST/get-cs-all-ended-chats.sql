@@ -3,13 +3,17 @@ WITH rating_config AS (
     FROM configuration
     WHERE key = 'isFiveRatingScale'
       AND "domain" IS NULL
-      AND id IN (SELECT max(id) FROM configuration WHERE key = 'isFiveRatingScale' AND "domain" IS NULL)
       AND NOT deleted
+    ORDER BY id DESC
+    LIMIT 1
 ),
-MaxChatHistoryComments AS (
-    SELECT MAX(id) AS maxId
-    FROM chat_history_comments
-    GROUP BY chat_id
+TitleVisibility AS (
+    SELECT value
+    FROM configuration
+    WHERE key = 'is_csa_title_visible'
+      AND NOT deleted
+    ORDER BY id DESC
+    LIMIT 1
 ),
 ChatUser AS (
     SELECT DISTINCT ON (id_code)
@@ -20,65 +24,8 @@ ChatUser AS (
     FROM "user"
     ORDER BY id_code, id DESC
 ),
-ChatHistoryComments AS (
-    SELECT
-        comment,
-        chat_id,
-        created,
-        author_display_name
-    FROM chat_history_comments
-    JOIN MaxChatHistoryComments ON id = maxId
-),
-MessageWithContent AS (
-    SELECT
-        MAX(id) AS maxId,
-        MIN(id) AS minId
-    FROM message
-    WHERE content <> ''
-      AND content <> 'message-read'
-    GROUP BY chat_base_id
-),
-FirstContentMessage AS (
-    SELECT created, chat_base_id
-    FROM message
-    JOIN MessageWithContent ON message.id = MessageWithContent.minId
-),
-LastContentMessage AS (
-    SELECT content, chat_base_id
-    FROM message
-    JOIN MessageWithContent ON message.id = MessageWithContent.maxId
-),
-TitleVisibility AS (
-    SELECT value
-    FROM configuration
-    WHERE key = 'is_csa_title_visible'
-      AND NOT deleted
-    ORDER BY id DESC
-    LIMIT 1
-),
-FulfilledMessages AS (
-    SELECT MAX(id) AS maxId
-    FROM message
-    WHERE event = 'contact-information-fulfilled'
-    GROUP BY chat_base_id
-),
-ContactsMessage AS (
-    SELECT chat_base_id, content
-    FROM message
-    JOIN FulfilledMessages ON id = maxId
-),
-MaxMessages AS (
-    SELECT MAX(id) AS maxId
-    FROM message
-    GROUP BY chat_base_id
-),
-Messages AS (
-    SELECT event, updated, chat_base_id, author_id
-    FROM message
-    JOIN MaxMessages ON id = maxID
-),
 MaxChats AS (
-    SELECT MAX(id) AS maxId
+    SELECT MAX(id) AS maxId, base_id
     FROM chat
     WHERE ended IS NOT NULL
       AND status <> 'IDLE'
@@ -89,7 +36,7 @@ MaxChats AS (
 ),
 EndedChatMessages AS (
     SELECT
-        base_id,
+        chat.base_id,
         customer_support_id,
         customer_support_display_name,
         csa_title,
@@ -112,21 +59,68 @@ EndedChatMessages AS (
         feedback_rating,
         feedback_rating_five
     FROM chat
-    RIGHT JOIN MaxChats ON id = maxId
+    RIGHT JOIN MaxChats ON chat.id = MaxChats.maxId
+),
+MaxChatHistoryComments AS (
+    SELECT MAX(id) AS maxId
+    FROM chat_history_comments
+    WHERE chat_id IN (SELECT base_id FROM MaxChats)
+    GROUP BY chat_id
+),
+ChatHistoryComments AS (
+    SELECT
+        comment,
+        chat_id,
+        created,
+        author_display_name
+    FROM chat_history_comments
+    JOIN MaxChatHistoryComments ON id = maxId
+),
+MessageAgg AS (
+    SELECT
+        chat_base_id,
+        MAX(id) AS maxId,
+        MAX(CASE WHEN content <> '' AND content <> 'message-read' THEN id END) AS maxContentId,
+        MIN(CASE WHEN content <> '' AND content <> 'message-read' THEN id END) AS minContentId,
+        MAX(CASE WHEN event = 'contact-information-fulfilled' THEN id END) AS fulfilledId
+    FROM message
+    WHERE chat_base_id IN (SELECT base_id FROM MaxChats)
+    GROUP BY chat_base_id
+),
+FirstContentMessage AS (
+    SELECT message.created, message.chat_base_id
+    FROM message
+    JOIN MessageAgg ON message.id = MessageAgg.minContentId
+),
+LastContentMessage AS (
+    SELECT message.content, message.chat_base_id
+    FROM message
+    JOIN MessageAgg ON message.id = MessageAgg.maxContentId
+),
+ContactsMessage AS (
+    SELECT message.chat_base_id, message.content
+    FROM message
+    JOIN MessageAgg ON message.id = MessageAgg.fulfilledId
+),
+Messages AS (
+    SELECT message.event, message.updated, message.chat_base_id, message.author_id
+    FROM message
+    JOIN MessageAgg ON message.id = MessageAgg.maxId
 ),
 RatedChats AS (
-    SELECT 
-        CASE 
-            WHEN (SELECT COALESCE(is_five_rating_scale, 'false') = 'true' FROM rating_config) 
+    SELECT
+        CASE
+            WHEN (SELECT COALESCE(is_five_rating_scale, 'false') = 'true' FROM rating_config)
             THEN MAX(feedback_rating_five)
             ELSE MAX(feedback_rating)
         END AS rating
     FROM chat
-    WHERE CASE 
-        WHEN (SELECT COALESCE(is_five_rating_scale, 'false') = 'true' FROM rating_config) 
+    WHERE base_id IN (SELECT base_id FROM MaxChats)
+      AND CASE
+        WHEN (SELECT COALESCE(is_five_rating_scale, 'false') = 'true' FROM rating_config)
         THEN feedback_rating_five IS NOT NULL
         ELSE feedback_rating IS NOT NULL
-    END
+      END
     GROUP BY base_id
 ),
 RatedChatsCount AS (
@@ -145,12 +139,13 @@ NPS AS (
     CROSS JOIN Detractors
 ),
 LatestOpenChat AS (
-    SELECT DISTINCT ON (base_id)
-        base_id,
-        customer_support_id AS latest_open_csa
+    SELECT DISTINCT ON (chat.base_id)
+        chat.base_id,
+        chat.customer_support_id AS latest_open_csa
     FROM chat
-    WHERE status = 'OPEN'
-    ORDER BY base_id, id DESC
+    JOIN MaxChats ON MaxChats.base_id = chat.base_id
+    WHERE chat.status = 'OPEN'
+    ORDER BY chat.base_id, chat.id DESC
 ),
 CSAFullNames AS (
     SELECT
@@ -173,11 +168,12 @@ CSAFullNames AS (
             )
         ) AS all_csa_ids
     FROM chat c2
+    JOIN MaxChats ON MaxChats.base_id = c2.base_id
     LEFT JOIN ChatUser cu ON cu.id_code = c2.customer_support_id
     LEFT JOIN LatestOpenChat lo ON lo.base_id = c2.base_id
     GROUP BY c2.base_id
 )
-SELECT 
+SELECT
     c.base_id AS id,
     c.customer_support_id,
     c.customer_support_display_name,
@@ -208,7 +204,7 @@ SELECT
     m.updated AS last_message_timestamp,
     c.feedback_text,
     COALESCE(c.feedback_rating_five, c.feedback_rating) AS feedback_rating,
-    CASE 
+    CASE
         WHEN c.feedback_rating_five IS NOT NULL THEN 'true'
         WHEN c.feedback_rating IS NOT NULL THEN 'false'
         ELSE NULL
@@ -241,7 +237,7 @@ WHERE (
             AND array_length(CSAFullNames.all_csa_ids, 1) = 1
             AND CSAFullNames.all_csa_ids[1] = ''
         )
-    ) 
+    )
     AND (
         :search IS NULL OR
         :search = '' OR
