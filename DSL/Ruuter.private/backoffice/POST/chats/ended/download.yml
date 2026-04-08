@@ -14,42 +14,142 @@ declaration:
       - field: language
         type: string
         description: "Body field 'language'"
-      - field: rows
+      - field: startDate
+        type: string
+        description: "Body field 'startDate'"
+      - field: endDate
+        type: string
+        description: "Body field 'endDate'"
+      - field: sorting
+        type: string
+        description: "Body field 'sorting'"
+      - field: search
+        type: string
+        description: "Body field 'search'"
+      - field: customerSupportIds
         type: object
-        description: "Body field 'rows'"
-      - field: chatIds
+        description: "Body field 'customerSupportIds'"
+      - field: urls
+        type: array
+        description: "Body field 'urls'"
+      - field: columnIds
         type: object
-        description: "Body field 'chatIds'"
+        description: "Body field 'columnIds'"
 
 extractRequestData:
   assign:
     headers: ${incoming.body.headers}
+    columnIds: ${incoming.body.columnIds}
     language: ${incoming.body.language}
-    rows: ${incoming.body.rows}
-    chatIds: ${incoming.body.chatIds}
+    startDate: "${incoming.body.startDate}"
+    endDate: "${incoming.body.endDate}"
+    urls: ${incoming.body.urls}
 
-getChatMessages:
+initializeState:
+  assign:
+    page: 1
+    page_size: 100
+    totalPages: 1
+    allChats: []
+    allMessages: []
+  next: fetchPage
+
+fetchPage:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-cs-all-ended-chats"
+    body:
+      start: ${startDate}
+      end: ${endDate}
+      page: ${page}
+      page_size: ${page_size}
+      sorting: ${incoming.body.sorting}
+      search: ${incoming.body.search}
+      customerSupportIds: ${incoming.body.customerSupportIds?.join(',') ?? ''}
+      csaId: ${"chatbot"}
+      urls: ${urls}
+  result: pageResult
+  next: savePageBody
+
+savePageBody:
+  assign:
+    pageBody: ${pageResult.response.body}
+    totalPages: "${pageResult.response.body.length > 0 ? pageResult.response.body[0].totalPages : 0}"
+  next: checkHasResults
+
+checkHasResults:
+  switch:
+    - condition: ${totalPages == "0"}
+      next: return_empty
+  next: fetchPageMessages
+
+fetchPageMessages:
   call: http.post
   args:
     url: "[#CHATBOT_RESQL]/get-chats-with-messages"
     body:
-      chatIds: ${chatIds}
-  result: chatMessages
+      chatIds: ${pageBody.map(c => c.id)}
+  result: messagesResult
+  next: saveMessagesBody
+
+saveMessagesBody:
+  assign:
+    messagesBody: ${messagesResult.response.body}
+  next: appendChats
+
+appendChats:
+  switch:
+    - condition: ${allChats.length === 0}
+      next: appendFirstPage
+  next: appendNextPage
+
+appendFirstPage:
+  assign:
+    allChats: ${[allChats, ...pageBody]}
+    allMessages: ${[allMessages, ...messagesBody]}
+    page: ${page + 1}
+  next: checkMorePages
+
+appendNextPage:
+  assign:
+    allChats: ${[...allChats, ...pageBody]}
+    allMessages: ${[...allMessages, ...messagesBody]}
+    page: ${page + 1}
+  next: checkMorePages
+
+checkMorePages:
+  switch:
+    - condition: ${page <= totalPages}
+      next: fetchPage
+  next: prepareFinalData
+
+prepareFinalData:
+  assign:
+    finalChats: ${allChats.splice(1, allChats.length - 1)}
+    finalMessages: ${allMessages.splice(1, allMessages.length - 1)}
+  next: get_xlsx_data
 
 get_xlsx_data:
   call: http.post
   args:
     url: "[#CHATBOT_DMAPPER]/conversion/chats-to-xlsx"
     body:
-      chatMessages: ${chatMessages.response.body}
+      chatMessages: ${finalMessages}
       chatHeaders: ${headers}
-      chatIds: ${chatIds}
-      chatRows: ${rows}
+      chatColumnIds: ${columnIds}
+      chatIds: ${finalChats.map(c => c.id)}
+      chatRows: ${finalChats}
       language: ${language}
   result: xlsxData
 
 return_success:
   wrapper: false
   return: ${xlsxData.response.body}
+  next: end
+  status: 200
+
+return_empty:
+  wrapper: false
+  return: ''
   next: end
   status: 200
