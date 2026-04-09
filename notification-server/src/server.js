@@ -156,37 +156,26 @@ app.post('/remove-chat-from-termination-queue', express.json(), express.text(), 
   }
 });
 
-app.post('/channels/:channelId/stream', async (req, res) => {
-  try {
-    const { channelId } = req.params;
-    const { messages, options = {}, use_agentic = false, agent_name, agent_type } = req.body;
+app.post('/channels/:channelId/stream', (req, res) => {
+  const { channelId } = req.params;
+  const { messages, options = {}, use_agentic = false, agent_name, agent_type } = req.body;
 
-    if (!messages || !Array.isArray(messages)) {
-      return res.status(400).json({ error: 'Messages array is required' });
-    }
-
-    const result = await createAzureOpenAIStreamRequest({
-      channelId,
-      messages,
-      options,
-      use_agentic,
-      agent_name,
-      agent_type,
-    });
-
-    res.status(200).json(result);
-  } catch (error) {
-    if (error.message.includes('No active connections found for this channel - request queued')) {
-      res.status(202).json({
-        message: 'Request queued - will be processed when connection becomes available',
-        status: 'queued',
-      });
-    } else if (error.message === 'No active connections found for this channel') {
-      res.status(404).json({ error: error.message });
-    } else {
-      res.status(500).json({ error: 'Failed to start streaming' });
-    }
+  if (!messages || !Array.isArray(messages)) {
+    return res.status(400).json({ error: 'Messages array is required' });
   }
+
+  res.status(202).json({ response: 'stream triggered' });
+
+  createAzureOpenAIStreamRequest({
+    channelId,
+    messages,
+    options,
+    use_agentic,
+    agent_name,
+    agent_type,
+  }).catch((error) => {
+    console.error(`Stream error for channel ${channelId}:`, error.message);
+  });
 });
 
 app.post('/channels/:channelId/stream/stop', async (req, res) => {
