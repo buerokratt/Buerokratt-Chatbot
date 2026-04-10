@@ -284,7 +284,9 @@
       "taken-over": "Klienditeenindaja võttis vestluse üle",
       "ask_to_forward_to_csa": "Vestlus paluti klienditeenindajale suunata",
       "forwarded_to_backoffice": "Vestlus suunatakse klienditeenindajale",
-      "continue_chatting_with_bot": "Jätkake vestlust kasutajaga bürokratt"
+      "continue_chatting_with_bot": "Jätkake vestlust kasutajaga bürokratt",
+      "waiting_validation": "Vastust koostatakse",
+      "approved_validation": "Kinnitatud valideerimine"
     },
     "validations": {
       "title": "Valideerimised",
