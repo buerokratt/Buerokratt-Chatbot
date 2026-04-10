@@ -63,24 +63,24 @@ changeStatus:
       id: ${chatId}
       customerSupportId: ${botName}
       customerSupportDisplayName: 'Bürokratt'
-      csaTitle: ${chat.csaTitle}
-      endUserId: ${chat.endUserId}
-      endUserFirstName: ${chat.endUserFirstName}
-      endUserLastName: ${chat.endUserLastName}
+      csaTitle: ${chat.csaTitle ?? ''}
+      endUserId: ${chat.endUserId ?? ''}
+      endUserFirstName: ${chat.endUserFirstName ?? ''}
+      endUserLastName: ${chat.endUserLastName ?? ''}
       status: 'OPEN'
-      endUserEmail: ${chat.endUserEmail}
-      endUserPhone: ${chat.endUserPhone}
-      endUserOs: ${chat.endUserOs}
-      endUserUrl: ${chat.endUserUrl}
+      endUserEmail: ${chat.endUserEmail ?? ''}
+      endUserPhone: ${chat.endUserPhone ?? ''}
+      endUserOs: ${chat.endUserOs ?? ''}
+      endUserUrl: ${chat.endUserUrl ?? ''}
       feedbackText: ""
       feedbackRating: ""
       externalId: ''
       created: ${chat.created}
       ended: ''
-      forwardedTo: ${chat.forwardedTo}
-      forwardedToName: ${chat.forwardedToName}
-      receivedFrom: ${chat.receivedFrom}
-      receivedFromName: ${chat.receivedFromName}
+      forwardedTo: ${chat.forwardedTo ?? ''}
+      forwardedToName: ${chat.forwardedToName ?? ''}
+      receivedFrom: ${chat.receivedFrom ?? ''}
+      receivedFromName: ${chat.receivedFromName ?? ''}
   result: change_status_res
   next: getMessageById
 
