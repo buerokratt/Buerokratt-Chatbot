@@ -97,7 +97,7 @@ const ChatMessage: FC<ChatMessageProps> = ({ message, onSelect, selected, editab
                         border: 'none',
                         width: '400px',
                       }}
-                      defaultValue={content}
+                      defaultValue={inputContent}
                       onChange={(e) => {
                         setInputContent(e.target.value);
                       }}
