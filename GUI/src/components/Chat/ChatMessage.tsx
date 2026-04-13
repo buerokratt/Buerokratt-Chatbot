@@ -27,9 +27,10 @@ type ChatMessageProps = {
   onSelect: (message: Message) => void;
   selected: boolean;
   editableMessage?: boolean;
+  onApprove?: () => void;
 };
 
-const ChatMessage: FC<ChatMessageProps> = ({ message, onSelect, selected, editableMessage }) => {
+const ChatMessage: FC<ChatMessageProps> = ({ message, onSelect, selected, editableMessage, onApprove }) => {
   const { t } = useTranslation();
 
   const buttons = useMemo(() => parseButtons(message), [message.buttons]);
@@ -58,6 +59,7 @@ const ChatMessage: FC<ChatMessageProps> = ({ message, onSelect, selected, editab
         title: t('global.notification'),
         message: t('chat.validations.messageApproved'),
       });
+      onApprove?.();
       return true;
     },
     onError: (error: AxiosError) => {
@@ -97,7 +99,7 @@ const ChatMessage: FC<ChatMessageProps> = ({ message, onSelect, selected, editab
                         border: 'none',
                         width: '400px',
                       }}
-                      defaultValue={content}
+                      defaultValue={inputContent}
                       onChange={(e) => {
                         setInputContent(e.target.value);
                       }}
