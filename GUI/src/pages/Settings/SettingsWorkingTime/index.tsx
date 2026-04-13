@@ -16,9 +16,11 @@ import { getDefaultValues, getOrganizationTimeData, setOrganizationTimeData } fr
 
 import {
   BOT_CANNOT_ANSWER_MESSAGE_LENGTH,
+  isValidationsEnabled,
   NO_CSA_MESSAGE_LENGTH,
   OUTSIDE_WORKING_HOURS_MESSAGE_LENGTH,
   REDIRECT_IF_BOT_CANNOT_ANSWER_MESSAGE_LENGTH,
+  VALIDATION_NO_CSA_MESSAGE_LENGTH,
 } from 'constants/config';
 
 import DomainSelector from '../../../components/DomainsSelector';
@@ -538,6 +540,29 @@ const SettingsWorkingTime: FC = () => {
                     useRichText
                   />
                   <InfoTooltip name="settings.workingTime.tooltip.bykCouldNotRespond" />
+                </Track>
+              )}
+            />
+          </div>
+        )}
+        {isValidationsEnabled && (
+          <div style={{ paddingRight: '20px' }}>
+            <Controller
+              name="organizationValidationNoCsaMessage"
+              control={control}
+              render={({ field }) => (
+                <Track gap={10} style={{ width: '100%' }}>
+                  <FormTextarea
+                    label={t('settings.workingTime.validationNoCsaMessage')}
+                    maxLength={VALIDATION_NO_CSA_MESSAGE_LENGTH}
+                    showMaxLength
+                    maxLengthBottom
+                    onChange={field.onChange}
+                    defaultValue={field.value}
+                    name="label"
+                    useRichText
+                  />
+                  <InfoTooltip name="settings.workingTime.tooltip.validationNoCsaMessage" />
                 </Track>
               )}
             />
