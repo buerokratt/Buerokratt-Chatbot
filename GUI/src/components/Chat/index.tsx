@@ -49,6 +49,7 @@ type ChatProps = {
   onSendToEmail?: (chat: ChatType) => void;
   onStartAService?: (chat: ChatType) => void;
   onRefresh: () => void;
+  onApprove?: () => void;
 };
 
 type GroupedMessage = {
@@ -66,6 +67,7 @@ const Chat: FC<ChatProps> = ({
   onSendToEmail,
   onStartAService,
   onRefresh,
+  onApprove,
 }) => {
   const { t } = useTranslation();
   const userInfo = useStore((state) => state.userInfo);
@@ -778,6 +780,7 @@ const Chat: FC<ChatProps> = ({
                           }}
                           selected={selectedMessage?.id === message.id}
                           editableMessage={checkIsMessageEditable(message)}
+                          onApprove={onApprove}
                         />
                         {!message.id && (
                           <div className="active-chat__message-failed-wrapper active-chat__message-failed">

@@ -16,6 +16,7 @@ const ValidationRequests: React.FC = () => {
   const selectedChat = useHeaderStore((state) => state.selectedValidationChat());
 
   const loadValidationRequests = useHeaderStore((state) => state.loadValidationChats);
+  const setSelectedChatId = useHeaderStore((state) => state.setSelectedChatId);
 
   useEffect(() => {
     useHeaderStore.getState().loadValidationChats();
@@ -60,6 +61,13 @@ const ValidationRequests: React.FC = () => {
               onForwardToEstablishment={() => {}}
               onSendToEmail={() => {}} // To be added when endpoint is ready
               onRefresh={loadValidationRequests}
+              onApprove={async () => {
+                await loadValidationRequests();
+                const chats = useHeaderStore.getState().getValidationChats();
+                if (!chats.some((c) => c.id === selectedChatId)) {
+                  setSelectedChatId(null);
+                }
+              }}
             />
           )}
         </Tabs.Content>

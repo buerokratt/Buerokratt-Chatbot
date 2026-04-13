@@ -36,7 +36,7 @@ const MessageContentView = (props: any) => {
             label={''}
             minRows={1}
             maxRows={5}
-            defaultValue={content}
+            defaultValue={inputContent}
             onChange={(e) => {
               setInputContent(e.target.value);
             }}
