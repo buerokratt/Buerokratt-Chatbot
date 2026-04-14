@@ -452,7 +452,7 @@
       "botCannotAnswerMessage": "Notification if Bürokratt cannot answer",
       "redirectIfBotCannotAnswerMessage": "Notification before redirecting, if Bürokratt cannot answer",
       "organizationUseCSA": "Use customer service",
-      "validationNoCsaMessage": "Notification if no one can validate the answer",
+      "validationNoCsaMessage": "Notification if the response is unable to be validated",
       "tooltip": {
         "useCsa": "Select \"Yes\" if employees can take chat messages, this option will open up the working hours settings. In case Bürokratt does not know how to answer, the conversation will be redirected to customer service. If there are no employees, select \"No\". This will hide the additional settings as there is no need to set working hours. In case Bürokratt does not know how to answer, a notification message will be sent but the conversation will not be redirected.",
         "work24/7": "Select \"Yes\" if employees are available 24/7, even during public holidays. Select \"No\" if time periods need to be customized depending on your organization's working hours.",
@@ -465,7 +465,7 @@
         "allCsaAway": "Text displayed to the customer when all the employees are away or busy. We recommend taking previous settings into account. For example, if contact detail collection is enabled, this should be reflected in the message, such as: \"Currently all our represtatives are busy, you may leave your contact details so we can get back to you later.\"",
         "bykCouldNotRespond": "Text displayed when Bürokratt is unable to provide an answer when customer service is not used.",
         "redirectIfBykCouldNotRespond": "Text that is displayed when Bürokratt is unable to provide an answer but customer service is used. In addition, when showing this message, a chat redirection option is offered to the customer.",
-        "validationNoCsaMessage": "Notification if no one can validate the answer"
+        "validationNoCsaMessage": "This text is displayed to the end-user if the response is unable to be validated. The same text is displayed when the organization is outside working hours and during working hours if no CSA is available."
       }
     },
     "userSession": {

@@ -452,7 +452,7 @@
       "botCannotAnswerMessage": "Teavitus, kui Bürokratt ei oska vastata",
       "redirectIfBotCannotAnswerMessage": "Teavitussõnum enne suunamist, kui Bürokratt ei oska vastata",
       "organizationUseCSA": "Kasutan klienditeenindust",
-      "validationNoCsaMessage": "Teade, kui keegi ei saa vastust kinnitada",
+      "validationNoCsaMessage": "Teavitus kui vastust ei ole võimalik valideerida",
       "tooltip": {
         "useCsa": "Vali \"Jah\", kui vestlusi võtavad vastu töötajad, sellega avanevad tööaja täpsemad seadistused. Juhul kui Bürokratt ei oska vastata, toimub vestluse suunamine klienditeenindajale. Kui töötajaid ei ole, vali \"Ei\" ja tööaega pole vaja määrata. Juhul kui Bürokratt ei oska vastata, saadetakse vestlusesse teavitussõnum ja suunamist ei toimu.",
         "work24/7": "Vali \"Jah\" kui vastajate tööaeg on ööpäevaringne, sh ka riigipühadel. Kui valida \"Ei\", saab valida täpsemaid ajavahemikke ja tingimusi.\n",
@@ -465,7 +465,7 @@
         "allCsaAway": "Tekst, mida kuvatakse kliendile klienditeenindaja eemaoleku korral. Soovitame arvestada eelnevate seadistustega ehk kui kontakti päring on sisse lülitatud, siis võiks see kajastuda ka tekstis, \"Hetkel on kõik klienditeenindajad eemal, võite jätta meile oma kontaktandmed, et saaksime teiega hiljem ühendust võtta.\"",
         "bykCouldNotRespond": "Tekst, mida kuvatakse kui Bürokratt ei oska vastata kui klienditeenindust ei kasutata.",
         "redirectIfBykCouldNotRespond": "Tekst, mida kuvatakse kui Bürokratt ei oska vastata ja paralleelselt kasutatakse klienditeenindust. Mis tähendab, et koos selle sõnumiga, pakutakse kliendile ka vestluse suunamist nõustajale.",
-        "validationNoCsaMessage": "Teade, kui keegi ei saa vastust kinnitada"
+        "validationNoCsaMessage": "Tekst mida kuvatakse kasutajale siis kui mudeli vastust ei ole võimalik valideerida. Seda sama teksti kuvatakse nii töövälisel ajal kui tööajal siis kui ükski nõustaja ei ole \"Kohal\" olekus."
       }
     },
     "userSession": {
