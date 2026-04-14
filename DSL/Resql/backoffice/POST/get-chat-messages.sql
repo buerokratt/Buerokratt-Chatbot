@@ -14,7 +14,7 @@ FilteredMessages AS (
     FROM MessageChain mc
     LEFT JOIN MessageChain mc2 ON mc.base_id = mc2.original_base_id
     WHERE mc2.base_id IS NULL
-    ORDER BY mc.base_id,mc.author_timestamp DESC
+    ORDER BY mc.base_id, mc.author_timestamp DESC, mc.created DESC
 ),
 LatestActiveUser AS (
   SELECT
