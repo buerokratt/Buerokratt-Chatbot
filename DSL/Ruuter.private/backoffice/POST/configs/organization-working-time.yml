@@ -94,7 +94,10 @@ declaration:
         description: "Body field 'organizationRedirectIfBotCannotAnswerMessage'"  
       - field: organizationUseCSA
         type: string
-        description: "Body field 'organizationUseCSA'"  
+        description: "Body field 'organizationUseCSA'"
+      - field: organizationValidationNoCsaMessage
+        type: string
+        description: "Body field 'organizationValidationNoCsaMessage'"  
 
 extractRequestData:
   assign:
@@ -126,6 +129,7 @@ extractRequestData:
     organizationBotCannotAnswerMessage: ${incoming.body.organizationBotCannotAnswerMessage}
     organizationRedirectIfBotCannotAnswerMessage: ${incoming.body.organizationRedirectIfBotCannotAnswerMessage}
     organizationUseCSA: ${incoming.body.organizationUseCSA}
+    organizationValidationNoCsaMessage: ${incoming.body.organizationValidationNoCsaMessage}
     domains: ${incoming.body.domainUUID}
 
 checkForDomains:
@@ -167,6 +171,7 @@ setDomainOrganizationWorkingTime:
       organizationBotCannotAnswerMessage: ${organizationBotCannotAnswerMessage}
       organizationRedirectIfBotCannotAnswerMessage: ${organizationRedirectIfBotCannotAnswerMessage}
       organizationUseCSA: ${incoming.body.organizationUseCSA}
+      organizationValidationNoCsaMessage: ${incoming.body.organizationValidationNoCsaMessage}
       created: ${new Date().toISOString()}
       domains: ${JSON.stringify(domains)}
   result: setOrganizationWorkingTimeResult
@@ -205,6 +210,7 @@ setOrganizationWorkingTime:
       organizationBotCannotAnswerMessage: ${organizationBotCannotAnswerMessage}
       organizationRedirectIfBotCannotAnswerMessage: ${organizationRedirectIfBotCannotAnswerMessage}
       organizationUseCSA: ${organizationUseCSA}
+      organizationValidationNoCsaMessage: ${organizationValidationNoCsaMessage}
       created: ${new Date().toISOString()}
   result: setOrganizationWorkingTimeResult
 
