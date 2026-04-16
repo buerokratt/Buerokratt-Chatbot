@@ -27,6 +27,7 @@ export interface OrganizationWorkingTime {
   organizationBotCannotAnswerMessage: string;
   organizationRedirectIfBotCannotAnswerMessage: string;
   organizationUseCSA: boolean;
+  organizationValidationNoCsaMessage: string;
   domainUUID?: string[];
 }
 

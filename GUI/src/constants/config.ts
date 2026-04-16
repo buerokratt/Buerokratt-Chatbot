@@ -6,6 +6,7 @@ export const FEEDBACK_NOTICE_LENGTH = 250;
 export const BOT_CANNOT_ANSWER_MESSAGE_LENGTH = 250;
 export const REDIRECT_IF_BOT_CANNOT_ANSWER_MESSAGE_LENGTH = 250;
 export const OUTSIDE_WORKING_HOURS_MESSAGE_LENGTH = 250;
+export const VALIDATION_NO_CSA_MESSAGE_LENGTH = 250;
 export const SUB_TITLE_LENGTH = 70;
 export const USER_IDLE_STATUS_TIMEOUT = 300000; // milliseconds
 export const CHAT_INPUT_LENGTH = 3000; // characters
@@ -16,6 +17,7 @@ export const isHiddenFeaturesEnabled =
   import.meta.env.REACT_APP_ENABLE_HIDDEN_FEATURES?.toLowerCase().trim() == '1';
 export const isJiraIntegrationEnabled = import.meta.env.REACT_APP_JIRA_INTEGRATION_ENABLED?.toLowerCase() === 'true';
 export const isSmaxIntegrationEnabled = import.meta.env.REACT_APP_SMAX_INTEGRATION_ENABLED?.toLowerCase() === 'true';
+export const isValidationsEnabled = import.meta.env.REACT_APP_VALIDATIONS_ENABLED?.toLowerCase() === 'true';
 export enum CHAT_SESSIONS {
   SESSION_ID_KEY = 'tabId',
   SESSION_STATE_KEY = 'sessionTabs',

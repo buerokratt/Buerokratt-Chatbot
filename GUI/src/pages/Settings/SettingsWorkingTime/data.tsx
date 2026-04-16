@@ -32,6 +32,7 @@ export function getOrganizationTimeData(data: OrganizationWorkingTime) {
     organizationBotCannotAnswerMessage: data.organizationBotCannotAnswerMessage,
     organizationRedirectIfBotCannotAnswerMessage: data.organizationRedirectIfBotCannotAnswerMessage,
     organizationUseCSA: data.organizationUseCSA.toString() === 'true',
+    organizationValidationNoCsaMessage: data.organizationValidationNoCsaMessage,
   };
 }
 
@@ -89,5 +90,6 @@ export const getDefaultValues = (): OrganizationWorkingTime => {
     organizationBotCannotAnswerMessage: '',
     organizationRedirectIfBotCannotAnswerMessage: '',
     organizationUseCSA: false,
+    organizationValidationNoCsaMessage: '',
   };
 };

@@ -243,7 +243,17 @@ assign_validation_event:
         text: ${correct_value.map((item) => item.text)[0].replace('$validate_', '')}
         context: ${context}
     event: "waiting_validation"
-  next: change_chat_status 
+  next: get_validation_no_csa_config
+
+get_validation_no_csa_config:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-configuration"
+    body:
+      key: "organizationValidationNoCsaMessage"
+    error: return_bad_request
+  result: validation_no_csa_res
+  next: change_chat_status
 
 change_chat_status:
   call: http.post
@@ -267,7 +277,7 @@ assign_unavailable_message:
   assign:
     correct_value:
       - recipient_id: ${sender}
-        text: "Edasine lahendamine toimub vastavalt pöördumiste protsessile väljaspool AI-assistendi lahendust."
+        text: ${validation_no_csa_res.response.body[0]?.value ?? ''}
         context: ${context}
     event: ""
   next: format_messages
