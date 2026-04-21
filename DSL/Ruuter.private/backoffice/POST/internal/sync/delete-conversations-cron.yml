@@ -1,7 +1,7 @@
 declaration:
   call: declare
   version: 0.1
-  description: "Decription placeholder for 'Delete conversations cron'"
+  description: "Description placeholder for 'Delete conversations cron'"
   method: post
   accepts: json
   returns: json
@@ -20,7 +20,7 @@ declaration:
 
 assignCronFileLocation:
   assign:
-    cronFileLocation: "/CronManager/delete_conversations.yml"
+    cronFileLocation: "[#CRON_FILE_LOCATION]/delete_conversations.yml"
     expression: ${incoming.body.expression}
     anonEnabled: ${incoming.body.anonEnabled}
     authEnabled: ${incoming.body.authEnabled}
@@ -58,7 +58,7 @@ createAuthCronJson:
       type: "json"
     body:
       cronExpression: ${expression}
-      command: "./scripts/remove-auth-conversations.sh"
+      command: "[#CRON_SCRIPTS_LOCATION]/remove-auth-conversations.sh"
   result: authCronJson
 
 createAnonCronJson:
@@ -69,7 +69,7 @@ createAnonCronJson:
       type: "json"
     body:
       cronExpression: ${expression}
-      command: "./scripts/remove-anonym-conversations.sh"
+      command: "[#CRON_SCRIPTS_LOCATION]/remove-anonym-conversations.sh"
   result: anonCronJson
 
 checkAuthConditions:
