@@ -83,8 +83,11 @@ checkAuthConditions:
 convertAnonJsonToYaml:
   call: http.post
   args:
-    url: "[#CHATBOT_DMAPPER]/conversion/json_to_yaml"
+    url: "[#CHATBOT_DMAPPER]/conversion/json_to_yaml_quoted"
     body:
+      keys:
+        - trigger
+        - command
       anon_conversations: ${anonCronJson.response.body}
   result: converted
   next: saveFile
@@ -92,8 +95,11 @@ convertAnonJsonToYaml:
 convertAuthJsonToYaml:
   call: http.post
   args:
-    url: "[#CHATBOT_DMAPPER]/conversion/json_to_yaml"
+    url: "[#CHATBOT_DMAPPER]/conversion/json_to_yaml_quoted"
     body:
+      keys:
+        - trigger
+        - command
       auth_conversations: ${authCronJson.response.body}
   result: converted
   next: saveFile
@@ -101,8 +107,11 @@ convertAuthJsonToYaml:
 convertFullJsonToYaml:
   call: http.post
   args:
-    url: "[#CHATBOT_DMAPPER]/conversion/json_to_yaml"
+    url: "[#CHATBOT_DMAPPER]/conversion/json_to_yaml_quoted"
     body:
+      keys:
+        - trigger
+        - command
       anon_conversations: ${anonCronJson.response.body}
       auth_conversations: ${authCronJson.response.body}
   result: converted
