@@ -212,6 +212,7 @@ SELECT
     c.test as isTest,
     nps,
     CSAFullNames.all_csa_names AS all_csa,
+    COUNT(*) OVER() AS total_count,
     CEIL(COUNT(*) OVER() / :page_size::DECIMAL) AS total_pages
 FROM EndedChatMessages AS c
 JOIN Messages AS m ON c.base_id = m.chat_base_id
