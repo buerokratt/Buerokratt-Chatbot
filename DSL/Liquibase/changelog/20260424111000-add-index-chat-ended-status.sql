@@ -1,5 +1,5 @@
 -- liquibase formatted sql
--- changeset ahmedyasser:20260424110000 runInTransaction:false
+-- changeset ahmedyasser:20260424111000 runInTransaction:false
 
 DROP INDEX CONCURRENTLY IF EXISTS idx_chat_ended_status;
 
