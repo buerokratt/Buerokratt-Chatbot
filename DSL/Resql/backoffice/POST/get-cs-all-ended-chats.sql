@@ -1,4 +1,4 @@
-WITH rating_config AS MATERIALIZED (
+WITH rating_config AS (
     SELECT value AS is_five_rating_scale
     FROM configuration
     WHERE key = 'isFiveRatingScale'
@@ -7,7 +7,7 @@ WITH rating_config AS MATERIALIZED (
     ORDER BY id DESC
     LIMIT 1
 ),
-TitleVisibility AS MATERIALIZED (
+TitleVisibility AS (
     SELECT value
     FROM configuration
     WHERE key = 'is_csa_title_visible'
@@ -15,7 +15,7 @@ TitleVisibility AS MATERIALIZED (
     ORDER BY id DESC
     LIMIT 1
 ),
-ChatUser AS MATERIALIZED (
+ChatUser AS (
     SELECT DISTINCT ON (id_code)
         id_code,
         display_name,
@@ -24,7 +24,7 @@ ChatUser AS MATERIALIZED (
     FROM "user"
     ORDER BY id_code, id DESC
 ),
-MaxChats AS MATERIALIZED (
+MaxChats AS (
     SELECT MAX(id) AS maxId, base_id
     FROM chat
     WHERE ended IS NOT NULL
@@ -34,7 +34,7 @@ MaxChats AS MATERIALIZED (
         OR chat.end_user_url LIKE ANY(ARRAY[:urls]::TEXT[]))
     GROUP BY base_id
 ),
-EndedChatMessages AS MATERIALIZED (
+EndedChatMessages AS (
     SELECT
         chat.base_id,
         customer_support_id,
@@ -76,7 +76,7 @@ ChatHistoryComments AS (
     FROM chat_history_comments
     JOIN MaxChatHistoryComments ON id = maxId
 ),
-MessageAgg AS MATERIALIZED (
+MessageAgg AS (
     SELECT
         chat_base_id,
         MAX(id) AS maxId,
@@ -107,7 +107,7 @@ Messages AS (
     FROM message
     JOIN MessageAgg ON message.id = MessageAgg.maxId
 ),
-RatedChats AS MATERIALIZED (
+RatedChats AS (
     SELECT
         CASE
             WHEN (SELECT COALESCE(is_five_rating_scale, 'false') = 'true' FROM rating_config)
