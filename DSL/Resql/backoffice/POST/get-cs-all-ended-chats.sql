@@ -56,6 +56,7 @@ EndedChatMessages AS MATERIALIZED (
         created,
         feedback_text,
         test,
+        preserve,
         feedback_rating,
         feedback_rating_five
     FROM chat
@@ -210,6 +211,7 @@ SELECT
         ELSE NULL
     END AS is_five_rating_scale,
     c.test as isTest,
+    c.preserve as is_preserve,
     nps,
     CSAFullNames.all_csa_names AS all_csa,
     CEIL(COUNT(*) OVER() / :page_size::DECIMAL) AS total_pages

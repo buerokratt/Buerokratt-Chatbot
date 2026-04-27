@@ -49,7 +49,8 @@
     "statusClarification": "Staatuse täpsustus",
     "selectAll": "Vali kõik",
     "displayText": "Kuva tekst",
-    "test": "Test"
+    "test": "Test",
+    "preserve": "Säilitada"
   },
   "files": {
     "download_xlsx": "Lae alla XLSX"
