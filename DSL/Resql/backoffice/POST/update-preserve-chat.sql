@@ -24,8 +24,8 @@ SELECT base_id,
        received_from,
        received_from_name,
        csa_title,
-       :isTest,
-       preserve
+       test,
+       :isPreserve
 FROM chat
 WHERE base_id = :chatId
 ORDER BY updated DESC
