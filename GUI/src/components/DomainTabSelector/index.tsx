@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import { getWidgetData } from '../../services/users';
 import useStore from '../../store';
 import { DomainSelection } from '../../types/domainsModels';
@@ -11,21 +11,23 @@ type DomainTabSelectorProps = {
 };
 
 const DomainTabSelector: FC<DomainTabSelectorProps> = ({ onChange }) => {
-  const userInfo = useStore((state) => state.userInfo);
+  const idCode = useStore((state) => state.userInfo?.idCode);
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
   const [options, setOptions] = useState<SelectOption[]>([]);
   const [activeValue, setActiveValue] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!userInfo?.idCode) return;
+    if (!idCode) return;
 
     const fetchDomains = async () => {
       try {
-        const data: DomainSelection[] = await getWidgetData(userInfo.idCode);
+        const data: DomainSelection[] = await getWidgetData(idCode);
         const opts = data.map((d) => ({ label: d.name, value: d.id, meta: d.url }));
         setOptions(opts);
         if (opts.length > 0) {
           setActiveValue(opts[0].value);
-          onChange?.([opts[0]]);
+          onChangeRef.current?.([opts[0]]);
         }
       } catch (error) {
         console.error('Failed to fetch widget data', error);
@@ -33,11 +35,11 @@ const DomainTabSelector: FC<DomainTabSelectorProps> = ({ onChange }) => {
     };
 
     fetchDomains();
-  }, [userInfo?.idCode]);
+  }, [idCode]);
 
   const handleClick = (option: SelectOption) => {
     setActiveValue(option.value);
-    onChange?.([option]);
+    onChangeRef.current?.([option]);
   };
 
   return (

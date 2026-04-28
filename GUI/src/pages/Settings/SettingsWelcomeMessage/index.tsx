@@ -114,7 +114,7 @@ const SettingsWelcomeMessage: FC = () => {
       <Card
         tabs={
           multiDomainEnabled ? (
-            <DomainTabSelector onChange={(selected) => handleDomainSelection(selected)} />
+            <DomainTabSelector onChange={handleDomainSelection} />
           ) : undefined
         }
         footer={

@@ -12,7 +12,7 @@ import { SkmConfig, SkmConfigResponse } from 'types/skmConfig';
 import { ROLES } from 'utils/constants';
 
 import { getQueryTypes } from './data';
-import DomainSelector from '../../../components/DomainsSelector';
+import DomainTabSelector from '../../../components/DomainTabSelector';
 import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
 import { fetchConfigurationFromDomain } from '../../../services/configurations';
 
@@ -145,18 +145,14 @@ const SettingsSkmConfiguration: FC = () => {
       <h1>{t('settings.skmConfiguration.title')}</h1>
       <p>{t('settings.skmConfiguration.description')}</p>
 
-      {multiDomainEnabled && (
-        <DomainSelector
-          disabled={(multiDomainEnabled && selectedDomains.length === 0) || false}
-          onChange={(selected) => {
-            handleDomainSelection(selected);
-          }}
-        />
-      )}
-
       <Card
         key={key}
         isScrollable
+        tabs={
+          multiDomainEnabled ? (
+            <DomainTabSelector onChange={handleDomainSelection} />
+          ) : undefined
+        }
         footer={
           <Track justify="end">
             <Button disabled={(multiDomainEnabled && selectedDomains.length === 0) || false} onClick={handleFormSubmit}>

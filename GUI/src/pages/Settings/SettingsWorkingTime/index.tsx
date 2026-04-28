@@ -4,7 +4,7 @@ import { Button, Card, FormDatepicker, FormTextarea, Switch, Track } from 'compo
 import { format, parse } from 'date-fns';
 import withAuthorization from 'hoc/with-authorization';
 import { useToast } from 'hooks/useToast';
-import { FC, useEffect, useState } from 'react';
+import { FC, Fragment, useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { apiDev } from 'services/api';
@@ -23,7 +23,7 @@ import {
   VALIDATION_NO_CSA_MESSAGE_LENGTH,
 } from 'constants/config';
 
-import DomainSelector from '../../../components/DomainsSelector';
+import DomainTabSelector from '../../../components/DomainTabSelector';
 import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
 import { fetchConfigurationFromDomain } from '../../../services/configurations';
 import { InfoTooltip } from '../../../utils/getToolTipWithText';
@@ -171,19 +171,13 @@ const SettingsWorkingTime: FC = () => {
       <h1>{t('settings.workingTime.title')}</h1>
       <p>{t('settings.workingTime.description')}</p>
 
-      {multiDomainEnabled && (
-        <div style={{ marginBottom: '11px' }}>
-          <DomainSelector
-            onChange={(selected) => {
-              handleDomainSelection(selected);
-            }}
-          />
-        </div>
-      )}
-
       <Card
-        key={key}
         isHeaderLight={true}
+        tabs={
+          multiDomainEnabled ? (
+            <DomainTabSelector onChange={handleDomainSelection} />
+          ) : undefined
+        }
         isBodyDivided={true}
         isScrollable={true}
         footer={
@@ -281,6 +275,7 @@ const SettingsWorkingTime: FC = () => {
           </Track>
         }
       >
+        <Fragment key={key}>
         {isOrganizationTheSameOnAllWorkingDays && !isOrganizationAvailableAllTime && isOrganizationUseCSA && (
           <Track>
             <label className="Label">
@@ -570,6 +565,7 @@ const SettingsWorkingTime: FC = () => {
             />
           </div>
         )}
+        </Fragment>
       </Card>
     </>
   );

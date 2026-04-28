@@ -15,7 +15,7 @@ import { MdOutlinePalette } from 'react-icons/md';
 import { apiDev } from 'services/api';
 import { ROLES } from 'utils/constants';
 
-import DomainSelector from '../../../components/DomainsSelector';
+import DomainTabSelector from '../../../components/DomainTabSelector';
 import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
 import { fetchConfigurationFromDomain } from '../../../services/configurations';
 import { WidgetAppearance, WidgetAppearanceResponse } from '../../../types/widgetAppearance';
@@ -171,17 +171,12 @@ const SettingsAppearance: FC = () => {
     <div ref={colorComponentRef}>
       <h1 style={{ paddingBottom: 16 }}>{t('settings.appearance.title')}</h1>
 
-      {multiDomainEnabled && (
-        <div style={{ marginBottom: '11px' }}>
-          <DomainSelector
-            onChange={(selected) => {
-              handleDomainSelection(selected);
-            }}
-          />
-        </div>
-      )}
-
       <Card
+        tabs={
+          multiDomainEnabled ? (
+            <DomainTabSelector onChange={handleDomainSelection} />
+          ) : undefined
+        }
         footer={
           <Track gap={8} justify="end">
             <Button disabled={(multiDomainEnabled && selectedDomains.length === 0) || false} onClick={handleFormSubmit}>

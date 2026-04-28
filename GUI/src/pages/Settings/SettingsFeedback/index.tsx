@@ -14,7 +14,7 @@ import { ROLES } from 'utils/constants';
 
 import { getFeedbackConfigData, setFeedbackData } from './data';
 import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
-import DomainSelector from '../../../components/DomainsSelector';
+import DomainTabSelector from '../../../components/DomainTabSelector';
 import { fetchConfigurationFromDomain } from '../../../services/configurations';
 
 const SettingsFeedback: FC = () => {
@@ -93,16 +93,12 @@ const SettingsFeedback: FC = () => {
     <>
       <h1>{t('settings.feedback.title')}</h1>
 
-      {multiDomainEnabled && (
-        <DomainSelector
-          disabled={(multiDomainEnabled && selectedDomains.length === 0) || false}
-          onChange={(selected) => {
-            handleDomainSelection(selected);
-          }}
-        />
-      )}
-
       <Card
+        tabs={
+          multiDomainEnabled ? (
+            <DomainTabSelector onChange={handleDomainSelection} />
+          ) : undefined
+        }
         footer={
           <Track justify="end">
             <Button disabled={(multiDomainEnabled && selectedDomains.length === 0) || false} onClick={handleFormSubmit}>
