@@ -3,7 +3,7 @@ import { AxiosError } from 'axios';
 import { Button, Card, FormInput, FormSelect, FormTextarea, Icon, Switch, Tooltip, Track } from 'components';
 import withAuthorization from 'hoc/with-authorization';
 import { useToast } from 'hooks/useToast';
-import { FC, useEffect, useState } from 'react';
+import { FC, Fragment, useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { AiOutlineInfoCircle } from 'react-icons/ai';
@@ -146,7 +146,6 @@ const SettingsSkmConfiguration: FC = () => {
       <p>{t('settings.skmConfiguration.description')}</p>
 
       <Card
-        key={key}
         isScrollable
         tabs={
           multiDomainEnabled ? (
@@ -161,6 +160,7 @@ const SettingsSkmConfiguration: FC = () => {
           </Track>
         }
       >
+        <Fragment key={key}>
         <Track gap={16} direction="vertical" align="left">
           {getNumberControl('range')}
           {getNumberControl('documents')}
@@ -203,6 +203,7 @@ const SettingsSkmConfiguration: FC = () => {
           />
           {getSwitchControl('inScope')}
         </Track>
+        </Fragment>
       </Card>
     </>
   );
