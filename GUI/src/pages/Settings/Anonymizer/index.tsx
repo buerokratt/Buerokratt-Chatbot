@@ -21,7 +21,7 @@ import { apiDev } from 'services/api';
 import { AnonymizerConfig, AnonymizerConfigResponse } from 'types/anonymizerConfig';
 import { ROLES } from 'utils/constants';
 
-import DomainSelector from '../../../components/DomainsSelector';
+import DomainTabSelector from '../../../components/DomainTabSelector';
 import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
 import { fetchConfigurationFromDomain } from '../../../services/configurations';
 import { AiOutlineInfoCircle } from 'react-icons/ai';
@@ -179,15 +179,8 @@ const Anonymizer: FC = () => {
       }}
     >
       <h1>{t('settings.anonymizer.settingsTitle')}</h1>
-      {multiDomainEnabled && (
-        <DomainSelector
-          onChange={(selected) => {
-            handleDomainSelection(selected);
-          }}
-        />
-      )}
-
       <Card
+        tabs={multiDomainEnabled && <DomainTabSelector onChange={handleDomainSelection} />}
         footer={
           <Track justify="end">
             <Button

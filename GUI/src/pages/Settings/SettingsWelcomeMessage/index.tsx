@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { apiDev } from 'services/api';
 import { ROLES } from 'utils/constants';
 
-import DomainSelector from '../../../components/DomainsSelector';
+import DomainTabSelector from '../../../components/DomainTabSelector';
 import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
 import { fetchConfigurationFromDomain } from '../../../services/configurations';
 import { GreetingsMessage, GreetingsMessageResponse } from '../../../types/greetingMessage';
@@ -111,15 +111,8 @@ const SettingsWelcomeMessage: FC = () => {
       <h1>{t('settings.welcomeMessage.welcomeMessage')}</h1>
       <p>{t('settings.welcomeMessage.description')}</p>
 
-      {multiDomainEnabled && (
-        <DomainSelector
-          onChange={(selected) => {
-            handleDomainSelection(selected);
-          }}
-        />
-      )}
-
       <Card
+        tabs={multiDomainEnabled && <DomainTabSelector onChange={handleDomainSelection} />}
         footer={
           <Track justify="end">
             <Button disabled={(multiDomainEnabled && selectedDomains.length === 0) || false} onClick={handleFormSubmit}>
