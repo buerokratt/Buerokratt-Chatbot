@@ -147,11 +147,7 @@ const SettingsSkmConfiguration: FC = () => {
 
       <Card
         isScrollable
-        tabs={
-          multiDomainEnabled ? (
-            <DomainTabSelector onChange={handleDomainSelection} />
-          ) : undefined
-        }
+        tabs={multiDomainEnabled ? <DomainTabSelector onChange={handleDomainSelection} /> : undefined}
         footer={
           <Track justify="end">
             <Button disabled={(multiDomainEnabled && selectedDomains.length === 0) || false} onClick={handleFormSubmit}>
@@ -161,48 +157,48 @@ const SettingsSkmConfiguration: FC = () => {
         }
       >
         <Fragment key={key}>
-        <Track gap={16} direction="vertical" align="left">
-          {getNumberControl('range')}
-          {getNumberControl('documents')}
-          <Controller
-            name="systemMessage"
-            control={control}
-            render={({ field }) => (
-              <Track gap={10} style={{ width: '100%' }}>
-                <FormTextarea
-                  label={t('settings.skmConfiguration.systemMessage')}
-                  maxLength={-1}
-                  onChange={field.onChange}
-                  defaultValue={field.value}
-                  name="label"
-                  height={320}
-                  useRichText
-                />
-                {getTooltip('systemMessage')}
-              </Track>
-            )}
-          />
-          {getNumberControl('maxTokens')}
-          {getTextControl('indexName')}
-          {getTextControl('semanticConfiguration')}
-          <Controller
-            name="queryType"
-            control={control}
-            render={({ field }) => (
-              <Track gap={10} style={{ width: '100%' }}>
-                <FormSelect
-                  {...field}
-                  onSelectionChange={(selection) => field.onChange(selection?.value)}
-                  label={t('settings.skmConfiguration.queryType')}
-                  defaultValue={field.value}
-                  options={getQueryTypes()}
-                />
-                {getTooltip('queryType')}
-              </Track>
-            )}
-          />
-          {getSwitchControl('inScope')}
-        </Track>
+          <Track gap={16} direction="vertical" align="left">
+            {getNumberControl('range')}
+            {getNumberControl('documents')}
+            <Controller
+              name="systemMessage"
+              control={control}
+              render={({ field }) => (
+                <Track gap={10} style={{ width: '100%' }}>
+                  <FormTextarea
+                    label={t('settings.skmConfiguration.systemMessage')}
+                    maxLength={-1}
+                    onChange={field.onChange}
+                    defaultValue={field.value}
+                    name="label"
+                    height={320}
+                    useRichText
+                  />
+                  {getTooltip('systemMessage')}
+                </Track>
+              )}
+            />
+            {getNumberControl('maxTokens')}
+            {getTextControl('indexName')}
+            {getTextControl('semanticConfiguration')}
+            <Controller
+              name="queryType"
+              control={control}
+              render={({ field }) => (
+                <Track gap={10} style={{ width: '100%' }}>
+                  <FormSelect
+                    {...field}
+                    onSelectionChange={(selection) => field.onChange(selection?.value)}
+                    label={t('settings.skmConfiguration.queryType')}
+                    defaultValue={field.value}
+                    options={getQueryTypes()}
+                  />
+                  {getTooltip('queryType')}
+                </Track>
+              )}
+            />
+            {getSwitchControl('inScope')}
+          </Track>
         </Fragment>
       </Card>
     </>
