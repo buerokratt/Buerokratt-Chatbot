@@ -3,6 +3,11 @@
 @import 'src/styles/settings/variables/other';
 @import 'src/styles/settings/variables/typography';
 
+.card-tabs-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
 .card {
   $self: &;
   background-color: get-color(white);
@@ -22,6 +27,16 @@
 
   &--scrollable {
     overflow-y: auto;
+  }
+
+  &__tabs {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    overflow: visible;
+    background-color: get-color(black-coral-0);
+    padding: 0 8px 0;
+    gap: 4px;
   }
 
   &__header,
