@@ -94,7 +94,7 @@ const SettingsFeedback: FC = () => {
       <h1>{t('settings.feedback.title')}</h1>
 
       <Card
-        tabs={multiDomainEnabled && (<DomainTabSelector onChange={handleDomainSelection} />)}
+        tabs={multiDomainEnabled && <DomainTabSelector onChange={handleDomainSelection} />}
         footer={
           <Track justify="end">
             <Button disabled={(multiDomainEnabled && selectedDomains.length === 0) || false} onClick={handleFormSubmit}>
