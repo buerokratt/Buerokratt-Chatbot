@@ -180,7 +180,7 @@ const Anonymizer: FC = () => {
     >
       <h1>{t('settings.anonymizer.settingsTitle')}</h1>
       <Card
-        tabs={multiDomainEnabled ? <DomainTabSelector onChange={handleDomainSelection} /> : undefined}
+        tabs={multiDomainEnabled && (<DomainTabSelector onChange={handleDomainSelection} />)}
         footer={
           <Track justify="end">
             <Button

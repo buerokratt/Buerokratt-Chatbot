@@ -173,7 +173,7 @@ const SettingsWorkingTime: FC = () => {
 
       <Card
         isHeaderLight={true}
-        tabs={multiDomainEnabled ? <DomainTabSelector onChange={handleDomainSelection} /> : undefined}
+        tabs={multiDomainEnabled && (<DomainTabSelector onChange={handleDomainSelection} />)}
         isBodyDivided={true}
         isScrollable={true}
         footer={

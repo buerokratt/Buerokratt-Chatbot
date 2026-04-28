@@ -181,7 +181,7 @@ const SettingsChatSettings: FC = () => {
       <h1>{t('settings.title')}</h1>
 
       <Card
-        tabs={multiDomainEnabled ? <DomainTabSelector onChange={handleDomainSelection} /> : undefined}
+        tabs={multiDomainEnabled && (<DomainTabSelector onChange={handleDomainSelection} />)}
         header={
           <Track direction="vertical" gap={8} align="left">
             {isBotActive != undefined && (

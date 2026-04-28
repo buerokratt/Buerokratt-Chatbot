@@ -112,7 +112,7 @@ const SettingsWelcomeMessage: FC = () => {
       <p>{t('settings.welcomeMessage.description')}</p>
 
       <Card
-        tabs={multiDomainEnabled ? <DomainTabSelector onChange={handleDomainSelection} /> : undefined}
+        tabs={multiDomainEnabled && (<DomainTabSelector onChange={handleDomainSelection} />)}
         footer={
           <Track justify="end">
             <Button disabled={(multiDomainEnabled && selectedDomains.length === 0) || false} onClick={handleFormSubmit}>

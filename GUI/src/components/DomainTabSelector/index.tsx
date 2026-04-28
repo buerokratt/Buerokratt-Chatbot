@@ -7,7 +7,7 @@ import './DomainTabSelector.scss';
 type SelectOption = { label: string; value: string; meta?: string };
 
 type DomainTabSelectorProps = {
-  onChange?: (selected: SelectOption[]) => void;
+  readonly onChange?: (selected: SelectOption[]) => void;
 };
 
 const DomainTabSelector: FC<DomainTabSelectorProps> = ({ onChange }) => {

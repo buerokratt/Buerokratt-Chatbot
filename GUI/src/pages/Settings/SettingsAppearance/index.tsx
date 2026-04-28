@@ -172,7 +172,7 @@ const SettingsAppearance: FC = () => {
       <h1 style={{ paddingBottom: 16 }}>{t('settings.appearance.title')}</h1>
 
       <Card
-        tabs={multiDomainEnabled ? <DomainTabSelector onChange={handleDomainSelection} /> : undefined}
+        tabs={multiDomainEnabled && (<DomainTabSelector onChange={handleDomainSelection} />)}
         footer={
           <Track gap={8} justify="end">
             <Button disabled={(multiDomainEnabled && selectedDomains.length === 0) || false} onClick={handleFormSubmit}>
