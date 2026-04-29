@@ -13,7 +13,7 @@ import { apiDev } from 'services/api';
 import { EmergencyNotice, EmergencyNoticeResponse } from 'types/emergencyNotice';
 import { ROLES } from 'utils/constants';
 
-import DomainSelector from '../../../components/DomainsSelector';
+import DomainTabSelector from '../../../components/DomainTabSelector';
 import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
 import { fetchConfigurationFromDomain } from '../../../services/configurations';
 
@@ -136,15 +136,8 @@ const SettingsEmergencyNotices: FC = () => {
     <>
       <h1>{t('settings.emergencyNotices.title')}</h1>
 
-      {multiDomainEnabled && (
-        <DomainSelector
-          onChange={(selected) => {
-            handleDomainSelection(selected);
-          }}
-        />
-      )}
-
       <Card
+        tabs={multiDomainEnabled && <DomainTabSelector onChange={handleDomainSelection} />}
         footer={
           <Track justify="end">
             <Button disabled={(multiDomainEnabled && selectedDomains.length === 0) || false} onClick={handleFormSubmit}>

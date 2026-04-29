@@ -73,6 +73,8 @@
     "domains": "Domeenid",
     "domainName": "Domeeni nimi",
     "selectDomains": "Vali Domeenid",
+    "chooseDomain": "Vali domeen:",
+    "allDomains": "Kõik",
     "noDomains": "Domeene ei ole saadaval. Palun võtke ühendust süsteemiadministraatoriga."
   },
   "menu": {

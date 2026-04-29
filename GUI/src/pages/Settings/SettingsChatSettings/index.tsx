@@ -9,7 +9,7 @@ import { apiDev } from 'services/api';
 import { BotConfigResponse } from 'types/botConfig';
 import { ROLES } from 'utils/constants';
 
-import DomainSelector from '../../../components/DomainsSelector';
+import DomainTabSelector from '../../../components/DomainTabSelector';
 import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
 import { fetchConfigurationFromDomain } from '../../../services/configurations';
 import { AiOutlineInfoCircle } from 'react-icons/ai';
@@ -180,17 +180,8 @@ const SettingsChatSettings: FC = () => {
     <>
       <h1>{t('settings.title')}</h1>
 
-      {multiDomainEnabled && (
-        <div style={{ marginBottom: '11px' }}>
-          <DomainSelector
-            onChange={(selected) => {
-              handleDomainSelection(selected);
-            }}
-          />
-        </div>
-      )}
-
       <Card
+        tabs={multiDomainEnabled && <DomainTabSelector onChange={handleDomainSelection} />}
         header={
           <Track direction="vertical" gap={8} align="left">
             {isBotActive != undefined && (

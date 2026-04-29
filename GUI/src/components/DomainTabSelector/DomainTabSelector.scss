@@ -1,0 +1,41 @@
+@import 'src/styles/tools/color';
+@import 'src/styles/settings/variables/typography';
+@import 'src/styles/settings/variables/other';
+
+.domain-tab-selector {
+  display: contents;
+
+  &__tab {
+    position: relative;
+    background-color: get-color(black-coral-0);
+    border-radius: $veera-radius-s $veera-radius-s 0 0;
+    cursor: pointer;
+    font-size: $veera-font-size-100;
+    color: get-color(black-coral-10);
+    padding: 10px 20px;
+
+    &:hover:not(&--active) {
+      background-color: rgba(255, 255, 255, 0.7);
+      color: get-color(sapphire-blue-10);
+    }
+
+    &--active {
+      background-color: get-color(white);
+      color: get-color(sapphire-blue-10);
+      font-weight: 600;
+      border: 1px solid get-color(black-coral-2);
+      border-bottom: none;
+      z-index: 1;
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background-color: get-color(white);
+      }
+    }
+  }
+}
