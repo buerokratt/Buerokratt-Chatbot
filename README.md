@@ -19,6 +19,8 @@ This repo will primarily contain:
 - Navigate to Cron Manager and build the image `docker build -t cron-manager .`
 - Clone [TIM](https://github.com/buerokratt/TIM)
 - Navigate to TIM and build the image `docker build -t tim .`
+- Clone [S3-Ferry](https://github.com/buerokratt/S3-Ferry)
+- Navigate to S3-Ferry and build the image `docker build -t s3-ferry .`
 - Clone [Chat Widget](https://github.com/buerokratt/Chat-Widget)
 - build chat widget image `docker build -f Dockerfile.dev -t chat-widget .`
 - Clone [Authentication Layer](https://github.com/buerokratt/Authentication-layer)
