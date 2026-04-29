@@ -343,7 +343,6 @@ get_domain_organization_working_details:
     body:
       holidays: ${holidays}
       holiday_names: ${holidayNames}
-      current_timestamp: ${new Date().toISOString()}
       domainUUID: ${domainUuid.response.body[0].domainId}
   result: org_res
   next: assign_organization_details
@@ -355,7 +354,6 @@ get_organization_working_details:
     body:
       holidays: ${holidays}
       holiday_names: ${holidayNames}
-      current_timestamp: ${new Date().toISOString()}
   result: org_res
   next: assign_organization_details
 

@@ -116,12 +116,12 @@ const SettingsWorkingTime: FC = () => {
   const handleTime = (field: any, date: any, isStart: boolean) => {
     const { minTime, maxTime } = getStartEndTimeValues(field, isStart);
     if (isStart && date > maxTime) {
-      field.onChange(minTime);
+      field.onChange(format(minTime, 'HH:mm'));
+    } else if (!isStart && date < minTime) {
+      field.onChange(format(maxTime, 'HH:mm'));
+    } else {
+      field.onChange(format(date, 'HH:mm'));
     }
-    if (!isStart && date < minTime) {
-      field.onChange(maxTime);
-    }
-    field.onChange(date);
   };
 
   const getStartEndTimeValues = (field: any, isStart: boolean) => {
@@ -132,7 +132,7 @@ const SettingsWorkingTime: FC = () => {
   };
 
   const adjustTimeGap = (date: any, isStart: boolean) => {
-    const convertedDate = parse(format(getValues(date) as Date, 'HH:mm:ss'), 'HH:mm:ss', new Date());
+    const convertedDate = parse(getValues(date) as string, 'HH:mm', new Date());
     let adjustedTime = new Date(convertedDate);
     if (isStart) {
       adjustedTime.setMinutes(adjustedTime.getMinutes() + 15);
@@ -305,7 +305,7 @@ const SettingsWorkingTime: FC = () => {
                       hideLabel
                       direction="row"
                       label=""
-                      value={parse(format(field.value as Date, 'HH:mm:ss'), 'HH:mm:ss', new Date()) ?? new Date('0')}
+                      value={parse(field.value as string, 'HH:mm', new Date()) ?? new Date('0')}
                       onChange={(date) => handleTime(field, date, true)}
                       maxTime={maxTime}
                     />
@@ -327,7 +327,7 @@ const SettingsWorkingTime: FC = () => {
                       hideLabel
                       direction="row"
                       label=""
-                      value={parse(format(field.value as Date, 'HH:mm:ss'), 'HH:mm:ss', new Date()) ?? new Date('0')}
+                      value={parse(field.value as string, 'HH:mm', new Date()) ?? new Date('0')}
                       onChange={(date) => handleTime(field, date, false)}
                       minTime={minTime}
                     />
@@ -383,7 +383,7 @@ const SettingsWorkingTime: FC = () => {
                               direction="row"
                               label=""
                               value={
-                                parse(format(field.value as Date, 'HH:mm:ss'), 'HH:mm:ss', new Date()) ?? new Date('0')
+                                parse(field.value as string, 'HH:mm', new Date()) ?? new Date('0')
                               }
                               onChange={(date) => handleTime(field, date, true)}
                               maxTime={maxTime}
@@ -407,7 +407,7 @@ const SettingsWorkingTime: FC = () => {
                               direction="row"
                               label=""
                               value={
-                                parse(format(field.value as Date, 'HH:mm:ss'), 'HH:mm:ss', new Date()) ?? new Date('0')
+                                parse(field.value as string, 'HH:mm', new Date()) ?? new Date('0')
                               }
                               onChange={(date) => handleTime(field, date, false)}
                               minTime={minTime}
