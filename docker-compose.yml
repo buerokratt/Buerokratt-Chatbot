@@ -110,6 +110,55 @@ services:
     networks:
       - bykstack
 
+  s3-ferry:
+    container_name: s3-ferry
+    image: s3-ferry
+    environment:
+      - API_CORS_ORIGIN=*
+      - API_DOCUMENTATION_ENABLED=true
+
+      - S3_DEFAULT_REGION=us-east-1
+      - S3_DEFAULT_ENDPOINT_URL=http://s3.localhost:4566
+      - S3_DEFAULT_ACCESS_KEY_ID=accesskey
+      - S3_DEFAULT_SECRET_ACCESS_KEY=secretkey
+      - S3_DEFAULT_DATA_BUCKET_NAME=buerokratt
+      - S3_DEFAULT_DATA_BUCKET_PATH=
+      - S3_DEFAULT_FS_DATA_DIRECTORY_PATH=/data
+
+      - S3_CHATS_REGION=us-east-1
+      - S3_CHATS_ENDPOINT_URL=http://s3.localhost:4566
+      - S3_CHATS_ACCESS_KEY_ID=accesskey
+      - S3_CHATS_SECRET_ACCESS_KEY=secretkey
+      - S3_CHATS_DATA_BUCKET_NAME=chats
+      - S3_CHATS_DATA_BUCKET_PATH=
+      - S3_CHATS_FS_DATA_DIRECTORY_PATH=/chats
+
+      - AZURE_ACCOUNT_1_CONNECTION_STRING=DefaultEndpointsProtocol=http;AccountName=testaccount1;AccountKey=dGVzdGtleTE9PQ==;BlobEndpoint=http://localhost:10000/testaccount1;QueueEndpoint=http://localhost:10001/testaccount1;TableEndpoint=http://localhost:10002/testaccount1;
+      - AZURE_ACCOUNT_2_CONNECTION_STRING=DefaultEndpointsProtocol=http;AccountName=testaccount2;AccountKey=dGVzdGtleTI9PQ==;BlobEndpoint=http://localhost:10000/testaccount2;QueueEndpoint=http://localhost:10001/testaccount2;TableEndpoint=http://localhost:10002/testaccount2;
+      - AZURE_ACCOUNT_3_CONNECTION_STRING=DefaultEndpointsProtocol=http;AccountName=testaccount3;AccountKey=dGVzdGtleTM9PQ==;BlobEndpoint=http://localhost:10000/testaccount3;QueueEndpoint=http://localhost:10001/testaccount3;TableEndpoint=http://localhost:10002/testaccount3;
+    ports:
+      - 3005:3000
+    volumes:
+      - ./DSL:/data
+    networks:
+      - bykstack
+    depends_on:
+     - localstack
+
+  localstack:
+    container_name: localstack
+    image: localstack/localstack:3.3.0
+    environment:
+      - SERVICES=s3:4566
+    ports:
+      - 4566:4566
+    volumes:
+      - ./scripts/localstack-init.sh:/etc/localstack/init/ready.d/init.sh
+    networks:
+      bykstack:
+        aliases:
+          - s3.localhost
+
   resql:
     container_name: resql
     image: resql
