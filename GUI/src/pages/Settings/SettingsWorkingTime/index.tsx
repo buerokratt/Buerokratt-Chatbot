@@ -116,12 +116,12 @@ const SettingsWorkingTime: FC = () => {
   const handleTime = (field: any, date: any, isStart: boolean) => {
     const { minTime, maxTime } = getStartEndTimeValues(field, isStart);
     if (isStart && date > maxTime) {
-      field.onChange(minTime);
+      field.onChange(format(minTime, 'HH:mm'));
+    } else if (!isStart && date < minTime) {
+      field.onChange(format(maxTime, 'HH:mm'));
+    } else {
+      field.onChange(format(date, 'HH:mm'));
     }
-    if (!isStart && date < minTime) {
-      field.onChange(maxTime);
-    }
-    field.onChange(date);
   };
 
   const getStartEndTimeValues = (field: any, isStart: boolean) => {
@@ -132,7 +132,7 @@ const SettingsWorkingTime: FC = () => {
   };
 
   const adjustTimeGap = (date: any, isStart: boolean) => {
-    const convertedDate = parse(format(getValues(date) as Date, 'HH:mm:ss'), 'HH:mm:ss', new Date());
+    const convertedDate = parse(getValues(date) as string, 'HH:mm', new Date());
     let adjustedTime = new Date(convertedDate);
     if (isStart) {
       adjustedTime.setMinutes(adjustedTime.getMinutes() + 15);
@@ -140,10 +140,6 @@ const SettingsWorkingTime: FC = () => {
       adjustedTime.setMinutes(adjustedTime.getMinutes() - 15);
     }
     return adjustedTime;
-  };
-
-  const filterTime = (date: any, isStart: any, time: any) => {
-    return date > time;
   };
 
   const getFieldNames = (field: any, isStart: boolean): FieldDateNames => {
@@ -190,7 +186,7 @@ const SettingsWorkingTime: FC = () => {
               control={control}
               render={({ field }) => (
                 <Switch
-                  label={t('settings.workingTime.organizationUseCSA')}
+                  label={t('settings.workingTime.organizationUseCSA').toString()}
                   onLabel={t('global.yes').toString()}
                   offLabel={t('global.no').toString()}
                   onCheckedChange={field.onChange}
@@ -206,7 +202,7 @@ const SettingsWorkingTime: FC = () => {
                 control={control}
                 render={({ field }) => (
                   <Switch
-                    label={t('settings.workingTime.availableAllTime')}
+                    label={t('settings.workingTime.availableAllTime').toString()}
                     onLabel={t('global.yes').toString()}
                     offLabel={t('global.no').toString()}
                     onCheckedChange={field.onChange}
@@ -223,7 +219,7 @@ const SettingsWorkingTime: FC = () => {
                 control={control}
                 render={({ field }) => (
                   <Switch
-                    label={t('settings.workingTime.publicHolidays')}
+                    label={t('settings.workingTime.publicHolidays').toString()}
                     onLabel={t('global.yes').toString()}
                     offLabel={t('global.no').toString()}
                     onCheckedChange={field.onChange}
@@ -240,7 +236,7 @@ const SettingsWorkingTime: FC = () => {
                 control={control}
                 render={({ field }) => (
                   <Switch
-                    label={t('settings.workingTime.closedOnWeekends')}
+                    label={t('settings.workingTime.closedOnWeekends').toString()}
                     onLabel={t('global.yes').toString()}
                     offLabel={t('global.no').toString()}
                     onCheckedChange={field.onChange}
@@ -257,7 +253,7 @@ const SettingsWorkingTime: FC = () => {
                 control={control}
                 render={({ field }) => (
                   <Switch
-                    label={t('settings.workingTime.theSameOnAllWorkingDays')}
+                    label={t('settings.workingTime.theSameOnAllWorkingDays').toString()}
                     onLabel={t('global.yes').toString()}
                     offLabel={t('global.no').toString()}
                     onCheckedChange={field.onChange}
@@ -296,7 +292,7 @@ const SettingsWorkingTime: FC = () => {
                         hideLabel
                         direction="row"
                         label=""
-                        value={parse(format(field.value as Date, 'HH:mm:ss'), 'HH:mm:ss', new Date()) ?? new Date('0')}
+                        value={parse(field.value as string, 'HH:mm', new Date()) ?? new Date('0')}
                         onChange={(date) => handleTime(field, date, true)}
                         maxTime={maxTime}
                       />
@@ -318,7 +314,7 @@ const SettingsWorkingTime: FC = () => {
                         hideLabel
                         direction="row"
                         label=""
-                        value={parse(format(field.value as Date, 'HH:mm:ss'), 'HH:mm:ss', new Date()) ?? new Date('0')}
+                        value={parse(field.value as string, 'HH:mm', new Date()) ?? new Date('0')}
                         onChange={(date) => handleTime(field, date, false)}
                         minTime={minTime}
                       />
@@ -373,10 +369,7 @@ const SettingsWorkingTime: FC = () => {
                                 hideLabel
                                 direction="row"
                                 label=""
-                                value={
-                                  parse(format(field.value as Date, 'HH:mm:ss'), 'HH:mm:ss', new Date()) ??
-                                  new Date('0')
-                                }
+                                value={parse(field.value as string, 'HH:mm', new Date()) ?? new Date('0')}
                                 onChange={(date) => handleTime(field, date, true)}
                                 maxTime={maxTime}
                               />
@@ -398,13 +391,9 @@ const SettingsWorkingTime: FC = () => {
                                 hideLabel
                                 direction="row"
                                 label=""
-                                value={
-                                  parse(format(field.value as Date, 'HH:mm:ss'), 'HH:mm:ss', new Date()) ??
-                                  new Date('0')
-                                }
+                                value={parse(field.value as string, 'HH:mm', new Date()) ?? new Date('0')}
                                 onChange={(date) => handleTime(field, date, false)}
                                 minTime={minTime}
-                                filterTime={(date: any) => filterTime(date, false, minTime)}
                               />
                             </div>
                           );
@@ -420,7 +409,7 @@ const SettingsWorkingTime: FC = () => {
               control={control}
               render={({ field }) => (
                 <Switch
-                  label={t('settings.workingTime.showIfOrganizationIsOutsideWorkingHours')}
+                  label={t('settings.workingTime.showIfOrganizationIsOutsideWorkingHours').toString()}
                   onLabel={t('global.yes').toString()}
                   offLabel={t('global.no').toString()}
                   onCheckedChange={field.onChange}
@@ -439,7 +428,7 @@ const SettingsWorkingTime: FC = () => {
                 render={({ field }) => (
                   <Track gap={10} style={{ width: '100%' }}>
                     <FormTextarea
-                      label={t('settings.workingTime.outsideWorkingHoursMessage')}
+                      label={t('settings.workingTime.outsideWorkingHoursMessage').toString()}
                       maxLength={OUTSIDE_WORKING_HOURS_MESSAGE_LENGTH}
                       showMaxLength
                       maxLengthBottom
@@ -460,7 +449,7 @@ const SettingsWorkingTime: FC = () => {
               control={control}
               render={({ field }) => (
                 <Switch
-                  label={t('settings.workingTime.showIfCSAIsNotAvailable')}
+                  label={t('settings.workingTime.showIfCSAIsNotAvailable').toString()}
                   onLabel={t('global.yes').toString()}
                   offLabel={t('global.no').toString()}
                   onCheckedChange={field.onChange}
@@ -479,7 +468,7 @@ const SettingsWorkingTime: FC = () => {
                 render={({ field }) => (
                   <Track gap={10} style={{ width: '100%' }}>
                     <FormTextarea
-                      label={t('settings.workingTime.noCsaAvailableMessage')}
+                      label={t('settings.workingTime.noCsaAvailableMessage').toString()}
                       maxLength={NO_CSA_MESSAGE_LENGTH}
                       showMaxLength
                       maxLengthBottom
@@ -502,7 +491,7 @@ const SettingsWorkingTime: FC = () => {
                 render={({ field }) => (
                   <Track gap={10} style={{ width: '100%' }}>
                     <FormTextarea
-                      label={t('settings.workingTime.redirectIfBotCannotAnswerMessage')}
+                      label={t('settings.workingTime.redirectIfBotCannotAnswerMessage').toString()}
                       maxLength={REDIRECT_IF_BOT_CANNOT_ANSWER_MESSAGE_LENGTH}
                       showMaxLength
                       maxLengthBottom
@@ -525,7 +514,7 @@ const SettingsWorkingTime: FC = () => {
                 render={({ field }) => (
                   <Track gap={10} style={{ width: '100%' }}>
                     <FormTextarea
-                      label={t('settings.workingTime.botCannotAnswerMessage')}
+                      label={t('settings.workingTime.botCannotAnswerMessage').toString()}
                       maxLength={BOT_CANNOT_ANSWER_MESSAGE_LENGTH}
                       showMaxLength
                       maxLengthBottom
@@ -548,7 +537,7 @@ const SettingsWorkingTime: FC = () => {
                 render={({ field }) => (
                   <Track gap={10} style={{ width: '100%' }}>
                     <FormTextarea
-                      label={t('settings.workingTime.validationNoCsaMessage')}
+                      label={t('settings.workingTime.validationNoCsaMessage').toString()}
                       maxLength={VALIDATION_NO_CSA_MESSAGE_LENGTH}
                       showMaxLength
                       maxLengthBottom
