@@ -2,26 +2,44 @@
 @import 'src/styles/settings/variables/other';
 
 .slider {
-  --slider-color: #{get-color(sapphire-blue-10)};
-  --slider-track-bg: #{get-color(black-coral-3)};
-  --slider-thumb-size: 20px;
-  --slider-track-height: 4px;
-  --value-percent: 0%;
-
   display: flex;
   align-items: center;
 
   &__input {
+    --slider-color: #2b579a;
+    --slider-track-bg: #d9dbe0;
+    --slider-thumb-size: 24px;
+    --slider-track-height: 7px;
+    --slider-thumb-ring: 2px;
+    --value-percent: 0%;
+
     -webkit-appearance: none;
     appearance: none;
     width: 100%;
+    height: var(--slider-thumb-size);
+    margin: 0;
     background: transparent;
     outline: none;
     cursor: pointer;
+    accent-color: transparent;
+
+    &::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      box-sizing: border-box;
+      width: var(--slider-thumb-size);
+      height: var(--slider-thumb-size);
+      border-radius: 50%;
+      background-color: #{get-color(white)};
+      border: var(--slider-thumb-ring) solid var(--slider-color);
+      cursor: pointer;
+      box-shadow: none;
+      margin-top: calc((var(--slider-track-height) - var(--slider-thumb-size)) / 2);
+    }
 
     &::-webkit-slider-runnable-track {
       height: var(--slider-track-height);
-      border-radius: 999px;
+      border-radius: 9999px;
       background: linear-gradient(
         to right,
         var(--slider-color) var(--value-percent),
@@ -29,51 +47,38 @@
       );
     }
 
-    &::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
+    &::-moz-range-thumb {
+      box-sizing: border-box;
       width: var(--slider-thumb-size);
       height: var(--slider-thumb-size);
       border-radius: 50%;
-      background: white;
-      border: 2px solid var(--slider-color);
-      cursor: pointer;
+      background-color: #{get-color(white)};
+      border: var(--slider-thumb-ring) solid var(--slider-color);
       box-shadow: none;
-      margin-top: calc((var(--slider-track-height) - var(--slider-thumb-size)) / 2);
+      cursor: pointer;
     }
 
     &::-moz-range-track {
       height: var(--slider-track-height);
-      border-radius: 999px;
+      border-radius: 9999px;
       background: var(--slider-track-bg);
     }
 
     &::-moz-range-progress {
       height: var(--slider-track-height);
-      border-radius: 999px;
+      border-radius: 9999px;
       background: var(--slider-color);
-    }
-
-    &::-moz-range-thumb {
-      width: var(--slider-thumb-size);
-      height: var(--slider-thumb-size);
-      border-radius: 50%;
-      background: white;
-      border: 2px solid var(--slider-color);
-      box-shadow: none;
-      cursor: pointer;
-      box-sizing: border-box;
     }
 
     &:focus-visible {
       &::-webkit-slider-thumb {
         outline: 2px solid var(--slider-color);
-        outline-offset: 2px;
+        outline-offset: 3px;
       }
 
       &::-moz-range-thumb {
         outline: 2px solid var(--slider-color);
-        outline-offset: 2px;
+        outline-offset: 3px;
       }
     }
 
