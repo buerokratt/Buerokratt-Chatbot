@@ -28,5 +28,5 @@ SELECT
     MAX(CASE WHEN KEY = 'show_sub_title' THEN value END) AS show_sub_title,
     MAX(CASE WHEN KEY = 'sub_title' THEN value END) AS sub_title,
     MAX(CASE WHEN KEY = 'response_waiting_time' THEN value END) AS response_waiting_time,
-    MAX(CASE WHEN KEY = 'response_processing_notice' THEN value END) AS response_processing
+    MAX(CASE WHEN KEY = 'response_processing_notice' THEN value END) AS response_processing_notice
 FROM configuration_values;

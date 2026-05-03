@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import { Button, Card, Dialog, FormInput, FormTextarea, Icon, Switch, Tooltip, Track } from 'components';
+import { Button, Card, Dialog, FormInput, FormTextarea, Icon, Slider, Switch, Tooltip, Track } from 'components';
 import withAuthorization from 'hoc/with-authorization';
 import { useToast } from 'hooks/useToast';
 import { FC, useEffect, useRef, useState } from 'react';
@@ -13,7 +13,12 @@ import DomainTabSelector from '../../../components/DomainTabSelector';
 import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
 import { fetchConfigurationFromDomain } from '../../../services/configurations';
 import { AiOutlineInfoCircle } from 'react-icons/ai';
-import { SUB_TITLE_LENGTH } from 'constants/config';
+import {
+  SUB_TITLE_LENGTH,
+  RESPONSE_PROCESSING_NOTICE_LENGTH,
+  RESPONSE_WAITING_TIME_MIN,
+  RESPONSE_WAITING_TIME_MAX,
+} from 'constants/config';
 
 const SettingsChatSettings: FC = () => {
   const { t } = useTranslation();
@@ -158,6 +163,8 @@ const SettingsChatSettings: FC = () => {
     setInstantlyOpenChatWidget(false);
     setShowSubTitle(false);
     setSubTitle('');
+    setResponseWaitingTime('10');
+    setResponseProcessingNotice('');
   };
 
   const handleDomainSelection = useDomainSelectionHandler(setSelectedDomains, fetchData, resetSettingsToDefault);
@@ -192,6 +199,7 @@ const SettingsChatSettings: FC = () => {
 
       <Card
         tabs={multiDomainEnabled && <DomainTabSelector onChange={handleDomainSelection} />}
+        isScrollable={true}
         header={
           <Track direction="vertical" gap={8} align="left">
             {isBotActive != undefined && (
@@ -297,6 +305,60 @@ const SettingsChatSettings: FC = () => {
               {getTooltip('is_edit_chat_visible')}
             </Track>
           )}
+          <Track direction="vertical" gap={5} style={{ width: '40%', paddingTop: '10px', paddingBottom: '5px' }}>
+            <Track gap={8} align="center" style={{ width: '100%' }}>
+              <label style={{ flex: '0 0 185px', lineHeight: '24px' }}>{t('settings.chat.responseWaitingTime')}</label>
+              <Track gap={8} align="center" style={{ flex: 1 }}>
+                <div style={{ width: '80px', flexShrink: 0 }}>
+                  <FormInput
+                    name="response_waiting_time"
+                    label={t('settings.chat.responseWaitingTime')}
+                    hideLabel
+                    type="number"
+                    min={RESPONSE_WAITING_TIME_MIN}
+                    max={RESPONSE_WAITING_TIME_MAX}
+                    step={1}
+                    value={responseWaitingTime || '10'}
+                    onChange={(e) => {
+                      const raw = parseInt(e.target.value);
+                      if (!isNaN(raw)) {
+                        setResponseWaitingTime(
+                          String(Math.min(RESPONSE_WAITING_TIME_MAX, Math.max(RESPONSE_WAITING_TIME_MIN, raw))),
+                        );
+                      }
+                    }}
+                  />
+                </div>
+                <span style={{ whiteSpace: 'nowrap' }}>{t('settings.chat.seconds')}*</span>
+                <Slider
+                  min={RESPONSE_WAITING_TIME_MIN}
+                  max={RESPONSE_WAITING_TIME_MAX}
+                  step={1}
+                  value={parseInt(responseWaitingTime) || 10}
+                  onChange={(e) => setResponseWaitingTime(e.target.value)}
+                  style={{ flex: 1 }}
+                />
+              </Track>
+            </Track>
+            <Track gap={8} style={{ width: '100%' }}>
+              <div style={{ flex: '0 0 185px' }} />
+              <span style={{ fontSize: '12px', color: '#6e6e6e' }}>
+                *{t('settings.chat.responseWaitingTimeRangeInfo')}
+              </span>
+            </Track>
+          </Track>
+          <Track direction="vertical" gap={4} style={{ width: '40%' }}>
+            <FormTextarea
+              name="response_processing_notice"
+              label={t('settings.chat.responseProcessingNotice').toString()}
+              minRows={4}
+              maxLength={RESPONSE_PROCESSING_NOTICE_LENGTH}
+              showMaxLength={true}
+              maxLengthBottom
+              onChange={(e) => setResponseProcessingNotice(e.target.value)}
+              defaultValue={responseProcessingNotice}
+            />
+          </Track>
         </Track>
       </Card>
       {burokrattConfirmationModal && (
