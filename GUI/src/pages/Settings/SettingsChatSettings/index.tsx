@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import { Button, Card, Dialog, FormTextarea, Icon, Switch, Tooltip, Track } from 'components';
+import { Button, Card, Dialog, FormInput, FormTextarea, Icon, Switch, Tooltip, Track } from 'components';
 import withAuthorization from 'hoc/with-authorization';
 import { useToast } from 'hooks/useToast';
 import { FC, useEffect, useRef, useState } from 'react';
@@ -30,6 +30,8 @@ const SettingsChatSettings: FC = () => {
   const [instantlyOpenChatWidget, setInstantlyOpenChatWidget] = useState<boolean | undefined>(undefined);
   const [showSubTitle, setShowSubTitle] = useState<boolean | undefined>(undefined);
   const [subTitle, setSubTitle] = useState<string>('');
+  const [responseWaitingTime, setResponseWaitingTime] = useState<string>('');
+  const [responseProcessingNotice, setResponseProcessingNotice] = useState<string>('');
   const queryClient = useQueryClient();
   const [burokrattConfirmationModal, setBurokrattConfirmationModal] = useState<boolean | null>(null);
   const tooltips = {
@@ -70,6 +72,8 @@ const SettingsChatSettings: FC = () => {
       setInstantlyOpenChatWidget(res.instantlyOpenChatWidget === 'true');
       setShowSubTitle(res.showSubTitle === 'true');
       setSubTitle(res.subTitle);
+      setResponseWaitingTime(res.responseWaitingTime);
+      setResponseProcessingNotice(res.responseProcessingNotice);
 
       hasRendered.current = true;
     } catch (error) {
@@ -87,6 +91,8 @@ const SettingsChatSettings: FC = () => {
       instantly_open_chat_widget: boolean;
       show_sub_title: boolean;
       sub_title: string;
+      response_waiting_time: string;
+      response_processing_notice: string;
       domainUUID: string[];
     }) => {
       return apiDev.post(`configs/bot-config`, {
@@ -97,6 +103,8 @@ const SettingsChatSettings: FC = () => {
         isEditChatVisible: data.is_edit_chat_visible.toString(),
         instantlyOpenChatWidget: data.instantly_open_chat_widget.toString(),
         showSubTitle: data.show_sub_title.toString(),
+        responseWaitingTime: data.response_waiting_time,
+        responseProcessingNotice: data.response_processing_notice,
         subTitle: data.sub_title,
         domainUUID: data.domainUUID,
       });
@@ -134,6 +142,8 @@ const SettingsChatSettings: FC = () => {
       instantly_open_chat_widget: instantlyOpenChatWidget ?? false,
       show_sub_title: showSubTitle ?? false,
       sub_title: subTitle ?? '',
+      response_waiting_time: responseWaitingTime ?? '',
+      response_processing_notice: responseProcessingNotice ?? '',
       domainUUID: multiDomainEnabled ? selectedDomains : [],
     });
   };
@@ -315,6 +325,8 @@ const SettingsChatSettings: FC = () => {
                     instantly_open_chat_widget: instantlyOpenChatWidget ?? false,
                     show_sub_title: showSubTitle ?? false,
                     sub_title: subTitle ?? '',
+                    response_waiting_time: responseWaitingTime ?? '',
+                    response_processing_notice: responseProcessingNotice ?? '',
                     domainUUID: multiDomainEnabled ? selectedDomains : [],
                   });
                 }}
