@@ -35,4 +35,10 @@
       top: 135px;
     }
   }
+
+  &--hide-domain-bar {
+    .domain-selector-bar {
+      display: none;
+    }
+  }
 }
