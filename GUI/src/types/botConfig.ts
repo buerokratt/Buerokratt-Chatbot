@@ -7,6 +7,8 @@ export interface BotConfig {
   instantlyOpenChatWidget: string;
   showSubTitle: string;
   subTitle: string;
+  responseWaitingTime: string;
+  responseProcessingNotice: string;
 }
 
 export interface BotConfigResponse {
