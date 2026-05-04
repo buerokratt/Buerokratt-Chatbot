@@ -1,0 +1,21 @@
+export const ROUTES = {
+  CHATBOT_SETTINGS: '/chatbot/settings',
+  CHATBOT_WELCOME_MESSAGE: '/chatbot/welcome-message',
+  CHATBOT_EMERGENCY_NOTICES: '/chatbot/emergency-notices',
+  CHATBOT_APPEARANCE: '/chatbot/appearance',
+  CHATBOT_FEEDBACK: '/chatbot/feedback',
+  WORKING_TIME: '/working-time',
+  SKM_CONFIGURATION: '/skm-configuration',
+  ANONYMIZER: '/anonymizer',
+};
+
+export const PAGES_WITH_DOMAIN_TAB_SELECTOR = [
+  ROUTES.CHATBOT_SETTINGS,
+  ROUTES.CHATBOT_WELCOME_MESSAGE,
+  ROUTES.CHATBOT_EMERGENCY_NOTICES,
+  ROUTES.CHATBOT_APPEARANCE,
+  ROUTES.CHATBOT_FEEDBACK,
+  ROUTES.WORKING_TIME,
+  ROUTES.SKM_CONFIGURATION,
+  ROUTES.ANONYMIZER,
+];

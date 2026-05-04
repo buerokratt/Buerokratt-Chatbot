@@ -4,19 +4,9 @@ import React, { FC } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import useStore from 'store';
 
+import { PAGES_WITH_DOMAIN_TAB_SELECTOR } from '../../constants/routes';
 import { useToast } from '../../hooks/useToast';
 import './Layout.scss';
-
-const PAGES_WITH_DOMAIN_TAB_SELECTOR = [
-  '/chatbot/settings',
-  '/chatbot/welcome-message',
-  '/chatbot/emergency-notices',
-  '/chatbot/appearance',
-  '/chatbot/feedback',
-  '/working-time',
-  '/skm-configuration',
-  '/anonymizer',
-];
 
 const Layout: FC = () => {
   const menuCountConf = useMenuCountConf();
@@ -26,7 +16,9 @@ const Layout: FC = () => {
   const domainBarShowing = multiDomainEnabled && !hasDomainTabSelector;
 
   return (
-    <div className={`layout${domainBarShowing ? ' layout--multi-domain' : ''}${hasDomainTabSelector ? ' layout--hide-domain-bar' : ''}`}>
+    <div
+      className={`layout${domainBarShowing ? ' layout--multi-domain' : ''}${hasDomainTabSelector ? ' layout--hide-domain-bar' : ''}`}
+    >
       <MainNavigation countConf={menuCountConf} />
       <div className="layout__wrapper">
         <Header
