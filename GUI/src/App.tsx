@@ -32,6 +32,7 @@ import MultiDomain from './pages/Settings/MultiDomain';
 import SettingsFeedback from 'pages/Settings/SettingsFeedback';
 
 import { getWidgetData } from './services/users';
+import { ROUTES } from './constants/routes';
 
 const App: FC = () => {
   const multiDomainEnabled = import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
@@ -68,27 +69,26 @@ const App: FC = () => {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route index element={<Navigate to="/landing" />} />
-        <Route path="/landing" element={<LandingPage />} />
-        <Route path="/unanswered" element={<ChatUnanswered />} />
-        <Route path="/active" element={<ChatActive />} />
-        <Route path="/delete-conversations" element={<DeleteConversations />} />
-        <Route path="/history" element={<ChatHistory />} />
-        <Route path="/validations" element={<ValidationRequests />} />
-        <Route path="/pending" element={<ChatPending />} />
-        <Route path="/users" element={<SettingsUsers />} />
-        <Route path="/chatbot/settings" element={<SettingsChatSettings />} />
-        <Route path="/chatbot/welcome-message" element={<SettingsWelcomeMessage />} />
-        <Route path="/chatbot/emergency-notices" element={<SettingsEmergencyNotices />} />
-        <Route path="/chatbot/appearance" element={<SettingsAppearance />} />
-        <Route path="/chatbot/feedback" element={<SettingsFeedback />} />
-        <Route path="/working-time" element={<SettingsWorkingTime />} />
-        <Route path="/session-length" element={<SettingsSessionLength />} />
-        <Route path="/skm-configuration" element={<SettingsSkmConfiguration />} />
-        <Route path="/skm-configuration" element={<SettingsSkmConfiguration />} />
-        <Route path="/multi-domains" element={<MultiDomain />} />
-        <Route path="/anonymizer" element={<Anonymizer />} />
-        <Route path="/uptime" element={<MonitoringUptime />} />
+        <Route index element={<Navigate to={ROUTES.LANDING} />} />
+        <Route path={ROUTES.LANDING} element={<LandingPage />} />
+        <Route path={ROUTES.UNANSWERED} element={<ChatUnanswered />} />
+        <Route path={ROUTES.ACTIVE} element={<ChatActive />} />
+        <Route path={ROUTES.DELETE_CONVERSATIONS} element={<DeleteConversations />} />
+        <Route path={ROUTES.HISTORY} element={<ChatHistory />} />
+        <Route path={ROUTES.VALIDATIONS} element={<ValidationRequests />} />
+        <Route path={ROUTES.PENDING} element={<ChatPending />} />
+        <Route path={ROUTES.USERS} element={<SettingsUsers />} />
+        <Route path={ROUTES.CHATBOT_SETTINGS} element={<SettingsChatSettings />} />
+        <Route path={ROUTES.CHATBOT_WELCOME_MESSAGE} element={<SettingsWelcomeMessage />} />
+        <Route path={ROUTES.CHATBOT_EMERGENCY_NOTICES} element={<SettingsEmergencyNotices />} />
+        <Route path={ROUTES.CHATBOT_APPEARANCE} element={<SettingsAppearance />} />
+        <Route path={ROUTES.CHATBOT_FEEDBACK} element={<SettingsFeedback />} />
+        <Route path={ROUTES.WORKING_TIME} element={<SettingsWorkingTime />} />
+        <Route path={ROUTES.SESSION_LENGTH} element={<SettingsSessionLength />} />
+        <Route path={ROUTES.SKM_CONFIGURATION} element={<SettingsSkmConfiguration />} />
+        <Route path={ROUTES.MULTI_DOMAINS} element={<MultiDomain />} />
+        <Route path={ROUTES.ANONYMIZER} element={<Anonymizer />} />
+        <Route path={ROUTES.UPTIME} element={<MonitoringUptime />} />
       </Route>
     </Routes>
   );
