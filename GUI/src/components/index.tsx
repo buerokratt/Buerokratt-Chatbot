@@ -17,6 +17,7 @@ import {
   FormTagInput,
   FormTextarea,
   IconSwitch,
+  Slider,
   Switch,
   SwitchBox,
 } from './FormElements';
@@ -60,4 +61,5 @@ export {
   Section,
   Chat,
   FormTagInput,
+  Slider,
 };

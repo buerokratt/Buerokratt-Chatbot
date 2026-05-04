@@ -26,6 +26,7 @@
   }
 
   &--scrollable {
+    max-height: max(200px, calc(100vh - 300px)) !important;
     overflow-y: auto;
   }
 

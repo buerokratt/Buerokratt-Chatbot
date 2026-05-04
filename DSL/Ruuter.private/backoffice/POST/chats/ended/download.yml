@@ -141,10 +141,41 @@ get_xlsx_data:
       chatRows: ${finalChats}
       language: ${language}
   result: xlsxData
+  next: assign_s3_filepath
+
+assign_s3_filepath:
+  assign:
+    s3FilePath: ${'history/' + xlsxData.response.body.filePath.split('/').pop()}
+  next: copy_xlsx_to_s3
+
+copy_xlsx_to_s3:
+  call: http.post
+  args:
+    url: "[#CHATBOT_S3_FERRY]/v1/files/copy"
+    body:
+      destinationStorageType: "S3"
+      destinationConfigKey: "chats"
+      destinationFilePath: ${s3FilePath}
+      sourceStorageType: "FS"
+      sourceConfigKey: "default"
+      sourceFilePath: ${xlsxData.response.body.filePath}
+  result: s3FileCopy
+  next: get_signed_url
+
+get_signed_url:
+  call: http.post
+  args:
+    url: "[#CHATBOT_S3_FERRY]/v1/files/signed-url/download"
+    body:
+      type: "S3"
+      expiresInSec: 1800
+      configKey: "chats"
+      filePath: ${s3FilePath}
+  result: signedUrlResponse
 
 return_success:
   wrapper: false
-  return: ${xlsxData.response.body}
+  return: ${signedUrlResponse.response.body}
   next: end
   status: 200
 

@@ -395,6 +395,10 @@
       "subTitle": "Vestlusakna alampealkiri",
       "showBurokrattConfirmation": "Kas soovid Bürokrati veebilehel nähtavaks teha?",
       "hideBurokrattConfirmation": "Kas soovid Bürokrati veebilehel ära peita?",
+      "responseWaitingTime": "Vastuse ooteaeg",
+      "responseProcessingNotice": "Vastuse töötlemise teavitus",
+      "seconds": "sekundit",
+      "responseWaitingTimeRangeInfo": "Lubatud vahemik 1 sek - 120 sek (2 min)",
       "tooltip": {
         "isBotActive": "Valides sees, vastab Bürokratt automaatselt kliendile kasutades tehisintellektil põhinevat vestluslahendust (vastavalt tehnilisele lahendusele kas keelemudelit, RAG või RASA lahendust). Valides väljas, suunatakse vestlus automaatselt nõustajale.",
         "isBurokrattActive": "Valides sees, on Bürokratt veebilehel nähtav. Valides väljas, peidetakse veebilehelt Bürokratt ära.",
