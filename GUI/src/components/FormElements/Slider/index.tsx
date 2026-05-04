@@ -2,10 +2,10 @@ import { forwardRef, InputHTMLAttributes } from 'react';
 import './Slider.scss';
 
 type SliderProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> & {
-  color?: string;
-  thumbSize?: number;
-  trackHeight?: number;
-  wrapperStyle?: React.CSSProperties;
+  readonly color?: string;
+  readonly thumbSize?: number;
+  readonly trackHeight?: number;
+  readonly wrapperStyle?: React.CSSProperties;
 };
 
 const Slider = forwardRef<HTMLInputElement, SliderProps>(
