@@ -30,12 +30,12 @@ This repo will primarily contain:
 - Clone [Anonymizer](https://github.com/buerokratt/Presidio-Anonymizer)
 - choose dev branch and run `docker build --platform=linux/amd64 -t anonymizer .`
 
-### Run with local bot
+### Run with local bot - depcreated
 
 - Change `CHATBOT_BOT=http://bot:5005` in constants.ini
 - Navigate to current repo and run `docker-compose $(find docker-* | sed -e 's/^/-f /') up -d`
 
-### Run with remote bot
+### Run with remote bot - depcreated
 
 - Change `CHATBOT_BOT=http://171.22.247.37:5005` in constants.ini
 - Navigate to current repo and run `docker-compose up -d`
