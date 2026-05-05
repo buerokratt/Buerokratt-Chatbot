@@ -185,6 +185,7 @@
       "endTime": "End time",
       "csaName": "Customer support name",
       "contact": "Contact",
+      "authenticatedPerson": "Authenticated person",
       "comment": "Comment",
       "label": "Label",
       "nps": "NPS",
