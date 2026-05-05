@@ -10,7 +10,9 @@ WITH configuration_values AS (
                   'is_edit_chat_visible',
                   'instantly_open_chat_widget',
                   'show_sub_title',
-                  'sub_title'
+                  'sub_title',
+                  'response_waiting_time',
+                  'response_processing_notice'
                  )
       AND id IN (SELECT max(id) FROM configuration GROUP BY KEY)
       AND NOT deleted
@@ -23,5 +25,7 @@ SELECT
     MAX(CASE WHEN KEY = 'is_edit_chat_visible' THEN value END) AS is_edit_chat_visible,
     MAX(CASE WHEN KEY = 'instantly_open_chat_widget' THEN value END) AS instantly_open_chat_widget,
     MAX(CASE WHEN KEY = 'show_sub_title' THEN value END) AS show_sub_title,
-    MAX(CASE WHEN KEY = 'sub_title' THEN value END) AS sub_title
+    MAX(CASE WHEN KEY = 'sub_title' THEN value END) AS sub_title,
+    MAX(CASE WHEN KEY = 'response_waiting_time' THEN value END) AS response_waiting_time,
+    MAX(CASE WHEN KEY = 'response_processing_notice' THEN value END) AS response_processing_notice
 FROM configuration_values;

@@ -10,6 +10,11 @@
     display: flex;
     flex-direction: column;
     position: relative;
+    min-height: 0;
+  }
+
+  &__wrapper > header {
+    flex-shrink: 0;
   }
 
   &__main {
@@ -23,5 +28,17 @@
     left: 0;
     right: 0;
     bottom: 0;
+  }
+
+  &--multi-domain {
+    .layout__main {
+      top: 135px;
+    }
+  }
+
+  &--hide-domain-bar {
+    .domain-selector-bar {
+      display: none;
+    }
   }
 }

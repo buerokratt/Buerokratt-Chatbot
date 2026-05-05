@@ -1,0 +1,32 @@
+export const ROUTES = {
+  LANDING: '/landing',
+  UNANSWERED: '/unanswered',
+  ACTIVE: '/active',
+  DELETE_CONVERSATIONS: '/delete-conversations',
+  HISTORY: '/history',
+  VALIDATIONS: '/validations',
+  PENDING: '/pending',
+  USERS: '/users',
+  CHATBOT_SETTINGS: '/chatbot/settings',
+  CHATBOT_WELCOME_MESSAGE: '/chatbot/welcome-message',
+  CHATBOT_EMERGENCY_NOTICES: '/chatbot/emergency-notices',
+  CHATBOT_APPEARANCE: '/chatbot/appearance',
+  CHATBOT_FEEDBACK: '/chatbot/feedback',
+  WORKING_TIME: '/working-time',
+  SESSION_LENGTH: '/session-length',
+  SKM_CONFIGURATION: '/skm-configuration',
+  MULTI_DOMAINS: '/multi-domains',
+  ANONYMIZER: '/anonymizer',
+  UPTIME: '/uptime',
+};
+
+export const PAGES_WITH_DOMAIN_TAB_SELECTOR = [
+  ROUTES.CHATBOT_SETTINGS,
+  ROUTES.CHATBOT_WELCOME_MESSAGE,
+  ROUTES.CHATBOT_EMERGENCY_NOTICES,
+  ROUTES.CHATBOT_APPEARANCE,
+  ROUTES.CHATBOT_FEEDBACK,
+  ROUTES.WORKING_TIME,
+  ROUTES.SKM_CONFIGURATION,
+  ROUTES.ANONYMIZER,
+];
