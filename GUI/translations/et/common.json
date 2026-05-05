@@ -185,6 +185,7 @@
       "endTime": "Lõppaeg",
       "csaName": "Nõustaja nimi",
       "contact": "Kontaktandmed",
+      "authenticatedPerson": "Autenditud isik",
       "comment": "Kommentaar",
       "label": "Märksõna",
       "nps": "Soovitusindeks",
