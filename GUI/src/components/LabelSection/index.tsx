@@ -56,7 +56,7 @@ const LabelSection: FC<LabelSectionProps> = ({
   return (
     <Track direction="vertical" align="left" gap={0} style={{ width: '100%' }}>
       <Track gap={16} align="center" style={{ width: '100%', paddingBottom: '8px' }}>
-        <span style={{ minWidth: '220px', fontWeight: 500, fontSize: '14px' }}>{title}</span>
+        <span className="switch__label">{title}</span>
         <div style={{ flex: 1, display: 'flex', gap: '8px', alignItems: 'center' }}>
           <input
             value={inputValue}
@@ -83,7 +83,7 @@ const LabelSection: FC<LabelSectionProps> = ({
         </div>
       </Track>
 
-      <div style={{ paddingLeft: '236px' }}>
+      <div style={{ paddingLeft: '201px' }}>
         <p style={{ color: '#686B78', fontSize: '13px', marginBottom: '12px' }}>{hint}</p>
 
         {labels.length > 0 && (

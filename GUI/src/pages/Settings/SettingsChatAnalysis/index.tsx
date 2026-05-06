@@ -1,11 +1,11 @@
 import { useMutation } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import { Button, Card, Dialog, Track } from 'components';
+import { Button, Card, Dialog, Switch, Track } from 'components';
 import LabelSection from 'components/LabelSection';
 import withAuthorization from 'hoc/with-authorization';
 import { useToast } from 'hooks/useToast';
 import { FC, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { apiDev } from 'services/api';
 import { ChatAnalysisConfig, ChatAnalysisConfigResponse } from 'types/chatAnalysisConfig';
 import { ROLES } from 'utils/constants';
@@ -225,50 +225,13 @@ const ChatAnalysis: FC = () => {
         }
       >
         <Track gap={16} direction="vertical" align="left" style={{ width: '100%' }}>
-          {/* Enabled toggle */}
-          <Track gap={16} align="center" style={{ width: '100%' }}>
-            <span style={{ minWidth: '220px', fontWeight: 500, fontSize: '14px' }}>
-              {t('settings.chatAnalysis.chatAnalysisEnabled')}
-            </span>
-            <div
-              style={{
-                display: 'inline-flex',
-                borderRadius: '20px',
-                overflow: 'hidden',
-                border: '2px solid #003399',
-              }}
-            >
-              <button
-                onClick={() => setChatAnalysisEnabled(true)}
-                style={{
-                  padding: '6px 20px',
-                  backgroundColor: chatAnalysisEnabled ? '#003399' : 'transparent',
-                  color: chatAnalysisEnabled ? '#fff' : '#003399',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: 500,
-                  transition: 'background-color 0.2s',
-                }}
-              >
-                {t('global.on')}
-              </button>
-              <button
-                onClick={() => setChatAnalysisEnabled(false)}
-                style={{
-                  padding: '6px 20px',
-                  backgroundColor: !chatAnalysisEnabled ? '#003399' : 'transparent',
-                  color: !chatAnalysisEnabled ? '#fff' : '#003399',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: 500,
-                  transition: 'background-color 0.2s',
-                }}
-              >
-                {t('global.off')}
-              </button>
-            </div>
+          <Track gap={10}>
+            <Switch
+              name="chat_analysis_enabled"
+              label={t('settings.chatAnalysis.chatAnalysisEnabled').toString()}
+              checked={chatAnalysisEnabled}
+              onCheckedChange={setChatAnalysisEnabled}
+            />
           </Track>
 
           {chatAnalysisEnabled && (
@@ -316,6 +279,7 @@ const ChatAnalysis: FC = () => {
                 onDrop={() => handleDrop('quality', qualityLabels, setQualityLabels)}
                 onDragEnd={handleDragEnd}
               />
+              
 
               <div style={dividerStyle} />
               <LabelSection
@@ -359,11 +323,11 @@ const ChatAnalysis: FC = () => {
           }
         >
           <p style={{ lineHeight: 1.6 }}>
-            {t('settings.chatAnalysis.deleteDialogTextStart')}
-            <strong>{deleteDialog.label}</strong>
-            {t('settings.chatAnalysis.deleteDialogTextMid')}
-            <strong>{t('settings.chatAnalysis.deleteConfirm')}</strong>
-            {t('settings.chatAnalysis.deleteDialogTextEnd')}
+            <Trans
+              i18nKey="settings.chatAnalysis.deleteDialogText"
+              values={{ label: deleteDialog.label, confirm: t('settings.chatAnalysis.deleteConfirm') }}
+              components={{ strong: <strong /> }}
+            />
           </p>
         </Dialog>
       )}
