@@ -557,6 +557,9 @@
         "systemMessage": "System message can't be empty"
       }
     },
+    "chatAnalysis": {
+      "title": "Chat analysis management"
+    },
     "anonymizer": {
       "settingsTitle": "Anonymizer Settings",
       "approach": "Anonymization approach",

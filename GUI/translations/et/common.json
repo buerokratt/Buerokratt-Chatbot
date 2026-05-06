@@ -557,6 +557,9 @@
         "systemMessage": "Süsteemisõnumi väli ei tohi olla tühi"
       }
     },
+    "chatAnalysis": {
+      "title": "Vestluste analüüsi haldus"
+    },
     "anonymizer": {
       "settingsTitle": "Anonümiseerija seaded",
       "approach": "Anonümiseerimise viis",

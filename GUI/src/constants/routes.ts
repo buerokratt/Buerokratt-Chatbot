@@ -12,6 +12,7 @@ export const ROUTES = {
   CHATBOT_EMERGENCY_NOTICES: '/chatbot/emergency-notices',
   CHATBOT_APPEARANCE: '/chatbot/appearance',
   CHATBOT_FEEDBACK: '/chatbot/feedback',
+  CHAT_ANALYSIS: '/chat-analysis',
   WORKING_TIME: '/working-time',
   SESSION_LENGTH: '/session-length',
   SKM_CONFIGURATION: '/skm-configuration',
@@ -26,7 +27,8 @@ export const PAGES_WITH_DOMAIN_TAB_SELECTOR = [
   ROUTES.CHATBOT_EMERGENCY_NOTICES,
   ROUTES.CHATBOT_APPEARANCE,
   ROUTES.CHATBOT_FEEDBACK,
+  ROUTES.CHAT_ANALYSIS,
   ROUTES.WORKING_TIME,
   ROUTES.SKM_CONFIGURATION,
-  ROUTES.ANONYMIZER,
+  ROUTES.ANONYMIZER
 ];
