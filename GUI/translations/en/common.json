@@ -558,7 +558,29 @@
       }
     },
     "chatAnalysis": {
-      "title": "Chat analysis management"
+      "title": "Chat analysis management",
+      "chatAnalysisEnabled": "Chat Analysis",
+      "theme": "Add field",
+      "themePlaceholder": "Enter field name",
+      "themeHint": "Enter one or more names (separated by commas) and press \"Add\".",
+      "themeTooltip": "The names of the areas should be clear, distinct, and substantively accurate so that conversations can be unambiguously categorized later (e.g., land tax, recipes, software issues). Avoid overly general or overlapping names and favor specific topics that clearly direct the analysis to a specific area.",
+      "responseQuality": "Add response quality",
+      "responseQualityPlaceholder": "Enter quality level",
+      "responseQualityHint": "Enter one or more quality levels (separated by commas) and press \"Add\".",
+      "responseQualityTooltip": "We recommend setting the quality name according to your institution (colors, good/bad comparison, etc.). The purpose of the quality assessment is to assess the quality of the Bureaucrat's answers to help better understand the strengths and weaknesses of the Bureaucrat's knowledge. By combining the field and the quality assessment, it is possible to get a better overview of the Bureaucrat's knowledge and plan specific activities.",
+      "followUpAction": "Add follow-up action status",
+      "followUpActionPlaceholder": "Enter follow-up action",
+      "followUpActionHint": "Enter one or more follow-up actions (separated by commas) and press \"Add\".",
+      "followUpActionTooltip": "The action naming of follow-up activities helps to monitor the life cycle of internal processes and helps to keep track of conversation analysis. For example, if the field and quality analysis shows that it is necessary to initiate a specific chain of activities within the institution, we recommend writing down the names of the activities of the corresponding process as follow-up actions. For example, if it is necessary to update the knowledge of the Bureaucrat, specific activities can be added such as \"Need to update the website\", \"Needs input from information security\", \"Documents need to be updated\", \"Scrape information again\", \"Knowledge updated\". You can also add notes outside the institution such as \"Needs help from the Bureaucrat team\" or \"Needs input from another institution\". For a complete lifecycle of follow-up activities, we recommend using the final action \"Checked\" or \"Completed\" in parallel, which indicates that no additional activities need to be performed, but the conversation has been checked by the employee.",
+      "dragHint": "You can change the order of the labels by dragging them.",
+      "deleteDialogTitle": "Confirm deletion",
+      "deleteDialogTextStart": "Do you want to delete the \"",
+      "deleteDialogTextMid": "\" selection? Press \"",
+      "deleteDialogTextEnd": "\" to remove the selection. If you want to change the selection, delete it and add a new one. You can change the order of the selections by dragging them.",
+      "deleteConfirm": "Delete",
+      "deleteCancel": "Do not delete",
+      "savedSettingsSuccessfully": "Chat analysis settings saved successfully",
+      "labelTooLong": "Label cannot be longer than 50 characters"
     },
     "anonymizer": {
       "settingsTitle": "Anonymizer Settings",

@@ -558,7 +558,29 @@
       }
     },
     "chatAnalysis": {
-      "title": "Vestluste analüüsi haldus"
+      "title": "Vestluste analüüsi haldus",
+      "chatAnalysisEnabled": "Vestluse analüüs",
+      "theme": "Lisa valdkond",
+      "themePlaceholder": "Sisesta valdkonna nimetus",
+      "themeHint": "Sisestage üks või mitu nimetust (eraldades komaga) ja vajutage \"Lisa\".",
+      "themeTooltip": "Valdkondade nimetused peavad olema selged, eristatavad ja sisuliselt täpsed, et vestlusi saaks hiljem üheselt kategoriseerida (nt maamaks, retseptid, tarkvara küsimused). Väldi liiga üldiseid või kattuvaid nimetusi ning eelista konkreetseid teemasid, mis suunavad analüüsi selgelt kindlasse valdkonda.",
+      "responseQuality": "Lisa vastuse kvaliteet",
+      "responseQualityPlaceholder": "Sisesta kvaliteedi tase",
+      "responseQualityHint": "Sisestage üks või mitu taset (eraldades komaga) ja vajutage \"Lisa\".",
+      "responseQualityTooltip": "Kvaliteedi nimetust soovitame seadistada vastavalt oma asutusele (värvid, hea/halb võrdlus jne). Kvaliteedi hinnangu mõte on hinnata Bürokrati vastuste kvaliteeti, et aidata paremini mõista mis on Bürokrati teadmistes tugevad ja nõrgad kohad. Kombineerides valdkonda ja kvaliteedi hinnangut, on võimalik Bürokrati teadmiste parem ülevaade saada ja konkreetseid tegevusi planeerida.",
+      "followUpAction": "Lisa järeltegevuste staatus",
+      "followUpActionPlaceholder": "Sisesta järeltegevus",
+      "followUpActionHint": "Sisestage üks või mitu järeltegevust (eraldades komaga) ja vajutage \"Lisa\".",
+      "followUpActionTooltip": "Järeltegevuste staatus aitab jälgida sisemiste protsesside elukaart ja aitab vestlusanalüüsil järge pidada. Näiteks kui selgub valdkonna ja kvaliteedi analüüsist, et on vaja algatada asutuse siseselt konkreetse tegevuste ahel, siis soovitame panna vastava protsessi tegevuste nimetused järeltegevuse staatustena kirja. Näiteks kui on vajalik Bürokrati teadmusi uuendada, siis võib konkreetseid tegevusi lisada nagu \"Vajalik kodulehe uuendamine\", \"Infoturbesse suunatud\", \"Dokumendid vajavad täiendamist\", \"Uuesti info kraapida\", \"Teadmised uuendatud\". Samuti võib panna ka asutusest väljapoole olevaid märkeid nagu \"Vajab Bürokrati meeskonna abi\" või \"Vajab teise asutuse sisendit\". Järeltegevuse terviklikus elukaareks soovitame kasutada ka paralleelselt lõppstaatust \"Kontrollitud\" või \"Lõpetatud\" staatust, mis näitab, et lisategevusi pole vaja teha, aga vestlus on üle kontrollitud töötaja poolt.",
+      "dragHint": "Valikute järjekorda saate muuta neid lohistades.",
+      "deleteDialogTitle": "Kustutamise kinnitus",
+      "deleteDialogTextStart": "Kas soovite valiku \"",
+      "deleteDialogTextMid": "\" kustutada? Valiku eemaldamiseks vajutage „",
+      "deleteDialogTextEnd": "\". Kui soovite valikut muuta, kustutage see ja lisage uus. Valikute järjekorda saate muuta neid lohistades.",
+      "deleteConfirm": "Kustuta",
+      "deleteCancel": "Ära kustuta",
+      "savedSettingsSuccessfully": "Vestluste analüüsi seaded salvestati edukalt",
+      "labelTooLong": "Silt ei tohi olla pikem kui 50 tähemärki"
     },
     "anonymizer": {
       "settingsTitle": "Anonümiseerija seaded",
