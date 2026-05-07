@@ -49,7 +49,12 @@ const ChatAnalysis: FC = () => {
   }, []);
 
   const parseLabels = (value: string): string[] =>
-    value ? value.split(',').map((s) => s.trim()).filter(Boolean) : [];
+    value
+      ? value
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : [];
 
   const fetchData = async (selectedDomain: string) => {
     try {

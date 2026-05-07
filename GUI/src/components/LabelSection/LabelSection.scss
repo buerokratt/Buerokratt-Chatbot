@@ -54,7 +54,11 @@
     border: 1px solid #cbd4e1;
     cursor: grab;
     gap: 6px;
-    transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+    transition:
+      opacity 0.15s,
+      transform 0.15s,
+      box-shadow 0.15s,
+      border-color 0.15s;
     outline: none;
     user-select: none;
 

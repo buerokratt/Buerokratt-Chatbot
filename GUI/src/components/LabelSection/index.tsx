@@ -142,7 +142,10 @@ const LabelSection: FC<LabelSectionProps> = ({
                         draggable
                         onDragStart={() => handleDragStart(index)}
                         onDragOver={(e) => handleDragOver(e, index)}
-                        onDrop={(e) => { e.stopPropagation(); handleDrop(); }}
+                        onDrop={(e) => {
+                          e.stopPropagation();
+                          handleDrop();
+                        }}
                         onDragEnd={handleDragEnd}
                         onKeyDown={(e) => handleChipKeyDown(e, index)}
                         className="label-section__chip-handle"
