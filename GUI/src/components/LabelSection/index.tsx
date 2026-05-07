@@ -86,7 +86,14 @@ const LabelSection: FC<LabelSectionProps> = ({
     insertionIndex = dragIndex > dragOverIndex ? dragOverIndex : dragOverIndex + 1;
   }
 
-  const dropIndicator = <div aria-hidden="true" className="label-section__drop-indicator" />;
+  const dropIndicator = (
+    <div
+      aria-hidden="true"
+      className="label-section__drop-indicator"
+      onDragOver={(e) => e.preventDefault()}
+      onDrop={handleDrop}
+    />
+  );
 
   return (
     <Track direction="vertical" align="left" gap={0} className="label-section">
@@ -116,7 +123,12 @@ const LabelSection: FC<LabelSectionProps> = ({
 
         {labels.length > 0 && (
           <>
-            <ul aria-label={title} className="label-section__chips-list">
+            <ul
+              aria-label={title}
+              className="label-section__chips-list"
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={handleDrop}
+            >
               {labels.map((label, index) => {
                 const isDragging = dragIndex === index;
 
@@ -130,7 +142,7 @@ const LabelSection: FC<LabelSectionProps> = ({
                         draggable
                         onDragStart={() => handleDragStart(index)}
                         onDragOver={(e) => handleDragOver(e, index)}
-                        onDrop={handleDrop}
+                        onDrop={(e) => { e.stopPropagation(); handleDrop(); }}
                         onDragEnd={handleDragEnd}
                         onKeyDown={(e) => handleChipKeyDown(e, index)}
                         className="label-section__chip-handle"
