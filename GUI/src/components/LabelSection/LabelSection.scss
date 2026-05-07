@@ -58,16 +58,31 @@
     outline: none;
     user-select: none;
 
-    &--focused {
-      box-shadow: 0 0 0 2px get-color(sapphire-blue-10);
-    }
-
     &--dragging {
-      border-color: get-color(sapphire-blue-10);
       cursor: grabbing;
       opacity: 0.35;
       transform: scale(1.04);
       box-shadow: 0 4px 14px rgba(0, 90, 163, 0.2);
+    }
+  }
+
+  &__chip-handle {
+    display: inline-flex;
+    align-items: center;
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: inherit;
+    color: inherit;
+    font: inherit;
+    outline: none;
+
+    &:focus,
+    &:focus-visible,
+    &:active {
+      outline: none;
+      box-shadow: none;
     }
   }
 

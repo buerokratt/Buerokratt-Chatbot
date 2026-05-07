@@ -37,7 +37,6 @@ const LabelSection: FC<LabelSectionProps> = ({
   const { t } = useTranslation();
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
-  const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
 
   const reorder = (from: number, to: number) => {
     const result = [...labels];
@@ -66,7 +65,7 @@ const LabelSection: FC<LabelSectionProps> = ({
     setDragOverIndex(null);
   };
 
-  const handleChipKeyDown = (e: KeyboardEvent<HTMLLIElement>, index: number) => {
+  const handleChipKeyDown = (e: KeyboardEvent<HTMLButtonElement>, index: number) => {
     if (e.key === 'ArrowRight' && index < labels.length - 1) {
       e.preventDefault();
       reorder(index, index + 1);
@@ -120,25 +119,24 @@ const LabelSection: FC<LabelSectionProps> = ({
             <ul aria-label={title} className="label-section__chips-list">
               {labels.map((label, index) => {
                 const isDragging = dragIndex === index;
-                const isFocused = !isDragging && focusedIndex === index;
 
                 return (
                   <Fragment key={`${label}-${index}`}>
                     {insertionIndex === index && dropIndicator}
-                    <li
-                      tabIndex={0}
-                      aria-label={`${label}, use arrow keys to reorder`}
-                      draggable
-                      onDragStart={() => handleDragStart(index)}
-                      onDragOver={(e) => handleDragOver(e, index)}
-                      onDrop={handleDrop}
-                      onDragEnd={handleDragEnd}
-                      onKeyDown={(e) => handleChipKeyDown(e, index)}
-                      onFocus={() => setFocusedIndex(index)}
-                      onBlur={() => setFocusedIndex(null)}
-                      className={`label-section__chip${isDragging ? ' label-section__chip--dragging' : ''}${isFocused ? ' label-section__chip--focused' : ''}`}
-                    >
-                      <span className="label-section__chip-label">{label}</span>
+                    <li className={`label-section__chip${isDragging ? ' label-section__chip--dragging' : ''}`}>
+                      <button
+                        type="button"
+                        aria-label={`${label}, use arrow keys to reorder`}
+                        draggable
+                        onDragStart={() => handleDragStart(index)}
+                        onDragOver={(e) => handleDragOver(e, index)}
+                        onDrop={handleDrop}
+                        onDragEnd={handleDragEnd}
+                        onKeyDown={(e) => handleChipKeyDown(e, index)}
+                        className="label-section__chip-handle"
+                      >
+                        <span className="label-section__chip-label">{label}</span>
+                      </button>
                       <button
                         onClick={() => onDeleteRequest(index, label)}
                         className="label-section__chip-delete"
