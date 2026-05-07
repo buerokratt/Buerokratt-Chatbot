@@ -61,7 +61,6 @@ return_result:
   next: end
 
 return_empty:
-  # Returns null body with status 201 to signal no config exists; the caller falls back to default values
   status: 201
   return: ${null}
   next: end
