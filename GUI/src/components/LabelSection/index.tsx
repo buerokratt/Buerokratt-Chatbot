@@ -66,7 +66,7 @@ const LabelSection: FC<LabelSectionProps> = ({
     setDragOverIndex(null);
   };
 
-  const handleChipKeyDown = (e: KeyboardEvent<HTMLDivElement>, index: number) => {
+  const handleChipKeyDown = (e: KeyboardEvent<HTMLLIElement>, index: number) => {
     if (e.key === 'ArrowRight' && index < labels.length - 1) {
       e.preventDefault();
       reorder(index, index + 1);
@@ -82,12 +82,10 @@ const LabelSection: FC<LabelSectionProps> = ({
     if (e.key === 'Enter') onAdd();
   };
 
-  const insertionIndex =
-    dragIndex !== null && dragOverIndex !== null && dragIndex !== dragOverIndex
-      ? dragIndex > dragOverIndex
-        ? dragOverIndex
-        : dragOverIndex + 1
-      : null;
+  let insertionIndex: number | null = null;
+  if (dragIndex !== null && dragOverIndex !== null && dragIndex !== dragOverIndex) {
+    insertionIndex = dragIndex > dragOverIndex ? dragOverIndex : dragOverIndex + 1;
+  }
 
   const dropIndicator = <div aria-hidden="true" className="label-section__drop-indicator" />;
 
@@ -119,7 +117,7 @@ const LabelSection: FC<LabelSectionProps> = ({
 
         {labels.length > 0 && (
           <>
-            <div role="list" aria-label={title} className="label-section__chips-list">
+            <ul aria-label={title} className="label-section__chips-list">
               {labels.map((label, index) => {
                 const isDragging = dragIndex === index;
                 const isFocused = !isDragging && focusedIndex === index;
@@ -127,8 +125,7 @@ const LabelSection: FC<LabelSectionProps> = ({
                 return (
                   <Fragment key={`${label}-${index}`}>
                     {insertionIndex === index && dropIndicator}
-                    <div
-                      role="listitem"
+                    <li
                       tabIndex={0}
                       aria-label={`${label}, use arrow keys to reorder`}
                       draggable
@@ -149,12 +146,12 @@ const LabelSection: FC<LabelSectionProps> = ({
                       >
                         <MdClose size={14} />
                       </button>
-                    </div>
+                    </li>
                   </Fragment>
                 );
               })}
               {insertionIndex === labels.length && dropIndicator}
-            </div>
+            </ul>
             {dragHintLabel && <p className="label-section__drag-hint">{dragHintLabel}</p>}
           </>
         )}
