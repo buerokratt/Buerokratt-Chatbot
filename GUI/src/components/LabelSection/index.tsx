@@ -3,6 +3,7 @@ import { FC, Fragment, KeyboardEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AiOutlineInfoCircle } from 'react-icons/ai';
 import { MdClose } from 'react-icons/md';
+import './LabelSection.scss';
 
 export type LabelSectionProps = {
   title: string;
@@ -88,41 +89,21 @@ const LabelSection: FC<LabelSectionProps> = ({
         : dragOverIndex + 1
       : null;
 
-  const dropIndicator = (
-    <div
-      aria-hidden="true"
-      style={{
-        width: '2px',
-        alignSelf: 'stretch',
-        minHeight: '28px',
-        backgroundColor: '#005aa3',
-        borderRadius: '2px',
-        flexShrink: 0,
-        transition: 'opacity 0.1s',
-      }}
-    />
-  );
+  const dropIndicator = <div aria-hidden="true" className="label-section__drop-indicator" />;
 
   return (
-    <Track direction="vertical" align="left" gap={0} style={{ width: '100%' }}>
-      <Track gap={16} align="center" style={{ width: '100%', paddingBottom: '8px' }}>
+    <Track direction="vertical" align="left" gap={0} className="label-section">
+      <Track gap={16} align="center" className="label-section__header">
         <span className="switch__label">{title}</span>
-        <div style={{ flex: 1, display: 'flex', gap: '8px', alignItems: 'center' }}>
+        <div className="label-section__input-wrapper">
           <input
             value={inputValue}
             onChange={(e) => onInputChange(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
-            style={{
-              flex: 1,
-              padding: '8px 12px',
-              border: '1px solid #CBD4E1',
-              borderRadius: '4px',
-              fontSize: '14px',
-              outline: 'none',
-            }}
+            className="label-section__input"
           />
-          <Button appearance="secondary" onClick={onAdd} style={{ whiteSpace: 'nowrap' }}>
+          <Button appearance="secondary" onClick={onAdd} className="label-section__add-button">
             {addButtonLabel ?? `+ ${t('global.add')}`}
           </Button>
           <Tooltip content={tooltip}>
@@ -133,18 +114,15 @@ const LabelSection: FC<LabelSectionProps> = ({
         </div>
       </Track>
 
-      <div style={{ paddingLeft: '201px' }}>
-        <p style={{ color: '#686B78', fontSize: '13px', marginBottom: '12px' }}>{hint}</p>
+      <div className="label-section__content">
+        <p className="label-section__hint">{hint}</p>
 
         {labels.length > 0 && (
           <>
-            <div
-              role="list"
-              aria-label={title}
-              style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '8px' }}
-            >
+            <div role="list" aria-label={title} className="label-section__chips-list">
               {labels.map((label, index) => {
                 const isDragging = dragIndex === index;
+                const isFocused = !isDragging && focusedIndex === index;
 
                 return (
                   <Fragment key={`${label}-${index}`}>
@@ -161,39 +139,12 @@ const LabelSection: FC<LabelSectionProps> = ({
                       onKeyDown={(e) => handleChipKeyDown(e, index)}
                       onFocus={() => setFocusedIndex(index)}
                       onBlur={() => setFocusedIndex(null)}
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        padding: '4px 10px',
-                        backgroundColor: '#EBF1F8',
-                        borderRadius: '4px',
-                        border: `1px solid ${isDragging ? '#005aa3' : '#CBD4E1'}`,
-                        cursor: isDragging ? 'grabbing' : 'grab',
-                        gap: '6px',
-                        opacity: isDragging ? 0.35 : 1,
-                        transform: isDragging ? 'scale(1.04)' : 'scale(1)',
-                        boxShadow: isDragging
-                          ? '0 4px 14px rgba(0,90,163,0.2)'
-                          : focusedIndex === index
-                          ? '0 0 0 2px #005aa3'
-                          : 'none',
-                        transition: 'opacity 0.15s, transform 0.15s, box-shadow 0.15s, border-color 0.15s',
-                        outline: 'none',
-                        userSelect: 'none',
-                      }}
+                      className={`label-section__chip${isDragging ? ' label-section__chip--dragging' : ''}${isFocused ? ' label-section__chip--focused' : ''}`}
                     >
-                      <span style={{ fontSize: '14px', color: '#1D2739' }}>{label}</span>
+                      <span className="label-section__chip-label">{label}</span>
                       <button
                         onClick={() => onDeleteRequest(index, label)}
-                        style={{
-                          background: 'none',
-                          border: 'none',
-                          cursor: 'pointer',
-                          padding: '0',
-                          display: 'flex',
-                          alignItems: 'center',
-                          color: '#5A6473',
-                        }}
+                        className="label-section__chip-delete"
                         aria-label={`Remove ${label}`}
                       >
                         <MdClose size={14} />
@@ -204,9 +155,7 @@ const LabelSection: FC<LabelSectionProps> = ({
               })}
               {insertionIndex === labels.length && dropIndicator}
             </div>
-            {dragHintLabel && (
-              <p style={{ color: '#686B78', fontSize: '13px' }}>{dragHintLabel}</p>
-            )}
+            {dragHintLabel && <p className="label-section__drag-hint">{dragHintLabel}</p>}
           </>
         )}
       </div>

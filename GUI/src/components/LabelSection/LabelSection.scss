@@ -1,0 +1,103 @@
+@import 'src/styles/tools/color';
+
+.label-section {
+  width: 100%;
+
+  &__header {
+    width: 100%;
+    padding-bottom: 8px;
+  }
+
+  &__input-wrapper {
+    flex: 1;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  &__input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #cbd4e1;
+    border-radius: 4px;
+    font-size: 14px;
+    outline: none;
+  }
+
+  &__add-button {
+    white-space: nowrap;
+  }
+
+  &__content {
+    padding-left: 201px;
+  }
+
+  &__hint {
+    color: #686b78;
+    font-size: 13px;
+    margin-bottom: 12px;
+  }
+
+  &__chips-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  &__chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    background-color: #ebf1f8;
+    border-radius: 4px;
+    border: 1px solid #cbd4e1;
+    cursor: grab;
+    gap: 6px;
+    transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+    outline: none;
+    user-select: none;
+
+    &--focused {
+      box-shadow: 0 0 0 2px get-color(sapphire-blue-10);
+    }
+
+    &--dragging {
+      border-color: get-color(sapphire-blue-10);
+      cursor: grabbing;
+      opacity: 0.35;
+      transform: scale(1.04);
+      box-shadow: 0 4px 14px rgba(0, 90, 163, 0.2);
+    }
+  }
+
+  &__chip-label {
+    font-size: 14px;
+    color: #1d2739;
+  }
+
+  &__chip-delete {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    color: #5a6473;
+  }
+
+  &__drop-indicator {
+    width: 2px;
+    align-self: stretch;
+    min-height: 28px;
+    background-color: get-color(sapphire-blue-10);
+    border-radius: 2px;
+    flex-shrink: 0;
+    transition: opacity 0.1s;
+  }
+
+  &__drag-hint {
+    color: #686b78;
+    font-size: 13px;
+  }
+}
