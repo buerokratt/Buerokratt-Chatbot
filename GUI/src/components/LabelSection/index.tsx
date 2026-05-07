@@ -6,18 +6,18 @@ import { MdClose } from 'react-icons/md';
 import './LabelSection.scss';
 
 export type LabelSectionProps = {
-  title: string;
-  placeholder: string;
-  hint: string;
-  tooltip: string;
-  addButtonLabel?: string;
-  dragHintLabel?: string;
-  labels: string[];
-  inputValue: string;
-  onInputChange: (val: string) => void;
-  onAdd: () => void;
-  onDeleteRequest: (index: number, label: string) => void;
-  onReorder: (newLabels: string[]) => void;
+  readonly title: string;
+  readonly placeholder: string;
+  readonly hint: string;
+  readonly tooltip: string;
+  readonly addButtonLabel?: string;
+  readonly dragHintLabel?: string;
+  readonly labels: readonly string[];
+  readonly inputValue: string;
+  readonly onInputChange: (val: string) => void;
+  readonly onAdd: () => void;
+  readonly onDeleteRequest: (index: number, label: string) => void;
+  readonly onReorder: (newLabels: string[]) => void;
 };
 
 const LabelSection: FC<LabelSectionProps> = ({
