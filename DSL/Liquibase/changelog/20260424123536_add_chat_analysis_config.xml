@@ -15,7 +15,7 @@ http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
         </insert>
         <insert tableName="configuration">
             <column name="key" value="chat_analysis_byk_response_quality"/>
-            <column name="value" value=""/>
+            <column name="value" value="Hästi,Halvasti,Osaliselt hästi"/>
         </insert>
         <insert tableName="configuration">
             <column name="key" value="chat_analysis_follow_up_action"/>

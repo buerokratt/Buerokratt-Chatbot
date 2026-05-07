@@ -14,8 +14,6 @@ import DomainTabSelector from '../../../components/DomainTabSelector';
 import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
 import { fetchConfigurationFromDomain } from '../../../services/configurations';
 
-const DEFAULT_QUALITY_LABELS = ['Hästi', 'Halvasti', 'Osaliselt hästi'];
-
 type DeleteDialogState = {
   field: 'theme' | 'quality' | 'followUp';
   index: number;
@@ -32,7 +30,7 @@ const ChatAnalysis: FC = () => {
 
   const [chatAnalysisEnabled, setChatAnalysisEnabled] = useState<boolean>(true);
   const [themeLabels, setThemeLabels] = useState<string[]>([]);
-  const [qualityLabels, setQualityLabels] = useState<string[]>(DEFAULT_QUALITY_LABELS);
+  const [qualityLabels, setQualityLabels] = useState<string[]>([]);
   const [followUpLabels, setFollowUpLabels] = useState<string[]>([]);
 
   const [themeInput, setThemeInput] = useState('');
@@ -67,8 +65,7 @@ const ChatAnalysis: FC = () => {
       if (res) {
         setChatAnalysisEnabled(res.chatAnalysisEnabled);
         setThemeLabels(parseLabels(res.chatAnalysisTheme));
-        const quality = parseLabels(res.chatAnalysisBykResponseQuality);
-        setQualityLabels(quality.length > 0 ? quality : DEFAULT_QUALITY_LABELS);
+        setQualityLabels(parseLabels(res.chatAnalysisBykResponseQuality));
         setFollowUpLabels(parseLabels(res.chatAnalysisFollowUpAction));
       } else {
         resetSettingsToDefault();
@@ -82,7 +79,7 @@ const ChatAnalysis: FC = () => {
   const resetSettingsToDefault = () => {
     setChatAnalysisEnabled(true);
     setThemeLabels([]);
-    setQualityLabels(DEFAULT_QUALITY_LABELS);
+    setQualityLabels([]);
     setFollowUpLabels([]);
     setThemeInput('');
     setQualityInput('');
@@ -279,7 +276,7 @@ const ChatAnalysis: FC = () => {
                 onDrop={() => handleDrop('quality', qualityLabels, setQualityLabels)}
                 onDragEnd={handleDragEnd}
               />
-              
+
 
               <div style={dividerStyle} />
               <LabelSection
