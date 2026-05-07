@@ -15,9 +15,9 @@ import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHand
 import { fetchConfigurationFromDomain } from '../../../services/configurations';
 
 type DeleteDialogState = {
-  field: 'theme' | 'quality' | 'followUp';
-  index: number;
-  label: string;
+  readonly field: 'theme' | 'quality' | 'followUp';
+  readonly index: number;
+  readonly label: string;
 };
 
 const ChatAnalysis: FC = () => {
@@ -129,7 +129,7 @@ const ChatAnalysis: FC = () => {
       chatAnalysisTheme: themeLabels.join(','),
       chatAnalysisBykResponseQuality: qualityLabels.join(','),
       chatAnalysisFollowUpAction: followUpLabels.join(','),
-      domainUUID: multiDomainEnabled ? selectedDomains : [],
+      domainUuid: multiDomainEnabled ? selectedDomains : [],
     };
     chatAnalysisSettingsMutation.mutate(config);
   };

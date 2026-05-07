@@ -27,7 +27,7 @@ getDomainChatAnalysisConfig:
   args:
     url: "[#CHATBOT_RESQL]/get-domain-chat-analysis-config"
     body:
-      domainUUID: ${domain}
+      domainUuid: ${domain}
   result: res
   next: validateResults
 
@@ -61,6 +61,7 @@ return_result:
   next: end
 
 return_empty:
+  # Returns null body with status 201 to signal no config exists; the caller falls back to default values
   status: 201
-  return: ${undefined}
+  return: ${null}
   next: end

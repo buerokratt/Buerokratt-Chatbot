@@ -1,11 +1,11 @@
 export interface ChatAnalysisConfig {
-  chatAnalysisEnabled: boolean;
-  chatAnalysisTheme: string;
-  chatAnalysisBykResponseQuality: string;
-  chatAnalysisFollowUpAction: string;
-  domainUUID?: string[];
+  readonly chatAnalysisEnabled: boolean;
+  readonly chatAnalysisTheme: string;
+  readonly chatAnalysisBykResponseQuality: string;
+  readonly chatAnalysisFollowUpAction: string;
+  readonly domainUuid?: string[];
 }
 
 export interface ChatAnalysisConfigResponse {
-  response: ChatAnalysisConfig;
+  readonly response: ChatAnalysisConfig;
 }

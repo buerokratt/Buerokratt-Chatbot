@@ -5,7 +5,7 @@ import { AiOutlineInfoCircle } from 'react-icons/ai';
 import { MdClose } from 'react-icons/md';
 import './LabelSection.scss';
 
-export type LabelSectionProps = {
+type LabelSectionProps = {
   readonly title: string;
   readonly placeholder: string;
   readonly hint: string;

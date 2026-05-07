@@ -9,7 +9,7 @@ WITH last_configuration AS (
     AND id IN (SELECT max(id) from configuration GROUP BY key)
     AND deleted = FALSE
 ), new_configuration as (
-  SELECT new_values.key, new_values.value, :created::timestamp with time zone as created
+  SELECT new_values.key, new_values.value, NOW() as created
   FROM (
     VALUES
         ('chat_analysis_enabled', :chat_analysis_enabled),

@@ -20,9 +20,9 @@ declaration:
       - field: chatAnalysisFollowUpAction
         type: string
         description: "Body field 'chatAnalysisFollowUpAction'"
-      - field: domainUUID
+      - field: domainUuid
         type: object
-        description: "Body field 'domainUUID'"
+        description: "Body field 'domainUuid'"
 
 extractRequestData:
   assign:
@@ -30,7 +30,7 @@ extractRequestData:
     chat_analysis_theme: ${incoming.body.chatAnalysisTheme}
     chat_analysis_byk_response_quality: ${incoming.body.chatAnalysisBykResponseQuality}
     chat_analysis_follow_up_action: ${incoming.body.chatAnalysisFollowUpAction}
-    domains: ${incoming.body.domainUUID}
+    domains: ${incoming.body.domainUuid}
 
 checkForDomains:
   switch:
@@ -47,7 +47,6 @@ setDomainChatAnalysisConfig:
       chat_analysis_theme: ${chat_analysis_theme}
       chat_analysis_byk_response_quality: ${chat_analysis_byk_response_quality}
       chat_analysis_follow_up_action: ${chat_analysis_follow_up_action}
-      created: ${new Date().toISOString()}
       domains: ${JSON.stringify(domains)}
   result: set_domain_config_res
   next: return_result
@@ -61,7 +60,6 @@ setChatAnalysisConfig:
       chat_analysis_theme: ${chat_analysis_theme}
       chat_analysis_byk_response_quality: ${chat_analysis_byk_response_quality}
       chat_analysis_follow_up_action: ${chat_analysis_follow_up_action}
-      created: ${new Date().toISOString()}
   result: set_config_res
 
 return_result:

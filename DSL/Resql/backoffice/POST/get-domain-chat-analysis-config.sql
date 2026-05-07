@@ -8,9 +8,9 @@ WITH configuration_values AS (
                   'chat_analysis_byk_response_quality',
                   'chat_analysis_follow_up_action'
                  )
-      AND "domain" = :domainUUID::UUID
+      AND "domain" = :domainUuid::UUID
       AND NOT deleted
-      AND id IN (SELECT max(id) FROM configuration where "domain" = :domainUUID::UUID GROUP BY KEY)
+      AND id IN (SELECT max(id) FROM configuration where "domain" = :domainUuid::UUID GROUP BY KEY)
 )
 SELECT
     MAX(CASE WHEN KEY = 'chat_analysis_enabled' THEN value END) AS chat_analysis_enabled,
