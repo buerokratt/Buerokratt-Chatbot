@@ -39,10 +39,6 @@ const ChatAnalysis: FC = () => {
 
   const [deleteDialog, setDeleteDialog] = useState<DeleteDialogState | null>(null);
 
-  const [dragField, setDragField] = useState<string | null>(null);
-  const [dragIndex, setDragIndex] = useState<number | null>(null);
-  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
-
   useEffect(() => {
     resetSettingsToDefault();
     if (multiDomainEnabled) {
@@ -119,42 +115,6 @@ const ChatAnalysis: FC = () => {
     if (field === 'quality') setQualityLabels((prev) => prev.filter((_, i) => i !== index));
     if (field === 'followUp') setFollowUpLabels((prev) => prev.filter((_, i) => i !== index));
     setDeleteDialog(null);
-  };
-
-  const handleDragStart = (field: string, index: number) => {
-    setDragField(field);
-    setDragIndex(index);
-  };
-
-  const handleDragOver = (e: React.DragEvent, index: number) => {
-    e.preventDefault();
-    setDragOverIndex(index);
-  };
-
-  const reorder = (labels: string[], from: number, to: number): string[] => {
-    const result = [...labels];
-    const [removed] = result.splice(from, 1);
-    result.splice(to, 0, removed);
-    return result;
-  };
-
-  const handleDrop = (field: string, labels: string[], setLabels: (labels: string[]) => void) => {
-    if (dragField !== field || dragIndex === null || dragOverIndex === null || dragIndex === dragOverIndex) {
-      setDragField(null);
-      setDragIndex(null);
-      setDragOverIndex(null);
-      return;
-    }
-    setLabels(reorder(labels, dragIndex, dragOverIndex));
-    setDragField(null);
-    setDragIndex(null);
-    setDragOverIndex(null);
-  };
-
-  const handleDragEnd = () => {
-    setDragField(null);
-    setDragIndex(null);
-    setDragOverIndex(null);
   };
 
   const saveSettings = () => {
@@ -242,17 +202,10 @@ const ChatAnalysis: FC = () => {
                 dragHintLabel={dragHint}
                 labels={themeLabels}
                 inputValue={themeInput}
-                dragField={dragField}
-                dragIndex={dragIndex}
-                dragOverIndex={dragOverIndex}
-                fieldKey="theme"
                 onInputChange={setThemeInput}
                 onAdd={() => addLabels(themeInput, themeLabels, setThemeLabels, setThemeInput)}
                 onDeleteRequest={(index, label) => setDeleteDialog({ field: 'theme', index, label })}
-                onDragStart={(index) => handleDragStart('theme', index)}
-                onDragOver={handleDragOver}
-                onDrop={() => handleDrop('theme', themeLabels, setThemeLabels)}
-                onDragEnd={handleDragEnd}
+                onReorder={setThemeLabels}
               />
 
               <div style={dividerStyle} />
@@ -264,19 +217,11 @@ const ChatAnalysis: FC = () => {
                 dragHintLabel={dragHint}
                 labels={qualityLabels}
                 inputValue={qualityInput}
-                dragField={dragField}
-                dragIndex={dragIndex}
-                dragOverIndex={dragOverIndex}
-                fieldKey="quality"
                 onInputChange={setQualityInput}
                 onAdd={() => addLabels(qualityInput, qualityLabels, setQualityLabels, setQualityInput)}
                 onDeleteRequest={(index, label) => setDeleteDialog({ field: 'quality', index, label })}
-                onDragStart={(index) => handleDragStart('quality', index)}
-                onDragOver={handleDragOver}
-                onDrop={() => handleDrop('quality', qualityLabels, setQualityLabels)}
-                onDragEnd={handleDragEnd}
+                onReorder={setQualityLabels}
               />
-
 
               <div style={dividerStyle} />
               <LabelSection
@@ -287,17 +232,10 @@ const ChatAnalysis: FC = () => {
                 dragHintLabel={dragHint}
                 labels={followUpLabels}
                 inputValue={followUpInput}
-                dragField={dragField}
-                dragIndex={dragIndex}
-                dragOverIndex={dragOverIndex}
-                fieldKey="followUp"
                 onInputChange={setFollowUpInput}
                 onAdd={() => addLabels(followUpInput, followUpLabels, setFollowUpLabels, setFollowUpInput)}
                 onDeleteRequest={(index, label) => setDeleteDialog({ field: 'followUp', index, label })}
-                onDragStart={(index) => handleDragStart('followUp', index)}
-                onDragOver={handleDragOver}
-                onDrop={() => handleDrop('followUp', followUpLabels, setFollowUpLabels)}
-                onDragEnd={handleDragEnd}
+                onReorder={setFollowUpLabels}
               />
             </>
           )}
