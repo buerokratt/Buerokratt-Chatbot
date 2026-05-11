@@ -32,7 +32,7 @@ getConfigurations:
 
 splitCall:
   switch:
-    - condition: ${incoming.body.isAuth}
+    - condition: ${incoming.body.isAuth === 'true'}
       next: convertAuthTime
   next: convertAnonTime
 
