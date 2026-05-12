@@ -46,6 +46,8 @@ const DeleteConversations: FC = () => {
   const [isAnonymMessaged, setIsAnonymMessaged] = useState<boolean>(false);
   const [authPeriod, setAuthPeriod] = useState<number>(160);
   const [anonymPeriod, setAnonymPeriod] = useState<number>(160);
+  const [authPeriodError, setAuthPeriodError] = useState<boolean>(false);
+  const [anonymPeriodError, setAnonymPeriodError] = useState<boolean>(false);
   const [deletionTime, setDeletionTime] = useState<string>();
   const startDate = plusDays(new Date(), 1);
   const [endDate, setEndDate] = useState<Date>(new Date());
@@ -139,6 +141,7 @@ const DeleteConversations: FC = () => {
   };
 
   const handleFormSubmit = handleSubmit(async (data) => {
+    if (authPeriodError || anonymPeriodError) return;
     const expression = data.deletionTimeISO ? getCronExpression(new Date(data.deletionTimeISO)) : '';
     try {
       await Promise.all([
@@ -212,8 +215,10 @@ const DeleteConversations: FC = () => {
                       type="number"
                       hideLabel={false}
                       onChange={(e) => {
+                        const val = Number(e.target.value);
                         field.onChange(e.target.value);
-                        setAuthPeriod(Number(e.target.value));
+                        setAuthPeriodError(val > 9999);
+                        if (val <= 9999) setAuthPeriod(val);
                       }}
                       value={authPeriod}
                     />
@@ -222,6 +227,9 @@ const DeleteConversations: FC = () => {
                       <InfoTooltip name="deleteConversation.tooltip.days" />
                     </Track>
                   </Track>
+                  {authPeriodError && (
+                    <label className="rule" style={{ color: 'red' }}>{t('deleteConversation.maxDaysError')}</label>
+                  )}
                   <label className="rule">{t('deleteConversation.deletionAuthNote')}</label>
                 </Track>
               )}
@@ -261,8 +269,10 @@ const DeleteConversations: FC = () => {
                       type="number"
                       hideLabel={false}
                       onChange={(e) => {
+                        const val = Number(e.target.value);
                         field.onChange(e.target.value);
-                        setAnonymPeriod(Number(e.target.value));
+                        setAnonymPeriodError(val > 9999);
+                        if (val <= 9999) setAnonymPeriod(val);
                       }}
                       value={anonymPeriod}
                     />
@@ -271,6 +281,9 @@ const DeleteConversations: FC = () => {
                       <InfoTooltip name="deleteConversation.tooltip.days" />
                     </Track>
                   </Track>
+                  {anonymPeriodError && (
+                    <label className="rule" style={{ color: 'red' }}>{t('deleteConversation.maxDaysError')}</label>
+                  )}
                   <label className="rule">{t('deleteConversation.deletionAnonNote')}</label>
                 </Track>
               )}
