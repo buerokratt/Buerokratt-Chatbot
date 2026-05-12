@@ -16,7 +16,9 @@ WITH configuration_values AS (
             'feedbackNotice',
             'instantly_open_chat_widget',
             'show_sub_title',
-            'sub_title'
+            'sub_title',
+            'response_waiting_time',
+            'response_processing_notice'
         ))
         OR 
         ("domain" IS NULL AND key IN (
@@ -52,7 +54,9 @@ WITH configuration_values AS (
             'idle_message',
             'show_auto_close_text',
             'auto_close_text',
-            'isFiveRatingScale'
+            'isFiveRatingScale',
+            'response_waiting_time',
+            'response_processing_notice'
         )
         GROUP BY key, "domain"
     )
@@ -78,5 +82,7 @@ SELECT
     MAX(CASE WHEN key = 'isFiveRatingScale' THEN value END) AS is_five_rating_scale,
     MAX(CASE WHEN key = 'instantly_open_chat_widget' THEN value END) AS instantly_open_chat_widget,
     MAX(CASE WHEN key = 'show_sub_title' THEN value END) AS show_sub_title,
-    MAX(CASE WHEN key = 'sub_title' THEN value END) AS sub_title
+    MAX(CASE WHEN key = 'sub_title' THEN value END) AS sub_title,
+    MAX(CASE WHEN key = 'response_waiting_time' THEN value END) AS response_waiting_time,
+    MAX(CASE WHEN key = 'response_processing_notice' THEN value END) AS response_processing_notice
 FROM configuration_values;
