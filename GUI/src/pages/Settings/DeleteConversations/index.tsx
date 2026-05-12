@@ -24,8 +24,9 @@ const DeleteConversations: FC = () => {
     shouldUnregister: true,
   });
 
-  const { data: deleteConfig } = useQuery<DeleteChatSettings>({
+  const { data: deleteConfig, isLoading: isConfigLoading } = useQuery<DeleteChatSettings>({
     queryKey: ['configs/delete-conversation-config', 'prod'],
+    cacheTime: 0,
   });
 
   const plusDays = (date: Date, days: number): Date => {
@@ -100,20 +101,15 @@ const DeleteConversations: FC = () => {
       isAuthConversations: data.isAuthConversations || false,
       anonymPeriod: data.anonymPeriod || 360,
       authPeriod: data.authPeriod || 360,
-      deletionTimeISO: dateToUTCExcludingDST(data.deletionTimeISO) || dateToUTCExcludingDST(new Date().toISOString()),
+      deletionTimeISO:
+        data.deletionTimeISO ? dateToUTCExcludingDST(data.deletionTimeISO) :
+        dateToUTCExcludingDST(new Date().toISOString()),
     };
   };
 
   const deleteSettingsMutation = useMutation({
     mutationFn: (data: DeleteChatSettings) =>
       apiDev.post<DeleteChatSettings>('configs/update-delete-messages-config', setDeleteConversationsData(data)),
-    onSuccess: () => {
-      toast.open({
-        type: 'success',
-        title: t('global.notification'),
-        message: t('toast.success.updateSuccess'),
-      });
-    },
     onError: (error: AxiosError) => {
       toast.open({
         type: 'error',
@@ -126,13 +122,6 @@ const DeleteConversations: FC = () => {
   const cronUpdateMutation = useMutation({
     mutationFn: (data: { expression: string; anonEnabled: boolean; authEnabled: boolean }) =>
       apiDev.post<any>('internal/sync/delete-conversations-cron', data),
-    onSuccess: () => {
-      toast.open({
-        type: 'success',
-        title: t('global.notification'),
-        message: t('toast.success.updateSuccess'),
-      });
-    },
     onError: (error: AxiosError) => {
       toast.open({
         type: 'error',
@@ -149,10 +138,19 @@ const DeleteConversations: FC = () => {
     return `${minutes} ${hours} * * * ?`;
   };
 
-  const handleFormSubmit = handleSubmit((data) => {
-    const expression = getCronExpression(new Date(data.deletionTimeISO));
-    cronUpdateMutation.mutate({ expression, anonEnabled: isAnonymMessaged, authEnabled: isAuthMessaged });
-    deleteSettingsMutation.mutate(data);
+  const handleFormSubmit = handleSubmit(async (data) => {
+    const expression = data.deletionTimeISO ? getCronExpression(new Date(data.deletionTimeISO)) : '';
+    try {
+      await Promise.all([
+        cronUpdateMutation.mutateAsync({ expression, anonEnabled: isAnonymMessaged, authEnabled: isAuthMessaged }),
+        deleteSettingsMutation.mutateAsync(data),
+      ]);
+      toast.open({
+        type: 'success',
+        title: t('global.notification'),
+        message: t('toast.success.updateSuccess'),
+      });
+    } catch {}
   });
 
   const handleDatesUpdate = (day: number) => {
@@ -161,7 +159,7 @@ const DeleteConversations: FC = () => {
     setEndDate(new Date(resultDate.toISOString().split('T')[0]));
   };
 
-  if (!deleteConfig) {
+  if (isConfigLoading || !deleteConfig) {
     return <>Loading...</>;
   }
 
