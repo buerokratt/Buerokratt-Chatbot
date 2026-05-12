@@ -213,10 +213,11 @@ const DeleteConversations: FC = () => {
                       name="authPeriod"
                       label={t('deleteConversation.period')}
                       type="number"
+                      min={0}
                       hideLabel={false}
                       onChange={(e) => {
-                        const val = Number(e.target.value);
-                        field.onChange(e.target.value);
+                        const val = Math.max(0, Number(e.target.value));
+                        field.onChange(val);
                         setAuthPeriodError(val > 9999);
                         if (val <= 9999) setAuthPeriod(val);
                       }}
@@ -267,10 +268,11 @@ const DeleteConversations: FC = () => {
                       name="anonymPeriod"
                       label={t('deleteConversation.period')}
                       type="number"
+                      min={0}
                       hideLabel={false}
                       onChange={(e) => {
-                        const val = Number(e.target.value);
-                        field.onChange(e.target.value);
+                        const val = Math.max(0, Number(e.target.value));
+                        field.onChange(val);
                         setAnonymPeriodError(val > 9999);
                         if (val <= 9999) setAnonymPeriod(val);
                       }}
