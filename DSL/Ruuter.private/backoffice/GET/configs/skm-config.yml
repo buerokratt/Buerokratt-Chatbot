@@ -20,27 +20,12 @@ checkForDomain:
   switch:
     - condition: ${domain === 'none'}
       next: getSkmConfig
-  next: getDomainUUID
-
-getDomainUUID:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RESQL]/get-domain-uuid"
-    body:
-      domainUrl: ${domain + '%'}
-  result: domainUuid
-  next: validate_domain_res
-
-validate_domain_res:
-  switch:
-    - condition: ${domainUuid.response.body.length > 0}
-      next: getDomainSkmConfig
-  next: getSkmConfig
+  next: getDomainSkmConfig
 
 getDomainSkmConfig:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/get-domain-greeting-message"
+    url: "[#CHATBOT_RESQL]/get-domain-skm-config"
     body:
       domainUUID: ${domain}
   result: res
