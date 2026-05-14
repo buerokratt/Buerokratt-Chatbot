@@ -50,7 +50,8 @@
     "selectAll": "Vali kõik",
     "displayText": "Kuva tekst",
     "test": "Test",
-    "preserve": "Säilitada"
+    "preserve": "Säilitada",
+    "clearFilters": "Tühjenda filtrid"
   },
   "files": {
     "download_xlsx": "Lae alla XLSX"
@@ -198,7 +199,8 @@
       "statusAdder": "Staatuse lisaja",
       "statusAddedDate": "Staatuse lisamise kuupäev",
       "chosenCsa": "Valitud nõustaja(d)",
-      "chosenColumn": "Valitud tulba(d)"
+      "chosenColumn": "Valitud tulba(d)",
+      "chooseAll": "Vali kõik"
     },
     "plainEvents": {
       "answered": "Vastatud",

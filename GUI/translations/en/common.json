@@ -50,7 +50,8 @@
     "selectAll": "Select all",
     "displayText": "Display message",
     "test": "Test",
-    "preserve": "Preserve"
+    "preserve": "Preserve",
+    "clearFilters": "Clear filters"
   },
   "files": {
     "download_xlsx": "Download XLSX"
@@ -198,7 +199,8 @@
       "statusAdder": "Status adder",
       "statusAddedDate": "Status added date",
       "chosenCsa": "Chosen csa(s)",
-      "chosenColumn": "Chosen column(s)"
+      "chosenColumn": "Chosen column(s)",
+      "chooseAll": "Choose all"
     },
     "plainEvents": {
       "answered": "Answered",
