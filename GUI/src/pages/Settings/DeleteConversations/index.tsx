@@ -240,7 +240,9 @@ const DeleteConversations: FC = () => {
                     </Track>
                   </Track>
                   {authPeriodError && (
-                    <label className="rule" style={{ color: 'red' }}>{t('deleteConversation.maxDaysError')}</label>
+                    <label className="rule" style={{ color: 'red' }}>
+                      {t('deleteConversation.maxDaysError')}
+                    </label>
                   )}
                   <label className="rule">{t('deleteConversation.deletionAuthNote')}</label>
                 </Track>
@@ -295,7 +297,9 @@ const DeleteConversations: FC = () => {
                     </Track>
                   </Track>
                   {anonymPeriodError && (
-                    <label className="rule" style={{ color: 'red' }}>{t('deleteConversation.maxDaysError')}</label>
+                    <label className="rule" style={{ color: 'red' }}>
+                      {t('deleteConversation.maxDaysError')}
+                    </label>
                   )}
                   <label className="rule">{t('deleteConversation.deletionAnonNote')}</label>
                 </Track>
@@ -321,7 +325,10 @@ const DeleteConversations: FC = () => {
                       timePicker={true}
                       hideLabel
                       direction="row"
-                      value={parse(format(new Date(deletionTime ?? new Date()), 'HH:mm:ss'), 'HH:mm:ss', new Date()) ?? new Date('0')}
+                      value={
+                        parse(format(new Date(deletionTime ?? new Date()), 'HH:mm:ss'), 'HH:mm:ss', new Date()) ??
+                        new Date('0')
+                      }
                       onChange={(e) => {
                         setDeletionTime(e);
                         field.onChange(e);
@@ -402,7 +409,12 @@ const DeleteConversations: FC = () => {
               <Track gap={40} align={'center'}>
                 {t('deleteConversation.periodConversations')} <b>{removableChatsCount}</b>
               </Track>
-              <DeletionChatOverview authDate={authDate} anonDate={anonDate} authDateStart={authDateStart} anonDateStart={anonDateStart} />
+              <DeletionChatOverview
+                authDate={authDate}
+                anonDate={anonDate}
+                authDateStart={authDateStart}
+                anonDateStart={anonDateStart}
+              />
             </Track>
           </>
         )}

@@ -27,7 +27,12 @@ type DeletionChatOverViewProps = {
   anonDateStart: Date;
 };
 
-const ChatOverview: FC<PropsWithChildren<DeletionChatOverViewProps>> = ({ authDate, anonDate, authDateStart, anonDateStart }) => {
+const ChatOverview: FC<PropsWithChildren<DeletionChatOverViewProps>> = ({
+  authDate,
+  anonDate,
+  authDateStart,
+  anonDateStart,
+}) => {
   const { t, i18n } = useTranslation();
   const toast = useToast();
   const userInfo = useStore((state) => state.userInfo);
