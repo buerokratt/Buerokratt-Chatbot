@@ -160,6 +160,7 @@ copy_xlsx_to_s3:
       sourceConfigKey: "default"
       sourceFilePath: ${xlsxData.response.body.filePath}
   result: s3FileCopy
+  error: unlink_xlsx_from_fs_after_export_error
   next: get_signed_url
 
 get_signed_url:
@@ -172,11 +173,43 @@ get_signed_url:
       configKey: "chats"
       filePath: ${s3FilePath}
   result: signedUrlResponse
+  error: unlink_xlsx_from_fs_after_export_error
+  next: unlink_xlsx_from_fs_after_success
+
+unlink_xlsx_from_fs_after_success:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/conversion/chats-to-xlsx/unlink"
+    body:
+      filePath: ${xlsxData.response.body.filePath}
+  result: unlinkResult
+  error: return_unlink_error
+  next: return_success
+
+unlink_xlsx_from_fs_after_export_error:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/conversion/chats-to-xlsx/unlink"
+    body:
+      filePath: ${xlsxData.response.body.filePath}
+  result: unlinkResultAfterExportError
+  error: return_unlink_error
+  next: return_export_error
 
 return_success:
   return: ${signedUrlResponse.response.body}
   next: end
   status: 200
+
+return_export_error:
+  return: "Failed to prepare chat history export download"
+  next: end
+  status: 500
+
+return_unlink_error:
+  return: "Failed to remove generated chat history export"
+  next: end
+  status: 500
 
 return_empty:
   return: ''
