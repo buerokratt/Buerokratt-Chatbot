@@ -50,7 +50,8 @@
     "selectAll": "Vali kõik",
     "displayText": "Kuva tekst",
     "test": "Test",
-    "preserve": "Säilitada"
+    "preserve": "Säilitada",
+    "clearFilters": "Tühjenda filtrid"
   },
   "files": {
     "download_xlsx": "Lae alla XLSX"
@@ -198,7 +199,8 @@
       "statusAdder": "Staatuse lisaja",
       "statusAddedDate": "Staatuse lisamise kuupäev",
       "chosenCsa": "Valitud nõustaja(d)",
-      "chosenColumn": "Valitud tulba(d)"
+      "chosenColumn": "Valitud tulba(d)",
+      "chooseAll": "Vali kõik"
     },
     "plainEvents": {
       "answered": "Vastatud",
@@ -325,6 +327,7 @@
     "sevenDays": "7 päeva",
     "thirtyOneDay": "31 päeva",
     "ninetyDays": "90 päeva",
+    "maxDaysError": "Päevade maksimaalne valik saab olla kuni 9999",
     "tooltip": {
       "removeAuth": "Vali \"Jah\" kui soovid autentitud vestluste kustutamist. Perioodi aja täpsustus avaneb automaatselt. Vali \"Ei\" kui soovid, et vestlusi ei kustutataks.",
       "removeAnon": "Vali \"Jah\" kui soovid anonüümsete vestluste kustutamist. Perioodi aja täpsustus avaneb automaatselt. Vali \"Ei\" kui soovid, et vestlusi ei kustutataks.",

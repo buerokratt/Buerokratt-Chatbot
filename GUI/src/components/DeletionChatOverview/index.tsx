@@ -21,11 +21,18 @@ import { getFromLocalStorage, setToLocalStorage } from 'utils/local-storage-util
 import { CHAT_HISTORY_PREFERENCES_KEY } from 'constants/config';
 
 type DeletionChatOverViewProps = {
-  authDate: Date;
-  anonDate: Date;
+  readonly authDate: Date;
+  readonly anonDate: Date;
+  readonly authDateStart: Date;
+  readonly anonDateStart: Date;
 };
 
-const ChatOverview: FC<PropsWithChildren<DeletionChatOverViewProps>> = ({ authDate, anonDate }) => {
+const ChatOverview: FC<PropsWithChildren<DeletionChatOverViewProps>> = ({
+  authDate,
+  anonDate,
+  authDateStart,
+  anonDateStart,
+}) => {
   const { t, i18n } = useTranslation();
   const toast = useToast();
   const userInfo = useStore((state) => state.userInfo);
@@ -68,16 +75,20 @@ const ChatOverview: FC<PropsWithChildren<DeletionChatOverViewProps>> = ({ authDa
     getAllEndedChats.mutate({
       startDate: format(authDate, 'yyyy-MM-dd'),
       endDate: format(anonDate, 'yyyy-MM-dd'),
+      startAuthDate: format(authDateStart, 'yyyy-MM-dd'),
+      startAnonDate: format(anonDateStart, 'yyyy-MM-dd'),
       pagination,
       sorting,
       search,
     });
-  }, [authDate, anonDate]);
+  }, [authDate, anonDate, authDateStart, anonDateStart]);
 
   const getAllEndedChats = useMutation({
     mutationFn: (data: {
       startDate: string;
       endDate: string;
+      startAuthDate: string;
+      startAnonDate: string;
       pagination: PaginationState;
       sorting: SortingState;
       search: string;
@@ -91,6 +102,8 @@ const ChatOverview: FC<PropsWithChildren<DeletionChatOverViewProps>> = ({ authDa
       return apiDev.post('agents/chats/removable', {
         startDate: format(authDate, 'yyyy-MM-dd'),
         endDate: format(anonDate, 'yyyy-MM-dd'),
+        startAuthDate: format(authDateStart, 'yyyy-MM-dd'),
+        startAnonDate: format(anonDateStart, 'yyyy-MM-dd'),
         page: pagination.pageIndex + 1,
         page_size: pagination.pageSize,
         sorting: sortBy,
@@ -404,6 +417,8 @@ const ChatOverview: FC<PropsWithChildren<DeletionChatOverViewProps>> = ({ authDa
           getAllEndedChats.mutate({
             startDate: format(new Date(startDate), 'yyyy-MM-dd'),
             endDate: format(new Date(endDate), 'yyyy-MM-dd'),
+            startAuthDate: format(authDateStart, 'yyyy-MM-dd'),
+            startAnonDate: format(anonDateStart, 'yyyy-MM-dd'),
             pagination: state,
             sorting,
             search,
@@ -414,6 +429,8 @@ const ChatOverview: FC<PropsWithChildren<DeletionChatOverViewProps>> = ({ authDa
           getAllEndedChats.mutate({
             startDate: format(new Date(startDate), 'yyyy-MM-dd'),
             endDate: format(new Date(endDate), 'yyyy-MM-dd'),
+            startAuthDate: format(authDateStart, 'yyyy-MM-dd'),
+            startAnonDate: format(anonDateStart, 'yyyy-MM-dd'),
             pagination,
             sorting: state,
             search,
