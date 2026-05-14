@@ -21,10 +21,10 @@ import { getFromLocalStorage, setToLocalStorage } from 'utils/local-storage-util
 import { CHAT_HISTORY_PREFERENCES_KEY } from 'constants/config';
 
 type DeletionChatOverViewProps = {
-  authDate: Date;
-  anonDate: Date;
-  authDateStart: Date;
-  anonDateStart: Date;
+  readonly authDate: Date;
+  readonly anonDate: Date;
+  readonly authDateStart: Date;
+  readonly anonDateStart: Date;
 };
 
 const ChatOverview: FC<PropsWithChildren<DeletionChatOverViewProps>> = ({
