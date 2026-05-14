@@ -327,6 +327,7 @@
     "sevenDays": "7 päeva",
     "thirtyOneDay": "31 päeva",
     "ninetyDays": "90 päeva",
+    "maxDaysError": "Päevade maksimaalne valik saab olla kuni 9999",
     "tooltip": {
       "removeAuth": "Vali \"Jah\" kui soovid autentitud vestluste kustutamist. Perioodi aja täpsustus avaneb automaatselt. Vali \"Ei\" kui soovid, et vestlusi ei kustutataks.",
       "removeAnon": "Vali \"Jah\" kui soovid anonüümsete vestluste kustutamist. Perioodi aja täpsustus avaneb automaatselt. Vali \"Ei\" kui soovid, et vestlusi ei kustutataks.",

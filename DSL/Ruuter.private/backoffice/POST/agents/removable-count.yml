@@ -14,11 +14,19 @@ declaration:
       - field: anonDate
         type: string
         description: "Body field 'anonDate'"
+      - field: authDateStart
+        type: string
+        description: "Body field 'authDateStart'"
+      - field: anonDateStart
+        type: string
+        description: "Body field 'anonDateStart'"
 
 extractRequestData:
   assign:
     authDate: "${incoming.body.authDate}"
     anonDate: "${incoming.body.anonDate}"
+    authDateStart: "${incoming.body.authDateStart}"
+    anonDateStart: "${incoming.body.anonDateStart}"
 
 getEndedChats:
   call: http.post
@@ -27,6 +35,8 @@ getEndedChats:
     body:
       auth_date: ${authDate}
       anon_date: ${anonDate}
+      auth_date_start: ${authDateStart}
+      anon_date_start: ${anonDateStart}
   result: res
 
 returnSuccess:
