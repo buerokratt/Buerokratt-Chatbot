@@ -50,7 +50,7 @@ const DeleteConversations: FC = () => {
   const [anonymPeriodError, setAnonymPeriodError] = useState<boolean>(false);
   const [deletionTime, setDeletionTime] = useState<Date | undefined>();
   const [startDate, setStartDate] = useState<Date>(() => subDays(new Date(), -1));
-  const [endDate, setEndDate] = useState<Date>(new Date());
+  const [endDate, setEndDate] = useState<Date>(() => subDays(new Date(), -1));
   const [removableChatsCount, setremovableChatsCount] = useState<number>(0);
   const [authDate, setAuthDate] = useState<Date>(new Date());
   const [anonDate, setAnonDate] = useState<Date>(new Date());
@@ -58,7 +58,7 @@ const DeleteConversations: FC = () => {
   const [anonDateStart, setAnonDateStart] = useState<Date>(new Date(0));
 
   useEffect(() => {
-    setEndDate(new Date());
+    setEndDate(subDays(new Date(), -1));
     if (deleteConfig) {
       setIsAnonymMessaged(deleteConfig.isAnonymConversations === 'true');
       setIsAuthMessages(deleteConfig.isAuthConversations === 'true');
@@ -168,7 +168,9 @@ const DeleteConversations: FC = () => {
   const handleDatesUpdate = (day: number) => {
     if (day === undefined) return;
     const resultDate = plusDays(new Date(), Number(day));
-    setEndDate(new Date(resultDate.toISOString().split('T')[0]));
+    const newEnd = new Date(resultDate.toISOString().split('T')[0]);
+    setEndDate(newEnd);
+    if (newEnd < startDate) setStartDate(newEnd);
   };
 
   if (isConfigLoading || !deleteConfig) {
@@ -350,6 +352,7 @@ const DeleteConversations: FC = () => {
                           onChange={(val) => {
                             field.onChange(val);
                             setStartDate(val);
+                            if (val > endDate) setEndDate(val);
                           }}
                         />
                       </div>
@@ -373,6 +376,7 @@ const DeleteConversations: FC = () => {
                           onChange={(val) => {
                             field.onChange(val);
                             setEndDate(val);
+                            if (val < startDate) setStartDate(val);
                           }}
                         />
                       </div>
