@@ -74,6 +74,12 @@ Currently, Header and Main Navigation used as external components, they are defi
 
 - When running ruuter either on local or in an environment make sure to adjust `- application.internalRequests.allowedIPs=127.0.0.1,{YOUR_IPS}` under ruuter environments
 
+##### S3 Ferry source config key
+
+- `CHATBOT_S3_FERRY_SOURCE_CONFIG_KEY` in `constants.ini` controls the S3 Ferry source storage configuration key used when exporting ended chat history to XLSX.
+- The ended chats download flow first creates the XLSX file through Data Mapper, then asks S3 Ferry to copy that generated file from filesystem storage (`sourceStorageType: "FS"`) to S3. This value is passed as S3 Ferry's `sourceConfigKey` for that filesystem source.
+- The default value is `default`, which preserves the previous hardcoded behavior. Override it during deployment when the S3 Ferry filesystem source configuration uses a different key.
+
 ### Kubernetes deployment
 
 For production deploying on kubernetes use this the variable [`REACT_APP_MENU_JSON`](https://github.com/buerokratt/NoOps/blob/dev/Kubernetes/Modules/Buerokratt-Chatbot/templates/deployment-byk-backoffice-gui.yaml) with the value:

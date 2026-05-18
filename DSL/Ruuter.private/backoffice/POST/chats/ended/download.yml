@@ -157,7 +157,7 @@ copy_xlsx_to_s3:
       destinationConfigKey: "chats"
       destinationFilePath: ${s3FilePath}
       sourceStorageType: "FS"
-      sourceConfigKey: "default"
+      sourceConfigKey: "[#CHATBOT_S3_FERRY_SOURCE_CONFIG_KEY]"
       sourceFilePath: ${xlsxData.response.body.filePath}
   result: s3FileCopy
   error: unlink_xlsx_from_fs_after_export_error
