@@ -127,6 +127,12 @@ get_organization_base_config:
 assign_organization_base_config:
   assign:
     base_config: ${org_base_config_res.response.body[0]}
+  next: is_waiting_validation_event_check
+
+is_waiting_validation_event_check:
+  switch:
+    - condition: ${event === 'waiting_validation'}
+      next: change_chat_status
   next: check_if_organization_use_csa
 
 check_if_organization_use_csa:
@@ -241,17 +247,7 @@ assign_validation_event:
         text: ${correct_value.map((item) => item.text)[0].replace('$validate_', '')}
         context: ${context}
     event: "waiting_validation"
-  next: get_validation_no_csa_config
-
-get_validation_no_csa_config:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RESQL]/get-configuration"
-    body:
-      key: "organizationValidationNoCsaMessage"
-    error: return_bad_request
-  result: validation_no_csa_res
-  next: change_chat_status
+  next: check_base_config_domain
 
 change_chat_status:
   call: http.post
@@ -275,7 +271,7 @@ assign_unavailable_message:
   assign:
     correct_value:
       - recipient_id: ${sender}
-        text: ${validation_no_csa_res.response.body[0]?.value ?? ''}
+        text: ${base_config?.validationNoCsaMessage ?? ''}
         context: ${context}
     event: ""
   next: format_messages
