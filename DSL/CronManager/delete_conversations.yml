@@ -1,8 +1,8 @@
 anon_conversations:
-  trigger: "0 1 * * * ?"
+  trigger: "15 13 * * * ?"
   type: exec
   command: "./scripts/remove-anonym-conversations.sh"
 auth_conversations:
-  trigger: "0 1 * * * ?"
+  trigger: "15 13 * * * ?"
   type: exec
   command: "./scripts/remove-auth-conversations.sh"
