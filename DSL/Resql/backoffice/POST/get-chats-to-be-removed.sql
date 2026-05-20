@@ -68,11 +68,11 @@ MaxChats AS (
     SELECT MAX(id) AS maxId
     FROM chat
     WHERE ended IS NOT NULL
-      AND status <> 'IDLE'
+      AND status = 'ENDED'
       AND (
         (end_user_id IS NOT NULL AND end_user_id <> '' AND ended::date >= :start_auth_date::date AND ended::date <= :auth_date::date)
         OR
-        (end_user_id IS NULL OR end_user_id = '' AND ended::date >= :start_anon_date::date AND ended::date <= :anon_date::date)
+        ((end_user_id IS NULL OR end_user_id = '') AND ended::date >= :start_anon_date::date AND ended::date <= :anon_date::date)
       )
     GROUP BY base_id
 ),
