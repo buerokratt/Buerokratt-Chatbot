@@ -18,6 +18,12 @@ declaration:
         type: string
         description: "Body field 'domain'"
 
+check_if_message_is_service:
+  switch:
+    - condition: ${message.startsWith("#common_service") || message.startsWith("#service")}
+      next: return_skip
+  next: get_bot_name
+
 get_bot_name:
   call: http.post
   args:
