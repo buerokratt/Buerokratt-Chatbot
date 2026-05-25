@@ -18,6 +18,10 @@ declaration:
         type: string
         description: "Body field 'domain'"
 
+assign_message:
+  assign:
+    message: ${incoming.body.message ?? ''}
+
 check_if_message_is_service:
   switch:
     - condition: ${message.startsWith("#common_service") || message.startsWith("#service")}
@@ -45,7 +49,6 @@ assignParameters:
     currentDate: ${new Date().toISOString().split('T')[0]}
     sender: ${incoming.body.sender}
     domain: ${incoming.body.domain}
-    message: ${incoming.body.message ?? ''}
     botName: ${get_bot_name_result.response.body[0].value}
 
 assign_config:
