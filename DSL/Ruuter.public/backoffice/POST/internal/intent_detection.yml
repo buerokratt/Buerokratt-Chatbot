@@ -18,6 +18,10 @@ declaration:
         type: string
         description: "Body field 'domain'"
 
+assgin_message:
+  assign:
+    message: ${incoming.body.message ?? ''}
+
 check_if_message_is_service:
   switch:
     - condition: ${message.startsWith("#common_service") || message.startsWith("#service")}
@@ -45,7 +49,6 @@ assignParameters:
     currentDate: ${new Date().toISOString().split('T')[0]}
     sender: ${incoming.body.sender}
     domain: ${incoming.body.domain}
-    message: ${incoming.body.message ?? ''}
     botName: ${get_bot_name_result.response.body[0].value}
 
 assign_config:
@@ -263,6 +266,25 @@ assignNewEntities:
   assign:
     entities: ${Object.values(intentJson.entities)}
   next: trigger_service
+
+get_service_by_name:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/get-active-service-by-name"
+    body:
+      service_name: ${validated_intent.response.body[0].name}
+  result: service_by_name_res
+
+assign_service_entities:
+  assign:
+    service_entities: ${service_by_name_res.response.body[0].entities}
+  next: check_if_entities_match
+
+check_if_entities_match:
+  switch:
+    - condition: ${entities === service_entities}
+      next: trigger_service
+  next: return_skip  
 
 trigger_service:
   template: "[#CHATBOT_PROJECT_LAYER]/chats/trigger-llm-service"
