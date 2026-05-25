@@ -18,7 +18,7 @@ declaration:
         type: string
         description: "Body field 'domain'"
 
-assgin_message:
+assign_message:
   assign:
     message: ${incoming.body.message ?? ''}
 
