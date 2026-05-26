@@ -50,7 +50,8 @@
     "selectAll": "Select all",
     "displayText": "Display message",
     "test": "Test",
-    "preserve": "Preserve"
+    "preserve": "Preserve",
+    "clearFilters": "Clear filters"
   },
   "files": {
     "download_xlsx": "Download XLSX"
@@ -198,7 +199,8 @@
       "statusAdder": "Status adder",
       "statusAddedDate": "Status added date",
       "chosenCsa": "Chosen csa(s)",
-      "chosenColumn": "Chosen column(s)"
+      "chosenColumn": "Chosen column(s)",
+      "chooseAll": "Choose all"
     },
     "plainEvents": {
       "answered": "Answered",
@@ -242,7 +244,9 @@
       "user-authenticated": "{{name}} is authenticated {{date}}",
       "ask_to_forward_to_csa": "Asked to forward the conversation to a customer service agent",
       "forwarded_to_backoffice": "Conversation forwarded to back office",
-      "continue_chatting_with_bot": "Continue conversation with bürokratt"
+      "continue_chatting_with_bot": "Continue conversation with bürokratt",
+      "waiting_validation": "Waiting for validation",
+      "approved_validation": "Approved Validation"
     },
     "events": {
       "answered": "Answered {{date}}",
@@ -325,6 +329,7 @@
     "sevenDays": "7 days",
     "thirtyOneDay": "31 day",
     "ninetyDays": "90 days",
+    "maxDaysError": "The maximum selection of days can be up to 9999",
     "tooltip": {
       "removeAuth": "Select \"Yes\" if you want authenticated conversations to be deleted. The period selection will open automatically. Select \"No\" if you do not want the conversations to be deleted.",
       "removeAnon": "Select \"Yes\" if you want anonymous conversations to be deleted. The period selection will open automatically. Select \"No\" if you do not want the conversations to be deleted.",

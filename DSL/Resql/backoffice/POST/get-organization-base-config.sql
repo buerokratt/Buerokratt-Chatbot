@@ -3,8 +3,8 @@ WITH configuration_values AS (
            KEY,
            value
     FROM configuration
-    WHERE KEY IN ('organizationWorkingAllTime', 
-                  'organizationNoCsaAskForContacts', 
+    WHERE KEY IN ('organizationWorkingAllTime',
+                  'organizationNoCsaAskForContacts',
                   'organizationNoCsaAvailableMessage',
                   'organizationOutsideWorkingHoursAskForContacts',
                   'organizationOutsideWorkingHoursMessage',
@@ -12,7 +12,8 @@ WITH configuration_values AS (
                   'organizationRedirectIfBotCannotAnswerMessage',
                   'organizationUseCSA',
                   'organizationValidationNoCsaMessage')
-      AND id IN (SELECT max(id) FROM configuration GROUP BY KEY)
+      AND "domain" IS NULL
+      AND id IN (SELECT max(id) FROM configuration WHERE "domain" IS NULL GROUP BY KEY)
       AND NOT deleted
 )
 SELECT
