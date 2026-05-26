@@ -17,6 +17,9 @@ declaration:
       - field: holidays
         type: string
         description: "Body field 'holidays'"
+      - field: domain
+        type: string
+        description: "Body field 'domain'"  
 
 extractRequestData:
   assign:
@@ -26,7 +29,39 @@ extractRequestData:
     authorRole: ${incoming.body.message.authorRole ?? 'buerokratt'}
     holidays: ${incoming.body.holidays}
     holidayNames: ${incoming.body.holidayNames}
+    domain: ${incoming.body.domain}
+  next: check_if_domain_exists
+
+check_if_domain_exists:
+  switch:
+    - condition: ${domain === 'none'}
+      next: check_bot_is_active
+  next: getDomainId
+
+getDomainId:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-uuid"
+    body:
+      domainUrl: ${domain + '%'}
+  result: domainId
+  next: validate_domain_id_res
+
+validate_domain_id_res:
+  switch:
+    - condition: ${domainId.response.body.length > 0}
+      next: check_domain_bot_is_active
   next: check_bot_is_active
+
+check_domain_bot_is_active:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-configuration"
+    body:
+      key: "is_bot_active"
+      domain: ${domainId.response.body[0].domainId}
+  result: is_bot_active_result
+  next: check_domain_bot_activity_result  
 
 check_bot_is_active:
   call: http.post
@@ -37,11 +72,35 @@ check_bot_is_active:
   result: is_bot_active_result
   next: check_bot_activity_result
 
+check_domain_bot_activity_result:
+  switch:
+    - condition: ${is_bot_active_result.response.body[0]?.value === 'true'}
+      next: get_domain_bot_name
+  next: return_bot_is_not_active
+
 check_bot_activity_result:
   switch:
     - condition: ${is_bot_active_result.response.body[0]?.value === 'true'}
       next: get_bot_name
   next: return_bot_is_not_active
+
+get_domain_bot_name:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-configuration"
+    body:
+      key: "bot_institution_id"
+  result: get_bot_name_result
+  next: get_domain_organization_base_config
+
+get_domain_organization_base_config:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-organization-base-config"
+    body:
+      domainUUID: ${domainId.response.body[0].domainId}
+  result: org_base_config_res
+  next: assign_organization_base_config  
 
 get_bot_name:
   call: http.post

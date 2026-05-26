@@ -66,8 +66,39 @@ get_chat:
 check_chat_belongs_to_bot:
   switch:
     - condition: ${get_chat_result.response.body[0].customerSupportId == chat_bot_name}
-      next: check_bot_is_active
+      next: check_if_domain_exists
   next: return_chat_does_not_belong_to_bot
+
+check_if_domain_exists:
+  switch:
+    - condition: ${domain === 'none'}
+      next: check_bot_is_active
+  next: getDomainId
+
+getDomainId:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-uuid"
+    body:
+      domainUrl: ${domain + '%'}
+  result: domainId
+  next: validate_domain_id_res
+
+validate_domain_id_res:
+  switch:
+    - condition: ${domainId.response.body.length > 0}
+      next: check_domain_bot_is_active
+  next: check_bot_is_active
+
+check_domain_bot_is_active:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-configuration"
+    body:
+      key: "is_bot_active"
+      domain: ${domainId.response.body[0].domainId}
+  result: is_bot_active_result
+  next: check_bot_activity_result
 
 check_bot_is_active:
   call: http.post
