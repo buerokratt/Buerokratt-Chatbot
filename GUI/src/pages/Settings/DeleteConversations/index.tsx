@@ -64,11 +64,8 @@ const DeleteConversations: FC = () => {
       setIsAuthMessages(deleteConfig.isAuthConversations === 'true');
       setAuthPeriod(Number(deleteConfig.authPeriod ?? 160));
       setAnonymPeriod(Number(deleteConfig.anonymPeriod ?? 160));
-      setDeletionTime(
-        deleteConfig?.deletionTimeISO === ''
-          ? dateToLocalExcludingDST(new Date().toISOString())
-          : dateToLocalExcludingDST(new Date(deleteConfig.deletionTimeISO).toISOString()),
-      );
+      const isoString = deleteConfig?.deletionTimeISO || new Date().toISOString();
+      setDeletionTime(dateToLocalExcludingDST(new Date(isoString).toISOString()));
       reset(deleteConfig);
     }
   }, [deleteConfig]);
