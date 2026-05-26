@@ -1,17 +1,5 @@
 SELECT id, key, value
 FROM configuration
-WHERE key = :key
-  AND NOT deleted
-  AND (
-    :domain IS NULL
-    OR "domain" = :domain::UUID
-  )
-  AND id IN (
-    SELECT max(id)
-    FROM configuration
-    WHERE (
-      :domain IS NULL
-      OR "domain" = :domain::UUID
-    )
-    GROUP BY key
-  );
+WHERE key=:key
+AND id IN (SELECT max(id) from configuration GROUP BY key)
+AND NOT deleted;

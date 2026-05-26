@@ -56,7 +56,7 @@ validate_domain_id_res:
 check_domain_bot_is_active:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/get-configuration"
+    url: "[#CHATBOT_RESQL]/get-domain-configuration"
     body:
       key: "is_bot_active"
       domain: ${domainId.response.body[0].domainId}
