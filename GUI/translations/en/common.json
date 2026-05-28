@@ -200,7 +200,13 @@
       "statusAddedDate": "Status added date",
       "chosenCsa": "Chosen csa(s)",
       "chosenColumn": "Chosen column(s)",
-      "chooseAll": "Choose all"
+      "chooseAll": "Choose all",
+      "conversationResponseQuality": "Response quality",
+      "followUpAction": "Follow-up action",
+      "chooseFollowUpAction": "- Select follow-up action -",
+      "chooseConversationResponseQuality": "- Select response quality -",
+      "chooseConversationTheme": "- Select chat theme -",
+      "conversationTheme": "Chat theme",
     },
     "plainEvents": {
       "answered": "Answered",
@@ -651,7 +657,10 @@
       "copied": "Copied",
       "userDeleted": "User deleted",
       "newUserAdded": "New user added",
-      "userUpdated": "User updated"
+      "userUpdated": "User updated",
+      "conversationThemeSaved": "Theme selection has been saved.",
+      "conversationQualitySaved": "Response quality selection has been saved.",
+      "conversationFollowUpActionSaved": "Follow-up action selection has been saved."
     }
   },
   "notification": {
