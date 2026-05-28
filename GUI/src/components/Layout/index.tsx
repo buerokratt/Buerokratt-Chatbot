@@ -12,12 +12,11 @@ const Layout: FC = () => {
   const menuCountConf = useMenuCountConf();
   const { pathname } = useLocation();
   const multiDomainEnabled = import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
-  const hasDomainTabSelector = multiDomainEnabled && PAGES_WITH_DOMAIN_TAB_SELECTOR.includes(pathname);
-  const domainBarShowing = multiDomainEnabled && !hasDomainTabSelector;
+  const domainBarShowing = multiDomainEnabled && !PAGES_WITH_DOMAIN_TAB_SELECTOR.includes(pathname);
 
   return (
     <div
-      className={`layout${domainBarShowing ? ' layout--multi-domain' : ''}${hasDomainTabSelector ? ' layout--hide-domain-bar' : ''}`}
+      className={`layout${domainBarShowing ? ' layout--multi-domain' : ''}`}
     >
       <MainNavigation countConf={menuCountConf} />
       <div className="layout__wrapper">
@@ -25,6 +24,7 @@ const Layout: FC = () => {
           toastContext={useToast()}
           user={useStore.getState().userInfo}
           setUserDomains={useStore.getState().setUserDomains}
+          hideDomainBarPages={PAGES_WITH_DOMAIN_TAB_SELECTOR}
         />
         <main className="layout__main">
           <Outlet />
