@@ -258,6 +258,7 @@ change_chat_status:
       status: "VALIDATING"
       holidays: ${holidays}
       holidayNames: ${holidayNames}
+      domain: ${domain}
   result: change_chat_status_res
   next: check_chat_status_result
 
