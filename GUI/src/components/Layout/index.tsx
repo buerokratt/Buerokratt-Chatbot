@@ -12,12 +12,11 @@ const Layout: FC = () => {
   const menuCountConf = useMenuCountConf();
   const { pathname } = useLocation();
   const multiDomainEnabled = import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
-  const isDomainSelectorVisible = multiDomainEnabled && !!useStore.getState().userInfo && !PAGES_WITH_DOMAIN_TAB_SELECTOR.includes(pathname);
+  const isDomainSelectorVisible =
+    multiDomainEnabled && !!useStore.getState().userInfo && !PAGES_WITH_DOMAIN_TAB_SELECTOR.includes(pathname);
 
   return (
-    <div
-      className={`layout${isDomainSelectorVisible ? ' layout--multi-domain' : ''}`}
-    >
+    <div className={`layout${isDomainSelectorVisible ? ' layout--multi-domain' : ''}`}>
       <MainNavigation countConf={menuCountConf} />
       <div className="layout__wrapper">
         <Header
