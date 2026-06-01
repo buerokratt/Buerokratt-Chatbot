@@ -14,6 +14,30 @@ declaration:
       - field: page_size
         type: number
         description: "Body field 'page_size'"
+      - field: search_full_name
+        type: string
+        description: "Body field 'search_full_name'"
+      - field: search_id_code
+        type: string
+        description: "Body field 'search_id_code'"
+      - field: search_display_name
+        type: string
+        description: "Body field 'search_display_name'"
+      - field: search_csa_title
+        type: string
+        description: "Body field 'search_csa_title'"
+      - field: search_csa_email
+        type: string
+        description: "Body field 'search_csa_email'"
+      - field: search_authority
+        type: string
+        description: "Body field 'search_authority'"
+      - field: search_department
+        type: string
+        description: "Body field 'search_department'"
+      - field: current_user_id
+        type: string
+        description: "Body field 'current_user_id'" 
       - field: search_display_name_and_csa_title
         type: string
         description: "Body field 'search_display_name_and_csa_title'"

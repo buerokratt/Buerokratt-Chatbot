@@ -406,9 +406,7 @@ const Chat: FC<ChatProps> = ({
         },
       });
 
-      if (chat.customerSupportId != '') {
-        chat.customerSupportId = userInfo?.idCode;
-      }
+      chat.customerSupportId = userInfo?.idCode;
       onRefresh();
     },
     onError: (error: AxiosError) => {
