@@ -168,7 +168,7 @@ const SettingsAppearance: FC = () => {
   if (hasRendered.current === undefined) return <>Loading...</>;
 
   return (
-    <div ref={colorComponentRef}>
+    <div>
       <h1 style={{ paddingBottom: 16 }}>{t('settings.appearance.title')}</h1>
 
       <Card
@@ -211,6 +211,7 @@ const SettingsAppearance: FC = () => {
             {...register('widgetBubbleMessageText')}
             label={t('settings.appearance.widgetBubbleMessageText')}
           />
+          <div ref={colorComponentRef} style={{ width: '100%', position: 'relative' }}>
           <FormInput
             {...register('widgetColor')}
             readOnly={true}
@@ -242,6 +243,7 @@ const SettingsAppearance: FC = () => {
               </div>
             }
           </FormInput>
+          </div>
           <Controller
             name="widgetAnimation"
             control={control}
@@ -249,6 +251,7 @@ const SettingsAppearance: FC = () => {
               <FormSelect
                 {...field}
                 onSelectionChange={(selection) => field.onChange(selection?.value)}
+                onOpen={() => setShowColorPalette(false)}
                 label={t('settings.appearance.widgetAnimation')}
                 defaultValue={field.value}
                 options={[

@@ -21,6 +21,7 @@ type FormSelectProps = Partial<ControllerRenderProps> &
       value: string;
     }[];
     onSelectionChange?: (selection: { label: string; value: string } | null) => void;
+    onOpen?: () => void;
   };
 
 const itemToString = (item: { label: string; value: string } | null) => {
@@ -39,6 +40,7 @@ const FormSelect = forwardRef<HTMLSelectElement, FormSelectProps>(
       placeholderColor,
       defaultValue,
       onSelectionChange,
+      onOpen,
       ...rest
     },
     ref,
@@ -55,6 +57,9 @@ const FormSelect = forwardRef<HTMLSelectElement, FormSelectProps>(
       onSelectedItemChange: ({ selectedItem: newSelectedItem }) => {
         setSelectedItem(newSelectedItem ?? null);
         if (onSelectionChange) onSelectionChange(newSelectedItem ?? null);
+      },
+      onIsOpenChange: ({ isOpen: newValue }) => {
+        if (newValue && onOpen) onOpen();
       },
     });
 
