@@ -18,7 +18,7 @@
     "typecheck": "./typecheck.sh"
   },
   "dependencies": {
-    "@buerokratt-ria/header": "^0.1.51",
+    "@buerokratt-ria/header": "^0.1.52",
     "@buerokratt-ria/menu": "^0.2.12",
     "@buerokratt-ria/styles": "^0.0.1",
     "@buerokratt-ria/common-gui-components": "^0.0.58",

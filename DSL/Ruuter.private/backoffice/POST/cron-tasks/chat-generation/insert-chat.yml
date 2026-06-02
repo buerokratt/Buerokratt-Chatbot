@@ -1,0 +1,135 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Insert custom chat entry for chat generation"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    header:
+      - field: x-ruuter-nonce
+        type: string
+        description: "Nonce field"
+    body:
+      - field: id
+        type: string
+        description: "Chat base id"
+      - field: customerSupportId
+        type: string
+        description: "Customer support id"
+      - field: customerSupportDisplayName
+        type: string
+        description: "Customer support display name"
+      - field: csaTitle
+        type: string
+        description: "Customer support title"
+      - field: endUserId
+        type: string
+        description: "End user id"
+      - field: endUserFirstName
+        type: string
+        description: "End user first name"
+      - field: endUserLastName
+        type: string
+        description: "End user last name"
+      - field: status
+        type: string
+        description: "Chat status"
+      - field: created
+        type: string
+        description: "Chat created timestamp"
+      - field: ended
+        type: string
+        description: "Chat ended timestamp"
+      - field: feedbackText
+        type: string
+        description: "Feedback text"
+      - field: feedbackRating
+        type: string
+        description: "Feedback rating"
+      - field: endUserEmail
+        type: string
+        description: "End user email"
+      - field: endUserPhone
+        type: string
+        description: "End user phone"
+      - field: endUserOs
+        type: string
+        description: "End user OS"
+      - field: endUserUrl
+        type: string
+        description: "End user URL"
+      - field: externalId
+        type: string
+        description: "External id"
+      - field: forwardedTo
+        type: string
+        description: "Forwarded to id"
+      - field: forwardedToName
+        type: string
+        description: "Forwarded to name"
+      - field: receivedFrom
+        type: string
+        description: "Received from id"
+      - field: receivedFromName
+        type: string
+        description: "Received from name"
+
+extractRequestData:
+  assign:
+    id: ${incoming.body.id}
+    customerSupportId: ${incoming.body.customerSupportId ?? ""}
+    customerSupportDisplayName: ${incoming.body.customerSupportDisplayName ?? ""}
+    csaTitle: ${incoming.body.csaTitle ?? ""}
+    endUserId: ${incoming.body.endUserId ?? ""}
+    endUserFirstName: ${incoming.body.endUserFirstName ?? ""}
+    endUserLastName: ${incoming.body.endUserLastName ?? ""}
+    status: ${incoming.body.status ?? "OPEN"}
+    created: ${incoming.body.created ?? new Date().toISOString()}
+    ended: ${incoming.body.ended ?? ""}
+    feedbackText: ${incoming.body.feedbackText ?? ""}
+    feedbackRating: ${incoming.body.feedbackRating ?? ""}
+    endUserEmail: ${incoming.body.endUserEmail ?? ""}
+    endUserPhone: ${incoming.body.endUserPhone ?? ""}
+    endUserOs: ${incoming.body.endUserOs ?? ""}
+    endUserUrl: ${incoming.body.endUserUrl ?? ""}
+    externalId: ${incoming.body.externalId ?? ""}
+    forwardedTo: ${incoming.body.forwardedTo ?? ""}
+    forwardedToName: ${incoming.body.forwardedToName ?? ""}
+    receivedFrom: ${incoming.body.receivedFrom ?? ""}
+    receivedFromName: ${incoming.body.receivedFromName ?? ""}
+  next: insertChat
+
+insertChat:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-chat"
+    body:
+      id: ${id}
+      customerSupportId: ${customerSupportId}
+      customerSupportDisplayName: ${customerSupportDisplayName}
+      csaTitle: ${csaTitle}
+      endUserId: ${endUserId}
+      endUserFirstName: ${endUserFirstName}
+      endUserLastName: ${endUserLastName}
+      status: ${status}
+      created: ${created}
+      ended: ${ended}
+      feedbackText: ${feedbackText}
+      feedbackRating: ${feedbackRating}
+      endUserEmail: ${endUserEmail}
+      endUserPhone: ${endUserPhone}
+      endUserOs: ${endUserOs}
+      endUserUrl: ${endUserUrl}
+      externalId: ${externalId}
+      forwardedTo: ${forwardedTo}
+      forwardedToName: ${forwardedToName}
+      receivedFrom: ${receivedFrom}
+      receivedFromName: ${receivedFromName}
+  result: insert_chat_res
+  next: return_result
+
+return_result:
+  return: "Chat Inserted Successfully"
+  next: end
