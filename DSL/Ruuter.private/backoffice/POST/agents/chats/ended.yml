@@ -7,6 +7,10 @@ declaration:
   returns: json
   namespace: backoffice
   allowlist:
+    params:
+      - field: isChatAnalysisEnabled
+        type: boolean
+        description: "Parameter 'isChatAnalysisEnabled'"
     body:
       - field: endDate
         type: string
@@ -32,12 +36,41 @@ declaration:
       - field: urls
         type: array
         description: "Body field 'urls'"
+      - field: feedbackRatings
+        type: array
+        description: "Body field 'feedbackRatings'"
+      - field: isTest
+        type: array
+        description: "Body field 'isTest'"
+      - field: authenticatedChats
+        type: array
+        description: "Body field 'authenticatedChats'"
+      - field: status
+        type: array
+        description: "Body field 'status'"
+      - field: responseQuality
+        type: array
+        description: "Body field 'responseQuality'"
+      - field: followUpStatus
+        type: array
+        description: "Body field 'followUpStatus'"
+      - field: theme
+        type: array
+        description: "Body field 'theme'"
 
 extractRequestData:
   assign:
     startDate: "${incoming.body.startDate}"
     endDate: "${incoming.body.endDate}"
     urls: ${incoming.body.urls}
+    feedbackRatings: ${incoming.body.feedbackRatings ?? []}
+    isTest: ${incoming.body.isTest ?? []}
+    authenticatedChats: ${incoming.body.authenticatedChats ?? []}
+    status: ${incoming.body.status ?? []}
+    responseQuality: ${incoming.body.responseQuality ?? []}
+    followUpStatus: ${incoming.body.followUpStatus ?? []}
+    theme: ${incoming.body.theme ?? []}
+    isChatAnalysisEnabled: ${incoming.params.isChatAnalysisEnabled === true || incoming.params.isChatAnalysisEnabled === 'true'}
 
 getEndedChats:
   call: http.post
@@ -53,6 +86,14 @@ getEndedChats:
       customerSupportIds: ${incoming.body.customerSupportIds?.join(',') ?? ''}
       csaId: ${"chatbot"}
       urls: ${urls}
+      feedbackRatings: ${feedbackRatings}
+      isTest: ${isTest}
+      authenticatedChats: ${authenticatedChats}
+      status: ${status}
+      responseQuality: ${responseQuality}
+      followUpStatus: ${followUpStatus}
+      theme: ${theme}
+      isChatAnalysisEnabled: ${isChatAnalysisEnabled}
   result: res
 
 returnSuccess:

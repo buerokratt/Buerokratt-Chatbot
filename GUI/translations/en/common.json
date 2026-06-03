@@ -186,6 +186,7 @@
       "endTime": "End time",
       "csaName": "Customer support name",
       "contact": "Contact",
+      "www": "Webpage",
       "authenticatedPerson": "Authenticated person",
       "comment": "Comment",
       "label": "Label",
@@ -207,6 +208,10 @@
       "chooseConversationResponseQuality": "- Select response quality -",
       "chooseConversationTheme": "- Select chat theme -",
       "conversationTheme": "Chat theme",
+      "theme": "Theme",
+      "responseQuality": "Bürokratt Response Quality",
+      "followUpStatus": "Follow-up Status",
+      "analysis": "Analysis"
     },
     "plainEvents": {
       "answered": "Answered",
@@ -316,6 +321,12 @@
         "requestedAt": "Requested At",
         "approve": "Approve"
       }
+    },
+    "quality": {
+      "theme": "Chat theme",
+      "responseQuality": "Chat response quality",
+      "followUpAction": "Follow-up action",
+      "selectionEmptied": "Selection emptied"
     }
   },
   "deleteConversation": {
