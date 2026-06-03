@@ -1,0 +1,66 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Set chat analysis configuration"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: chatAnalysisEnabled
+        type: boolean
+        description: "Body field 'chatAnalysisEnabled'"
+      - field: chatAnalysisTheme
+        type: string
+        description: "Body field 'chatAnalysisTheme'"
+      - field: chatAnalysisBykResponseQuality
+        type: string
+        description: "Body field 'chatAnalysisBykResponseQuality'"
+      - field: chatAnalysisFollowUpAction
+        type: string
+        description: "Body field 'chatAnalysisFollowUpAction'"
+      - field: domainUuid
+        type: object
+        description: "Body field 'domainUuid'"
+
+extractRequestData:
+  assign:
+    chat_analysis_enabled: ${incoming.body.chatAnalysisEnabled}
+    chat_analysis_theme: ${incoming.body.chatAnalysisTheme}
+    chat_analysis_byk_response_quality: ${incoming.body.chatAnalysisBykResponseQuality}
+    chat_analysis_follow_up_action: ${incoming.body.chatAnalysisFollowUpAction}
+    domains: ${incoming.body.domainUuid}
+
+checkForDomains:
+  switch:
+    - condition: ${domains.length > 0}
+      next: setDomainChatAnalysisConfig
+  next: setChatAnalysisConfig
+
+setDomainChatAnalysisConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-domain-chat-analysis-config"
+    body:
+      chat_analysis_enabled: ${chat_analysis_enabled.toString()}
+      chat_analysis_theme: ${chat_analysis_theme}
+      chat_analysis_byk_response_quality: ${chat_analysis_byk_response_quality}
+      chat_analysis_follow_up_action: ${chat_analysis_follow_up_action}
+      domains: ${JSON.stringify(domains)}
+  result: set_domain_config_res
+  next: return_result
+
+setChatAnalysisConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-chat-analysis-config"
+    body:
+      chat_analysis_enabled: ${chat_analysis_enabled.toString()}
+      chat_analysis_theme: ${chat_analysis_theme}
+      chat_analysis_byk_response_quality: ${chat_analysis_byk_response_quality}
+      chat_analysis_follow_up_action: ${chat_analysis_follow_up_action}
+  result: set_config_res
+
+return_result:
+  return: "Chat analysis configurations changed successfully"

@@ -1,0 +1,66 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Get chat analysis configuration"
+  method: get
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    params:
+      - field: domain
+        type: string
+        description: "Query param 'domain'"
+
+assignValues:
+  assign:
+    domain: ${incoming.params.domain}
+
+checkForDomain:
+  switch:
+    - condition: ${domain === 'none'}
+      next: getChatAnalysisConfig
+  next: getDomainChatAnalysisConfig
+
+getDomainChatAnalysisConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-chat-analysis-config"
+    body:
+      domainUuid: ${domain}
+  result: res
+  next: validateResults
+
+getChatAnalysisConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-chat-analysis-config"
+  result: res
+  next: validateResults
+
+validateResults:
+  switch:
+    - condition: ${res.response.body[0].chatAnalysisEnabled === null}
+      next: return_empty
+  next: mapAllConfigs
+
+mapAllConfigs:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_HBS]/return_chat_analysis_config"
+    headers:
+      type: json
+    body:
+      configs: ${res.response.body[0]}
+  result: mappedConfigs
+  next: return_result
+
+return_result:
+  status: 200
+  return: ${mappedConfigs.response.body}
+  next: end
+
+return_empty:
+  status: 201
+  return: ${null}
+  next: end

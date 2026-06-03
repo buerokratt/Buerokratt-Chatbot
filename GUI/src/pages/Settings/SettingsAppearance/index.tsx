@@ -212,37 +212,37 @@ const SettingsAppearance: FC = () => {
             label={t('settings.appearance.widgetBubbleMessageText')}
           />
           <div ref={colorComponentRef} style={{ width: '100%', position: 'relative' }}>
-          <FormInput
-            {...register('widgetColor')}
-            readOnly={true}
-            label={t('settings.appearance.widgetColor')}
-            onClick={() => setShowColorPalette(!showColorPalette)}
-          >
-            {
-              <div style={{ flexDirection: 'row' }}>
-                <button
-                  style={{
-                    position: 'absolute',
-                    zIndex: '2',
-                    right: '10px',
-                    bottom: '95%',
-                  }}
-                  onClick={() => setShowColorPalette(!showColorPalette)}
-                >
-                  <Icon icon={<MdOutlinePalette fontSize={20} color="rgba(0,0,0,0.54)" />} />
-                </button>
-                {showColorPalette && (
-                  <div style={{ position: 'absolute', zIndex: '2' }}>
-                    <ChromePicker
-                      {...register('widgetColor')}
-                      color={widgetColor}
-                      onChange={(color) => setValue('widgetColor', color.hex)}
-                    />
-                  </div>
-                )}
-              </div>
-            }
-          </FormInput>
+            <FormInput
+              {...register('widgetColor')}
+              readOnly={true}
+              label={t('settings.appearance.widgetColor')}
+              onClick={() => setShowColorPalette(!showColorPalette)}
+            >
+              {
+                <div style={{ flexDirection: 'row' }}>
+                  <button
+                    style={{
+                      position: 'absolute',
+                      zIndex: '2',
+                      right: '10px',
+                      bottom: '95%',
+                    }}
+                    onClick={() => setShowColorPalette(!showColorPalette)}
+                  >
+                    <Icon icon={<MdOutlinePalette fontSize={20} color="rgba(0,0,0,0.54)" />} />
+                  </button>
+                  {showColorPalette && (
+                    <div style={{ position: 'absolute', zIndex: '2' }}>
+                      <ChromePicker
+                        {...register('widgetColor')}
+                        color={widgetColor}
+                        onChange={(color) => setValue('widgetColor', color.hex)}
+                      />
+                    </div>
+                  )}
+                </div>
+              }
+            </FormInput>
           </div>
           <Controller
             name="widgetAnimation"
