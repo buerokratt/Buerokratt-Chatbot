@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+
+    <changeSet id="20260424123536" author="ahmedyasser">
+        <insert tableName="configuration">
+            <column name="key" value="chat_analysis_enabled"/>
+            <column name="value" value="true"/>
+        </insert>
+        <insert tableName="configuration">
+            <column name="key" value="chat_analysis_theme"/>
+            <column name="value" value=""/>
+        </insert>
+        <insert tableName="configuration">
+            <column name="key" value="chat_analysis_byk_response_quality"/>
+            <column name="value" value="Hästi,Halvasti,Osaliselt hästi"/>
+        </insert>
+        <insert tableName="configuration">
+            <column name="key" value="chat_analysis_follow_up_action"/>
+            <column name="value" value=""/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

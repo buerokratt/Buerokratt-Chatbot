@@ -33,6 +33,7 @@ import SettingsFeedback from 'pages/Settings/SettingsFeedback';
 
 import { getWidgetData } from './services/users';
 import { ROUTES } from './constants/routes';
+import SettingsChatAnalysis from 'pages/Settings/SettingsChatAnalysis';
 
 const App: FC = () => {
   const multiDomainEnabled = import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
@@ -83,6 +84,7 @@ const App: FC = () => {
         <Route path={ROUTES.CHATBOT_EMERGENCY_NOTICES} element={<SettingsEmergencyNotices />} />
         <Route path={ROUTES.CHATBOT_APPEARANCE} element={<SettingsAppearance />} />
         <Route path={ROUTES.CHATBOT_FEEDBACK} element={<SettingsFeedback />} />
+        <Route path={ROUTES.CHAT_ANALYSIS} element={<SettingsChatAnalysis />} />
         <Route path={ROUTES.WORKING_TIME} element={<SettingsWorkingTime />} />
         <Route path={ROUTES.SESSION_LENGTH} element={<SettingsSessionLength />} />
         <Route path={ROUTES.SKM_CONFIGURATION} element={<SettingsSkmConfiguration />} />
