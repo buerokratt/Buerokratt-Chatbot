@@ -1,0 +1,83 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Chat quality measurements"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: chatUuid
+        type: string
+        description: "Body field 'chatUuid'"
+      - field: type
+        type: string
+        description: "Body field 'type'"
+      - field: value
+        type: string
+        description: "Body field 'value'"
+    header:
+      - field: cookie
+        type: string
+        description: "Cookie field"
+
+extractRequestData:
+  assign:
+    chatUuid: ${incoming.body.chatUuid}
+    type: ${incoming.body.type}
+    value: ${incoming.body.value}
+  next: get_user_info
+
+get_user_info:
+  call: http.post
+  args:
+   url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
+   contentType: plaintext
+   headers:
+    cookie: ${incoming.headers.cookie}
+   plaintext:
+      "customJwtCookie"
+  result: user_info_res
+  next: check_user_info_response
+
+check_user_info_response:
+  switch:
+    - condition: ${200 <= user_info_res.response.statusCodeValue && user_info_res.response.statusCodeValue < 300}
+      next: assignIdCode
+  next: return_bad_request
+
+assignIdCode:
+  assign:
+    authorIdCode: ${user_info_res.response.body.idCode}
+  next: getUser
+
+getUser:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-user-with-roles-by-id-code"
+    body:
+      userIdCode: ${authorIdCode}
+  result: user_res
+  next: insertMeasurements
+
+insertMeasurements:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-chat-measurements"
+    body:
+      chatUuid: ${chatUuid}
+      authorId: ${authorIdCode}
+      type: ${type}
+      value: ${value}
+  result: insert_measurements_res
+  next: return_result
+
+return_result:
+  return: ${insert_measurements_res.response.body}
+  next: end
+
+return_bad_request:
+  return: "bad_request"
+  status: 400
+  next: end
