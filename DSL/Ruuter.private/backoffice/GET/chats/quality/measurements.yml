@@ -1,0 +1,31 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Chat quality measurements"
+  method: get
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    params:
+      - field: chatUuid
+        type: string
+        description: "Parameter 'chatUuid'"
+
+extractRequestData:
+  assign:
+    chatUuid: ${incoming.params.chatUuid}
+  next: getMeasurements
+
+getMeasurements:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-chat-measurements"
+    body:
+      chatUuid: ${chatUuid}
+  result: measurementsResult
+  next: return_result
+
+return_result:
+  return: ${measurementsResult.response.body}
+  next: end
