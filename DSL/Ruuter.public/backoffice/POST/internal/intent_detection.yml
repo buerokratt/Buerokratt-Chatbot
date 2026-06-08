@@ -265,13 +265,26 @@ handleEntities:
 assignNewEntities:
   assign:
     entities: ${Object.values(intentJson.entities)}
+    filteredEntities: ${[...new Set(entities)]}
+    service_entities: ${validated_intent.response.body[0].entities}
+  next: check_if_service_entities_are_in_included_in_llm_entities
+
+check_if_service_entities_are_in_included_in_llm_entities:
+  switch:
+    - condition: ${service_entities.every(e => filteredEntities.includes(e))}
+      next: trigger_service
+  next: assign_empty_entities
+
+assign_empty_entities:
+  assign:
+    service_entities: ${[]}
   next: trigger_service
 
 trigger_service:
   template: "[#CHATBOT_PROJECT_LAYER]/chats/trigger-llm-service"
   requestType: templates
   body:
-    entities: ${entities}
+    entities: ${service_entities}
     chatId: ${sender}
     authorId: ${botName}
     ruuterType: ${validated_intent.response.body[0].ruuterType}

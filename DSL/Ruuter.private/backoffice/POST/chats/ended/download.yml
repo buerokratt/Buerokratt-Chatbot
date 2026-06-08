@@ -38,6 +38,9 @@ declaration:
       - field: isTest
         type: array
         description: "Body field 'isTest'"
+      - field: isPreserve
+        type: array
+        description: "Body field 'isPreserve'"
       - field: authenticatedChats
         type: array
         description: "Body field 'authenticatedChats'"
@@ -67,6 +70,7 @@ extractRequestData:
     urls: ${incoming.body.urls}
     feedbackRatings: ${incoming.body.feedbackRatings ?? []}
     isTest: ${incoming.body.isTest ?? []}
+    isPreserve: ${incoming.body.isPreserve ?? []}
     authenticatedChats: ${incoming.body.authenticatedChats ?? []}
     status: ${incoming.body.status ?? []}
     responseQuality: ${incoming.body.responseQuality ?? []}
@@ -98,6 +102,7 @@ fetchPage:
       urls: ${urls}
       feedbackRatings: ${feedbackRatings}
       isTest: ${isTest}
+      isPreserve: ${isPreserve}
       authenticatedChats: ${authenticatedChats}
       status: ${status}
       responseQuality: ${responseQuality}
