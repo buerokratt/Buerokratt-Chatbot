@@ -186,6 +186,7 @@
       "endTime": "Lõppaeg",
       "csaName": "Nõustaja nimi",
       "contact": "Kontaktandmed",
+      "www": "Veebileht",
       "authenticatedPerson": "Autenditud isik",
       "comment": "Kommentaar",
       "label": "Märksõna",
@@ -200,7 +201,17 @@
       "statusAddedDate": "Staatuse lisamise kuupäev",
       "chosenCsa": "Valitud nõustaja(d)",
       "chosenColumn": "Valitud tulba(d)",
-      "chooseAll": "Vali kõik"
+      "chooseAll": "Vali kõik",
+      "conversationResponseQuality": "Vastuse kvaliteet",
+      "followUpAction": "Järeltegevus",
+      "chooseFollowUpAction": "- Vali järeltegevus -",
+      "chooseConversationResponseQuality": "- Vali vastuse kvaliteet -",
+      "chooseConversationTheme": "- Vali vestluse valdkond -",
+      "conversationTheme": "Vestluse valdkond",
+      "theme": "Valdkond",
+      "responseQuality": "Bürokrati vastuse kvaliteet",
+      "followUpStatus": "Järeltegevuste staatus",
+      "analysis": "Analüüs"
     },
     "plainEvents": {
       "answered": "Vastatud",
@@ -310,6 +321,12 @@
         "requestedAt": "Taotletud Kell",
         "approve": "Kinnita"
       }
+    },
+    "quality": {
+      "theme": "Vestluse valdkond",
+      "responseQuality": "Vastuse kvaliteet",
+      "followUpAction": "Järeltegevus",
+      "selectionEmptied": "Valik tühjendatud"
     }
   },
   "deleteConversation": {
@@ -651,7 +668,10 @@
       "copied": "Kopeeritud",
       "userDeleted": "Kasutaja kustutatud",
       "newUserAdded": "Uus kasutaja lisatud",
-      "userUpdated": "Kasutaja uuendatud"
+      "userUpdated": "Kasutaja uuendatud",
+      "conversationThemeSaved": "Valdkonna valik on salvestatud.",
+      "conversationQualitySaved": "Vastuse kvaliteedi valik on salvestatud.",
+      "conversationFollowUpActionSaved": "Järeltegevuse valik on salvestatud."
     }
   },
   "notification": {

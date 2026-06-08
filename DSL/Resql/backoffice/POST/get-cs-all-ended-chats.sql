@@ -173,6 +173,44 @@ CSAFullNames AS MATERIALIZED (
     LEFT JOIN ChatUser cu ON cu.id_code = c2.customer_support_id
     LEFT JOIN LatestOpenChat lo ON lo.base_id = c2.base_id
     GROUP BY c2.base_id
+),
+LatestMeasurements AS MATERIALIZED (
+    SELECT
+        chat_base_id,
+        type,
+        MAX(created_at) AS latest_created_at
+    FROM chat_measurements
+    WHERE :isChatAnalysisEnabled::BOOLEAN
+      AND chat_base_id::text IN (SELECT base_id FROM MaxChats)
+      AND type IN ('THEME', 'QUALITY', 'FOLLOW_UP_ACTION')
+    GROUP BY chat_base_id, type
+),
+ChatMeasurements AS MATERIALIZED (
+    SELECT
+        cm.chat_base_id,
+        COALESCE(
+            array_agg(cm.value ORDER BY cm.value)
+                FILTER (WHERE cm.type = 'QUALITY' AND cm.value IS NOT NULL),
+            ARRAY[]::text[]
+        ) AS quality,
+        COALESCE(
+            array_agg(cm.value ORDER BY cm.value)
+                FILTER (WHERE cm.type = 'FOLLOW_UP_ACTION' AND cm.value IS NOT NULL),
+            ARRAY[]::text[]
+        ) AS follow_up_action,
+        COALESCE(
+            array_agg(cm.value ORDER BY cm.value)
+                FILTER (WHERE cm.type = 'THEME' AND cm.value IS NOT NULL),
+            ARRAY[]::text[]
+        ) AS theme
+    FROM chat_measurements cm
+    JOIN LatestMeasurements lm
+      ON lm.chat_base_id = cm.chat_base_id
+     AND lm.type = cm.type
+     AND lm.latest_created_at = cm.created_at
+    WHERE :isChatAnalysisEnabled::BOOLEAN
+      AND cm.type IN ('THEME', 'QUALITY', 'FOLLOW_UP_ACTION')
+    GROUP BY cm.chat_base_id
 )
 SELECT
     c.base_id AS id,
@@ -214,6 +252,18 @@ SELECT
     c.preserve as is_preserve,
     nps,
     CSAFullNames.all_csa_names AS all_csa,
+    CASE
+        WHEN :isChatAnalysisEnabled::BOOLEAN THEN COALESCE(ChatMeasurements.quality, ARRAY[]::text[])
+        ELSE ARRAY[]::text[]
+    END AS response_quality,
+    CASE
+        WHEN :isChatAnalysisEnabled::BOOLEAN THEN COALESCE(ChatMeasurements.follow_up_action, ARRAY[]::text[])
+        ELSE ARRAY[]::text[]
+    END AS follow_up_status,
+    CASE
+        WHEN :isChatAnalysisEnabled::BOOLEAN THEN COALESCE(ChatMeasurements.theme, ARRAY[]::text[])
+        ELSE ARRAY[]::text[]
+    END AS theme,
     COUNT(*) OVER() AS total_count,
     CEIL(COUNT(*) OVER() / :page_size::DECIMAL) AS total_pages
 FROM EndedChatMessages AS c
@@ -225,6 +275,7 @@ JOIN LastContentMessage ON c.base_id = LastContentMessage.chat_base_id
 JOIN FirstContentMessage ON c.base_id = FirstContentMessage.chat_base_id
 LEFT JOIN ContactsMessage ON ContactsMessage.chat_base_id = c.base_id
 LEFT JOIN CSAFullNames ON CSAFullNames.base_id = c.base_id
+LEFT JOIN ChatMeasurements ON ChatMeasurements.chat_base_id::text = c.base_id
 CROSS JOIN TitleVisibility
 CROSS JOIN NPS
 WHERE (
@@ -260,6 +311,95 @@ WHERE (
             AND LOWER(msg.content) LIKE LOWER('%' || :search || '%')
         )
     )
+    AND (
+        NOT EXISTS (
+            SELECT 1
+            FROM unnest(ARRAY[:feedbackRatings]::TEXT[]) AS feedback_ratings(feedback_rating)
+            WHERE NULLIF(feedback_rating, '') IS NOT NULL
+        )
+        OR (
+            CASE
+                WHEN (SELECT COALESCE(is_five_rating_scale, 'false') = 'true' FROM rating_config)
+                THEN c.feedback_rating_five
+                ELSE c.feedback_rating
+            END
+        )::TEXT IN (
+            SELECT feedback_rating
+            FROM unnest(ARRAY[:feedbackRatings]::TEXT[]) AS feedback_ratings(feedback_rating)
+            WHERE NULLIF(feedback_rating, '') IS NOT NULL
+        )
+    )
+    AND (
+        NOT EXISTS (
+            SELECT 1
+            FROM unnest(ARRAY[:isTest]::TEXT[]) AS test_filters(is_test)
+            WHERE NULLIF(is_test, '') IS NOT NULL
+        )
+        OR (
+            'true' = ANY(ARRAY[:isTest]::TEXT[])
+            AND 'false' = ANY(ARRAY[:isTest]::TEXT[])
+        )
+        OR c.test::TEXT IN (
+            SELECT is_test
+            FROM unnest(ARRAY[:isTest]::TEXT[]) AS test_filters(is_test)
+            WHERE NULLIF(is_test, '') IS NOT NULL
+        )
+    )
+    AND (
+        NOT EXISTS (
+            SELECT 1
+            FROM unnest(ARRAY[:authenticatedChats]::TEXT[]) AS authenticated_filters(authenticated_chat)
+            WHERE NULLIF(authenticated_chat, '') IS NOT NULL
+        )
+        OR (
+            'true' = ANY(ARRAY[:authenticatedChats]::TEXT[])
+            AND 'false' = ANY(ARRAY[:authenticatedChats]::TEXT[])
+        )
+        OR (NULLIF(TRIM(c.end_user_id), '') IS NOT NULL)::TEXT IN (
+            SELECT authenticated_chat
+            FROM unnest(ARRAY[:authenticatedChats]::TEXT[]) AS authenticated_filters(authenticated_chat)
+            WHERE NULLIF(authenticated_chat, '') IS NOT NULL
+        )
+    )
+    AND (
+        NOT EXISTS (
+            SELECT 1
+            FROM unnest(ARRAY[:status]::TEXT[]) AS status_filters(status)
+            WHERE NULLIF(TRIM(status), '') IS NOT NULL
+        )
+        OR LOWER(NULLIF(TRIM(m.event), '')) IN (
+            SELECT LOWER(TRIM(status))
+            FROM unnest(ARRAY[:status]::TEXT[]) AS status_filters(status)
+            WHERE NULLIF(TRIM(status), '') IS NOT NULL
+        )
+    )
+    AND (
+        NOT :isChatAnalysisEnabled::BOOLEAN
+        OR NOT EXISTS (
+            SELECT 1
+            FROM unnest(ARRAY[:responseQuality]::TEXT[]) AS response_quality_filters(response_quality)
+            WHERE NULLIF(TRIM(response_quality), '') IS NOT NULL
+        )
+        OR COALESCE(ChatMeasurements.quality, ARRAY[]::text[]) && ARRAY[:responseQuality]::TEXT[]
+    )
+    AND (
+        NOT :isChatAnalysisEnabled::BOOLEAN
+        OR NOT EXISTS (
+            SELECT 1
+            FROM unnest(ARRAY[:followUpStatus]::TEXT[]) AS follow_up_status_filters(follow_up_status)
+            WHERE NULLIF(TRIM(follow_up_status), '') IS NOT NULL
+        )
+        OR COALESCE(ChatMeasurements.follow_up_action, ARRAY[]::text[]) && ARRAY[:followUpStatus]::TEXT[]
+    )
+    AND (
+        NOT :isChatAnalysisEnabled::BOOLEAN
+        OR NOT EXISTS (
+            SELECT 1
+            FROM unnest(ARRAY[:theme]::TEXT[]) AS theme_filters(theme)
+            WHERE NULLIF(TRIM(theme), '') IS NOT NULL
+        )
+        OR COALESCE(ChatMeasurements.theme, ARRAY[]::text[]) && ARRAY[:theme]::TEXT[]
+    )
 )
 ORDER BY
     CASE WHEN :sorting = 'created asc' THEN FirstContentMessage.created END ASC,
@@ -278,10 +418,24 @@ ORDER BY
     CASE WHEN :sorting = 'www desc' THEN c.end_user_url END DESC,
     CASE WHEN :sorting = 'contactsMessage asc' THEN ContactsMessage.content END ASC,
     CASE WHEN :sorting = 'contactsMessage desc' THEN ContactsMessage.content END DESC,
+    CASE WHEN :sorting = 'authenticatedPerson asc' THEN (
+        COALESCE(c.end_user_first_name, '') <> ''
+        OR COALESCE(c.end_user_last_name, '') <> ''
+        OR COALESCE(c.end_user_id, '') <> ''
+        OR COALESCE(ContactsMessage.content, '') <> ''
+    ) END ASC,
+    CASE WHEN :sorting = 'authenticatedPerson desc' THEN (
+        COALESCE(c.end_user_first_name, '') <> ''
+        OR COALESCE(c.end_user_last_name, '') <> ''
+        OR COALESCE(c.end_user_id, '') <> ''
+        OR COALESCE(ContactsMessage.content, '') <> ''
+    ) END DESC,
     CASE WHEN :sorting = 'comment asc' THEN s.comment END ASC,
     CASE WHEN :sorting = 'comment desc' THEN s.comment END DESC,
     CASE WHEN :sorting = 'labels asc' THEN c.labels END ASC,
     CASE WHEN :sorting = 'labels desc' THEN c.labels END DESC,
+    CASE WHEN :sorting = 'isPreserve asc' THEN c.preserve END ASC,
+    CASE WHEN :sorting = 'isPreserve desc' THEN c.preserve END DESC,
     CASE
         WHEN :sorting = 'status asc' THEN
             CASE

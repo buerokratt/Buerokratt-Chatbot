@@ -186,6 +186,7 @@
       "endTime": "End time",
       "csaName": "Customer support name",
       "contact": "Contact",
+      "www": "Webpage",
       "authenticatedPerson": "Authenticated person",
       "comment": "Comment",
       "label": "Label",
@@ -200,7 +201,17 @@
       "statusAddedDate": "Status added date",
       "chosenCsa": "Chosen csa(s)",
       "chosenColumn": "Chosen column(s)",
-      "chooseAll": "Choose all"
+      "chooseAll": "Choose all",
+      "conversationResponseQuality": "Response quality",
+      "followUpAction": "Follow-up action",
+      "chooseFollowUpAction": "- Select follow-up action -",
+      "chooseConversationResponseQuality": "- Select response quality -",
+      "chooseConversationTheme": "- Select chat theme -",
+      "conversationTheme": "Chat theme",
+      "theme": "Theme",
+      "responseQuality": "Bürokratt Response Quality",
+      "followUpStatus": "Follow-up Status",
+      "analysis": "Analysis"
     },
     "plainEvents": {
       "answered": "Answered",
@@ -310,6 +321,12 @@
         "requestedAt": "Requested At",
         "approve": "Approve"
       }
+    },
+    "quality": {
+      "theme": "Chat theme",
+      "responseQuality": "Chat response quality",
+      "followUpAction": "Follow-up action",
+      "selectionEmptied": "Selection emptied"
     }
   },
   "deleteConversation": {
@@ -651,7 +668,10 @@
       "copied": "Copied",
       "userDeleted": "User deleted",
       "newUserAdded": "New user added",
-      "userUpdated": "User updated"
+      "userUpdated": "User updated",
+      "conversationThemeSaved": "Theme selection has been saved.",
+      "conversationQualitySaved": "Response quality selection has been saved.",
+      "conversationFollowUpActionSaved": "Follow-up action selection has been saved."
     }
   },
   "notification": {
