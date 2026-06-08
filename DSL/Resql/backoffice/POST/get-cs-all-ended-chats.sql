@@ -348,6 +348,22 @@ WHERE (
     AND (
         NOT EXISTS (
             SELECT 1
+            FROM unnest(ARRAY[:isPreserve]::TEXT[]) AS preserve_filters(is_preserve)
+            WHERE NULLIF(is_preserve, '') IS NOT NULL
+        )
+        OR (
+            'true' = ANY(ARRAY[:isPreserve]::TEXT[])
+            AND 'false' = ANY(ARRAY[:isPreserve]::TEXT[])
+        )
+        OR c.preserve::TEXT IN (
+            SELECT is_preserve
+            FROM unnest(ARRAY[:isPreserve]::TEXT[]) AS preserve_filters(is_preserve)
+            WHERE NULLIF(is_preserve, '') IS NOT NULL
+        )
+    )
+    AND (
+        NOT EXISTS (
+            SELECT 1
             FROM unnest(ARRAY[:authenticatedChats]::TEXT[]) AS authenticated_filters(authenticated_chat)
             WHERE NULLIF(authenticated_chat, '') IS NOT NULL
         )
