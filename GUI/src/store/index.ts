@@ -2,6 +2,7 @@ import { apiDev } from 'services/api';
 import { CHAT_STATUS, Chat as ChatType, GroupedChat, GroupedPendingChat } from 'types/chat';
 import { UserInfo } from 'types/userInfo';
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 interface StoreState {
   userInfo: UserInfo | null;
@@ -28,9 +29,13 @@ interface StoreState {
   getGroupedPendingChats: () => GroupedPendingChat;
   userDomains: string[];
   setUserDomains: (domains: string[]) => void;
+  selectedDomainId: string | null;
+  setSelectedDomainId: (id: string | null) => void;
 }
 
-const useStore = create<StoreState>((set, get, store) => ({
+const useStore = create<StoreState>()(
+  persist(
+    (set, get, store) => ({
   userInfo: null,
   userId: '',
   activeChats: [],
@@ -43,6 +48,8 @@ const useStore = create<StoreState>((set, get, store) => ({
   setUserInfo: (data) => set({ userInfo: data, userId: data?.idCode || '' }),
   setSelectedChatId: (id) => set({ selectedChatId: id }),
   setUserDomains: (data: string[]) => set({ userDomains: data }),
+  selectedDomainId: null,
+  setSelectedDomainId: (id) => set({ selectedDomainId: id }),
   setChatCsaActive: (active) => {
     set({
       chatCsaActive: active,
@@ -228,6 +235,12 @@ const useStore = create<StoreState>((set, get, store) => ({
     }
     return grouped;
   },
-}));
+    }),
+    {
+      name: 'domain-selection',
+      partialize: (state) => ({ selectedDomainId: state.selectedDomainId }),
+    },
+  ),
+);
 
 export default useStore;
