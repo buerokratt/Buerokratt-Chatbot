@@ -468,6 +468,48 @@ ORDER BY
     END DESC NULLS LAST,
     CASE WHEN :sorting = 'feedbackRating desc' THEN COALESCE(c.feedback_rating_five, c.feedback_rating) END DESC NULLS LAST,
     CASE WHEN :sorting = 'feedbackRating asc' THEN COALESCE(c.feedback_rating_five, c.feedback_rating) END ASC NULLS LAST,
+    CASE
+        WHEN :sorting = 'responseQuality asc' THEN
+            CASE
+                WHEN :isChatAnalysisEnabled::BOOLEAN THEN COALESCE(ChatMeasurements.quality, ARRAY[]::text[])
+                ELSE ARRAY[]::text[]
+            END
+    END ASC,
+    CASE
+        WHEN :sorting = 'responseQuality desc' THEN
+            CASE
+                WHEN :isChatAnalysisEnabled::BOOLEAN THEN COALESCE(ChatMeasurements.quality, ARRAY[]::text[])
+                ELSE ARRAY[]::text[]
+            END
+    END DESC,
+    CASE
+        WHEN :sorting = 'followUpStatus asc' THEN
+            CASE
+                WHEN :isChatAnalysisEnabled::BOOLEAN THEN COALESCE(ChatMeasurements.follow_up_action, ARRAY[]::text[])
+                ELSE ARRAY[]::text[]
+            END
+    END ASC,
+    CASE
+        WHEN :sorting = 'followUpStatus desc' THEN
+            CASE
+                WHEN :isChatAnalysisEnabled::BOOLEAN THEN COALESCE(ChatMeasurements.follow_up_action, ARRAY[]::text[])
+                ELSE ARRAY[]::text[]
+            END
+    END DESC,
+    CASE
+        WHEN :sorting = 'theme asc' THEN
+            CASE
+                WHEN :isChatAnalysisEnabled::BOOLEAN THEN COALESCE(ChatMeasurements.theme, ARRAY[]::text[])
+                ELSE ARRAY[]::text[]
+            END
+    END ASC,
+    CASE
+        WHEN :sorting = 'theme desc' THEN
+            CASE
+                WHEN :isChatAnalysisEnabled::BOOLEAN THEN COALESCE(ChatMeasurements.theme, ARRAY[]::text[])
+                ELSE ARRAY[]::text[]
+            END
+    END DESC,
     CASE WHEN :sorting = 'customerSupportFullName asc' THEN
         COALESCE(
             NULLIF(array_to_string(CSAFullNames.all_csa_names, ', '), ''),
