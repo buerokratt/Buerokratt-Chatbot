@@ -31,7 +31,7 @@ fetchSource:
 
 mapSourceData:
   assign:
-    configMap: ${source.response.body.reduce((acc, row) => { acc[row.key] = row.value; return acc; }, {})}
+    configMap: '$=(source.response.body || []).reduce((acc, row) => { acc[row.key] = row.value; return acc; }, {})='
   next: transferToTargets
 
 transferToTargets:
