@@ -34,12 +34,12 @@ transferToTargets:
   args:
     url: "[#CHATBOT_RESQL]/set-domain-widget-config"
     body:
-      widgetProactiveSeconds: ${source.response.body[0].widget_proactive_seconds}
-      widgetDisplayBubbleMessageSeconds: ${source.response.body[0].widget_display_bubble_message_seconds}
-      widgetBubbleMessageText: ${source.response.body[0].widget_bubble_message_text}
-      widgetColor: ${source.response.body[0].widget_color}
-      isWidgetActive: ${source.response.body[0].is_widget_active}
-      widgetAnimation: ${source.response.body[0].widget_animation}
+      widgetProactiveSeconds: ${source.response.body[0].widgetProactiveSeconds}
+      widgetDisplayBubbleMessageSeconds: ${source.response.body[0].widgetDisplayBubbleMessageSeconds}
+      widgetBubbleMessageText: ${source.response.body[0].widgetBubbleMessageText}
+      widgetColor: ${source.response.body[0].widgetColor}
+      isWidgetActive: ${source.response.body[0].isWidgetActive}
+      widgetAnimation: ${source.response.body[0].widgetAnimation}
       created: ${new Date().toISOString()}
       domains: ${JSON.stringify(targetDomainUUIDs)}
   result: res

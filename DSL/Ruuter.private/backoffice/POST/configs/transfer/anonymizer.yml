@@ -34,13 +34,13 @@ transferToTargets:
   args:
     url: "[#CHATBOT_RESQL]/set-domain-anonymizer-config"
     body:
-      anonymizer_selected_approach: ${source.response.body[0].anonymizer_selected_approach}
-      anonymizer_selected_entities: ${source.response.body[0].anonymizer_selected_entities}
-      anonymizer_allowlist: ${source.response.body[0].anonymizer_allowlist}
-      anonymizer_denylist: ${source.response.body[0].anonymizer_denylist}
-      is_anonymization_before_llm: ${source.response.body[0].is_anonymization_before_llm}
-      is_anonymization_before_global_classifier: ${source.response.body[0].is_anonymization_before_global_classifier}
-      record_conversations_anonymously: ${source.response.body[0].record_conversations_anonymously}
+      anonymizer_selected_approach: ${source.response.body[0].anonymizerSelectedApproach}
+      anonymizer_selected_entities: ${source.response.body[0].anonymizerSelectedEntities}
+      anonymizer_allowlist: ${source.response.body[0].anonymizerAllowlist}
+      anonymizer_denylist: ${source.response.body[0].anonymizerDenylist}
+      is_anonymization_before_llm: ${source.response.body[0].isAnonymizationBeforeLlm}
+      is_anonymization_before_global_classifier: ${source.response.body[0].isAnonymizationBeforeGlobalClassifier}
+      record_conversations_anonymously: ${source.response.body[0].recordConversationsAnonymously}
       created: ${new Date().toISOString()}
       domains: ${JSON.stringify(targetDomainUUIDs)}
   result: res

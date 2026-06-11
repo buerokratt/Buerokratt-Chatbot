@@ -34,10 +34,10 @@ transferToTargets:
   args:
     url: "[#CHATBOT_RESQL]/set-domain-chat-analysis-config"
     body:
-      chat_analysis_enabled: ${source.response.body[0].chat_analysis_enabled}
-      chat_analysis_theme: ${source.response.body[0].chat_analysis_theme}
-      chat_analysis_byk_response_quality: ${source.response.body[0].chat_analysis_byk_response_quality}
-      chat_analysis_follow_up_action: ${source.response.body[0].chat_analysis_follow_up_action}
+      chat_analysis_enabled: ${source.response.body[0].chatAnalysisEnabled}
+      chat_analysis_theme: ${source.response.body[0].chatAnalysisTheme}
+      chat_analysis_byk_response_quality: ${source.response.body[0].chatAnalysisBykResponseQuality}
+      chat_analysis_follow_up_action: ${source.response.body[0].chatAnalysisFollowUpAction}
       domains: ${JSON.stringify(targetDomainUUIDs)}
   result: res
 

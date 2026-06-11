@@ -34,11 +34,11 @@ transferToTargets:
   args:
     url: "[#CHATBOT_RESQL]/set-domain-feedback-config"
     body:
-      feedbackActive: ${source.response.body[0].feedback_active}
-      feedbackQuestion: ${source.response.body[0].feedback_question}
-      feedbackNoticeActive: ${source.response.body[0].feedback_notice_active}
-      feedbackNotice: ${source.response.body[0].feedback_notice}
-      isFiveRatingScale: ${source.response.body[0].is_five_rating_scale}
+      feedbackActive: ${source.response.body[0].feedbackActive}
+      feedbackQuestion: ${source.response.body[0].feedbackQuestion}
+      feedbackNoticeActive: ${source.response.body[0].feedbackNoticeActive}
+      feedbackNotice: ${source.response.body[0].feedbackNotice}
+      isFiveRatingScale: ${source.response.body[0].isFiveRatingScale}
       created: ${new Date().toISOString()}
       domains: ${JSON.stringify(targetDomainUUIDs)}
   result: res
