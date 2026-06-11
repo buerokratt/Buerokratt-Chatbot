@@ -38,7 +38,6 @@ import './Chat.scss';
 import { useInterval } from 'usehooks-ts';
 import { BotConfig } from 'types/botConfig';
 
-
 type ChatProps = {
   chat: ChatType;
   onChatEnd: (chat: ChatType) => void;
