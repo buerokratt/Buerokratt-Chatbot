@@ -2,10 +2,19 @@ declaration:
   call: declare
   version: 0.1
   description: "Sync chat to SMAX"
-  method: get
+  method: post
   accepts: json
   returns: json
   namespace: backoffice
+  allowlist:
+    body:
+      - field: chatBaseId
+        type: string
+        description: "Body field 'chatBaseId'"
+
+extractRequestData:
+  assign:
+    chatBaseId: ${incoming.body.chatBaseId}
 
 # TODO: technical dept - ruuter is not able to parse plaintext response.
 getAuthToken:
@@ -20,35 +29,55 @@ getAuthToken:
 checkIfAuthorized:
   switch:
     - condition: "${smaxAuthRes.response.statusCodeValue === 200}"
-      next: getLastSynchronization
+      next: checkIfAlreadySynced
   next: return_unauthorized
 
-getLastSynchronization:
+checkIfAlreadySynced:
   call: http.post
-  maxRecursions: "[#SMAX_MAX_SYNC_RECURSION]"
   args:
-    url: "[#CHATBOT_RESQL]/get-smax-synchronization"
-  result: synchronization
-
-getNextChatForSynchronization:
-  call: http.post
-  maxRecursions: "[#SMAX_MAX_SYNC_RECURSION]"
-  args:
-    url: "[#CHATBOT_RESQL]/get-smax-chat"
+    url: "[#CHATBOT_RESQL]/get-smax-synchronization-by-chat-base-id"
     body:
-      chatBaseId: ${synchronization.response.body[0]?.chatBaseId ?? ""}
+      chatBaseId: ${chatBaseId}
+  result: existingSync
+
+checkIfDuplicate:
+  switch:
+    - condition: "${existingSync.response.body.length > 0}"
+      next: return_already_synced
+  next: getChatById
+
+getChatById:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-smax-chat-by-base-id"
+    body:
+      chatBaseId: ${chatBaseId}
   result: chat
 
 checkIfChatExists:
-  maxRecursions: "[#SMAX_MAX_SYNC_RECURSION]"
   switch:
     - condition: "${chat.response.body.length > 0}"
-      next: getChatCustomerSupportSmaxId
+      next: getChatMessages
   next: return_chat_not_found
+
+getChatMessages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-chat-messages"
+    body:
+      chatId: ${chatBaseId}
+  result: messages
+
+formatMessagesForSmax:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/smax-format-messages"
+    body:
+      messages: ${messages.response.body}
+  result: formattedMessages
 
 getChatCustomerSupportSmaxId:
   call: http.post
-  maxRecursions: "[#SMAX_MAX_SYNC_RECURSION]"
   args:
     url: "[#CHATBOT_RESQL]/get-user-smax-id-by-chat-csi"
     body:
@@ -56,19 +85,17 @@ getChatCustomerSupportSmaxId:
   result: chatCustomerSupportSmaxId
 
 setCustomerSupportSmaxAccountId:
-  maxRecursions: "[#SMAX_MAX_SYNC_RECURSION]"
   assign:
     csaSmaxAccountId: ${chatCustomerSupportSmaxId.response.body[0]?.smaxAccountId || ""}
 
 setData:
-  maxRecursions: "[#SMAX_MAX_SYNC_RECURSION]"
   assign:
     smax_entities: [
       {
         "entity_type": "Request",
         "properties": {
           "DisplayLabel": '${chat.response.body[0].id}',
-          "Description": "Link vestlusele: <a href='[#CHATBOT_GUI]/chat/history?chat=${chat.response.body[0].baseId}'>[#CHATBOT_GUI]/chat/history?chat=${chat.response.body[0].baseId}</a><br>Lõppkasutaja email: ${chat.response.body[0].endUserEmail}<br>Lõppkasutaja nimi: ${chat.response.body[0].endUserFirstName} ${chat.response.body[0].endUserLastName}",
+          "Description": "Link vestlusele: <a href='[#CHATBOT_GUI]/chat/history?chat=${chat.response.body[0].baseId}'>[#CHATBOT_GUI]/chat/history?chat=${chat.response.body[0].baseId}</a><br>Lõppkasutaja email: ${chat.response.body[0].endUserEmail}<br>Lõppkasutaja nimi: ${chat.response.body[0].endUserFirstName} ${chat.response.body[0].endUserLastName}<br><br>Vestluse sõnumid:<br>${formattedMessages.response.body.messagesHtml}",
           "RequestedByPerson": "[#SMAX_REQUESTED_BY_PERSON]",
           "ServiceDeskGroup": "[#SMAX_SERVICE_DESK_GROUP]",
           "OwnedByPerson": "${csaSmaxAccountId}",
@@ -82,27 +109,23 @@ setData:
 
 createSmaxIssue:
   call: http.post
-  maxRecursions: "[#SMAX_MAX_SYNC_RECURSION]"
   args:
     url: "[#SMAX_CLOUD_DOMAIN]/rest/[#SMAX_TENANT_ID]/ems/bulk"
     headers:
       Accept: "application/json"
       Content-Type: "application/json"
       Cookie: 'LWSSO_COOKIE_KEY=${smaxAuthRes.response.body.token}'
-    body: 
+    body:
       entities: ${smax_entities}
       operation: "CREATE"
   result: res_smax
 
 setResponseBody:
-  maxRecursions: "[#SMAX_MAX_SYNC_RECURSION]"
   assign:
     res_smax_body: ${res_smax.response.body}
-  next: createSynchronization
 
 createSynchronization:
   call: http.post
-  maxRecursions: "[#SMAX_MAX_SYNC_RECURSION]"
   args:
     url: "[#CHATBOT_RESQL]/insert-chat-smax-synchronization"
     body:
@@ -111,14 +134,19 @@ createSynchronization:
       smaxStatusCode: "${res_smax_body.meta?.completion_status === 'OK' ? 200 : res_smax_body.entity_result_list[0].errorDetails.httpStatus}"
       smaxErrorMessage: "${res_smax_body.meta?.completion_status === 'OK' ? '' : res_smax_body.entity_result_list[0].errorDetails.message}"
   result: create_res
-  next: getLastSynchronization
 
 return_result:
   return: "success"
   next: end
 
 return_chat_not_found:
+  status: 404
   return: "error: chat with ENDED status not found"
+  next: end
+
+return_already_synced:
+  status: 409
+  return: "error: chat already synced to SMAX"
   next: end
 
 return_unauthorized:
