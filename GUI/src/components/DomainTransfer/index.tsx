@@ -3,7 +3,7 @@ import { FC, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdContentCopy } from 'react-icons/md';
 
-type SelectOption = { label: string; value: string };
+import { SelectOption } from 'types/selectOption';
 
 type DomainTransferProps = {
   readonly allDomains: SelectOption[];

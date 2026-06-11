@@ -1,0 +1,48 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Transfer feedback settings from a source domain to one or more target domains"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: sourceDomainUUID
+        type: string
+        description: "UUID of the domain to copy settings from"
+      - field: targetDomainUUIDs
+        type: object
+        description: "Array of target domain UUIDs to copy settings to"
+
+extractRequestData:
+  assign:
+    sourceDomainUUID: ${incoming.body.sourceDomainUUID}
+    targetDomainUUIDs: ${incoming.body.targetDomainUUIDs}
+
+fetchSource:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-feedback-config"
+    body:
+      domainUUID: ${sourceDomainUUID}
+  result: source
+  next: transferToTargets
+
+transferToTargets:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-domain-feedback-config"
+    body:
+      feedbackActive: ${source.response.body[0].feedback_active}
+      feedbackQuestion: ${source.response.body[0].feedback_question}
+      feedbackNoticeActive: ${source.response.body[0].feedback_notice_active}
+      feedbackNotice: ${source.response.body[0].feedback_notice}
+      isFiveRatingScale: ${source.response.body[0].is_five_rating_scale}
+      created: ${new Date().toISOString()}
+      domains: ${JSON.stringify(targetDomainUUIDs)}
+  result: res
+
+return_result:
+  return: ${res.response.body}
+  next: end

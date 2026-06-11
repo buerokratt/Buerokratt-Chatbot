@@ -17,7 +17,7 @@ import { fetchConfigurationFromDomain } from '../../../services/configurations';
 import useStore from '../../../store';
 import { GreetingsMessage, GreetingsMessageResponse } from '../../../types/greetingMessage';
 
-type SelectOption = { label: string; value: string };
+import { SelectOption } from 'types/selectOption';
 
 const SettingsWelcomeMessage: FC = () => {
   const { t } = useTranslation();

@@ -1,0 +1,49 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Transfer widget appearance settings from a source domain to one or more target domains"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: sourceDomainUUID
+        type: string
+        description: "UUID of the domain to copy settings from"
+      - field: targetDomainUUIDs
+        type: object
+        description: "Array of target domain UUIDs to copy settings to"
+
+extractRequestData:
+  assign:
+    sourceDomainUUID: ${incoming.body.sourceDomainUUID}
+    targetDomainUUIDs: ${incoming.body.targetDomainUUIDs}
+
+fetchSource:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-widget-config"
+    body:
+      domainUUID: ${sourceDomainUUID}
+  result: source
+  next: transferToTargets
+
+transferToTargets:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-domain-widget-config"
+    body:
+      widgetProactiveSeconds: ${source.response.body[0].widget_proactive_seconds}
+      widgetDisplayBubbleMessageSeconds: ${source.response.body[0].widget_display_bubble_message_seconds}
+      widgetBubbleMessageText: ${source.response.body[0].widget_bubble_message_text}
+      widgetColor: ${source.response.body[0].widget_color}
+      isWidgetActive: ${source.response.body[0].is_widget_active}
+      widgetAnimation: ${source.response.body[0].widget_animation}
+      created: ${new Date().toISOString()}
+      domains: ${JSON.stringify(targetDomainUUIDs)}
+  result: res
+
+return_result:
+  return: ${res.response.body}
+  next: end

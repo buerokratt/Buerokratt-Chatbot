@@ -13,8 +13,12 @@ import { ROLES } from 'utils/constants';
 
 import { getQueryTypes } from './data';
 import DomainTabSelector from '../../../components/DomainTabSelector';
+import DomainTransfer from '../../../components/DomainTransfer';
 import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
 import { fetchConfigurationFromDomain } from '../../../services/configurations';
+import useStore from '../../../store';
+
+import { SelectOption } from 'types/selectOption';
 
 const SettingsSkmConfiguration: FC = () => {
   const { t } = useTranslation();
@@ -24,6 +28,8 @@ const SettingsSkmConfiguration: FC = () => {
   const [skmConfig, setSkmConfig] = useState<SkmConfig | undefined>(undefined);
   const multiDomainEnabled = import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
   const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
+  const rawDomains = useStore((state) => state.allDomains);
+  const allDomains: SelectOption[] = rawDomains.map((d) => ({ label: d.name, value: d.id }));
 
   useEffect(() => {
     if (multiDomainEnabled) {
@@ -134,7 +140,32 @@ const SettingsSkmConfiguration: FC = () => {
     setKey(key + 1);
   };
 
+  const transferMutation = useMutation({
+    mutationFn: (data: { sourceDomainUUID: string; targetDomainUUIDs: string[] }) =>
+      apiDev.post('configs/transfer/skm-config', data),
+    onSuccess: () => {
+      toast.open({
+        type: 'success',
+        title: t('global.notification'),
+        message: t('toast.success.updateSuccess'),
+      });
+    },
+    onError: (error: AxiosError) => {
+      toast.open({
+        type: 'error',
+        title: t('global.notificationError'),
+        message: error.message,
+      });
+    },
+  });
+
+  const handleTransfer = (targetIds: string[]) => {
+    transferMutation.mutate({ sourceDomainUUID: selectedDomains[0], targetDomainUUIDs: targetIds });
+  };
+
   const handleDomainSelection = useDomainSelectionHandler(setSelectedDomains, fetchData, resetSettingsToDefault);
+
+  const sourceDomainSelected = multiDomainEnabled && selectedDomains.length === 1;
 
   if (!skmConfig) {
     return <>Loading...</>;
@@ -158,7 +189,17 @@ const SettingsSkmConfiguration: FC = () => {
       >
         <Fragment key={key}>
           <Track gap={16} direction="vertical" align="left">
-            {getNumberControl('range')}
+            <Track justify="between" align="center" style={{ width: '100%' }}>
+              {getNumberControl('range')}
+              {sourceDomainSelected && (
+                <DomainTransfer
+                  allDomains={allDomains}
+                  excludedDomainIds={selectedDomains}
+                  onTransfer={handleTransfer}
+                  isTransferring={transferMutation.isPending}
+                />
+              )}
+            </Track>
             {getNumberControl('documents')}
             <Controller
               name="systemMessage"

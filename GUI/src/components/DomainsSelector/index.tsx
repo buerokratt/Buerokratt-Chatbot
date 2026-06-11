@@ -9,7 +9,7 @@ type DomainSelector = {
   onChange?: (selected: SelectOption[]) => void;
 };
 
-type SelectOption = { label: string; value: string; meta?: string };
+import { SelectOption } from 'types/selectOption';
 
 const DomainSelector: FC<PropsWithChildren<DomainSelector>> = ({ onChange }) => {
   const { t } = useTranslation();

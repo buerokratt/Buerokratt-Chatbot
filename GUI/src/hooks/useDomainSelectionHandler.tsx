@@ -1,6 +1,6 @@
 import { useCallback, useRef } from 'react';
 
-type SelectOption = { label: string; value: string; meta?: string };
+import { SelectOption } from 'types/selectOption';
 
 export const useDomainSelectionHandler = (
   setSelectedDomains: (ids: string[]) => void,

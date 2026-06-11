@@ -1,0 +1,46 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Transfer chat analysis settings from a source domain to one or more target domains"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: sourceDomainUUID
+        type: string
+        description: "UUID of the domain to copy settings from"
+      - field: targetDomainUUIDs
+        type: object
+        description: "Array of target domain UUIDs to copy settings to"
+
+extractRequestData:
+  assign:
+    sourceDomainUUID: ${incoming.body.sourceDomainUUID}
+    targetDomainUUIDs: ${incoming.body.targetDomainUUIDs}
+
+fetchSource:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-chat-analysis-config"
+    body:
+      domainUuid: ${sourceDomainUUID}
+  result: source
+  next: transferToTargets
+
+transferToTargets:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-domain-chat-analysis-config"
+    body:
+      chat_analysis_enabled: ${source.response.body[0].chat_analysis_enabled}
+      chat_analysis_theme: ${source.response.body[0].chat_analysis_theme}
+      chat_analysis_byk_response_quality: ${source.response.body[0].chat_analysis_byk_response_quality}
+      chat_analysis_follow_up_action: ${source.response.body[0].chat_analysis_follow_up_action}
+      domains: ${JSON.stringify(targetDomainUUIDs)}
+  result: res
+
+return_result:
+  return: ${res.response.body}
+  next: end

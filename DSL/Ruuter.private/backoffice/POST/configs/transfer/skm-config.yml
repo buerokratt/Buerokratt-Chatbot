@@ -1,0 +1,51 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Transfer SKM configuration settings from a source domain to one or more target domains"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: sourceDomainUUID
+        type: string
+        description: "UUID of the domain to copy settings from"
+      - field: targetDomainUUIDs
+        type: object
+        description: "Array of target domain UUIDs to copy settings to"
+
+extractRequestData:
+  assign:
+    sourceDomainUUID: ${incoming.body.sourceDomainUUID}
+    targetDomainUUIDs: ${incoming.body.targetDomainUUIDs}
+
+fetchSource:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-skm-config"
+    body:
+      domainUUID: ${sourceDomainUUID}
+  result: source
+  next: transferToTargets
+
+transferToTargets:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-domain-skm-config"
+    body:
+      skm_range: ${source.response.body[0].range}
+      skm_documents: ${source.response.body[0].documents}
+      skm_system_message: ${source.response.body[0].system_message}
+      skm_max_tokens: ${source.response.body[0].max_tokens}
+      skm_index_name: ${source.response.body[0].index_name}
+      skm_query_type: ${source.response.body[0].query_type}
+      skm_semantic_configuration: ${source.response.body[0].semantic_configuration}
+      skm_in_scope: ${source.response.body[0].in_scope}
+      created: ${new Date().toISOString()}
+      domains: ${JSON.stringify(targetDomainUUIDs)}
+  result: res
+
+return_result:
+  return: ${res.response.body}
+  next: end

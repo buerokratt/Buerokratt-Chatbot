@@ -2,7 +2,7 @@ import { FC, useEffect, useRef, useState } from 'react';
 import useStore from '../../store';
 import './DomainTabSelector.scss';
 
-type SelectOption = { label: string; value: string; meta?: string };
+import { SelectOption } from 'types/selectOption';
 
 type DomainTabSelectorProps = {
   readonly onChange?: (selected: SelectOption[]) => void;
