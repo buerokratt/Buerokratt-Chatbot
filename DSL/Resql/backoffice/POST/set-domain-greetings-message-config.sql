@@ -11,7 +11,7 @@ FROM
     domain_list AS d
         CROSS JOIN LATERAL (
         VALUES
-            ('is_greeting_message_active',       :isActive),
+            ('is_greeting_message_active',       :isActive::text),
             ('greeting_message_est',   :message)
             ) AS v(key, value)
         RETURNING key, value, domain;

@@ -53,6 +53,7 @@ const App: FC = () => {
               .map((d) => d.url)
               .filter(Boolean);
 
+            useStore.getState().setAllDomains(domains);
             useStore.getState().setUserDomains(selectedDomains);
             useHeaderStore.getState().setUserDomains(selectedDomains);
           })

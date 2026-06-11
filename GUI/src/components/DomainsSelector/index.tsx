@@ -1,7 +1,6 @@
 import { FC, PropsWithChildren, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { getWidgetData } from '../../services/users';
 import useStore from '../../store';
 import { DomainSelection } from '../../types/domainsModels';
 import { FormMultiselect } from '../FormElements';
@@ -15,7 +14,7 @@ type SelectOption = { label: string; value: string; meta?: string };
 const DomainSelector: FC<PropsWithChildren<DomainSelector>> = ({ onChange }) => {
   const { t } = useTranslation();
 
-  const userInfo = useStore((state) => state.userInfo);
+  const allDomains = useStore((state) => state.allDomains);
 
   const [renderVersion, setRenderVersion] = useState(0);
   const [options, setOptions] = useState<SelectOption[]>([]);
@@ -26,38 +25,18 @@ const DomainSelector: FC<PropsWithChildren<DomainSelector>> = ({ onChange }) => 
     options: SelectOption[];
     selectedOptions: SelectOption[];
   } {
-    const options = domains.map((d) => ({
-      label: d.name,
-      value: d.id,
-      meta: d.url,
-    }));
-
-    const selectedOptions = options.filter((opt) =>
-      domains.find((d) => {
-        return d.id === opt.value && d.selected;
-      }),
-    );
-
-    return { options, selectedOptions };
+    const opts = domains.map((d) => ({ label: d.name, value: d.id, meta: d.url }));
+    const selected = opts.filter((opt) => domains.find((d) => d.id === opt.value && d.selected));
+    return { options: opts, selectedOptions: selected };
   }
 
   useEffect(() => {
-    if (!userInfo?.idCode) return;
-
-    const fetchData = async () => {
-      try {
-        const data = await getWidgetData(userInfo.idCode);
-        const { options, selectedOptions } = mapDomainSelections(data);
-        setOptions(options);
-        setSelectedOptions(selectedOptions);
-        setRenderVersion((prev) => prev + 1);
-      } catch (error) {
-        console.error('Failed to fetch widget data', error);
-      }
-    };
-
-    fetchData();
-  }, [userInfo?.idCode]);
+    if (!allDomains.length) return;
+    const { options, selectedOptions } = mapDomainSelections(allDomains);
+    setOptions(options);
+    setSelectedOptions(selectedOptions);
+    setRenderVersion((prev) => prev + 1);
+  }, [allDomains]);
 
   return (
     <div style={{ width: '500px' }}>
