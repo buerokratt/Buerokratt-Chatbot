@@ -38,9 +38,6 @@ import './Chat.scss';
 import { useInterval } from 'usehooks-ts';
 import { BotConfig } from 'types/botConfig';
 
-import { getWidgetData } from '../../services/users';
-import { DomainSelection } from '../../types/domainsModels';
-
 type ChatProps = {
   chat: ChatType;
   onChatEnd: (chat: ChatType) => void;
@@ -100,7 +97,7 @@ const Chat: FC<ChatProps> = ({
 
   const [newMessageEffect] = useNewMessageSound();
   const navigate = useNavigate();
-  const [allDomains, setAllDomains] = useState<DomainSelection[]>([]);
+  const allDomains = useStore((state) => state.allDomains);
   const multiDomainEnabled = import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
 
   const askPermissionsTimeoutInSeconds = 60;
@@ -142,14 +139,6 @@ const Chat: FC<ChatProps> = ({
       localStorage.removeItem('focused_chat');
     }
   };
-
-  useEffect(() => {
-    if (multiDomainEnabled && userInfo?.idCode) {
-      getWidgetData(userInfo?.idCode).then((domains) => {
-        setAllDomains(domains);
-      });
-    }
-  }, [userInfo?.idCode, multiDomainEnabled]);
 
   useEffect(() => {
     localStorage.setItem('focused_chat', chat.id);

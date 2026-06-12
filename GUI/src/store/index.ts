@@ -1,5 +1,6 @@
 import { apiDev } from 'services/api';
 import { CHAT_STATUS, Chat as ChatType, GroupedChat, GroupedPendingChat } from 'types/chat';
+import { DomainSelection } from 'types/domainsModels';
 import { UserInfo } from 'types/userInfo';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
@@ -29,6 +30,8 @@ interface StoreState {
   getGroupedPendingChats: () => GroupedPendingChat;
   userDomains: string[];
   setUserDomains: (domains: string[]) => void;
+  allDomains: DomainSelection[];
+  setAllDomains: (domains: DomainSelection[]) => void;
   selectedDomainId: string | null;
   setSelectedDomainId: (id: string | null) => void;
 }
@@ -48,6 +51,8 @@ const useStore = create<StoreState>()(
       setUserInfo: (data) => set({ userInfo: data, userId: data?.idCode || '' }),
       setSelectedChatId: (id) => set({ selectedChatId: id }),
       setUserDomains: (data: string[]) => set({ userDomains: data }),
+      allDomains: [],
+      setAllDomains: (domains) => set({ allDomains: domains }),
       selectedDomainId: null,
       setSelectedDomainId: (id) => set({ selectedDomainId: id }),
       setChatCsaActive: (active) => {

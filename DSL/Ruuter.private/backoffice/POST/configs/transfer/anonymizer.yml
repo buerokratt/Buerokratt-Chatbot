@@ -1,0 +1,49 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Transfer anonymizer settings from a source domain to one or more target domains"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: sourceDomainUuid
+        type: string
+        description: "UUID of the domain to copy settings from"
+      - field: targetDomainUuids
+        type: object
+        description: "Array of target domain UUIDs to copy settings to"
+
+extractRequestData:
+  assign:
+    sourceDomainUuid: ${incoming.body.sourceDomainUuid}
+    targetDomainUuids: ${incoming.body.targetDomainUuids}
+
+fetchSource:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-anonymizer-config"
+    body:
+      domainUUID: ${sourceDomainUuid}
+  result: source
+  next: transferToTargets
+
+transferToTargets:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-domain-anonymizer-config"
+    body:
+      anonymizer_selected_approach: ${source.response.body[0].anonymizerSelectedApproach}
+      anonymizer_selected_entities: ${source.response.body[0].anonymizerSelectedEntities}
+      anonymizer_allowlist: ${source.response.body[0].anonymizerAllowlist}
+      anonymizer_denylist: ${source.response.body[0].anonymizerDenylist}
+      is_anonymization_before_llm: ${source.response.body[0].isAnonymizationBeforeLlm}
+      is_anonymization_before_global_classifier: ${source.response.body[0].isAnonymizationBeforeGlobalClassifier}
+      record_conversations_anonymously: ${source.response.body[0].recordConversationsAnonymously}
+      domains: ${JSON.stringify(targetDomainUuids)}
+  result: res
+
+return_result:
+  return: ${res.response.body}
+  next: end

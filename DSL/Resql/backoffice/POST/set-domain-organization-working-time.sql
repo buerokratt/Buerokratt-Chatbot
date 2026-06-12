@@ -57,7 +57,7 @@ WHERE
 SELECT
     v.key,
     v.value,
-    :created::timestamptz AS created
+    now() AS created
 FROM (
     VALUES
     ('organizationMondayWorkingTimeStartISO',           :organizationMondayWorkingTimeStartISO),

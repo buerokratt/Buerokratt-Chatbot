@@ -22,11 +22,13 @@ import { AnonymizerConfig, AnonymizerConfigResponse } from 'types/anonymizerConf
 import { ROLES } from 'utils/constants';
 
 import DomainTabSelector from '../../../components/DomainTabSelector';
+import DomainTransfer from '../../../components/DomainTransfer';
 import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
 import { fetchConfigurationFromDomain } from '../../../services/configurations';
+import useStore from '../../../store';
 import { AiOutlineInfoCircle } from 'react-icons/ai';
 
-type SelectOption = { label: string; value: string; meta?: string };
+import { SelectOption } from 'types';
 
 const Anonymizer: FC = () => {
   const { t } = useTranslation();
@@ -35,6 +37,8 @@ const Anonymizer: FC = () => {
   const [outputText, setOutputText] = useState('');
   const multiDomainEnabled = import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
   const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
+  const rawDomains = useStore((state) => state.allDomains);
+  const allDomains: SelectOption[] = rawDomains.map((d) => ({ label: d.name, value: d.id }));
   const [anonymizerConfig, setAnonymizerConfig] = useState<AnonymizerConfig>();
   const [loadingComplete, setLoadingComplete] = useState<boolean>(false);
   const [isSavingSettings, setIsSavingSettings] = useState<boolean>(false);
@@ -162,7 +166,32 @@ const Anonymizer: FC = () => {
     });
   };
 
+  const transferMutation = useMutation({
+    mutationFn: (data: { sourceDomainUuid: string; targetDomainUuids: string[] }) =>
+      apiDev.post('configs/transfer/anonymizer', data),
+    onSuccess: () => {
+      toast.open({
+        type: 'success',
+        title: t('global.notification'),
+        message: t('settings.anonymizer.savedSettingsSuccessfully'),
+      });
+    },
+    onError: (error: AxiosError) => {
+      toast.open({
+        type: 'error',
+        title: t('global.notificationError'),
+        message: error.message,
+      });
+    },
+  });
+
+  const handleTransfer = (targetIds: string[]) => {
+    transferMutation.mutate({ sourceDomainUuid: selectedDomains[0], targetDomainUuids: targetIds });
+  };
+
   const handleDomainSelection = useDomainSelectionHandler(setSelectedDomains, fetchData, resetSettingsToDefault);
+
+  const sourceDomainSelected = multiDomainEnabled && selectedDomains.length === 1;
 
   if (!loadingComplete) {
     return <>Loading...</>;
@@ -194,7 +223,17 @@ const Anonymizer: FC = () => {
         }
       >
         <Track gap={16} direction="vertical" align="left">
-          <p>{t('settings.anonymizer.approach')}</p>
+          <Track justify="between" align="center" style={{ width: '100%' }}>
+            <p>{t('settings.anonymizer.approach')}</p>
+            {sourceDomainSelected && (
+              <DomainTransfer
+                allDomains={allDomains}
+                excludedDomainIds={selectedDomains}
+                onTransfer={handleTransfer}
+                isTransferring={transferMutation.isPending}
+              />
+            )}
+          </Track>
           <FormSelect
             placeholder={t('settings.anonymizer.approachOptionsPlaceholder').toString()}
             placeholderColor="#686B78"
