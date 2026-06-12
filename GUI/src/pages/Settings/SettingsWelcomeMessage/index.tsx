@@ -82,7 +82,7 @@ const SettingsWelcomeMessage: FC = () => {
   });
 
   const transferMutation = useMutation({
-    mutationFn: (data: { sourceDomainUUID: string; targetDomainUUIDs: string[] }) =>
+    mutationFn: (data: { sourceDomainUuid: string; targetDomainUuids: string[] }) =>
       apiDev.post('configs/transfer/greeting', data),
     onSuccess: () => {
       toast.open({
@@ -119,8 +119,8 @@ const SettingsWelcomeMessage: FC = () => {
 
   const handleTransfer = (targetIds: string[]) => {
     transferMutation.mutate({
-      sourceDomainUUID: selectedDomains[0],
-      targetDomainUUIDs: targetIds,
+      sourceDomainUuid: selectedDomains[0],
+      targetDomainUuids: targetIds,
     });
   };
 

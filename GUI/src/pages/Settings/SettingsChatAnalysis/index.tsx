@@ -28,9 +28,9 @@ const ChatAnalysis: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
   const multiDomainEnabled = import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
-  const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
+  const [selectedDomain, setSelectedDomain] = useState<string[]>([]);
   const rawDomains = useStore((state) => state.allDomains);
-  const allDomains: SelectOption[] = rawDomains.map((d) => ({ label: d.name, value: d.id }));
+  const domainOptions: SelectOption[] = rawDomains.map((d) => ({ label: d.name, value: d.id }));
   const [loadingComplete, setLoadingComplete] = useState<boolean>(false);
   const [isSavingSettings, setIsSavingSettings] = useState<boolean>(false);
 
@@ -135,7 +135,7 @@ const ChatAnalysis: FC = () => {
       chatAnalysisTheme: themeLabels.join(','),
       chatAnalysisBykResponseQuality: qualityLabels.join(','),
       chatAnalysisFollowUpAction: followUpLabels.join(','),
-      domainUuid: multiDomainEnabled ? selectedDomains : [],
+      domainUuid: multiDomainEnabled ? selectedDomain : [],
     };
     chatAnalysisSettingsMutation.mutate(config);
   };
@@ -161,7 +161,7 @@ const ChatAnalysis: FC = () => {
   });
 
   const transferMutation = useMutation({
-    mutationFn: (data: { sourceDomainUUID: string; targetDomainUUIDs: string[] }) =>
+    mutationFn: (data: { sourceDomainUuid: string; targetDomainUuids: string[] }) =>
       apiDev.post('configs/transfer/chat-analysis', data),
     onSuccess: () => {
       toast.open({
@@ -180,12 +180,12 @@ const ChatAnalysis: FC = () => {
   });
 
   const handleTransfer = (targetIds: string[]) => {
-    transferMutation.mutate({ sourceDomainUUID: selectedDomains[0], targetDomainUUIDs: targetIds });
+    transferMutation.mutate({ sourceDomainUuid: selectedDomain[0], targetDomainUuids: targetIds });
   };
 
-  const handleDomainSelection = useDomainSelectionHandler(setSelectedDomains, fetchData, resetSettingsToDefault);
+  const handleDomainSelection = useDomainSelectionHandler(setSelectedDomain, fetchData, resetSettingsToDefault);
 
-  const sourceDomainSelected = multiDomainEnabled && selectedDomains.length === 1;
+  const sourceDomainSelected = multiDomainEnabled && selectedDomain.length === 1;
 
   if (!loadingComplete) {
     return <>Loading...</>;
@@ -208,7 +208,7 @@ const ChatAnalysis: FC = () => {
         footer={
           <Track justify="end">
             <Button
-              disabled={(multiDomainEnabled && selectedDomains.length === 0) || false}
+              disabled={(multiDomainEnabled && selectedDomain.length === 0) || false}
               onClick={saveSettings}
               appearance={isSavingSettings ? 'loading' : 'primary'}
             >
@@ -227,8 +227,8 @@ const ChatAnalysis: FC = () => {
             />
             {sourceDomainSelected && (
               <DomainTransfer
-                allDomains={allDomains}
-                excludedDomainIds={selectedDomains}
+                allDomains={domainOptions}
+                excludedDomainIds={selectedDomain}
                 onTransfer={handleTransfer}
                 isTransferring={transferMutation.isPending}
               />

@@ -8,24 +8,24 @@ declaration:
   namespace: backoffice
   allowlist:
     body:
-      - field: sourceDomainUUID
+      - field: sourceDomainUuid
         type: string
         description: "UUID of the domain to copy settings from"
-      - field: targetDomainUUIDs
+      - field: targetDomainUuids
         type: object
         description: "Array of target domain UUIDs to copy settings to"
 
 extractRequestData:
   assign:
-    sourceDomainUUID: ${incoming.body.sourceDomainUUID}
-    targetDomainUUIDs: ${incoming.body.targetDomainUUIDs}
+    sourceDomainUuid: ${incoming.body.sourceDomainUuid}
+    targetDomainUuids: ${incoming.body.targetDomainUuids}
 
 fetchSource:
   call: http.post
   args:
     url: "[#CHATBOT_RESQL]/get-domain-anonymizer-config"
     body:
-      domainUUID: ${sourceDomainUUID}
+      domainUUID: ${sourceDomainUuid}
   result: source
   next: transferToTargets
 
@@ -41,8 +41,7 @@ transferToTargets:
       is_anonymization_before_llm: ${source.response.body[0].isAnonymizationBeforeLlm}
       is_anonymization_before_global_classifier: ${source.response.body[0].isAnonymizationBeforeGlobalClassifier}
       record_conversations_anonymously: ${source.response.body[0].recordConversationsAnonymously}
-      created: ${new Date().toISOString()}
-      domains: ${JSON.stringify(targetDomainUUIDs)}
+      domains: ${JSON.stringify(targetDomainUuids)}
   result: res
 
 return_result:

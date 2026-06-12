@@ -6,7 +6,7 @@ SELECT
     v.key,
     v.value,
     d.domain,
-    :created::timestamptz
+    now()
 FROM
     domain_list AS d
         CROSS JOIN LATERAL (

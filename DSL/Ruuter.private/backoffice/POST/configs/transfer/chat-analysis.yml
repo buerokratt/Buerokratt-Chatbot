@@ -8,24 +8,24 @@ declaration:
   namespace: backoffice
   allowlist:
     body:
-      - field: sourceDomainUUID
+      - field: sourceDomainUuid
         type: string
         description: "UUID of the domain to copy settings from"
-      - field: targetDomainUUIDs
+      - field: targetDomainUuids
         type: object
         description: "Array of target domain UUIDs to copy settings to"
 
 extractRequestData:
   assign:
-    sourceDomainUUID: ${incoming.body.sourceDomainUUID}
-    targetDomainUUIDs: ${incoming.body.targetDomainUUIDs}
+    sourceDomainUuid: ${incoming.body.sourceDomainUuid}
+    targetDomainUuids: ${incoming.body.targetDomainUuids}
 
 fetchSource:
   call: http.post
   args:
     url: "[#CHATBOT_RESQL]/get-domain-chat-analysis-config"
     body:
-      domainUuid: ${sourceDomainUUID}
+      domainUuid: ${sourceDomainUuid}
   result: source
   next: transferToTargets
 
@@ -38,7 +38,7 @@ transferToTargets:
       chat_analysis_theme: ${source.response.body[0].chatAnalysisTheme}
       chat_analysis_byk_response_quality: ${source.response.body[0].chatAnalysisBykResponseQuality}
       chat_analysis_follow_up_action: ${source.response.body[0].chatAnalysisFollowUpAction}
-      domains: ${JSON.stringify(targetDomainUUIDs)}
+      domains: ${JSON.stringify(targetDomainUuids)}
   result: res
 
 return_result:

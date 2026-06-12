@@ -174,7 +174,7 @@ const SettingsChatSettings: FC = () => {
   };
 
   const transferMutation = useMutation({
-    mutationFn: (data: { sourceDomainUUID: string; targetDomainUUIDs: string[] }) =>
+    mutationFn: (data: { sourceDomainUuid: string; targetDomainUuids: string[] }) =>
       apiDev.post('configs/transfer/bot-config', data),
     onSuccess: async () => {
       toast.open({
@@ -193,7 +193,7 @@ const SettingsChatSettings: FC = () => {
   });
 
   const handleTransfer = (targetIds: string[]) => {
-    transferMutation.mutate({ sourceDomainUUID: selectedDomains[0], targetDomainUUIDs: targetIds });
+    transferMutation.mutate({ sourceDomainUuid: selectedDomains[0], targetDomainUuids: targetIds });
   };
 
   const handleDomainSelection = useDomainSelectionHandler(setSelectedDomains, fetchData, resetSettingsToDefault);

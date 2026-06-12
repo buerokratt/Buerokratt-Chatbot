@@ -29,7 +29,7 @@ const SettingsSkmConfiguration: FC = () => {
   const multiDomainEnabled = import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
   const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
   const rawDomains = useStore((state) => state.allDomains);
-  const allDomains: SelectOption[] = rawDomains.map((d) => ({ label: d.name, value: d.id }));
+  const domainOptions: SelectOption[] = rawDomains.map((d) => ({ label: d.name, value: d.id }));
 
   useEffect(() => {
     if (multiDomainEnabled) {
@@ -141,7 +141,7 @@ const SettingsSkmConfiguration: FC = () => {
   };
 
   const transferMutation = useMutation({
-    mutationFn: (data: { sourceDomainUUID: string; targetDomainUUIDs: string[] }) =>
+    mutationFn: (data: { sourceDomainUuid: string; targetDomainUuids: string[] }) =>
       apiDev.post('configs/transfer/skm-config', data),
     onSuccess: () => {
       toast.open({
@@ -160,7 +160,7 @@ const SettingsSkmConfiguration: FC = () => {
   });
 
   const handleTransfer = (targetIds: string[]) => {
-    transferMutation.mutate({ sourceDomainUUID: selectedDomains[0], targetDomainUUIDs: targetIds });
+    transferMutation.mutate({ sourceDomainUuid: selectedDomains[0], targetDomainUuids: targetIds });
   };
 
   const handleDomainSelection = useDomainSelectionHandler(setSelectedDomains, fetchData, resetSettingsToDefault);
@@ -193,7 +193,7 @@ const SettingsSkmConfiguration: FC = () => {
               {getNumberControl('range')}
               {sourceDomainSelected && (
                 <DomainTransfer
-                  allDomains={allDomains}
+                  allDomains={domainOptions}
                   excludedDomainIds={selectedDomains}
                   onTransfer={handleTransfer}
                   isTransferring={transferMutation.isPending}

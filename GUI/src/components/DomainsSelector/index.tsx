@@ -25,9 +25,9 @@ const DomainSelector: FC<PropsWithChildren<DomainSelector>> = ({ onChange }) => 
     options: SelectOption[];
     selectedOptions: SelectOption[];
   } {
-    const opts = domains.map((d) => ({ label: d.name, value: d.id, meta: d.url }));
-    const selected = opts.filter((opt) => domains.find((d) => d.id === opt.value && d.selected));
-    return { options: opts, selectedOptions: selected };
+    const options = domains.map((d) => ({ label: d.name, value: d.id, meta: d.url }));
+    const selectedOptions = options.filter((opt) => domains.find((d) => d.id === opt.value && d.selected));
+    return { options, selectedOptions };
   }
 
   useEffect(() => {
