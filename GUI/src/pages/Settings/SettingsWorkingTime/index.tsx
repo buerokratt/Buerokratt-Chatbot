@@ -24,9 +24,13 @@ import {
 } from 'constants/config';
 
 import DomainTabSelector from '../../../components/DomainTabSelector';
+import DomainTransfer from '../../../components/DomainTransfer';
 import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
 import { fetchConfigurationFromDomain } from '../../../services/configurations';
+import useStore from '../../../store';
 import { InfoTooltip } from '../../../utils/getToolTipWithText';
+
+import { SelectOption } from 'types';
 
 type FieldDateNames = {
   start: string;
@@ -45,6 +49,8 @@ const SettingsWorkingTime: FC = () => {
   const [key, setKey] = useState(0);
   const multiDomainEnabled = import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
   const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
+  const rawDomains = useStore((state) => state.allDomains);
+  const allDomains: SelectOption[] = rawDomains.map((d) => ({ label: d.name, value: d.id }));
 
   const resetSettingsToDefault = () => {
     reset(getDefaultValues());
@@ -156,7 +162,32 @@ const SettingsWorkingTime: FC = () => {
     return { start: startingTime, end: endingTime };
   };
 
+  const transferMutation = useMutation({
+    mutationFn: (data: { sourceDomainUuid: string; targetDomainUuids: string[] }) =>
+      apiDev.post('configs/transfer/organization-working-time', data),
+    onSuccess: () => {
+      toast.open({
+        type: 'success',
+        title: t('global.notification'),
+        message: t('toast.success.updateSuccess'),
+      });
+    },
+    onError: (error: AxiosError) => {
+      toast.open({
+        type: 'error',
+        title: t('global.notificationError'),
+        message: error.message,
+      });
+    },
+  });
+
+  const handleTransfer = (targetIds: string[]) => {
+    transferMutation.mutate({ sourceDomainUuid: selectedDomains[0], targetDomainUuids: targetIds });
+  };
+
   const handleDomainSelection = useDomainSelectionHandler(setSelectedDomains, fetchData, resetSettingsToDefault);
+
+  const sourceDomainSelected = multiDomainEnabled && selectedDomains.length === 1;
 
   if (!loadingCompleted) {
     return <>Loading...</>;
@@ -181,21 +212,31 @@ const SettingsWorkingTime: FC = () => {
         }
         header={
           <Track gap={8} direction="vertical" align="left">
-            <Controller
-              name="organizationUseCSA"
-              control={control}
-              render={({ field }) => (
-                <Switch
-                  label={t('settings.workingTime.organizationUseCSA').toString()}
-                  onLabel={t('global.yes').toString()}
-                  offLabel={t('global.no').toString()}
-                  onCheckedChange={field.onChange}
-                  checked={field.value}
-                  tooltip={<InfoTooltip name="settings.workingTime.tooltip.useCsa" />}
-                  {...field}
+            <Track justify="between" align="center" style={{ width: '100%' }}>
+              <Controller
+                name="organizationUseCSA"
+                control={control}
+                render={({ field }) => (
+                  <Switch
+                    label={t('settings.workingTime.organizationUseCSA').toString()}
+                    onLabel={t('global.yes').toString()}
+                    offLabel={t('global.no').toString()}
+                    onCheckedChange={field.onChange}
+                    checked={field.value}
+                    tooltip={<InfoTooltip name="settings.workingTime.tooltip.useCsa" />}
+                    {...field}
+                  />
+                )}
+              />
+              {sourceDomainSelected && (
+                <DomainTransfer
+                  allDomains={allDomains}
+                  excludedDomainIds={selectedDomains}
+                  onTransfer={handleTransfer}
+                  isTransferring={transferMutation.isPending}
                 />
               )}
-            />
+            </Track>
             {isOrganizationUseCSA && (
               <Controller
                 name="organizationWorkingAllTime"

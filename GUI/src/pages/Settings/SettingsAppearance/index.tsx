@@ -16,9 +16,13 @@ import { apiDev } from 'services/api';
 import { ROLES } from 'utils/constants';
 
 import DomainTabSelector from '../../../components/DomainTabSelector';
+import DomainTransfer from '../../../components/DomainTransfer';
 import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
 import { fetchConfigurationFromDomain } from '../../../services/configurations';
+import useStore from '../../../store';
 import { WidgetAppearance, WidgetAppearanceResponse } from '../../../types/widgetAppearance';
+
+import { SelectOption } from 'types';
 
 const variants = {
   initial: {
@@ -39,6 +43,8 @@ const SettingsAppearance: FC = () => {
   const [delayFinished, setDelayFinished] = useState(false);
   const multiDomainEnabled = import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
   const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
+  const rawDomains = useStore((state) => state.allDomains);
+  const allDomains: SelectOption[] = rawDomains.map((d) => ({ label: d.name, value: d.id }));
 
   useEffect(() => {
     if (multiDomainEnabled) {
@@ -163,7 +169,32 @@ const SettingsAppearance: FC = () => {
     });
   };
 
+  const transferMutation = useMutation({
+    mutationFn: (data: { sourceDomainUuid: string; targetDomainUuids: string[] }) =>
+      apiDev.post('configs/transfer/widget', data),
+    onSuccess: () => {
+      toast.open({
+        type: 'success',
+        title: t('global.notification'),
+        message: t('toast.success.updateSuccess'),
+      });
+    },
+    onError: (error: AxiosError) => {
+      toast.open({
+        type: 'error',
+        title: t('global.notificationError'),
+        message: error.message,
+      });
+    },
+  });
+
+  const handleTransfer = (targetIds: string[]) => {
+    transferMutation.mutate({ sourceDomainUuid: selectedDomains[0], targetDomainUuids: targetIds });
+  };
+
   const handleDomainSelection = useDomainSelectionHandler(setSelectedDomains, fetchData, resetSettingsToDefault);
+
+  const sourceDomainSelected = multiDomainEnabled && selectedDomains.length === 1;
 
   if (hasRendered.current === undefined) return <>Loading...</>;
 
@@ -185,11 +216,21 @@ const SettingsAppearance: FC = () => {
         }
       >
         <Track gap={8} direction="vertical" align="left">
-          <FormInput
-            {...register('widgetProactiveSeconds')}
-            label={t('settings.appearance.widgetProactiveSeconds')}
-            type="number"
-          />
+          <Track justify="between" align="center" style={{ width: '100%' }}>
+            <FormInput
+              {...register('widgetProactiveSeconds')}
+              label={t('settings.appearance.widgetProactiveSeconds')}
+              type="number"
+            />
+            {sourceDomainSelected && (
+              <DomainTransfer
+                allDomains={allDomains}
+                excludedDomainIds={selectedDomains}
+                onTransfer={handleTransfer}
+                isTransferring={transferMutation.isPending}
+              />
+            )}
+          </Track>
           <Controller
             name="isWidgetActive"
             control={control}

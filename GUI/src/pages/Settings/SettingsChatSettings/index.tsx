@@ -10,9 +10,13 @@ import { BotConfigResponse } from 'types/botConfig';
 import { ROLES } from 'utils/constants';
 
 import DomainTabSelector from '../../../components/DomainTabSelector';
+import DomainTransfer from '../../../components/DomainTransfer';
 import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
 import { fetchConfigurationFromDomain } from '../../../services/configurations';
+import useStore from '../../../store';
 import { AiOutlineInfoCircle } from 'react-icons/ai';
+
+import { SelectOption } from 'types';
 import {
   SUB_TITLE_LENGTH,
   RESPONSE_PROCESSING_NOTICE_LENGTH,
@@ -26,6 +30,8 @@ const SettingsChatSettings: FC = () => {
   const hasRendered = useRef<boolean>();
   const multiDomainEnabled = import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
   const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
+  const rawDomains = useStore((state) => state.allDomains);
+  const allDomains: SelectOption[] = rawDomains.map((d) => ({ label: d.name, value: d.id }));
   const [isBotActive, setIsBotActive] = useState<boolean | undefined>(undefined);
   const [currentIsBurokrattActive, setCurrentIsBurokrattActive] = useState<boolean | undefined>(undefined);
   const [isBurokrattActive, setIsBurokrattActive] = useState<boolean | undefined>(undefined);
@@ -167,7 +173,32 @@ const SettingsChatSettings: FC = () => {
     setResponseProcessingNotice('');
   };
 
+  const transferMutation = useMutation({
+    mutationFn: (data: { sourceDomainUuid: string; targetDomainUuids: string[] }) =>
+      apiDev.post('configs/transfer/bot-config', data),
+    onSuccess: async () => {
+      toast.open({
+        type: 'success',
+        title: t('global.notification'),
+        message: t('toast.success.updateSuccess'),
+      });
+    },
+    onError: (error: AxiosError) => {
+      toast.open({
+        type: 'error',
+        title: t('global.notificationError'),
+        message: error.message,
+      });
+    },
+  });
+
+  const handleTransfer = (targetIds: string[]) => {
+    transferMutation.mutate({ sourceDomainUuid: selectedDomains[0], targetDomainUuids: targetIds });
+  };
+
   const handleDomainSelection = useDomainSelectionHandler(setSelectedDomains, fetchData, resetSettingsToDefault);
+
+  const sourceDomainSelected = multiDomainEnabled && selectedDomains.length === 1;
 
   function getTooltip(
     name:
@@ -202,17 +233,27 @@ const SettingsChatSettings: FC = () => {
         isScrollable={true}
         header={
           <Track direction="vertical" gap={8} align="left">
-            {isBotActive != undefined && (
-              <Track gap={10}>
-                <Switch
-                  name="is_bot_active"
-                  label={t('settings.chat.chatActive').toString()}
-                  checked={isBotActive}
-                  onCheckedChange={setIsBotActive}
+            <Track justify="between" align="center" style={{ width: '100%' }}>
+              {isBotActive != undefined && (
+                <Track gap={10}>
+                  <Switch
+                    name="is_bot_active"
+                    label={t('settings.chat.chatActive').toString()}
+                    checked={isBotActive}
+                    onCheckedChange={setIsBotActive}
+                  />
+                  {getTooltip('is_bot_active')}
+                </Track>
+              )}
+              {sourceDomainSelected && (
+                <DomainTransfer
+                  allDomains={allDomains}
+                  excludedDomainIds={selectedDomains}
+                  onTransfer={handleTransfer}
+                  isTransferring={transferMutation.isPending}
                 />
-                {getTooltip('is_bot_active')}
-              </Track>
-            )}
+              )}
+            </Track>
             {isBurokrattActive != undefined && (
               <Track gap={10}>
                 <Switch
