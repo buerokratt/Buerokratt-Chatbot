@@ -22,7 +22,7 @@ import { fetchConfigurationFromDomain } from '../../../services/configurations';
 import useStore from '../../../store';
 import { WidgetAppearance, WidgetAppearanceResponse } from '../../../types/widgetAppearance';
 
-import { SelectOption } from 'types/selectOption';
+import { SelectOption } from 'types';
 
 const variants = {
   initial: {

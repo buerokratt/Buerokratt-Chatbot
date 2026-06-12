@@ -18,7 +18,7 @@ import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHand
 import { fetchConfigurationFromDomain } from '../../../services/configurations';
 import useStore from '../../../store';
 
-import { SelectOption } from 'types/selectOption';
+import { SelectOption } from 'types';
 
 const SettingsSkmConfiguration: FC = () => {
   const { t } = useTranslation();

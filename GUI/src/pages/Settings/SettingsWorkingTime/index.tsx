@@ -30,7 +30,7 @@ import { fetchConfigurationFromDomain } from '../../../services/configurations';
 import useStore from '../../../store';
 import { InfoTooltip } from '../../../utils/getToolTipWithText';
 
-import { SelectOption } from 'types/selectOption';
+import { SelectOption } from 'types';
 
 type FieldDateNames = {
   start: string;

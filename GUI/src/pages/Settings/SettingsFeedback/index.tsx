@@ -19,7 +19,7 @@ import DomainTransfer from '../../../components/DomainTransfer';
 import { fetchConfigurationFromDomain } from '../../../services/configurations';
 import useStore from '../../../store';
 
-import { SelectOption } from 'types/selectOption';
+import { SelectOption } from 'types';
 
 const SettingsFeedback: FC = () => {
   const { t } = useTranslation();

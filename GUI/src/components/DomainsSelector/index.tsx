@@ -9,7 +9,7 @@ type DomainSelector = {
   onChange?: (selected: SelectOption[]) => void;
 };
 
-import { SelectOption } from 'types/selectOption';
+import { SelectOption } from 'types';
 
 const DomainSelector: FC<PropsWithChildren<DomainSelector>> = ({ onChange }) => {
   const { t } = useTranslation();
@@ -43,18 +43,15 @@ const DomainSelector: FC<PropsWithChildren<DomainSelector>> = ({ onChange }) => 
       <div className="multiSelect">
         <div className="multiSelect_wrapper">
           <FormMultiselect
-            name={name}
+            name="domain-selector"
             label={t('multiDomains.selectDomains')}
             key={renderVersion}
-            mode={'static'}
-            required={false}
-            selectedOptions={reflectDomains ? selectedOptions || [] : []}
-            options={options || []}
-            isMulti={true}
+            selectedOptions={reflectDomains ? selectedOptions : []}
+            options={options}
             placeholder={t('global.choose')}
             onSelectionChange={(val) => {
-              setSelectedOptions(val);
-              if (onChange) onChange(val);
+              setSelectedOptions(val ?? []);
+              if (onChange) onChange(val ?? []);
             }}
           />
         </div>

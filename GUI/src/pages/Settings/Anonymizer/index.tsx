@@ -28,7 +28,7 @@ import { fetchConfigurationFromDomain } from '../../../services/configurations';
 import useStore from '../../../store';
 import { AiOutlineInfoCircle } from 'react-icons/ai';
 
-import { SelectOption } from 'types/selectOption';
+import { SelectOption } from 'types';
 
 const Anonymizer: FC = () => {
   const { t } = useTranslation();

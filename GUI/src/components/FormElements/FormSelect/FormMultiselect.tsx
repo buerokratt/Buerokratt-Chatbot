@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { MdArrowDropDown } from 'react-icons/md';
 import './FormSelect.scss';
 
-import { SelectOption } from 'types/selectOption';
+import { SelectOption } from 'types';
 
 type FormMultiselectProps = SelectHTMLAttributes<HTMLSelectElement> & {
   label: ReactNode;

@@ -16,7 +16,7 @@ import { fetchConfigurationFromDomain } from '../../../services/configurations';
 import useStore from '../../../store';
 import { AiOutlineInfoCircle } from 'react-icons/ai';
 
-import { SelectOption } from 'types/selectOption';
+import { SelectOption } from 'types';
 import {
   SUB_TITLE_LENGTH,
   RESPONSE_PROCESSING_NOTICE_LENGTH,

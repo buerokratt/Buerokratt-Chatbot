@@ -1,8 +1,8 @@
 import { FC, useEffect, useRef, useState } from 'react';
 import useStore from '../../store';
 import './DomainTabSelector.scss';
+import { SelectOption } from 'types';
 
-import { SelectOption } from 'types/selectOption';
 
 type DomainTabSelectorProps = {
   readonly onChange?: (selected: SelectOption[]) => void;
