@@ -2,6 +2,7 @@
   "global": {
     "email": "Email",
     "save": "Save",
+    "apply": "Apply",
     "add": "Add",
     "edit": "Edit",
     "delete": "Delete",
