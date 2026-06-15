@@ -1,6 +1,6 @@
 {
   "domainTransfer": {
-    "copyFromDomain": "Kopeeri domeenilt",
+    "copyToDomain": "Kopeeri domeenile",
     "transferDescription": "Valige domeenid, millele praegused seaded kopeeritakse.",
     "selectTargetDomain": "Vali sihidomeenid",
     "transfer": "Kopeeri"
