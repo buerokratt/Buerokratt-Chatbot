@@ -1,7 +1,7 @@
 {
   "domainTransfer": {
-    "copyFromDomain": "Copy from domain",
-    "transferDescription": "Select the domains to which the current settings will be copied.",
+    "copyToDomain": "Copy to domain",
+    "transferDescription": "Select the domains to which the current settings will be copied to.",
     "selectTargetDomain": "Select target domains",
     "transfer": "Copy"
   },
