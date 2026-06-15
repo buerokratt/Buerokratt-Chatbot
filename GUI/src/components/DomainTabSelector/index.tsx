@@ -1,44 +1,35 @@
 import { FC, useEffect, useRef, useState } from 'react';
-import { getWidgetData } from '../../services/users';
 import useStore from '../../store';
-import { DomainSelection } from '../../types/domainsModels';
 import './DomainTabSelector.scss';
+import { SelectOption } from 'types';
 
-type SelectOption = { label: string; value: string; meta?: string };
 
 type DomainTabSelectorProps = {
   readonly onChange?: (selected: SelectOption[]) => void;
 };
 
 const DomainTabSelector: FC<DomainTabSelectorProps> = ({ onChange }) => {
-  const idCode = useStore((state) => state.userInfo?.idCode);
+  const allDomains = useStore((state) => state.allDomains);
+  const selectedDomainId = useStore((state) => state.selectedDomainId);
+  const setSelectedDomainId = useStore((state) => state.setSelectedDomainId);
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
   const [options, setOptions] = useState<SelectOption[]>([]);
-  const [activeValue, setActiveValue] = useState<string | null>(null);
+  const [activeValue, setActiveValue] = useState<string | null>(selectedDomainId);
 
   useEffect(() => {
-    if (!idCode) return;
-
-    const fetchDomains = async () => {
-      try {
-        const data: DomainSelection[] = await getWidgetData(idCode);
-        const opts = data.map((d) => ({ label: d.name, value: d.id, meta: d.url }));
-        setOptions(opts);
-        if (opts.length > 0) {
-          setActiveValue(opts[0].value);
-          onChangeRef.current?.([opts[0]]);
-        }
-      } catch (error) {
-        console.error('Failed to fetch widget data', error);
-      }
-    };
-
-    fetchDomains();
-  }, [idCode]);
+    if (!allDomains.length) return;
+    const opts = allDomains.map((d) => ({ label: d.name, value: d.id, meta: d.url }));
+    setOptions(opts);
+    const restoredOpt = opts.find((o) => o.value === selectedDomainId) ?? opts[0];
+    setActiveValue(restoredOpt.value);
+    setSelectedDomainId(restoredOpt.value);
+    onChangeRef.current?.([restoredOpt]);
+  }, [allDomains]);
 
   const handleClick = (option: SelectOption) => {
     setActiveValue(option.value);
+    setSelectedDomainId(option.value);
     onChangeRef.current?.([option]);
   };
 

@@ -1,7 +1,14 @@
 {
+  "domainTransfer": {
+    "copyFromDomain": "Kopeeri domeenilt",
+    "transferDescription": "Valige domeenid, millele praegused seaded kopeeritakse.",
+    "selectTargetDomain": "Vali sihidomeenid",
+    "transfer": "Kopeeri"
+  },
   "global": {
     "email": "Email",
     "save": "Salvesta",
+    "apply": "Rakenda",
     "add": "Lisa",
     "edit": "Muuda",
     "delete": "Kustuta",

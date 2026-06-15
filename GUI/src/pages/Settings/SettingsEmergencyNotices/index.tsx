@@ -14,8 +14,12 @@ import { EmergencyNotice, EmergencyNoticeResponse } from 'types/emergencyNotice'
 import { ROLES } from 'utils/constants';
 
 import DomainTabSelector from '../../../components/DomainTabSelector';
+import DomainTransfer from '../../../components/DomainTransfer';
 import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
 import { fetchConfigurationFromDomain } from '../../../services/configurations';
+import useStore from '../../../store';
+
+import { SelectOption } from 'types';
 
 const SettingsEmergencyNotices: FC = () => {
   const { t } = useTranslation();
@@ -35,6 +39,8 @@ const SettingsEmergencyNotices: FC = () => {
 
   const multiDomainEnabled = import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
   const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
+  const rawDomains = useStore((state) => state.allDomains);
+  const allDomains: SelectOption[] = rawDomains.map((d) => ({ label: d.name, value: d.id }));
 
   useEffect(() => {
     if (multiDomainEnabled) {
@@ -128,7 +134,32 @@ const SettingsEmergencyNotices: FC = () => {
     });
   };
 
+  const transferMutation = useMutation({
+    mutationFn: (data: { sourceDomainUuid: string; targetDomainUuids: string[] }) =>
+      apiDev.post('configs/transfer/emergency-notice', data),
+    onSuccess: () => {
+      toast.open({
+        type: 'success',
+        title: t('global.notification'),
+        message: t('settings.emergencyNotices.noticeChanged'),
+      });
+    },
+    onError: (error: AxiosError) => {
+      toast.open({
+        type: 'error',
+        title: t('global.notificationError'),
+        message: error.message,
+      });
+    },
+  });
+
+  const handleTransfer = (targetIds: string[]) => {
+    transferMutation.mutate({ sourceDomainUuid: selectedDomains[0], targetDomainUuids: targetIds });
+  };
+
   const handleDomainSelection = useDomainSelectionHandler(setSelectedDomains, fetchData, resetSettingsToDefault);
+
+  const sourceDomainSelected = multiDomainEnabled && selectedDomains.length === 1;
 
   if (!loadingComplete) return <>Loading...</>;
 
@@ -147,18 +178,28 @@ const SettingsEmergencyNotices: FC = () => {
         }
       >
         <Track gap={16} direction="vertical" align="left">
-          <Controller
-            name="isEmergencyNoticeVisible"
-            control={control}
-            render={({ field }) => (
-              <Switch
-                checked={isEmergencyNoticeVisible}
-                onCheckedChange={handleSwitchChange}
-                label={t('settings.emergencyNotices.noticeActive')}
-                {...field}
+          <Track justify="between" align="center" style={{ width: '100%' }}>
+            <Controller
+              name="isEmergencyNoticeVisible"
+              control={control}
+              render={({ field }) => (
+                <Switch
+                  checked={isEmergencyNoticeVisible}
+                  onCheckedChange={handleSwitchChange}
+                  label={t('settings.emergencyNotices.noticeActive')}
+                  {...field}
+                />
+              )}
+            />
+            {sourceDomainSelected && (
+              <DomainTransfer
+                allDomains={allDomains}
+                excludedDomainIds={selectedDomains}
+                onTransfer={handleTransfer}
+                isTransferring={transferMutation.isPending}
               />
             )}
-          />
+          </Track>
           <FormTextarea
             {...register('emergencyNoticeText')}
             label={t('settings.emergencyNotices.notice')}

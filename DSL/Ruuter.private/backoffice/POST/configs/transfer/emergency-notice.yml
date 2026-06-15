@@ -1,0 +1,51 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Transfer emergency notice settings from a source domain to one or more target domains"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: sourceDomainUuid
+        type: string
+        description: "UUID of the domain to copy settings from"
+      - field: targetDomainUuids
+        type: object
+        description: "Array of target domain UUIDs to copy settings to"
+
+extractRequestData:
+  assign:
+    sourceDomainUuid: ${incoming.body.sourceDomainUuid}
+    targetDomainUuids: ${incoming.body.targetDomainUuids}
+
+fetchSource:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-emergency-notice"
+    body:
+      domainUUID: ${sourceDomainUuid}
+  result: source
+  next: mapSourceData
+
+mapSourceData:
+  assign:
+    configMap: '$=(source.response.body || []).reduce((acc, row) => { acc[row.key] = row.value; return acc; }, {})='
+  next: transferToTargets
+
+transferToTargets:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-domain-emergency-notice"
+    body:
+      emergencyNoticeText: ${configMap.emergencyNoticeText}
+      emergencyNoticeStartISO: ${configMap.emergencyNoticeStartISO}
+      emergencyNoticeEndISO: ${configMap.emergencyNoticeEndISO}
+      isEmergencyNoticeVisible: ${configMap.isEmergencyNoticeVisible}
+      domains: ${JSON.stringify(targetDomainUuids)}
+  result: res
+
+return_result:
+  return: ${res.response.body}
+  next: end
