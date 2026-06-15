@@ -41,13 +41,13 @@ const DomainTransfer: FC<DomainTransferProps> = ({
       <Button appearance="text" size="s" onClick={() => setShowDialog(true)}>
         <Track gap={8} align="center">
           <MdContentCopy />
-          {t('domainTransfer.copyFromDomain')}
+          {t('domainTransfer.copyToDomain')}
         </Track>
       </Button>
 
       {showDialog && (
         <Dialog
-          title={t('domainTransfer.copyFromDomain')}
+          title={t('domainTransfer.copyToDomain')}
           onClose={handleClose}
           footer={
             <>
