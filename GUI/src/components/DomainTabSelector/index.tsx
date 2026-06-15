@@ -3,7 +3,6 @@ import useStore from '../../store';
 import './DomainTabSelector.scss';
 import { SelectOption } from 'types';
 
-
 type DomainTabSelectorProps = {
   readonly onChange?: (selected: SelectOption[]) => void;
 };
