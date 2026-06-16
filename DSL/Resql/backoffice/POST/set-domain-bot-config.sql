@@ -20,6 +20,7 @@ FROM
             ('show_sub_title',  :show_sub_title),
             ('sub_title',  :sub_title),
             ('response_waiting_time', :response_waiting_time),
-            ('response_processing_notice', :response_processing_notice)
+            ('response_processing_notice', :response_processing_notice),
+            ('llm_module_active', :llm_module_active)
             ) AS v(key, value)
         RETURNING key, value, domain;
