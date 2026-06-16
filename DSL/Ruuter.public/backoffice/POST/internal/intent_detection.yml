@@ -264,7 +264,7 @@ handleEntities:
 
 assignNewEntities:
   assign:
-    entities: ${Object.values(intentJson.entities)}
+    entities: ${Object.keys(intentJson.entities)}
     filteredEntities: ${[...new Set(entities)]}
     service_entities: ${validated_intent.response.body[0].entities}
   next: check_if_service_entities_are_in_included_in_llm_entities
@@ -272,8 +272,13 @@ assignNewEntities:
 check_if_service_entities_are_in_included_in_llm_entities:
   switch:
     - condition: ${service_entities.every(e => filteredEntities.includes(e))}
-      next: trigger_service
+      next: assign_service_entities
   next: assign_empty_entities
+
+assign_service_entities:
+  assign:
+    service_entities: ${Object.values(intentJson.entities)}
+  next: trigger_service
 
 assign_empty_entities:
   assign:
