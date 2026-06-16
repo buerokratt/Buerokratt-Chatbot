@@ -264,7 +264,7 @@ handleEntities:
 
 assignNewEntities:
   assign:
-    entities: ${Object.values(intentJson.entities)}
+    entities: ${Object.keys(intentJson.entities)}
     filteredEntities: ${[...new Set(entities)]}
     service_entities: ${validated_intent.response.body[0].entities}
   next: check_if_service_entities_are_in_included_in_llm_entities
