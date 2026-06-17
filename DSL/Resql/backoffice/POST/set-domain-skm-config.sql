@@ -34,7 +34,7 @@ WHERE
 SELECT
     v.key,
     v.value,
-    :created::timestamptz AS created
+    now() AS created
 FROM (
     VALUES
         ('skm_range', :skm_range),

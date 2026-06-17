@@ -1,22 +1,29 @@
 import { Header, useMenuCountConf } from '@buerokratt-ria/header';
 import { MainNavigation } from '@buerokratt-ria/menu';
 import React, { FC } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import useStore from 'store';
 
+import { PAGES_WITH_DOMAIN_TAB_SELECTOR } from '../../constants/routes';
 import { useToast } from '../../hooks/useToast';
 import './Layout.scss';
 
 const Layout: FC = () => {
   const menuCountConf = useMenuCountConf();
+  const { pathname } = useLocation();
+  const multiDomainEnabled = import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
+  const isDomainSelectorVisible =
+    multiDomainEnabled && !!useStore.getState().userInfo && !PAGES_WITH_DOMAIN_TAB_SELECTOR.includes(pathname);
+
   return (
-    <div className="layout">
+    <div className={`layout${isDomainSelectorVisible ? ' layout--multi-domain' : ''}`}>
       <MainNavigation countConf={menuCountConf} />
       <div className="layout__wrapper">
         <Header
           toastContext={useToast()}
           user={useStore.getState().userInfo}
           setUserDomains={useStore.getState().setUserDomains}
+          isDomainSelectorVisible={isDomainSelectorVisible}
         />
         <main className="layout__main">
           <Outlet />

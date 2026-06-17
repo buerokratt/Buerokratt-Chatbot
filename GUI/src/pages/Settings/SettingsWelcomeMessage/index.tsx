@@ -10,12 +10,14 @@ import { useTranslation } from 'react-i18next';
 import { apiDev } from 'services/api';
 import { ROLES } from 'utils/constants';
 
-import DomainSelector from '../../../components/DomainsSelector';
+import DomainTabSelector from '../../../components/DomainTabSelector';
+import DomainTransfer from '../../../components/DomainTransfer';
 import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
 import { fetchConfigurationFromDomain } from '../../../services/configurations';
+import useStore from '../../../store';
 import { GreetingsMessage, GreetingsMessageResponse } from '../../../types/greetingMessage';
 
-type SelectOption = { label: string; value: string; meta?: string };
+import { SelectOption } from 'types';
 
 const SettingsWelcomeMessage: FC = () => {
   const { t } = useTranslation();
@@ -25,6 +27,8 @@ const SettingsWelcomeMessage: FC = () => {
   const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
   const [loadingComplete, setLoadingComplete] = useState<boolean>(false);
   const [key, setKey] = useState<number>(0);
+  const rawDomains = useStore((state) => state.allDomains);
+  const allDomains: SelectOption[] = rawDomains.map((d) => ({ label: d.name, value: d.id }));
 
   const [welcomeMessageActive, setWelcomeMessageActive] = useState<boolean | undefined>(undefined);
 
@@ -77,6 +81,25 @@ const SettingsWelcomeMessage: FC = () => {
     },
   });
 
+  const transferMutation = useMutation({
+    mutationFn: (data: { sourceDomainUuid: string; targetDomainUuids: string[] }) =>
+      apiDev.post('configs/transfer/greeting', data),
+    onSuccess: () => {
+      toast.open({
+        type: 'success',
+        title: t('global.notification'),
+        message: t('settings.welcomeMessage.messageChanged'),
+      });
+    },
+    onError: (error: AxiosError) => {
+      toast.open({
+        type: 'error',
+        title: t('global.notificationError'),
+        message: error.message,
+      });
+    },
+  });
+
   const handleFormSubmit = () => {
     if (welcomeMessage.length === 0) {
       toast.open({
@@ -86,13 +109,19 @@ const SettingsWelcomeMessage: FC = () => {
       });
     } else {
       const requestData: GreetingsMessage = {
-        isActive: (welcomeMessageActive || false).toString(),
+        isActive: welcomeMessageActive ?? false,
         est: welcomeMessage,
+        domainUUID: multiDomainEnabled ? selectedDomains : [],
       };
-      requestData.domainUUID = multiDomainEnabled ? selectedDomains : [];
-
       welcomeMessageMutation.mutate(requestData);
     }
+  };
+
+  const handleTransfer = (targetIds: string[]) => {
+    transferMutation.mutate({
+      sourceDomainUuid: selectedDomains[0],
+      targetDomainUuids: targetIds,
+    });
   };
 
   const resetSettingsToDefault = () => {
@@ -106,20 +135,15 @@ const SettingsWelcomeMessage: FC = () => {
     return <>Loading...</>;
   }
 
+  const sourceDomainSelected = multiDomainEnabled && selectedDomains.length === 1;
+
   return (
     <>
       <h1>{t('settings.welcomeMessage.welcomeMessage')}</h1>
       <p>{t('settings.welcomeMessage.description')}</p>
 
-      {multiDomainEnabled && (
-        <DomainSelector
-          onChange={(selected) => {
-            handleDomainSelection(selected);
-          }}
-        />
-      )}
-
       <Card
+        tabs={multiDomainEnabled && <DomainTabSelector onChange={handleDomainSelection} />}
         footer={
           <Track justify="end">
             <Button disabled={(multiDomainEnabled && selectedDomains.length === 0) || false} onClick={handleFormSubmit}>
@@ -129,12 +153,22 @@ const SettingsWelcomeMessage: FC = () => {
         }
       >
         <Track gap={16} direction="vertical" align="left">
-          <Switch
-            checked={welcomeMessageActive}
-            label={t('settings.welcomeMessage.greetingActive')}
-            name={'label'}
-            onCheckedChange={setWelcomeMessageActive}
-          />
+          <Track justify="between" align="center" style={{ width: '100%' }}>
+            <Switch
+              checked={welcomeMessageActive}
+              label={t('settings.welcomeMessage.greetingActive')}
+              name={'label'}
+              onCheckedChange={setWelcomeMessageActive}
+            />
+            {sourceDomainSelected && (
+              <DomainTransfer
+                allDomains={allDomains}
+                excludedDomainIds={selectedDomains}
+                onTransfer={handleTransfer}
+                isTransferring={transferMutation.isPending}
+              />
+            )}
+          </Track>
           <FormTextarea
             key={key}
             label={t('settings.welcomeMessage.welcomeMessage')}

@@ -24,8 +24,9 @@ const DeleteConversations: FC = () => {
     shouldUnregister: true,
   });
 
-  const { data: deleteConfig } = useQuery<DeleteChatSettings>({
+  const { data: deleteConfig, isLoading: isConfigLoading } = useQuery<DeleteChatSettings>({
     queryKey: ['configs/delete-conversation-config', 'prod'],
+    cacheTime: 0,
   });
 
   const plusDays = (date: Date, days: number): Date => {
@@ -45,25 +46,26 @@ const DeleteConversations: FC = () => {
   const [isAnonymMessaged, setIsAnonymMessaged] = useState<boolean>(false);
   const [authPeriod, setAuthPeriod] = useState<number>(160);
   const [anonymPeriod, setAnonymPeriod] = useState<number>(160);
-  const [deletionTime, setDeletionTime] = useState<string>();
-  const startDate = plusDays(new Date(), 1);
-  const [endDate, setEndDate] = useState<Date>(new Date());
+  const [authPeriodError, setAuthPeriodError] = useState<boolean>(false);
+  const [anonymPeriodError, setAnonymPeriodError] = useState<boolean>(false);
+  const [deletionTime, setDeletionTime] = useState<Date | undefined>();
+  const [startDate, setStartDate] = useState<Date>(() => subDays(new Date(), -1));
+  const [endDate, setEndDate] = useState<Date>(() => subDays(new Date(), -1));
   const [removableChatsCount, setremovableChatsCount] = useState<number>(0);
   const [authDate, setAuthDate] = useState<Date>(new Date());
   const [anonDate, setAnonDate] = useState<Date>(new Date());
+  const [authDateStart, setAuthDateStart] = useState<Date>(new Date(0));
+  const [anonDateStart, setAnonDateStart] = useState<Date>(new Date(0));
 
   useEffect(() => {
-    setEndDate(new Date());
+    setEndDate(subDays(new Date(), -1));
     if (deleteConfig) {
       setIsAnonymMessaged(deleteConfig.isAnonymConversations === 'true');
       setIsAuthMessages(deleteConfig.isAuthConversations === 'true');
       setAuthPeriod(Number(deleteConfig.authPeriod ?? 160));
       setAnonymPeriod(Number(deleteConfig.anonymPeriod ?? 160));
-      setDeletionTime(
-        deleteConfig?.deletionTimeISO === ''
-          ? dateToLocalExcludingDST(new Date().toISOString())
-          : dateToLocalExcludingDST(new Date(deleteConfig.deletionTimeISO).toISOString()),
-      );
+      const isoString = deleteConfig?.deletionTimeISO || new Date().toISOString();
+      setDeletionTime(dateToLocalExcludingDST(new Date(isoString).toISOString()));
       reset(deleteConfig);
     }
   }, [deleteConfig]);
@@ -72,20 +74,26 @@ const DeleteConversations: FC = () => {
     const never = new Date(0);
     setAnonDate(isAnonymMessaged ? calculateDateFrom(anonymPeriod) : never);
     setAuthDate(isAuthMessaged ? calculateDateFrom(authPeriod) : never);
-  }, [endDate, isAnonymMessaged, isAuthMessaged, anonymPeriod, authPeriod]);
+    setAuthDateStart(isAuthMessaged ? subDays(startDate, authPeriod) : never);
+    setAnonDateStart(isAnonymMessaged ? subDays(startDate, anonymPeriod) : never);
+  }, [endDate, startDate, isAnonymMessaged, isAuthMessaged, anonymPeriod, authPeriod]);
 
   useEffect(() => {
     getAllFutureRemovableChatsCount.mutate({
       authDate: authDate,
       anonDate: anonDate,
+      authDateStart: authDateStart,
+      anonDateStart: anonDateStart,
     });
-  }, [authDate, anonDate]);
+  }, [authDate, anonDate, authDateStart, anonDateStart]);
 
   const getAllFutureRemovableChatsCount = useMutation({
-    mutationFn: (data: { authDate: Date; anonDate: Date }) => {
+    mutationFn: (data: { authDate: Date; anonDate: Date; authDateStart: Date; anonDateStart: Date }) => {
       return apiDev.post('agents/removable-count', {
         authDate: format(data.authDate, 'yyyy-MM-dd'),
         anonDate: format(data.anonDate, 'yyyy-MM-dd'),
+        authDateStart: format(data.authDateStart, 'yyyy-MM-dd'),
+        anonDateStart: format(data.anonDateStart, 'yyyy-MM-dd'),
       });
     },
     onSuccess: (res: any) => {
@@ -100,20 +108,12 @@ const DeleteConversations: FC = () => {
       isAuthConversations: data.isAuthConversations || false,
       anonymPeriod: data.anonymPeriod || 360,
       authPeriod: data.authPeriod || 360,
-      deletionTimeISO: dateToUTCExcludingDST(data.deletionTimeISO) || dateToUTCExcludingDST(new Date().toISOString()),
     };
   };
 
   const deleteSettingsMutation = useMutation({
     mutationFn: (data: DeleteChatSettings) =>
-      apiDev.post<DeleteChatSettings>('configs/update-delete-messages-config', setDeleteConversationsData(data)),
-    onSuccess: () => {
-      toast.open({
-        type: 'success',
-        title: t('global.notification'),
-        message: t('toast.success.updateSuccess'),
-      });
-    },
+      apiDev.post<DeleteChatSettings>('configs/update-delete-messages-config', data),
     onError: (error: AxiosError) => {
       toast.open({
         type: 'error',
@@ -126,13 +126,6 @@ const DeleteConversations: FC = () => {
   const cronUpdateMutation = useMutation({
     mutationFn: (data: { expression: string; anonEnabled: boolean; authEnabled: boolean }) =>
       apiDev.post<any>('internal/sync/delete-conversations-cron', data),
-    onSuccess: () => {
-      toast.open({
-        type: 'success',
-        title: t('global.notification'),
-        message: t('toast.success.updateSuccess'),
-      });
-    },
     onError: (error: AxiosError) => {
       toast.open({
         type: 'error',
@@ -142,26 +135,42 @@ const DeleteConversations: FC = () => {
     },
   });
 
-  const getCronExpression = (deletionTime: Date) => {
-    const minutes = deletionTime.getMinutes();
-    const hours = deletionTime.getHours();
-
+  const getCronExpression = (time: Date) => {
+    const minutes = time.getMinutes();
+    const hours = time.getHours();
     return `${minutes} ${hours} * * * ?`;
   };
 
-  const handleFormSubmit = handleSubmit((data) => {
-    const expression = getCronExpression(new Date(data.deletionTimeISO));
-    cronUpdateMutation.mutate({ expression, anonEnabled: isAnonymMessaged, authEnabled: isAuthMessaged });
-    deleteSettingsMutation.mutate(data);
+  const handleFormSubmit = handleSubmit(async (data) => {
+    if (authPeriodError || anonymPeriodError) return;
+    const timeDate = deletionTime ?? new Date();
+    const expression = getCronExpression(timeDate);
+    const saveData: DeleteChatSettings = {
+      ...setDeleteConversationsData(data),
+      deletionTimeISO: dateToUTCExcludingDST(timeDate.toISOString()),
+    };
+    try {
+      await Promise.all([
+        cronUpdateMutation.mutateAsync({ expression, anonEnabled: isAnonymMessaged, authEnabled: isAuthMessaged }),
+        deleteSettingsMutation.mutateAsync(saveData),
+      ]);
+      toast.open({
+        type: 'success',
+        title: t('global.notification'),
+        message: t('toast.success.updateSuccess'),
+      });
+    } catch {}
   });
 
   const handleDatesUpdate = (day: number) => {
     if (day === undefined) return;
     const resultDate = plusDays(new Date(), Number(day));
-    setEndDate(new Date(resultDate.toISOString().split('T')[0]));
+    const newEnd = new Date(resultDate.toISOString().split('T')[0]);
+    setEndDate(newEnd);
+    if (newEnd < startDate) setStartDate(newEnd);
   };
 
-  if (!deleteConfig) {
+  if (isConfigLoading || !deleteConfig) {
     return <>Loading...</>;
   }
 
@@ -212,10 +221,13 @@ const DeleteConversations: FC = () => {
                       name="authPeriod"
                       label={t('deleteConversation.period')}
                       type="number"
+                      min={0}
                       hideLabel={false}
                       onChange={(e) => {
-                        field.onChange(e.target.value);
-                        setAuthPeriod(Number(e.target.value));
+                        const val = Math.max(0, Number(e.target.value));
+                        field.onChange(val);
+                        setAuthPeriodError(val > 9999);
+                        if (val <= 9999) setAuthPeriod(val);
                       }}
                       value={authPeriod}
                     />
@@ -224,6 +236,11 @@ const DeleteConversations: FC = () => {
                       <InfoTooltip name="deleteConversation.tooltip.days" />
                     </Track>
                   </Track>
+                  {authPeriodError && (
+                    <label className="rule" style={{ color: 'red' }}>
+                      {t('deleteConversation.maxDaysError')}
+                    </label>
+                  )}
                   <label className="rule">{t('deleteConversation.deletionAuthNote')}</label>
                 </Track>
               )}
@@ -261,10 +278,13 @@ const DeleteConversations: FC = () => {
                       name="anonymPeriod"
                       label={t('deleteConversation.period')}
                       type="number"
+                      min={0}
                       hideLabel={false}
                       onChange={(e) => {
-                        field.onChange(e.target.value);
-                        setAnonymPeriod(Number(e.target.value));
+                        const val = Math.max(0, Number(e.target.value));
+                        field.onChange(val);
+                        setAnonymPeriodError(val > 9999);
+                        if (val <= 9999) setAnonymPeriod(val);
                       }}
                       value={anonymPeriod}
                     />
@@ -273,6 +293,11 @@ const DeleteConversations: FC = () => {
                       <InfoTooltip name="deleteConversation.tooltip.days" />
                     </Track>
                   </Track>
+                  {anonymPeriodError && (
+                    <label className="rule" style={{ color: 'red' }}>
+                      {t('deleteConversation.maxDaysError')}
+                    </label>
+                  )}
                   <label className="rule">{t('deleteConversation.deletionAnonNote')}</label>
                 </Track>
               )}
@@ -297,7 +322,10 @@ const DeleteConversations: FC = () => {
                       timePicker={true}
                       hideLabel
                       direction="row"
-                      value={parse(format(new Date(deletionTime), 'HH:mm:ss'), 'HH:mm:ss', new Date()) ?? new Date('0')}
+                      value={
+                        parse(format(new Date(deletionTime ?? new Date()), 'HH:mm:ss'), 'HH:mm:ss', new Date()) ??
+                        new Date('0')
+                      }
                       onChange={(e) => {
                         setDeletionTime(e);
                         field.onChange(e);
@@ -322,10 +350,14 @@ const DeleteConversations: FC = () => {
                           {...field}
                           label={t('global.startDate')}
                           timePicker={false}
-                          disabled={true}
                           hideLabel
                           direction="row"
                           value={startDate}
+                          onChange={(val) => {
+                            field.onChange(val);
+                            setStartDate(val);
+                            if (val > endDate) setEndDate(val);
+                          }}
                         />
                       </div>
                     );
@@ -348,6 +380,7 @@ const DeleteConversations: FC = () => {
                           onChange={(val) => {
                             field.onChange(val);
                             setEndDate(val);
+                            if (val < startDate) setStartDate(val);
                           }}
                         />
                       </div>
@@ -373,7 +406,12 @@ const DeleteConversations: FC = () => {
               <Track gap={40} align={'center'}>
                 {t('deleteConversation.periodConversations')} <b>{removableChatsCount}</b>
               </Track>
-              <DeletionChatOverview authDate={authDate} anonDate={anonDate}></DeletionChatOverview>
+              <DeletionChatOverview
+                authDate={authDate}
+                anonDate={anonDate}
+                authDateStart={authDateStart}
+                anonDateStart={anonDateStart}
+              />
             </Track>
           </>
         )}

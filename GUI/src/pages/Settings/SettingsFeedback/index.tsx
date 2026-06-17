@@ -14,8 +14,12 @@ import { ROLES } from 'utils/constants';
 
 import { getFeedbackConfigData, setFeedbackData } from './data';
 import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
-import DomainSelector from '../../../components/DomainsSelector';
+import DomainTabSelector from '../../../components/DomainTabSelector';
+import DomainTransfer from '../../../components/DomainTransfer';
 import { fetchConfigurationFromDomain } from '../../../services/configurations';
+import useStore from '../../../store';
+
+import { SelectOption } from 'types';
 
 const SettingsFeedback: FC = () => {
   const { t } = useTranslation();
@@ -24,6 +28,8 @@ const SettingsFeedback: FC = () => {
   const [feedbackConfig, setFeedbackConfig] = useState<FeedbackConfig | undefined>(undefined);
   const multiDomainEnabled = import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
   const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
+  const rawDomains = useStore((state) => state.allDomains);
+  const allDomains: SelectOption[] = rawDomains.map((d) => ({ label: d.name, value: d.id }));
 
   useEffect(() => {
     resetSettingsToDefault();
@@ -83,7 +89,32 @@ const SettingsFeedback: FC = () => {
     reset(feedbackConfig);
   };
 
+  const transferMutation = useMutation({
+    mutationFn: (data: { sourceDomainUuid: string; targetDomainUuids: string[] }) =>
+      apiDev.post('configs/transfer/feedback', data),
+    onSuccess: () => {
+      toast.open({
+        type: 'success',
+        title: t('global.notification'),
+        message: t('toast.success.updateSuccess'),
+      });
+    },
+    onError: (error: AxiosError) => {
+      toast.open({
+        type: 'error',
+        title: t('global.notificationError'),
+        message: error.message,
+      });
+    },
+  });
+
+  const handleTransfer = (targetIds: string[]) => {
+    transferMutation.mutate({ sourceDomainUuid: selectedDomains[0], targetDomainUuids: targetIds });
+  };
+
   const handleDomainSelection = useDomainSelectionHandler(setSelectedDomains, fetchData, resetSettingsToDefault);
+
+  const sourceDomainSelected = multiDomainEnabled && selectedDomains.length === 1;
 
   if (!feedbackConfig) {
     return <>Loading...</>;
@@ -93,35 +124,39 @@ const SettingsFeedback: FC = () => {
     <>
       <h1>{t('settings.feedback.title')}</h1>
 
-      {multiDomainEnabled && (
-        <DomainSelector
-          disabled={(multiDomainEnabled && selectedDomains.length === 0) || false}
-          onChange={(selected) => {
-            handleDomainSelection(selected);
-          }}
-        />
-      )}
-
       <Card
+        tabs={multiDomainEnabled && <DomainTabSelector onChange={handleDomainSelection} />}
         footer={
           <Track justify="end">
-            <Button onClick={handleFormSubmit}>{t('global.save')}</Button>
+            <Button disabled={(multiDomainEnabled && selectedDomains.length === 0) || false} onClick={handleFormSubmit}>
+              {t('global.save')}
+            </Button>
           </Track>
         }
       >
         <Track gap={16} direction="vertical" align="left">
-          <Controller
-            name="feedbackActive"
-            control={control}
-            render={({ field }) => (
-              <Switch
-                label={t('settings.feedback.feedbackActive')}
-                onCheckedChange={field.onChange}
-                checked={Boolean(field.value)}
-                {...field}
+          <Track justify="between" align="center" style={{ width: '100%' }}>
+            <Controller
+              name="feedbackActive"
+              control={control}
+              render={({ field }) => (
+                <Switch
+                  label={t('settings.feedback.feedbackActive')}
+                  onCheckedChange={field.onChange}
+                  checked={Boolean(field.value)}
+                  {...field}
+                />
+              )}
+            />
+            {sourceDomainSelected && (
+              <DomainTransfer
+                allDomains={allDomains}
+                excludedDomainIds={selectedDomains}
+                onTransfer={handleTransfer}
+                isTransferring={transferMutation.isPending}
               />
             )}
-          />
+          </Track>
           <Controller
             name="isFiveRatingScale"
             control={control}

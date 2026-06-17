@@ -372,6 +372,7 @@ const SettingsUsers: FC = () => {
       }),
       columnHelper.accessor('statusComment', {
         header: t('global.statusClarification') ?? '',
+        enableColumnFilter: false,
         cell: statusCommentView,
       }),
       columnHelper.accessor('csaEmail', {
@@ -424,6 +425,7 @@ const SettingsUsers: FC = () => {
       {
         header: t('multiDomains.domains') ?? '',
         cell: (props) => truncateCellWithTooltip(props.getValue().join(', '), 160),
+        enableColumnFilter: false,
         filterFn: (row, _, filterValue) => {
           const mapped = mapUserDomains(row.original.domains ?? [], widgetDomains);
           return mapped.some((d) => d.name.toLowerCase().includes(filterValue.toLowerCase()));

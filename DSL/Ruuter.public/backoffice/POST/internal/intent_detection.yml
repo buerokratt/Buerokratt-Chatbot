@@ -18,6 +18,16 @@ declaration:
         type: string
         description: "Body field 'domain'"
 
+assign_message:
+  assign:
+    message: ${incoming.body.message ?? ''}
+
+check_if_message_is_service:
+  switch:
+    - condition: ${message.startsWith("#common_service") || message.startsWith("#service")}
+      next: return_skip
+  next: get_bot_name
+
 get_bot_name:
   call: http.post
   args:
@@ -39,7 +49,6 @@ assignParameters:
     currentDate: ${new Date().toISOString().split('T')[0]}
     sender: ${incoming.body.sender}
     domain: ${incoming.body.domain}
-    message: ${incoming.body.message ?? ''}
     botName: ${get_bot_name_result.response.body[0].value}
 
 assign_config:
@@ -255,14 +264,32 @@ handleEntities:
 
 assignNewEntities:
   assign:
-    entities: ${Object.values(intentJson.entities)}
+    entities: ${Object.keys(intentJson.entities)}
+    filteredEntities: ${[...new Set(entities)]}
+    service_entities: ${validated_intent.response.body[0].entities}
+  next: check_if_service_entities_are_in_included_in_llm_entities
+
+check_if_service_entities_are_in_included_in_llm_entities:
+  switch:
+    - condition: ${service_entities.every(e => filteredEntities.includes(e))}
+      next: assign_service_entities
+  next: assign_empty_entities
+
+assign_service_entities:
+  assign:
+    service_entities: ${Object.values(intentJson.entities)}
+  next: trigger_service
+
+assign_empty_entities:
+  assign:
+    service_entities: ${[]}
   next: trigger_service
 
 trigger_service:
   template: "[#CHATBOT_PROJECT_LAYER]/chats/trigger-llm-service"
   requestType: templates
   body:
-    entities: ${entities}
+    entities: ${service_entities}
     chatId: ${sender}
     authorId: ${botName}
     ruuterType: ${validated_intent.response.body[0].ruuterType}

@@ -38,9 +38,6 @@ import './Chat.scss';
 import { useInterval } from 'usehooks-ts';
 import { BotConfig } from 'types/botConfig';
 
-import { getWidgetData } from '../../services/users';
-import { DomainSelection } from '../../types/domainsModels';
-
 type ChatProps = {
   chat: ChatType;
   onChatEnd: (chat: ChatType) => void;
@@ -49,6 +46,7 @@ type ChatProps = {
   onSendToEmail?: (chat: ChatType) => void;
   onStartAService?: (chat: ChatType) => void;
   onRefresh: () => void;
+  onApprove?: () => void;
 };
 
 type GroupedMessage = {
@@ -66,6 +64,7 @@ const Chat: FC<ChatProps> = ({
   onSendToEmail,
   onStartAService,
   onRefresh,
+  onApprove,
 }) => {
   const { t } = useTranslation();
   const userInfo = useStore((state) => state.userInfo);
@@ -98,7 +97,7 @@ const Chat: FC<ChatProps> = ({
 
   const [newMessageEffect] = useNewMessageSound();
   const navigate = useNavigate();
-  const [allDomains, setAllDomains] = useState<DomainSelection[]>([]);
+  const allDomains = useStore((state) => state.allDomains);
   const multiDomainEnabled = import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
 
   const askPermissionsTimeoutInSeconds = 60;
@@ -140,14 +139,6 @@ const Chat: FC<ChatProps> = ({
       localStorage.removeItem('focused_chat');
     }
   };
-
-  useEffect(() => {
-    if (multiDomainEnabled && userInfo?.idCode) {
-      getWidgetData(userInfo?.idCode).then((domains) => {
-        setAllDomains(domains);
-      });
-    }
-  }, [userInfo?.idCode, multiDomainEnabled]);
 
   useEffect(() => {
     localStorage.setItem('focused_chat', chat.id);
@@ -404,9 +395,7 @@ const Chat: FC<ChatProps> = ({
         },
       });
 
-      if (chat.customerSupportId != '') {
-        chat.customerSupportId = userInfo?.idCode;
-      }
+      chat.customerSupportId = userInfo?.idCode;
       onRefresh();
     },
     onError: (error: AxiosError) => {
@@ -778,6 +767,7 @@ const Chat: FC<ChatProps> = ({
                           }}
                           selected={selectedMessage?.id === message.id}
                           editableMessage={checkIsMessageEditable(message)}
+                          onApprove={onApprove}
                         />
                         {!message.id && (
                           <div className="active-chat__message-failed-wrapper active-chat__message-failed">

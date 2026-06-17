@@ -1,0 +1,53 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'Session Logout'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: userId
+        type: string
+        description: "Body field 'userId'"
+
+extractRequestData:
+  assign:
+    userId: ${incoming.body.userId}
+
+unassignAllClaimedChats:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/update-chats-assignee-by-user-id"
+    body:
+      userId: ${userId}
+  result: unclaim_res
+
+setCustomerSupportAgentAway:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-customer-support-status"
+    body:
+      userIdCode: ${userId}
+      active: false
+      status: "offline"
+      statusComment: ""
+      created: ${new Date().toISOString()}
+  result: set_status_res
+
+assign_cookie:
+  assign:
+    setCookie:
+      customJwtCookie: null
+      Domain: "[#DOMAIN]"
+      Max-Age: 0
+      Secure: true
+      HttpOnly: true
+      SameSite: "[#COOKIE_SAME_SITE]"
+  next: return_result
+
+return_result:
+  headers:
+    Set-Cookie: ${setCookie}
+  return: "Logged Out Successfully"

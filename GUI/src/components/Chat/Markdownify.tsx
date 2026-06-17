@@ -28,6 +28,13 @@ const isValidImageUrl = (s: string): boolean => {
   }
 };
 
+const ensureAbsoluteUrl = (href: string): string => {
+  if (/^[a-z][a-z\d+\-.]*:\/\//i.test(href) || href.startsWith('//')) {
+    return href;
+  }
+  return `https://${href}`;
+};
+
 const LinkPreview: React.FC<{
   href: string;
   children: React.ReactNode;
@@ -42,7 +49,7 @@ const LinkPreview: React.FC<{
 
   if (sanitizeLinks) {
     return (
-      <a href={href} target="_blank" rel="noopener noreferrer">
+      <a href={ensureAbsoluteUrl(href)} target="_blank" rel="noopener noreferrer">
         {href}
       </a>
     );
@@ -50,7 +57,7 @@ const LinkPreview: React.FC<{
 
   if (!isValidImageUrl(href)) {
     return (
-      <a href={href} target="_blank" rel="noopener noreferrer">
+      <a href={ensureAbsoluteUrl(href)} target="_blank" rel="noopener noreferrer">
         {children}
       </a>
     );
@@ -76,15 +83,15 @@ const htmlLinkToMarkdown = (value: string): string => {
   const tempDiv = document.createElement('div');
   tempDiv.innerHTML = value;
   const links = tempDiv.querySelectorAll('a');
-  
+
   let result = value;
   links.forEach((link) => {
     const href = link.getAttribute('href') || '';
     const text = link.textContent || href;
-    const markdown = href ? `[${text}](${href})` : text;
+    const markdown = href ? `[${text}](${ensureAbsoluteUrl(href)})` : text;
     result = result.replace(link.outerHTML, markdown);
   });
-  
+
   return result;
 };
 

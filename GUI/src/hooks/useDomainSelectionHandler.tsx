@@ -1,12 +1,17 @@
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 
-type SelectOption = { label: string; value: string; meta?: string };
+import { SelectOption } from 'types';
 
 export const useDomainSelectionHandler = (
   setSelectedDomains: (ids: string[]) => void,
   fetchData: (domainId: string) => void,
   resetSettingsToDefault: () => void,
 ) => {
+  const fetchDataRef = useRef(fetchData);
+  const resetRef = useRef(resetSettingsToDefault);
+  fetchDataRef.current = fetchData;
+  resetRef.current = resetSettingsToDefault;
+
   const mapDomainSelection = useCallback((selectedDomains: SelectOption[]) => {
     if (!selectedDomains || selectedDomains.length === 0) return [];
     return selectedDomains.map((so) => so.value);
@@ -19,12 +24,12 @@ export const useDomainSelectionHandler = (
       setSelectedDomains(domainSelection);
 
       if (domainSelection.length === 1) {
-        fetchData(domainSelection[0]);
+        fetchDataRef.current(domainSelection[0]);
       } else {
-        resetSettingsToDefault();
+        resetRef.current();
       }
     },
-    [fetchData, resetSettingsToDefault, setSelectedDomains, mapDomainSelection],
+    [setSelectedDomains, mapDomainSelection],
   );
 
   return handleDomainSelection;

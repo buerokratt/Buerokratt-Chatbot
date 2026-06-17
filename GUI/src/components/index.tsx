@@ -1,5 +1,6 @@
 import Box from './Box';
 import Button from './Button';
+import DomainTransfer from './DomainTransfer';
 import Card from './Card';
 import Chat from './Chat';
 import Collapsible from './Collapsible';
@@ -17,6 +18,7 @@ import {
   FormTagInput,
   FormTextarea,
   IconSwitch,
+  Slider,
   Switch,
   SwitchBox,
 } from './FormElements';
@@ -33,6 +35,7 @@ import Track from './Track';
 export {
   Layout,
   Button,
+  DomainTransfer,
   Icon,
   Track,
   Tooltip,
@@ -60,4 +63,5 @@ export {
   Section,
   Chat,
   FormTagInput,
+  Slider,
 };

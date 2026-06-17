@@ -29,8 +29,10 @@ WITH last_configuration AS (
      'organizationOutsideWorkingHoursMessage',
      'organizationBotCannotAnswerMessage',
      'organizationRedirectIfBotCannotAnswerMessage',
-     'organizationUseCSA')
-    AND id IN (SELECT max(id) from configuration GROUP BY key)
+     'organizationUseCSA',
+     'organizationValidationNoCsaMessage')
+    AND "domain" IS NULL
+    AND id IN (SELECT max(id) from configuration WHERE "domain" IS NULL GROUP BY key)
     AND deleted = FALSE
 ), new_configuration as (
   SELECT new_values.key, new_values.value, :created::timestamp with time zone as created
@@ -63,7 +65,8 @@ WITH last_configuration AS (
         ('organizationOutsideWorkingHoursMessage', :organizationOutsideWorkingHoursMessage),
         ('organizationBotCannotAnswerMessage', :organizationBotCannotAnswerMessage),
         ('organizationRedirectIfBotCannotAnswerMessage', :organizationRedirectIfBotCannotAnswerMessage),
-        ('organizationUseCSA', :organizationUseCSA)
+        ('organizationUseCSA', :organizationUseCSA),
+        ('organizationValidationNoCsaMessage', :organizationValidationNoCsaMessage)
    ) as new_values (key, value)
 )
 INSERT INTO configuration (key, value, created)

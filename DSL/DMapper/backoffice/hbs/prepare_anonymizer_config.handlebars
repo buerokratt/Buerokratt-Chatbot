@@ -17,9 +17,9 @@
       {{#each entities}}
         "{{this}}": {
           "type": "mask",
-          "masking_char": "*",
-          "chars_to_mask": 4,
-          "from_end": true
+          "masking_char": "x",
+          "chars_to_mask": 6,
+          "from_end": false
         }
         {{#unless @last}},{{/unless}}
       {{/each}}

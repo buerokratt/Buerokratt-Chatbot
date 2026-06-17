@@ -15,10 +15,14 @@ import { MdOutlinePalette } from 'react-icons/md';
 import { apiDev } from 'services/api';
 import { ROLES } from 'utils/constants';
 
-import DomainSelector from '../../../components/DomainsSelector';
+import DomainTabSelector from '../../../components/DomainTabSelector';
+import DomainTransfer from '../../../components/DomainTransfer';
 import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
 import { fetchConfigurationFromDomain } from '../../../services/configurations';
+import useStore from '../../../store';
 import { WidgetAppearance, WidgetAppearanceResponse } from '../../../types/widgetAppearance';
+
+import { SelectOption } from 'types';
 
 const variants = {
   initial: {
@@ -39,6 +43,8 @@ const SettingsAppearance: FC = () => {
   const [delayFinished, setDelayFinished] = useState(false);
   const multiDomainEnabled = import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
   const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
+  const rawDomains = useStore((state) => state.allDomains);
+  const allDomains: SelectOption[] = rawDomains.map((d) => ({ label: d.name, value: d.id }));
 
   useEffect(() => {
     if (multiDomainEnabled) {
@@ -163,25 +169,41 @@ const SettingsAppearance: FC = () => {
     });
   };
 
+  const transferMutation = useMutation({
+    mutationFn: (data: { sourceDomainUuid: string; targetDomainUuids: string[] }) =>
+      apiDev.post('configs/transfer/widget', data),
+    onSuccess: () => {
+      toast.open({
+        type: 'success',
+        title: t('global.notification'),
+        message: t('toast.success.updateSuccess'),
+      });
+    },
+    onError: (error: AxiosError) => {
+      toast.open({
+        type: 'error',
+        title: t('global.notificationError'),
+        message: error.message,
+      });
+    },
+  });
+
+  const handleTransfer = (targetIds: string[]) => {
+    transferMutation.mutate({ sourceDomainUuid: selectedDomains[0], targetDomainUuids: targetIds });
+  };
+
   const handleDomainSelection = useDomainSelectionHandler(setSelectedDomains, fetchData, resetSettingsToDefault);
+
+  const sourceDomainSelected = multiDomainEnabled && selectedDomains.length === 1;
 
   if (hasRendered.current === undefined) return <>Loading...</>;
 
   return (
-    <div ref={colorComponentRef}>
+    <div>
       <h1 style={{ paddingBottom: 16 }}>{t('settings.appearance.title')}</h1>
 
-      {multiDomainEnabled && (
-        <div style={{ marginBottom: '11px' }}>
-          <DomainSelector
-            onChange={(selected) => {
-              handleDomainSelection(selected);
-            }}
-          />
-        </div>
-      )}
-
       <Card
+        tabs={multiDomainEnabled && <DomainTabSelector onChange={handleDomainSelection} />}
         footer={
           <Track gap={8} justify="end">
             <Button disabled={(multiDomainEnabled && selectedDomains.length === 0) || false} onClick={handleFormSubmit}>
@@ -194,11 +216,21 @@ const SettingsAppearance: FC = () => {
         }
       >
         <Track gap={8} direction="vertical" align="left">
-          <FormInput
-            {...register('widgetProactiveSeconds')}
-            label={t('settings.appearance.widgetProactiveSeconds')}
-            type="number"
-          />
+          <Track justify="between" align="center" style={{ width: '100%' }}>
+            <FormInput
+              {...register('widgetProactiveSeconds')}
+              label={t('settings.appearance.widgetProactiveSeconds')}
+              type="number"
+            />
+            {sourceDomainSelected && (
+              <DomainTransfer
+                allDomains={allDomains}
+                excludedDomainIds={selectedDomains}
+                onTransfer={handleTransfer}
+                isTransferring={transferMutation.isPending}
+              />
+            )}
+          </Track>
           <Controller
             name="isWidgetActive"
             control={control}
@@ -220,37 +252,39 @@ const SettingsAppearance: FC = () => {
             {...register('widgetBubbleMessageText')}
             label={t('settings.appearance.widgetBubbleMessageText')}
           />
-          <FormInput
-            {...register('widgetColor')}
-            readOnly={true}
-            label={t('settings.appearance.widgetColor')}
-            onClick={() => setShowColorPalette(!showColorPalette)}
-          >
-            {
-              <div style={{ flexDirection: 'row' }}>
-                <button
-                  style={{
-                    position: 'absolute',
-                    zIndex: '2',
-                    right: '10px',
-                    bottom: '95%',
-                  }}
-                  onClick={() => setShowColorPalette(!showColorPalette)}
-                >
-                  <Icon icon={<MdOutlinePalette fontSize={20} color="rgba(0,0,0,0.54)" />} />
-                </button>
-                {showColorPalette && (
-                  <div style={{ position: 'absolute', zIndex: '2' }}>
-                    <ChromePicker
-                      {...register('widgetColor')}
-                      color={widgetColor}
-                      onChange={(color) => setValue('widgetColor', color.hex)}
-                    />
-                  </div>
-                )}
-              </div>
-            }
-          </FormInput>
+          <div ref={colorComponentRef} style={{ width: '100%', position: 'relative' }}>
+            <FormInput
+              {...register('widgetColor')}
+              readOnly={true}
+              label={t('settings.appearance.widgetColor')}
+              onClick={() => setShowColorPalette(!showColorPalette)}
+            >
+              {
+                <div style={{ flexDirection: 'row' }}>
+                  <button
+                    style={{
+                      position: 'absolute',
+                      zIndex: '2',
+                      right: '10px',
+                      bottom: '95%',
+                    }}
+                    onClick={() => setShowColorPalette(!showColorPalette)}
+                  >
+                    <Icon icon={<MdOutlinePalette fontSize={20} color="rgba(0,0,0,0.54)" />} />
+                  </button>
+                  {showColorPalette && (
+                    <div style={{ position: 'absolute', zIndex: '2' }}>
+                      <ChromePicker
+                        {...register('widgetColor')}
+                        color={widgetColor}
+                        onChange={(color) => setValue('widgetColor', color.hex)}
+                      />
+                    </div>
+                  )}
+                </div>
+              }
+            </FormInput>
+          </div>
           <Controller
             name="widgetAnimation"
             control={control}
@@ -258,6 +292,7 @@ const SettingsAppearance: FC = () => {
               <FormSelect
                 {...field}
                 onSelectionChange={(selection) => field.onChange(selection?.value)}
+                onOpen={() => setShowColorPalette(false)}
                 label={t('settings.appearance.widgetAnimation')}
                 defaultValue={field.value}
                 options={[

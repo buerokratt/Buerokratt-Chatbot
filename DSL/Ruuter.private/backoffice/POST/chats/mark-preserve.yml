@@ -1,0 +1,35 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Decription placeholder for 'MARK-PRESERVE'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: chatId
+        type: string
+        description: "Body field 'chatId'"
+      - field: isPreserve
+        type: boolean
+        description: "Body field 'isPreserve'"
+
+extractRequestData:
+  assign:
+    chatId: ${incoming.body.chatId}
+    isPreserve: ${incoming.body.isPreserve}
+
+updateChat:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/update-preserve-chat"
+    body:
+      chatId: ${chatId}
+      isPreserve: ${isPreserve}
+      created: ${new Date().toISOString()}
+  result: updatedChat
+
+return_result:
+  return: ${updatedChat.response.body}
+  next: end

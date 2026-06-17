@@ -14,6 +14,12 @@ declaration:
       - field: startDate
         type: string
         description: "Body field 'startDate'"
+      - field: startAuthDate
+        type: string
+        description: "Body field 'startAuthDate'"
+      - field: startAnonDate
+        type: string
+        description: "Body field 'startAnonDate'"
       - field: page
         type: number
         description: "Body field 'page'"
@@ -31,6 +37,8 @@ extractRequestData:
   assign:
     startDate: "${incoming.body.startDate}"
     endDate: "${incoming.body.endDate}"
+    startAuthDate: "${incoming.body.startAuthDate}"
+    startAnonDate: "${incoming.body.startAnonDate}"
 
 getEndedChats:
   call: http.post
@@ -39,6 +47,8 @@ getEndedChats:
     body:
       auth_date: ${startDate}
       anon_date: ${endDate}
+      start_auth_date: ${startAuthDate}
+      start_anon_date: ${startAnonDate}
       page: ${incoming.body.page}
       page_size: ${incoming.body.page_size}
       sorting: ${incoming.body.sorting}

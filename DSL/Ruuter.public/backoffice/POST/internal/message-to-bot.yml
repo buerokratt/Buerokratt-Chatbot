@@ -66,8 +66,39 @@ get_chat:
 check_chat_belongs_to_bot:
   switch:
     - condition: ${get_chat_result.response.body[0].customerSupportId == chat_bot_name}
-      next: check_bot_is_active
+      next: check_if_domain_exists
   next: return_chat_does_not_belong_to_bot
+
+check_if_domain_exists:
+  switch:
+    - condition: ${domain === 'none'}
+      next: check_bot_is_active
+  next: getDomainId
+
+getDomainId:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-uuid"
+    body:
+      domainUrl: ${domain + '%'}
+  result: domainId
+  next: validate_domain_id_res
+
+validate_domain_id_res:
+  switch:
+    - condition: ${domainId.response.body.length > 0}
+      next: check_domain_bot_is_active
+  next: check_bot_is_active
+
+check_domain_bot_is_active:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-configuration"
+    body:
+      key: "is_bot_active"
+      domain: ${domainId.response.body[0].domainId}
+  result: is_bot_active_result
+  next: check_bot_activity_result
 
 check_bot_is_active:
   call: http.post
@@ -343,7 +374,6 @@ get_domain_organization_working_details:
     body:
       holidays: ${holidays}
       holiday_names: ${holidayNames}
-      current_timestamp: ${new Date().toISOString()}
       domainUUID: ${domainUuid.response.body[0].domainId}
   result: org_res
   next: assign_organization_details
@@ -355,7 +385,6 @@ get_organization_working_details:
     body:
       holidays: ${holidays}
       holiday_names: ${holidayNames}
-      current_timestamp: ${new Date().toISOString()}
   result: org_res
   next: assign_organization_details
 
@@ -489,7 +518,7 @@ extract_bot_responses:
 
 normalize_html_links_in_bot_messages:
   assign:
-    botMsg: '$=botMsg.map(m => { const cvt = v => (v||"").replace(/<a\s[^>]*href="([^"]+)"[^>]*>([\s\S]*?)(?:<\/a>|$)/gi, (_, u, l) => "[" + l.replace(/<[^>]+>/g,"").trim() + "](" + u + ")"); return {...m, text: cvt(m.text), result: cvt(m.result)}; })='
+    botMsg: '$=botMsg.map(m => { const cvt = v => (v||"").replace(/<a\s[^>]*href="([^"]+)"[^>]*>([\s\S]*?)(?:<\/a>|$)/gi, (_, u, l) => { const abs = /^[a-zA-Z][a-zA-Z\d+\-.]*:\/\//i.test(u) || u.startsWith("//") ? u : "https://" + u; return "[" + l.replace(/<[^>]+>/g,"").trim() + "](" + abs + ")"; }); return {...m, text: cvt(m.text), result: cvt(m.result)}; })='
   next: format_bot_messages
 
 format_bot_messages:

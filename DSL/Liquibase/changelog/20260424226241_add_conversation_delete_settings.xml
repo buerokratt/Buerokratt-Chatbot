@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+
+    <changeSet id="20260424226241" author="ahmedyasser">
+        <insert tableName="configuration">
+            <column name="key" value="isAuthConversations"/>
+            <column name="value" value="true"/>
+        </insert>
+        <insert tableName="configuration">
+            <column name="key" value="authPeriod"/>
+            <column name="value" value="365"/>
+        </insert>
+        <insert tableName="configuration">
+            <column name="key" value="isAnonymConversations"/>
+            <column name="value" value="true"/>
+        </insert>
+        <insert tableName="configuration">
+            <column name="key" value="anonymPeriod"/>
+            <column name="value" value="365"/>
+        </insert>
+        <insert tableName="configuration">
+            <column name="key" value="deletionTimeISO"/>
+            <column name="value" value="2024-11-12T17:00:00.000Z"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

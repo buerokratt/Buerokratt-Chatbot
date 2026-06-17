@@ -8,6 +8,7 @@ import FormMultiselect from './FormSelect/FormMultiselect';
 import FormTagInput from './FormTagInput';
 import FormTextarea from './FormTextarea';
 import IconSwitch from './IconSwitch';
+import Slider from './Slider';
 import Switch from './Switch';
 import SwitchBox from './SwitchBox';
 
@@ -24,4 +25,5 @@ export {
   SwitchBox,
   FormTagInput,
   IconSwitch,
+  Slider,
 };

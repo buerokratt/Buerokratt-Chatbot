@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import { Button, Card, Dialog, FormTextarea, Icon, Switch, Tooltip, Track } from 'components';
+import { Button, Card, Dialog, FormInput, FormTextarea, Icon, Slider, Switch, Tooltip, Track } from 'components';
 import withAuthorization from 'hoc/with-authorization';
 import { useToast } from 'hooks/useToast';
 import { FC, useEffect, useRef, useState } from 'react';
@@ -9,11 +9,20 @@ import { apiDev } from 'services/api';
 import { BotConfigResponse } from 'types/botConfig';
 import { ROLES } from 'utils/constants';
 
-import DomainSelector from '../../../components/DomainsSelector';
+import DomainTabSelector from '../../../components/DomainTabSelector';
+import DomainTransfer from '../../../components/DomainTransfer';
 import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
 import { fetchConfigurationFromDomain } from '../../../services/configurations';
+import useStore from '../../../store';
 import { AiOutlineInfoCircle } from 'react-icons/ai';
-import { SUB_TITLE_LENGTH } from 'constants/config';
+
+import { SelectOption } from 'types';
+import {
+  SUB_TITLE_LENGTH,
+  RESPONSE_PROCESSING_NOTICE_LENGTH,
+  RESPONSE_WAITING_TIME_MIN,
+  RESPONSE_WAITING_TIME_MAX,
+} from 'constants/config';
 
 const SettingsChatSettings: FC = () => {
   const { t } = useTranslation();
@@ -21,6 +30,8 @@ const SettingsChatSettings: FC = () => {
   const hasRendered = useRef<boolean>();
   const multiDomainEnabled = import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
   const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
+  const rawDomains = useStore((state) => state.allDomains);
+  const allDomains: SelectOption[] = rawDomains.map((d) => ({ label: d.name, value: d.id }));
   const [isBotActive, setIsBotActive] = useState<boolean | undefined>(undefined);
   const [currentIsBurokrattActive, setCurrentIsBurokrattActive] = useState<boolean | undefined>(undefined);
   const [isBurokrattActive, setIsBurokrattActive] = useState<boolean | undefined>(undefined);
@@ -30,6 +41,9 @@ const SettingsChatSettings: FC = () => {
   const [instantlyOpenChatWidget, setInstantlyOpenChatWidget] = useState<boolean | undefined>(undefined);
   const [showSubTitle, setShowSubTitle] = useState<boolean | undefined>(undefined);
   const [subTitle, setSubTitle] = useState<string>('');
+  const [responseWaitingTime, setResponseWaitingTime] = useState<string>('');
+  const [responseProcessingNotice, setResponseProcessingNotice] = useState<string>('');
+  const [isLlmModuleActive, setIsLlmModuleActive] = useState<boolean | undefined>(undefined);
   const queryClient = useQueryClient();
   const [burokrattConfirmationModal, setBurokrattConfirmationModal] = useState<boolean | null>(null);
   const tooltips = {
@@ -41,6 +55,7 @@ const SettingsChatSettings: FC = () => {
     is_edit_chat_visible: t('settings.chat.tooltip.isEditChatVisible'),
     show_sub_title: t('settings.chat.tooltip.showSubTitle'),
     sub_title: t('settings.chat.tooltip.subTitle'),
+    llm_module_active: t('settings.chat.tooltip.llmModuleActive'),
   };
 
   useEffect(() => {
@@ -70,6 +85,9 @@ const SettingsChatSettings: FC = () => {
       setInstantlyOpenChatWidget(res.instantlyOpenChatWidget === 'true');
       setShowSubTitle(res.showSubTitle === 'true');
       setSubTitle(res.subTitle);
+      setResponseWaitingTime(res.responseWaitingTime);
+      setResponseProcessingNotice(res.responseProcessingNotice);
+      setIsLlmModuleActive(res.llmModuleActive === 'true');
 
       hasRendered.current = true;
     } catch (error) {
@@ -87,6 +105,9 @@ const SettingsChatSettings: FC = () => {
       instantly_open_chat_widget: boolean;
       show_sub_title: boolean;
       sub_title: string;
+      response_waiting_time: string;
+      response_processing_notice: string;
+      llm_module_active: boolean;
       domainUUID: string[];
     }) => {
       return apiDev.post(`configs/bot-config`, {
@@ -97,6 +118,9 @@ const SettingsChatSettings: FC = () => {
         isEditChatVisible: data.is_edit_chat_visible.toString(),
         instantlyOpenChatWidget: data.instantly_open_chat_widget.toString(),
         showSubTitle: data.show_sub_title.toString(),
+        responseWaitingTime: data.response_waiting_time,
+        responseProcessingNotice: data.response_processing_notice,
+        llmModuleActive: data.llm_module_active.toString(),
         subTitle: data.sub_title,
         domainUUID: data.domainUUID,
       });
@@ -134,6 +158,9 @@ const SettingsChatSettings: FC = () => {
       instantly_open_chat_widget: instantlyOpenChatWidget ?? false,
       show_sub_title: showSubTitle ?? false,
       sub_title: subTitle ?? '',
+      response_waiting_time: responseWaitingTime ?? '',
+      response_processing_notice: responseProcessingNotice ?? '',
+      llm_module_active: isLlmModuleActive ?? false,
       domainUUID: multiDomainEnabled ? selectedDomains : [],
     });
   };
@@ -148,9 +175,37 @@ const SettingsChatSettings: FC = () => {
     setInstantlyOpenChatWidget(false);
     setShowSubTitle(false);
     setSubTitle('');
+    setResponseWaitingTime('10');
+    setResponseProcessingNotice('');
+    setIsLlmModuleActive(false);
+  };
+
+  const transferMutation = useMutation({
+    mutationFn: (data: { sourceDomainUuid: string; targetDomainUuids: string[] }) =>
+      apiDev.post('configs/transfer/bot-config', data),
+    onSuccess: async () => {
+      toast.open({
+        type: 'success',
+        title: t('global.notification'),
+        message: t('toast.success.updateSuccess'),
+      });
+    },
+    onError: (error: AxiosError) => {
+      toast.open({
+        type: 'error',
+        title: t('global.notificationError'),
+        message: error.message,
+      });
+    },
+  });
+
+  const handleTransfer = (targetIds: string[]) => {
+    transferMutation.mutate({ sourceDomainUuid: selectedDomains[0], targetDomainUuids: targetIds });
   };
 
   const handleDomainSelection = useDomainSelectionHandler(setSelectedDomains, fetchData, resetSettingsToDefault);
+
+  const sourceDomainSelected = multiDomainEnabled && selectedDomains.length === 1;
 
   function getTooltip(
     name:
@@ -161,7 +216,8 @@ const SettingsChatSettings: FC = () => {
       | 'is_csa_title_visible'
       | 'is_edit_chat_visible'
       | 'show_sub_title'
-      | 'sub_title',
+      | 'sub_title'
+      | 'llm_module_active',
   ) {
     return (
       <Tooltip content={tooltips[name]}>
@@ -180,30 +236,32 @@ const SettingsChatSettings: FC = () => {
     <>
       <h1>{t('settings.title')}</h1>
 
-      {multiDomainEnabled && (
-        <div style={{ marginBottom: '11px' }}>
-          <DomainSelector
-            onChange={(selected) => {
-              handleDomainSelection(selected);
-            }}
-          />
-        </div>
-      )}
-
       <Card
+        tabs={multiDomainEnabled && <DomainTabSelector onChange={handleDomainSelection} />}
+        isScrollable={true}
         header={
           <Track direction="vertical" gap={8} align="left">
-            {isBotActive != undefined && (
-              <Track gap={10}>
-                <Switch
-                  name="is_bot_active"
-                  label={t('settings.chat.chatActive').toString()}
-                  checked={isBotActive}
-                  onCheckedChange={setIsBotActive}
+            <Track justify="between" align="center" style={{ width: '100%' }}>
+              {isBotActive != undefined && (
+                <Track gap={10}>
+                  <Switch
+                    name="is_bot_active"
+                    label={t('settings.chat.chatActive').toString()}
+                    checked={isBotActive}
+                    onCheckedChange={setIsBotActive}
+                  />
+                  {getTooltip('is_bot_active')}
+                </Track>
+              )}
+              {sourceDomainSelected && (
+                <DomainTransfer
+                  allDomains={allDomains}
+                  excludedDomainIds={selectedDomains}
+                  onTransfer={handleTransfer}
+                  isTransferring={transferMutation.isPending}
                 />
-                {getTooltip('is_bot_active')}
-              </Track>
-            )}
+              )}
+            </Track>
             {isBurokrattActive != undefined && (
               <Track gap={10}>
                 <Switch
@@ -252,11 +310,24 @@ const SettingsChatSettings: FC = () => {
                 {getTooltip('sub_title')}
               </Track>
             )}
+            {isLlmModuleActive != undefined && (
+              <Track gap={10}>
+                <Switch
+                  name="llm_module_active"
+                  label={t('settings.chat.llmModuleActive').toString()}
+                  checked={isLlmModuleActive}
+                  onCheckedChange={setIsLlmModuleActive}
+                />
+                {getTooltip('llm_module_active')}
+              </Track>
+            )}
           </Track>
         }
         footer={
           <Track justify="end">
-            <Button onClick={handleFormSubmit}>{t('global.save')}</Button>
+            <Button disabled={(multiDomainEnabled && selectedDomains.length === 0) || false} onClick={handleFormSubmit}>
+              {t('global.save')}
+            </Button>
           </Track>
         }
       >
@@ -294,6 +365,60 @@ const SettingsChatSettings: FC = () => {
               {getTooltip('is_edit_chat_visible')}
             </Track>
           )}
+          <Track direction="vertical" gap={5} style={{ width: '40%', paddingTop: '10px', paddingBottom: '5px' }}>
+            <Track gap={8} align="center" style={{ width: '100%' }}>
+              <label style={{ flex: '0 0 185px', lineHeight: '24px' }}>{t('settings.chat.responseWaitingTime')}</label>
+              <Track gap={8} align="center" style={{ flex: 1 }}>
+                <div style={{ width: '80px', flexShrink: 0 }}>
+                  <FormInput
+                    name="response_waiting_time"
+                    label={t('settings.chat.responseWaitingTime')}
+                    hideLabel
+                    type="number"
+                    min={RESPONSE_WAITING_TIME_MIN}
+                    max={RESPONSE_WAITING_TIME_MAX}
+                    step={1}
+                    value={responseWaitingTime || '10'}
+                    onChange={(e) => {
+                      const raw = parseInt(e.target.value);
+                      if (!isNaN(raw)) {
+                        setResponseWaitingTime(
+                          String(Math.min(RESPONSE_WAITING_TIME_MAX, Math.max(RESPONSE_WAITING_TIME_MIN, raw))),
+                        );
+                      }
+                    }}
+                  />
+                </div>
+                <span style={{ whiteSpace: 'nowrap' }}>{t('settings.chat.seconds')}*</span>
+                <Slider
+                  min={RESPONSE_WAITING_TIME_MIN}
+                  max={RESPONSE_WAITING_TIME_MAX}
+                  step={1}
+                  value={parseInt(responseWaitingTime) || 10}
+                  onChange={(e) => setResponseWaitingTime(e.target.value)}
+                  style={{ flex: 1 }}
+                />
+              </Track>
+            </Track>
+            <Track gap={8} style={{ width: '100%' }}>
+              <div style={{ flex: '0 0 185px' }} />
+              <span style={{ fontSize: '12px', color: '#6e6e6e' }}>
+                *{t('settings.chat.responseWaitingTimeRangeInfo')}
+              </span>
+            </Track>
+          </Track>
+          <Track direction="vertical" gap={4} style={{ width: '40%' }}>
+            <FormTextarea
+              name="response_processing_notice"
+              label={t('settings.chat.responseProcessingNotice').toString()}
+              minRows={4}
+              maxLength={RESPONSE_PROCESSING_NOTICE_LENGTH}
+              showMaxLength={true}
+              maxLengthBottom
+              onChange={(e) => setResponseProcessingNotice(e.target.value)}
+              defaultValue={responseProcessingNotice}
+            />
+          </Track>
         </Track>
       </Card>
       {burokrattConfirmationModal && (
@@ -322,6 +447,9 @@ const SettingsChatSettings: FC = () => {
                     instantly_open_chat_widget: instantlyOpenChatWidget ?? false,
                     show_sub_title: showSubTitle ?? false,
                     sub_title: subTitle ?? '',
+                    response_waiting_time: responseWaitingTime ?? '',
+                    response_processing_notice: responseProcessingNotice ?? '',
+                    llm_module_active: isLlmModuleActive ?? false,
                     domainUUID: multiDomainEnabled ? selectedDomains : [],
                   });
                 }}

@@ -127,6 +127,12 @@ get_organization_base_config:
 assign_organization_base_config:
   assign:
     base_config: ${org_base_config_res.response.body[0]}
+  next: is_waiting_validation_event_check
+
+is_waiting_validation_event_check:
+  switch:
+    - condition: ${event === 'waiting_validation'}
+      next: change_chat_status
   next: check_if_organization_use_csa
 
 check_if_organization_use_csa:
@@ -160,7 +166,6 @@ get_domain_organization_working_details:
     body:
       holidays: ${holidays}
       holiday_names: ${holidayNames}
-      current_timestamp: ${new Date().toISOString()}
       domainUUID: ${domainUuid.response.body[0].domainId}
   result: org_res
   next: assign_organization_details
@@ -172,7 +177,6 @@ get_organization_working_details:
     body:
       holidays: ${holidays}
       holiday_names: ${holidayNames}
-      current_timestamp: ${new Date().toISOString()}
   result: org_res
   next: assign_organization_details
 
@@ -243,7 +247,7 @@ assign_validation_event:
         text: ${correct_value.map((item) => item.text)[0].replace('$validate_', '')}
         context: ${context}
     event: "waiting_validation"
-  next: change_chat_status 
+  next: check_base_config_domain
 
 change_chat_status:
   call: http.post
@@ -254,6 +258,7 @@ change_chat_status:
       status: "VALIDATING"
       holidays: ${holidays}
       holidayNames: ${holidayNames}
+      domain: ${domain}
   result: change_chat_status_res
   next: check_chat_status_result
 
@@ -267,7 +272,7 @@ assign_unavailable_message:
   assign:
     correct_value:
       - recipient_id: ${sender}
-        text: "Edasine lahendamine toimub vastavalt pöördumiste protsessile väljaspool AI-assistendi lahendust."
+        text: ${base_config?.validationNoCsaMessage ?? ''}
         context: ${context}
     event: ""
   next: format_messages
