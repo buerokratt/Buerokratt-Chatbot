@@ -44,6 +44,7 @@ transferToTargets:
       sub_title: ${source.response.body[0].subTitle}
       response_waiting_time: ${source.response.body[0].responseWaitingTime}
       response_processing_notice: ${source.response.body[0].responseProcessingNotice}
+      llm_module_active: ${source.response.body[0].llmModuleActive}
       domains: ${JSON.stringify(targetDomainUuids)}
   result: res
 

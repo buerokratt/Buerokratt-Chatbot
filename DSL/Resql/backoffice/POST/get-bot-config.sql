@@ -12,7 +12,8 @@ WITH configuration_values AS (
                   'show_sub_title',
                   'sub_title',
                   'response_waiting_time',
-                  'response_processing_notice'
+                  'response_processing_notice',
+                  'llm_module_active'
                  )
       AND id IN (SELECT max(id) FROM configuration GROUP BY KEY)
       AND NOT deleted
@@ -27,5 +28,6 @@ SELECT
     MAX(CASE WHEN KEY = 'show_sub_title' THEN value END) AS show_sub_title,
     MAX(CASE WHEN KEY = 'sub_title' THEN value END) AS sub_title,
     MAX(CASE WHEN KEY = 'response_waiting_time' THEN value END) AS response_waiting_time,
-    MAX(CASE WHEN KEY = 'response_processing_notice' THEN value END) AS response_processing_notice
+    MAX(CASE WHEN KEY = 'response_processing_notice' THEN value END) AS response_processing_notice,
+    MAX(CASE WHEN KEY = 'llm_module_active' THEN value END) AS llm_module_active
 FROM configuration_values;
