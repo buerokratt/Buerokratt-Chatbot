@@ -63,6 +63,7 @@ const SettingsSkmConfiguration: FC = () => {
         documents: data.documents.toString(),
         maxTokens: data.maxTokens.toString(),
         inScope: data.inScope.toString(),
+        useAgentic: data.useAgentic.toString(),
       }),
     onSuccess: () => {
       toast.open({
@@ -121,6 +122,9 @@ const SettingsSkmConfiguration: FC = () => {
     queryType: t('settings.skmConfiguration.tooltip.queryType'),
     semanticConfiguration: t('settings.skmConfiguration.tooltip.semanticConfiguration'),
     inScope: t('settings.skmConfiguration.tooltip.inScope'),
+    useAgentic: t('settings.skmConfiguration.tooltip.useAgentic'),
+    azureAgentName: t('settings.skmConfiguration.tooltip.azureAgentName'),
+    azureAgentType: t('settings.skmConfiguration.tooltip.azureAgentType'),
   };
 
   const resetSettingsToDefault = () => {
@@ -133,6 +137,9 @@ const SettingsSkmConfiguration: FC = () => {
       queryType: 'vector_semantic_hybrid',
       semanticConfiguration: 'azureml-default',
       inScope: 'true',
+      useAgentic: 'false',
+      azureAgentName: '',
+      azureAgentType: '',
       domainUUID: [],
     };
     setSkmConfig(skmConfig);

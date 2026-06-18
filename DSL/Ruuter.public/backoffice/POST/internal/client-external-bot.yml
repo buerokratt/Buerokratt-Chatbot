@@ -25,9 +25,6 @@ extract_data:
     sender: ${incoming.body.sender}
     domain: ${incoming.body.domain}
     stream: "[#SKM_STREAM]"
-    use_agentic: "[#SKM_USE_AGENTIC]"
-    agent_name: "[#AZURE_AGENT_NAME]"
-    agent_type: "[#AZURE_AGENT_TYPE]"
     message: ${incoming.body.message ?? ''}
 
 checkForDomain:
@@ -70,6 +67,9 @@ getSkmConfig:
 assignSkmConfig:
   assign:
     skm_config: ${skm_res.response.body[0]}
+    use_agentic: ${skm_config.useAgentic}
+    agent_name: ${skm_config.azureAgentName}
+    agent_type: ${skm_config.azureAgentType}
 
 assign_data_sources:
   assign:

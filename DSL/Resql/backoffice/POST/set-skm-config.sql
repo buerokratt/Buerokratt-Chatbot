@@ -9,7 +9,10 @@ WITH last_configuration AS (
      'skm_index_name',
      'skm_query_type',
      'skm_semantic_configuration',
-     'skm_in_scope')
+     'skm_in_scope',
+     'skm_use_agentic',
+     'azure_agent_name',
+     'azure_agent_type')
     AND id IN (SELECT max(id) from configuration GROUP BY key)
     AND deleted = FALSE
 ), new_configuration as (
@@ -23,7 +26,10 @@ WITH last_configuration AS (
         ('skm_index_name', :skm_index_name),
         ('skm_query_type', :skm_query_type),
         ('skm_semantic_configuration', :skm_semantic_configuration),
-        ('skm_in_scope', :skm_in_scope)
+        ('skm_in_scope', :skm_in_scope),
+        ('skm_use_agentic', :skm_use_agentic),
+        ('azure_agent_name', :azure_agent_name),
+        ('azure_agent_type', :azure_agent_type)
    ) as new_values (key, value)
 )
 INSERT INTO configuration (key, value, created)
