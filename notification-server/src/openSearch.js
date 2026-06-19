@@ -354,6 +354,102 @@ function handleError(e) {
   throw e;
 }
 
+async function createLLMOrchestrationStreamRequest({ channelId, chatId, message, authorId, conversationHistory = [] }) {
+  const connections = Array.from(activeConnections.entries()).filter(
+    ([_, connData]) => connData.channelId === channelId,
+  );
+
+  console.log(`Active connections for LLM stream channel ${channelId}:`, connections.length);
+
+  if (connections.length === 0) {
+    const requestId = streamQueue.addToQueue(channelId, { chatId: chatId || channelId, message, authorId, conversationHistory });
+    console.log(`No active connections for channel ${channelId}, queued LLM request ${requestId}`);
+    return;
+  }
+
+  const responsePromises = connections.map(async ([connectionId, connData]) => {
+    const { sender } = connData;
+
+    try {
+      const orchestrationPayload = {
+        chatId: chatId || channelId,
+        message,
+        authorId: authorId || `user-${channelId}`,
+        conversationHistory: (conversationHistory || []).map(m => {
+          const rawRole = m.authorRole || m.role || 'user';
+          const authorRole = rawRole === 'assistant' ? 'bot' : rawRole;
+          return {
+            authorRole,
+            message: m.message || m.content,
+            timestamp: m.timestamp || new Date().toISOString(),
+          };
+        }),
+        url: 'sse-stream-context',
+      };
+
+      const response = await fetch(
+        `${process.env.LLM_ORCHESTRATOR_URL || 'http://llm-orchestration-service:8100'}/orchestrate/stream`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(orchestrationPayload),
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error(`LLM Orchestration API error: ${response.status} ${response.statusText}`);
+      }
+
+      if (!activeConnections.has(connectionId)) return;
+
+      sender({ type: 'stream_start', streamId: channelId, channelId, isComplete: false });
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        if (!activeConnections.has(connectionId)) break;
+
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+          if (!line.trim() || !line.startsWith('data: ')) continue;
+
+          try {
+            const data = JSON.parse(line.slice(6));
+            const content = data.payload?.content;
+
+            if (!content) continue;
+
+            if (content === 'END') {
+              sender({ type: 'stream_complete', streamId: channelId, channelId, isComplete: true });
+              break;
+            }
+
+            sender({ type: 'stream_chunk', content, streamId: channelId, channelId, isComplete: false });
+          } catch (parseError) {
+            console.error(`Failed to parse LLM SSE data for channel ${channelId}:`, parseError, line);
+          }
+        }
+      }
+    } catch (error) {
+      console.error(`LLM streaming error for connection ${connectionId}:`, error);
+      if (activeConnections.has(connectionId)) {
+        sender({ type: 'stream_error', error: error.message, streamId: channelId, channelId, isComplete: true });
+      }
+    }
+  });
+
+  await Promise.all(responsePromises);
+  return { success: true, channelId };
+}
+
 module.exports = {
   client,
   searchNotification,
@@ -362,4 +458,5 @@ module.exports = {
   findChatIdOrder,
   sendBulkNotification,
   createAzureOpenAIStreamRequest,
+  createLLMOrchestrationStreamRequest,
 };
