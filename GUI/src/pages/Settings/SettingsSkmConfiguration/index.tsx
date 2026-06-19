@@ -139,8 +139,8 @@ const SettingsSkmConfiguration: FC = () => {
       semanticConfiguration: 'azureml-default',
       inScope: 'true',
       useAgentic: 'false',
-      azureAgentName: '',
-      azureAgentType: '',
+      azureAgentName: 'ai-act-agent',
+      azureAgentType: 'agent_reference',
       domainUUID: [],
     };
     setSkmConfig(skmConfig);
@@ -195,7 +195,7 @@ const SettingsSkmConfiguration: FC = () => {
           </Track>
         }
       >
-        <Fragment key={key} >
+        <Fragment key={key}>
           <Track gap={16} direction="vertical" align="left">
             <Track justify="between" align="center" style={{ width: '100%' }}>
               {getSwitchControl('useAgentic')}
