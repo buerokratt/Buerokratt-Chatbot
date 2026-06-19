@@ -583,9 +583,9 @@
         "queryType": "Vali otsingutüüp.",
         "semanticConfiguration": "Azures loodud indeksi semantiline konfiguratsioon",
         "inScope": "Kui otsing tagastab andmetest 0 vastet, siis 'Jah' puhul ei saadeta kasutaja küsimust keelemudelile, vaid kindlaksmääratud vastus tuleb otsingusüsteemist",
-        "useAgentic": "",
-        "azureAgentName": "",
-        "azureAgentType": ""
+        "useAgentic": "Agendiline otsing võimaldab sügavamat otsingut teadmusbaasis olevatest dokumentidest. Selle kasutamise eelduseks on Foundry portaalis loodud agent. Agendilise otsigu puhul tuleb SKMi seadistused teha Foundry portaalis.",
+        "azureAgentName": "Foundry portaalis loodud agendi nimi.",
+        "azureAgentType": "Otsinguagendi tüüp. Vaikeväärtus on 'agent_reference'."
       },
       "validation": {
         "range": "Rangus peab olema vahemikus 1 kuni 5",
