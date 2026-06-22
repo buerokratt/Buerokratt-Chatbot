@@ -173,7 +173,7 @@ app.post('/channels/:channelId/llm-stream', async (req, res) => {
     authorId,
     conversationHistory,
   }).catch((error) => {
-    console.error(`LLM stream error for channel ${channelId}:`, error.message);
+    console.error('LLM stream error for channel:', error.message);
   });
 });
 
