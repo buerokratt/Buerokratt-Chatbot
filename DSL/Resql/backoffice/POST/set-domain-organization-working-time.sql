@@ -38,9 +38,10 @@ WHERE
     'organizationNoCsaAvailableMessage',
     'organizationOutsideWorkingHoursAskForContacts',
     'organizationOutsideWorkingHoursMessage',
-    'organizationBotCannotAnswerAskToForwardToCSA',
     'organizationBotCannotAnswerMessage',
-    'organizationUseCSA'
+    'organizationRedirectIfBotCannotAnswerMessage',
+    'organizationUseCSA',
+    'organizationValidationNoCsaMessage'
     )
   AND c.deleted = FALSE
   AND c.id = (
@@ -56,7 +57,7 @@ WHERE
 SELECT
     v.key,
     v.value,
-    :created::timestamptz AS created
+    now() AS created
 FROM (
     VALUES
     ('organizationMondayWorkingTimeStartISO',           :organizationMondayWorkingTimeStartISO),
@@ -84,9 +85,10 @@ FROM (
     ('organizationNoCsaAvailableMessage',               :organizationNoCsaAvailableMessage),
     ('organizationOutsideWorkingHoursAskForContacts',   :organizationOutsideWorkingHoursAskForContacts),
     ('organizationOutsideWorkingHoursMessage',          :organizationOutsideWorkingHoursMessage),
-    ('organizationBotCannotAnswerAskToForwardToCSA',    :organizationBotCannotAnswerAskToForwardToCSA),
     ('organizationBotCannotAnswerMessage',              :organizationBotCannotAnswerMessage),
-    ('organizationUseCSA',                          :organizationUseCSA)
+    ('organizationRedirectIfBotCannotAnswerMessage',    :organizationRedirectIfBotCannotAnswerMessage),
+    ('organizationUseCSA',                          :organizationUseCSA),
+    ('organizationValidationNoCsaMessage',          :organizationValidationNoCsaMessage)
     ) AS v(key, value)
     )
 INSERT INTO configuration (key, value, domain, created)

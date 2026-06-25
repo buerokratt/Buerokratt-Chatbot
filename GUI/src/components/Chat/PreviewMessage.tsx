@@ -1,6 +1,6 @@
-import { FC } from 'react';
 import clsx from 'clsx';
 import Track from 'components/Track';
+import { FC } from 'react';
 import './Typing.scss';
 
 type PreviewMessageProps = {
@@ -26,11 +26,7 @@ const PreviewMessage: FC<PreviewMessageProps> = ({ preview }) => {
             )}
           </div>
         )}
-        <label
-          className="active-chat__message-date"
-        >
-          {'00:00:00'}
-        </label>
+        <label className="active-chat__message-date">{'00:00:00'}</label>
       </Track>
     </div>
   );

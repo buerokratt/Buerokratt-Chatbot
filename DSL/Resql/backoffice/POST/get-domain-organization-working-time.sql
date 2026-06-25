@@ -26,9 +26,10 @@ WHERE key IN (
    'organizationNoCsaAvailableMessage',
    'organizationOutsideWorkingHoursAskForContacts',
    'organizationOutsideWorkingHoursMessage',
-   'organizationBotCannotAnswerAskToForwardToCSA',
    'organizationBotCannotAnswerMessage',
-   'organizationUseCSA')
-  AND id IN (SELECT max(id) from configuration GROUP BY key)
+   'organizationRedirectIfBotCannotAnswerMessage',
+   'organizationUseCSA',
+   'organizationValidationNoCsaMessage')
   AND "domain" = :domainUUID::UUID
+  AND id IN (SELECT max(id) from configuration where "domain" = :domainUUID::UUID GROUP BY key)
   AND NOT deleted;

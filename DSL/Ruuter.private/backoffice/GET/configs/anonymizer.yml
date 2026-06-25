@@ -36,13 +36,20 @@ getDomainAnonymizerConfig:
     body:
       domainUUID: ${domain}
   result: res
-  next: return_result
+  next: validateResults
 
 getAnonymizerConfig:
   call: http.post
   args:
     url: "[#CHATBOT_RESQL]/get-anonymizer-config"
   result: res
+  next: validateResults
+
+validateResults:
+  switch:
+    - condition: ${res.response.body[0].anonymizerSelectedApproach === null}
+      next: return_empty
+  next: mapAllConfigs
 
 mapAllConfigs:
   call: http.post
@@ -57,5 +64,11 @@ mapAllConfigs:
   next: return_result
 
 return_result:
+  status: 200
   return: ${mappedConfigs.response.body}
+  next: end
 
+return_empty:
+  status: 201
+  return: ${undefined}
+  next: end

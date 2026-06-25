@@ -117,7 +117,7 @@ postChat:
       endUserLastName: ${chat.endUserLastName}
       status: "ENDED"
       created: ${chat.created}
-      ended: ${new Date().toISOString()}
+      ended: ${chat.ended ?? new Date().toISOString()}
       feedbackRating: ${chat.feedbackRating ?? ""}
       feedbackText: ${chat.feedbackText ?? ""}
       endUserEmail: ${chat.endUserEmail}
@@ -137,6 +137,6 @@ return_result:
   next: end
 
 return_chat_found:
-  return: "Chat Not Found"
+  return: "chat_not_found"
   status: 400
   next: end  

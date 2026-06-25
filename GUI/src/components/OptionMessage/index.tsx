@@ -7,8 +7,10 @@ type OptionMessageProps = {
 
 const OptionMessage: FC<OptionMessageProps> = ({ options }) => {
   return (
-    <div className='option-container'>
-      {options.map(option => <span key={option}>{option}</span>)}
+    <div className="option-container">
+      {options.map((option) => (
+        <span key={option}>{option}</span>
+      ))}
     </div>
   );
 };

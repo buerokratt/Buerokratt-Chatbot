@@ -84,17 +84,20 @@ declaration:
         type: string
         description: "Body field 'organizationOutsideWorkingHoursMessage'"
       - field: domainUUID
-        type: string
+        type: object
         description: "Body field 'domainUUID'"
-      - field: organizationBotCannotAnswerAskToForwardToCSA
-        type: string
-        description: "Body field 'organizationBotCannotAnswerAskToForwardToCSA'"
       - field: organizationBotCannotAnswerMessage
         type: string
-        description: "Body field 'organizationBotCannotAnswerMessage'"  
+        description: "Body field 'organizationBotCannotAnswerMessage'"
+      - field: organizationRedirectIfBotCannotAnswerMessage
+        type: string
+        description: "Body field 'organizationRedirectIfBotCannotAnswerMessage'"  
       - field: organizationUseCSA
         type: string
-        description: "Body field 'organizationUseCSA'"  
+        description: "Body field 'organizationUseCSA'"
+      - field: organizationValidationNoCsaMessage
+        type: string
+        description: "Body field 'organizationValidationNoCsaMessage'"  
 
 extractRequestData:
   assign:
@@ -123,9 +126,10 @@ extractRequestData:
     organizationNoCsaAvailableMessage: ${incoming.body.organizationNoCsaAvailableMessage}
     organizationOutsideWorkingHoursAskForContacts: ${incoming.body.organizationOutsideWorkingHoursAskForContacts}
     organizationOutsideWorkingHoursMessage: ${incoming.body.organizationOutsideWorkingHoursMessage}
-    organizationBotCannotAnswerAskToForwardToCSA: ${incoming.body.organizationBotCannotAnswerAskToForwardToCSA}
     organizationBotCannotAnswerMessage: ${incoming.body.organizationBotCannotAnswerMessage}
+    organizationRedirectIfBotCannotAnswerMessage: ${incoming.body.organizationRedirectIfBotCannotAnswerMessage}
     organizationUseCSA: ${incoming.body.organizationUseCSA}
+    organizationValidationNoCsaMessage: ${incoming.body.organizationValidationNoCsaMessage}
     domains: ${incoming.body.domainUUID}
 
 checkForDomains:
@@ -164,9 +168,10 @@ setDomainOrganizationWorkingTime:
       organizationNoCsaAvailableMessage: ${organizationNoCsaAvailableMessage}
       organizationOutsideWorkingHoursAskForContacts: ${organizationOutsideWorkingHoursAskForContacts}
       organizationOutsideWorkingHoursMessage: ${organizationOutsideWorkingHoursMessage}
-      organizationBotCannotAnswerAskToForwardToCSA: ${organizationBotCannotAnswerAskToForwardToCSA}
       organizationBotCannotAnswerMessage: ${organizationBotCannotAnswerMessage}
+      organizationRedirectIfBotCannotAnswerMessage: ${organizationRedirectIfBotCannotAnswerMessage}
       organizationUseCSA: ${incoming.body.organizationUseCSA}
+      organizationValidationNoCsaMessage: ${incoming.body.organizationValidationNoCsaMessage}
       created: ${new Date().toISOString()}
       domains: ${JSON.stringify(domains)}
   result: setOrganizationWorkingTimeResult
@@ -202,9 +207,10 @@ setOrganizationWorkingTime:
       organizationNoCsaAvailableMessage: ${organizationNoCsaAvailableMessage}
       organizationOutsideWorkingHoursAskForContacts: ${organizationOutsideWorkingHoursAskForContacts}
       organizationOutsideWorkingHoursMessage: ${organizationOutsideWorkingHoursMessage}
-      organizationBotCannotAnswerAskToForwardToCSA: ${organizationBotCannotAnswerAskToForwardToCSA}
       organizationBotCannotAnswerMessage: ${organizationBotCannotAnswerMessage}
+      organizationRedirectIfBotCannotAnswerMessage: ${organizationRedirectIfBotCannotAnswerMessage}
       organizationUseCSA: ${organizationUseCSA}
+      organizationValidationNoCsaMessage: ${organizationValidationNoCsaMessage}
       created: ${new Date().toISOString()}
   result: setOrganizationWorkingTimeResult
 

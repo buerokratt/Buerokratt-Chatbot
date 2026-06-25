@@ -1,0 +1,111 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Sync chat to JIRA"
+  method: get
+  accepts: json
+  returns: json
+  namespace: backoffice
+
+getLastSynchronization:
+  call: http.post
+  maxRecursions: 5
+  args:
+    url: "[#CHATBOT_RESQL]/get-jira-synchronization"
+  result: synchronization
+
+getNextChatForSynchronization:
+  call: http.post
+  maxRecursions: 5
+  args:
+    url: "[#CHATBOT_RESQL]/get-jira-chat"
+    body:
+      chatBaseId: ${synchronization.response.body[0]?.chatBaseId ?? ""}
+  result: chat
+
+checkIfChatExists:
+  maxRecursions: 5
+  switch:
+    - condition: "${chat.response.body.length > 0}"
+      next: getChatCustomerSupportJiraId
+  next: return_chat_not_found
+
+getChatCustomerSupportJiraId:
+  call: http.post
+  maxRecursions: 5
+  args:
+    url: "[#CHATBOT_RESQL]/get-user-jira-id-by-chat-csi"
+    body:
+      chatCustomerSupportId: ${chat.response.body[0].customerSupportId}
+  result: chatCustomerSupportJiraId
+
+checkJiraAccountId:
+  maxRecursions: 5
+  switch:
+    - condition: "${chatCustomerSupportJiraId.response.body.length > 0}"
+      next: setAssignee
+  next: setAssigneeNull
+
+setAssignee:
+  maxRecursions: 5
+  assign:
+    assignee:
+      name: "${chatCustomerSupportJiraId.response.body[0]?.jiraAccountId}"
+  next: setData
+
+setAssigneeNull:
+  maxRecursions: 5
+  assign:
+    assignee: 
+      name: null
+
+setData:
+  maxRecursions: 5
+  assign:
+    all_fields:
+      assignee: ${assignee}
+      description: |
+        [Link vestlusele|[#CHATBOT_GUI]/chat/history?chat=${chat.response.body[0].baseId}]
+
+          ${chat.response.body[0].endUserId ? '*Lõppkasutaja ID:* ' + chat.response.body[0].endUserId : ''}
+          ${chat.response.body[0].endUserFirstName ? '*Lõppkasutaja nimi:* ' + chat.response.body[0].endUserFirstName + ' ' + chat.response.body[0].endUserLastName : ''}
+      "[#JIRA_END_USER_CUSTOM_FIELD]": '${chat.response.body[0].endUserEmail}'
+      issuetype: 
+        id: "[#JIRA_ISSUE_TYPE]"
+      project: 
+        id: "[#JIRA_PROJECT_ID]"
+      summary: '${chat.response.body[0].id} ${chat.response.body[0].endUserPhone}'
+    
+createJiraIssue:
+  call: http.post
+  maxRecursions: 5
+  args:
+    url: "[#JIRA_CLOUD_DOMAIN]/rest/api/2/issue"
+    headers:
+      Authorization: "Bearer [#JIRA_API_TOKEN]"
+      Accept: "application/json"
+      Content-Type: "application/json"
+    body: 
+      fields: ${all_fields}
+  result: res_jira
+
+createSynchronization:
+  call: http.post
+  maxRecursions: 5
+  args:
+    url: "[#CHATBOT_RESQL]/insert-chat-jira-synchronization"
+    body:
+      chatBaseId: ${chat.response.body[0]?.baseId ?? ""}
+      status: "${200 <= res_jira.response.statusCodeValue && res_jira.response.statusCodeValue < 300 ? 'SUCCESS' : 'ERROR'}"
+      jiraStatusCode: ${res_jira.response.statusCodeValue}
+      jiraErrorMessage: "${200 <= res_jira.response.statusCodeValue && res_jira.response.statusCodeValue < 300 ? '' : res_jira.response.body}"
+  result: create_res
+  next: getLastSynchronization
+
+return_result:
+  return: "success"
+  next: end
+
+return_chat_not_found:
+  return: "error: chat with ENDED status not found"
+  next: end

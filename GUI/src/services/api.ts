@@ -1,6 +1,6 @@
 import axios, { AxiosError } from 'axios';
-import { useTranslation } from "react-i18next";
-import { useEffect } from "react";
+import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const api = axios.create({
   baseURL: import.meta.env.BASE_URL,
@@ -40,15 +40,17 @@ const AxiosInterceptor = ({ children }) => {
       import.meta.env.DEBUG_ENABLED && console.debug(response);
 
       return response;
-    }
+    };
 
     const errInterceptor = (error: any) => {
       import.meta.env.DEBUG_ENABLED && console.debug(error);
 
       let message = t('global.notificationErrorMsg');
 
-      return Promise.reject(new Error(message));
-    }
+      return Promise.reject(
+        new Error(t(`errors.${error.response?.data?.response}`, { defaultValue: message }) ?? message),
+      );
+    };
 
     const apiInterceptor = api.interceptors.response.use(resInterceptor, errInterceptor);
     const apiDevInterceptor = apiDev.interceptors.response.use(resInterceptor, errInterceptor);
@@ -56,13 +58,13 @@ const AxiosInterceptor = ({ children }) => {
 
     return () => {
       api.interceptors.response.eject(apiInterceptor);
-      notificationApiDev.interceptors.response.eject(notificationApiDevInterceptor)
+      notificationApiDev.interceptors.response.eject(notificationApiDevInterceptor);
       apiDev.interceptors.response.eject(apiDevInterceptor);
     };
   }, [t]);
 
   return children;
-}
+};
 
 const handleRequestError = (error: AxiosError) => {
   import.meta.env.DEBUG_ENABLED && console.debug(error);
@@ -73,21 +75,12 @@ const handleRequestError = (error: AxiosError) => {
     // To be added: handle forbidden requests
   }
   return Promise.reject(new Error(error.message));
-}
+};
 
-api.interceptors.request.use(
-  (axiosRequest) => axiosRequest,
-  handleRequestError
-);
+api.interceptors.request.use((axiosRequest) => axiosRequest, handleRequestError);
 
-apiDev.interceptors.request.use(
-  (axiosRequest) => axiosRequest,
-  handleRequestError
-);
+apiDev.interceptors.request.use((axiosRequest) => axiosRequest, handleRequestError);
 
-notificationApiDev.interceptors.request.use(
-  (axiosRequest) => axiosRequest,
-  handleRequestError
-);
+notificationApiDev.interceptors.request.use((axiosRequest) => axiosRequest, handleRequestError);
 
-export { api, apiDev,notificationApiDev,  AxiosInterceptor };
+export { api, apiDev, notificationApiDev, AxiosInterceptor };

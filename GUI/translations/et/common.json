@@ -1,7 +1,14 @@
 {
+  "domainTransfer": {
+    "copyToDomain": "Kopeeri domeenile",
+    "transferDescription": "Valige domeenid, millele praegused seaded kopeeritakse.",
+    "selectTargetDomain": "Vali sihidomeenid",
+    "transfer": "Kopeeri"
+  },
   "global": {
     "email": "Email",
     "save": "Salvesta",
+    "apply": "Rakenda",
     "add": "Lisa",
     "edit": "Muuda",
     "delete": "Kustuta",
@@ -49,7 +56,9 @@
     "statusClarification": "Staatuse täpsustus",
     "selectAll": "Vali kõik",
     "displayText": "Kuva tekst",
-    "test": "Test"
+    "test": "Test",
+    "preserve": "Säilitada",
+    "clearFilters": "Tühjenda filtrid"
   },
   "files": {
     "download_xlsx": "Lae alla XLSX"
@@ -69,8 +78,11 @@
   "multiDomains": {
     "addNew": "Lisa uus",
     "title": "Multidomeenid",
+    "domains": "Domeenid",
     "domainName": "Domeeni nimi",
     "selectDomains": "Vali Domeenid",
+    "chooseDomain": "Vali domeen:",
+    "allDomains": "Kõik",
     "noDomains": "Domeene ei ole saadaval. Palun võtke ühendust süsteemiadministraatoriga."
   },
   "menu": {
@@ -181,6 +193,8 @@
       "endTime": "Lõppaeg",
       "csaName": "Nõustaja nimi",
       "contact": "Kontaktandmed",
+      "www": "Veebileht",
+      "authenticatedPerson": "Autenditud isik",
       "comment": "Kommentaar",
       "label": "Märksõna",
       "nps": "Soovitusindeks",
@@ -193,7 +207,18 @@
       "statusAdder": "Staatuse lisaja",
       "statusAddedDate": "Staatuse lisamise kuupäev",
       "chosenCsa": "Valitud nõustaja(d)",
-      "chosenColumn": "Valitud tulba(d)"
+      "chosenColumn": "Valitud tulba(d)",
+      "chooseAll": "Vali kõik",
+      "conversationResponseQuality": "Vastuse kvaliteet",
+      "followUpAction": "Järeltegevus",
+      "chooseFollowUpAction": "- Vali järeltegevus -",
+      "chooseConversationResponseQuality": "- Vali vastuse kvaliteet -",
+      "chooseConversationTheme": "- Vali vestluse valdkond -",
+      "conversationTheme": "Vestluse valdkond",
+      "theme": "Valdkond",
+      "responseQuality": "Bürokrati vastuse kvaliteet",
+      "followUpStatus": "Järeltegevuste staatus",
+      "analysis": "Analüüs"
     },
     "plainEvents": {
       "answered": "Vastatud",
@@ -237,7 +262,9 @@
       "user-authenticated": "{{name}} on autenditud {{date}}",
       "ask_to_forward_to_csa": "Vestlus paluti klienditeenindajale suunata",
       "forwarded_to_backoffice": "Vestlus suunatakse klienditeenindajale",
-      "continue_chatting_with_bot": "Jätkake vestlust kasutajaga bürokratt"
+      "continue_chatting_with_bot": "Jätkake vestlust kasutajaga bürokratt",
+      "waiting_validation": "Vastust koostatakse",
+      "approved_validation": "Kinnitatud valideerimine"
     },
     "events": {
       "answered": "Vastatud {{date}}",
@@ -283,7 +310,9 @@
       "taken-over": "Klienditeenindaja võttis vestluse üle",
       "ask_to_forward_to_csa": "Vestlus paluti klienditeenindajale suunata",
       "forwarded_to_backoffice": "Vestlus suunatakse klienditeenindajale",
-      "continue_chatting_with_bot": "Jätkake vestlust kasutajaga bürokratt"
+      "continue_chatting_with_bot": "Jätkake vestlust kasutajaga bürokratt",
+      "waiting_validation": "Vastust koostatakse",
+      "approved_validation": "Kinnitatud valideerimine"
     },
     "validations": {
       "title": "Valideerimised",
@@ -299,6 +328,12 @@
         "requestedAt": "Taotletud Kell",
         "approve": "Kinnita"
       }
+    },
+    "quality": {
+      "theme": "Vestluse valdkond",
+      "responseQuality": "Vastuse kvaliteet",
+      "followUpAction": "Järeltegevus",
+      "selectionEmptied": "Valik tühjendatud"
     }
   },
   "deleteConversation": {
@@ -318,6 +353,7 @@
     "sevenDays": "7 päeva",
     "thirtyOneDay": "31 päeva",
     "ninetyDays": "90 päeva",
+    "maxDaysError": "Päevade maksimaalne valik saab olla kuni 9999",
     "tooltip": {
       "removeAuth": "Vali \"Jah\" kui soovid autentitud vestluste kustutamist. Perioodi aja täpsustus avaneb automaatselt. Vali \"Ei\" kui soovid, et vestlusi ei kustutataks.",
       "removeAnon": "Vali \"Jah\" kui soovid anonüümsete vestluste kustutamist. Perioodi aja täpsustus avaneb automaatselt. Vali \"Ei\" kui soovid, et vestlusi ei kustutataks.",
@@ -349,6 +385,8 @@
       "userTitle": "Tiitel",
       "email": "E-post",
       "department": "Osakond",
+      "connectedToJira": "Jiraga seotud",
+      "jiraAccountName": "Jira kasutajanimi",
       "connectToSmax": "Seo Smaxiga",
       "connectedToSmax": "Smaxiga seotud",
       "disconnectFromSmax": "Seo Smaxist lahti",
@@ -382,8 +420,27 @@
       "showSupportName": "Kuva nõustaja nimi",
       "showSupportTitle": "Kuva nõustaja tiitel",
       "editActiveChat": "Aktiivsete vestluste muutmine",
+      "instantlyOpenChatWidget": "Koheselt avatud vestlusaken",
+      "showSubTitle": "Kuva vestlusakna alampealkiri",
+      "subTitle": "Vestlusakna alampealkiri",
+      "llmModuleActive": "LLM moodul aktiivne",
       "showBurokrattConfirmation": "Kas soovid Bürokrati veebilehel nähtavaks teha?",
-      "hideBurokrattConfirmation": "Kas soovid Bürokrati veebilehel ära peita?"
+      "hideBurokrattConfirmation": "Kas soovid Bürokrati veebilehel ära peita?",
+      "responseWaitingTime": "Vastuse ooteaeg",
+      "responseProcessingNotice": "Vastuse töötlemise teavitus",
+      "seconds": "sekundit",
+      "responseWaitingTimeRangeInfo": "Lubatud vahemik 1 sek - 120 sek (2 min)",
+      "tooltip": {
+        "isBotActive": "Valides sees, vastab Bürokratt automaatselt kliendile kasutades tehisintellektil põhinevat vestluslahendust (vastavalt tehnilisele lahendusele kas keelemudelit, RAG või RASA lahendust). Valides väljas, suunatakse vestlus automaatselt nõustajale.",
+        "isBurokrattActive": "Valides sees, on Bürokratt veebilehel nähtav. Valides väljas, peidetakse veebilehelt Bürokratt ära.",
+        "instantlyOpenChatWidget": "Valides sees, avatakse vestlusaken automaatselt, kui kasutaja veebilehele maandub. Valides väljas, on Bürokratt minimeeritud ning vestlemiseks peab kasutaja ise vestlusakna avama. Seadistus töötab ainult arvutivaatest ja ei ole rakendu mobiilivaates!",
+        "isCsaNameVisible": "Kui seadistus on sees, kuvatakse vestlusaknas vasakul oleva vestleja pildi kohal nõustaja nime. Kui seadistus on väljas, siis profiili kohal ei kuvata nõustaja nime.",
+        "isCsaTitleVisible": "Kui seadistus on sees, kuvatakse nõustaja tiitlit vestlusaknas. Kui seadistus on väljas, siis nõustaja tiitlit vestlusaknas ei kuvata.",
+        "isEditChatVisible": "Kui valida sees, siis on ainult nõustajal võimalik oma viimati saadetud vastust korrigeerida. Valides väljas, ei saa nõustaja tagant järgi viimast sõnumit muuta.",
+        "showSubTitle": "Valides jah, näidatakse vestlusaknas lisaks Bürokrati pealkirjale ka alampealkirja. Alampealkirja teksti seadistuse leiab allpoolt. Valides ei, alampealkirja ei kuvata, aga Bürokrati pealkiri jääb endiselt nähtavale.",
+        "subTitle": "Sisesta lahtrisse alampealkirja sisutekst.",
+        "llmModuleActive": "Kui valida sees, on LLM moodul aktiivne. Valides väljas, on LLM moodul inaktiivne."
+      }
     },
     "emergencyNotices": {
       "title": "Erakorralised teated",
@@ -398,7 +455,10 @@
       "feedbackActive": "Tagasiside aktiivne",
       "feedbackQuestion": "Tagasiside küsimus",
       "noticeActive": "Teade aktiivne",
-      "notice": "Teade"
+      "notice": "Teade",
+      "feedbackScale": "Tagasiside skaala:",
+      "tenPoints": "10 punkti",
+      "fivePoints": "5 punkti"
     },
     "appearance": {
       "title": "Välimus ja käitumine",
@@ -424,29 +484,27 @@
       "allWeekdaysExceptWeekend": "E-R",
       "allWeekdays": "E-P",
       "availableAllTime": "Asutuse tööaeg on 24/7",
-      "showIfCSAIsNotAvailable": "Saada kliendile klienditeenindaja eemaloleku teavitus",
-      "showIfCSAIsNotAvailableWithContactsRequest": "Saada kliendile klienditeenindaja eemaloleku teavitus koos kontakti päringuga",
+      "showIfCSAIsNotAvailable": "Saada kliendile klienditeenindaja eemaloleku teavitus. Kas küsida kliendi kontaktandmeid?",
       "noCsaAvailableMessage": "Klienditeenindaja eemaloleku teavitus",
-      "showIfOrganizationIsOutsideWorkingHours": "Saada kliendile töövälise aja teavitus",
-      "showIfOrganizationIsOutsideWorkingHoursWithContactsRequest": "Saada kliendile töövälise aja teavitus koos kontakti päringuga",
+      "showIfOrganizationIsOutsideWorkingHours": "Saada kliendile töövälise aja teavitus. Kas küsida kliendi kontaktandmeid?",
       "outsideWorkingHoursMessage": "Töövälise aja teavitus",
-      "showIfBotCannotAnswerAskToForwardToCSA": "Kui Bürokratt ei oska vasta, kas küsida suunamist",
       "botCannotAnswerMessage": "Teavitus, kui Bürokratt ei oska vastata",
+      "redirectIfBotCannotAnswerMessage": "Teavitussõnum enne suunamist, kui Bürokratt ei oska vastata",
       "organizationUseCSA": "Kasutan klienditeenindust",
+      "validationNoCsaMessage": "Teavitus kui vastust ei ole võimalik valideerida",
       "tooltip": {
-        "useCsa": "Vali \"Jah\", kui vestlusi võtavad vastu töötajad, sellega avanevad tööaja täpsemad seadistused. Kui töötajaid ei ole, vali \"Ei\" ja tööaega pole vaja määrata.",
+        "useCsa": "Vali \"Jah\", kui vestlusi võtavad vastu töötajad, sellega avanevad tööaja täpsemad seadistused. Juhul kui Bürokratt ei oska vastata, toimub vestluse suunamine klienditeenindajale. Kui töötajaid ei ole, vali \"Ei\" ja tööaega pole vaja määrata. Juhul kui Bürokratt ei oska vastata, saadetakse vestlusesse teavitussõnum ja suunamist ei toimu.",
         "work24/7": "Vali \"Jah\" kui vastajate tööaeg on ööpäevaringne, sh ka riigipühadel. Kui valida \"Ei\", saab valida täpsemaid ajavahemikke ja tingimusi.\n",
-        "workingHolidays": "Riigipühadel käitub vestlus samamoodi nagu töövälisel ajal.",
+        "workingHolidays": "Kui valida \"Jah\" võetakse riigipüha kui töö aega ehk asutuse tööaeg rakendub samamoodi nii riigipühal kui ka tavalisel tööpäeval. Kui valida \"Ei\" ja riigipüha langeb tööpäevale, siis kuvatakse riigipüha kui töövälist aega. Sellisel juhul saadetakse välja töövälise aja teavitus ja suunamist ei toimu.",
         "workingWeekends": "Vali \"Jah\", kui nädalavahetusel pole tööaega. Vali \"Ei\", kui nädalavahetusel on töötunde. Isegi kui ainult ühel päeval nädalavahetusel on töötunde ette nähtud, tuleb seadistuses valida \"Ei\".",
         "workingSameEachDay": "Vali \"Jah\", kui tööaeg on kõigil tööpäevadel samasugune. Vali \"Ei\", kui tööajad erinevad, näiteks E-R on ühine aeg, aga laupäeval teine. See seadistus arvestab ka eelnevalt seadistatud \"Nädalavahetusel suletud\" valikut, kui nädalavahetus ei kuulu tööaja sisse, siis on nähtaval ainult valikud esmaspäevast reedeni.",
-        "sendCsa": "See valik on seotud järgmise seadistusega, kuid erinevus seisneb kliendi kontaktandmete küsimises. Kui valida \"Jah\", saadetakse kliendile ainult teavitustekst, mille sisu on määratud väljal \"Töövälise aja teavitus\". Kliendilt kontaktandmeid ei küsita.",
-        "sendCsaWithContactDataRequest": "See valik on seotud eelmise seadistusega, kuid siin küsitakse kliendilt kontaktandmeid. Kui valida \"Jah\", kuvatakse kliendile teavitustekst ja lisanduvad väljad nagu \"e-posti aadress\", \"telefoninumber\" ja \"täpsusta siin oma küsimust\". Kuvatava teksti sisu on seadistatav väljal \"Töövälise aja teavitus\". Kui valida \"Ei\", rakendub automaatselt eelmise teavituse loogika, kus kontaktandmeid ei küsita.",
+        "sendCsa": "Kui valida \"Jah\", kuvatakse kliendile töövälise aja teavitustekst ja lisanduvad väljad nagu \"e-posti aadress\", \"telefoninumber\" ja \"täpsusta siin oma küsimust\". Kuvatava teksti sisu on seadistatav väljal \"Töövälise aja teavitus\". Kui valida \"Ei\", siis kontaktandmeid ei küsita ja töövälise aja teavitussõnum saadetakse Bürokrati poolt kui tavalise vestluse sõnumina.",
         "outOfWorkingHoursText": "Tekst, mida kuvatakse kliendile töövälisel ajal. Soovitame arvestada eelnevate seadistustega ehk kui kontakti päring on sisse lülitatud, siis võiks see kajastuda ka tekstis, \"Hetkel on meil tööväline aeg, võite jätta meile oma kontaktandmed, et saaksime teiega hiljem ühendust võtta.\"",
-        "csaOutOfReach": "See valik on seotud järgmise seadistusega, kuid erinevus seisneb kliendi kontaktandmete küsimises. Kui valida \"Jah\", saadetakse kliendile ainult eemaloleku teavitustekst, mille sisu on määratud väljal \"Klienditeenindaja eemaoleku teavitus\". Kliendilt kontaktandmeid ei küsita.",
-        "csaOutOfReachWithContactDataRequest": "See valik on seotud eelmise seadistusega, kuid siin küsitakse kliendilt kontaktandmeid. Kui valida \"Jah\", kuvatakse kliendile eemaloleku teavitustekst ja lisanduvad väljad nagu \"e-posti aadress\", \"telefoninumber\" ja \"täpsusta siin oma küsimust\". Kuvatava teksti sisu on seadistatav väljal \"Klienditeenindaja eemaoleku teavitus\". Kui valida \"Ei\", rakendub automaatselt eelmise teavituse loogika, kus kontaktandmeid ei küsita.",
+        "csaOutOfReach": "Kui valida \"Jah\", kuvatakse kliendile eemaloleku teavitustekst ja lisanduvad väljad nagu \"e-posti aadress\", \"telefoninumber\" ja \"täpsusta siin oma küsimust\". Kuvatava teksti sisu on seadistatav väljal \"Klienditeenindaja eemaoleku teavitus\". Kui valida \"Ei\", siis kontaktandmeid ei küsita ja eemaloluku teavitussõnum saadetakse Bürokrati poolt kui tavalise vestluse sõnumina.",
         "allCsaAway": "Tekst, mida kuvatakse kliendile klienditeenindaja eemaoleku korral. Soovitame arvestada eelnevate seadistustega ehk kui kontakti päring on sisse lülitatud, siis võiks see kajastuda ka tekstis, \"Hetkel on kõik klienditeenindajad eemal, võite jätta meile oma kontaktandmed, et saaksime teiega hiljem ühendust võtta.\"",
-        "bykCouldNotRespondRedirect": "Vali \"Jah\", kui soovid, et vestlus suunatakse töötajale kui Bürokratt ei oska vastata. Vali \"Ei\", kui töötajale suunamist ei toimu, sel juhul vestlus jätkub samas aknas Bürokratiga.",
-        "bykCouldNotRespond": "Tekst, mida kuvatakse kui Bürokratt ei oska vastata."
+        "bykCouldNotRespond": "Tekst, mida kuvatakse kui Bürokratt ei oska vastata kui klienditeenindust ei kasutata.",
+        "redirectIfBykCouldNotRespond": "Tekst, mida kuvatakse kui Bürokratt ei oska vastata ja paralleelselt kasutatakse klienditeenindust. Mis tähendab, et koos selle sõnumiga, pakutakse kliendile ka vestluse suunamist nõustajale.",
+        "validationNoCsaMessage": "Tekst mida kuvatakse kasutajale siis kui mudeli vastust ei ole võimalik valideerida. Seda sama teksti kuvatakse nii töövälisel ajal kui tööajal siis kui ükski nõustaja ei ole \"Kohal\" olekus."
       }
     },
     "userSession": {
@@ -530,6 +588,29 @@
         "systemMessage": "Süsteemisõnumi väli ei tohi olla tühi"
       }
     },
+    "chatAnalysis": {
+      "title": "Vestluste analüüsi haldus",
+      "chatAnalysisEnabled": "Vestluse analüüs",
+      "theme": "Lisa valdkond",
+      "themePlaceholder": "Sisesta valdkonna nimetus",
+      "themeHint": "Sisestage üks või mitu nimetust (eraldades komaga) ja vajutage \"Lisa\".",
+      "themeTooltip": "Valdkondade nimetused peavad olema selged, eristatavad ja sisuliselt täpsed, et vestlusi saaks hiljem üheselt kategoriseerida (nt maamaks, retseptid, tarkvara küsimused). Väldi liiga üldiseid või kattuvaid nimetusi ning eelista konkreetseid teemasid, mis suunavad analüüsi selgelt kindlasse valdkonda.",
+      "responseQuality": "Lisa vastuse kvaliteet",
+      "responseQualityPlaceholder": "Sisesta kvaliteedi tase",
+      "responseQualityHint": "Sisestage üks või mitu taset (eraldades komaga) ja vajutage \"Lisa\".",
+      "responseQualityTooltip": "Kvaliteedi nimetust soovitame seadistada vastavalt oma asutusele (värvid, hea/halb võrdlus jne). Kvaliteedi hinnangu mõte on hinnata Bürokrati vastuste kvaliteeti, et aidata paremini mõista mis on Bürokrati teadmistes tugevad ja nõrgad kohad. Kombineerides valdkonda ja kvaliteedi hinnangut, on võimalik Bürokrati teadmiste parem ülevaade saada ja konkreetseid tegevusi planeerida.",
+      "followUpAction": "Lisa järeltegevuste staatus",
+      "followUpActionPlaceholder": "Sisesta järeltegevus",
+      "followUpActionHint": "Sisestage üks või mitu järeltegevust (eraldades komaga) ja vajutage \"Lisa\".",
+      "followUpActionTooltip": "Järeltegevuste staatus aitab jälgida sisemiste protsesside elukaart ja aitab vestlusanalüüsil järge pidada. Näiteks kui selgub valdkonna ja kvaliteedi analüüsist, et on vaja algatada asutuse siseselt konkreetse tegevuste ahel, siis soovitame panna vastava protsessi tegevuste nimetused järeltegevuse staatustena kirja. Näiteks kui on vajalik Bürokrati teadmusi uuendada, siis võib konkreetseid tegevusi lisada nagu \"Vajalik kodulehe uuendamine\", \"Infoturbesse suunatud\", \"Dokumendid vajavad täiendamist\", \"Uuesti info kraapida\", \"Teadmised uuendatud\". Samuti võib panna ka asutusest väljapoole olevaid märkeid nagu \"Vajab Bürokrati meeskonna abi\" või \"Vajab teise asutuse sisendit\". Järeltegevuse terviklikus elukaareks soovitame kasutada ka paralleelselt lõppstaatust \"Kontrollitud\" või \"Lõpetatud\" staatust, mis näitab, et lisategevusi pole vaja teha, aga vestlus on üle kontrollitud töötaja poolt.",
+      "dragHint": "Valikute järjekorda saate muuta neid lohistades.",
+      "deleteDialogTitle": "Kustutamise kinnitus",
+      "deleteDialogText": "Kas soovite valiku <strong>\"{{label}}\"</strong> kustutada? Valiku eemaldamiseks vajutage <strong>„{{confirm}}\"</strong>. Kui soovite valikut muuta, kustutage see ja lisage uus. Valikute järjekorda saate muuta neid lohistades.",
+      "deleteConfirm": "Kustuta",
+      "deleteCancel": "Ära kustuta",
+      "savedSettingsSuccessfully": "Vestluste analüüsi seaded salvestati edukalt",
+      "labelTooLong": "Silt ei tohi olla pikem kui 50 tähemärki"
+    },
     "anonymizer": {
       "settingsTitle": "Anonümiseerija seaded",
       "approach": "Anonümiseerimise viis",
@@ -544,6 +625,7 @@
       "denyListPlaceholder": "Sisestage sõna ja vajutage Enter, et lisada keelatute nimekirja",
       "anonymizationBeforeLLM": "Anonümiseerimine enne SKM-i",
       "anonymizationBeforeGlobalClassifier": "Anonümiseerimine enne klassifitseerijat",
+      "recordConversationsAnonymously": "Salvesta vestlused anonüümitult",
       "saveSettings": "Salvesta seaded",
       "testingTitle": "Anonümiseerija testimine",
       "testingDescription": "Anonümiseerija seadistuse testimiseks sisestage tekst ja vajutage \"Anonümiseeri\"",
@@ -572,6 +654,9 @@
         "person": "ISIK",
         "gpe": "RIIK_VÕI_LINN",
         "crypto": "KRÜPTORAHAKOTT"
+      },
+      "tooltip": {
+        "recordConversationsAnonymously": "Sisselülitamisel anonümiseeritakse vestlused enne andmebaasi salvestamist. Kasutajale kuvatakse vestluse ajal ja vestlusajaloos ainult anonümiseeritud sõnumid. Algseid, anonümiseerimata sõnumeid, ei säilitata ega ole võimalik hiljem taastada."
       }
     }
   },
@@ -592,7 +677,10 @@
       "copied": "Kopeeritud",
       "userDeleted": "Kasutaja kustutatud",
       "newUserAdded": "Uus kasutaja lisatud",
-      "userUpdated": "Kasutaja uuendatud"
+      "userUpdated": "Kasutaja uuendatud",
+      "conversationThemeSaved": "Valdkonna valik on salvestatud.",
+      "conversationQualitySaved": "Vastuse kvaliteedi valik on salvestatud.",
+      "conversationFollowUpActionSaved": "Järeltegevuse valik on salvestatud."
     }
   },
   "notification": {
@@ -601,5 +689,19 @@
   },
   "landing": {
     "title": "Tere tulemast Bürokratti"
+  },
+  "errors": {
+    "claimed_by_another_agent": "Vestlus on juba teise nõustaja poolt üle võetud.",
+    "chat_has_ended": "Vestlus on juba lõpetatud.",
+    "could_not_fetch_user_info": "Kasutaja info võtt ebaõnnestus.",
+    "message_editing_not_allowed": "Sõnumi redigeerimine ei ole lubatud.",
+    "chat_not_found": "Vestlust ei leitud.",
+    "bad_request": "Vigane päring.",
+    "not_found": "Tulemit ei leitud.",
+    "user_not_found": "Kasutajat ei leitud.",
+    "user_already_exists": "Kasutaja on juba olemas.",
+    "jira_user_not_found": "Jira kasutajat ei leitud.",
+    "unauthorized": "Kasutajal ei ole piisavalt õigusi.",
+    "csa_is_offline": "Klienditoel on tööväline aeg."
   }
 }

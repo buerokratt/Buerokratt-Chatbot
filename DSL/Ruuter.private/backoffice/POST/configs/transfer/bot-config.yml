@@ -1,0 +1,53 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Transfer bot configuration settings from a source domain to one or more target domains"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: sourceDomainUuid
+        type: string
+        description: "UUID of the domain to copy settings from"
+      - field: targetDomainUuids
+        type: object
+        description: "Array of target domain UUIDs to copy settings to"
+
+extractRequestData:
+  assign:
+    sourceDomainUuid: ${incoming.body.sourceDomainUuid}
+    targetDomainUuids: ${incoming.body.targetDomainUuids}
+
+fetchSource:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-bot-config"
+    body:
+      domainUUID: ${sourceDomainUuid}
+  result: source
+  next: transferToTargets
+
+transferToTargets:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-domain-bot-config"
+    body:
+      is_bot_active: ${source.response.body[0].isBotActive}
+      is_burokratt_active: ${source.response.body[0].isBurokrattActive}
+      is_csa_name_visible: ${source.response.body[0].isCsaNameVisible}
+      is_csa_title_visible: ${source.response.body[0].isCsaTitleVisible}
+      is_edit_chat_visible: ${source.response.body[0].isEditChatVisible}
+      instantly_open_chat_widget: ${source.response.body[0].instantlyOpenChatWidget}
+      show_sub_title: ${source.response.body[0].showSubTitle}
+      sub_title: ${source.response.body[0].subTitle}
+      response_waiting_time: ${source.response.body[0].responseWaitingTime}
+      response_processing_notice: ${source.response.body[0].responseProcessingNotice}
+      llm_module_active: ${source.response.body[0].llmModuleActive}
+      domains: ${JSON.stringify(targetDomainUuids)}
+  result: res
+
+return_result:
+  return: ${res.response.body}
+  next: end

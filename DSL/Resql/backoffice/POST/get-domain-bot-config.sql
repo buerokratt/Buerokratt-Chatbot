@@ -3,20 +3,32 @@ WITH configuration_values AS (
            KEY,
            value
     FROM configuration
-    WHERE KEY IN ('is_bot_active', 
-                  'is_burokratt_active', 
+    WHERE KEY IN ('is_bot_active',
+                  'is_burokratt_active',
                   'is_csa_name_visible',
                   'is_csa_title_visible',
-                  'is_edit_chat_visible'
+                  'is_edit_chat_visible',
+                  'instantly_open_chat_widget',
+                  'show_sub_title',
+                  'sub_title',
+                  'response_waiting_time',
+                  'response_processing_notice',
+                  'llm_module_active'
                  )
-      AND id IN (SELECT max(id) FROM configuration GROUP BY KEY)
       AND "domain" = :domainUUID::UUID
       AND NOT deleted
+      AND id IN (SELECT max(id) FROM configuration where "domain" = :domainUUID::UUID GROUP BY KEY)
 )
 SELECT
     MAX(CASE WHEN KEY = 'is_bot_active' THEN value END) AS is_bot_active,
     MAX(CASE WHEN KEY = 'is_burokratt_active' THEN value END) AS is_burokratt_active,
     MAX(CASE WHEN KEY = 'is_csa_name_visible' THEN value END) AS is_csa_name_visible,
     MAX(CASE WHEN KEY = 'is_csa_title_visible' THEN value END) AS is_csa_title_visible,
-    MAX(CASE WHEN KEY = 'is_edit_chat_visible' THEN value END) AS is_edit_chat_visible
+    MAX(CASE WHEN KEY = 'is_edit_chat_visible' THEN value END) AS is_edit_chat_visible,
+    MAX(CASE WHEN KEY = 'instantly_open_chat_widget' THEN value END) AS instantly_open_chat_widget,
+    MAX(CASE WHEN KEY = 'show_sub_title' THEN value END) AS show_sub_title,
+    MAX(CASE WHEN KEY = 'sub_title' THEN value END) AS sub_title,
+    MAX(CASE WHEN KEY = 'response_waiting_time' THEN value END) AS response_waiting_time,
+    MAX(CASE WHEN KEY = 'response_processing_notice' THEN value END) AS response_processing_notice,
+    MAX(CASE WHEN KEY = 'llm_module_active' THEN value END) AS llm_module_active
 FROM configuration_values;

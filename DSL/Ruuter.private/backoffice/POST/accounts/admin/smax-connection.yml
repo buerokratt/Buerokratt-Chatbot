@@ -32,6 +32,9 @@ declaration:
       - field: department
         type: string
         description: "Body field 'department'"
+      - field: jiraAccountId
+        type: string
+        description: "Body field 'jiraAccountId'"
       - field: smaxAccountId
         type: string
         description: "Body field 'smaxAccountId'"
@@ -49,6 +52,7 @@ extractRequestData:
     csa_email: ${incoming.body.csa_email}
     roles: ${incoming.body.roles}
     department: ${incoming.body.department}
+    jira_account_id: ${incoming.body.jiraAccountId}
     smax_account_id: ${incoming.body.smaxAccountId}
  
 getUser:
@@ -131,6 +135,7 @@ updateUser:
       csaTitle: ${csaTitle}
       csaEmail: ${csa_email}
       department: ${department}
+      jiraAccountId: ${jira_account_id ?? ""}
       smaxAccountId: ${smax_account_id}
   result: add_user_res
   next: updateRoles
@@ -152,11 +157,11 @@ return_result:
   next: end
 
 return_not_exists:
-  return: "error: user does not exist"
+  return: "user_not_found"
   status: 400
   next: end
 
 return_unauthorized:
   status: 401
-  return: "error: unauthorized"
+  return: "unauthorized"
   next: end

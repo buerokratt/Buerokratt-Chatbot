@@ -46,7 +46,4 @@ returnSuccess:
   return: ${mappedDomains.response.body}
   wrapper: false
   next: end
-
-return_not_found:
-  return: "error: not found"
-  next: end
+  

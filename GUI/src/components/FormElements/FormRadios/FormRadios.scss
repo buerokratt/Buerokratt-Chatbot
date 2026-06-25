@@ -23,7 +23,7 @@
   }
 
   &__item {
-    input[type=radio] {
+    input[type='radio'] {
       display: none;
 
       + label {
@@ -51,7 +51,7 @@
           &::before {
             width: 20px;
             height: 20px;
-            box-shadow: inset 0 0 0 1px #8F91A8;
+            box-shadow: inset 0 0 0 1px #8f91a8;
           }
 
           &::after {

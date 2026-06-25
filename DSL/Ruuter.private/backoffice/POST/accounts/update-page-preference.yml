@@ -44,7 +44,3 @@ setUserPagePreferences:
 returnSuccess:
   return: ${returnSuccess.response.body}
   next: end
-
-return_bad_request:
-  return: "error: bad request"
-  next: end

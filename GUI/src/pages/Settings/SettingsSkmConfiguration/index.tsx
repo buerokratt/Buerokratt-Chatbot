@@ -1,29 +1,24 @@
-import { FC, useEffect, useState } from 'react';
-import { AxiosError } from 'axios';
-import { useTranslation } from 'react-i18next';
-import {
-  Button,
-  Card,
-  FormInput,
-  FormSelect,
-  FormTextarea,
-  Icon,
-  Switch,
-  Tooltip,
-  Track,
-} from 'components';
 import { useMutation } from '@tanstack/react-query';
-import { useToast } from 'hooks/useToast';
-import { apiDev } from 'services/api';
+import { AxiosError } from 'axios';
+import { Button, Card, FormInput, FormSelect, FormTextarea, Icon, Switch, Tooltip, Track } from 'components';
 import withAuthorization from 'hoc/with-authorization';
-import { ROLES } from 'utils/constants';
-import { AiOutlineInfoCircle } from 'react-icons/ai';
-import { SkmConfig, SkmConfigResponse } from 'types/skmConfig';
+import { useToast } from 'hooks/useToast';
+import { FC, Fragment, useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { AiOutlineInfoCircle } from 'react-icons/ai';
+import { apiDev } from 'services/api';
+import { SkmConfig, SkmConfigResponse } from 'types/skmConfig';
+import { ROLES } from 'utils/constants';
+
 import { getQueryTypes } from './data';
+import DomainTabSelector from '../../../components/DomainTabSelector';
+import DomainTransfer from '../../../components/DomainTransfer';
 import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
-import DomainSelector from '../../../components/DomainsSelector';
 import { fetchConfigurationFromDomain } from '../../../services/configurations';
+import useStore from '../../../store';
+
+import { SelectOption } from 'types';
 
 const SettingsSkmConfiguration: FC = () => {
   const { t } = useTranslation();
@@ -31,10 +26,11 @@ const SettingsSkmConfiguration: FC = () => {
   const { control, handleSubmit, reset } = useForm<SkmConfig>();
   const [key, setKey] = useState(0);
   const [skmConfig, setSkmConfig] = useState<SkmConfig | undefined>(undefined);
-  const multiDomainEnabled =
-    import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
+  const multiDomainEnabled = import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
   const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
-  
+  const rawDomains = useStore((state) => state.allDomains);
+  const domainOptions: SelectOption[] = rawDomains.map((d) => ({ label: d.name, value: d.id }));
+
   useEffect(() => {
     if (multiDomainEnabled) {
       resetSettingsToDefault();
@@ -45,11 +41,10 @@ const SettingsSkmConfiguration: FC = () => {
 
   const fetchData = async (selectedDomain: string) => {
     try {
-      const data: SkmConfigResponse =
-        await fetchConfigurationFromDomain<SkmConfigResponse>(
-          'configs/skm-config',
-          selectedDomain
-        );
+      const data: SkmConfigResponse = await fetchConfigurationFromDomain<SkmConfigResponse>(
+        'configs/skm-config',
+        selectedDomain,
+      );
       const res = data.response;
 
       reset(res);
@@ -124,9 +119,7 @@ const SettingsSkmConfiguration: FC = () => {
     maxTokens: t('settings.skmConfiguration.tooltip.maxTokens'),
     indexName: t('settings.skmConfiguration.tooltip.indexName'),
     queryType: t('settings.skmConfiguration.tooltip.queryType'),
-    semanticConfiguration: t(
-      'settings.skmConfiguration.tooltip.semanticConfiguration'
-    ),
+    semanticConfiguration: t('settings.skmConfiguration.tooltip.semanticConfiguration'),
     inScope: t('settings.skmConfiguration.tooltip.inScope'),
   };
 
@@ -147,11 +140,32 @@ const SettingsSkmConfiguration: FC = () => {
     setKey(key + 1);
   };
 
-  const handleDomainSelection = useDomainSelectionHandler(
-    setSelectedDomains,
-    fetchData,
-    resetSettingsToDefault
-  );
+  const transferMutation = useMutation({
+    mutationFn: (data: { sourceDomainUuid: string; targetDomainUuids: string[] }) =>
+      apiDev.post('configs/transfer/skm-config', data),
+    onSuccess: () => {
+      toast.open({
+        type: 'success',
+        title: t('global.notification'),
+        message: t('toast.success.updateSuccess'),
+      });
+    },
+    onError: (error: AxiosError) => {
+      toast.open({
+        type: 'error',
+        title: t('global.notificationError'),
+        message: error.message,
+      });
+    },
+  });
+
+  const handleTransfer = (targetIds: string[]) => {
+    transferMutation.mutate({ sourceDomainUuid: selectedDomains[0], targetDomainUuids: targetIds });
+  };
+
+  const handleDomainSelection = useDomainSelectionHandler(setSelectedDomains, fetchData, resetSettingsToDefault);
+
+  const sourceDomainSelected = multiDomainEnabled && selectedDomains.length === 1;
 
   if (!skmConfig) {
     return <>Loading...</>;
@@ -162,70 +176,71 @@ const SettingsSkmConfiguration: FC = () => {
       <h1>{t('settings.skmConfiguration.title')}</h1>
       <p>{t('settings.skmConfiguration.description')}</p>
 
-      {multiDomainEnabled && (
-        <DomainSelector
-          disabled={
-            (multiDomainEnabled && selectedDomains.length === 0) || false
-          }
-          onChange={(selected) => {
-            handleDomainSelection(selected);
-          }}
-        />
-      )}
-
       <Card
-        key={key}
         isScrollable
+        tabs={multiDomainEnabled && <DomainTabSelector onChange={handleDomainSelection} />}
         footer={
           <Track justify="end">
-            <Button onClick={handleFormSubmit}>{t('global.save')}</Button>
+            <Button disabled={(multiDomainEnabled && selectedDomains.length === 0) || false} onClick={handleFormSubmit}>
+              {t('global.save')}
+            </Button>
           </Track>
         }
       >
-        <Track gap={16} direction="vertical" align="left">
-          {getNumberControl('range')}
-          {getNumberControl('documents')}
-          <Controller
-            name="systemMessage"
-            control={control}
-            render={({ field }) => (
-              <Track gap={10} style={{ width: '100%' }}>
-                <FormTextarea
-                  label={t('settings.skmConfiguration.systemMessage')}
-                  maxLength={-1}
-                  onChange={field.onChange}
-                  defaultValue={field.value}
-                  name="label"
-                  height={320}
-                  useRichText
+        <Fragment key={key}>
+          <Track gap={16} direction="vertical" align="left">
+            <Track justify="between" align="center" style={{ width: '100%' }}>
+              {getNumberControl('range')}
+              {sourceDomainSelected && (
+                <DomainTransfer
+                  allDomains={domainOptions}
+                  excludedDomainIds={selectedDomains}
+                  onTransfer={handleTransfer}
+                  isTransferring={transferMutation.isPending}
                 />
-                {getTooltip('systemMessage')}
-              </Track>
-            )}
-          />
-          {getNumberControl('maxTokens')}
-          {getTextControl('indexName')}
-          {getTextControl('semanticConfiguration')}
-          <Controller
-            name="queryType"
-            control={control}
-            render={({ field }) => (
-              <Track gap={10} style={{ width: '100%' }}>
-                <FormSelect
-                  {...field}
-                  onSelectionChange={(selection) =>
-                    field.onChange(selection?.value)
-                  }
-                  label={t('settings.skmConfiguration.queryType')}
-                  defaultValue={field.value}
-                  options={getQueryTypes()}
-                />
-                {getTooltip('queryType')}
-              </Track>
-            )}
-          />
-          {getSwitchControl('inScope')}
-        </Track>
+              )}
+            </Track>
+            {getNumberControl('documents')}
+            <Controller
+              name="systemMessage"
+              control={control}
+              render={({ field }) => (
+                <Track gap={10} style={{ width: '100%' }}>
+                  <FormTextarea
+                    label={t('settings.skmConfiguration.systemMessage')}
+                    maxLength={-1}
+                    onChange={field.onChange}
+                    defaultValue={field.value}
+                    name="label"
+                    height={320}
+                    useRichText
+                  />
+                  {getTooltip('systemMessage')}
+                </Track>
+              )}
+            />
+            {getNumberControl('maxTokens')}
+            {getTextControl('indexName')}
+            {getTextControl('semanticConfiguration')}
+            <Controller
+              name="queryType"
+              control={control}
+              render={({ field }) => (
+                <Track gap={10} style={{ width: '100%' }}>
+                  <FormSelect
+                    {...field}
+                    onSelectionChange={(selection) => field.onChange(selection?.value)}
+                    label={t('settings.skmConfiguration.queryType')}
+                    defaultValue={field.value}
+                    options={getQueryTypes()}
+                  />
+                  {getTooltip('queryType')}
+                </Track>
+              )}
+            />
+            {getSwitchControl('inScope')}
+          </Track>
+        </Fragment>
       </Card>
     </>
   );
@@ -239,23 +254,18 @@ const SettingsSkmConfiguration: FC = () => {
       | 'indexName'
       | 'queryType'
       | 'semanticConfiguration'
-      | 'inScope'
+      | 'inScope',
   ) {
     return (
       <Tooltip content={tooltips[name]}>
         <span>
-          <Icon
-            icon={<AiOutlineInfoCircle fontSize={20} color="#005aa3" />}
-            size="medium"
-          />
+          <Icon icon={<AiOutlineInfoCircle fontSize={20} color="#005aa3" />} size="medium" />
         </span>
       </Tooltip>
     );
   }
 
-  function getNumberControl(
-    name: 'systemMessage' | 'range' | 'documents' | 'maxTokens'
-  ) {
+  function getNumberControl(name: 'systemMessage' | 'range' | 'documents' | 'maxTokens') {
     return (
       <Controller
         name={name}
@@ -321,6 +331,4 @@ const SettingsSkmConfiguration: FC = () => {
   }
 };
 
-export default withAuthorization(SettingsSkmConfiguration, [
-  ROLES.ROLE_ADMINISTRATOR,
-]);
+export default withAuthorization(SettingsSkmConfiguration, [ROLES.ROLE_ADMINISTRATOR]);

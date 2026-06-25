@@ -117,7 +117,7 @@ export enum MessageSseEvent {
 export type MessageStatus = {
   messageId: string | null;
   readTime: any;
-}
+};
 
 export enum BACKOFFICE_NAME {
   DEFAULT = 'Bürokratt',

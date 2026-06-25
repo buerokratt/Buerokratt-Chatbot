@@ -1,0 +1,4 @@
+terminate_failed_chats:
+  trigger: "0 0/30 * * * ?"
+  type: exec
+  command: "../app/scripts/terminate-failed-chats.sh"

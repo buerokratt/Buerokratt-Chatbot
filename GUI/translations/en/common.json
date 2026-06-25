@@ -1,7 +1,14 @@
 {
+  "domainTransfer": {
+    "copyToDomain": "Copy to domain",
+    "transferDescription": "Select the domains to which the current settings will be copied to.",
+    "selectTargetDomain": "Select target domains",
+    "transfer": "Copy"
+  },
   "global": {
     "email": "Email",
     "save": "Save",
+    "apply": "Apply",
     "add": "Add",
     "edit": "Edit",
     "delete": "Delete",
@@ -49,7 +56,9 @@
     "statusClarification": "Status clarification",
     "selectAll": "Select all",
     "displayText": "Display message",
-    "test": "Test"
+    "test": "Test",
+    "preserve": "Preserve",
+    "clearFilters": "Clear filters"
   },
   "files": {
     "download_xlsx": "Download XLSX"
@@ -69,8 +78,11 @@
   "multiDomains": {
     "addNew": "Add new",
     "title": "Multidomains",
+    "domains": "Domains",
     "domainName": "Domain name",
     "selectDomains": "Select Domains",
+    "chooseDomain": "Select domain:",
+    "allDomains": "All",
     "noDomains": "No domains available. Please contact your system administrator."
   },
   "menu": {
@@ -181,6 +193,8 @@
       "endTime": "End time",
       "csaName": "Customer support name",
       "contact": "Contact",
+      "www": "Webpage",
+      "authenticatedPerson": "Authenticated person",
       "comment": "Comment",
       "label": "Label",
       "nps": "NPS",
@@ -193,7 +207,18 @@
       "statusAdder": "Status adder",
       "statusAddedDate": "Status added date",
       "chosenCsa": "Chosen csa(s)",
-      "chosenColumn": "Chosen column(s)"
+      "chosenColumn": "Chosen column(s)",
+      "chooseAll": "Choose all",
+      "conversationResponseQuality": "Response quality",
+      "followUpAction": "Follow-up action",
+      "chooseFollowUpAction": "- Select follow-up action -",
+      "chooseConversationResponseQuality": "- Select response quality -",
+      "chooseConversationTheme": "- Select chat theme -",
+      "conversationTheme": "Chat theme",
+      "theme": "Theme",
+      "responseQuality": "Bürokratt Response Quality",
+      "followUpStatus": "Follow-up Status",
+      "analysis": "Analysis"
     },
     "plainEvents": {
       "answered": "Answered",
@@ -237,7 +262,9 @@
       "user-authenticated": "{{name}} is authenticated {{date}}",
       "ask_to_forward_to_csa": "Asked to forward the conversation to a customer service agent",
       "forwarded_to_backoffice": "Conversation forwarded to back office",
-      "continue_chatting_with_bot": "Continue conversation with bürokratt"
+      "continue_chatting_with_bot": "Continue conversation with bürokratt",
+      "waiting_validation": "Waiting for validation",
+      "approved_validation": "Approved Validation"
     },
     "events": {
       "answered": "Answered {{date}}",
@@ -283,7 +310,9 @@
       "taken-over": "A human took the conversation over",
       "ask_to_forward_to_csa": "Asked to forward the conversation to a customer service agent",
       "forwarded_to_backoffice": "Conversation forwarded to back office",
-      "continue_chatting_with_bot": "Continue conversation with bürokratt"
+      "continue_chatting_with_bot": "Continue conversation with bürokratt",
+      "waiting_validation": "Waiting for validation",
+      "approved_validation": "Approved Validation"
     },
     "validations": {
       "title": "Validations",
@@ -299,6 +328,12 @@
         "requestedAt": "Requested At",
         "approve": "Approve"
       }
+    },
+    "quality": {
+      "theme": "Chat theme",
+      "responseQuality": "Chat response quality",
+      "followUpAction": "Follow-up action",
+      "selectionEmptied": "Selection emptied"
     }
   },
   "deleteConversation": {
@@ -318,6 +353,7 @@
     "sevenDays": "7 days",
     "thirtyOneDay": "31 day",
     "ninetyDays": "90 days",
+    "maxDaysError": "The maximum selection of days can be up to 9999",
     "tooltip": {
       "removeAuth": "Select \"Yes\" if you want authenticated conversations to be deleted. The period selection will open automatically. Select \"No\" if you do not want the conversations to be deleted.",
       "removeAnon": "Select \"Yes\" if you want anonymous conversations to be deleted. The period selection will open automatically. Select \"No\" if you do not want the conversations to be deleted.",
@@ -349,6 +385,8 @@
       "userTitle": "User title",
       "email": "E-mail",
       "department": "Department",
+      "connectedToJira": "Connected to Jira",
+      "jiraAccountName": "Jira account name",
       "connectToSmax": "Connect to Smax",
       "connectedToSmax": "Connected to Smax",
       "disconnectFromSmax": "Disconnect from Smax",
@@ -382,8 +420,27 @@
       "showSupportName": "Show support name",
       "showSupportTitle": "Show support title",
       "editActiveChat": "Editing active chats",
+      "instantlyOpenChatWidget": "Instantly open chat widget",
+      "showSubTitle": "Show chat window subtitle",
+      "subTitle": "Chat window subtitle",
+      "llmModuleActive": "LLM module active",
       "showBurokrattConfirmation": "Do you want to make Bürokrat visible on the website?",
-      "hideBurokrattConfirmation": "Do you want to hide the Bureaucrat on the website?"
+      "hideBurokrattConfirmation": "Do you want to hide Bürokrat on the website?",
+      "responseWaitingTime": "Response wait time",
+      "responseProcessingNotice": "Response processing notice",
+      "seconds": "seconds",
+      "responseWaitingTimeRangeInfo": "Allowed range 1 sec - 120 sec (2 min)",
+      "tooltip": {
+        "isBotActive": "If on is selected, Bürokratt will automatically respond to the client using an AI-based conversational solution (depending on the technical setup, either LLM, RAG, or RASA solution). If off is selected, the conversation will be automatically forwarded to an advisor.",
+        "isBurokrattActive": "If on is selected, Bürokratt will be visible on the website. If off is selected, Bürokratt will be hidden from the website.",
+        "instantlyOpenChatWidget": "If on is selected, the chat window will open automatically when the user lands on the website. If off is selected, Bürokratt will be minimized and the user must open the chat window themselves. This setting works only in the desktop view and does not apply to the mobile view!",
+        "isCsaNameVisible": "If the setting is enabled, the advisor's name is displayed on the left side of the chat window above the chat participant's picture . If the setting is disabled, the name will not be shown.",
+        "isCsaTitleVisible": "If the setting is enabled, the advisor's title will be displayed in the chat window. If the setting is disabled, the advisor's title will not be displayed.",
+        "isEditChatVisible": "If on is selected, only the advisor is able to edit their most recently sent response. If off is selected, the advisor cannot modify their last message after it has been sent.",
+        "showSubTitle": "By selecting Yes, in addition to the Bürokrati title, a subtitle will also be displayed in the chat window. The settings for the subtitle text can be found below. By selecting No, the subtitle will not be shown, but the Bürokrati title will still remain visible.",
+        "subTitle": "Enter the subtitle text here.",
+        "llmModuleActive": "If on is selected, the LLM module will be active. If off is selected, the LLM module will be inactive."
+      }
     },
     "emergencyNotices": {
       "title": "Emergency notices",
@@ -398,7 +455,10 @@
       "feedbackActive": "Feedback active",
       "feedbackQuestion": "Feedback question",
       "noticeActive": "Notice active",
-      "notice": "Notice"
+      "notice": "Notice",
+      "feedbackScale": "Feedback scale:",
+      "tenPoints": "10 points",
+      "fivePoints": "5 points"
     },
     "appearance": {
       "title": "Appearance and behavior",
@@ -424,29 +484,27 @@
       "allWeekdaysExceptWeekend": "M-F",
       "allWeekdays": "M-S",
       "availableAllTime": "Working hours are 24/7",
-      "showIfCSAIsNotAvailable": "Send a notification of absence to the client",
-      "showIfCSAIsNotAvailableWithContactsRequest": "Send a notification of absence to the client with a contact request",
+      "showIfCSAIsNotAvailable": "Send a notification of absence to the client. Will we ask the clients contact information?",
       "noCsaAvailableMessage": "Notification of the absence of a customer service representative",
-      "showIfOrganizationIsOutsideWorkingHours": "Send a notification to the client when the organization is outside working hours",
-      "showIfOrganizationIsOutsideWorkingHoursWithContactsRequest": "Send a notification to the client when the organization is outside working hours with a contact request",
+      "showIfOrganizationIsOutsideWorkingHours": "Send a notification of outside office hours to the client. Will we ask the clients contact information?",
       "outsideWorkingHoursMessage": "Outside working hours message",
-      "showIfBotCannotAnswerAskToForwardToCSA": "If Bürokratt cannot answer, ask for a customer service representative",
       "botCannotAnswerMessage": "Notification if Bürokratt cannot answer",
+      "redirectIfBotCannotAnswerMessage": "Notification before redirecting, if Bürokratt cannot answer",
       "organizationUseCSA": "Use customer service",
+      "validationNoCsaMessage": "Notification if the response is unable to be validated",
       "tooltip": {
-        "useCsa": "Select \"Yes\" if employees can take chat messages, this option will open up the working hours settings. If there are no employees, select \"No\". This will hide the additional settings as there is no need to set working hours.",
+        "useCsa": "Select \"Yes\" if employees can take chat messages, this option will open up the working hours settings. In case Bürokratt does not know how to answer, the conversation will be redirected to customer service. If there are no employees, select \"No\". This will hide the additional settings as there is no need to set working hours. In case Bürokratt does not know how to answer, a notification message will be sent but the conversation will not be redirected.",
         "work24/7": "Select \"Yes\" if employees are available 24/7, even during public holidays. Select \"No\" if time periods need to be customized depending on your organization's working hours.",
-        "workingHolidays": "On public holidays, the conversation behaves the same way as outside working hours.",
+        "workingHolidays": "By selecting \"Yes\" a holiday is taken as a working day and working hours apply the same way as they are intended on a regular working day. By selecting \"No\" and the holiday is on a working day then the holiday is set as an out-of-office day. The outside working hours message is sent and the chat will not be redirected.",
         "workingWeekends": "Select \"Yes\" if there are no working hours on weekends. Select \"No\" if there are working hours on weekends. Keep in mind to select \"No\" even if working hours are scheduled for only one weekend day.",
         "workingSameEachDay": "Select \"Yes\" if the working hours are the same on all weekdays. Select \"No\" if the hours differ. For example, select \"No\" when Monday to Friday have the same hours, but Saturday is different. This setting also considers the previously configured \"Closed on weekends\" option, if weekends are not part of the working hours, only Monday to Friday will be shown.",
-        "sendCsa": "This option is linked to the next setting, but the difference is whether the customer's contact information is requested. By selecting \"Yes\", only the message in the \"outside working hours message\" field will be sent to the customer. No contact details will be requested from the customer.",
-        "sendCsaWithContactDataRequest": "This option is connected to the previous setting, but here the customer's contact details are requested. By selecting \"Yes\", the customer will see a notification message and additional fields such as \"email address\", \"phone number\", and \"describe your question\". The content of the notification is defined in the \"outside working hours message\" field. When selecting \"No\", the logic from the previous setting will automatically apply, where no contact information is requested.",
+        "sendCsa": "By selecting \"Yes\", the customer will see an outside working hours notification message and additional fields such as \"email address\", \"phone number\", and \"describe your question\" can be filled in. The content of the notification is defined in the \"Outside working hours message\" field. When selecting \"No\", only the outside working hours message is sent as a chat message and no contact information is requested.",
         "outOfWorkingHoursText": "Text displayed to the customer during out-of-office hours. We recommend taking previous settings into account. For example, if contact detail collection is enabled, this should be reflected in the message, such as: \"It is currently outside of our working hours, you may leave your contact details so we can get back to you later.\"",
-        "csaOutOfReach": "This option is linked to the next setting, but the difference is whether the customer's contact information is requested. By selecting \"Yes\", only the message in the \"notification of the absence of a customer service represetative\" field will be sent to the customer. No contact details will be requested from the customer.",
-        "csaOutOfReachWithContactDataRequest": "This option is connected to the previous setting, but here the customer's contact details are requested. By selecting \"Yes\", the customer will see a notification message and additional fields such as \"email address\", \"phone number\", and \"describe your question\". The content of the notification is defined in the \"notification of the absence of a customer service represetative\" field. When selecting \"No\", the logic from the previous setting will automatically apply, where no contact information is requested.",
+        "csaOutOfReach": "By selecting \"Yes\", the customer will see a notification message and additional fields such as \"email address\", \"phone number\", and \"describe your question\". The content of the notification is defined in the \"notification of the absence of a customer service represetative\" field. When selecting \"No\", no contact information is requested and the absence message is sent as a chat message.",
         "allCsaAway": "Text displayed to the customer when all the employees are away or busy. We recommend taking previous settings into account. For example, if contact detail collection is enabled, this should be reflected in the message, such as: \"Currently all our represtatives are busy, you may leave your contact details so we can get back to you later.\"",
-        "bykCouldNotRespondRedirect": "Select \"Yes\" if you want the conversation to be forwarded to an employee when Bürokratt is unable to answer. Select \"No\" if forwarding should not occur. In that case, the conversation will continue in the same window with Bürokratt.",
-        "bykCouldNotRespond": "Text displayed when Bürokratt is unable to provide an answer."
+        "bykCouldNotRespond": "Text displayed when Bürokratt is unable to provide an answer when customer service is not used.",
+        "redirectIfBykCouldNotRespond": "Text that is displayed when Bürokratt is unable to provide an answer but customer service is used. In addition, when showing this message, a chat redirection option is offered to the customer.",
+        "validationNoCsaMessage": "This text is displayed to the end-user if the response is unable to be validated. The same text is displayed when the organization is outside working hours and during working hours if no CSA is available."
       }
     },
     "userSession": {
@@ -530,6 +588,29 @@
         "systemMessage": "System message can't be empty"
       }
     },
+    "chatAnalysis": {
+      "title": "Chat analysis management",
+      "chatAnalysisEnabled": "Chat Analysis",
+      "theme": "Add field",
+      "themePlaceholder": "Enter field name",
+      "themeHint": "Enter one or more names (separated by commas) and press \"Add\".",
+      "themeTooltip": "The names of the areas should be clear, distinct, and substantively accurate so that conversations can be unambiguously categorized later (e.g., land tax, recipes, software issues). Avoid overly general or overlapping names and favor specific topics that clearly direct the analysis to a specific area.",
+      "responseQuality": "Add response quality",
+      "responseQualityPlaceholder": "Enter quality level",
+      "responseQualityHint": "Enter one or more quality levels (separated by commas) and press \"Add\".",
+      "responseQualityTooltip": "We recommend setting the quality name according to your institution (colors, good/bad comparison, etc.). The purpose of the quality assessment is to assess the quality of the Bureaucrat's answers to help better understand the strengths and weaknesses of the Bureaucrat's knowledge. By combining the field and the quality assessment, it is possible to get a better overview of the Bureaucrat's knowledge and plan specific activities.",
+      "followUpAction": "Add follow-up action status",
+      "followUpActionPlaceholder": "Enter follow-up action",
+      "followUpActionHint": "Enter one or more follow-up actions (separated by commas) and press \"Add\".",
+      "followUpActionTooltip": "The action naming of follow-up activities helps to monitor the life cycle of internal processes and helps to keep track of conversation analysis. For example, if the field and quality analysis shows that it is necessary to initiate a specific chain of activities within the institution, we recommend writing down the names of the activities of the corresponding process as follow-up actions. For example, if it is necessary to update the knowledge of the Bureaucrat, specific activities can be added such as \"Need to update the website\", \"Needs input from information security\", \"Documents need to be updated\", \"Scrape information again\", \"Knowledge updated\". You can also add notes outside the institution such as \"Needs help from the Bureaucrat team\" or \"Needs input from another institution\". For a complete lifecycle of follow-up activities, we recommend using the final action \"Checked\" or \"Completed\" in parallel, which indicates that no additional activities need to be performed, but the conversation has been checked by the employee.",
+      "dragHint": "You can change the order of the labels by dragging them.",
+      "deleteDialogTitle": "Confirm deletion",
+      "deleteDialogText": "Do you want to delete the <strong>\"{{label}}\"</strong> selection? Press <strong>\"{{confirm}}\"</strong> to remove the selection. If you want to change the selection, delete it and add a new one. You can change the order of the selections by dragging them.",
+      "deleteConfirm": "Delete",
+      "deleteCancel": "Do not delete",
+      "savedSettingsSuccessfully": "Chat analysis settings saved successfully",
+      "labelTooLong": "Label cannot be longer than 50 characters"
+    },
     "anonymizer": {
       "settingsTitle": "Anonymizer Settings",
       "approach": "Anonymization approach",
@@ -544,6 +625,7 @@
       "denyListPlaceholder": "Enter a word and press Enter to add to the denylist",
       "anonymizationBeforeLLM": "Anonymization before LLM",
       "anonymizationBeforeGlobalClassifier": "Anonymization before Global classifier",
+      "recordConversationsAnonymously": "Record conversations anonymously",
       "saveSettings": "Save Settings",
       "testingTitle": "Anonymizer Testing",
       "testingDescription": "To test your anonymizer configuration, enter the input text and press \"Anonymize\"",
@@ -572,6 +654,9 @@
         "person": "PERSON",
         "gpe": "GPE",
         "crypto": "CRYPTO"
+      },
+      "tooltip": {
+        "recordConversationsAnonymously": "When enabled, all messages are anonymized before being saved. Users will see only anonymized messages during the conversation and in chat history. Original messages are not stored or retrievable."
       }
     }
   },
@@ -592,7 +677,10 @@
       "copied": "Copied",
       "userDeleted": "User deleted",
       "newUserAdded": "New user added",
-      "userUpdated": "User updated"
+      "userUpdated": "User updated",
+      "conversationThemeSaved": "Theme selection has been saved.",
+      "conversationQualitySaved": "Response quality selection has been saved.",
+      "conversationFollowUpActionSaved": "Follow-up action selection has been saved."
     }
   },
   "notification": {
@@ -601,5 +689,19 @@
   },
   "landing": {
     "title": "Welcome to Bürokratt"
+  },
+  "errors": {
+    "claimed_by_another_agent": "This chat has already been claimed by another agent.",
+    "chat_has_ended": "This chat has already ended.",
+    "could_not_fetch_user_info": "Could not fetch user info.",
+    "message_editing_not_allowed": "Message editing is not allowed.",
+    "chat_not_found": "Chat not found.",
+    "bad_request": "Bad request.",
+    "not_found": "Not found.",
+    "user_not_found": "User not found.",
+    "user_already_exists": "User already exists.",
+    "jira_user_not_found": "Jira user not found.",
+    "unauthorized": "Unauthorized.",
+    "csa_is_offline": "Customer support is offline"
   }
 }

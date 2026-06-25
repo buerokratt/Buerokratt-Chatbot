@@ -1,4 +1,4 @@
-const { AzureOpenAI } = require("openai");
+const { AzureOpenAI } = require('openai');
 
 const azureConfig = {
   endpoint: process.env.AZURE_OPENAI_ENDPOINT,
@@ -12,7 +12,7 @@ let client = null;
 
 function initializeAzureOpenAI() {
   if (!azureConfig.apiKey) {
-    throw new Error("Azure OpenAI API key is required");
+    throw new Error('Azure OpenAI API key is required');
   }
 
   client = new AzureOpenAI({
@@ -47,7 +47,7 @@ async function streamAzureOpenAIResponse(messages, options = {}) {
       return await client.chat.completions.create(requestConfig);
     }
   } catch (error) {
-    console.error("Azure OpenAI API error:", error);
+    console.error('Azure OpenAI API error:', error);
     throw error;
   }
 }

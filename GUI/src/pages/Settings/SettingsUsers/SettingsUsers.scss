@@ -4,31 +4,30 @@
 @import 'src/styles/settings/variables/typography';
 
 .multiSelect {
-    $self: &;
-    display: flex;
-    align-items: center;
-    gap: get-spacing(paldiski);
-    width: 100%;
-    &::placeholder {
-      color: get-color(black-coral-6);
-      font-size: small;
-    }
+  $self: &;
+  display: flex;
+  align-items: center;
+  gap: get-spacing(paldiski);
+  width: 100%;
+  &::placeholder {
+    color: get-color(black-coral-6);
+    font-size: small;
+  }
 
-    &__label {
-        flex: 0 0 185px;
-        font-size: $veera-font-size-100;
-        line-height: 24px;
-    }
+  &__label {
+    flex: 0 0 185px;
+    font-size: $veera-font-size-100;
+    line-height: 24px;
+  }
 
-
-    &__wrapper {
-        width: 390px;
-        flex: 1;
-        display: block;
-        flex-direction: column;
-        gap: 7px;
-        position: relative;
-        border: 0.15px solid get-color(black-coral-6);
-        border-radius: $veera-radius-s;
-    }
+  &__wrapper {
+    width: 390px;
+    flex: 1;
+    display: block;
+    flex-direction: column;
+    gap: 7px;
+    position: relative;
+    border: 0.15px solid get-color(black-coral-6);
+    border-radius: $veera-radius-s;
+  }
 }

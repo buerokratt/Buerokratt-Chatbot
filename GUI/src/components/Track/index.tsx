@@ -6,7 +6,7 @@ type TrackProps = HTMLAttributes<HTMLDivElement> & {
   justify?: 'start' | 'between' | 'center' | 'around' | 'end';
   direction?: 'horizontal' | 'vertical';
   isMultiline?: boolean;
-}
+};
 
 const alignMap = {
   left: 'flex-start',
@@ -23,21 +23,19 @@ const justifyMap = {
   end: 'flex-end',
 };
 
-const Track: FC<PropsWithChildren<TrackProps>> = (
-  {
-    gap = 0,
-    align = 'center',
-    justify = 'start',
-    direction = 'horizontal',
-    isMultiline = false,
-    children,
-    style,
-    ...rest
-  },
-) => {
+const Track: FC<PropsWithChildren<TrackProps>> = ({
+  gap = 0,
+  align = 'center',
+  justify = 'start',
+  direction = 'horizontal',
+  isMultiline = false,
+  children,
+  style,
+  ...rest
+}) => {
   return (
     <div
-      className='track'
+      className="track"
       style={{
         display: 'flex',
         gap,

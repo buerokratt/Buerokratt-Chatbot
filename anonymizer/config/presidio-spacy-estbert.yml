@@ -35,13 +35,13 @@ nlp_configuration:
       LOC: LOCATION
       LOCATION: LOCATION
       ORG: ORGANIZATION
-      GPE: LOCATION
+      GPE: GPE
       DATE: DATE_TIME
       TIME: DATE_TIME
 
 # EstBERT NER Model Configuration
 estbert_configuration:
-  model_name: "tartuNLP/EstBERT_NER_v2"
+  model_name: "buerokrattRIA/EstBert_NER_SyntheticGov"
   supported_language: xx
   entity_mapping:
     LOC: LOCATION

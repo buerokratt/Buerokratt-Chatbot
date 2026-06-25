@@ -1,0 +1,30 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Description placeholder for 'STOP STREAM'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: channelId
+        type: string
+        description: "Body field 'channelId'"
+
+extractRequestData:
+  assign:
+    channelId: ${incoming.body.channelId}
+
+stop_ai_stream:
+  call: http.post
+  args:
+    url: "[#CHATBOT_NOTIFICATIONS]/channels/${channelId}/stream/stop"
+    headers:
+      Content-Type: application/json
+    body:
+      channelId: ${channelId}
+  result: stream_stop_response
+
+return_result:
+  return: "stream stopped"

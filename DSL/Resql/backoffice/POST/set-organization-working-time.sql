@@ -27,10 +27,12 @@ WITH last_configuration AS (
      'organizationNoCsaAvailableMessage',
      'organizationOutsideWorkingHoursAskForContacts',
      'organizationOutsideWorkingHoursMessage',
-     'organizationBotCannotAnswerAskToForwardToCSA',
      'organizationBotCannotAnswerMessage',
-     'organizationUseCSA')
-    AND id IN (SELECT max(id) from configuration GROUP BY key)
+     'organizationRedirectIfBotCannotAnswerMessage',
+     'organizationUseCSA',
+     'organizationValidationNoCsaMessage')
+    AND "domain" IS NULL
+    AND id IN (SELECT max(id) from configuration WHERE "domain" IS NULL GROUP BY key)
     AND deleted = FALSE
 ), new_configuration as (
   SELECT new_values.key, new_values.value, :created::timestamp with time zone as created
@@ -61,9 +63,10 @@ WITH last_configuration AS (
         ('organizationNoCsaAvailableMessage', :organizationNoCsaAvailableMessage),
         ('organizationOutsideWorkingHoursAskForContacts', :organizationOutsideWorkingHoursAskForContacts),
         ('organizationOutsideWorkingHoursMessage', :organizationOutsideWorkingHoursMessage),
-        ('organizationBotCannotAnswerAskToForwardToCSA', :organizationBotCannotAnswerAskToForwardToCSA),
         ('organizationBotCannotAnswerMessage', :organizationBotCannotAnswerMessage),
-        ('organizationUseCSA', :organizationUseCSA)
+        ('organizationRedirectIfBotCannotAnswerMessage', :organizationRedirectIfBotCannotAnswerMessage),
+        ('organizationUseCSA', :organizationUseCSA),
+        ('organizationValidationNoCsaMessage', :organizationValidationNoCsaMessage)
    ) as new_values (key, value)
 )
 INSERT INTO configuration (key, value, created)

@@ -1,6 +1,6 @@
 export interface GreetingsMessage {
   est: string;
-  isActive: string;
+  isActive: boolean;
   domainUUID?: string[];
 }
 

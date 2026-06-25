@@ -26,7 +26,9 @@
     border: 1px solid get-color(black-coral-2);
     padding: 0;
     cursor: pointer;
-    transition: background-color 0.25s ease-out, border-color 0.25s ease-out;
+    transition:
+      background-color 0.25s ease-out,
+      border-color 0.25s ease-out;
 
     &[aria-checked='true'] {
       background-color: get-color(sapphire-blue-10);
@@ -89,7 +91,9 @@
     top: 50%;
     left: 4px;
     transform: translateY(-50%);
-    transition: transform 0.25s ease-out, background-color 0.25s ease-out;
+    transition:
+      transform 0.25s ease-out,
+      background-color 0.25s ease-out;
     pointer-events: none;
 
     > * {
@@ -147,4 +151,3 @@
     color: get-color(sapphire-blue-10);
   }
 }
-

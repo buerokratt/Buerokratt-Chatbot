@@ -5,5 +5,20 @@ updates:
     schedule:
       time: "00:00"
       interval: "daily"
+      timezone: 'Europe/Tallinn'
     open-pull-requests-limit: 50
     target-branch: "dev"
+    labels:
+      - 'dependencies'
+    pull-request-branch-name:
+      separator: '/'
+    groups:
+      vitest:
+        patterns:
+          - 'vitest'
+          - '@vitest/*'
+      react:
+        patterns:
+          - 'react'
+          - '@types/react'
+          - 'react-dom'

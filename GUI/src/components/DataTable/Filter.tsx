@@ -1,10 +1,10 @@
-import React, { FC, useState, MouseEvent } from 'react';
 import { Column, Table } from '@tanstack/react-table';
+import { Icon } from 'components';
+import useDocumentEscapeListener from 'hooks/useDocumentEscapeListener';
+import React, { FC, MouseEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdOutlineSearch } from 'react-icons/md';
 
-import { Icon } from 'components';
-import useDocumentEscapeListener from 'hooks/useDocumentEscapeListener';
 import DebouncedInput from './DebouncedInput';
 
 type FilterProps = {
@@ -15,9 +15,7 @@ type FilterProps = {
 const Filter: FC<FilterProps> = ({ column, table }) => {
   const { t } = useTranslation();
   const [filterOpen, setFilterOpen] = useState(false);
-  const firstValue = table
-    .getPreFilteredRowModel()
-    .flatRows[0]?.getValue(column.id);
+  const firstValue = table.getPreFilteredRowModel().flatRows[0]?.getValue(column.id);
 
   const columnFilterValue = column.getFilterValue();
 
@@ -41,12 +39,7 @@ const Filter: FC<FilterProps> = ({ column, table }) => {
               min={Number(column.getFacetedMinMaxValues()?.[0] ?? '')}
               max={Number(column.getFacetedMinMaxValues()?.[1] ?? '')}
               value={(columnFilterValue as [number, number])?.[0] ?? ''}
-              onChange={(value) =>
-                column.setFilterValue((old: [number, number]) => [
-                  value,
-                  old?.[1],
-                ])
-              }
+              onChange={(value) => column.setFilterValue((old: [number, number]) => [value, old?.[1]])}
             />
           ) : (
             <DebouncedInput

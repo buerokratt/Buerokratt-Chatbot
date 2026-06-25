@@ -1,11 +1,10 @@
-import { apiDev } from './api';
 import { User, UserDTO } from 'types/user';
+
+import { apiDev } from './api';
 import { DomainSelection } from '../types/domainsModels';
 
 export async function createUser(userData: UserDTO) {
-  const authorities = userData.authorities
-    .map((e) => (e as any).value)
-    .filter((item) => item);
+  const authorities = userData.authorities.map((e) => (e as any).value).filter((item) => item);
   const fullName = userData.fullName?.trim();
   const { data } = await apiDev.post<User>('accounts/admin/add', {
     firstName: fullName?.split(' ').slice(0, 1).join(' ') ?? '',
@@ -14,15 +13,10 @@ export async function createUser(userData: UserDTO) {
     displayName: userData.displayName,
     csaTitle: userData.csaTitle,
     csa_email: userData.csaEmail,
-    roles:
-      authorities.length === 0
-        ? Object.values(userData.authorities)
-        : authorities,
+    roles: authorities.length === 0 ? Object.values(userData.authorities) : authorities,
     department: userData.department,
     domains:
-      userData.domains.length === 0 || userData.domains[0] === null
-        ? []
-        : userData.domains.map(d => d.value)
+      userData.domains.length === 0 || userData.domains[0] === null ? [] : userData.domains.map((d) => d.value ?? d),
   });
   return data;
 }
@@ -34,19 +28,11 @@ export async function checkIfUserExists(userData: UserDTO) {
   return data;
 }
 
-export async function editUser(
-  id: string | number,
-  userData: UserDTO,
-  smaxConnectDisconnect: boolean
-) {
-  const authorities = userData.authorities
-    .map((e: any) => e.value)
-    .filter((item) => item);
+export async function editUser(id: string | number, userData: UserDTO, smaxConnectDisconnect: boolean) {
+  const authorities = userData.authorities.map((e: any) => e.value).filter((item) => item);
   const fullName = userData.fullName?.trim();
 
-  const apiUrl = smaxConnectDisconnect
-    ? 'accounts/admin/smax-connection'
-    : 'accounts/admin/edit';
+  const apiUrl = smaxConnectDisconnect ? 'accounts/admin/smax-connection' : 'accounts/admin/edit';
 
   const { data } = await apiDev.post<User>(apiUrl, {
     firstName: fullName?.split(' ').slice(0, 1).join(' ') ?? '',
@@ -57,15 +43,11 @@ export async function editUser(
     csa_email: userData.csaEmail,
     smaxAccountId: userData.smaxAccountId,
     ...(smaxConnectDisconnect && { smaxConnectDisconnect }),
-    roles:
-      authorities.length === 0
-        ? Object.values(userData.authorities)
-        : authorities,
+    jiraAccountId: userData.jiraAccountId,
+    roles: authorities.length === 0 ? Object.values(userData.authorities) : authorities,
     department: userData.department,
     domains:
-      userData.domains.length === 0 || userData.domains[0] === null
-        ? []
-        : userData.domains.map(d => d.value)
+      userData.domains.length === 0 || userData.domains[0] === null ? [] : userData.domains.map((d) => d.value ?? d),
   });
   return data;
 }

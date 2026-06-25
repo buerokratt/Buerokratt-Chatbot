@@ -1,31 +1,22 @@
-import { FC, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
-import { useIdleTimer } from 'react-idle-timer';
-import { MdOutlineExpandMore } from 'react-icons/md';
-
-import {
-  Track,
-  Button,
-  Icon,
-  Drawer,
-  Section,
-  SwitchBox,
-  Switch,
-  Dialog,
-} from 'components';
-import useStore from 'store';
-import { ReactComponent as BykLogo } from 'assets/logo.svg';
-import { UserProfileSettings } from 'types/userProfileSettings';
-import { Chat as ChatType } from 'types/chat';
-import { useToast } from 'hooks/useToast';
 import { USER_IDLE_STATUS_TIMEOUT } from 'constants/config';
-import { apiDev } from 'services/api';
-import { interval } from 'rxjs';
-import { AUTHORITY } from 'types/authorities';
-import { useCookies } from 'react-cookie';
+
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { ReactComponent as BykLogo } from 'assets/logo.svg';
+import { AxiosError } from 'axios';
+import { Button, Dialog, Drawer, Icon, Section, Switch, SwitchBox, Track } from 'components';
 import { useDing } from 'hooks/useAudio';
+import { useToast } from 'hooks/useToast';
+import { FC, useEffect, useState } from 'react';
+import { useCookies } from 'react-cookie';
+import { useTranslation } from 'react-i18next';
+import { MdOutlineExpandMore } from 'react-icons/md';
+import { useIdleTimer } from 'react-idle-timer';
+import { interval } from 'rxjs';
+import { apiDev } from 'services/api';
+import useStore from 'store';
+import { AUTHORITY } from 'types/authorities';
+import { Chat as ChatType } from 'types/chat';
+import { UserProfileSettings } from 'types/userProfileSettings';
 import './Header.scss';
 import { CustomerSupportActivityDTO } from 'types/customerSupportActivity';
 
@@ -46,45 +37,35 @@ const Header: FC = () => {
   const userInfo = useStore((state) => state.userInfo);
   const toast = useToast();
   let secondsUntilStatusPopup = 300;
-  const [statusPopupTimerHasStarted, setStatusPopupTimerHasStarted] =
-    useState(false);
-  const [showStatusConfirmationModal, setShowStatusConfirmationModal] =
-    useState(false);
+  const [statusPopupTimerHasStarted, setStatusPopupTimerHasStarted] = useState(false);
+  const [showStatusConfirmationModal, setShowStatusConfirmationModal] = useState(false);
 
   const queryClient = useQueryClient();
   const [userDrawerOpen, setUserDrawerOpen] = useState(false);
-  const [csaStatus, setCsaStatus] = useState<'idle' | 'offline' | 'online'>(
-    'online'
-  );
+  const [csaStatus, setCsaStatus] = useState<'idle' | 'offline' | 'online'>('online');
   const [ding] = useDing();
   const chatCsaActive = useStore((state) => state.chatCsaActive);
-  const [userProfileSettings, setUserProfileSettings] =
-    useState<UserProfileSettings>({
-      userId: 1,
-      forwardedChatPopupNotifications: true,
-      forwardedChatSoundNotifications: true,
-      forwardedChatEmailNotifications: false,
-      newChatPopupNotifications: false,
-      newChatSoundNotifications: true,
-      newChatEmailNotifications: false,
-      useAutocorrect: true,
-    });
+  const [userProfileSettings, setUserProfileSettings] = useState<UserProfileSettings>({
+    userId: 1,
+    forwardedChatPopupNotifications: true,
+    forwardedChatSoundNotifications: true,
+    forwardedChatEmailNotifications: false,
+    newChatPopupNotifications: false,
+    newChatSoundNotifications: true,
+    newChatEmailNotifications: false,
+    useAutocorrect: true,
+  });
   const customJwtCookieKey = 'customJwtCookie';
 
   useEffect(() => {
     const interval = setInterval(() => {
       const expirationTimeStamp = localStorage.getItem('exp');
-      if (
-        expirationTimeStamp !== 'null' &&
-        expirationTimeStamp !== null &&
-        expirationTimeStamp !== undefined
-      ) {
+      if (expirationTimeStamp !== 'null' && expirationTimeStamp !== null && expirationTimeStamp !== undefined) {
         const expirationDate = new Date(parseInt(expirationTimeStamp) ?? '');
         const currentDate = new Date(Date.now());
         if (expirationDate < currentDate) {
           localStorage.removeItem('exp');
-          window.location.href =
-            import.meta.env.REACT_APP_CUSTOMER_SERVICE_LOGIN;
+          window.location.href = import.meta.env.REACT_APP_CUSTOMER_SERVICE_LOGIN;
         }
       }
     }, 2000);
@@ -98,8 +79,7 @@ const Header: FC = () => {
   const getMessages = async () => {
     const { data: res } = await apiDev.get('accounts/settings');
 
-    if (res.response && res.response != 'error: not found')
-      setUserProfileSettings(res.response[0]);
+    if (res.response && res.response != 'error: not found') setUserProfileSettings(res.response[0]);
   };
   const { data: customerSupportActivity } = useQuery<CustomerSupportActivity>({
     queryKey: ['accounts/customer-support-activity', 'prod'],
@@ -118,12 +98,8 @@ const Header: FC = () => {
   });
 
   const [_, setCookie] = useCookies([customJwtCookieKey]);
-  const unansweredChatsLength = useStore((state) =>
-    state.unansweredChatsLength()
-  );
-  const forwardedChatsLength = useStore((state) =>
-    state.forwordedChatsLength()
-  );
+  const unansweredChatsLength = useStore((state) => state.unansweredChatsLength());
+  const forwardedChatsLength = useStore((state) => state.forwordedChatsLength());
 
   const handleNewMessage = () => {
     if (unansweredChatsLength <= 0) {
@@ -148,9 +124,7 @@ const Header: FC = () => {
   useEffect(() => {
     handleNewMessage();
 
-    const subscription = interval(2 * 60 * 1000).subscribe(() =>
-      handleNewMessage()
-    );
+    const subscription = interval(2 * 60 * 1000).subscribe(() => handleNewMessage());
     return () => {
       subscription?.unsubscribe();
     };
@@ -179,9 +153,7 @@ const Header: FC = () => {
   useEffect(() => {
     handleForwordMessage();
 
-    const subscription = interval(2 * 60 * 1000).subscribe(
-      () => handleForwordMessage
-    );
+    const subscription = interval(2 * 60 * 1000).subscribe(() => handleForwordMessage);
     return () => {
       subscription?.unsubscribe();
     };
@@ -227,10 +199,7 @@ const Header: FC = () => {
       if (csaStatus === 'online') extendUserSessionMutation.mutate();
     },
     onError: async (error: AxiosError) => {
-      await queryClient.invalidateQueries([
-        'accounts/customer-support-activity',
-        'prod',
-      ]);
+      await queryClient.invalidateQueries(['accounts/customer-support-activity', 'prod']);
       toast.open({
         type: 'error',
         title: t('global.notificationError'),
@@ -278,7 +247,7 @@ const Header: FC = () => {
       customerSupportActive: chatCsaActive,
       customerSupportId: customerSupportActivity.idCode,
       customerSupportStatus: 'idle',
-      statusComment: ''
+      statusComment: '',
     });
   };
 
@@ -294,7 +263,7 @@ const Header: FC = () => {
       customerSupportActive: chatCsaActive,
       customerSupportId: customerSupportActivity.idCode,
       customerSupportStatus: 'online',
-      statusComment: ''
+      statusComment: '',
     });
   };
 
@@ -323,7 +292,7 @@ const Header: FC = () => {
       customerSupportActive: checked,
       customerSupportStatus: checked === true ? 'online' : 'offline',
       customerSupportId: '',
-      statusComment: ''
+      statusComment: '',
     });
 
     if (!checked) showStatusChangePopup();
@@ -359,9 +328,8 @@ const Header: FC = () => {
                     textTransform: 'lowercase',
                   }}
                 >
-                  <strong>{unansweredChatsLength}</strong>{' '}
-                  {t('chat.unanswered')} <strong>{forwardedChatsLength}</strong>{' '}
-                  {t('chat.forwarded')}
+                  <strong>{unansweredChatsLength}</strong> {t('chat.unanswered')}{' '}
+                  <strong>{forwardedChatsLength}</strong> {t('chat.forwarded')}
                 </p>
                 <Switch
                   onCheckedChange={handleCsaStatusChange}
@@ -382,10 +350,7 @@ const Header: FC = () => {
                   backgroundColor: '#DBDFE2',
                 }}
               ></span>
-              <Button
-                appearance="text"
-                onClick={() => setUserDrawerOpen(!userDrawerOpen)}
-              >
+              <Button appearance="text" onClick={() => setUserDrawerOpen(!userDrawerOpen)}>
                 <span
                   style={{
                     display: 'block',
@@ -407,7 +372,7 @@ const Header: FC = () => {
                     customerSupportActive: false,
                     customerSupportStatus: 'offline',
                     customerSupportId: userInfo.idCode,
-                    statusComment: ''
+                    statusComment: '',
                   });
                   localStorage.removeItem('exp');
                   logoutMutation.mutate();
@@ -425,12 +390,7 @@ const Header: FC = () => {
           onClose={() => setShowStatusConfirmationModal((value) => !value)}
           footer={
             <>
-              <Button
-                appearance="secondary"
-                onClick={() =>
-                  setShowStatusConfirmationModal((value) => !value)
-                }
-              >
+              <Button appearance="secondary" onClick={() => setShowStatusConfirmationModal((value) => !value)}>
                 {t('global.cancel')}
               </Button>
               <Button
@@ -446,9 +406,7 @@ const Header: FC = () => {
           }
         >
           <div className="dialog__body">
-            <h1
-              style={{ fontSize: '24px', fontWeight: '400', color: '#09090B' }}
-            >
+            <h1 style={{ fontSize: '24px', fontWeight: '400', color: '#09090B' }}>
               {t('global.statusChangeQuestion')}
             </h1>
           </div>
@@ -456,11 +414,7 @@ const Header: FC = () => {
       )}
 
       {userInfo && userProfileSettings && userDrawerOpen && (
-        <Drawer
-          title={userInfo.displayName}
-          onClose={() => setUserDrawerOpen(false)}
-          style={{ width: 400 }}
-        >
+        <Drawer title={userInfo.displayName} onClose={() => setUserDrawerOpen(false)} style={{ width: 400 }}>
           <Section>
             <Track gap={8} direction="vertical" align="left">
               {[
@@ -470,9 +424,7 @@ const Header: FC = () => {
                 },
                 {
                   label: t('settings.users.userRoles'),
-                  value: userInfo.authorities
-                    .map((r) => t(`roles.${r}`))
-                    .join(', '),
+                  value: userInfo.authorities.map((r) => t(`roles.${r}`)).join(', '),
                 },
                 {
                   label: t('settings.users.userTitle'),
@@ -487,11 +439,9 @@ const Header: FC = () => {
               ))}
             </Track>
           </Section>
-          {[
-            AUTHORITY.ADMINISTRATOR,
-            AUTHORITY.CUSTOMER_SUPPORT_AGENT,
-            AUTHORITY.SERVICE_MANAGER,
-          ].some((auth) => userInfo.authorities.includes(auth)) && (
+          {[AUTHORITY.ADMINISTRATOR, AUTHORITY.CUSTOMER_SUPPORT_AGENT, AUTHORITY.SERVICE_MANAGER].some((auth) =>
+            userInfo.authorities.includes(auth),
+          ) && (
             <>
               <Section>
                 <Track gap={8} direction="vertical" align="left">
@@ -500,9 +450,7 @@ const Header: FC = () => {
                     name="useAutocorrect"
                     label={t('settings.users.useAutocorrect')}
                     checked={userProfileSettings.useAutocorrect}
-                    onCheckedChange={(checked) =>
-                      handleUserProfileSettingsChange('useAutocorrect', checked)
-                    }
+                    onCheckedChange={(checked) => handleUserProfileSettingsChange('useAutocorrect', checked)}
                   />
                 </Track>
               </Section>
@@ -512,26 +460,16 @@ const Header: FC = () => {
                   <SwitchBox
                     name="forwardedChatEmailNotifications"
                     label={t('settings.users.newForwardedChat')}
-                    checked={
-                      userProfileSettings.forwardedChatEmailNotifications
-                    }
+                    checked={userProfileSettings.forwardedChatEmailNotifications}
                     onCheckedChange={(checked) =>
-                      handleUserProfileSettingsChange(
-                        'forwardedChatEmailNotifications',
-                        checked
-                      )
+                      handleUserProfileSettingsChange('forwardedChatEmailNotifications', checked)
                     }
                   />
                   <SwitchBox
                     name="newChatEmailNotifications"
                     label={t('settings.users.newUnansweredChat')}
                     checked={userProfileSettings.newChatEmailNotifications}
-                    onCheckedChange={(checked) =>
-                      handleUserProfileSettingsChange(
-                        'newChatEmailNotifications',
-                        checked
-                      )
-                    }
+                    onCheckedChange={(checked) => handleUserProfileSettingsChange('newChatEmailNotifications', checked)}
                   />
                 </Track>
               </Section>
@@ -541,26 +479,16 @@ const Header: FC = () => {
                   <SwitchBox
                     name="forwardedChatSoundNotifications"
                     label={t('settings.users.newForwardedChat')}
-                    checked={
-                      userProfileSettings.forwardedChatSoundNotifications
-                    }
+                    checked={userProfileSettings.forwardedChatSoundNotifications}
                     onCheckedChange={(checked) =>
-                      handleUserProfileSettingsChange(
-                        'forwardedChatSoundNotifications',
-                        checked
-                      )
+                      handleUserProfileSettingsChange('forwardedChatSoundNotifications', checked)
                     }
                   />
                   <SwitchBox
                     name="newChatSoundNotifications"
                     label={t('settings.users.newUnansweredChat')}
                     checked={userProfileSettings.newChatSoundNotifications}
-                    onCheckedChange={(checked) =>
-                      handleUserProfileSettingsChange(
-                        'newChatSoundNotifications',
-                        checked
-                      )
-                    }
+                    onCheckedChange={(checked) => handleUserProfileSettingsChange('newChatSoundNotifications', checked)}
                   />
                 </Track>
               </Section>
@@ -570,26 +498,16 @@ const Header: FC = () => {
                   <SwitchBox
                     name="forwardedChatPopupNotifications"
                     label={t('settings.users.newForwardedChat')}
-                    checked={
-                      userProfileSettings.forwardedChatPopupNotifications
-                    }
+                    checked={userProfileSettings.forwardedChatPopupNotifications}
                     onCheckedChange={(checked) =>
-                      handleUserProfileSettingsChange(
-                        'forwardedChatPopupNotifications',
-                        checked
-                      )
+                      handleUserProfileSettingsChange('forwardedChatPopupNotifications', checked)
                     }
                   />
                   <SwitchBox
                     name="newChatPopupNotifications"
                     label={t('settings.users.newUnansweredChat')}
                     checked={userProfileSettings.newChatPopupNotifications}
-                    onCheckedChange={(checked) =>
-                      handleUserProfileSettingsChange(
-                        'newChatPopupNotifications',
-                        checked
-                      )
-                    }
+                    onCheckedChange={(checked) => handleUserProfileSettingsChange('newChatPopupNotifications', checked)}
                   />
                 </Track>
               </Section>

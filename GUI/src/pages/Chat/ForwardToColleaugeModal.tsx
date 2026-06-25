@@ -1,41 +1,23 @@
+import { DialogTrigger } from '@radix-ui/react-dialog';
+import { createColumnHelper, PaginationState, SortingState } from '@tanstack/react-table';
+import { Button, DataTable, Dialog, FormCheckbox, FormInput, Icon, Tooltip, Track } from 'components';
+import { format } from 'date-fns';
 import { FC, useEffect, useMemo, useState } from 'react';
-import {
-  createColumnHelper,
-  PaginationState,
-  SortingState,
-} from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 import { MdOutlineArrowForward } from 'react-icons/md';
 import { apiDev } from 'services/api';
-
-import {
-  Button,
-  DataTable,
-  Dialog,
-  FormCheckbox,
-  FormInput,
-  Icon,
-  Tooltip,
-  Track,
-} from 'components';
-import { User } from 'types/user';
-import { Chat } from 'types/chat';
-import { useDebouncedCallback } from 'use-debounce';
 import useStore from 'store';
-import { format } from 'date-fns';
-import { DialogTrigger } from '@radix-ui/react-dialog';
+import { Chat } from 'types/chat';
+import { User } from 'types/user';
+import { useDebouncedCallback } from 'use-debounce';
 
 type ForwardToColleaugeModalProps = {
-    chat: Chat;
-    onModalClose: () => void;
-    onForward: (chat: Chat, user: User) => void;
+  chat: Chat;
+  onModalClose: () => void;
+  onForward: (chat: Chat, user: User) => void;
 };
 
-const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({
-  chat,
-  onModalClose,
-  onForward,
-}) => {
+const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({ chat, onModalClose, onForward }) => {
   const { t } = useTranslation();
   const [filter, setFilter] = useState('');
   const [showActiveAgents, setShowActiveAgents] = useState(false);
@@ -51,12 +33,9 @@ const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({
     pagination: PaginationState,
     filter: string,
     sorting: SortingState,
-    showActiveOnly: boolean = false
+    showActiveOnly: boolean = false,
   ) => {
-    const sort =
-      sorting.length === 0
-        ? 'name asc'
-        : sorting[0].id + ' ' + (sorting[0].desc ? 'desc' : 'asc');
+    const sort = sorting.length === 0 ? 'name asc' : sorting[0].id + ' ' + (sorting[0].desc ? 'desc' : 'asc');
     apiDev
       .post(`accounts/customer-support-agents`, {
         page: pagination.pageIndex + 1,
@@ -79,102 +58,92 @@ const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({
     getUsers(pagination, filter, sorting, showActiveAgents);
   }, [showActiveAgents]);
 
-    const columnHelper = createColumnHelper<User>();
+  const columnHelper = createColumnHelper<User>();
 
-    const customerSupportStatusView = (props: any) => {
-        const isIdle = props.getValue() === 'idle' ? '#FFB511' : '#D73E3E';
-        return (
-            <span
-                style={{
-                    display: 'block',
-                    width: 16,
-                    height: 16,
-                    borderRadius: '50%',
-                    backgroundColor: props.getValue() === 'online' ? '#308653' : isIdle,
-                }}
-            ></span>
-        );
-    };
+  const customerSupportStatusView = (props: any) => {
+    const isIdle = props.getValue() === 'idle' ? '#FFB511' : '#D73E3E';
+    return (
+      <span
+        style={{
+          display: 'block',
+          width: 16,
+          height: 16,
+          borderRadius: '50%',
+          backgroundColor: props.getValue() === 'online' ? '#308653' : isIdle,
+        }}
+      ></span>
+    );
+  };
 
-    const forwardView = (props: any) => {
-      const status = props.row.original.customerSupportStatus;
-      return status === 'online' || status === 'idle' ? (
-        <Button
-          appearance="text"
-          onClick={() => {
-            onForward(chat, props.row.original);
-          }}
-        >
-          <Icon icon={<MdOutlineArrowForward color="rgba(0, 0, 0, 0.54)" />} />
-          {t('global.forward')}
-        </Button>
-      ) : null;
-    };
+  const forwardView = (props: any) => {
+    const status = props.row.original.customerSupportStatus;
+    return status === 'online' || status === 'idle' ? (
+      <Button
+        appearance="text"
+        onClick={() => {
+          onForward(chat, props.row.original);
+        }}
+      >
+        <Icon icon={<MdOutlineArrowForward color="rgba(0, 0, 0, 0.54)" />} />
+        {t('global.forward')}
+      </Button>
+    ) : null;
+  };
 
-    const statusCommentView = (props: any) => {
+  const statusCommentView = (props: any) => {
     const value = props.getValue();
     const statusTimeStamp = format(new Date(props.row.original.statusCommentTimeStamp), 'HH:mm:ss');
     const statusDateTimeStamp = format(new Date(props.row.original.statusCommentTimeStamp), 'dd.MM HH:mm');
     const statusComment = value.length < 13 ? `${value}` : `${value?.slice?.(0, 13)}...`;
     return (
       <Tooltip content={value.length > 13 ? `${statusDateTimeStamp} ${value}` : ''}>
-       <DialogTrigger asChild>
-        <span style={{ maxWidth: '170px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          {value ? statusComment : ''}
-          {value ? (
-            <time
-              dateTime={statusTimeStamp}
-              className="active-chat__message-date"
-            >
-              {statusTimeStamp}
-            </time>
-          ) : (
-            ''
-          )}
-        </span>
-       </DialogTrigger>
+        <DialogTrigger asChild>
+          <span style={{ maxWidth: '170px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            {value ? statusComment : ''}
+            {value ? (
+              <time dateTime={statusTimeStamp} className="active-chat__message-date">
+                {statusTimeStamp}
+              </time>
+            ) : (
+              ''
+            )}
+          </span>
+        </DialogTrigger>
       </Tooltip>
     );
   };
 
-    const usersColumns = useMemo(
-      () => [
-        columnHelper.accessor(
-          (row) => `${row.firstName ?? ''} ${row.lastName ?? ''}`,
-          {
-            id: `name`,
-            header: t('settings.users.name') ?? '',
-          }
-        ),
-        columnHelper.accessor('csaTitle', {
-          header: t('settings.users.userTitle') ?? '',
-        }),
-        columnHelper.accessor('customerSupportStatus', {
-          header: t('global.status') ?? '',
-          cell: customerSupportStatusView,
-        }),
-        columnHelper.accessor('statusComment', {
-          header: t('global.statusClarification') ?? '',
-          cell: statusCommentView,
-        }),
-        columnHelper.display({
-          id: 'forward',
-          cell: forwardView,
-          meta: {
-            size: '1%',
-            sticky: 'right'
-          },
-        }),
-      ],
-      []
-    );
+  const usersColumns = useMemo(
+    () => [
+      columnHelper.accessor((row) => `${row.firstName ?? ''} ${row.lastName ?? ''}`, {
+        id: `name`,
+        header: t('settings.users.name') ?? '',
+      }),
+      columnHelper.accessor('csaTitle', {
+        header: t('settings.users.userTitle') ?? '',
+      }),
+      columnHelper.accessor('customerSupportStatus', {
+        header: t('global.status') ?? '',
+        cell: customerSupportStatusView,
+      }),
+      columnHelper.accessor('statusComment', {
+        header: t('global.statusClarification') ?? '',
+        cell: statusCommentView,
+      }),
+      columnHelper.display({
+        id: 'forward',
+        cell: forwardView,
+        meta: {
+          size: '1%',
+          sticky: 'right',
+        },
+      }),
+    ],
+    [],
+  );
 
   return (
-    <Dialog
-      title={t('chat.active.forwardChat')}
-      onClose={onModalClose}
-      size="large"
-    >
+    <Dialog title={t('chat.active.forwardChat')} onClose={onModalClose} size="large">
       <Track
         direction="vertical"
         gap={8}
@@ -215,25 +184,23 @@ const ForwardToColleaugeModal: FC<ForwardToColleaugeModalProps> = ({
           columns={usersColumns}
           sortable
           tableBodyPrefix={
-            <tr    style={{
-              height: 0,
-              border: "none",
-              padding: 0,
-            }}>
-              <td style={{ width: "auto", height: 0, padding: 0, border: "none" }} />
-              <td style={{ width: "auto", height: 0, padding: 0, border: "none" }} />
-              <td style={{ width: "auto", height: 0, padding: 0, border: "none" }} />
-              <td style={{ width: "auto", height: 0, padding: 0, border: "none" }} />
-              <td style={{ minWidth: "110px", height: 0, padding: 0, border: "none" }} />
+            <tr
+              style={{
+                height: 0,
+                border: 'none',
+                padding: 0,
+              }}
+            >
+              <td style={{ width: 'auto', height: 0, padding: 0, border: 'none' }} />
+              <td style={{ width: 'auto', height: 0, padding: 0, border: 'none' }} />
+              <td style={{ width: 'auto', height: 0, padding: 0, border: 'none' }} />
+              <td style={{ width: 'auto', height: 0, padding: 0, border: 'none' }} />
+              <td style={{ minWidth: '110px', height: 0, padding: 0, border: 'none' }} />
             </tr>
           }
           pagination={pagination}
           setPagination={(state: PaginationState) => {
-            if (
-              state.pageIndex === pagination.pageIndex &&
-              state.pageSize === pagination.pageSize
-            )
-              return;
+            if (state.pageIndex === pagination.pageIndex && state.pageSize === pagination.pageSize) return;
             setPagination(state);
             getUsers(state, filter, sorting, showActiveAgents);
           }}

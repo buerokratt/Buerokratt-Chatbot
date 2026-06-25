@@ -32,7 +32,7 @@ getConfigurations:
 
 splitCall:
   switch:
-    - condition: ${incoming.body.isAuth}
+    - condition: ${incoming.body.isAuth === 'true'}
       next: convertAuthTime
   next: convertAnonTime
 
@@ -41,7 +41,7 @@ convertAuthTime:
   args:
     url: "[#CHATBOT_DMAPPER]/utils/today-minus-days"
     body:
-      days: ${configs.response.body.authPeriod}
+      days: "${parseInt(configs.response.body.authPeriod ?? '1000') - 1}"
   result: dateTime
 
 getAuthRemovableConversations:
@@ -58,7 +58,7 @@ convertAnonTime:
   args:
     url: "[#CHATBOT_DMAPPER]/utils/today-minus-days"
     body:
-      days: ${configs.response.body.anonymPeriod}
+      days: "${parseInt(configs.response.body.anonymPeriod ?? '1000') - 1}"
   result: dateTime
 
 getAnonymRemovableConversations:
@@ -81,5 +81,5 @@ return_result:
   next: end
 
 return_not_found:
-  return: "error: not found"
+  return: "not_found"
   next: end

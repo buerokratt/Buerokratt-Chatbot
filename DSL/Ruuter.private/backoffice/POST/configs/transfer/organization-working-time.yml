@@ -1,0 +1,76 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Transfer organization working time settings from a source domain to one or more target domains"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: sourceDomainUuid
+        type: string
+        description: "UUID of the domain to copy settings from"
+      - field: targetDomainUuids
+        type: object
+        description: "Array of target domain UUIDs to copy settings to"
+
+extractRequestData:
+  assign:
+    sourceDomainUuid: ${incoming.body.sourceDomainUuid}
+    targetDomainUuids: ${incoming.body.targetDomainUuids}
+
+fetchSource:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-organization-working-time"
+    body:
+      domainUUID: ${sourceDomainUuid}
+  result: source
+  next: mapSourceData
+
+mapSourceData:
+  assign:
+    configMap: '$=(source.response.body || []).reduce((acc, row) => { acc[row.key] = row.value; return acc; }, {})='
+  next: transferToTargets
+
+transferToTargets:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-domain-organization-working-time"
+    body:
+      organizationMondayWorkingTimeStartISO: ${configMap.organizationMondayWorkingTimeStartISO}
+      organizationMondayWorkingTimeEndISO: ${configMap.organizationMondayWorkingTimeEndISO}
+      organizationTuesdayWorkingTimeStartISO: ${configMap.organizationTuesdayWorkingTimeStartISO}
+      organizationTuesdayWorkingTimeEndISO: ${configMap.organizationTuesdayWorkingTimeEndISO}
+      organizationWednesdayWorkingTimeStartISO: ${configMap.organizationWednesdayWorkingTimeStartISO}
+      organizationWednesdayWorkingTimeEndISO: ${configMap.organizationWednesdayWorkingTimeEndISO}
+      organizationThursdayWorkingTimeStartISO: ${configMap.organizationThursdayWorkingTimeStartISO}
+      organizationThursdayWorkingTimeEndISO: ${configMap.organizationThursdayWorkingTimeEndISO}
+      organizationFridayWorkingTimeStartISO: ${configMap.organizationFridayWorkingTimeStartISO}
+      organizationFridayWorkingTimeEndISO: ${configMap.organizationFridayWorkingTimeEndISO}
+      organizationSaturdayWorkingTimeStartISO: ${configMap.organizationSaturdayWorkingTimeStartISO}
+      organizationSaturdayWorkingTimeEndISO: ${configMap.organizationSaturdayWorkingTimeEndISO}
+      organizationSundayWorkingTimeStartISO: ${configMap.organizationSundayWorkingTimeStartISO}
+      organizationSundayWorkingTimeEndISO: ${configMap.organizationSundayWorkingTimeEndISO}
+      organizationAllWeekdaysTimeStartISO: ${configMap.organizationAllWeekdaysTimeStartISO}
+      organizationAllWeekdaysTimeEndISO: ${configMap.organizationAllWeekdaysTimeEndISO}
+      organizationWorkingTimeWeekdays: ${configMap.organizationWorkingTimeWeekdays}
+      organizationClosedOnWeekEnds: ${configMap.organizationClosedOnWeekEnds}
+      organizationTheSameOnAllWorkingDays: ${configMap.organizationTheSameOnAllWorkingDays}
+      organizationWorkingTimeNationalHolidays: ${configMap.organizationWorkingTimeNationalHolidays}
+      organizationWorkingAllTime: ${configMap.organizationWorkingAllTime}
+      organizationNoCsaAskForContacts: ${configMap.organizationNoCsaAskForContacts}
+      organizationNoCsaAvailableMessage: ${configMap.organizationNoCsaAvailableMessage}
+      organizationOutsideWorkingHoursAskForContacts: ${configMap.organizationOutsideWorkingHoursAskForContacts}
+      organizationOutsideWorkingHoursMessage: ${configMap.organizationOutsideWorkingHoursMessage}
+      organizationBotCannotAnswerMessage: ${configMap.organizationBotCannotAnswerMessage}
+      organizationRedirectIfBotCannotAnswerMessage: ${configMap.organizationRedirectIfBotCannotAnswerMessage}
+      organizationUseCSA: ${configMap.organizationUseCSA}
+      organizationValidationNoCsaMessage: ${configMap.organizationValidationNoCsaMessage}
+      domains: ${JSON.stringify(targetDomainUuids)}
+  result: res
+
+return_result:
+  return: ${res.response.body}
+  next: end

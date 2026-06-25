@@ -33,7 +33,7 @@ getDomainAnonymizerConfig:
     body:
       domainUUID: ${domain}
   result: res
-  next: return_result
+  next: assignConfigs
 
 getAnonymizerConfig:
   call: http.post

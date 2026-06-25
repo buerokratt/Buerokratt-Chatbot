@@ -91,6 +91,6 @@ return_message_sent:
   next: end
 
 return_chat_ended:
-  return: "Chat Has Ended"
+  return: "chat_has_ended"
   status: 400
   next: end  

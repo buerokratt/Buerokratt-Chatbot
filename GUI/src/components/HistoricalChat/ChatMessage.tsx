@@ -1,12 +1,13 @@
-import { FC, useMemo } from 'react';
-import { format } from 'date-fns';
-import { Message } from 'types/message';
-import Markdownify from 'components/Chat/Markdownify';
-import { parseButtons, parseOptions } from 'utils/parse-utils';
 import ButtonMessage from 'components/ButtonMessage';
+import Markdownify from 'components/Chat/Markdownify';
 import OptionMessage from 'components/OptionMessage';
-import { useToast } from '../../hooks/useToast';
+import { format } from 'date-fns';
+import { FC, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Message } from 'types/message';
+import { parseButtons, parseOptions } from 'utils/parse-utils';
+
+import { useToast } from '../../hooks/useToast';
 
 type ChatMessageProps = {
   message: Message;
@@ -48,15 +49,9 @@ const ChatMessage: FC<ChatMessageProps> = ({ message, onMessageClick }) => {
           onClick={onMessageClick ? () => onMessageClick(message) : undefined}
           onContextMenu={handleContextMenu}
         >
-          <Markdownify
-            message={message.content ?? ''}
-            sanitizeLinks={message.authorRole === 'end-user'}
-          />
+          <Markdownify message={message.content ?? ''} sanitizeLinks={message.authorRole === 'end-user'} />
         </button>
-        <time
-          dateTime={message.created}
-          className="historical-chat__message-date"
-        >
+        <time dateTime={message.created} className="historical-chat__message-date">
           {format(new Date(message.created), 'HH:mm:ss')}
         </time>
       </div>

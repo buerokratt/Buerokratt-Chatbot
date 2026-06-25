@@ -21,7 +21,7 @@ declaration:
         type: string
         description: "Body field 'isEmergencyNoticeVisible'"
       - field: domainUUID
-        type: string
+        type: object
         description: "Body field 'domainUUID'"
 
 extractRequestData:
@@ -77,5 +77,5 @@ return_result:
   next: end
 
 returnInvalidBody:
-  return: "error: invalid body"
+  return: "bad_request"
   next: end

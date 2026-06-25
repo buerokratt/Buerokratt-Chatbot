@@ -1,23 +1,19 @@
-import { FC, useEffect, useMemo, useState } from 'react';
 import { createColumnHelper, PaginationState, SortingState } from '@tanstack/react-table';
-import { useTranslation } from 'react-i18next';
-
 import { Button, DataTable, Dialog, FormInput, Icon, Track } from 'components';
-import { Chat } from 'types/chat';
-import { MdOutlineArrowForward } from 'react-icons/md';
-import { Service } from 'types/service';
-import { api } from 'services/api';
 import { useToast } from 'hooks/useToast';
+import { FC, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { MdOutlineArrowForward } from 'react-icons/md';
+import { api } from 'services/api';
+import { Chat } from 'types/chat';
+import { Service } from 'types/service';
 
 type StartAServiceModalProps = {
   chat: Chat;
   onModalClose: () => void;
 };
 
-const StartAServiceModal: FC<StartAServiceModalProps> = ({
-  chat,
-  onModalClose,
-}) => {
+const StartAServiceModal: FC<StartAServiceModalProps> = ({ chat, onModalClose }) => {
   const { t } = useTranslation();
   const [searchName, setSearchName] = useState('');
   const [pagination, setPagination] = useState<PaginationState>({
@@ -56,10 +52,7 @@ const StartAServiceModal: FC<StartAServiceModalProps> = ({
   const columnHelper = createColumnHelper<Service>();
 
   const startView = (props: any) => (
-    <Button
-      appearance="text"
-      onClick={() => onStartService(props.row.original)}
-    >
+    <Button appearance="text" onClick={() => onStartService(props.row.original)}>
       <Icon icon={<MdOutlineArrowForward color="rgba(0, 0, 0, 0.54)" />} />
       {t('chat.active.start')}
     </Button>
@@ -78,7 +71,7 @@ const StartAServiceModal: FC<StartAServiceModalProps> = ({
         },
       }),
     ],
-    []
+    [],
   );
 
   return (

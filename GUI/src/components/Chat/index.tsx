@@ -1,64 +1,52 @@
-import {
-  ChangeEvent,
-  FC,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from 'react';
-import { useTranslation } from 'react-i18next';
+import { CHAT_INPUT_LENGTH, isHiddenFeaturesEnabled } from 'constants/config';
+
+import { userStore as useHeaderStore } from '@buerokratt-ria/header';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { ReactComponent as BykLogoWhite } from 'assets/logo-white.svg';
+import { AxiosError } from 'axios';
+import clsx from 'clsx';
+import { Button, Icon, Label, Track } from 'components';
 import { format } from 'date-fns';
 import { et } from 'date-fns/locale';
-import clsx from 'clsx';
+import { useNewMessageSound } from 'hooks/useAudio';
+import { useToast } from 'hooks/useToast';
+import { ChangeEvent, FC, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   MdClose,
   MdDoneOutline,
   MdOutlineAttachFile,
   MdOutlineCreate,
-  MdOutlineSend,
   MdOutlineErrorOutline,
+  MdOutlineSend,
 } from 'react-icons/md';
-import { Button, Icon, Label, Track } from 'components';
-import { ReactComponent as BykLogoWhite } from 'assets/logo-white.svg';
-import {
-  BACKOFFICE_NAME,
-  Chat as ChatType,
-  CHAT_EVENTS,
-  CHAT_STATUS,
-} from 'types/chat';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import { apiDev } from 'services/api';
+import useStore from 'store';
+import { BACKOFFICE_NAME, CHAT_EVENTS, CHAT_STATUS, Chat as ChatType } from 'types/chat';
 import { AttachmentTypes, Message } from 'types/message';
+import { AUTHOR_ROLES, MESSAGE_FILE_SIZE_LIMIT, ROLES } from 'utils/constants';
+
 import ChatMessage from './ChatMessage';
 import ChatEvent from '../ChatEvent';
-import { CHAT_INPUT_LENGTH, isHiddenFeaturesEnabled } from 'constants/config';
-import { apiDev } from 'services/api';
 import ChatTextArea from './ChatTextArea';
-import { AUTHOR_ROLES, MESSAGE_FILE_SIZE_LIMIT, ROLES } from 'utils/constants';
-import { AxiosError } from 'axios';
-import { useToast } from 'hooks/useToast';
-import useStore from 'store';
-import { userStore as useHeaderStore } from '@buerokratt-ria/header';
-import sse from '../../services/sse-service';
-import { useNavigate } from 'react-router-dom';
-import PreviewMessage from './PreviewMessage';
 import LoaderOverlay from './LoaderOverlay';
-import { useNewMessageSound } from 'hooks/useAudio';
+import PreviewMessage from './PreviewMessage';
+import sse from '../../services/sse-service';
+
 import './Chat.scss';
 import { useInterval } from 'usehooks-ts';
 import { BotConfig } from 'types/botConfig';
-import { DomainSelection } from '../../types/domainsModels';
-import { getWidgetData } from '../../services/users';
 
 type ChatProps = {
   chat: ChatType;
-  isCsaNameVisible: boolean;
-  isCsaTitleVisible: boolean;
   onChatEnd: (chat: ChatType) => void;
   onForwardToColleauge?: (chat: ChatType) => void;
   onForwardToEstablishment?: (chat: ChatType) => void;
   onSendToEmail?: (chat: ChatType) => void;
   onStartAService?: (chat: ChatType) => void;
   onRefresh: () => void;
+  onApprove?: () => void;
 };
 
 type GroupedMessage = {
@@ -70,19 +58,21 @@ type GroupedMessage = {
 
 const Chat: FC<ChatProps> = ({
   chat,
-  isCsaNameVisible,
-  isCsaTitleVisible,
   onChatEnd,
   onForwardToColleauge,
   onForwardToEstablishment,
   onSendToEmail,
   onStartAService,
   onRefresh,
+  onApprove,
 }) => {
   const { t } = useTranslation();
   const userInfo = useStore((state) => state.userInfo);
   const chatRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const scrollableContainerRef = useRef<HTMLDivElement>(null);
+  const userHasScrolledUp = useRef(false);
+  const lastScrollTop = useRef(0);
 
   const [messageGroups, setMessageGroups] = useState<GroupedMessage[]>([]);
   const messageGroupsRef = useRef(messageGroups);
@@ -96,26 +86,19 @@ const Chat: FC<ChatProps> = ({
   const chatCsaActive = useHeaderStore((state) => state.chatCsaActive);
   const [messagesList, setMessagesList] = useState<Message[]>([]);
   const messageListRef = useRef(messagesList);
-  const [latestPermissionMessageCreated, setLatestPermissionMessageCreated] =
-    useState<string>();
-  const [latestPermissionMessageSeconds, setLatestPermissionMessageSeconds] =
-    useState<number>(0);
-  const [previewTypingMessage, setPreviewTypingMessage] = useState<
-    string | undefined
-  >();
+  const [latestPermissionMessageCreated, setLatestPermissionMessageCreated] = useState<string>();
+  const [latestPermissionMessageSeconds, setLatestPermissionMessageSeconds] = useState<number>(0);
+  const [previewTypingMessage, setPreviewTypingMessage] = useState<string | undefined>();
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
-  const [isChatEditingAllowed, setIsChatEditingAllowed] =
-    useState<boolean>(false);
-  const [isNewMessageNotificationVisible, setIsNewMessageNotificationVisible] =
-    useState<boolean>(false);
+  const [isChatEditingAllowed, setIsChatEditingAllowed] = useState<boolean>(false);
+  const [isNewMessageNotificationVisible, setIsNewMessageNotificationVisible] = useState<boolean>(false);
   const [isCsaAtEnd, setIsCsaAtEnd] = useState<boolean>(true);
   const isCsaAtEndRef = useRef(isCsaAtEnd);
 
   const [newMessageEffect] = useNewMessageSound();
   const navigate = useNavigate();
-  const [allDomains, setAllDomains] = useState<DomainSelection[]>([]);
-  const multiDomainEnabled =
-    import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
+  const allDomains = useStore((state) => state.allDomains);
+  const multiDomainEnabled = import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
 
   const askPermissionsTimeoutInSeconds = 60;
   let messagesLength = 0;
@@ -123,11 +106,7 @@ const Chat: FC<ChatProps> = ({
   const calculatePermissionMessageSeconds = () => {
     if (latestPermissionMessageCreated) {
       const countdown =
-        Math.round(
-          (new Date().getTime() -
-            new Date(latestPermissionMessageCreated).getTime()) /
-            1000
-        ) ?? 0;
+        Math.round((new Date().getTime() - new Date(latestPermissionMessageCreated).getTime()) / 1000) ?? 0;
 
       setLatestPermissionMessageSeconds(countdown);
     }
@@ -139,12 +118,10 @@ const Chat: FC<ChatProps> = ({
         e.event === 'ask-permission' ||
         e.event === 'ask-permission-accepted' ||
         e.event === 'ask-permission-rejected' ||
-        e.event === 'ask-permission-ignored'
+        e.event === 'ask-permission-ignored',
     );
 
-    setLatestPermissionMessageCreated(
-      permissionsMessages[permissionsMessages.length - 1]?.created ?? ''
-    );
+    setLatestPermissionMessageCreated(permissionsMessages[permissionsMessages.length - 1]?.created ?? '');
     calculatePermissionMessageSeconds();
   };
 
@@ -152,10 +129,7 @@ const Chat: FC<ChatProps> = ({
     () => {
       calculatePermissionMessageSeconds();
     },
-    latestPermissionMessageCreated &&
-      latestPermissionMessageSeconds <= askPermissionsTimeoutInSeconds
-      ? 1000
-      : null
+    latestPermissionMessageCreated && latestPermissionMessageSeconds <= askPermissionsTimeoutInSeconds ? 1000 : null,
   );
 
   const onVisibilityChange = () => {
@@ -167,24 +141,17 @@ const Chat: FC<ChatProps> = ({
   };
 
   useEffect(() => {
-    if(multiDomainEnabled && userInfo?.idCode) {
-      getWidgetData(userInfo?.idCode).then((domains) => {
-        setAllDomains(domains);
-      })
-    }
-  }, [userInfo?.idCode, multiDomainEnabled]);
-
-  useEffect(() => {
     localStorage.setItem('focused_chat', chat.id);
+    userHasScrolledUp.current = false;
+    lastScrollTop.current = 0;
     return () => {
       localStorage.removeItem('focused_chat');
     };
-  }, []);
+  }, [chat.id]);
 
   useLayoutEffect(() => {
     document.addEventListener('visibilitychange', onVisibilityChange);
-    return () =>
-      document.removeEventListener('visibilitychange', onVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', onVisibilityChange);
   }, []);
 
   useEffect(() => {
@@ -217,24 +184,16 @@ const Chat: FC<ChatProps> = ({
   useEffect(() => {
     if (!chatRef.current) return;
 
-    const observer = new IntersectionObserver(
-      checkLastMessageVisibility,
-      options
-    );
+    const observer = new IntersectionObserver(checkLastMessageVisibility, options);
     if (chatRef.current) observer.observe(chatRef.current);
 
     return () => {
       if (chatRef.current) observer.unobserve(chatRef.current);
     };
-
   }, [chatRef, options, isNewMessageNotificationVisible]);
 
   const handleLastUserMessage = (newMessages: Message[]) => {
-    const hasMatchingMessage = newMessages.some(
-      (msg) =>
-        msg.event === '' &&
-        msg.authorRole === 'end-user'
-    );
+    const hasMatchingMessage = newMessages.some((msg) => msg.event === '' && msg.authorRole === 'end-user');
 
     if (hasMatchingMessage) {
       setIsNewMessageNotificationVisible(!isCsaAtEndRef.current);
@@ -249,14 +208,9 @@ const Chat: FC<ChatProps> = ({
   useEffect(() => {
     const onMessage = async (res: any) => {
       if (res.type === 'preview') {
-        const previewMessage = await apiDev.get(
-          'agents/chats/messages/preview?chatId=' + chat.id
-        );
+        const previewMessage = await apiDev.get('agents/chats/messages/preview?chatId=' + chat.id);
         setPreviewTypingMessage(previewMessage.data.response);
-        if (
-          !previewMessage.data.response &&
-          messageListRef.current?.length > 0
-        ) {
+        if (!previewMessage.data.response && messageListRef.current?.length > 0) {
           await getNewMessages();
         }
       } else if (messageListRef.current?.length > 0) {
@@ -274,9 +228,7 @@ const Chat: FC<ChatProps> = ({
   const getNewMessages = async () => {
     const res =
       (await apiDev.get(
-        `agents/chats/messages/new?chatId=${chat.id}&lastRead=${
-          chat.lastMessageTimestamp?.split('+')[0] ?? ''
-        }`
+        `agents/chats/messages/new?chatId=${chat.id}&lastRead=${chat.lastMessageTimestamp?.split('+')[0] ?? ''}`,
       )) ?? [];
     const messages = res.data.response;
     setPreviewTypingMessage(undefined);
@@ -284,18 +236,13 @@ const Chat: FC<ChatProps> = ({
       return filterMessages(messageListRef.current, newMessage);
     });
 
-    let newDisplayableMessages = filteredMessages?.filter(
-      (msg: Message) => msg.authorId != userInfo?.idCode
-    );
+    let newDisplayableMessages = filteredMessages?.filter((msg: Message) => msg.authorId != userInfo?.idCode);
 
     if (newDisplayableMessages?.length > 0) {
       setTimeout(() => {
         handleLastUserMessage(newDisplayableMessages);
       }, 500);
-      setMessagesList((oldMessages) => [
-        ...oldMessages,
-        ...newDisplayableMessages,
-      ]);
+      setMessagesList((oldMessages) => [...oldMessages, ...newDisplayableMessages]);
     }
 
     handlePermissionMessages();
@@ -320,9 +267,7 @@ const Chat: FC<ChatProps> = ({
       'redirectedMessage',
     ];
 
-    const eventMessages: Message[] = filteredMessages?.filter((e: Message) =>
-      actionEventTypes.includes(e.event ?? '')
-    );
+    const eventMessages: Message[] = filteredMessages?.filter((e: Message) => actionEventTypes.includes(e.event ?? ''));
 
     if (eventMessages?.length > 0) {
       await getMessages();
@@ -375,13 +320,7 @@ const Chat: FC<ChatProps> = ({
   };
 
   const postMessageMutation = useMutation({
-    mutationFn: ({
-      message,
-      editing,
-    }: {
-      message: Message;
-      editing: boolean;
-    }) => {
+    mutationFn: ({ message, editing }: { message: Message; editing: boolean }) => {
       const endpoint = editing ? 'edit' : 'insert';
       return apiDev.post(`agents/chats/messages/${endpoint}`, message);
     },
@@ -456,9 +395,7 @@ const Chat: FC<ChatProps> = ({
         },
       });
 
-      if (chat.customerSupportId != '') {
-        chat.customerSupportId = userInfo?.idCode;
-      }
+      chat.customerSupportId = userInfo?.idCode;
       onRefresh();
     },
     onError: (error: AxiosError) => {
@@ -535,16 +472,9 @@ const Chat: FC<ChatProps> = ({
         return;
       }
       if (lastGroup?.type === message.authorRole) {
-        if (
-          !message.event ||
-          message.event === '' ||
-          message.event === 'greeting'
-        ) {
+        if (!message.event || message.event === '' || message.event === 'greeting') {
           lastGroup.messages.push({ ...message });
-        } else if (
-          message.event === CHAT_EVENTS.WAITING_VALIDATION &&
-          chat.status === CHAT_STATUS.VALIDATING
-        ) {
+        } else if (message.event === CHAT_EVENTS.WAITING_VALIDATION && chat.status === CHAT_STATUS.VALIDATING) {
           groupedMessages.push({
             name: 'Bürokratt',
             type: 'buerokratt',
@@ -559,28 +489,18 @@ const Chat: FC<ChatProps> = ({
             messages: [{ ...message }],
           });
         }
-      } else if (
-        !message.event ||
-        message.event === '' ||
-        message.event === 'greeting'
-      ) {
+      } else if (!message.event || message.event === '' || message.event === 'greeting') {
         const isBackOfficeUser =
           message.authorRole === 'backoffice-user'
             ? `${message.authorFirstName} ${message.authorLastName}`
             : BACKOFFICE_NAME.DEFAULT;
         groupedMessages.push({
-          name:
-            message.authorRole === 'end-user'
-              ? endUserFullName
-              : isBackOfficeUser,
+          name: message.authorRole === 'end-user' ? endUserFullName : isBackOfficeUser,
           type: message.authorRole,
           title: message.csaTitle ?? '',
           messages: [{ ...message }],
         });
-      } else if (
-        message.event === CHAT_EVENTS.WAITING_VALIDATION &&
-        chat.status === CHAT_STATUS.VALIDATING
-      ) {
+      } else if (message.event === CHAT_EVENTS.WAITING_VALIDATION && chat.status === CHAT_STATUS.VALIDATING) {
         groupedMessages.push({
           name: 'Bürokratt',
           type: 'buerokratt',
@@ -600,9 +520,41 @@ const Chat: FC<ChatProps> = ({
   }, [messagesList, endUserFullName]);
 
   useEffect(() => {
+    const scrollableElement = scrollableContainerRef.current;
+    if (!scrollableElement) return;
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = scrollableElement;
+
+      if (scrollTop < lastScrollTop.current) {
+        userHasScrolledUp.current = true;
+      }
+
+      if (scrollHeight - scrollTop <= clientHeight + 2) {
+        userHasScrolledUp.current = false;
+      }
+
+      lastScrollTop.current = scrollTop;
+    };
+
+    scrollableElement.addEventListener('scroll', handleScroll);
+
+    return () => {
+      scrollableElement.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  useEffect(() => {
     if (!chatRef.current || !messageGroups) return;
-    if(isCsaAtEnd) {
-      chatRef.current.scrollIntoView({ block: 'end', inline: 'end' });
+
+    if (!userHasScrolledUp.current) {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          if (chatRef.current) {
+            chatRef.current.scrollIntoView({ block: 'end', inline: 'end' });
+          }
+        });
+      });
     }
   }, [messageGroups, previewTypingMessage]);
 
@@ -637,9 +589,7 @@ const Chat: FC<ChatProps> = ({
         };
 
         if (selectedMessage) {
-          const index = messagesList.findIndex(
-            (m) => m.id === selectedMessage.id
-          );
+          const index = messagesList.findIndex((m) => m.id === selectedMessage.id);
           const updatedMessages = [...messagesList];
           updatedMessages[index] = message;
           setMessagesList(updatedMessages);
@@ -647,7 +597,7 @@ const Chat: FC<ChatProps> = ({
           setMessagesList((oldMessages) => [...oldMessages, message]);
         }
       } catch (error) {
-        console.error(error)
+        console.error(error);
         setMessagesList((oldMessages) => [...oldMessages, newMessage]);
       } finally {
         setResponseText('');
@@ -701,9 +651,7 @@ const Chat: FC<ChatProps> = ({
 
   const deleteMessageFromList = (message: Message) => {
     setMessagesList((oldMessages) => {
-      const filteredMessages = oldMessages.filter(
-        (m) => m.authorTimestamp !== message.authorTimestamp
-      );
+      const filteredMessages = oldMessages.filter((m) => m.authorTimestamp !== message.authorTimestamp);
       return filteredMessages;
     });
   };
@@ -731,40 +679,36 @@ const Chat: FC<ChatProps> = ({
         return updatedMessages;
       });
     } catch (error) {
-      console.error(error)
+      console.error(error);
       setMessagesList((oldMessages) => [...oldMessages, retryMessage]);
     }
   };
 
   let url = 'none';
 
-  if(multiDomainEnabled && allDomains.length > 0) {
+  if (multiDomainEnabled && allDomains.length > 0) {
     const chatUrl = chat.endUserUrl ?? '';
-    const found = allDomains.find(domain =>
-      chatUrl.includes(domain.url)
-    );
+    const found = allDomains.find((domain) => chatUrl.includes(domain.url));
 
-    if(found) {
-      url = found.id
+    if (found) {
+      url = found.id;
     }
   }
 
   useQuery<{ config: BotConfig }>({
-    queryKey: ['configs/bot-config?domain=' + url, 'prod'],
+    queryKey: ['agents/csa/is-chat-editable?domain=' + url, 'prod'],
     onSuccess(data: any) {
-      setIsChatEditingAllowed(data.response.isEditChatVisible === 'true');
+      setIsChatEditingAllowed(data.response === 'true');
     },
   });
 
   const disableAskForPermission =
     chat.customerSupportId != userInfo?.idCode ||
-    (latestPermissionMessageSeconds <= askPermissionsTimeoutInSeconds &&
-      latestPermissionMessageSeconds != 0);
+    (latestPermissionMessageSeconds <= askPermissionsTimeoutInSeconds && latestPermissionMessageSeconds != 0);
 
   const takeOverCondition =
     chat.customerSupportId === '' ||
-    (chat.customerSupportId !== userInfo?.idCode &&
-      userInfo?.authorities.includes('ROLE_ADMINISTRATOR'));
+    (chat.customerSupportId !== userInfo?.idCode && userInfo?.authorities.includes('ROLE_ADMINISTRATOR'));
 
   return (
     <div className="active-chat">
@@ -782,37 +726,34 @@ const Chat: FC<ChatProps> = ({
           </Track>
         </div>
 
-        <div className="active-chat__group-wrapper">
+        <div ref={scrollableContainerRef} className="active-chat__group-wrapper">
           {messageGroups?.map((group, index) => (
             <div
-              className={clsx([
-                'active-chat__group',
-                `active-chat__group--${group.type}`,
-              ])}
+              className={clsx(['active-chat__group', `active-chat__group--${group.type}`])}
               key={`${group.type}-${index}`}
             >
               {group.type === 'event' ? (
                 <ChatEvent message={group.messages[0]} />
               ) : (
                 <>
-                  <div className="active-chat__group-initials">
-                    {group.type === 'buerokratt' || group.type === 'chatbot' ? (
-                      <BykLogoWhite height={24} />
-                    ) : (
-                      <>
-                        {group.name
-                          .split(' ')
-                          .map((n) => n[0])
-                          .join('')
-                          .toUpperCase()}
-                      </>
-                    )}
-                  </div>
-                  <div className="active-chat__group-name">
-                    {group.name}
-                    {group.title.length > 0 && (
-                      <div className="title">{group.title}</div>
-                    )}
+                  <div className="active-chat__group-header">
+                    <div className="active-chat__group-initials">
+                      {group.type === 'buerokratt' || group.type === 'chatbot' ? (
+                        <BykLogoWhite height={24} />
+                      ) : (
+                        <>
+                          {group.name
+                            .split(' ')
+                            .map((n) => n[0])
+                            .join('')
+                            .toUpperCase()}
+                        </>
+                      )}
+                    </div>
+                    <div className="active-chat__group-name">
+                      {group.name}
+                      {group.title.length > 0 && <div className="title">{group.title}</div>}
+                    </div>
                   </div>
 
                   <div ref={containerRef} className="active-chat__messages">
@@ -822,19 +763,17 @@ const Chat: FC<ChatProps> = ({
                           message={message}
                           readStatus={messageReadStatusRef}
                           onSelect={(m) => {
-                            if (checkIsMessageEditable(message))
-                              handleSelectMessage(m);
+                            if (checkIsMessageEditable(message)) handleSelectMessage(m);
                           }}
                           selected={selectedMessage?.id === message.id}
                           editableMessage={checkIsMessageEditable(message)}
+                          onApprove={onApprove}
                         />
                         {!message.id && (
                           <div className="active-chat__message-failed-wrapper active-chat__message-failed">
                             <MdOutlineErrorOutline fontSize={22} />
                             <div className="active-chat__message-failed-content">
-                              <span>
-                                {t('chat.active.messageSendingFailed')}
-                              </span>
+                              <span>{t('chat.active.messageSendingFailed')}</span>
                               <div className="active-chat__message-failed-buttons">
                                 <Button
                                   appearance="text"
@@ -866,17 +805,10 @@ const Chat: FC<ChatProps> = ({
           {/* Preview commented Out as requested by clients in task -1024- */}
           {previewTypingMessage && (
             <div className={clsx(['active-chat__group'])} key={`group`}>
-              <div className="active-chat__group-initials">
-                {<BykLogoWhite height={24} />}
-              </div>
-              <div className="active-chat__group-name">
-                {t('chat.userTyping')}
-              </div>
+              <div className="active-chat__group-initials">{<BykLogoWhite height={24} />}</div>
+              <div className="active-chat__group-name">{t('chat.userTyping')}</div>
               <div className="active-chat__messages">
-                <PreviewMessage
-                  key={`preview-message`}
-                  preview={previewTypingMessage ?? ''}
-                />
+                <PreviewMessage key={`preview-message`} preview={previewTypingMessage ?? ''} />
               </div>
             </div>
           )}
@@ -892,103 +824,81 @@ const Chat: FC<ChatProps> = ({
           </div>
         )}
 
-        {chat.customerSupportId == userInfo?.idCode &&
-          chat.status != CHAT_STATUS.IDLE && (
-            <>
-              {selectedMessage ? (
-                <div className="active-chat__toolbar edit-toolbar">
-                  <div className="edit-toolbar__header">
-                    {t('chat.changingMessage')}
-                    <MdOutlineCreate className="active-chat__edit-icon" />
-                  </div>
-                  <div className="edit-toolbar__textarea">
-                    <ChatTextArea
-                      name="message"
-                      label={t('')}
-                      id="chatArea"
-                      placeholder={t('chat.reply') + '...'}
-                      minRows={1}
-                      maxRows={8}
-                      value={responseText}
-                      onSubmit={(e) => handleResponseTextSend(true)}
-                      maxLength={CHAT_INPUT_LENGTH}
-                      onChange={(e) => setResponseText(e.target.value)}
-                    />
-                  </div>
+        {chat.customerSupportId == userInfo?.idCode && chat.status != CHAT_STATUS.IDLE && (
+          <>
+            {selectedMessage ? (
+              <div className="active-chat__toolbar edit-toolbar">
+                <div className="edit-toolbar__header">
+                  {t('chat.changingMessage')}
+                  <MdOutlineCreate className="active-chat__edit-icon" />
+                </div>
+                <div className="edit-toolbar__textarea">
+                  <ChatTextArea
+                    name="message"
+                    label={t('')}
+                    id="chatArea"
+                    placeholder={t('chat.reply') + '...'}
+                    minRows={1}
+                    maxRows={8}
+                    value={responseText}
+                    onSubmit={(e) => handleResponseTextSend(true)}
+                    maxLength={CHAT_INPUT_LENGTH}
+                    onChange={(e) => setResponseText(e.target.value)}
+                  />
+                </div>
 
-                  <div className="edit-toolbar__edit-actions">
-                    <Button
-                      id="myButton"
-                      appearance="primary"
-                      size="s"
-                      onClick={() => handleResponseTextSend(true)}
-                    >
-                      <Icon
-                        icon={<MdDoneOutline fontSize={18} />}
-                        size="medium"
+                <div className="edit-toolbar__edit-actions">
+                  <Button id="myButton" appearance="primary" size="s" onClick={() => handleResponseTextSend(true)}>
+                    <Icon icon={<MdDoneOutline fontSize={18} />} size="medium" />
+                  </Button>
+                  <Button
+                    appearance="secondary"
+                    size="s"
+                    onClick={() => {
+                      setSelectedMessage(null);
+                      setResponseText('');
+                    }}
+                  >
+                    <Icon icon={<MdClose fontSize={18} />} size="medium" />
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="active-chat__toolbar">
+                <Track>
+                  <ChatTextArea
+                    name="message"
+                    label={t('')}
+                    id="chatArea"
+                    placeholder={t('chat.reply') + '...'}
+                    minRows={1}
+                    maxRows={8}
+                    value={responseText}
+                    onSubmit={(e) => handleResponseTextSend(false)}
+                    maxLength={CHAT_INPUT_LENGTH}
+                    onChange={(e) => setResponseText(e.target.value)}
+                  />
+                  <div className="active-chat__toolbar-actions">
+                    <Button id="myButton" appearance="primary" onClick={() => handleResponseTextSend(false)}>
+                      <Icon icon={<MdOutlineSend fontSize={18} />} size="medium" />
+                      <input
+                        type="file"
+                        ref={hiddenFileInputRef}
+                        onChange={handleFileChange}
+                        style={{ display: 'none' }}
                       />
                     </Button>
-                    <Button
-                      appearance="secondary"
-                      size="s"
-                      onClick={() => {
-                        setSelectedMessage(null);
-                        setResponseText('');
-                      }}
-                    >
-                      <Icon icon={<MdClose fontSize={18} />} size="medium" />
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <div className="active-chat__toolbar">
-                  <Track>
-                    <ChatTextArea
-                      name="message"
-                      label={t('')}
-                      id="chatArea"
-                      placeholder={t('chat.reply') + '...'}
-                      minRows={1}
-                      maxRows={8}
-                      value={responseText}
-                      onSubmit={(e) => handleResponseTextSend(false)}
-                      maxLength={CHAT_INPUT_LENGTH}
-                      onChange={(e) => setResponseText(e.target.value)}
-                    />
-                    <div className="active-chat__toolbar-actions">
-                      <Button
-                        id="myButton"
-                        appearance="primary"
-                        onClick={() => handleResponseTextSend(false)}
-                      >
-                        <Icon
-                          icon={<MdOutlineSend fontSize={18} />}
-                          size="medium"
-                        />
-                        <input
-                          type="file"
-                          ref={hiddenFileInputRef}
-                          onChange={handleFileChange}
-                          style={{ display: 'none' }}
-                        />
+                    {isHiddenFeaturesEnabled && (
+                      <Button appearance="secondary" onClick={handleUploadClick}>
+                        <Icon icon={<MdOutlineAttachFile fontSize={18} />} size="medium" />
                       </Button>
-                      {isHiddenFeaturesEnabled && (
-                        <Button
-                          appearance="secondary"
-                          onClick={handleUploadClick}
-                        >
-                          <Icon
-                            icon={<MdOutlineAttachFile fontSize={18} />}
-                            size="medium"
-                          />
-                        </Button>
-                      )}
-                    </div>
-                  </Track>
-                </div>
-              )}
-            </>
-          )}
+                    )}
+                  </div>
+                </Track>
+              </div>
+            )}
+          </>
+        )}
 
         {takeOverCondition &&
           chatCsaActive === true &&
@@ -1016,8 +926,7 @@ const Chat: FC<ChatProps> = ({
           )}
 
         {chat.status === CHAT_STATUS.IDLE &&
-          (chat.customerSupportId === 'chatbot' ||
-            chat.customerSupportId != userInfo?.idCode) && (
+          (chat.customerSupportId === 'chatbot' || chat.customerSupportId != userInfo?.idCode) && (
             <div className="active-chat__toolbar">
               <Track justify="center">
                 <div className="active-chat__toolbar-actions">
@@ -1073,8 +982,7 @@ const Chat: FC<ChatProps> = ({
           )}
       </div>
       <div className="active-chat__side">
-        {(chat.customerSupportId === '' ||
-          chat.customerSupportId === userInfo?.idCode) &&
+        {(chat.customerSupportId === '' || chat.customerSupportId === userInfo?.idCode) &&
           chat.status != CHAT_STATUS.IDLE &&
           chat.status != CHAT_STATUS.VALIDATING && (
             <div className="active-chat__side-actions">
@@ -1083,13 +991,8 @@ const Chat: FC<ChatProps> = ({
               </Button>
               <Button
                 appearance="secondary"
-                disabled={
-                  chat.customerSupportId != userInfo?.idCode ||
-                  chat.endUserId != ''
-                }
-                onClick={() =>
-                  handleChatEvent(CHAT_EVENTS.REQUESTED_AUTHENTICATION)
-                }
+                disabled={chat.customerSupportId != userInfo?.idCode || chat.endUserId != ''}
+                onClick={() => handleChatEvent(CHAT_EVENTS.REQUESTED_AUTHENTICATION)}
               >
                 {t('chat.active.askAuthentication')}
               </Button>
@@ -1108,7 +1011,7 @@ const Chat: FC<ChatProps> = ({
                   disabled={chat.customerSupportId != userInfo?.idCode}
                   onClick={() => {
                     const message: Message | undefined = messagesList.findLast(
-                      (e) => e.event === CHAT_EVENTS.ASK_PERMISSION
+                      (e) => e.event === CHAT_EVENTS.ASK_PERMISSION,
                     );
                     if (message != undefined) {
                       postMessageWithNewEventMutation.mutate(message);
@@ -1119,27 +1022,18 @@ const Chat: FC<ChatProps> = ({
                 >
                   {t('chat.active.askPermission')}
                 </Button>
-                {latestPermissionMessageSeconds <=
-                  askPermissionsTimeoutInSeconds && (
+                {latestPermissionMessageSeconds <= askPermissionsTimeoutInSeconds && (
                   <LoaderOverlay
                     maxPercent={askPermissionsTimeoutInSeconds}
                     currentPercent={latestPermissionMessageSeconds}
                   />
                 )}
               </div>
-              <Button
-                appearance="secondary"
-                disabled={!chatCsaActive}
-                onClick={forwardToColleague()}
-              >
+              <Button appearance="secondary" disabled={!chatCsaActive} onClick={forwardToColleague()}>
                 {t('chat.active.forwardToColleague')}
               </Button>
               {isHiddenFeaturesEnabled && (
-                <Button
-                  appearance="secondary"
-                  disabled={!chatCsaActive}
-                  onClick={forwardToEstablishment()}
-                >
+                <Button appearance="secondary" disabled={!chatCsaActive} onClick={forwardToEstablishment()}>
                   {t('chat.active.forwardToOrganization')}
                 </Button>
               )}
@@ -1163,26 +1057,21 @@ const Chat: FC<ChatProps> = ({
               )}
             </div>
           )}
-        {chat.customerSupportId !== '' &&
-          chat.customerSupportId !== userInfo?.idCode &&
-          !chatCsaActive && (
-            <div className="active-chat__side-actions">
-              <Track gap={8} style={{ marginBottom: 36 }}>
-                <Label type="warning">!</Label>
-                <p className="csa-away">Nõustaja on eemal.</p>
-              </Track>
-              {userInfo?.authorities.some((authority) =>
-                [
-                  ROLES.ROLE_ADMINISTRATOR,
-                  ROLES.ROLE_CUSTOMER_SUPPORT_AGENT,
-                ].includes(authority as ROLES)
-              ) && (
-                <Button appearance="secondary" onClick={forwardToColleague()}>
-                  {t('chat.active.forwardToColleague')}
-                </Button>
-              )}
-            </div>
-          )}
+        {chat.customerSupportId !== '' && chat.customerSupportId !== userInfo?.idCode && !chatCsaActive && (
+          <div className="active-chat__side-actions">
+            <Track gap={8} style={{ marginBottom: 36 }}>
+              <Label type="warning">!</Label>
+              <p className="csa-away">Nõustaja on eemal.</p>
+            </Track>
+            {userInfo?.authorities.some((authority) =>
+              [ROLES.ROLE_ADMINISTRATOR, ROLES.ROLE_CUSTOMER_SUPPORT_AGENT].includes(authority as ROLES),
+            ) && (
+              <Button appearance="secondary" onClick={forwardToColleague()}>
+                {t('chat.active.forwardToColleague')}
+              </Button>
+            )}
+          </div>
+        )}
         <div className="active-chat__side-meta">
           <div>
             <p>
@@ -1260,9 +1149,7 @@ const Chat: FC<ChatProps> = ({
   }
 
   function forwardToEstablishment() {
-    return onForwardToEstablishment
-      ? () => onForwardToEstablishment(chat)
-      : undefined;
+    return onForwardToEstablishment ? () => onForwardToEstablishment(chat) : undefined;
   }
 
   function sendToEmail() {
@@ -1295,12 +1182,12 @@ const Chat: FC<ChatProps> = ({
     if (file.size > MESSAGE_FILE_SIZE_LIMIT) {
       return null;
     } else {
-      return await convertBase64(file);
+      return convertBase64(file);
     }
   }
 
   async function convertBase64(file: File): Promise<any> {
-    return await new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       const fileReader = new FileReader();
       fileReader.readAsDataURL(file);
       fileReader.onload = () => {
@@ -1315,9 +1202,7 @@ const Chat: FC<ChatProps> = ({
 
 function filterMessages(messagesList: Message[], newMessage: Message) {
   return !messagesList.some(
-    (existingMessage) =>
-      existingMessage.id === newMessage.id &&
-      existingMessage.event === newMessage.event
+    (existingMessage) => existingMessage.id === newMessage.id && existingMessage.event === newMessage.event,
   );
 }
 

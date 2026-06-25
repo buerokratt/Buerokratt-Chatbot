@@ -40,6 +40,9 @@ assignBgkConfig:
     semantic_configuration: "[#BGK_SEMANTIC_CONFIGURATION]"
     in_scope: "[#BGK_IN_SCOPE]"
     stream: "[#BGK_STREAM]"
+    use_agentic: "[#BGK_USE_AGENTIC]"
+    agent_name: "[#AZURE_AGENT_NAME]"
+    agent_type: "[#AZURE_AGENT_TYPE]"
     domain: ${incoming.body.domain}
     message: ${incoming.body.message ?? ''}
 
@@ -105,7 +108,22 @@ checkForPassedDomain:
   switch:
     - condition: ${domain === 'none'}
       next: getAnonymizerConfig
-  next: getDomainAnonymizerConfig
+  next: getDomainUUID
+
+getDomainUUID:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-uuid"
+    body:
+      domainUrl: ${domain + '%'}
+  result: domainUuid
+  next: validate_domain_res
+
+validate_domain_res:
+  switch:
+    - condition: ${domainUuid.response.body.length > 0}
+      next: getDomainAnonymizerConfig
+  next: getAnonymizerConfig
 
 getAnonymizerConfig:
   call: http.post
@@ -119,7 +137,7 @@ getDomainAnonymizerConfig:
   args:
     url: "[#CHATBOT_RESQL]/get-domain-anonymizer-config"
     body:
-      domainUUID: ${domain}
+      domainUUID: ${domainUuid.response.body[0].domainId}
   result: anonymizer_configs_res
   next: assignAnonymizerConfigs
 
@@ -141,7 +159,7 @@ prepareAnonymizerConfig:
     headers:
       type: json
     body:
-      texts: ${messages.slice(1).map(i => i.content)}
+      texts: ${messages.filter(i => i.role === 'user').map(i => i.content)}
       approach: ${anonymizer_configs.anonymizerSelectedApproach}
       entities: ${anonymizer_configs.anonymizerSelectedEntities.split(',')}
       allowlist: ${anonymizer_configs.anonymizerAllowlist.split(',')}
@@ -171,8 +189,8 @@ anonymizeText:
 assign_anonymized_messages:
   assign:
     anonymizedMessages: ${anonymize_res.response.body.results}
-    messages: "$=messages.map((e, i) => i ? {...e, content: anonymizedMessages[i-1].text} : e)="
-  
+    messages: "$=messages.map((m, i) => m.role === 'user' ? {...m, content: anonymizedMessages[messages.slice(0, i).filter(msg => msg.role === 'user').length].text} : m)="
+
 trigger_ai_stream:
   call: http.post
   args:
@@ -180,6 +198,9 @@ trigger_ai_stream:
     headers:
       Content-Type: application/json
     body:
+      use_agentic: ${use_agentic.toLowerCase() === 'true'}
+      agent_name: ${agent_name}
+      agent_type: ${agent_type}
       messages: ${messages}
       options:
         data_sources: ${data_sources}

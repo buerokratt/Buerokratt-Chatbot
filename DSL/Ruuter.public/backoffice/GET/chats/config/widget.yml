@@ -44,6 +44,7 @@ getDomainWidgetConfig:
     body:
       domainUUID: ${domainUuid.response.body[0].domainId}
   result: res
+  next: return_result
 
 getWidgetConfig:
   call: http.post

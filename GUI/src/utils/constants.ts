@@ -10,7 +10,7 @@ export enum ROLES {
 }
 
 export enum RUUTER_ENDPOINTS {
-  SEND_ATTACHMENT= '/attachments/add'
+  SEND_ATTACHMENT = '/attachments/add',
 }
 
 export enum AUTHOR_ROLES {

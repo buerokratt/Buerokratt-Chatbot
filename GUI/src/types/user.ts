@@ -14,25 +14,26 @@ export interface User {
   customerSupportStatus: 'online' | 'idle' | 'offline';
   department: string;
   smaxAccountId?: string;
+  jiraAccountId?: string;
   statusComment: string;
 }
 
-export interface UserDTO
-  extends Pick<
-    User,
-    | 'login'
-    | 'firstName'
-    | 'lastName'
-    | 'fullName'
-    | 'idCode'
-    | 'authorities'
-    | 'domains'
-    | 'displayName'
-    | 'csaTitle'
-    | 'csaEmail'
-    | 'department'
-    | 'smaxAccountId'
-  > {}
+export interface UserDTO extends Pick<
+  User,
+  | 'login'
+  | 'firstName'
+  | 'lastName'
+  | 'fullName'
+  | 'idCode'
+  | 'authorities'
+  | 'domains'
+  | 'displayName'
+  | 'csaTitle'
+  | 'csaEmail'
+  | 'department'
+  | 'smaxAccountId'
+  | 'jiraAccountId'
+> {}
 
 export interface UserSearchFilters {
   search_full_name: string;

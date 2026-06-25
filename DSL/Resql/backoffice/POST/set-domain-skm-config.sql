@@ -2,7 +2,6 @@ WITH
     domain_list AS (
         SELECT (jsonb_array_elements_text(:domains::jsonb))::uuid AS domain
     ),
-
     last_configuration AS (
 SELECT
     c.domain,
@@ -31,12 +30,11 @@ WHERE
   AND c2.key    = c.key
     )
     ),
-
     new_configuration AS (
 SELECT
     v.key,
     v.value,
-    :created::timestamptz AS created
+    now() AS created
 FROM (
     VALUES
         ('skm_range', :skm_range),

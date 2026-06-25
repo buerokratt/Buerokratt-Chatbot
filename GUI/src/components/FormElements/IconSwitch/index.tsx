@@ -1,5 +1,5 @@
-import { forwardRef, ReactNode, useId } from 'react';
 import * as RadixSwitch from '@radix-ui/react-switch';
+import { forwardRef, ReactNode, useId } from 'react';
 import { MdOutlineCheck } from 'react-icons/md';
 
 import './IconSwitch.scss';
@@ -17,20 +17,7 @@ type IconSwitchProps = {
 };
 
 const IconSwitch = forwardRef<HTMLButtonElement, IconSwitchProps>(
-  (
-    {
-      name,
-      label,
-      checked,
-      defaultChecked,
-      onCheckedChange,
-      hideLabel,
-      disabled,
-      icon,
-      offIcon
-    },
-    ref
-  ) => {
+  ({ name, label, checked, defaultChecked, onCheckedChange, hideLabel, disabled, icon, offIcon }, ref) => {
     const id = useId();
     const activeIcon = icon !== undefined ? icon : <MdOutlineCheck className="icon-switch__checkmark" />;
 
@@ -58,10 +45,9 @@ const IconSwitch = forwardRef<HTMLButtonElement, IconSwitchProps>(
         </RadixSwitch.Root>
       </div>
     );
-  }
+  },
 );
 
 IconSwitch.displayName = 'IconSwitch';
 
 export default IconSwitch;
-

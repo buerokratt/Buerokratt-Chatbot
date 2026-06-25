@@ -1,0 +1,44 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Transfer greeting settings from a source domain to one or more target domains"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: sourceDomainUuid
+        type: string
+        description: "UUID of the domain to copy settings from"
+      - field: targetDomainUuids
+        type: object
+        description: "Array of target domain UUIDs to copy settings to"
+
+extractRequestData:
+  assign:
+    sourceDomainUuid: ${incoming.body.sourceDomainUuid}
+    targetDomainUuids: ${incoming.body.targetDomainUuids}
+
+fetchSource:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-greeting-message"
+    body:
+      domainUUID: ${sourceDomainUuid}
+  result: source
+  next: transferToTargets
+
+transferToTargets:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-domain-greetings-message-config"
+    body:
+      isActive: ${source.response.body[0].isActive}
+      message: ${source.response.body[0].est}
+      domains: ${JSON.stringify(targetDomainUuids)}
+  result: res
+
+return_result:
+  return: ${res.response.body}
+  next: end

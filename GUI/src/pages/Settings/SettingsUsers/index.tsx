@@ -1,28 +1,52 @@
-import { FC, useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { isJiraIntegrationEnabled, isSmaxIntegrationEnabled } from 'constants/config';
+
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import {
-  ColumnFiltersState,
-  PaginationState,
-  Row,
-  SortingState,
-  createColumnHelper,
-} from '@tanstack/react-table';
+import { ColumnFiltersState, createColumnHelper, PaginationState, Row, SortingState } from '@tanstack/react-table';
 import { AxiosError } from 'axios';
-import { MdOutlineEdit, MdOutlineDeleteOutline } from 'react-icons/md';
-import { apiDev } from 'services/api';
 import { Button, Card, DataTable, Dialog, Icon, Tooltip, Track } from 'components';
-import { User, UserSearchFilters } from 'types/user';
-import { deleteUser } from 'services/users';
-import { useToast } from 'hooks/useToast';
-import UserModal from './UserModal';
-import { ROLES } from 'utils/constants';
-import withAuthorization from 'hoc/with-authorization';
-import { CustomerSupportActivityDTO } from 'types/customerSupportActivity';
-import useStore from '../../../store';
 import { format } from 'date-fns';
+import withAuthorization from 'hoc/with-authorization';
+import { useToast } from 'hooks/useToast';
+import { FC, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { MdOutlineDeleteOutline, MdOutlineEdit } from 'react-icons/md';
+import { apiDev } from 'services/api';
+import { deleteUser } from 'services/users';
+import { CustomerSupportActivityDTO } from 'types/customerSupportActivity';
+import { User, UserSearchFilters } from 'types/user';
+import { ROLES } from 'utils/constants';
+
+import UserModal from './UserModal';
+import useStore from '../../../store';
+
+import './SettingsUsers.scss';
 import { WDomain } from '../../../types/widgetModels';
-import { isSmaxIntegrationEnabled } from 'constants/config';
+
+const TruncateCellWithTooltip: FC<{ text: string; maxWidth: number }> = ({ text, maxWidth }) => {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [isTruncated, setIsTruncated] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    setIsTruncated(el.scrollWidth > el.clientWidth);
+  }, [text, maxWidth]);
+  if (!text) return <></>;
+  const span = (
+    <span
+      ref={ref}
+      style={{
+        maxWidth,
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+        display: 'block',
+      }}
+    >
+      {text}
+    </span>
+  );
+  return isTruncated ? <Tooltip content={text}>{span}</Tooltip> : span;
+};
 
 const SettingsUsers: FC = () => {
   const { t } = useTranslation();
@@ -34,22 +58,25 @@ const SettingsUsers: FC = () => {
   const [changeStatusDialog, setChangeStatusDialog] = useState(false);
   const [widgetDomains, setWidgetDomains] = useState<WDomain[]>([]);
   const [editableRow, setEditableRow] = useState<User | null>(null);
-  const [deletableRow, setDeletableRow] = useState<string | number | null>(
-    null
-  );
+  const [deletableRow, setDeletableRow] = useState<string | number | null>(null);
   const [usersList, setUsersList] = useState<User[] | null>(null);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [selectedUserIdCode, setSelectedUserIdCode] = useState<string | null>(null);
 
-  const getUsers = (pagination: PaginationState, sorting: SortingState, columnFilters: ColumnFiltersState, setTablePagination: boolean = false) => {
-      let sort = 'name asc';
-      if(sorting.length > 0) {
-          if(sorting[0].id === t('settings.users.role')) {
-              sort = `Role ${sorting[0].desc ? 'desc' : 'asc'}`
-          } else {
-          sort = sorting[0].id + ' ' + (sorting[0].desc ? 'desc' : 'asc')
-          }
+  const getUsers = (
+    pagination: PaginationState,
+    sorting: SortingState,
+    columnFilters: ColumnFiltersState,
+    setTablePagination: boolean = false,
+  ) => {
+    let sort = 'name asc';
+    if (sorting.length > 0) {
+      if (sorting[0].id === t('settings.users.role')) {
+        sort = `Role ${sorting[0].desc ? 'desc' : 'asc'}`;
+      } else {
+        sort = sorting[0].id + ' ' + (sorting[0].desc ? 'desc' : 'asc');
       }
+    }
     const searchfilters = checkFilters(columnFilters);
     apiDev
       .post(`accounts/customer-support-agents`, {
@@ -78,8 +105,8 @@ const SettingsUsers: FC = () => {
     queryKey: ['configs/widget-domains', 'prod'],
     onSuccess: (data: any) => {
       const initialData = data.response ?? [];
-        setWidgetDomains(initialData);
-    }
+      setWidgetDomains(initialData);
+    },
   });
 
   useEffect(() => {
@@ -92,7 +119,7 @@ const SettingsUsers: FC = () => {
 
   const mapUserDomains = (domainIds: string[], domainsList: WDomain[]): WDomain[] => {
     return domainsList.filter((domain) => domainIds.includes(domain.domainId));
-  }
+  };
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -132,7 +159,7 @@ const SettingsUsers: FC = () => {
         user_id: userInfo?.idCode,
         page_name: window.location.pathname,
         page_results: data.page_results,
-        selected_columns: "{}"
+        selected_columns: '{}',
       });
     },
   });
@@ -174,10 +201,7 @@ const SettingsUsers: FC = () => {
       });
     },
     onError: async (error: AxiosError) => {
-      await queryClient.invalidateQueries([
-        'accounts/customer-support-activity',
-        'prod',
-      ]);
+      await queryClient.invalidateQueries(['accounts/customer-support-activity', 'prod']);
       toast.open({
         type: 'error',
         title: t('global.notificationError'),
@@ -191,20 +215,14 @@ const SettingsUsers: FC = () => {
   });
 
   const editView = (props: any) => (
-    <Button
-      appearance="text"
-      onClick={() => setEditableRow(props.row.original)}
-    >
+    <Button appearance="text" onClick={() => setEditableRow(props.row.original)}>
       <Icon icon={<MdOutlineEdit />} />
       {t('global.edit')}
     </Button>
   );
 
   const deleteView = (props: any) => (
-    <Button
-      appearance="text"
-      onClick={() => setDeletableRow(props.row.original.idCode)}
-    >
+    <Button appearance="text" onClick={() => setDeletableRow(props.row.original.idCode)}>
       <Icon icon={<MdOutlineDeleteOutline />} />
       {t('global.delete')}
     </Button>
@@ -281,6 +299,10 @@ const SettingsUsers: FC = () => {
     );
   };
 
+  const truncateCellWithTooltip = (text: string, maxWidth: number = 180) => (
+    <TruncateCellWithTooltip text={text} maxWidth={maxWidth} />
+  );
+
   const statusCommentView = (props: any) => {
     const value = props.getValue();
     const statusTimeStamp = format(new Date(props.row.original.statusCommentTimeStamp), 'HH:mm:ss');
@@ -291,10 +313,7 @@ const SettingsUsers: FC = () => {
         <span style={{ maxWidth: '170px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           {value ? statusComment : ''}
           {value ? (
-            <time
-              dateTime={statusTimeStamp}
-              className="active-chat__message-date"
-            >
+            <time dateTime={statusTimeStamp} className="active-chat__message-date">
               {statusTimeStamp}
             </time>
           ) : (
@@ -307,13 +326,11 @@ const SettingsUsers: FC = () => {
 
   const usersColumns = useMemo(() => {
     const baseColumns = [
-      columnHelper.accessor(
-        (row) => `${row.firstName ?? ''} ${row.lastName ?? ''}`,
-        {
-          id: `name`,
-          header: t('settings.users.name') ?? '',
-        }
-      ),
+      columnHelper.accessor((row) => `${row.firstName ?? ''} ${row.lastName ?? ''}`.trim(), {
+        id: `name`,
+        header: t('settings.users.name') ?? '',
+        cell: (props) => truncateCellWithTooltip(props.getValue() ?? '', 160),
+      }),
       columnHelper.accessor('idCode', {
         header: t('settings.users.idCode') ?? '',
       }),
@@ -327,24 +344,26 @@ const SettingsUsers: FC = () => {
         },
         {
           header: t('settings.users.role') ?? '',
-          cell: (props) => props.getValue().join(', '),
+          cell: (props) => truncateCellWithTooltip(props.getValue().join(', '), 200),
           filterFn: (row: Row<User>, _, filterValue) => {
             const rowAuthorities: string[] = [];
             row.original.authorities.map((role) => {
               return rowAuthorities.push(t(`roles.${role}`));
             });
             const filteredArray = rowAuthorities.filter((word) =>
-              word.toLowerCase().includes(filterValue.toLowerCase())
+              word.toLowerCase().includes(filterValue.toLowerCase()),
             );
             return filteredArray.length > 0;
           },
-        }
+        },
       ),
       columnHelper.accessor('displayName', {
         header: t('settings.users.displayName') ?? '',
+        cell: (props) => truncateCellWithTooltip(props.getValue() ?? '', 140),
       }),
       columnHelper.accessor('csaTitle', {
         header: t('settings.users.userTitle') ?? '',
+        cell: (props) => truncateCellWithTooltip(props.getValue() ?? '', 140),
       }),
       columnHelper.accessor('customerSupportStatus', {
         header: t('global.status') ?? '',
@@ -353,21 +372,33 @@ const SettingsUsers: FC = () => {
       }),
       columnHelper.accessor('statusComment', {
         header: t('global.statusClarification') ?? '',
+        enableColumnFilter: false,
         cell: statusCommentView,
       }),
       columnHelper.accessor('csaEmail', {
         header: t('settings.users.email') ?? '',
+        cell: (props) => truncateCellWithTooltip(props.getValue() ?? '', 180),
       }),
       columnHelper.accessor('department', {
         header: t('settings.users.department') ?? '',
+        cell: (props) => truncateCellWithTooltip(props.getValue() ?? '', 140),
       }),
+      ...(isJiraIntegrationEnabled
+        ? [
+            columnHelper.accessor('jiraAccountId', {
+              header: t('settings.users.connectedToJira') ?? '',
+              enableColumnFilter: false,
+              cell: (props) => (props.getValue() ? t('global.yes') : t('global.no')),
+            }),
+          ]
+        : []),
       ...(isSmaxIntegrationEnabled
         ? [
-        columnHelper.accessor('smaxAccountId', {
-          header: t('settings.users.connectedToSmax') ?? '',
-          enableColumnFilter: false,
-          cell: (props) => (props.getValue() ? t('global.yes') : t('global.no')),
-        }),
+            columnHelper.accessor('smaxAccountId', {
+              header: t('settings.users.connectedToSmax') ?? '',
+              enableColumnFilter: false,
+              cell: (props) => (props.getValue() ? t('global.yes') : t('global.no')),
+            }),
           ]
         : []),
       columnHelper.display({
@@ -392,15 +423,14 @@ const SettingsUsers: FC = () => {
         return mapped.map((d) => d.name);
       },
       {
-        header: t('multiDomains.title') ?? '',
-        cell: (props) => props.getValue().join(', '),
+        header: t('multiDomains.domains') ?? '',
+        cell: (props) => truncateCellWithTooltip(props.getValue().join(', '), 160),
+        enableColumnFilter: false,
         filterFn: (row, _, filterValue) => {
           const mapped = mapUserDomains(row.original.domains ?? [], widgetDomains);
-          return mapped.some((d) =>
-            d.name.toLowerCase().includes(filterValue.toLowerCase())
-          );
+          return mapped.some((d) => d.name.toLowerCase().includes(filterValue.toLowerCase()));
         },
-      }
+      },
     );
 
     return import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN.toLowerCase() === 'true'
@@ -408,16 +438,13 @@ const SettingsUsers: FC = () => {
       : baseColumns;
   }, [t, widgetDomains]);
 
-
   if (!usersList) return <>Loading...</>;
 
   return (
     <>
       <Track gap={16} justify="between" style={{ paddingBottom: '10px' }}>
         <h1>{t('settings.users.title')}</h1>
-        <Button onClick={() => setNewUserModal(true)}>
-          {t('settings.users.addUser')}
-        </Button>
+        <Button onClick={() => setNewUserModal(true)}>{t('settings.users.addUser')}</Button>
       </Track>
 
       <div style={{ height: 'auto', overflow: 'auto' }}>
@@ -430,11 +457,7 @@ const SettingsUsers: FC = () => {
             pagination={pagination}
             columnFilters={columnFilters}
             setPagination={(state: PaginationState) => {
-              if (
-                state.pageIndex === pagination.pageIndex &&
-                state.pageSize === pagination.pageSize
-              )
-                return;
+              if (state.pageIndex === pagination.pageIndex && state.pageSize === pagination.pageSize) return;
               setPagination(state);
               updatePageSize.mutate({ page_results: state.pageSize });
               getUsers(state, sorting, columnFilters);
@@ -447,9 +470,7 @@ const SettingsUsers: FC = () => {
             setFiltering={(state: ColumnFiltersState) => {
               setColumnFilters(state);
               const searchfilters = checkFilters(state);
-              const hasData = Object.values(searchfilters).some(
-                (value) => value !== ''
-              );
+              const hasData = Object.values(searchfilters).some((value) => value !== '');
 
               if (hasData) {
                 const intialPagination = { pageIndex: 0, pageSize: 10 };
@@ -499,7 +520,7 @@ const SettingsUsers: FC = () => {
                     customerSupportId: selectedUserIdCode ?? '',
                     customerSupportActive: false,
                     customerSupportStatus: 'offline',
-                    statusComment: ''
+                    statusComment: '',
                   });
                 }}
               >
@@ -529,16 +550,10 @@ const SettingsUsers: FC = () => {
           onClose={() => setDeletableRow(null)}
           footer={
             <>
-              <Button
-                appearance="secondary"
-                onClick={() => setDeletableRow(null)}
-              >
+              <Button appearance="secondary" onClick={() => setDeletableRow(null)}>
                 {t('global.no')}
               </Button>
-              <Button
-                appearance="error"
-                onClick={() => deleteUserMutation.mutate({ id: deletableRow })}
-              >
+              <Button appearance="error" onClick={() => deleteUserMutation.mutate({ id: deletableRow })}>
                 {t('global.yes')}
               </Button>
             </>

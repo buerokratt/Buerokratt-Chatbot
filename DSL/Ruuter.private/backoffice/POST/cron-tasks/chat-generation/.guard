@@ -1,0 +1,30 @@
+process_request:
+  switch:
+    - condition: ${incoming.headers != null && incoming.headers['x-ruuter-nonce'] != null}
+      next: verify_header_nonce
+  next: guard_fail
+
+verify_header_nonce:
+  call: http.post
+  args:
+    url: "[#TRAINING_RESQL]/use-nonce"
+    body:
+      updated_nonce: ${incoming.headers['x-ruuter-nonce']}
+  result: nonce_response
+  next: check_nonce
+
+check_nonce:
+  switch:
+    - condition: ${nonce_response.response.body[0] != null}
+      next: guard_success
+  next: guard_fail
+
+guard_success:
+  return: "success"
+  status: 200
+  next: end
+
+guard_fail:
+  return: "unauthorized"
+  status: 403
+  next: end

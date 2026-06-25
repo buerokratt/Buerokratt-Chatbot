@@ -1,97 +1,187 @@
-import { FC, useEffect, useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { AxiosError } from 'axios';
-import { useTranslation } from 'react-i18next';
+import { FEEDBACK_NOTICE_LENGTH, FEEDBACK_QUESTION_LENGTH } from 'constants/config';
 
-import {
-  Button,
-  Card,
-  FormTextarea,
-  Switch,
-  Track,
-} from 'components';
-import {
-  FEEDBACK_QUESTION_LENGTH,
-  FEEDBACK_NOTICE_LENGTH,
-} from 'constants/config';
 import { useMutation } from '@tanstack/react-query';
-import { useToast } from 'hooks/useToast';
-import { apiDev } from 'services/api';
+import { AxiosError } from 'axios';
+import { Button, Card, FormRadios, FormTextarea, Switch, Track } from 'components';
 import withAuthorization from 'hoc/with-authorization';
-import { ROLES } from 'utils/constants';
+import { useToast } from 'hooks/useToast';
+import { FC, useEffect, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { apiDev } from 'services/api';
 import { FeedbackConfig } from 'types/feedbackConfig';
+import { ROLES } from 'utils/constants';
+
 import { getFeedbackConfigData, setFeedbackData } from './data';
+import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
+import DomainTabSelector from '../../../components/DomainTabSelector';
+import DomainTransfer from '../../../components/DomainTransfer';
+import { fetchConfigurationFromDomain } from '../../../services/configurations';
+import useStore from '../../../store';
+
+import { SelectOption } from 'types';
 
 const SettingsFeedback: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
   const { control, handleSubmit, reset } = useForm<FeedbackConfig>();
-  const [key, setKey] = useState(0);
   const [feedbackConfig, setFeedbackConfig] = useState<FeedbackConfig | undefined>(undefined);
+  const multiDomainEnabled = import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
+  const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
+  const rawDomains = useStore((state) => state.allDomains);
+  const allDomains: SelectOption[] = rawDomains.map((d) => ({ label: d.name, value: d.id }));
 
-  const getFeedbackConfig = async () => {
-      const res = await apiDev.get<{response: FeedbackConfig}>('configs/feedback');
-      reset(getFeedbackConfigData(res.data.response));
-      setFeedbackConfig(res.data.response);
-      setKey(key + 1);
+  useEffect(() => {
+    resetSettingsToDefault();
+    if (multiDomainEnabled) {
+      resetSettingsToDefault();
+    } else {
+      fetchData('none');
     }
-  
-    useEffect(() => {
-      getFeedbackConfig();
-    }, []);
+  }, []);
 
-    const feedbackConfigMutation = useMutation({
-      mutationFn: (data: FeedbackConfig) =>
-        apiDev.post<FeedbackConfig>(
-          'configs/feedback',
-          setFeedbackData(data)
-        ),
-      onSuccess: () => {
-        toast.open({
-          type: 'success',
-          title: t('global.notification'),
-          message: t('toast.success.updateSuccess'),
-        });
-      },
-      onError: (error: AxiosError) => {
-        toast.open({
-          type: 'error',
-          title: t('global.notificationError'),
-          message: error.message,
-        });
-      },
-    });
-
-    const handleFormSubmit = handleSubmit((data) => {
-      feedbackConfigMutation.mutate(data);
-    });
-
-    if (!feedbackConfig) {
-      return <>Loading...</>;
+  const fetchData = async (selectedDomain: string) => {
+    try {
+      const data: { response: FeedbackConfig } = await fetchConfigurationFromDomain<{ response: FeedbackConfig }>(
+        'configs/feedback',
+        selectedDomain,
+      );
+      const res = data.response;
+      reset(res);
+      setFeedbackConfig(getFeedbackConfigData(res));
+    } catch (error) {
+      console.error('Failed to fetch feedback', error);
     }
+  };
+
+  const feedbackConfigMutation = useMutation({
+    mutationFn: (data: FeedbackConfig) => apiDev.post<FeedbackConfig>('configs/feedback', setFeedbackData(data)),
+    onSuccess: () => {
+      toast.open({
+        type: 'success',
+        title: t('global.notification'),
+        message: t('toast.success.updateSuccess'),
+      });
+    },
+    onError: (error: AxiosError) => {
+      toast.open({
+        type: 'error',
+        title: t('global.notificationError'),
+        message: error.message,
+      });
+    },
+  });
+
+  const handleFormSubmit = handleSubmit((data) => {
+    data.domainUUID = multiDomainEnabled ? selectedDomains : [];
+    feedbackConfigMutation.mutate(data);
+  });
+
+  const resetSettingsToDefault = () => {
+    const feedbackConfig = {
+      feedbackActive: false,
+      feedbackQuestion: '',
+      feedbackNoticeActive: false,
+      isFiveRatingScale: undefined,
+      feedbackNotice: '',
+    };
+    setFeedbackConfig(feedbackConfig);
+    reset(feedbackConfig);
+  };
+
+  const transferMutation = useMutation({
+    mutationFn: (data: { sourceDomainUuid: string; targetDomainUuids: string[] }) =>
+      apiDev.post('configs/transfer/feedback', data),
+    onSuccess: () => {
+      toast.open({
+        type: 'success',
+        title: t('global.notification'),
+        message: t('toast.success.updateSuccess'),
+      });
+    },
+    onError: (error: AxiosError) => {
+      toast.open({
+        type: 'error',
+        title: t('global.notificationError'),
+        message: error.message,
+      });
+    },
+  });
+
+  const handleTransfer = (targetIds: string[]) => {
+    transferMutation.mutate({ sourceDomainUuid: selectedDomains[0], targetDomainUuids: targetIds });
+  };
+
+  const handleDomainSelection = useDomainSelectionHandler(setSelectedDomains, fetchData, resetSettingsToDefault);
+
+  const sourceDomainSelected = multiDomainEnabled && selectedDomains.length === 1;
+
+  if (!feedbackConfig) {
+    return <>Loading...</>;
+  }
 
   return (
     <>
       <h1>{t('settings.feedback.title')}</h1>
+
       <Card
+        tabs={multiDomainEnabled && <DomainTabSelector onChange={handleDomainSelection} />}
         footer={
           <Track justify="end">
-            <Button onClick={handleFormSubmit}>{t('global.save')}</Button>
+            <Button disabled={(multiDomainEnabled && selectedDomains.length === 0) || false} onClick={handleFormSubmit}>
+              {t('global.save')}
+            </Button>
           </Track>
         }
       >
         <Track gap={16} direction="vertical" align="left">
-          <Controller
-            name="feedbackActive"
-            control={control}
-            render={({ field }) => (
-              <Switch
-                label={t('settings.feedback.feedbackActive')}
-                onCheckedChange={field.onChange}
-                checked={field.value}
-                {...field}
+          <Track justify="between" align="center" style={{ width: '100%' }}>
+            <Controller
+              name="feedbackActive"
+              control={control}
+              render={({ field }) => (
+                <Switch
+                  label={t('settings.feedback.feedbackActive')}
+                  onCheckedChange={field.onChange}
+                  checked={Boolean(field.value)}
+                  {...field}
+                />
+              )}
+            />
+            {sourceDomainSelected && (
+              <DomainTransfer
+                allDomains={allDomains}
+                excludedDomainIds={selectedDomains}
+                onTransfer={handleTransfer}
+                isTransferring={transferMutation.isPending}
               />
             )}
+          </Track>
+          <Controller
+            name="isFiveRatingScale"
+            control={control}
+            render={({ field }) => {
+              return (
+                <FormRadios
+                  label={t('settings.feedback.feedbackScale')}
+                  name={field.name}
+                  items={[
+                    {
+                      label: t('settings.feedback.tenPoints'),
+                      value: 'false',
+                    },
+                    {
+                      label: t('settings.feedback.fivePoints'),
+                      value: 'true',
+                    },
+                  ]}
+                  onChange={(value) => {
+                    field.onChange(value === 'true');
+                  }}
+                  value={field.value?.toString() ?? undefined}
+                />
+              );
+            }}
           />
           <Controller
             name="feedbackQuestion"
@@ -102,7 +192,7 @@ const SettingsFeedback: FC = () => {
                 minRows={4}
                 maxLength={FEEDBACK_QUESTION_LENGTH}
                 onChange={field.onChange}
-                defaultValue={field.value}
+                defaultValue={field.value ?? ''}
                 name="label"
                 showMaxLength
                 maxLengthBottom
@@ -117,7 +207,7 @@ const SettingsFeedback: FC = () => {
               <Switch
                 label={t('settings.feedback.noticeActive')}
                 onCheckedChange={field.onChange}
-                checked={field.value}
+                checked={Boolean(field.value)}
                 {...field}
               />
             )}
@@ -131,7 +221,7 @@ const SettingsFeedback: FC = () => {
                 minRows={4}
                 maxLength={FEEDBACK_NOTICE_LENGTH}
                 onChange={field.onChange}
-                defaultValue={field.value}
+                defaultValue={field.value ?? ''}
                 name="label"
                 showMaxLength
                 maxLengthBottom
@@ -145,6 +235,4 @@ const SettingsFeedback: FC = () => {
   );
 };
 
-export default withAuthorization(SettingsFeedback, [
-  ROLES.ROLE_ADMINISTRATOR,
-]);
+export default withAuthorization(SettingsFeedback, [ROLES.ROLE_ADMINISTRATOR]);

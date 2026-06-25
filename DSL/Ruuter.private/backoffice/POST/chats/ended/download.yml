@@ -14,42 +14,245 @@ declaration:
       - field: language
         type: string
         description: "Body field 'language'"
-      - field: rows
+      - field: startDate
+        type: string
+        description: "Body field 'startDate'"
+      - field: endDate
+        type: string
+        description: "Body field 'endDate'"
+      - field: sorting
+        type: string
+        description: "Body field 'sorting'"
+      - field: search
+        type: string
+        description: "Body field 'search'"
+      - field: customerSupportIds
         type: object
-        description: "Body field 'rows'"
-      - field: chatIds
+        description: "Body field 'customerSupportIds'"
+      - field: urls
+        type: array
+        description: "Body field 'urls'"
+      - field: feedbackRatings
+        type: array
+        description: "Body field 'feedbackRatings'"
+      - field: isTest
+        type: array
+        description: "Body field 'isTest'"
+      - field: isPreserve
+        type: array
+        description: "Body field 'isPreserve'"
+      - field: authenticatedChats
+        type: array
+        description: "Body field 'authenticatedChats'"
+      - field: status
+        type: array
+        description: "Body field 'status'"
+      - field: responseQuality
+        type: array
+        description: "Body field 'responseQuality'"
+      - field: followUpStatus
+        type: array
+        description: "Body field 'followUpStatus'"
+      - field: theme
+        type: array
+        description: "Body field 'theme'"
+      - field: columnIds
         type: object
-        description: "Body field 'chatIds'"
+        description: "Body field 'columnIds'"
 
 extractRequestData:
   assign:
     headers: ${incoming.body.headers}
+    columnIds: ${incoming.body.columnIds}
     language: ${incoming.body.language}
-    rows: ${incoming.body.rows}
-    chatIds: ${incoming.body.chatIds}
+    startDate: "${incoming.body.startDate}"
+    endDate: "${incoming.body.endDate}"
+    urls: ${incoming.body.urls}
+    feedbackRatings: ${incoming.body.feedbackRatings ?? []}
+    isTest: ${incoming.body.isTest ?? []}
+    isPreserve: ${incoming.body.isPreserve ?? []}
+    authenticatedChats: ${incoming.body.authenticatedChats ?? []}
+    status: ${incoming.body.status ?? []}
+    responseQuality: ${incoming.body.responseQuality ?? []}
+    followUpStatus: ${incoming.body.followUpStatus ?? []}
+    theme: ${incoming.body.theme ?? []}
 
-getChatMessages:
+initializeState:
+  assign:
+    page: 1
+    page_size: 100
+    totalPages: 1
+    allChats: []
+    allMessages: []
+  next: fetchPage
+
+fetchPage:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-cs-all-ended-chats"
+    body:
+      start: ${startDate}
+      end: ${endDate}
+      page: ${page}
+      page_size: ${page_size}
+      sorting: ${incoming.body.sorting}
+      search: ${incoming.body.search}
+      customerSupportIds: ${incoming.body.customerSupportIds?.join(',') ?? ''}
+      csaId: ${"chatbot"}
+      urls: ${urls}
+      feedbackRatings: ${feedbackRatings}
+      isTest: ${isTest}
+      isPreserve: ${isPreserve}
+      authenticatedChats: ${authenticatedChats}
+      status: ${status}
+      responseQuality: ${responseQuality}
+      followUpStatus: ${followUpStatus}
+      theme: ${theme}
+      isChatAnalysisEnabled: ${true}
+  result: pageResult
+  next: savePageBody
+
+savePageBody:
+  assign:
+    pageBody: ${pageResult.response.body}
+    totalPages: "${pageResult.response.body.length > 0 ? pageResult.response.body[0].totalPages : 0}"
+  next: checkHasResults
+
+checkHasResults:
+  switch:
+    - condition: ${totalPages == "0"}
+      next: return_empty
+  next: fetchPageMessages
+
+fetchPageMessages:
   call: http.post
   args:
     url: "[#CHATBOT_RESQL]/get-chats-with-messages"
     body:
-      chatIds: ${chatIds}
-  result: chatMessages
+      chatIds: ${pageBody.map(c => c.id)}
+  result: messagesResult
+  next: saveMessagesBody
+
+saveMessagesBody:
+  assign:
+    messagesBody: ${messagesResult.response.body}
+  next: appendChats
+
+appendChats:
+  switch:
+    - condition: ${allChats.length === 0}
+      next: appendFirstPage
+  next: appendNextPage
+
+appendFirstPage:
+  assign:
+    allChats: ${[allChats, ...pageBody]}
+    allMessages: ${[allMessages, ...messagesBody]}
+    page: ${page + 1}
+  next: checkMorePages
+
+appendNextPage:
+  assign:
+    allChats: ${[...allChats, ...pageBody]}
+    allMessages: ${[...allMessages, ...messagesBody]}
+    page: ${page + 1}
+  next: checkMorePages
+
+checkMorePages:
+  switch:
+    - condition: ${page <= totalPages}
+      next: fetchPage
+  next: prepareFinalData
+
+prepareFinalData:
+  assign:
+    finalChats: ${allChats.splice(1, allChats.length - 1)}
+    finalMessages: ${allMessages.splice(1, allMessages.length - 1)}
+  next: get_xlsx_data
 
 get_xlsx_data:
   call: http.post
   args:
     url: "[#CHATBOT_DMAPPER]/conversion/chats-to-xlsx"
     body:
-      chatMessages: ${chatMessages.response.body}
+      chatMessages: ${finalMessages}
       chatHeaders: ${headers}
-      chatIds: ${chatIds}
-      chatRows: ${rows}
+      chatColumnIds: ${columnIds}
+      chatIds: ${finalChats.map(c => c.id)}
+      chatRows: ${finalChats}
       language: ${language}
   result: xlsxData
+  next: assign_s3_filepath
+
+assign_s3_filepath:
+  assign:
+    s3FilePath: ${'history/' + xlsxData.response.body.filePath.split('/').pop()}
+  next: copy_xlsx_to_s3
+
+copy_xlsx_to_s3:
+  call: http.post
+  args:
+    url: "[#CHATBOT_S3_FERRY]/v1/files/copy"
+    body:
+      destinationStorageType: "S3"
+      destinationConfigKey: "chats"
+      destinationFilePath: ${s3FilePath}
+      sourceStorageType: "FS"
+      sourceConfigKey: "[#CHATBOT_S3_FERRY_SOURCE_CONFIG_KEY]"
+      sourceFilePath: ${xlsxData.response.body.filePath}
+  result: s3FileCopy
+  error: unlink_xlsx_from_fs_after_export_error
+  next: get_signed_url
+
+get_signed_url:
+  call: http.post
+  args:
+    url: "[#CHATBOT_S3_FERRY]/v1/files/signed-url/download"
+    body:
+      type: "S3"
+      expiresInSec: 1800
+      configKey: "chats"
+      filePath: ${s3FilePath}
+  result: signedUrlResponse
+  error: unlink_xlsx_from_fs_after_export_error
+  next: unlink_xlsx_from_fs_after_success
+
+unlink_xlsx_from_fs_after_success:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/conversion/chats-to-xlsx/unlink"
+    body:
+      filePath: ${xlsxData.response.body.filePath}
+  result: unlinkResult
+  error: return_unlink_error
+  next: return_success
+
+unlink_xlsx_from_fs_after_export_error:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/conversion/chats-to-xlsx/unlink"
+    body:
+      filePath: ${xlsxData.response.body.filePath}
+  result: unlinkResultAfterExportError
+  error: return_unlink_error
+  next: return_export_error
 
 return_success:
-  wrapper: false
-  return: ${xlsxData.response.body}
+  return: ${signedUrlResponse.response.body}
+  next: end
+  status: 200
+
+return_export_error:
+  return: "Failed to prepare chat history export download"
+  next: end
+  status: 500
+
+return_unlink_error:
+  return: "Failed to remove generated chat history export"
+  next: end
+  status: 500
+
+return_empty:
+  return: ''
   next: end
   status: 200

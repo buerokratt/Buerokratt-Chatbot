@@ -1,15 +1,12 @@
+import { QueryClient, QueryClientProvider, QueryFunction } from '@tanstack/react-query';
+import { ToastProvider } from 'context/ToastContext';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
-import {
-  QueryClient,
-  QueryClientProvider,
-  QueryFunction,
-} from '@tanstack/react-query';
+import { api, apiDev, AxiosInterceptor } from 'services/api';
 
 import App from './App';
-import { api, apiDev, AxiosInterceptor } from 'services/api';
-import { ToastProvider } from 'context/ToastContext';
+
 import 'styles/main.scss';
 import '../i18n';
 import { CookiesProvider } from 'react-cookie';
@@ -45,5 +42,5 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
         </AxiosInterceptor>
       </BrowserRouter>
     </QueryClientProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );

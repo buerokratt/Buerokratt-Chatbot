@@ -1,6 +1,6 @@
 ARG nginx_version=nginx:1.25.4-alpine
 
-FROM node:22.0.0-alpine AS image
+FROM node:22.18.0-alpine AS image
 WORKDIR /usr/buerokratt-chatbot
 COPY ./package*.json ./
 

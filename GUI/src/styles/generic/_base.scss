@@ -1,4 +1,7 @@
-html, body, #root, #overlay-root {
+html,
+body,
+#root,
+#overlay-root {
   height: 100%;
   overflow: hidden;
 }
@@ -21,7 +24,6 @@ body {
   @include veera-breakpoint-down(sm) {
     background-color: get-color(black-coral-0);
   }
-  
 }
 
 a,
@@ -30,7 +32,11 @@ select,
 textarea,
 button {
   font-family: inherit;
-  transition: background-color 0.25s, color 0.25s, border-color 0.25s, box-shadow 0.25s;
+  transition:
+    background-color 0.25s,
+    color 0.25s,
+    border-color 0.25s,
+    box-shadow 0.25s;
 }
 
 a {
@@ -51,28 +57,34 @@ button {
   font-family: inherit;
 }
 
-h1, .h1 {
+h1,
+.h1 {
   font-size: $veera-font-size-350;
   font-weight: $veera-font-weight-alpha;
 }
 
-h2, .h2 {
+h2,
+.h2 {
   font-size: $veera-font-size-300;
 }
 
-h3, .h3 {
+h3,
+.h3 {
   font-size: $veera-font-size-250;
 }
 
-h4, .h4 {
+h4,
+.h4 {
   font-size: $veera-font-size-220;
 }
 
-h5, .h5 {
+h5,
+.h5 {
   font-size: $veera-font-size-200;
 }
 
-h6, .h6 {
+h6,
+.h6 {
   font-size: $veera-font-size-100;
   font-weight: $veera-font-weight-delta;
 }
