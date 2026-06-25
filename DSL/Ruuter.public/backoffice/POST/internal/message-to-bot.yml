@@ -112,49 +112,8 @@ check_bot_is_active:
 check_bot_activity_result:
   switch:
     - condition: ${is_bot_active_result.response.body[0]?.value === 'true'}
-      next: get_llm_module_active
+      next: check_for_intent
   next: assign_bot_not_active_response
-
-get_llm_module_active:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RESQL]/get-configuration"
-    body:
-      key: "llm_module_active"
-  result: llm_module_active_result
-  next: check_llm_module_active
-
-check_llm_module_active:
-  switch:
-    - condition: ${llm_module_active_result.response.body[0]?.value === 'true'}
-      next: get_chat_history_for_llm
-  next: check_for_intent
-
-get_chat_history_for_llm:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RESQL]/get-chat-messages"
-    body:
-      chatId: ${chatId}
-  result: chat_history_result
-  next: assign_chat_history
-
-assign_chat_history:
-  assign:
-    conversation_history: '$=chat_history_result.response.body.map(m => ({ authorRole: (m.author_role === "assistant" ? "bot" : m.author_role), message: m.content, timestamp: m.created }))='
-  next: call_llm_stream
-
-call_llm_stream:
-  call: http.post
-  args:
-    url: "[#CHATBOT_NOTIFICATIONS]/channels/${chatId}/llm-stream"
-    body:
-      chatId: ${chatId}
-      message: ${content}
-      authorId: ${chat_bot_name}
-      conversationHistory: ${conversation_history}
-  result: llm_stream_result
-  next: return_message_sent
 
 assign_bot_not_active_response:
   assign:
