@@ -9,7 +9,7 @@ const { initializeAzureOpenAI } = require('./azureOpenAI');
 const { serverConfig } = require('./config');
 const { stoppedChannels } = require('./connectionManager');
 const { addToLogoutQueue, removeFromLogoutQueue } = require('./logoutQueue');
-const { enqueueChatId, dequeueChatId, sendBulkNotification, createAzureOpenAIStreamRequest } = require('./openSearch');
+const { enqueueChatId, dequeueChatId, sendBulkNotification, createAzureOpenAIStreamRequest, createLLMOrchestrationStreamRequest } = require('./openSearch');
 const { buildSSEResponse } = require('./sseUtil');
 const streamQueue = require('./streamQueue');
 const { addToTerminationQueue, removeFromTerminationQueue } = require('./terminationQueue');
@@ -154,6 +154,27 @@ app.post('/remove-chat-from-termination-queue', express.json(), express.text(), 
   } catch {
     res.status(500).json({ response: 'error' });
   }
+});
+
+app.post('/channels/:channelId/llm-stream', async (req, res) => {
+  const { channelId } = req.params;
+  const { chatId, message, authorId, conversationHistory = [] } = req.body;
+
+  if (!message) {
+    return res.status(400).json({ error: 'message is required' });
+  }
+
+  res.status(202).json({ response: 'stream triggered' });
+
+  createLLMOrchestrationStreamRequest({
+    channelId,
+    chatId: chatId || channelId,
+    message,
+    authorId,
+    conversationHistory,
+  }).catch((error) => {
+    console.error('LLM stream error for channel:', error.message);
+  });
 });
 
 app.post('/channels/:channelId/stream', (req, res) => {
