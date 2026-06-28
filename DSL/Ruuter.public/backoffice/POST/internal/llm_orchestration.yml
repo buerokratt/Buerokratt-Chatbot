@@ -102,7 +102,7 @@ prepareAnonymizerConfig:
     headers:
       type: json
     body:
-      texts: ${messages.filter(i => i.role === 'user').map(i => i.content)}
+      texts: ${messages.filter(i => i.authorRole === 'user').map(i => i.message.content)}
       approach: ${anonymizer_configs.anonymizerSelectedApproach}
       entities: ${anonymizer_configs.anonymizerSelectedEntities.split(',')}
       allowlist: ${anonymizer_configs.anonymizerAllowlist.split(',')}
@@ -132,7 +132,7 @@ anonymizeText:
 assign_anonymized_messages:
   assign:
     anonymizedMessages: ${anonymize_res.response.body.results}
-    messages: "$=messages.map((m, i) => m.role === 'user' ? {...m, content: anonymizedMessages[messages.slice(0, i).filter(msg => msg.role === 'user').length].text} : m)="
+    messages: "$=messages.map((m, i) => m.authorRole === 'user' ? {...m, message: anonymizedMessages[messages.slice(0, i).filter(msg => msg.authorRole === 'user').length].text} : m)="
 
 trigger_llm_stream:
   call: http.post
