@@ -102,7 +102,7 @@ prepareAnonymizerConfig:
     headers:
       type: json
     body:
-      texts: ${messages.filter(i => i.authorRole === 'user').map(i => i.message.content)}
+      texts: ${messages.filter(i => i.authorRole === 'user').map(i => i.message)}
       approach: ${anonymizer_configs.anonymizerSelectedApproach}
       entities: ${anonymizer_configs.anonymizerSelectedEntities.split(',')}
       allowlist: ${anonymizer_configs.anonymizerAllowlist.split(',')}
