@@ -10,7 +10,10 @@ WITH configuration_values AS (
                   'skm_index_name',
                   'skm_query_type',
                   'skm_semantic_configuration',
-                  'skm_in_scope')
+                  'skm_in_scope',
+                  'skm_use_agentic',
+                  'azure_agent_name',
+                  'azure_agent_type')
       AND id IN (SELECT max(id) FROM configuration GROUP BY KEY)
       AND NOT deleted
 )
@@ -22,5 +25,8 @@ SELECT
     MAX(CASE WHEN KEY = 'skm_index_name' THEN value END) AS index_name,
     MAX(CASE WHEN KEY = 'skm_query_type' THEN value END) AS query_type,
     MAX(CASE WHEN KEY = 'skm_semantic_configuration' THEN value END) AS semantic_configuration,
-    MAX(CASE WHEN KEY = 'skm_in_scope' THEN value END) AS in_scope
+    MAX(CASE WHEN KEY = 'skm_in_scope' THEN value END) AS in_scope,
+    MAX(CASE WHEN KEY = 'skm_use_agentic' THEN value END) AS use_agentic,
+    MAX(CASE WHEN KEY = 'azure_agent_name' THEN value END) AS azure_agent_name,
+    MAX(CASE WHEN KEY = 'azure_agent_type' THEN value END) AS azure_agent_type
 FROM configuration_values;
