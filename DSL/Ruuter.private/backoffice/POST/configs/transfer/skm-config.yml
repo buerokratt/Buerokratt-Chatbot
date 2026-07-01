@@ -42,6 +42,9 @@ transferToTargets:
       skm_query_type: ${source.response.body[0].queryType}
       skm_semantic_configuration: ${source.response.body[0].semanticConfiguration}
       skm_in_scope: ${source.response.body[0].inScope}
+      skm_use_agentic: ${source.response.body[0].useAgentic}
+      azure_agent_name: ${source.response.body[0].azureAgentName}
+      azure_agent_type: ${source.response.body[0].azureAgentType}
       domains: ${JSON.stringify(targetDomainUuids)}
   result: res
 

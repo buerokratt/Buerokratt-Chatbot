@@ -7,10 +7,14 @@ declaration:
   returns: json
   namespace: backoffice
   allowlist:
+    header:
+      - field: x-ruuter-nonce
+        type: string
+        description: "Nonce field"
     body:
       - field: chatBaseId
         type: string
-        description: "Body field 'chatBaseId'"
+        description: "Body field 'chatBaseId'"     
 
 extractRequestData:
   assign:

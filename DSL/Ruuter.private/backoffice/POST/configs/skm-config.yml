@@ -32,6 +32,15 @@ declaration:
       - field: inScope
         type: string
         description: "Body field 'inScope'"
+      - field: useAgentic
+        type: string
+        description: "Body field 'useAgentic'"
+      - field: azureAgentName
+        type: string
+        description: "Body field 'azureAgentName'"
+      - field: azureAgentType
+        type: string
+        description: "Body field 'azureAgentType'"
       - field: domainUUID
         type: object
         description: "Body field 'domainUUID'"
@@ -46,6 +55,9 @@ extractRequestData:
     skm_query_type: ${incoming.body.queryType}
     skm_semantic_configuration: ${incoming.body.semanticConfiguration}
     skm_in_scope: ${incoming.body.inScope}
+    skm_use_agentic: ${incoming.body.useAgentic}
+    azure_agent_name: ${incoming.body.azureAgentName}
+    azure_agent_type: ${incoming.body.azureAgentType}
     domains: ${incoming.body.domainUUID}
 
 checkForDomains:
@@ -67,6 +79,9 @@ setDomainSkmConfig:
       skm_query_type: ${skm_query_type}
       skm_semantic_configuration: ${skm_semantic_configuration}
       skm_in_scope: ${skm_in_scope}
+      skm_use_agentic: ${skm_use_agentic}
+      azure_agent_name: ${azure_agent_name}
+      azure_agent_type: ${azure_agent_type}
       created: ${new Date().toISOString()}
       domains: ${JSON.stringify(domains)}
   result: skm_result
@@ -85,6 +100,9 @@ setSkmConfig:
       skm_query_type: ${skm_query_type}
       skm_semantic_configuration: ${skm_semantic_configuration}
       skm_in_scope: ${skm_in_scope}
+      skm_use_agentic: ${skm_use_agentic}
+      azure_agent_name: ${azure_agent_name}
+      azure_agent_type: ${azure_agent_type}
       created: ${new Date().toISOString()}
   result: skm_result
   next: return_result

@@ -81,14 +81,25 @@ function processPendingStreamsForChannel(channelId) {
     pendingRequests.forEach(async (requestData) => {
       if (streamQueue.shouldRetry(requestData)) {
         try {
-          await createAzureOpenAIStreamRequest({
-            use_agentic: requestData.use_agentic,
-            agent_name: requestData.agent_name,
-            agent_type: requestData.agent_type,
-            channelId,
-            messages: requestData.messages,
-            options: requestData.options,
-          });
+          if (requestData.message === undefined) {
+            await createAzureOpenAIStreamRequest({
+              use_agentic: requestData.use_agentic,
+              agent_name: requestData.agent_name,
+              agent_type: requestData.agent_type,
+              channelId,
+              messages: requestData.messages,
+              options: requestData.options,
+            });
+          } else {
+            const { createLLMOrchestrationStreamRequest } = require('./openSearch');
+            await createLLMOrchestrationStreamRequest({
+              channelId,
+              chatId: requestData.chatId || channelId,
+              message: requestData.message,
+              authorId: requestData.authorId,
+              conversationHistory: requestData.conversationHistory,
+            });
+          }
 
           streamQueue.removeFromQueue(channelId, requestData.id);
         } catch (error) {

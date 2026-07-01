@@ -23,7 +23,8 @@ import { SelectOption } from 'types';
 const SettingsSkmConfiguration: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
-  const { control, handleSubmit, reset } = useForm<SkmConfig>();
+  const { control, handleSubmit, reset, watch } = useForm<SkmConfig>();
+  const useAgentic = watch('useAgentic');
   const [key, setKey] = useState(0);
   const [skmConfig, setSkmConfig] = useState<SkmConfig | undefined>(undefined);
   const multiDomainEnabled = import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
@@ -63,6 +64,7 @@ const SettingsSkmConfiguration: FC = () => {
         documents: data.documents.toString(),
         maxTokens: data.maxTokens.toString(),
         inScope: data.inScope.toString(),
+        useAgentic: data.useAgentic.toString(),
       }),
     onSuccess: () => {
       toast.open({
@@ -121,6 +123,9 @@ const SettingsSkmConfiguration: FC = () => {
     queryType: t('settings.skmConfiguration.tooltip.queryType'),
     semanticConfiguration: t('settings.skmConfiguration.tooltip.semanticConfiguration'),
     inScope: t('settings.skmConfiguration.tooltip.inScope'),
+    useAgentic: t('settings.skmConfiguration.tooltip.useAgentic'),
+    azureAgentName: t('settings.skmConfiguration.tooltip.azureAgentName'),
+    azureAgentType: t('settings.skmConfiguration.tooltip.azureAgentType'),
   };
 
   const resetSettingsToDefault = () => {
@@ -133,6 +138,9 @@ const SettingsSkmConfiguration: FC = () => {
       queryType: 'vector_semantic_hybrid',
       semanticConfiguration: 'azureml-default',
       inScope: 'true',
+      useAgentic: 'false',
+      azureAgentName: 'ai-act-agent',
+      azureAgentType: 'agent_reference',
       domainUUID: [],
     };
     setSkmConfig(skmConfig);
@@ -190,7 +198,7 @@ const SettingsSkmConfiguration: FC = () => {
         <Fragment key={key}>
           <Track gap={16} direction="vertical" align="left">
             <Track justify="between" align="center" style={{ width: '100%' }}>
-              {getNumberControl('range')}
+              {getSwitchControl('useAgentic')}
               {sourceDomainSelected && (
                 <DomainTransfer
                   allDomains={domainOptions}
@@ -200,46 +208,57 @@ const SettingsSkmConfiguration: FC = () => {
                 />
               )}
             </Track>
-            {getNumberControl('documents')}
-            <Controller
-              name="systemMessage"
-              control={control}
-              render={({ field }) => (
-                <Track gap={10} style={{ width: '100%' }}>
-                  <FormTextarea
-                    label={t('settings.skmConfiguration.systemMessage')}
-                    maxLength={-1}
-                    onChange={field.onChange}
-                    defaultValue={field.value}
-                    name="label"
-                    height={320}
-                    useRichText
-                  />
-                  {getTooltip('systemMessage')}
-                </Track>
-              )}
-            />
-            {getNumberControl('maxTokens')}
-            {getTextControl('indexName')}
-            {getTextControl('semanticConfiguration')}
-            <Controller
-              name="queryType"
-              control={control}
-              render={({ field }) => (
-                <Track gap={10} style={{ width: '100%' }}>
-                  <FormSelect
-                    {...field}
-                    onSelectionChange={(selection) => field.onChange(selection?.value)}
-                    label={t('settings.skmConfiguration.queryType')}
-                    defaultValue={field.value}
-                    options={getQueryTypes()}
-                  />
-                  {getTooltip('queryType')}
-                </Track>
-              )}
-            />
-            {getSwitchControl('inScope')}
+            {useAgentic !== 'true' && (
+              <>
+                {getNumberControl('range')}
+                {getNumberControl('documents')}
+                <Controller
+                  name="systemMessage"
+                  control={control}
+                  render={({ field }) => (
+                    <Track gap={10} style={{ width: '100%' }}>
+                      <FormTextarea
+                        label={t('settings.skmConfiguration.systemMessage')}
+                        maxLength={-1}
+                        onChange={field.onChange}
+                        defaultValue={field.value}
+                        name="label"
+                        height={320}
+                        useRichText
+                      />
+                      {getTooltip('systemMessage')}
+                    </Track>
+                  )}
+                />
+                {getNumberControl('maxTokens')}
+                {getTextControl('indexName')}
+                {getTextControl('semanticConfiguration')}
+                <Controller
+                  name="queryType"
+                  control={control}
+                  render={({ field }) => (
+                    <Track gap={10} style={{ width: '100%' }}>
+                      <FormSelect
+                        {...field}
+                        onSelectionChange={(selection) => field.onChange(selection?.value)}
+                        label={t('settings.skmConfiguration.queryType')}
+                        defaultValue={field.value}
+                        options={getQueryTypes()}
+                      />
+                      {getTooltip('queryType')}
+                    </Track>
+                  )}
+                />
+                {getSwitchControl('inScope')}
+              </>
+            )}
           </Track>
+          {useAgentic === 'true' && (
+            <Track gap={16} direction="vertical" align="left" style={{ paddingTop: 16 }}>
+              {getTextControl('azureAgentName')}
+              {getTextControl('azureAgentType')}
+            </Track>
+          )}
         </Fragment>
       </Card>
     </>
@@ -254,7 +273,10 @@ const SettingsSkmConfiguration: FC = () => {
       | 'indexName'
       | 'queryType'
       | 'semanticConfiguration'
-      | 'inScope',
+      | 'inScope'
+      | 'useAgentic'
+      | 'azureAgentName'
+      | 'azureAgentType',
   ) {
     return (
       <Tooltip content={tooltips[name]}>
@@ -286,7 +308,7 @@ const SettingsSkmConfiguration: FC = () => {
     );
   }
 
-  function getTextControl(name: 'indexName' | 'semanticConfiguration') {
+  function getTextControl(name: 'indexName' | 'semanticConfiguration' | 'azureAgentName' | 'azureAgentType') {
     return (
       <Controller
         name={name}
@@ -294,7 +316,7 @@ const SettingsSkmConfiguration: FC = () => {
         render={({ field }) => (
           <Track gap={10} style={{ width: '100%' }}>
             <FormInput
-              name="indexName"
+              name={name}
               label={t(`settings.skmConfiguration.${name}`)}
               onChange={field.onChange}
               value={field.value}
@@ -306,13 +328,13 @@ const SettingsSkmConfiguration: FC = () => {
     );
   }
 
-  function getSwitchControl(name: 'inScope') {
+  function getSwitchControl(name: 'inScope' | 'useAgentic') {
     return (
       <Controller
         name={name}
         control={control}
         render={({ field }) => (
-          <Track gap={10} style={{ width: '100%' }}>
+          <Track gap={10}>
             <Switch
               label={t(`settings.skmConfiguration.${name}`)}
               onCheckedChange={(value) => {

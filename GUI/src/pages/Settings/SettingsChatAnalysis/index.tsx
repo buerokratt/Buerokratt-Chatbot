@@ -216,6 +216,7 @@ const ChatAnalysis: FC = () => {
             </Button>
           </Track>
         }
+        isScrollable
       >
         <Track gap={16} direction="vertical" align="left" style={{ width: '100%' }}>
           <Track justify="between" align="center" style={{ width: '100%' }}>

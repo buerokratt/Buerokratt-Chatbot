@@ -43,6 +43,7 @@ const SettingsChatSettings: FC = () => {
   const [subTitle, setSubTitle] = useState<string>('');
   const [responseWaitingTime, setResponseWaitingTime] = useState<string>('');
   const [responseProcessingNotice, setResponseProcessingNotice] = useState<string>('');
+  const [isLlmModuleActive, setIsLlmModuleActive] = useState<boolean | undefined>(undefined);
   const queryClient = useQueryClient();
   const [burokrattConfirmationModal, setBurokrattConfirmationModal] = useState<boolean | null>(null);
   const tooltips = {
@@ -54,6 +55,7 @@ const SettingsChatSettings: FC = () => {
     is_edit_chat_visible: t('settings.chat.tooltip.isEditChatVisible'),
     show_sub_title: t('settings.chat.tooltip.showSubTitle'),
     sub_title: t('settings.chat.tooltip.subTitle'),
+    llm_module_active: t('settings.chat.tooltip.llmModuleActive'),
   };
 
   useEffect(() => {
@@ -85,6 +87,7 @@ const SettingsChatSettings: FC = () => {
       setSubTitle(res.subTitle);
       setResponseWaitingTime(res.responseWaitingTime);
       setResponseProcessingNotice(res.responseProcessingNotice);
+      setIsLlmModuleActive(res.llmModuleActive === 'true');
 
       hasRendered.current = true;
     } catch (error) {
@@ -104,6 +107,7 @@ const SettingsChatSettings: FC = () => {
       sub_title: string;
       response_waiting_time: string;
       response_processing_notice: string;
+      llm_module_active: boolean;
       domainUUID: string[];
     }) => {
       return apiDev.post(`configs/bot-config`, {
@@ -116,6 +120,7 @@ const SettingsChatSettings: FC = () => {
         showSubTitle: data.show_sub_title.toString(),
         responseWaitingTime: data.response_waiting_time,
         responseProcessingNotice: data.response_processing_notice,
+        llmModuleActive: data.llm_module_active.toString(),
         subTitle: data.sub_title,
         domainUUID: data.domainUUID,
       });
@@ -155,6 +160,7 @@ const SettingsChatSettings: FC = () => {
       sub_title: subTitle ?? '',
       response_waiting_time: responseWaitingTime ?? '',
       response_processing_notice: responseProcessingNotice ?? '',
+      llm_module_active: isLlmModuleActive ?? false,
       domainUUID: multiDomainEnabled ? selectedDomains : [],
     });
   };
@@ -171,6 +177,7 @@ const SettingsChatSettings: FC = () => {
     setSubTitle('');
     setResponseWaitingTime('10');
     setResponseProcessingNotice('');
+    setIsLlmModuleActive(false);
   };
 
   const transferMutation = useMutation({
@@ -209,7 +216,8 @@ const SettingsChatSettings: FC = () => {
       | 'is_csa_title_visible'
       | 'is_edit_chat_visible'
       | 'show_sub_title'
-      | 'sub_title',
+      | 'sub_title'
+      | 'llm_module_active',
   ) {
     return (
       <Tooltip content={tooltips[name]}>
@@ -300,6 +308,17 @@ const SettingsChatSettings: FC = () => {
                   name="sub_title"
                 />
                 {getTooltip('sub_title')}
+              </Track>
+            )}
+            {isLlmModuleActive != undefined && (
+              <Track gap={10}>
+                <Switch
+                  name="llm_module_active"
+                  label={t('settings.chat.llmModuleActive').toString()}
+                  checked={isLlmModuleActive}
+                  onCheckedChange={setIsLlmModuleActive}
+                />
+                {getTooltip('llm_module_active')}
               </Track>
             )}
           </Track>
@@ -430,6 +449,7 @@ const SettingsChatSettings: FC = () => {
                     sub_title: subTitle ?? '',
                     response_waiting_time: responseWaitingTime ?? '',
                     response_processing_notice: responseProcessingNotice ?? '',
+                    llm_module_active: isLlmModuleActive ?? false,
                     domainUUID: multiDomainEnabled ? selectedDomains : [],
                   });
                 }}

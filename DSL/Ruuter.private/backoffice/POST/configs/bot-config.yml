@@ -38,6 +38,9 @@ declaration:
       - field: responseProcessingNotice
         type: string
         description: "Body field 'responseProcessingNotice'"
+      - field: llmModuleActive
+        type: string
+        description: "Body field 'llmModuleActive'"
       - field: domainUUID
         type: object
         description: "Body field 'domainUUID'"
@@ -54,6 +57,7 @@ extractRequestData:
     sub_title: ${incoming.body.subTitle}
     response_waiting_time: ${incoming.body.responseWaitingTime}
     response_processing_notice: ${incoming.body.responseProcessingNotice}
+    llm_module_active: ${incoming.body.llmModuleActive}
     domains: ${incoming.body.domainUUID}
 
 checkForDomains:
@@ -77,6 +81,7 @@ setDomainBotConfig:
       sub_title: ${sub_title}
       response_waiting_time: ${response_waiting_time}
       response_processing_notice: ${response_processing_notice}
+      llm_module_active: ${llm_module_active}
       created: ${new Date().toISOString()}
       domains: ${JSON.stringify(domains)}
   result: set_bot_config_res
@@ -97,6 +102,7 @@ setBotConfig:
       sub_title: ${sub_title}
       response_waiting_time: ${response_waiting_time}
       response_processing_notice: ${response_processing_notice}
+      llm_module_active: ${llm_module_active}
       created: ${new Date().toISOString()}
   result: set_bot_config_res
 

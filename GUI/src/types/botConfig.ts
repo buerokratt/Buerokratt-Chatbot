@@ -9,6 +9,7 @@ export interface BotConfig {
   subTitle: string;
   responseWaitingTime: string;
   responseProcessingNotice: string;
+  llmModuleActive: string;
 }
 
 export interface BotConfigResponse {

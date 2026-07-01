@@ -7,6 +7,9 @@ export interface SkmConfig {
   queryType: string;
   semanticConfiguration: string;
   inScope: string;
+  useAgentic: string;
+  azureAgentName: string;
+  azureAgentType: string;
   domainUUID?: string[];
 }
 
