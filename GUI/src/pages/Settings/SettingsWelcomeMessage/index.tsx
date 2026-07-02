@@ -229,138 +229,153 @@ const SettingsWelcomeMessage: FC = () => {
           </div>
         </div>
 
-        <div className="welcome-message-section">
-          <div className="welcome-message-section__label">
-            <p className="greeting-type__title">{t('settings.welcomeMessage.greetingType')}</p>
-            <p className="greeting-type__description">{t('settings.welcomeMessage.greetingTypeDescription')}</p>
-          </div>
-          <div className="welcome-message-section__control">
-            <div className="greeting-type-options">
-              <button
-                type="button"
-                className={clsx('greeting-type-option', { 'greeting-type-option--selected': greetingType === 'message' })}
-                onClick={() => setGreetingType('message')}
-              >
-                <span className="greeting-type-option__radio" aria-hidden="true" />
-                <span className="greeting-type-option__icon">
-                  <Icon
-                    icon={
-                      <MdOutlineChatBubbleOutline
-                        fontSize={20}
-                        color={greetingType === 'message' ? '#003cff' : 'rgba(0,0,0,0.54)'}
+        {welcomeMessageActive && (
+          <>
+            <div className="welcome-message-section">
+              <div className="welcome-message-section__label">
+                <p className="greeting-type__title">{t('settings.welcomeMessage.greetingType')}</p>
+                <p className="greeting-type__description">{t('settings.welcomeMessage.greetingTypeDescription')}</p>
+              </div>
+              <div className="welcome-message-section__control">
+                <div className="greeting-type-options">
+                  <button
+                    type="button"
+                    className={clsx('greeting-type-option', {
+                      'greeting-type-option--selected': greetingType === 'message',
+                    })}
+                    onClick={() => setGreetingType('message')}
+                  >
+                    <span className="greeting-type-option__radio" aria-hidden="true" />
+                    <span className="greeting-type-option__icon">
+                      <Icon
+                        icon={
+                          <MdOutlineChatBubbleOutline
+                            fontSize={20}
+                            color={greetingType === 'message' ? '#003cff' : 'rgba(0,0,0,0.54)'}
+                          />
+                        }
                       />
-                    }
-                  />
-                </span>
-                <span>
-                  <span className="greeting-type-option__label">{t('settings.welcomeMessage.messageOption')}</span>
-                  <span className="greeting-type-option__description">
-                    {t('settings.welcomeMessage.messageOptionDescription')}
-                  </span>
-                </span>
-              </button>
-              <button
-                type="button"
-                className={clsx('greeting-type-option', { 'greeting-type-option--selected': greetingType === 'service' })}
-                onClick={() => setGreetingType('service')}
-              >
-                <span className="greeting-type-option__radio" aria-hidden="true" />
-                <span className="greeting-type-option__icon">
-                  <ServiceFlowIcon color={greetingType === 'service' ? '#003cff' : 'rgba(0,0,0,0.54)'} />
-                </span>
-                <span>
-                  <span className="greeting-type-option__label">{t('settings.welcomeMessage.serviceOption')}</span>
-                  <span className="greeting-type-option__description">
-                    {t('settings.welcomeMessage.serviceOptionDescription')}
-                  </span>
-                </span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div className="welcome-message-section">
-          <div className="welcome-message-section__label">
-            <p className="greeting-type__title">
-              {greetingType === 'service'
-                ? t('settings.welcomeMessage.fallbackMessage')
-                : t('settings.welcomeMessage.welcomeMessage')}
-            </p>
-            {greetingType === 'service' && (
-              <p className="greeting-type__description">{t('settings.welcomeMessage.fallbackMessageDescription')}</p>
-            )}
-          </div>
-          <div className="welcome-message-section__control">
-            <FormTextarea
-              key={key}
-              hideLabel
-              label={
-                greetingType === 'service'
-                  ? t('settings.welcomeMessage.fallbackMessage')
-                  : t('settings.welcomeMessage.welcomeMessage')
-              }
-              minRows={4}
-              maxLength={WELCOME_MESSAGE_LENGTH}
-              showMaxLength={true}
-              maxLengthBottom
-              onChange={(e) => setWelcomeMessage(e.target.value)}
-              defaultValue={welcomeMessage}
-              name="label"
-            />
-            {greetingType === 'service' && (
-              <p className="welcome-message-section__required-hint">{t('settings.welcomeMessage.messageRequired')}</p>
-            )}
-          </div>
-        </div>
-
-        {greetingType === 'service' && (
-          <div className="welcome-message-section">
-            <div className="welcome-message-section__label">
-              <p className="greeting-type__title">{t('settings.welcomeMessage.greetingService')}</p>
-              <p className="greeting-type__description">{t('settings.welcomeMessage.serviceDescription')}</p>
-            </div>
-            <div className="welcome-message-section__control">
-              <FormSelect
-                hideLabel
-                name="serviceId"
-                placeholder={t('settings.welcomeMessage.serviceDropdownPlaceholder') ?? ''}
-                options={serviceOptions}
-                defaultValue={serviceId}
-                onSelectionChange={(selection) => setServiceId(selection?.value ?? '')}
-              />
-              {selectedService && (
-                <div className="service-info-card">
-                  <span className="service-info-card__icon">
-                    <ServiceFlowIcon />
-                  </span>
-                  <span className="service-info-card__name">{selectedService.name}</span>
-                  <div className="service-info-card__meta">
-                    <div className="service-info-card__meta-item">
-                      <span className="service-info-card__meta-label">{t('global.status')}</span>
-                      <span
-                        className={clsx('service-info-card__status', `service-info-card__status--${selectedService.state}`)}
-                      >
-                        {t(`settings.welcomeMessage.serviceState.${selectedService.state ?? 'draft'}`)}
+                    </span>
+                    <span>
+                      <span className="greeting-type-option__label">{t('settings.welcomeMessage.messageOption')}</span>
+                      <span className="greeting-type-option__description">
+                        {t('settings.welcomeMessage.messageOptionDescription')}
                       </span>
-                    </div>
-                    {selectedService.updatedAt && (
-                      <>
-                        <span className="service-info-card__divider" aria-hidden="true" />
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    className={clsx('greeting-type-option', {
+                      'greeting-type-option--selected': greetingType === 'service',
+                    })}
+                    onClick={() => setGreetingType('service')}
+                  >
+                    <span className="greeting-type-option__radio" aria-hidden="true" />
+                    <span className="greeting-type-option__icon">
+                      <ServiceFlowIcon color={greetingType === 'service' ? '#003cff' : 'rgba(0,0,0,0.54)'} />
+                    </span>
+                    <span>
+                      <span className="greeting-type-option__label">{t('settings.welcomeMessage.serviceOption')}</span>
+                      <span className="greeting-type-option__description">
+                        {t('settings.welcomeMessage.serviceOptionDescription')}
+                      </span>
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="welcome-message-section">
+              <div className="welcome-message-section__label">
+                <p className="greeting-type__title">
+                  {greetingType === 'service'
+                    ? t('settings.welcomeMessage.fallbackMessage')
+                    : t('settings.welcomeMessage.welcomeMessage')}
+                </p>
+                {greetingType === 'service' && (
+                  <p className="greeting-type__description">
+                    {t('settings.welcomeMessage.fallbackMessageDescription')}
+                  </p>
+                )}
+              </div>
+              <div className="welcome-message-section__control">
+                <FormTextarea
+                  key={key}
+                  hideLabel
+                  label={
+                    greetingType === 'service'
+                      ? t('settings.welcomeMessage.fallbackMessage')
+                      : t('settings.welcomeMessage.welcomeMessage')
+                  }
+                  minRows={4}
+                  maxLength={WELCOME_MESSAGE_LENGTH}
+                  showMaxLength={true}
+                  maxLengthBottom
+                  onChange={(e) => setWelcomeMessage(e.target.value)}
+                  defaultValue={welcomeMessage}
+                  name="label"
+                />
+                {greetingType === 'service' && (
+                  <p className="welcome-message-section__required-hint">
+                    {t('settings.welcomeMessage.messageRequired')}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {greetingType === 'service' && (
+              <div className="welcome-message-section">
+                <div className="welcome-message-section__label">
+                  <p className="greeting-type__title">{t('settings.welcomeMessage.greetingService')}</p>
+                  <p className="greeting-type__description">{t('settings.welcomeMessage.serviceDescription')}</p>
+                </div>
+                <div className="welcome-message-section__control">
+                  <FormSelect
+                    hideLabel
+                    name="serviceId"
+                    placeholder={t('settings.welcomeMessage.serviceDropdownPlaceholder') ?? ''}
+                    options={serviceOptions}
+                    defaultValue={serviceId}
+                    onSelectionChange={(selection) => setServiceId(selection?.value ?? '')}
+                  />
+                  {selectedService && (
+                    <div className="service-info-card">
+                      <span className="service-info-card__icon">
+                        <ServiceFlowIcon />
+                      </span>
+                      <span className="service-info-card__name">{selectedService.name}</span>
+                      <div className="service-info-card__meta">
                         <div className="service-info-card__meta-item">
-                          <span className="service-info-card__meta-label">
-                            {t('settings.welcomeMessage.lastUpdated')}
-                          </span>
-                          <span className="service-info-card__updated">
-                            {format(new Date(selectedService.updatedAt), 'dd.MM.yyyy, HH:mm')}
+                          <span className="service-info-card__meta-label">{t('global.status')}</span>
+                          <span
+                            className={clsx(
+                              'service-info-card__status',
+                              `service-info-card__status--${selectedService.state}`,
+                            )}
+                          >
+                            {t(`settings.welcomeMessage.serviceState.${selectedService.state ?? 'draft'}`)}
                           </span>
                         </div>
-                      </>
-                    )}
-                  </div>
+                        {selectedService.updatedAt && (
+                          <>
+                            <span className="service-info-card__divider" aria-hidden="true" />
+                            <div className="service-info-card__meta-item">
+                              <span className="service-info-card__meta-label">
+                                {t('settings.welcomeMessage.lastUpdated')}
+                              </span>
+                              <span className="service-info-card__updated">
+                                {format(new Date(selectedService.updatedAt), 'dd.MM.yyyy, HH:mm')}
+                              </span>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          </div>
+              </div>
+            )}
+          </>
         )}
       </Card>
     </>
