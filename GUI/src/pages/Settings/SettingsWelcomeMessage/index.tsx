@@ -9,12 +9,13 @@ import withAuthorization from 'hoc/with-authorization';
 import { useToast } from 'hooks/useToast';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MdOutlineAccountTree, MdOutlineChatBubbleOutline } from 'react-icons/md';
+import { MdOutlineChatBubbleOutline } from 'react-icons/md';
 import { apiDev } from 'services/api';
 import { ROLES } from 'utils/constants';
 
 import DomainTabSelector from '../../../components/DomainTabSelector';
 import DomainTransfer from '../../../components/DomainTransfer';
+import ServiceFlowIcon from '../../../components/ServiceFlowIcon';
 import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
 import { fetchConfigurationFromDomain } from '../../../services/configurations';
 import useStore from '../../../store';
@@ -191,6 +192,9 @@ const SettingsWelcomeMessage: FC = () => {
       <p>{t('settings.welcomeMessage.description')}</p>
 
       <Card
+        isHeaderLight={multiDomainEnabled}
+        isBodyDivided
+        isScrollable
         tabs={multiDomainEnabled && <DomainTabSelector onChange={handleDomainSelection} />}
         footer={
           <Track justify="end">
@@ -200,35 +204,53 @@ const SettingsWelcomeMessage: FC = () => {
           </Track>
         }
       >
-        <Track gap={16} direction="vertical" align="left">
-          <Track justify="between" align="center" style={{ width: '100%' }}>
-            <Switch
-              checked={welcomeMessageActive}
-              label={t('settings.welcomeMessage.greetingActive')}
-              name={'label'}
-              onCheckedChange={setWelcomeMessageActive}
-            />
-            {sourceDomainSelected && (
-              <DomainTransfer
-                allDomains={allDomains}
-                excludedDomainIds={selectedDomains}
-                onTransfer={handleTransfer}
-                isTransferring={transferMutation.isPending}
+        <div className="welcome-message-section">
+          <div className="welcome-message-section__label">
+            <p className="greeting-type__title">{t('settings.welcomeMessage.greetingActive')}</p>
+          </div>
+          <div className="welcome-message-section__control welcome-message-section__control--wide">
+            <Track justify="between" align="center" style={{ width: '100%' }}>
+              <Switch
+                checked={welcomeMessageActive}
+                hideLabel
+                label={t('settings.welcomeMessage.greetingActive')}
+                name="greetingActive"
+                onCheckedChange={setWelcomeMessageActive}
               />
-            )}
-          </Track>
+              {sourceDomainSelected && (
+                <DomainTransfer
+                  allDomains={allDomains}
+                  excludedDomainIds={selectedDomains}
+                  onTransfer={handleTransfer}
+                  isTransferring={transferMutation.isPending}
+                />
+              )}
+            </Track>
+          </div>
+        </div>
 
-          <div>
+        <div className="welcome-message-section">
+          <div className="welcome-message-section__label">
             <p className="greeting-type__title">{t('settings.welcomeMessage.greetingType')}</p>
             <p className="greeting-type__description">{t('settings.welcomeMessage.greetingTypeDescription')}</p>
-            <Track gap={16} style={{ marginTop: 8 }}>
+          </div>
+          <div className="welcome-message-section__control">
+            <div className="greeting-type-options">
               <button
                 type="button"
                 className={clsx('greeting-type-option', { 'greeting-type-option--selected': greetingType === 'message' })}
                 onClick={() => setGreetingType('message')}
               >
+                <span className="greeting-type-option__radio" aria-hidden="true" />
                 <span className="greeting-type-option__icon">
-                  <Icon icon={<MdOutlineChatBubbleOutline fontSize={20} color="rgba(0,0,0,0.54)" />} />
+                  <Icon
+                    icon={
+                      <MdOutlineChatBubbleOutline
+                        fontSize={20}
+                        color={greetingType === 'message' ? '#003cff' : 'rgba(0,0,0,0.54)'}
+                      />
+                    }
+                  />
                 </span>
                 <span>
                   <span className="greeting-type-option__label">{t('settings.welcomeMessage.messageOption')}</span>
@@ -242,8 +264,9 @@ const SettingsWelcomeMessage: FC = () => {
                 className={clsx('greeting-type-option', { 'greeting-type-option--selected': greetingType === 'service' })}
                 onClick={() => setGreetingType('service')}
               >
+                <span className="greeting-type-option__radio" aria-hidden="true" />
                 <span className="greeting-type-option__icon">
-                  <Icon icon={<MdOutlineAccountTree fontSize={20} color="rgba(0,0,0,0.54)" />} />
+                  <ServiceFlowIcon color={greetingType === 'service' ? '#003cff' : 'rgba(0,0,0,0.54)'} />
                 </span>
                 <span>
                   <span className="greeting-type-option__label">{t('settings.welcomeMessage.serviceOption')}</span>
@@ -252,30 +275,53 @@ const SettingsWelcomeMessage: FC = () => {
                   </span>
                 </span>
               </button>
-            </Track>
+            </div>
           </div>
+        </div>
 
-          <FormTextarea
-            key={key}
-            label={
-              greetingType === 'service'
+        <div className="welcome-message-section">
+          <div className="welcome-message-section__label">
+            <p className="greeting-type__title">
+              {greetingType === 'service'
                 ? t('settings.welcomeMessage.fallbackMessage')
-                : t('settings.welcomeMessage.welcomeMessage')
-            }
-            minRows={4}
-            maxLength={WELCOME_MESSAGE_LENGTH}
-            showMaxLength={true}
-            maxLengthBottom
-            onChange={(e) => setWelcomeMessage(e.target.value)}
-            defaultValue={welcomeMessage}
-            name="label"
-          />
+                : t('settings.welcomeMessage.welcomeMessage')}
+            </p>
+            {greetingType === 'service' && (
+              <p className="greeting-type__description">{t('settings.welcomeMessage.fallbackMessageDescription')}</p>
+            )}
+          </div>
+          <div className="welcome-message-section__control">
+            <FormTextarea
+              key={key}
+              hideLabel
+              label={
+                greetingType === 'service'
+                  ? t('settings.welcomeMessage.fallbackMessage')
+                  : t('settings.welcomeMessage.welcomeMessage')
+              }
+              minRows={4}
+              maxLength={WELCOME_MESSAGE_LENGTH}
+              showMaxLength={true}
+              maxLengthBottom
+              onChange={(e) => setWelcomeMessage(e.target.value)}
+              defaultValue={welcomeMessage}
+              name="label"
+            />
+            {greetingType === 'service' && (
+              <p className="welcome-message-section__required-hint">{t('settings.welcomeMessage.messageRequired')}</p>
+            )}
+          </div>
+        </div>
 
-          {greetingType === 'service' && (
-            <div>
-              <p className="greeting-type__title">{t('settings.welcomeMessage.service')}</p>
+        {greetingType === 'service' && (
+          <div className="welcome-message-section">
+            <div className="welcome-message-section__label">
+              <p className="greeting-type__title">{t('settings.welcomeMessage.greetingService')}</p>
               <p className="greeting-type__description">{t('settings.welcomeMessage.serviceDescription')}</p>
+            </div>
+            <div className="welcome-message-section__control">
               <FormSelect
+                hideLabel
                 name="serviceId"
                 placeholder={t('settings.welcomeMessage.serviceDropdownPlaceholder') ?? ''}
                 options={serviceOptions}
@@ -285,29 +331,37 @@ const SettingsWelcomeMessage: FC = () => {
               {selectedService && (
                 <div className="service-info-card">
                   <span className="service-info-card__icon">
-                    <Icon icon={<MdOutlineAccountTree fontSize={20} color="rgba(0,0,0,0.54)" />} />
+                    <ServiceFlowIcon />
                   </span>
-                  <div className="service-info-card__body">
-                    <span className="service-info-card__name">{selectedService.name}</span>
-                    <Track gap={16}>
+                  <span className="service-info-card__name">{selectedService.name}</span>
+                  <div className="service-info-card__meta">
+                    <div className="service-info-card__meta-item">
+                      <span className="service-info-card__meta-label">{t('global.status')}</span>
                       <span
                         className={clsx('service-info-card__status', `service-info-card__status--${selectedService.state}`)}
                       >
                         {t(`settings.welcomeMessage.serviceState.${selectedService.state ?? 'draft'}`)}
                       </span>
-                      {selectedService.updatedAt && (
-                        <span className="service-info-card__updated">
-                          {t('settings.welcomeMessage.lastUpdated')}:{' '}
-                          {format(new Date(selectedService.updatedAt), 'dd/MM/yyyy HH:mm')}
-                        </span>
-                      )}
-                    </Track>
+                    </div>
+                    {selectedService.updatedAt && (
+                      <>
+                        <span className="service-info-card__divider" aria-hidden="true" />
+                        <div className="service-info-card__meta-item">
+                          <span className="service-info-card__meta-label">
+                            {t('settings.welcomeMessage.lastUpdated')}
+                          </span>
+                          <span className="service-info-card__updated">
+                            {format(new Date(selectedService.updatedAt), 'dd.MM.yyyy, HH:mm')}
+                          </span>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               )}
             </div>
-          )}
-        </Track>
+          </div>
+        )}
       </Card>
     </>
   );
