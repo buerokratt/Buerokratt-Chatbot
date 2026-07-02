@@ -3,7 +3,7 @@ import { WELCOME_MESSAGE_LENGTH } from 'constants/config';
 import { useMutation } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import clsx from 'clsx';
-import { Button, Card, FormSelect, FormTextarea, Icon, Switch, Track } from 'components';
+import { Button, Card, FormSelect, FormTextarea, Icon, Label, Switch, Track } from 'components';
 import { format } from 'date-fns';
 import withAuthorization from 'hoc/with-authorization';
 import { useToast } from 'hooks/useToast';
@@ -135,6 +135,13 @@ const SettingsWelcomeMessage: FC = () => {
     value: service.serviceId ?? service.id ?? '',
   }));
 
+  const serviceStateLabelType: Record<NonNullable<Service['state']>, 'success' | 'info' | 'warning' | 'error'> = {
+    active: 'success',
+    ready: 'info',
+    draft: 'warning',
+    inactive: 'error',
+  };
+
   const handleFormSubmit = () => {
     if (welcomeMessage.trim().length === 0) {
       toast.open({
@@ -204,40 +211,42 @@ const SettingsWelcomeMessage: FC = () => {
           </Track>
         }
       >
-        <div className="welcome-message-section">
-          <div className="welcome-message-section__label">
+        <Track align="left" className="welcome-message-section">
+          <Track direction="vertical" align="left" className="welcome-message-section__label">
             <p className="greeting-type__title">{t('settings.welcomeMessage.greetingActive')}</p>
-          </div>
-          <div className="welcome-message-section__control welcome-message-section__control--wide">
-            <Track justify="between" align="center" style={{ width: '100%' }}>
-              <Switch
-                checked={welcomeMessageActive}
-                hideLabel
-                label={t('settings.welcomeMessage.greetingActive')}
-                name="greetingActive"
-                onCheckedChange={setWelcomeMessageActive}
+          </Track>
+          <Track
+            justify="between"
+            align="center"
+            className="welcome-message-section__control welcome-message-section__control--wide"
+          >
+            <Switch
+              checked={welcomeMessageActive}
+              hideLabel
+              label={t('settings.welcomeMessage.greetingActive')}
+              name="greetingActive"
+              onCheckedChange={setWelcomeMessageActive}
+            />
+            {sourceDomainSelected && (
+              <DomainTransfer
+                allDomains={allDomains}
+                excludedDomainIds={selectedDomains}
+                onTransfer={handleTransfer}
+                isTransferring={transferMutation.isPending}
               />
-              {sourceDomainSelected && (
-                <DomainTransfer
-                  allDomains={allDomains}
-                  excludedDomainIds={selectedDomains}
-                  onTransfer={handleTransfer}
-                  isTransferring={transferMutation.isPending}
-                />
-              )}
-            </Track>
-          </div>
-        </div>
+            )}
+          </Track>
+        </Track>
 
         {welcomeMessageActive && (
           <>
-            <div className="welcome-message-section">
-              <div className="welcome-message-section__label">
+            <Track align="left" className="welcome-message-section">
+              <Track direction="vertical" align="left" gap={4} className="welcome-message-section__label">
                 <p className="greeting-type__title">{t('settings.welcomeMessage.greetingType')}</p>
                 <p className="greeting-type__description">{t('settings.welcomeMessage.greetingTypeDescription')}</p>
-              </div>
-              <div className="welcome-message-section__control">
-                <div className="greeting-type-options">
+              </Track>
+              <Track direction="vertical" align="left" className="welcome-message-section__control">
+                <Track gap={16} className="greeting-type-options">
                   <button
                     type="button"
                     className={clsx('greeting-type-option', {
@@ -256,12 +265,12 @@ const SettingsWelcomeMessage: FC = () => {
                         }
                       />
                     </span>
-                    <span>
+                    <Track direction="vertical" align="left" gap={2}>
                       <span className="greeting-type-option__label">{t('settings.welcomeMessage.messageOption')}</span>
                       <span className="greeting-type-option__description">
                         {t('settings.welcomeMessage.messageOptionDescription')}
                       </span>
-                    </span>
+                    </Track>
                   </button>
                   <button
                     type="button"
@@ -274,19 +283,19 @@ const SettingsWelcomeMessage: FC = () => {
                     <span className="greeting-type-option__icon">
                       <ServiceFlowIcon color={greetingType === 'service' ? '#003cff' : 'rgba(0,0,0,0.54)'} />
                     </span>
-                    <span>
+                    <Track direction="vertical" align="left" gap={2}>
                       <span className="greeting-type-option__label">{t('settings.welcomeMessage.serviceOption')}</span>
                       <span className="greeting-type-option__description">
                         {t('settings.welcomeMessage.serviceOptionDescription')}
                       </span>
-                    </span>
+                    </Track>
                   </button>
-                </div>
-              </div>
-            </div>
+                </Track>
+              </Track>
+            </Track>
 
-            <div className="welcome-message-section">
-              <div className="welcome-message-section__label">
+            <Track align="left" className="welcome-message-section">
+              <Track direction="vertical" align="left" gap={4} className="welcome-message-section__label">
                 <p className="greeting-type__title">
                   {greetingType === 'service'
                     ? t('settings.welcomeMessage.fallbackMessage')
@@ -297,8 +306,8 @@ const SettingsWelcomeMessage: FC = () => {
                     {t('settings.welcomeMessage.fallbackMessageDescription')}
                   </p>
                 )}
-              </div>
-              <div className="welcome-message-section__control">
+              </Track>
+              <Track direction="vertical" align="left" className="welcome-message-section__control">
                 <FormTextarea
                   key={key}
                   hideLabel
@@ -320,16 +329,16 @@ const SettingsWelcomeMessage: FC = () => {
                     {t('settings.welcomeMessage.messageRequired')}
                   </p>
                 )}
-              </div>
-            </div>
+              </Track>
+            </Track>
 
             {greetingType === 'service' && (
-              <div className="welcome-message-section">
-                <div className="welcome-message-section__label">
+              <Track align="left" className="welcome-message-section">
+                <Track direction="vertical" align="left" gap={4} className="welcome-message-section__label">
                   <p className="greeting-type__title">{t('settings.welcomeMessage.greetingService')}</p>
                   <p className="greeting-type__description">{t('settings.welcomeMessage.serviceDescription')}</p>
-                </div>
-                <div className="welcome-message-section__control">
+                </Track>
+                <Track direction="vertical" align="left" className="welcome-message-section__control">
                   <FormSelect
                     hideLabel
                     name="serviceId"
@@ -339,41 +348,36 @@ const SettingsWelcomeMessage: FC = () => {
                     onSelectionChange={(selection) => setServiceId(selection?.value ?? '')}
                   />
                   {selectedService && (
-                    <div className="service-info-card">
+                    <Track gap={12} align="center" className="service-info-card">
                       <span className="service-info-card__icon">
                         <ServiceFlowIcon />
                       </span>
                       <span className="service-info-card__name">{selectedService.name}</span>
-                      <div className="service-info-card__meta">
-                        <div className="service-info-card__meta-item">
+                      <Track gap={16} align="center" className="service-info-card__meta">
+                        <Track direction="vertical" align="left" gap={4} className="service-info-card__meta-item">
                           <span className="service-info-card__meta-label">{t('global.status')}</span>
-                          <span
-                            className={clsx(
-                              'service-info-card__status',
-                              `service-info-card__status--${selectedService.state}`,
-                            )}
-                          >
+                          <Label type={serviceStateLabelType[selectedService.state ?? 'draft']}>
                             {t(`settings.welcomeMessage.serviceState.${selectedService.state ?? 'draft'}`)}
-                          </span>
-                        </div>
+                          </Label>
+                        </Track>
                         {selectedService.updatedAt && (
                           <>
                             <span className="service-info-card__divider" aria-hidden="true" />
-                            <div className="service-info-card__meta-item">
+                            <Track direction="vertical" align="left" gap={4} className="service-info-card__meta-item">
                               <span className="service-info-card__meta-label">
                                 {t('settings.welcomeMessage.lastUpdated')}
                               </span>
                               <span className="service-info-card__updated">
                                 {format(new Date(selectedService.updatedAt), 'dd.MM.yyyy, HH:mm')}
                               </span>
-                            </div>
+                            </Track>
                           </>
                         )}
-                      </div>
-                    </div>
+                      </Track>
+                    </Track>
                   )}
-                </div>
-              </div>
+                </Track>
+              </Track>
             )}
           </>
         )}
