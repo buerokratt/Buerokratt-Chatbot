@@ -211,7 +211,7 @@ const SettingsWelcomeMessage: FC = () => {
           </Track>
         }
       >
-        <Track align="left" className="welcome-message-section">
+        <Track align="center" className="welcome-message-section">
           <Track direction="vertical" align="left" className="welcome-message-section__label">
             <p className="greeting-type__title">{t('settings.welcomeMessage.greetingActive')}</p>
           </Track>
@@ -240,7 +240,7 @@ const SettingsWelcomeMessage: FC = () => {
 
         {welcomeMessageActive && (
           <>
-            <Track align="left" className="welcome-message-section">
+            <Track align="center" className="welcome-message-section">
               <Track direction="vertical" align="left" gap={4} className="welcome-message-section__label">
                 <p className="greeting-type__title">{t('settings.welcomeMessage.greetingType')}</p>
                 <p className="greeting-type__description">{t('settings.welcomeMessage.greetingTypeDescription')}</p>
