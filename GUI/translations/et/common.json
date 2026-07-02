@@ -541,9 +541,28 @@
     "welcomeMessage": {
       "welcomeMessage": "Tervitussõnum",
       "description": "Bürokrati automaatne tervitussõnum, mida kuvatakse esimese sõnumina vestlusakna avamisel",
-      "greetingActive": "Tervitus aktiivne",
+      "greetingActive": "Tervituse olek",
       "messageChanged": "Tervitust muudeti edukalt",
-      "emptyMessage": "Tervitussõnumi väli ei tohi olla tühi"
+      "emptyMessage": "Tervitussõnumi väli ei tohi olla tühi",
+      "emptyService": "Palun valige teenus",
+      "greetingType": "Tervituse tüüp",
+      "greetingTypeDescription": "Valige, mida vestlusrobot peaks avamisel näitama",
+      "messageOption": "Tervitussõnum",
+      "messageOptionDescription": "Näita kohandatud tervitussõnumit",
+      "serviceOption": "Teenus",
+      "serviceOptionDescription": "Käivita eelmääratud teenuse voog",
+      "fallbackMessage": "Varutervitussõnum",
+      "fallbackMessageDescription": "Seda sõnumit näidatakse, kui tervitusteenus ei ole saadaval või ebaõnnestub",
+      "service": "Teenus",
+      "serviceDescription": "Valige teenus, mis käivitatakse vestlusroboti avamisel",
+      "serviceDropdownPlaceholder": "Valige teenus",
+      "serviceState": {
+        "active": "Aktiivne",
+        "ready": "Valmis",
+        "draft": "Mustand",
+        "inactive": "Mitteaktiivne"
+      },
+      "lastUpdated": "Viimati uuendatud"
     },
     "sessionLength": {
       "tooltip": {

@@ -2,11 +2,14 @@ import { WELCOME_MESSAGE_LENGTH } from 'constants/config';
 
 import { useMutation } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import { Button, Card, FormTextarea, Switch, Track } from 'components';
+import clsx from 'clsx';
+import { Button, Card, FormSelect, FormTextarea, Icon, Switch, Track } from 'components';
+import { format } from 'date-fns';
 import withAuthorization from 'hoc/with-authorization';
 import { useToast } from 'hooks/useToast';
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { MdOutlineAccountTree, MdOutlineChatBubbleOutline } from 'react-icons/md';
 import { apiDev } from 'services/api';
 import { ROLES } from 'utils/constants';
 
@@ -15,9 +18,12 @@ import DomainTransfer from '../../../components/DomainTransfer';
 import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
 import { fetchConfigurationFromDomain } from '../../../services/configurations';
 import useStore from '../../../store';
-import { GreetingsMessage, GreetingsMessageResponse } from '../../../types/greetingMessage';
+import { GreetingsMessage, GreetingsMessageResponse, GreetingType } from '../../../types/greetingMessage';
+import { Service } from '../../../types/service';
 
 import { SelectOption } from 'types';
+
+import './SettingsWelcomeMessage.scss';
 
 const SettingsWelcomeMessage: FC = () => {
   const { t } = useTranslation();
@@ -31,6 +37,9 @@ const SettingsWelcomeMessage: FC = () => {
   const allDomains: SelectOption[] = rawDomains.map((d) => ({ label: d.name, value: d.id }));
 
   const [welcomeMessageActive, setWelcomeMessageActive] = useState<boolean | undefined>(undefined);
+  const [greetingType, setGreetingType] = useState<GreetingType>('message');
+  const [serviceId, setServiceId] = useState<string>('');
+  const [services, setServices] = useState<Service[]>([]);
 
   useEffect(() => {
     resetSettingsToDefault();
@@ -39,7 +48,20 @@ const SettingsWelcomeMessage: FC = () => {
     } else {
       fetchData('none');
     }
+    fetchServices();
   }, []);
+
+  const fetchServices = async () => {
+    try {
+      const res = await apiDev.get<Service[] | { response: Service[] }>('service/active-services');
+      const data = res.data;
+      const rows = Array.isArray(data) ? data : data?.response;
+      setServices(Array.isArray(rows) ? rows : []);
+    } catch (error) {
+      console.error('Failed to fetch services', error);
+      setServices([]);
+    }
+  };
 
   const fetchData = async (selectedDomain: string) => {
     try {
@@ -53,6 +75,8 @@ const SettingsWelcomeMessage: FC = () => {
       if (res) {
         setWelcomeMessageActive(res.isActive);
         setWelcomeMessage(res.est);
+        setGreetingType(res.type ?? 'message');
+        setServiceId(res.serviceId ?? '');
         setKey(key + 1);
       } else {
         resetSettingsToDefault();
@@ -100,21 +124,43 @@ const SettingsWelcomeMessage: FC = () => {
     },
   });
 
+  const selectedService = useMemo(
+    () => services.find((service) => (service.serviceId ?? service.id) === serviceId),
+    [services, serviceId],
+  );
+
+  const serviceOptions: { label: string; value: string }[] = services.map((service) => ({
+    label: service.name,
+    value: service.serviceId ?? service.id ?? '',
+  }));
+
   const handleFormSubmit = () => {
-    if (welcomeMessage.length === 0) {
+    if (welcomeMessage.trim().length === 0) {
       toast.open({
         type: 'error',
         title: t('global.notificationError'),
         message: t('settings.welcomeMessage.emptyMessage'),
       });
-    } else {
-      const requestData: GreetingsMessage = {
-        isActive: welcomeMessageActive ?? false,
-        est: welcomeMessage,
-        domainUUID: multiDomainEnabled ? selectedDomains : [],
-      };
-      welcomeMessageMutation.mutate(requestData);
+      return;
     }
+    if (greetingType === 'service' && serviceId.trim().length === 0) {
+      toast.open({
+        type: 'error',
+        title: t('global.notificationError'),
+        message: t('settings.welcomeMessage.emptyService'),
+      });
+      return;
+    }
+
+    const requestData: GreetingsMessage = {
+      isActive: welcomeMessageActive ?? false,
+      est: welcomeMessage,
+      type: greetingType,
+      serviceId,
+      serviceName: selectedService?.name ?? '',
+      domainUUID: multiDomainEnabled ? selectedDomains : [],
+    };
+    welcomeMessageMutation.mutate(requestData);
   };
 
   const handleTransfer = (targetIds: string[]) => {
@@ -127,6 +173,8 @@ const SettingsWelcomeMessage: FC = () => {
   const resetSettingsToDefault = () => {
     setWelcomeMessageActive(false);
     setWelcomeMessage('');
+    setGreetingType('message');
+    setServiceId('');
   };
 
   const handleDomainSelection = useDomainSelectionHandler(setSelectedDomains, fetchData, resetSettingsToDefault);
@@ -169,9 +217,51 @@ const SettingsWelcomeMessage: FC = () => {
               />
             )}
           </Track>
+
+          <div>
+            <p className="greeting-type__title">{t('settings.welcomeMessage.greetingType')}</p>
+            <p className="greeting-type__description">{t('settings.welcomeMessage.greetingTypeDescription')}</p>
+            <Track gap={16} style={{ marginTop: 8 }}>
+              <button
+                type="button"
+                className={clsx('greeting-type-option', { 'greeting-type-option--selected': greetingType === 'message' })}
+                onClick={() => setGreetingType('message')}
+              >
+                <span className="greeting-type-option__icon">
+                  <Icon icon={<MdOutlineChatBubbleOutline fontSize={20} color="rgba(0,0,0,0.54)" />} />
+                </span>
+                <span>
+                  <span className="greeting-type-option__label">{t('settings.welcomeMessage.messageOption')}</span>
+                  <span className="greeting-type-option__description">
+                    {t('settings.welcomeMessage.messageOptionDescription')}
+                  </span>
+                </span>
+              </button>
+              <button
+                type="button"
+                className={clsx('greeting-type-option', { 'greeting-type-option--selected': greetingType === 'service' })}
+                onClick={() => setGreetingType('service')}
+              >
+                <span className="greeting-type-option__icon">
+                  <Icon icon={<MdOutlineAccountTree fontSize={20} color="rgba(0,0,0,0.54)" />} />
+                </span>
+                <span>
+                  <span className="greeting-type-option__label">{t('settings.welcomeMessage.serviceOption')}</span>
+                  <span className="greeting-type-option__description">
+                    {t('settings.welcomeMessage.serviceOptionDescription')}
+                  </span>
+                </span>
+              </button>
+            </Track>
+          </div>
+
           <FormTextarea
             key={key}
-            label={t('settings.welcomeMessage.welcomeMessage')}
+            label={
+              greetingType === 'service'
+                ? t('settings.welcomeMessage.fallbackMessage')
+                : t('settings.welcomeMessage.welcomeMessage')
+            }
             minRows={4}
             maxLength={WELCOME_MESSAGE_LENGTH}
             showMaxLength={true}
@@ -180,6 +270,43 @@ const SettingsWelcomeMessage: FC = () => {
             defaultValue={welcomeMessage}
             name="label"
           />
+
+          {greetingType === 'service' && (
+            <div>
+              <p className="greeting-type__title">{t('settings.welcomeMessage.service')}</p>
+              <p className="greeting-type__description">{t('settings.welcomeMessage.serviceDescription')}</p>
+              <FormSelect
+                name="serviceId"
+                placeholder={t('settings.welcomeMessage.serviceDropdownPlaceholder') ?? ''}
+                options={serviceOptions}
+                defaultValue={serviceId}
+                onSelectionChange={(selection) => setServiceId(selection?.value ?? '')}
+              />
+              {selectedService && (
+                <div className="service-info-card">
+                  <span className="service-info-card__icon">
+                    <Icon icon={<MdOutlineAccountTree fontSize={20} color="rgba(0,0,0,0.54)" />} />
+                  </span>
+                  <div className="service-info-card__body">
+                    <span className="service-info-card__name">{selectedService.name}</span>
+                    <Track gap={16}>
+                      <span
+                        className={clsx('service-info-card__status', `service-info-card__status--${selectedService.state}`)}
+                      >
+                        {t(`settings.welcomeMessage.serviceState.${selectedService.state ?? 'draft'}`)}
+                      </span>
+                      {selectedService.updatedAt && (
+                        <span className="service-info-card__updated">
+                          {t('settings.welcomeMessage.lastUpdated')}:{' '}
+                          {format(new Date(selectedService.updatedAt), 'dd/MM/yyyy HH:mm')}
+                        </span>
+                      )}
+                    </Track>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </Track>
       </Card>
     </>

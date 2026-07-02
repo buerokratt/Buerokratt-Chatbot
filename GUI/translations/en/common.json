@@ -543,7 +543,26 @@
       "description": "The bureaucrat's automatic welcome message that is displayed as the first message when opening a chat window.",
       "greetingActive": "Greeting Active",
       "messageChanged": "Welcome message changed successfully",
-      "emptyMessage": "Welcome message can't be empty"
+      "emptyMessage": "Welcome message can't be empty",
+      "emptyService": "Please select a service",
+      "greetingType": "Greeting Type",
+      "greetingTypeDescription": "Choose what the chatbot should show when opened",
+      "messageOption": "Welcome Message",
+      "messageOptionDescription": "Show a custom welcome message",
+      "serviceOption": "Service",
+      "serviceOptionDescription": "Start a predefined service flow",
+      "fallbackMessage": "Fallback Welcome Message",
+      "fallbackMessageDescription": "This message will be shown if the Greeting Service is unavailable or fails",
+      "service": "Service",
+      "serviceDescription": "Select the service that will be triggered when the chat widget opens",
+      "serviceDropdownPlaceholder": "Select a service",
+      "serviceState": {
+        "active": "Active",
+        "ready": "Ready",
+        "draft": "Draft",
+        "inactive": "Inactive"
+      },
+      "lastUpdated": "Last updated"
     },
     "sessionLength": {
       "tooltip": {

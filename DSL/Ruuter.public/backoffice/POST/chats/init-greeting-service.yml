@@ -1,0 +1,267 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Initializes a chat and triggers the configured greeting service, falling back to the greeting message if the service fails to start"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    headers:
+      - field: cookie
+        type: string
+        description: "Cookie field"
+    body:
+      - field: endUserTechnicalData
+        type: json
+        description: "Body field 'endUserTechnicalData'"
+      - field: domain
+        type: string
+        description: "Body field 'domain'"
+
+extractRequestData:
+  assign:
+    authorTimestamp: ${new Date().toISOString()}
+    endUserId: ""
+    endUserEmail: ""
+    endUserFirstName: ""
+    endUserLastName: ""
+    endUserPhone: ""
+    endUserOs: ${incoming.body.endUserTechnicalData.endUserOs}
+    endUserUrl: ${incoming.body.endUserTechnicalData.endUserUrl}
+    domain: ${incoming.body.domain}
+
+checkIncomingCookie:
+  switch:
+    - condition: ${incoming.headers.cookie == null}
+      next: getChatUuid
+  next: getTaraUserInfo
+
+getTaraUserInfo:
+  call: http.post
+  args:
+   url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
+   contentType: plaintext
+   headers:
+    cookie: ${incoming.headers.cookie}
+   plaintext:
+      "customSmaxJwtCookie"
+  result: tara_info
+  next: checkTaraInfo
+
+checkTaraInfo:
+  switch:
+    - condition: ${tara_info.response.body !== null}
+      next: assignEndUserFields
+  next: getChatUuid
+
+assignEndUserFields:
+  assign:
+    endUserId: ${tara_info.response.body.personalCode}
+    endUserEmail: ${tara_info.response.body.login}
+    endUserFirstName: ${tara_info.response.body.firstName}
+    endUserLastName: ${tara_info.response.body.lastName}
+  next: getChatUuid
+
+getChatUuid:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_HBS]/return_uuid"
+    headers:
+      type: json
+  result: chat_uuid_result
+  next: assignChatUuid
+
+assignChatUuid:
+  assign:
+    chatUuid: ${chat_uuid_result.response.body.uuid}
+  next: get_session_length
+
+get_session_length:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-configuration"
+    body:
+      key: "session_length"
+  result: session_result
+  next: generate_cookie
+
+generate_cookie:
+  call: http.post
+  args:
+    url: "[#CHATBOT_TIM]/jwt/custom-jwt-generate"
+    body:
+      JWTName: "chatJwt"
+      expirationInMinutes: ${session_result.response.body[0]?.value ?? '120'}
+      content: { "chatId": "${chatUuid}", "forwardTo": "" }
+  result: cookie_result
+  next: assign_cookie
+
+assign_cookie:
+  assign:
+    setCookie:
+      chatJwt: ${cookie_result.response.body.token}
+      Domain: "[#DOMAIN]"
+      Secure: true
+      HttpOnly: true
+      SameSite: "[#COOKIE_SAME_SITE]"
+  next: get_bot_name
+
+get_bot_name:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-configuration"
+    body:
+      key: "bot_institution_id"
+  result: get_bot_name_result
+  next: assign_bot_name
+
+assign_bot_name:
+  assign:
+    chat_bot_name: ${get_bot_name_result.response.body[0]?.value ?? ''}
+  next: checkForDomain
+
+checkForDomain:
+  switch:
+    - condition: ${domain === 'none'}
+      next: getGreetingConfig
+  next: getDomainUUID
+
+getDomainUUID:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-uuid"
+    body:
+      domainUrl: ${domain + '%'}
+  result: domainUuid
+  next: validate_domain_res
+
+validate_domain_res:
+  switch:
+    - condition: ${domainUuid.response.body.length > 0}
+      next: getDomainGreetingConfig
+  next: getGreetingConfig
+
+getDomainGreetingConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-greeting-message"
+    body:
+      domainUUID: ${domainUuid.response.body[0].domainId}
+  result: greeting_config_res
+  next: assignGreetingConfig
+
+getGreetingConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-greeting-message"
+  result: greeting_config_res
+  next: assignGreetingConfig
+
+assignGreetingConfig:
+  assign:
+    greetingServiceName: ${greeting_config_res.response.body[0]?.serviceName ?? ''}
+  next: insertChat
+
+insertChat:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/init-chat"
+    body:
+      id: ${chatUuid}
+      endUserId: ${endUserId}
+      endUserFirstName: ${endUserFirstName}
+      endUserLastName: ${endUserLastName}
+      status: "OPEN"
+      lastMessage: ""
+      created: ${new Date().toISOString()}
+      ended: ""
+      feedbackRating: ""
+      feedbackText: ""
+      endUserEmail: ${endUserEmail}
+      endUserPhone: ${endUserPhone}
+      endUserOs: ${endUserOs}
+      endUserUrl: ${endUserUrl}
+      externalId: ""
+      forwardedTo: ""
+      forwardedToName: ""
+      receivedFrom: ""
+      receivedFromName: ""
+  result: insert_chat_result
+  next: check_service_name
+
+check_service_name:
+  switch:
+    - condition: ${greetingServiceName === ''}
+      next: insertFallbackGreeting
+  next: triggerGreetingService
+
+triggerGreetingService:
+  template: "[#CHATBOT_PROJECT_LAYER]/chats/trigger-service"
+  requestType: templates
+  body:
+    message: "${'#service,/POST/services/active/' + greetingServiceName}"
+    chatId: ${chatUuid}
+    authorId: ${chat_bot_name}
+  result: trigger_res
+  error: insertFallbackGreeting
+  next: check_trigger_result
+
+check_trigger_result:
+  switch:
+    - condition: ${trigger_res == null || trigger_res === 'Service is not approved' || trigger_res.length === 0}
+      next: insertFallbackGreeting
+  next: insertServiceMessages
+
+insertServiceMessages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/insert-bot-message"
+    body:
+      messages: ${trigger_res}
+  result: insert_messages_result
+  next: getChat
+
+insertFallbackGreeting:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RUUTER_PUBLIC]/chats/messages/greeting"
+    body:
+      chatId: ${chatUuid}
+      authorTimestamp: ${authorTimestamp}
+      domain: ${domain}
+  result: greeting_result
+  next: getChat
+
+getChat:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-chat-by-id"
+    body:
+      id: ${chatUuid}
+  result: chat_result
+  next: notify_chats
+
+notify_chats:
+  template: "[#CHATBOT_PROJECT_LAYER]/chats/notify"
+  requestType: templates
+  body:
+    chatId: ${chatUuid}
+  result: chats_notify_res
+  next: notify_messages
+
+notify_messages:
+  template: "[#CHATBOT_PROJECT_LAYER]/messages/notify"
+  requestType: templates
+  body:
+    chatId: ${chatUuid}
+    type: "message"
+    messageId: ""
+  result: messages_notify_res
+  next: return_result
+
+return_result:
+  headers:
+    Set-Cookie: ${setCookie}
+  return: ${chat_result.response.body[0]}
+  next: end
