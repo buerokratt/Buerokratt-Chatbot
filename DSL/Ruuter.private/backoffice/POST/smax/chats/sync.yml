@@ -22,7 +22,7 @@ declaration:
 extractRequestData:
   assign:
     chatBaseId: ${incoming.body.chatBaseId}
-    displayLabel: ${incoming.body.displayLabel}
+    displayLabel: "${incoming.body.displayLabel.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}"
 
 # TODO: technical dept - ruuter is not able to parse plaintext response.
 getAuthToken:
