@@ -1,7 +1,7 @@
 declaration:
   call: declare
   version: 0.1
-  description: "Returns active, non-common Service-Module services for the greeting service dropdown"
+  description: "Returns all non-common Service-Module services for the greeting service dropdown"
   method: get
   accepts: json
   returns: json
@@ -10,7 +10,7 @@ declaration:
 getActiveServices:
   call: http.post
   args:
-    url: "[#SERVICE_RESQL]/get-active-services-list"
+    url: "[#SERVICE_RESQL]/get-services-list"
   result: res
 
 return_result:

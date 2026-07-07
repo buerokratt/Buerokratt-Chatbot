@@ -542,6 +542,8 @@
       "welcomeMessage": "Tervitussõnum",
       "description": "Bürokrati automaatne tervitussõnum, mida kuvatakse esimese sõnumina vestlusakna avamisel",
       "greetingActive": "Tervituse olek",
+      "greetingActiveOn": "Tervitus on sisselülitatud.",
+      "greetingActiveOff": "Tervitus on välja lülitatud. Vestlus algab vaikimisi ilma tervitussõnumita.",
       "messageChanged": "Tervitust muudeti edukalt",
       "emptyMessage": "Tervitussõnumi väli ei tohi olla tühi",
       "emptyService": "Palun valige teenus",
@@ -549,8 +551,13 @@
       "greetingTypeDescription": "Valige, mida vestlusrobot peaks avamisel näitama",
       "messageOption": "Tervitussõnum",
       "messageOptionDescription": "Näita kohandatud tervitussõnumit",
+      "welcomeMessageHint": "Sõnum kuvatakse vestlusroboti avamisel esimesena.",
       "serviceOption": "Teenus",
       "serviceOptionDescription": "Käivita eelmääratud teenuse voog",
+      "serviceTypeWarning": "Teenuse valimisel keelatakse vestluses vaba tekstisisestus ja AI. Kasutaja liigub ainult nuppude kaudu.",
+      "draftServiceWarning": "See teenus on mustand ega käivitu lõppkasutajatele. Aktiveeri see Teenuste moodulis enne salvestamist.",
+      "createService": "Loo teenus",
+      "noServices": "Teenuseid pole",
       "fallbackMessage": "Varutervitussõnum",
       "fallbackMessageDescription": "Seda sõnumit näidatakse, kui tervitusteenus ei ole saadaval või ebaõnnestub.",
       "messageRequired": "See sõnum on kohustuslik.",
@@ -564,7 +571,7 @@
         "draft": "Mustand",
         "inactive": "Mitteaktiivne"
       },
-      "lastUpdated": "Viimati uuendatud"
+      "lastUpdated": "Viimane uuendus"
     },
     "sessionLength": {
       "tooltip": {

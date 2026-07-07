@@ -9,7 +9,7 @@ import withAuthorization from 'hoc/with-authorization';
 import { useToast } from 'hooks/useToast';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MdOutlineChatBubbleOutline } from 'react-icons/md';
+import { MdOutlineChatBubbleOutline, MdOutlineInfo, MdOutlineOpenInNew } from 'react-icons/md';
 import { apiDev } from 'services/api';
 import { ROLES } from 'utils/constants';
 
@@ -26,6 +26,13 @@ import { SelectOption } from 'types';
 
 import './SettingsWelcomeMessage.scss';
 
+type SavedConfig = {
+  isActive: boolean;
+  est: string;
+  type: GreetingType;
+  serviceId: string;
+};
+
 const SettingsWelcomeMessage: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
@@ -41,6 +48,9 @@ const SettingsWelcomeMessage: FC = () => {
   const [greetingType, setGreetingType] = useState<GreetingType>('message');
   const [serviceId, setServiceId] = useState<string>('');
   const [services, setServices] = useState<Service[]>([]);
+  const [savedConfig, setSavedConfig] = useState<SavedConfig | null>(null);
+
+  const servicesBaseUrl = import.meta.env.REACT_APP_SERVICES_BASE_URL ?? '/services';
 
   useEffect(() => {
     resetSettingsToDefault();
@@ -54,7 +64,7 @@ const SettingsWelcomeMessage: FC = () => {
 
   const fetchServices = async () => {
     try {
-      const res = await apiDev.get<Service[] | { response: Service[] }>('service/active-services');
+      const res = await apiDev.get<Service[] | { response: Service[] }>('service/services-list');
       const data = res.data;
       const rows = Array.isArray(data) ? data : data?.response;
       setServices(Array.isArray(rows) ? rows : []);
@@ -62,6 +72,14 @@ const SettingsWelcomeMessage: FC = () => {
       console.error('Failed to fetch services', error);
       setServices([]);
     }
+  };
+
+  const applyConfig = (config: SavedConfig) => {
+    setWelcomeMessageActive(config.isActive);
+    setWelcomeMessage(config.est);
+    setGreetingType(config.type);
+    setServiceId(config.serviceId);
+    setKey((currentKey) => currentKey + 1);
   };
 
   const fetchData = async (selectedDomain: string) => {
@@ -74,13 +92,22 @@ const SettingsWelcomeMessage: FC = () => {
       const res = data.response;
 
       if (res) {
-        setWelcomeMessageActive(res.isActive);
-        setWelcomeMessage(res.est);
-        setGreetingType(res.type ?? 'message');
-        setServiceId(res.serviceId ?? '');
-        setKey(key + 1);
+        const config: SavedConfig = {
+          isActive: res.isActive,
+          est: res.est,
+          type: res.type ?? 'message',
+          serviceId: res.serviceId ?? '',
+        };
+        applyConfig(config);
+        setSavedConfig(config);
       } else {
         resetSettingsToDefault();
+        setSavedConfig({
+          isActive: false,
+          est: '',
+          type: 'message',
+          serviceId: '',
+        });
       }
       setLoadingComplete(true);
     } catch (error) {
@@ -90,7 +117,14 @@ const SettingsWelcomeMessage: FC = () => {
 
   const welcomeMessageMutation = useMutation({
     mutationFn: (data: GreetingsMessage) => apiDev.post('greeting/greetings-message', data),
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
+      const config: SavedConfig = {
+        isActive: variables.isActive,
+        est: variables.est,
+        type: variables.type,
+        serviceId: variables.serviceId,
+      };
+      setSavedConfig(config);
       toast.open({
         type: 'success',
         title: t('global.notification'),
@@ -142,6 +176,13 @@ const SettingsWelcomeMessage: FC = () => {
     inactive: 'error',
   };
 
+  const hasChanges =
+    savedConfig !== null &&
+    (welcomeMessageActive !== savedConfig.isActive ||
+      welcomeMessage !== savedConfig.est ||
+      greetingType !== savedConfig.type ||
+      serviceId !== savedConfig.serviceId);
+
   const handleFormSubmit = () => {
     if (welcomeMessage.trim().length === 0) {
       toast.open({
@@ -171,6 +212,11 @@ const SettingsWelcomeMessage: FC = () => {
     welcomeMessageMutation.mutate(requestData);
   };
 
+  const handleCancel = () => {
+    if (!savedConfig) return;
+    applyConfig(savedConfig);
+  };
+
   const handleTransfer = (targetIds: string[]) => {
     transferMutation.mutate({
       sourceDomainUuid: selectedDomains[0],
@@ -192,6 +238,7 @@ const SettingsWelcomeMessage: FC = () => {
   }
 
   const sourceDomainSelected = multiDomainEnabled && selectedDomains.length === 1;
+  const isSaveDisabled = (multiDomainEnabled && selectedDomains.length === 0) || !hasChanges;
 
   return (
     <>
@@ -204,16 +251,28 @@ const SettingsWelcomeMessage: FC = () => {
         isScrollable
         tabs={multiDomainEnabled && <DomainTabSelector onChange={handleDomainSelection} />}
         footer={
-          <Track justify="end">
-            <Button disabled={(multiDomainEnabled && selectedDomains.length === 0) || false} onClick={handleFormSubmit}>
+          <Track justify="end" gap={8}>
+            {welcomeMessageActive && (
+              <Button appearance="secondary" onClick={handleCancel} disabled={!hasChanges}>
+                {t('global.cancel')}
+              </Button>
+            )}
+            <Button disabled={isSaveDisabled} onClick={handleFormSubmit}>
               {t('global.save')}
             </Button>
           </Track>
         }
       >
         <Track align="center" className="welcome-message-section">
-          <Track direction="vertical" align="left" className="welcome-message-section__label">
-            <p className="greeting-type__title">{t('settings.welcomeMessage.greetingActive')}</p>
+          <Track direction="vertical" align="left" gap={4} className="welcome-message-section__label">
+            <p className="greeting-type__title greeting-type__title--uppercase">
+              {t('settings.welcomeMessage.greetingActive')}
+            </p>
+            <p className="greeting-type__description">
+              {welcomeMessageActive
+                ? t('settings.welcomeMessage.greetingActiveOn')
+                : t('settings.welcomeMessage.greetingActiveOff')}
+            </p>
           </Track>
           <Track
             justify="between"
@@ -291,8 +350,83 @@ const SettingsWelcomeMessage: FC = () => {
                     </Track>
                   </button>
                 </Track>
+                {greetingType === 'service' && (
+                  <div className="greeting-notice">
+                    <Icon icon={<MdOutlineInfo fontSize={20} color="#e67e00" />} size="medium" />
+                    <p>{t('settings.welcomeMessage.serviceTypeWarning')}</p>
+                  </div>
+                )}
               </Track>
             </Track>
+
+            {greetingType === 'service' && (
+              <Track align="left" className="welcome-message-section">
+                <Track direction="vertical" align="left" gap={4} className="welcome-message-section__label">
+                  <p className="greeting-type__title">{t('settings.welcomeMessage.greetingService')}</p>
+                  <p className="greeting-type__description">{t('settings.welcomeMessage.serviceDescription')}</p>
+                </Track>
+                <Track direction="vertical" align="left" className="welcome-message-section__control">
+                  <FormSelect
+                    hideLabel
+                    name="serviceId"
+                    placeholder={
+                      services.length === 0
+                        ? t('settings.welcomeMessage.noServices')
+                        : (t('settings.welcomeMessage.serviceDropdownPlaceholder') ?? '')
+                    }
+                    options={serviceOptions}
+                    defaultValue={serviceId}
+                    onSelectionChange={(selection) => setServiceId(selection?.value ?? '')}
+                  />
+                  {services.length === 0 && (
+                    <a
+                      href={`${servicesBaseUrl}/newService`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="create-service-link"
+                    >
+                      <MdOutlineOpenInNew fontSize={18} />
+                      {t('settings.welcomeMessage.createService')}
+                    </a>
+                  )}
+                  {selectedService && (
+                    <>
+                      <Track align="center" gap={12} className="service-info-card">
+                        <span className="service-info-card__icon">
+                          <ServiceFlowIcon />
+                        </span>
+                        <span className="service-info-card__name" title={selectedService.name}>
+                          {selectedService.name}
+                        </span>
+                        <Track align="center" gap={24} className="service-info-card__meta">
+                          {selectedService.updatedAt && (
+                            <Track direction="vertical" align="left" gap={4} className="service-info-card__meta-item">
+                              <span className="service-info-card__meta-label">
+                                {t('settings.welcomeMessage.lastUpdated')}
+                              </span>
+                              <span className="service-info-card__updated">
+                                {format(new Date(selectedService.updatedAt), 'dd.MM.yyyy, HH:mm')}
+                              </span>
+                            </Track>
+                          )}
+                          <Track direction="vertical" align="left" gap={4} className="service-info-card__meta-item">
+                            <Label type={serviceStateLabelType[selectedService.state ?? 'draft']}>
+                              {t(`settings.welcomeMessage.serviceState.${selectedService.state ?? 'draft'}`)}
+                            </Label>
+                          </Track>
+                        </Track>
+                      </Track>
+                      {selectedService.state === 'draft' && (
+                        <Track align="left" gap={12} className="greeting-notice">
+                          <Icon icon={<MdOutlineInfo fontSize={20} color="#e67e00" />} size="medium" />
+                          <p>{t('settings.welcomeMessage.draftServiceWarning')}</p>
+                        </Track>
+                      )}
+                    </>
+                  )}
+                </Track>
+              </Track>
+            )}
 
             <Track align="left" className="welcome-message-section">
               <Track direction="vertical" align="left" gap={4} className="welcome-message-section__label">
@@ -324,61 +458,17 @@ const SettingsWelcomeMessage: FC = () => {
                   defaultValue={welcomeMessage}
                   name="label"
                 />
-                {greetingType === 'service' && (
+                {greetingType === 'service' ? (
                   <p className="welcome-message-section__required-hint">
                     {t('settings.welcomeMessage.messageRequired')}
+                  </p>
+                ) : (
+                  <p className="welcome-message-section__required-hint">
+                    {t('settings.welcomeMessage.welcomeMessageHint')}
                   </p>
                 )}
               </Track>
             </Track>
-
-            {greetingType === 'service' && (
-              <Track align="left" className="welcome-message-section">
-                <Track direction="vertical" align="left" gap={4} className="welcome-message-section__label">
-                  <p className="greeting-type__title">{t('settings.welcomeMessage.greetingService')}</p>
-                  <p className="greeting-type__description">{t('settings.welcomeMessage.serviceDescription')}</p>
-                </Track>
-                <Track direction="vertical" align="left" className="welcome-message-section__control">
-                  <FormSelect
-                    hideLabel
-                    name="serviceId"
-                    placeholder={t('settings.welcomeMessage.serviceDropdownPlaceholder') ?? ''}
-                    options={serviceOptions}
-                    defaultValue={serviceId}
-                    onSelectionChange={(selection) => setServiceId(selection?.value ?? '')}
-                  />
-                  {selectedService && (
-                    <Track gap={12} align="center" className="service-info-card">
-                      <span className="service-info-card__icon">
-                        <ServiceFlowIcon />
-                      </span>
-                      <span className="service-info-card__name">{selectedService.name}</span>
-                      <Track gap={16} align="center" className="service-info-card__meta">
-                        <Track direction="vertical" align="left" gap={4} className="service-info-card__meta-item">
-                          <span className="service-info-card__meta-label">{t('global.status')}</span>
-                          <Label type={serviceStateLabelType[selectedService.state ?? 'draft']}>
-                            {t(`settings.welcomeMessage.serviceState.${selectedService.state ?? 'draft'}`)}
-                          </Label>
-                        </Track>
-                        {selectedService.updatedAt && (
-                          <>
-                            <span className="service-info-card__divider" aria-hidden="true" />
-                            <Track direction="vertical" align="left" gap={4} className="service-info-card__meta-item">
-                              <span className="service-info-card__meta-label">
-                                {t('settings.welcomeMessage.lastUpdated')}
-                              </span>
-                              <span className="service-info-card__updated">
-                                {format(new Date(selectedService.updatedAt), 'dd.MM.yyyy, HH:mm')}
-                              </span>
-                            </Track>
-                          </>
-                        )}
-                      </Track>
-                    </Track>
-                  )}
-                </Track>
-              </Track>
-            )}
           </>
         )}
       </Card>
