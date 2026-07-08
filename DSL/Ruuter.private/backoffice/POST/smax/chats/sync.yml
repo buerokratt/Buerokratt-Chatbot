@@ -14,11 +14,15 @@ declaration:
     body:
       - field: chatBaseId
         type: string
-        description: "Body field 'chatBaseId'"     
+        description: "Body field 'chatBaseId'"
+      - field: displayLabel
+        type: string
+        description: "Body field 'displayLabel'"
 
 extractRequestData:
   assign:
     chatBaseId: ${incoming.body.chatBaseId}
+    displayLabel: "${incoming.body.displayLabel.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}"
 
 # TODO: technical dept - ruuter is not able to parse plaintext response.
 getAuthToken:
@@ -98,7 +102,7 @@ setData:
       {
         "entity_type": "Request",
         "properties": {
-          "DisplayLabel": '${chat.response.body[0].id}',
+          "DisplayLabel": '${displayLabel ?? chat.response.body[0].id}',
           "Description": "Link vestlusele: <a href='[#CHATBOT_GUI]/chat/history?chat=${chat.response.body[0].baseId}'>[#CHATBOT_GUI]/chat/history?chat=${chat.response.body[0].baseId}</a><br>Lõppkasutaja email: ${chat.response.body[0].endUserEmail}<br>Lõppkasutaja nimi: ${chat.response.body[0].endUserFirstName} ${chat.response.body[0].endUserLastName}<br><br>Vestluse sõnumid:<br>${formattedMessages.response.body.messagesHtml}",
           "RequestedByPerson": "[#SMAX_REQUESTED_BY_PERSON]",
           "ServiceDeskGroup": "[#SMAX_SERVICE_DESK_GROUP]",
