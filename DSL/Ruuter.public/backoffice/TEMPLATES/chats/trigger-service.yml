@@ -33,13 +33,13 @@ assign_data:
 check_for_service_type:
   switch:
     - condition: ${serviceType === 'common_service'}
-      next: check_for_service_method
+      next: get_new_nonce
   next: check_if_its_a_microservice
 
 check_if_its_a_microservice:
   switch:
     - condition: ${servicePath.includes('_mcq_')} # Could be a more complex check
-      next: check_for_service_method
+      next: get_new_nonce
   next: get_service_trigger_for_service
 
 get_service_trigger_for_service:
@@ -54,8 +54,15 @@ get_service_trigger_for_service:
 check_service_is_approved:
   switch:
     - condition: ${trigger_res.response.body.length > 0}
-      next: check_for_service_method
+      next: get_new_nonce
   next: return_service_is_not_approved
+
+get_new_nonce:
+  call: http.post
+  args:
+    url: "[#TRAINING_RESQL]/get-new-nonce"
+  result: nonce_res
+  next: check_for_service_method
  
 check_for_service_method:
   switch:
@@ -67,6 +74,8 @@ trigger_get_service:
   call: http.get
   args:
     url: "${baseUrl}/${servicePath}"
+    headers:
+      x-ruuter-nonce: ${nonce_res.response.body[0].nonce}
     query:
       input: ${serviceInput.join(',')}
       authorId: ${authorId}
@@ -79,6 +88,8 @@ trigger_post_service:
   call: http.post
   args:
     url: "${baseUrl}/${servicePath}"
+    headers:
+      x-ruuter-nonce: ${nonce_res.response.body[0].nonce}
     body:
       input: ${serviceInput}
       authorId: ${authorId}
