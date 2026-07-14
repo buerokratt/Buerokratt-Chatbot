@@ -5,13 +5,7 @@ import clsx from 'clsx';
 import { Icon } from 'components';
 import type { ToastType } from 'context/ToastContext';
 import { FC, useState } from 'react';
-import {
-  MdCheckCircleOutline,
-  MdErrorOutline,
-  MdOutlineClose,
-  MdOutlineInfo,
-  MdOutlineWarningAmber,
-} from 'react-icons/md';
+import { MdCheck, MdFlag, MdInfo, MdOutlineClose, MdWarning } from 'react-icons/md';
 
 import './Toast.scss';
 
@@ -21,10 +15,10 @@ type ToastProps = {
 };
 
 const toastIcons = {
-  info: <MdOutlineInfo />,
-  success: <MdCheckCircleOutline />,
-  warning: <MdOutlineWarningAmber />,
-  error: <MdErrorOutline />,
+  info: <MdInfo />,
+  success: <MdCheck />,
+  warning: <MdFlag />,
+  error: <MdWarning />,
 };
 
 const Toast: FC<ToastProps> = ({ toast, close }) => {
@@ -40,13 +34,16 @@ const Toast: FC<ToastProps> = ({ toast, close }) => {
       onOpenChange={setOpen}
       duration={toast.duration ?? POPUP_DURATION * 1000}
     >
-      <RadixToast.Title className="toast__title h5">
-        <Icon icon={toastIcons[toast.type]} />
-        {toast.title}
-      </RadixToast.Title>
-      <RadixToast.Description className="toast__content">{toast.message}</RadixToast.Description>
+      <Icon icon={toastIcons[toast.type]} />
+      <div className="toast__body">
+        <RadixToast.Title className="toast__title h6">
+          {toast.title}
+          {toast.message ? ':' : ''}
+        </RadixToast.Title>
+        {toast.message && <RadixToast.Description className="toast__content">{toast.message}</RadixToast.Description>}
+      </div>
       <RadixToast.Close onClick={close} className="toast__close">
-        <Icon icon={<MdOutlineClose />} size="medium" />
+        <Icon icon={<MdOutlineClose />} size="small" />
       </RadixToast.Close>
     </RadixToast.Root>
   );
