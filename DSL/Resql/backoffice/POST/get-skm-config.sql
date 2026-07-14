@@ -18,15 +18,15 @@ WITH configuration_values AS (
       AND NOT deleted
 )
 SELECT
-    MAX(CASE WHEN KEY = 'skm_range' THEN value END) AS range,
-    MAX(CASE WHEN KEY = 'skm_documents' THEN value END) AS documents,
-    MAX(CASE WHEN KEY = 'skm_system_message' THEN value END) AS system_message,
-    MAX(CASE WHEN KEY = 'skm_max_tokens' THEN value END) AS max_tokens,
-    MAX(CASE WHEN KEY = 'skm_index_name' THEN value END) AS index_name,
-    MAX(CASE WHEN KEY = 'skm_query_type' THEN value END) AS query_type,
-    MAX(CASE WHEN KEY = 'skm_semantic_configuration' THEN value END) AS semantic_configuration,
-    MAX(CASE WHEN KEY = 'skm_in_scope' THEN value END) AS in_scope,
-    MAX(CASE WHEN KEY = 'skm_use_agentic' THEN value END) AS use_agentic,
-    MAX(CASE WHEN KEY = 'azure_agent_name' THEN value END) AS azure_agent_name,
-    MAX(CASE WHEN KEY = 'azure_agent_type' THEN value END) AS azure_agent_type
+    COALESCE(MAX(CASE WHEN KEY = 'skm_range' THEN value END), '') AS range,
+    COALESCE(MAX(CASE WHEN KEY = 'skm_documents' THEN value END), '') AS documents,
+    COALESCE(MAX(CASE WHEN KEY = 'skm_system_message' THEN value END), '') AS system_message,
+    COALESCE(MAX(CASE WHEN KEY = 'skm_max_tokens' THEN value END), '') AS max_tokens,
+    COALESCE(MAX(CASE WHEN KEY = 'skm_index_name' THEN value END), '') AS index_name,
+    COALESCE(MAX(CASE WHEN KEY = 'skm_query_type' THEN value END), '') AS query_type,
+    COALESCE(MAX(CASE WHEN KEY = 'skm_semantic_configuration' THEN value END), '') AS semantic_configuration,
+    COALESCE(MAX(CASE WHEN KEY = 'skm_in_scope' THEN value END), 'true') AS in_scope,
+    COALESCE(MAX(CASE WHEN KEY = 'skm_use_agentic' THEN value END), 'false') AS use_agentic,
+    COALESCE(MAX(CASE WHEN KEY = 'azure_agent_name' THEN value END), '') AS azure_agent_name,
+    COALESCE(MAX(CASE WHEN KEY = 'azure_agent_type' THEN value END), '') AS azure_agent_type
 FROM configuration_values;
