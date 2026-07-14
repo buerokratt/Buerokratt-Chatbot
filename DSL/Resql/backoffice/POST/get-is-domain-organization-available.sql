@@ -121,11 +121,15 @@ FROM organization_time
 WHERE KEY = 'organizationWorkingTimeNationalHolidays'),
     is_within_working_time AS
     (SELECT CASE
-    WHEN is_the_same_on_all_working_days
-    AND (SELECT local_time FROM local_now)
-    BETWEEN (SELECT value FROM all_weekdays_start_time)
-    AND (SELECT value FROM all_weekdays_end_time)
-    THEN TRUE
+    WHEN is_the_same_on_all_working_days THEN CASE
+    WHEN (SELECT value FROM all_weekdays_start_time) > (SELECT value FROM all_weekdays_end_time)
+    THEN (SELECT local_time FROM local_now) BETWEEN
+    (SELECT value FROM all_weekdays_start_time) AND (SELECT maxTime FROM consts)::TIME
+    OR (SELECT local_time FROM local_now) BETWEEN
+    (SELECT minTime FROM consts)::TIME AND (SELECT value FROM all_weekdays_end_time)
+    ELSE (SELECT local_time FROM local_now) BETWEEN
+    (SELECT value FROM all_weekdays_start_time) AND (SELECT value FROM all_weekdays_end_time)
+    END
     WHEN current_day.current_day = 'monday' THEN CASE
     WHEN (SELECT value FROM monday_start_time) > (SELECT value FROM monday_end_time)
     THEN (SELECT local_time FROM local_now) BETWEEN
