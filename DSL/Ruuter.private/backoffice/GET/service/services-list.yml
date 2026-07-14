@@ -1,0 +1,20 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Returns all non-common Service-Module services for the greeting service dropdown"
+  method: get
+  accepts: json
+  returns: json
+  namespace: backoffice
+
+getActiveServices:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/get-services-list"
+  result: res
+
+return_result:
+  status: 200
+  wrapper: false
+  return: ${res.response.body}
+  next: end
