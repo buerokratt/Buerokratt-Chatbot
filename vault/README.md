@@ -61,6 +61,31 @@ before starting.
    curl http://vault-agent-backoffice:8203/v1/secret/data/backoffice/<name>
    ```
 
+## Accessing the web UI
+
+`vault` isn't published to the host on purpose (see above), so
+`http://localhost:8200` won't work directly. To open the UI in a browser:
+
+1. Get the root token:
+   ```sh
+   docker exec vault sh -c 'grep -o "\"root_token\":\"[^\"]*\"" /vault/data/init.json | cut -d\" -f4'
+   ```
+2. Start a temporary bridge container (a plain `-p 8200:8200` on the `vault`
+   service itself won't work - Docker refuses to publish a port for a
+   container that's only on an `internal: true` network, so the bridge
+   needs a leg on `bykstack` too):
+   ```sh
+   docker run -d --rm --name vault-ui-bridge --network bykstack -p 8200:8200 \
+     alpine/socat tcp-listen:8200,fork,reuseaddr tcp-connect:vault:8200
+   docker network connect vault-network vault-ui-bridge
+   ```
+3. Open [http://localhost:8200/ui](http://localhost:8200/ui) and log in with
+   the root token from step 1.
+4. When done, remove the bridge:
+   ```sh
+   docker rm -f vault-ui-bridge
+   ```
+
 ## Verifying
 
 ```sh
