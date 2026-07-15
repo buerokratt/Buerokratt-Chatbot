@@ -14,6 +14,15 @@ declaration:
       - field: est
         type: string
         description: "Body field 'est'"
+      - field: type
+        type: string
+        description: "Body field 'type'"
+      - field: serviceId
+        type: string
+        description: "Body field 'serviceId'"
+      - field: serviceName
+        type: string
+        description: "Body field 'serviceName'"
       - field: domainUUID
         type: object
         description: "Body field 'domainUUID'"
@@ -21,8 +30,19 @@ declaration:
 extractRequestData:
   assign:
     isActive: ${incoming.body.isActive}
-    message: ${incoming.body.est}
+    message: ${incoming.body.est ?? ''}
+    type: ${incoming.body.type ?? 'message'}
+    serviceId: ${incoming.body.serviceId ?? ''}
+    serviceName: ${incoming.body.serviceName ?? ''}
     domains: ${incoming.body.domainUUID}
+
+validateConfig:
+  switch:
+    - condition: ${message.trim() === ''}
+      next: returnInvalidBody
+    - condition: ${type === 'service' && serviceId.trim() === ''}
+      next: returnInvalidBody
+  next: checkForDomains
 
 checkForDomains:
   switch:
@@ -37,6 +57,9 @@ setDomainGreetingsMessage:
     body:
       isActive: ${isActive}
       message: ${message}
+      type: ${type}
+      serviceId: ${serviceId}
+      serviceName: ${serviceName}
       created: ${new Date().toISOString()}
       domains: ${JSON.stringify(domains)}
   result: res
@@ -49,6 +72,9 @@ setGreetingsMessage:
     body:
       isActive: ${isActive}
       message: ${message}
+      type: ${type}
+      serviceId: ${serviceId}
+      serviceName: ${serviceName}
       created: ${new Date().toISOString()}
   result: res
   next: return_result
@@ -58,5 +84,6 @@ return_result:
   next: end
 
 returnInvalidBody:
+  status: 400
   return: "bad_request"
   next: end

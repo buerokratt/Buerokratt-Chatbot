@@ -36,6 +36,9 @@ transferToTargets:
     body:
       isActive: ${source.response.body[0].isActive}
       message: ${source.response.body[0].est}
+      type: ${source.response.body[0].type}
+      serviceId: ${source.response.body[0].serviceId}
+      serviceName: ${source.response.body[0].serviceName}
       domains: ${JSON.stringify(targetDomainUuids)}
   result: res
 

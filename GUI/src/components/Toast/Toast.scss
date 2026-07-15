@@ -3,39 +3,109 @@
 @import 'src/styles/settings/variables/other';
 @import 'src/styles/settings/variables/typography';
 
+$toast-height: 48px;
+$toast-gap: 8px;
+$toast-step: $toast-height + $toast-gap;
+
 .toast {
-  padding: 16px;
-  border-radius: 5px;
+  height: $toast-height;
+  padding: 0 40px 0 16px;
+  border-radius: 8px;
   border: 1px solid;
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 8px;
-  position: relative;
-  transition: opacity 0.25s ease-out;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+
+  > .icon {
+    flex-shrink: 0;
+  }
 
   &__title {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding-right: 25px;
+    flex-shrink: 0;
+    max-width: 60%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  &__body {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
   }
 
   &__list {
     position: fixed;
-    bottom: 0;
-    right: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    padding: 8px;
-    width: 408px;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(440px, calc(100% - 32px));
+    min-width: 300px;
     max-width: 100vw;
     z-index: 9999;
     list-style: none;
+    padding: 0;
+    margin: 0;
+
+    .toast {
+      &:nth-last-child(1) {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+        z-index: 3;
+      }
+
+      &:nth-last-child(2) {
+        transform: translateY(8px) scale(0.95);
+        opacity: 1;
+        z-index: 2;
+      }
+
+      &:nth-last-child(3) {
+        transform: translateY(16px) scale(0.9);
+        opacity: 1;
+        z-index: 1;
+      }
+
+      &:nth-last-child(n + 4) {
+        transform: translateY(16px) scale(0.9);
+        opacity: 0;
+        z-index: 0;
+        pointer-events: none;
+      }
+    }
+
+    &:has(.toast:hover) .toast {
+      @for $i from 1 through 8 {
+        &:nth-last-child(#{$i}) {
+          transform: translateY(#{($i - 1) * $toast-step}) scale(1);
+          opacity: 1;
+          z-index: 10 - $i;
+          pointer-events: auto;
+        }
+      }
+    }
   }
 
   &__content {
     font-size: $veera-font-size-80;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    min-width: 0;
 
     a {
       display: inline;
@@ -48,26 +118,44 @@
     position: absolute;
     top: 16px;
     right: 16px;
-    font-size: 20px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
   }
 
   &--success {
     border-color: get-color(sea-green-10);
     background-color: get-color(sea-green-0);
+
+    > .icon {
+      color: get-color(sea-green-10);
+    }
   }
 
   &--info {
     border-color: get-color(sapphire-blue-10);
     background-color: get-color(sapphire-blue-1);
+
+    > .icon {
+      color: get-color(sapphire-blue-10);
+    }
   }
 
   &--error {
     border-color: get-color(jasper-10);
     background-color: #fceeee;
+
+    > .icon {
+      color: get-color(jasper-10);
+    }
   }
 
   &--warning {
     border-color: get-color(dark-tangerine-10);
     background-color: get-color(dark-tangerine-1);
+
+    > .icon {
+      color: get-color(dark-tangerine-10);
+    }
   }
 }

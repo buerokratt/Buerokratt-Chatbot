@@ -542,8 +542,36 @@
       "welcomeMessage": "Welcome Message",
       "description": "The bureaucrat's automatic welcome message that is displayed as the first message when opening a chat window.",
       "greetingActive": "Greeting Active",
+      "greetingActiveOn": "Greeting is turned on.",
+      "greetingActiveOff": "Greeting is turned off. Chat starts by default without a greeting message.",
       "messageChanged": "Welcome message changed successfully",
-      "emptyMessage": "Welcome message can't be empty"
+      "emptyMessage": "Welcome message can't be empty",
+      "emptyService": "Please select a service",
+      "greetingType": "Greeting Type",
+      "greetingTypeDescription": "Choose what the chatbot should show when opened",
+      "messageOption": "Welcome Message",
+      "messageOptionDescription": "Show a custom welcome message",
+      "welcomeMessageHint": "The message is displayed first when opening the chatbot.",
+      "serviceOption": "Service",
+      "serviceOptionDescription": "Start a predefined service flow",
+      "serviceTypeWarning": "When selecting a service, free text input and AI are disabled in the chat. The user moves only through buttons.",
+      "draftServiceWarning": "This service is a draft and will not start for end users. Activate it in the Services module before saving.",
+      "createService": "Create service",
+      "noServices": "No services",
+      "fallbackMessage": "Fallback Welcome Message",
+      "fallbackMessageDescription": "This message will be shown if the Greeting Service is unavailable or fails.",
+      "messageRequired": "This message is required.",
+      "greetingService": "Greeting Service",
+      "service": "Service",
+      "serviceDescription": "Select the service that will be triggered when the chat widget opens",
+      "serviceDropdownPlaceholder": "Select a service",
+      "serviceState": {
+        "active": "Active",
+        "ready": "Ready",
+        "draft": "Draft",
+        "inactive": "Inactive"
+      },
+      "lastUpdated": "Last updated"
     },
     "sessionLength": {
       "tooltip": {
