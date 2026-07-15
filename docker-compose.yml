@@ -81,11 +81,10 @@ services:
   tim-postgresql:
     container_name: tim-postgresql
     image: postgres:14.1
-    environment:
-      - POSTGRES_USER=tim
-      - POSTGRES_PASSWORD=123
-      - POSTGRES_DB=tim
-      - POSTGRES_HOST_AUTH_METHOD=trust
+    depends_on:
+      - vault-agent-backoffice
+    env_file:
+      - ./vault/agent-out/tim-postgresql.env
     volumes:
       - ./tim-db:/var/lib/postgresql/data
     ports:
@@ -361,13 +360,85 @@ services:
     networks:
       - bykstack
 
+  vault:
+    container_name: vault
+    image: hashicorp/vault:1.18
+    restart: on-failure
+    cap_add:
+      - IPC_LOCK
+    environment:
+      VAULT_ADDR: "http://0.0.0.0:8200"
+    volumes:
+      - ./vault/config.hcl:/vault/config/config.hcl:ro
+      - vault-data:/vault/data
+    entrypoint: vault server -config=/vault/config/config.hcl
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O-", "http://127.0.0.1:8200/v1/sys/health?standbyok=true&sealedcode=200&uninitcode=200"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    networks:
+      - vault-network
+
+  vault-init:
+    container_name: vault-init
+    build:
+      context: .
+      dockerfile: Dockerfile.vault-init
+    depends_on:
+      vault:
+        condition: service_healthy
+    user: "0"
+    environment:
+      VAULT_ADDR: "http://vault:8200"
+    volumes:
+      - vault-data:/vault/data
+      - vault-agent-creds:/agent/credentials
+      - ./vault/vault-init.sh:/vault-init.sh:ro
+    entrypoint: sh /vault-init.sh
+    networks:
+      - vault-network
+    restart: "no"
+
+  vault-agent-backoffice:
+    container_name: vault-agent-backoffice
+    image: hashicorp/vault:1.18
+    entrypoint: vault agent -config=/agent/config/backoffice-agent.hcl
+    depends_on:
+      vault-init:
+        condition: service_completed_successfully
+    user: "0"
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - ./vault/agent/backoffice-agent.hcl:/agent/config/backoffice-agent.hcl:ro
+      - ./vault/templates:/vault/templates:ro
+      - ./vault/agent-out:/vault/secrets
+      - vault-agent-creds:/agent/credentials:ro
+    healthcheck:
+      test: ["CMD", "sh", "-c", "test -s /vault/secrets/.agent-token"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    networks:
+      - vault-network
+      - bykstack
+
 volumes:
   opensearch-data:
   spacy_models:
-  
+  vault-data:
+  vault-agent-creds:
+
 networks:
   bykstack:
     name: bykstack
     driver: bridge
     driver_opts:
       com.docker.network.driver.mtu: 1400
+  vault-network:
+    name: vault-network
+    driver: bridge
+    internal: true
