@@ -22,7 +22,9 @@ WHERE
      'skm_in_scope',
      'skm_use_agentic',
      'azure_agent_name',
-     'azure_agent_type'
+     'azure_agent_type',
+     'azure_client_id',
+     'azure_agentic_max_output_tokens'
     )
   AND c.deleted = FALSE
   AND c.id = (
@@ -50,7 +52,9 @@ FROM (
         ('skm_in_scope', :skm_in_scope),
         ('skm_use_agentic', :skm_use_agentic),
         ('azure_agent_name', :azure_agent_name),
-        ('azure_agent_type', :azure_agent_type)
+        ('azure_agent_type', :azure_agent_type),
+        ('azure_client_id', :azure_client_id),
+        ('azure_agentic_max_output_tokens', :azure_agentic_max_output_tokens)
    ) AS v(key, value)
     )
 INSERT INTO configuration (key, value, domain, created)
