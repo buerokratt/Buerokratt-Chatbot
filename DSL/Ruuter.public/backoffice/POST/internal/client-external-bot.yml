@@ -71,6 +71,23 @@ assignSkmConfig:
     agent_name: ${skm_config.azureAgentName}
     agent_type: ${skm_config.azureAgentType}
 
+checkForAgenticCredentials:
+  switch:
+    - condition: ${use_agentic.toLowerCase() === 'true' && !!skm_config.azureClientId}
+      next: fetchAzureClientSecret
+  next: assign_data_sources
+
+fetchAzureClientSecret:
+  call: http.get
+  args:
+    url: "[#VAULT_AGENT_BACKOFFICE]/v1/secret/data/backoffice/${domain === 'none' ? 'global' : domainUuid.response.body[0].domainId}/azure-agentic"
+  result: vault_res
+  next: assignAzureClientSecret
+
+assignAzureClientSecret:
+  assign:
+    azure_client_secret: ${vault_res.response.body.data.data.client_secret}
+
 assign_data_sources:
   assign:
     data_sources:
@@ -206,6 +223,9 @@ trigger_ai_stream:
       use_agentic: ${use_agentic.toLowerCase() === 'true'}
       agent_name: ${agent_name}
       agent_type: ${agent_type}
+      azure_client_id: ${skm_config.azureClientId}
+      azure_client_secret: ${azure_client_secret}
+      azure_agentic_max_output_tokens: ${parseInt(skm_config.azureAgenticMaxOutputTokens ?? '4000')}
       messages: ${messages}
       options:
         data_sources: ${data_sources}

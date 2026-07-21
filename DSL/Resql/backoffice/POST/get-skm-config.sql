@@ -13,7 +13,9 @@ WITH configuration_values AS (
                   'skm_in_scope',
                   'skm_use_agentic',
                   'azure_agent_name',
-                  'azure_agent_type')
+                  'azure_agent_type',
+                  'azure_client_id',
+                  'azure_agentic_max_output_tokens')
       AND id IN (SELECT max(id) FROM configuration GROUP BY KEY)
       AND NOT deleted
 )
@@ -28,5 +30,7 @@ SELECT
     COALESCE(MAX(CASE WHEN KEY = 'skm_in_scope' THEN value END), 'true') AS in_scope,
     COALESCE(MAX(CASE WHEN KEY = 'skm_use_agentic' THEN value END), 'false') AS use_agentic,
     COALESCE(MAX(CASE WHEN KEY = 'azure_agent_name' THEN value END), '') AS azure_agent_name,
-    COALESCE(MAX(CASE WHEN KEY = 'azure_agent_type' THEN value END), '') AS azure_agent_type
+    COALESCE(MAX(CASE WHEN KEY = 'azure_agent_type' THEN value END), '') AS azure_agent_type,
+    COALESCE(MAX(CASE WHEN KEY = 'azure_client_id' THEN value END), '') AS azure_client_id,
+    COALESCE(MAX(CASE WHEN KEY = 'azure_agentic_max_output_tokens' THEN value END), '4000') AS azure_agentic_max_output_tokens
 FROM configuration_values;
