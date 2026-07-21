@@ -1,0 +1,5 @@
+# Rendered from secret/backoffice/global/tim-postgresql (KV v2)
+POSTGRES_USER={{ with secret "secret/data/backoffice/global/tim-postgresql" }}{{ .Data.data.POSTGRES_USER }}{{ end }}
+POSTGRES_PASSWORD={{ with secret "secret/data/backoffice/global/tim-postgresql" }}{{ .Data.data.POSTGRES_PASSWORD }}{{ end }}
+POSTGRES_DB={{ with secret "secret/data/backoffice/global/tim-postgresql" }}{{ .Data.data.POSTGRES_DB }}{{ end }}
+POSTGRES_HOST_AUTH_METHOD={{ with secret "secret/data/backoffice/global/tim-postgresql" }}{{ .Data.data.POSTGRES_HOST_AUTH_METHOD }}{{ end }}

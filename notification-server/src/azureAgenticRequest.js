@@ -50,7 +50,7 @@ async function* parseSSEStream(response) {
 }
 
 async function sendAzureAgenticRequest(messages, options = {}) {
-  const { stream = false, agent_name, agent_type } = options;
+  const { stream = false, agent_name, agent_type, client_id, client_secret, max_output_tokens } = options;
 
   if (!azureAgenticConfig.endpoint || !azureAgenticConfig.projectName) {
     throw new Error('Azure Agentic endpoint and project name are required');
@@ -65,7 +65,7 @@ async function sendAzureAgenticRequest(messages, options = {}) {
   }
 
   try {
-    const accessToken = await getAccessToken();
+    const accessToken = await getAccessToken({ clientId: client_id, clientSecret: client_secret });
 
     const requestUrl = `${azureAgenticConfig.endpoint}/api/projects/${azureAgenticConfig.projectName}/openai/responses?api-version=${azureAgenticConfig.apiVersion}`;
 
@@ -76,7 +76,7 @@ async function sendAzureAgenticRequest(messages, options = {}) {
         type: agent_type,
       },
       stream: stream,
-      max_output_tokens: parseInt(azureAgenticConfig.maxOutputTokens) ?? 4000,
+      max_output_tokens: parseInt(max_output_tokens ?? azureAgenticConfig.maxOutputTokens) || 4000,
     };
 
     const fetchOptions = {

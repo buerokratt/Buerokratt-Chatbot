@@ -45,6 +45,8 @@ transferToTargets:
       skm_use_agentic: ${source.response.body[0].useAgentic}
       azure_agent_name: ${source.response.body[0].azureAgentName}
       azure_agent_type: ${source.response.body[0].azureAgentType}
+      azure_client_id: ${source.response.body[0].azureClientId}
+      azure_agentic_max_output_tokens: ${source.response.body[0].azureAgenticMaxOutputTokens}
       domains: ${JSON.stringify(targetDomainUuids)}
   result: res
 

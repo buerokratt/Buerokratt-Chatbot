@@ -602,6 +602,9 @@
       "useAgentic": "Use agentic retrieval",
       "azureAgentName": "Agent name",
       "azureAgentType": "Agent type",
+      "azureClientId": "Client ID",
+      "azureClientSecret": "Client secret",
+      "azureAgenticMaxOutputTokens": "Maximum output tokens",
       "tooltip": {
         "range": "Range defines the threshold at which documents are considered relevant to your queries. Increasing the stringency means a higher relevance threshold and filtering out more less relevant documents. However, a very high stringency may cause answers to fail to be generated because there are too few documents available. The default severity level is 3.Possible values: 1 - 5",
         "documents": "This determines the number of highest-scoring documents to use to build answers from your data index. It's worth increasing this value if you have short documents or want to provide more context. The default value is 5.Possible values: 1 - 20",
@@ -613,7 +616,10 @@
         "inScope": "When the search service returns 0 chunks from the data, the user query is not sent on to the LLM (when 'Yes' is selected) and a predefined response is sent to the user straight from the search service",
         "useAgentic": "Agentic retrieval allows for more sophisticated content retrieval from AI Search index(es). The prerequisite to use agentic retrieval is a knowledge agent set up in Foundry portal. When using agentic retrieval, the LLM settings have to be configured in the Foundry portal.",
         "azureAgentName": "Name of the agent that is set up in Foundry portal.",
-        "azureAgentType": "Knowledge agent type. Default value is 'agent_reference'."
+        "azureAgentType": "Knowledge agent type. Default value is 'agent_reference'.",
+        "azureClientId": "Agent application (client) ID that is registered in Azure",
+        "azureClientSecret": "Agent application secret that is registered in Azure",
+        "azureAgenticMaxOutputTokens": "Maximum total number of tokens that the agent is allowed to consume per turn. This includes any LLM-driven query planning and reasoning the agent performs before or during the search."
       },
       "validation": {
         "range": "Range must be between 1 and 5",

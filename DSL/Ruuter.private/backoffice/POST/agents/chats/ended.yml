@@ -45,6 +45,12 @@ declaration:
       - field: isPreserve
         type: array
         description: "Body field 'isPreserve'"
+      - field: hasComment
+        type: array
+        description: "Body field 'hasComment'"
+      - field: hasFeedback
+        type: array
+        description: "Body field 'hasFeedback'"
       - field: authenticatedChats
         type: array
         description: "Body field 'authenticatedChats'"
@@ -69,6 +75,8 @@ extractRequestData:
     feedbackRatings: ${incoming.body.feedbackRatings ?? []}
     isTest: ${incoming.body.isTest ?? []}
     isPreserve: ${incoming.body.isPreserve ?? []}
+    hasComment: ${incoming.body.hasComment ?? []}
+    hasFeedback: ${incoming.body.hasFeedback ?? []}
     authenticatedChats: ${incoming.body.authenticatedChats ?? []}
     status: ${incoming.body.status ?? []}
     responseQuality: ${incoming.body.responseQuality ?? []}
@@ -93,6 +101,8 @@ getEndedChats:
       feedbackRatings: ${feedbackRatings}
       isTest: ${isTest}
       isPreserve: ${isPreserve}
+      hasComment: ${hasComment}
+      hasFeedback: ${hasFeedback}
       authenticatedChats: ${authenticatedChats}
       status: ${status}
       responseQuality: ${responseQuality}

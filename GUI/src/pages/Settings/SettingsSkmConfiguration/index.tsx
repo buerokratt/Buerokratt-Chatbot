@@ -46,7 +46,7 @@ const SettingsSkmConfiguration: FC = () => {
         'configs/skm-config',
         selectedDomain,
       );
-      const res = data.response;
+      const res = { ...data.response, azureClientSecret: '' };
 
       reset(res);
       setSkmConfig(res);
@@ -57,15 +57,18 @@ const SettingsSkmConfiguration: FC = () => {
   };
 
   const skmConfigMutation = useMutation({
-    mutationFn: (data: SkmConfig) =>
-      apiDev.post<SkmConfig>('configs/skm-config', {
-        ...data,
+    mutationFn: (data: SkmConfig) => {
+      const { azureClientSecret: _azureClientSecret, ...body } = data;
+      return apiDev.post<SkmConfig>('configs/skm-config', {
+        ...body,
         range: data.range.toString(),
         documents: data.documents.toString(),
         maxTokens: data.maxTokens.toString(),
         inScope: data.inScope.toString(),
         useAgentic: data.useAgentic.toString(),
-      }),
+        azureAgenticMaxOutputTokens: data.azureAgenticMaxOutputTokens?.toString(),
+      });
+    },
     onSuccess: () => {
       toast.open({
         type: 'success',
@@ -82,11 +85,32 @@ const SettingsSkmConfiguration: FC = () => {
     },
   });
 
-  const handleFormSubmit = handleSubmit((data) => {
+  const syncClientSecret = async (data: SkmConfig) => {
+    if (data.useAgentic !== 'true') {
+      return;
+    }
+    const domains = data.domainUUID ?? [];
+    if (domains.length > 1) {
+      await Promise.all(domains.map((id) => apiDev.post('configs/skm-config/secret', { domain: id, secret: '' })));
+      return;
+    }
+    if (!data.azureClientSecret) {
+      return;
+    }
+    const domain = domains.length === 1 ? domains[0] : 'none';
+    await apiDev.post('configs/skm-config/secret', { domain, secret: data.azureClientSecret });
+  };
+
+  const handleFormSubmit = handleSubmit(async (data) => {
     const validationMessage = isValid(data);
     if (validationMessage === '') {
       data.domainUUID = multiDomainEnabled ? selectedDomains : [];
-      skmConfigMutation.mutate(data);
+      try {
+        await skmConfigMutation.mutateAsync(data);
+        await syncClientSecret(data);
+      } catch {
+        // Failure toast already shown by skmConfigMutation.onError
+      }
     } else {
       toast.open({
         type: 'error',
@@ -126,6 +150,9 @@ const SettingsSkmConfiguration: FC = () => {
     useAgentic: t('settings.skmConfiguration.tooltip.useAgentic'),
     azureAgentName: t('settings.skmConfiguration.tooltip.azureAgentName'),
     azureAgentType: t('settings.skmConfiguration.tooltip.azureAgentType'),
+    azureClientId: t('settings.skmConfiguration.tooltip.azureClientId'),
+    azureClientSecret: t('settings.skmConfiguration.tooltip.azureClientSecret'),
+    azureAgenticMaxOutputTokens: t('settings.skmConfiguration.tooltip.azureAgenticMaxOutputTokens'),
   };
 
   const resetSettingsToDefault = () => {
@@ -141,6 +168,9 @@ const SettingsSkmConfiguration: FC = () => {
       useAgentic: 'false',
       azureAgentName: 'ai-act-agent',
       azureAgentType: 'agent_reference',
+      azureClientId: '',
+      azureClientSecret: '',
+      azureAgenticMaxOutputTokens: '4000',
       domainUUID: [],
     };
     setSkmConfig(skmConfig);
@@ -167,8 +197,13 @@ const SettingsSkmConfiguration: FC = () => {
     },
   });
 
-  const handleTransfer = (targetIds: string[]) => {
-    transferMutation.mutate({ sourceDomainUuid: selectedDomains[0], targetDomainUuids: targetIds });
+  const handleTransfer = async (targetIds: string[]) => {
+    try {
+      await transferMutation.mutateAsync({ sourceDomainUuid: selectedDomains[0], targetDomainUuids: targetIds });
+      await Promise.all(targetIds.map((id) => apiDev.post('configs/skm-config/secret', { domain: id, secret: '' })));
+    } catch {
+      // Failure toast already shown by transferMutation.onError
+    }
   };
 
   const handleDomainSelection = useDomainSelectionHandler(setSelectedDomains, fetchData, resetSettingsToDefault);
@@ -257,6 +292,9 @@ const SettingsSkmConfiguration: FC = () => {
             <Track gap={16} direction="vertical" align="left" style={{ paddingTop: 16 }}>
               {getTextControl('azureAgentName')}
               {getTextControl('azureAgentType')}
+              {getTextControl('azureClientId')}
+              {getNumberControl('azureAgenticMaxOutputTokens')}
+              {getPasswordControl('azureClientSecret')}
             </Track>
           )}
         </Fragment>
@@ -276,7 +314,10 @@ const SettingsSkmConfiguration: FC = () => {
       | 'inScope'
       | 'useAgentic'
       | 'azureAgentName'
-      | 'azureAgentType',
+      | 'azureAgentType'
+      | 'azureClientId'
+      | 'azureClientSecret'
+      | 'azureAgenticMaxOutputTokens',
   ) {
     return (
       <Tooltip content={tooltips[name]}>
@@ -287,7 +328,7 @@ const SettingsSkmConfiguration: FC = () => {
     );
   }
 
-  function getNumberControl(name: 'systemMessage' | 'range' | 'documents' | 'maxTokens') {
+  function getNumberControl(name: 'systemMessage' | 'range' | 'documents' | 'maxTokens' | 'azureAgenticMaxOutputTokens') {
     return (
       <Controller
         name={name}
@@ -308,7 +349,9 @@ const SettingsSkmConfiguration: FC = () => {
     );
   }
 
-  function getTextControl(name: 'indexName' | 'semanticConfiguration' | 'azureAgentName' | 'azureAgentType') {
+  function getTextControl(
+    name: 'indexName' | 'semanticConfiguration' | 'azureAgentName' | 'azureAgentType' | 'azureClientId',
+  ) {
     return (
       <Controller
         name={name}
@@ -320,6 +363,32 @@ const SettingsSkmConfiguration: FC = () => {
               label={t(`settings.skmConfiguration.${name}`)}
               onChange={field.onChange}
               value={field.value}
+            />
+            {getTooltip(name)}
+          </Track>
+        )}
+      />
+    );
+  }
+
+  function getPasswordControl(name: 'azureClientSecret') {
+    const disabled = multiDomainEnabled && selectedDomains.length > 1;
+    return (
+      <Controller
+        name={name}
+        control={control}
+        render={({ field }) => (
+          <Track gap={10} style={{ width: '100%' }}>
+            <FormInput
+              name={name}
+              label={t(`settings.skmConfiguration.${name}`)}
+              type="password"
+              autoComplete="new-password"
+              disabled={disabled}
+              onChange={field.onChange}
+              value={field.value}
+              onCopy={(e) => e.preventDefault()}
+              onCut={(e) => e.preventDefault()}
             />
             {getTooltip(name)}
           </Track>
