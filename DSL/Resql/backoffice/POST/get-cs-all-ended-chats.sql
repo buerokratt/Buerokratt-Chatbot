@@ -380,6 +380,38 @@ WHERE (
     AND (
         NOT EXISTS (
             SELECT 1
+            FROM unnest(ARRAY[:hasComment]::TEXT[]) AS comment_filters(has_comment)
+            WHERE NULLIF(has_comment, '') IS NOT NULL
+        )
+        OR (
+            'true' = ANY(ARRAY[:hasComment]::TEXT[])
+            AND 'false' = ANY(ARRAY[:hasComment]::TEXT[])
+        )
+        OR (NULLIF(TRIM(s.comment), '') IS NOT NULL)::TEXT IN (
+            SELECT has_comment
+            FROM unnest(ARRAY[:hasComment]::TEXT[]) AS comment_filters(has_comment)
+            WHERE NULLIF(has_comment, '') IS NOT NULL
+        )
+    )
+    AND (
+        NOT EXISTS (
+            SELECT 1
+            FROM unnest(ARRAY[:hasFeedback]::TEXT[]) AS feedback_filters(has_feedback)
+            WHERE NULLIF(has_feedback, '') IS NOT NULL
+        )
+        OR (
+            'true' = ANY(ARRAY[:hasFeedback]::TEXT[])
+            AND 'false' = ANY(ARRAY[:hasFeedback]::TEXT[])
+        )
+        OR (NULLIF(TRIM(c.feedback_text), '') IS NOT NULL)::TEXT IN (
+            SELECT has_feedback
+            FROM unnest(ARRAY[:hasFeedback]::TEXT[]) AS feedback_filters(has_feedback)
+            WHERE NULLIF(has_feedback, '') IS NOT NULL
+        )
+    )
+    AND (
+        NOT EXISTS (
+            SELECT 1
             FROM unnest(ARRAY[:status]::TEXT[]) AS status_filters(status)
             WHERE NULLIF(TRIM(status), '') IS NOT NULL
         )
