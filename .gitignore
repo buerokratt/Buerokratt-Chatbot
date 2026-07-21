@@ -4,3 +4,5 @@
 .DS_Store
 /loba
 node_modules
+/vault/agent-out/*
+!/vault/agent-out/tim-postgresql.env

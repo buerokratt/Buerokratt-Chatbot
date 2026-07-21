@@ -1,0 +1,8 @@
+FROM hashicorp/vault:1.18
+
+# Bake jq so container startup never depends on the Alpine CDN being
+# reachable at boot (apk add on every restart caused intermittent failures).
+RUN for i in 1 2 3; do \
+        apk add --no-cache jq && break; \
+        echo "apk add failed (attempt $i), retrying..."; sleep 3; \
+    done
