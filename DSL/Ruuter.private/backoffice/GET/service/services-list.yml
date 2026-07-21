@@ -10,7 +10,7 @@ declaration:
 getActiveServices:
   call: http.post
   args:
-    url: "[#SERVICE_RESQL]/get-services-list"
+    url: "[#CHATBOT_RESQL]/get-services-list"
   result: res
 
 return_result:
