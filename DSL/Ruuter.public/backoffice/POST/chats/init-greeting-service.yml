@@ -161,6 +161,7 @@ getGreetingConfig:
 assignGreetingConfig:
   assign:
     greetingServiceName: ${greeting_config_res.response.body[0]?.serviceName ?? ''}
+    greetingServiceId: ${greeting_config_res.response.body[0]?.serviceId ?? ''}
   next: insertChat
 
 insertChat:
@@ -194,13 +195,27 @@ check_service_name:
   switch:
     - condition: ${greetingServiceName === ''}
       next: insertFallbackGreeting
+  next: getGreetingServiceStatus
+
+getGreetingServiceStatus:
+  call: http.post
+  args:
+    url: "[#SERVICE_RESQL]/get-service-status-by-id"
+    body:
+      serviceId: ${greetingServiceId}
+  result: service_status_res
+  next: assignGreetingServiceStatus
+
+assignGreetingServiceStatus:
+  assign:
+    greetingServiceStatus: "${service_status_res.response.body[0]?.currentState === 'active' ? 'active' : 'draft'}"
   next: triggerGreetingService
 
 triggerGreetingService:
   template: "[#CHATBOT_PROJECT_LAYER]/chats/trigger-service"
   requestType: templates
   body:
-    message: "${'#service,/POST/services/active/' + greetingServiceName}"
+    message: "${'#service,/POST/services/' + greetingServiceStatus + '/' + greetingServiceName}"
     chatId: ${chatUuid}
     authorId: ${chat_bot_name}
   result: trigger_res
