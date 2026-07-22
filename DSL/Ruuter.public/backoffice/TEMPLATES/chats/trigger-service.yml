@@ -29,33 +29,6 @@ assign_data:
     servicePath: "${input[1].split(serviceMethod === 'post' ? '/POST/' : '/GET/', 2)[1]}"
     serviceInput: ${input.slice(2).map(item => item.replace(/[()]/g, ""))}
     baseUrl: "${serviceType === 'common_service' ? '[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]' : '[#CHATBOT_RUUTER_PUBLIC_INTERNAL_SERVICE]'}"
-
-check_for_service_type:
-  switch:
-    - condition: ${serviceType === 'common_service'}
-      next: check_for_service_method
-  next: check_if_its_a_microservice
-
-check_if_its_a_microservice:
-  switch:
-    - condition: ${servicePath.includes('_mcq_')} # Could be a more complex check
-      next: check_for_service_method
-  next: get_service_trigger_for_service
-
-get_service_trigger_for_service:
-  call: http.post
-  args:
-    url: "[#TRAINING_RESQL]/check-if-service-trigger-exists"
-    body:
-      serviceName: ${servicePath.split('/')[servicePath.split('/').length - 1]}
-  result: trigger_res
-  next: check_service_is_approved
-
-check_service_is_approved:
-  switch:
-    - condition: ${trigger_res.response.body.length > 0}
-      next: check_for_service_method
-  next: return_service_is_not_approved
  
 check_for_service_method:
   switch:
