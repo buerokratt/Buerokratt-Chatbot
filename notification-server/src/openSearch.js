@@ -48,6 +48,7 @@ async function createAzureOpenAIStreamRequest({
   azure_client_id,
   azure_client_secret,
   azure_agentic_max_output_tokens,
+  raw_response = false,
 }) {
   const { stream = true } = options;
 
@@ -68,6 +69,7 @@ async function createAzureOpenAIStreamRequest({
         azure_client_id,
         azure_client_secret,
         azure_agentic_max_output_tokens,
+        raw_response,
       });
       console.log('No active connections for channel, queued request');
     }
@@ -93,6 +95,18 @@ async function createAzureOpenAIStreamRequest({
         }
 
         if (!activeConnections.has(connectionId)) {
+          return;
+        }
+
+        if (raw_response) {
+          if (stream) {
+            for await (const part of response) {
+              if (!activeConnections.has(connectionId) || stoppedChannels.has(channelId)) break;
+              sender(part);
+            }
+          } else {
+            sender(response);
+          }
           return;
         }
 
