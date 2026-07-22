@@ -9,7 +9,13 @@ const { initializeAzureOpenAI } = require('./azureOpenAI');
 const { serverConfig } = require('./config');
 const { stoppedChannels } = require('./connectionManager');
 const { addToLogoutQueue, removeFromLogoutQueue } = require('./logoutQueue');
-const { enqueueChatId, dequeueChatId, sendBulkNotification, createAzureOpenAIStreamRequest, createLLMOrchestrationStreamRequest } = require('./openSearch');
+const {
+  enqueueChatId,
+  dequeueChatId,
+  sendBulkNotification,
+  createAzureOpenAIStreamRequest,
+  createLLMOrchestrationStreamRequest,
+} = require('./openSearch');
 const { buildSSEResponse } = require('./sseUtil');
 const streamQueue = require('./streamQueue');
 const { addToTerminationQueue, removeFromTerminationQueue } = require('./terminationQueue');

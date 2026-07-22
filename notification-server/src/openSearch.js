@@ -413,7 +413,7 @@ async function createLLMOrchestrationStreamRequest({ channelId, chatId, message,
 }
 
 function buildConversationHistory(conversationHistory) {
-  return (conversationHistory || []).map(m => {
+  return (conversationHistory || []).map((m) => {
     const rawRole = m.authorRole || m.role || 'user';
     const authorRole = rawRole === 'assistant' ? 'bot' : rawRole;
     return {
