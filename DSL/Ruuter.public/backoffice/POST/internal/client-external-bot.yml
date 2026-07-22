@@ -70,6 +70,7 @@ assignSkmConfig:
     use_agentic: ${skm_config.useAgentic}
     agent_name: ${skm_config.azureAgentName}
     agent_type: ${skm_config.azureAgentType}
+    azure_client_secret: ""
 
 checkForAgenticCredentials:
   switch:
