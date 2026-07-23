@@ -14,7 +14,7 @@ export interface SkmConfig {
   azureClientSecret: string;
   azureAgenticMaxOutputTokens: string;
   domainUUID?: string[];
-  azureClientSecretSet?: string;
+  azureClientSecretIsSet?: string;
 }
 
 export interface SkmConfigResponse {

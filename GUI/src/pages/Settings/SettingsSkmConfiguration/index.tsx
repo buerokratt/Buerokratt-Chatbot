@@ -172,7 +172,7 @@ const SettingsSkmConfiguration: FC = () => {
       azureClientSecret: '',
       azureAgenticMaxOutputTokens: '4000',
       domainUUID: [],
-      azureClientSecretSet: 'false',
+      azureClientSecretIsSet: 'false',
     };
     setSkmConfig(skmConfig);
     reset(skmConfig);
@@ -376,7 +376,7 @@ const SettingsSkmConfiguration: FC = () => {
 
   function getPasswordControl(name: 'azureClientSecret') {
     const disabled = multiDomainEnabled && selectedDomains.length > 1;
-    const secretIsSet = skmConfig?.azureClientSecretSet === 'true';
+    const secretIsSet = skmConfig?.azureClientSecretIsSet === 'true';
     return (
       <Controller
         name={name}
@@ -392,7 +392,7 @@ const SettingsSkmConfiguration: FC = () => {
                   autoComplete="new-password"
                   disabled={disabled}
                   placeholder={
-                    secretIsSet ? t('settings.skmConfiguration.azureClientSecretSetPlaceholder').toString() : undefined
+                    secretIsSet ? t('settings.skmConfiguration.azureClientSecretIsSetPlaceholder').toString() : undefined
                   }
                   onChange={field.onChange}
                   value={field.value}
@@ -404,7 +404,7 @@ const SettingsSkmConfiguration: FC = () => {
             </Track>
             {secretIsSet && (
               <span style={{ fontSize: 12, color: '#5d6071' }}>
-                {t('settings.skmConfiguration.azureClientSecretSetHint')}
+                {t('settings.skmConfiguration.azureClientSecretIsSetHint')}
               </span>
             )}
           </Track>
