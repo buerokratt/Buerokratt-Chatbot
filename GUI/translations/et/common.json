@@ -604,6 +604,8 @@
       "azureAgentType": "Agendi tüüp",
       "azureClientId": "Kliendi ID",
       "azureClientSecret": "Kliendi salasõna",
+      "azureClientSecretSetPlaceholder": "•••••••• (salasõna on määratud)",
+      "azureClientSecretSetHint": "Sellele domeenile on salasõna juba määratud. Jäta tühjaks, et see muutmata jätta.",
       "azureAgenticMaxOutputTokens": "Maksimaalne väljundtokenite arv",
       "tooltip": {
         "range": "Rangus määrab künnise, mille alusel xdokumente peetakse teie päringutele asjakohasteks. Ranguse tõstmine tähendab kõrgemat asjakohasuse künnist ja rohkemate vähem asjakohaste dokumentide filtreerimist. Väga kõrge rangus võib aga põhjustada vastuste genereerimise ebaõnnestumise, kuna kättesaadavaid dokumente on liiga vähe. Vaikimisi on ranguse tase 3.Võimalikud väärtused: 1 - 5",
