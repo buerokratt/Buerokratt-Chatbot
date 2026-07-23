@@ -92,6 +92,7 @@ function processPendingStreamsForChannel(channelId) {
               channelId,
               messages: requestData.messages,
               options: requestData.options,
+              raw_response: requestData.raw_response,
             });
           } else {
             const { createLLMOrchestrationStreamRequest } = require('./openSearch');
