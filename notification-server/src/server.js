@@ -9,7 +9,13 @@ const { initializeAzureOpenAI } = require('./azureOpenAI');
 const { serverConfig } = require('./config');
 const { stoppedChannels } = require('./connectionManager');
 const { addToLogoutQueue, removeFromLogoutQueue } = require('./logoutQueue');
-const { enqueueChatId, dequeueChatId, sendBulkNotification, createAzureOpenAIStreamRequest, createLLMOrchestrationStreamRequest } = require('./openSearch');
+const {
+  enqueueChatId,
+  dequeueChatId,
+  sendBulkNotification,
+  createAzureOpenAIStreamRequest,
+  createLLMOrchestrationStreamRequest,
+} = require('./openSearch');
 const { buildSSEResponse } = require('./sseUtil');
 const streamQueue = require('./streamQueue');
 const { addToTerminationQueue, removeFromTerminationQueue } = require('./terminationQueue');
@@ -188,6 +194,7 @@ app.post('/channels/:channelId/stream', (req, res) => {
     azure_client_id,
     azure_client_secret,
     azure_agentic_max_output_tokens,
+    raw_response = false,
   } = req.body;
 
   if (!messages || !Array.isArray(messages)) {
@@ -206,6 +213,7 @@ app.post('/channels/:channelId/stream', (req, res) => {
     azure_client_id,
     azure_client_secret,
     azure_agentic_max_output_tokens,
+    raw_response,
   }).catch((error) => {
     console.error(`Stream error for channel ${channelId}:`, error.message);
   });

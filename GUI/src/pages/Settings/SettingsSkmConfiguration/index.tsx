@@ -328,7 +328,9 @@ const SettingsSkmConfiguration: FC = () => {
     );
   }
 
-  function getNumberControl(name: 'systemMessage' | 'range' | 'documents' | 'maxTokens' | 'azureAgenticMaxOutputTokens') {
+  function getNumberControl(
+    name: 'systemMessage' | 'range' | 'documents' | 'maxTokens' | 'azureAgenticMaxOutputTokens',
+  ) {
     return (
       <Controller
         name={name}

@@ -25,6 +25,7 @@ extract_data:
     sender: ${incoming.body.sender}
     domain: ${incoming.body.domain}
     stream: "[#SKM_STREAM]"
+    raw_response: "[#SKM_RAW_RESPONSE]"
     message: ${incoming.body.message ?? ''}
 
 checkForDomain:
@@ -227,6 +228,7 @@ trigger_ai_stream:
       azure_client_id: ${skm_config.azureClientId}
       azure_client_secret: ${azure_client_secret}
       azure_agentic_max_output_tokens: ${parseInt(skm_config.azureAgenticMaxOutputTokens ?? '4000')}
+      raw_response: ${raw_response.toLowerCase() === 'true'}
       messages: ${messages}
       options:
         data_sources: ${data_sources}
