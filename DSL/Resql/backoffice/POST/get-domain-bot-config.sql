@@ -20,15 +20,15 @@ WITH configuration_values AS (
       AND id IN (SELECT max(id) FROM configuration where "domain" = :domainUUID::UUID GROUP BY KEY)
 )
 SELECT
-    MAX(CASE WHEN KEY = 'is_bot_active' THEN value END) AS is_bot_active,
-    MAX(CASE WHEN KEY = 'is_burokratt_active' THEN value END) AS is_burokratt_active,
-    MAX(CASE WHEN KEY = 'is_csa_name_visible' THEN value END) AS is_csa_name_visible,
-    MAX(CASE WHEN KEY = 'is_csa_title_visible' THEN value END) AS is_csa_title_visible,
-    MAX(CASE WHEN KEY = 'is_edit_chat_visible' THEN value END) AS is_edit_chat_visible,
-    MAX(CASE WHEN KEY = 'instantly_open_chat_widget' THEN value END) AS instantly_open_chat_widget,
-    MAX(CASE WHEN KEY = 'show_sub_title' THEN value END) AS show_sub_title,
-    MAX(CASE WHEN KEY = 'sub_title' THEN value END) AS sub_title,
-    MAX(CASE WHEN KEY = 'response_waiting_time' THEN value END) AS response_waiting_time,
-    MAX(CASE WHEN KEY = 'response_processing_notice' THEN value END) AS response_processing_notice,
-    MAX(CASE WHEN KEY = 'llm_module_active' THEN value END) AS llm_module_active
+    COALESCE(MAX(CASE WHEN KEY = 'is_bot_active' THEN value END), 'false') AS is_bot_active,
+    COALESCE(MAX(CASE WHEN KEY = 'is_burokratt_active' THEN value END), 'false') AS is_burokratt_active,
+    COALESCE(MAX(CASE WHEN KEY = 'is_csa_name_visible' THEN value END), 'false') AS is_csa_name_visible,
+    COALESCE(MAX(CASE WHEN KEY = 'is_csa_title_visible' THEN value END), 'false') AS is_csa_title_visible,
+    COALESCE(MAX(CASE WHEN KEY = 'is_edit_chat_visible' THEN value END), 'false') AS is_edit_chat_visible,
+    COALESCE(MAX(CASE WHEN KEY = 'instantly_open_chat_widget' THEN value END), 'false') AS instantly_open_chat_widget,
+    COALESCE(MAX(CASE WHEN KEY = 'show_sub_title' THEN value END), 'false') AS show_sub_title,
+    COALESCE(MAX(CASE WHEN KEY = 'sub_title' THEN value END), '') AS sub_title,
+    COALESCE(MAX(CASE WHEN KEY = 'response_waiting_time' THEN value END), '10') AS response_waiting_time,
+    COALESCE(MAX(CASE WHEN KEY = 'response_processing_notice' THEN value END), '') AS response_processing_notice,
+    COALESCE(MAX(CASE WHEN KEY = 'llm_module_active' THEN value END), 'false') AS llm_module_active
 FROM configuration_values;

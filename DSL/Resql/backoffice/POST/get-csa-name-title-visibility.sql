@@ -9,6 +9,6 @@ WHERE KEY IN ('is_csa_title_visible',
   AND NOT deleted
     )
 SELECT
-    MAX(CASE WHEN KEY = 'is_csa_title_visible' THEN value END) AS is_csa_title_visible,
-    MAX(CASE WHEN KEY = 'is_csa_name_visible' THEN value END) AS is_csa_name_visible
+    COALESCE(MAX(CASE WHEN KEY = 'is_csa_title_visible' THEN value END), 'false') AS is_csa_title_visible,
+    COALESCE(MAX(CASE WHEN KEY = 'is_csa_name_visible' THEN value END), 'false') AS is_csa_name_visible
 FROM configuration_values;
