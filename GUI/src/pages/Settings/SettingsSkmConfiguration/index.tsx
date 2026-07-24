@@ -172,6 +172,7 @@ const SettingsSkmConfiguration: FC = () => {
       azureClientSecret: '',
       azureAgenticMaxOutputTokens: '4000',
       domainUUID: [],
+      azureClientSecretIsSet: 'false',
     };
     setSkmConfig(skmConfig);
     reset(skmConfig);
@@ -375,24 +376,37 @@ const SettingsSkmConfiguration: FC = () => {
 
   function getPasswordControl(name: 'azureClientSecret') {
     const disabled = multiDomainEnabled && selectedDomains.length > 1;
+    const secretIsSet = skmConfig?.azureClientSecretIsSet === 'true';
     return (
       <Controller
         name={name}
         control={control}
         render={({ field }) => (
-          <Track gap={10} style={{ width: '100%' }}>
-            <FormInput
-              name={name}
-              label={t(`settings.skmConfiguration.${name}`)}
-              type="password"
-              autoComplete="new-password"
-              disabled={disabled}
-              onChange={field.onChange}
-              value={field.value}
-              onCopy={(e) => e.preventDefault()}
-              onCut={(e) => e.preventDefault()}
-            />
-            {getTooltip(name)}
+          <Track gap={10} style={{ width: '100%' }} isMultiline>
+            <Track gap={10} style={{ width: '100%' }}>
+              <Track direction="vertical" align="left" gap={4} style={{ width: '100%' }}>
+                <FormInput
+                  name={name}
+                  label={t(`settings.skmConfiguration.${name}`)}
+                  type="password"
+                  autoComplete="new-password"
+                  disabled={disabled}
+                  placeholder={
+                    secretIsSet ? t('settings.skmConfiguration.azureClientSecretIsSetPlaceholder').toString() : undefined
+                  }
+                  onChange={field.onChange}
+                  value={field.value}
+                  onCopy={(e) => e.preventDefault()}
+                  onCut={(e) => e.preventDefault()}
+                />
+              </Track>
+              {getTooltip(name)}
+            </Track>
+            {secretIsSet && (
+              <span style={{ fontSize: 12, color: '#5d6071' }}>
+                {t('settings.skmConfiguration.azureClientSecretIsSetHint')}
+              </span>
+            )}
           </Track>
         )}
       />

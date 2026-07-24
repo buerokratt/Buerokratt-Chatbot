@@ -604,6 +604,8 @@
       "azureAgentType": "Agent type",
       "azureClientId": "Client ID",
       "azureClientSecret": "Client secret",
+      "azureClientSecretIsSetPlaceholder": "•••••••• (secret is set)",
+      "azureClientSecretIsSetHint": "A secret is already saved for this domain. Leave blank to keep it unchanged.",
       "azureAgenticMaxOutputTokens": "Maximum output tokens",
       "tooltip": {
         "range": "Range defines the threshold at which documents are considered relevant to your queries. Increasing the stringency means a higher relevance threshold and filtering out more less relevant documents. However, a very high stringency may cause answers to fail to be generated because there are too few documents available. The default severity level is 3.Possible values: 1 - 5",
