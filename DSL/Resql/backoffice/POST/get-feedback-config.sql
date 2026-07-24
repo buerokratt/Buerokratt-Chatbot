@@ -19,9 +19,9 @@ global_rating_scale AS (
       AND NOT deleted
 )
 SELECT
-    MAX(CASE WHEN KEY = 'feedbackActive' THEN value END) AS feedback_active,
-    MAX(CASE WHEN KEY = 'feedbackQuestion' THEN value END) AS feedback_question,
-    MAX(CASE WHEN KEY = 'feedbackNoticeActive' THEN value END) AS feedback_notice_active,
-    MAX(CASE WHEN KEY = 'feedbackNotice' THEN value END) AS feedback_notice,
-    (SELECT is_five_rating_scale FROM global_rating_scale LIMIT 1) AS is_five_rating_scale
+    COALESCE(MAX(CASE WHEN KEY = 'feedbackActive' THEN value END), 'false') AS feedback_active,
+    COALESCE(MAX(CASE WHEN KEY = 'feedbackQuestion' THEN value END), '') AS feedback_question,
+    COALESCE(MAX(CASE WHEN KEY = 'feedbackNoticeActive' THEN value END), 'false') AS feedback_notice_active,
+    COALESCE(MAX(CASE WHEN KEY = 'feedbackNotice' THEN value END), '') AS feedback_notice,
+    COALESCE((SELECT is_five_rating_scale FROM global_rating_scale LIMIT 1), 'false') AS is_five_rating_scale
 FROM configuration_values;
