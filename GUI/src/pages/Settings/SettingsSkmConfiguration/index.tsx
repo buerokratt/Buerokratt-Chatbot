@@ -105,6 +105,16 @@ const SettingsSkmConfiguration: FC = () => {
     const validationMessage = isValid(data);
     if (validationMessage === '') {
       data.domainUUID = multiDomainEnabled ? selectedDomains : [];
+      if (data.useAgentic === 'true' && skmConfig) {
+        data.range = skmConfig.range;
+        data.documents = skmConfig.documents;
+        data.maxTokens = skmConfig.maxTokens;
+        data.systemMessage = skmConfig.systemMessage;
+        data.indexName = skmConfig.indexName;
+        data.semanticConfiguration = skmConfig.semanticConfiguration;
+        data.queryType = skmConfig.queryType;
+        data.inScope = skmConfig.inScope;
+      }
       try {
         await skmConfigMutation.mutateAsync(data);
         await syncClientSecret(data);
@@ -121,20 +131,24 @@ const SettingsSkmConfiguration: FC = () => {
   });
 
   const isValid = (data: SkmConfig) => {
-    const range = parseInt(data.range ?? '3');
-    const documents = parseInt(data.documents ?? '5');
-    const maxTokens = parseInt(data.maxTokens ?? '1000');
-    const systemMessage = data.systemMessage;
-    if (range < 1 || range > 5) {
-      return t('settings.skmConfiguration.validation.range');
-    } else if (documents < 1 || documents > 20) {
-      return t('settings.skmConfiguration.validation.documents');
-    } else if (maxTokens < 1 || maxTokens > 2000) {
-      return t('settings.skmConfiguration.validation.maxTokens');
-    } else if (systemMessage.length < 1) {
-      return t('settings.skmConfiguration.validation.systemMessage');
-    } else {
+    if (useAgentic === 'true') {
       return '';
+    } else {
+      const range = parseInt(data.range ?? '3');
+      const documents = parseInt(data.documents ?? '5');
+      const maxTokens = parseInt(data.maxTokens ?? '1000');
+      const systemMessage = data.systemMessage;
+      if (range < 1 || range > 5) {
+        return t('settings.skmConfiguration.validation.range');
+      } else if (documents < 1 || documents > 20) {
+        return t('settings.skmConfiguration.validation.documents');
+      } else if (maxTokens < 1 || maxTokens > 2000) {
+        return t('settings.skmConfiguration.validation.maxTokens');
+      } else if (systemMessage.length < 1) {
+        return t('settings.skmConfiguration.validation.systemMessage');
+      } else {
+        return '';
+      }
     }
   };
 
@@ -392,7 +406,9 @@ const SettingsSkmConfiguration: FC = () => {
                   autoComplete="new-password"
                   disabled={disabled}
                   placeholder={
-                    secretIsSet ? t('settings.skmConfiguration.azureClientSecretIsSetPlaceholder').toString() : undefined
+                    secretIsSet
+                      ? t('settings.skmConfiguration.azureClientSecretIsSetPlaceholder').toString()
+                      : undefined
                   }
                   onChange={field.onChange}
                   value={field.value}
