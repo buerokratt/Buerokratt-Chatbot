@@ -105,6 +105,16 @@ const SettingsSkmConfiguration: FC = () => {
     const validationMessage = isValid(data);
     if (validationMessage === '') {
       data.domainUUID = multiDomainEnabled ? selectedDomains : [];
+      if (data.useAgentic === 'true' && skmConfig) {
+        data.range = skmConfig.range;
+        data.documents = skmConfig.documents;
+        data.maxTokens = skmConfig.maxTokens;
+        data.systemMessage = skmConfig.systemMessage;
+        data.indexName = skmConfig.indexName;
+        data.semanticConfiguration = skmConfig.semanticConfiguration;
+        data.queryType = skmConfig.queryType;
+        data.inScope = skmConfig.inScope;
+      }
       try {
         await skmConfigMutation.mutateAsync(data);
         await syncClientSecret(data);
