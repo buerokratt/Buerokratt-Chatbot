@@ -1,0 +1,61 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Sets or clears the Vault-stored Azure agentic client ID for a single domain"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: domain
+        type: string
+        description: "Body field 'domain'"
+      - field: id
+        type: string
+        description: "Body field 'id'"
+
+extractRequestData:
+  assign:
+    domain: ${incoming.body.domain}
+    id: ${incoming.body.id ?? ''}
+    vault_path: "${domain === 'none' ? 'global' : domain}"
+    has_id: "${id !== '' ? 'true' : 'false'}"
+
+writeId:
+  call: http.post
+  args:
+    url: "[#VAULT_AGENT_BACKOFFICE]/v1/secret/data/backoffice/${vault_path}/azure-agentic-client-id"
+    body:
+      data:
+        client_id: ${id}
+  result: vault_result
+  next: checkForDomain
+
+checkForDomain:
+  switch:
+    - condition: ${domain === 'none'}
+      next: setGlobalIdStatus
+  next: setDomainIdStatus
+
+setGlobalIdStatus:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-skm-config-id-status"
+    body:
+      azure_client_id_is_set: ${has_id}
+  result: status_result
+  next: return_result
+
+setDomainIdStatus:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-domain-skm-config-id-status"
+    body:
+      domainUUID: ${domain}
+      azure_client_id_is_set: ${has_id}
+  result: status_result
+  next: return_result
+
+return_result:
+  return: 'Azure agentic client ID updated successfully'
