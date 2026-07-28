@@ -41,9 +41,6 @@ declaration:
       - field: azureAgentType
         type: string
         description: "Body field 'azureAgentType'"
-      - field: azureClientId
-        type: string
-        description: "Body field 'azureClientId'"
       - field: azureAgenticMaxOutputTokens
         type: string
         description: "Body field 'azureAgenticMaxOutputTokens'"
@@ -64,7 +61,6 @@ extractRequestData:
     skm_use_agentic: ${incoming.body.useAgentic}
     azure_agent_name: ${incoming.body.azureAgentName}
     azure_agent_type: ${incoming.body.azureAgentType}
-    azure_client_id: ${incoming.body.azureClientId}
     azure_agentic_max_output_tokens: ${incoming.body.azureAgenticMaxOutputTokens}
     domains: ${incoming.body.domainUUID}
 
@@ -90,7 +86,6 @@ setDomainSkmConfig:
       skm_use_agentic: ${skm_use_agentic}
       azure_agent_name: ${azure_agent_name}
       azure_agent_type: ${azure_agent_type}
-      azure_client_id: ${azure_client_id}
       azure_agentic_max_output_tokens: ${azure_agentic_max_output_tokens}
       created: ${new Date().toISOString()}
       domains: ${JSON.stringify(domains)}
@@ -113,7 +108,6 @@ setSkmConfig:
       skm_use_agentic: ${skm_use_agentic}
       azure_agent_name: ${azure_agent_name}
       azure_agent_type: ${azure_agent_type}
-      azure_client_id: ${azure_client_id}
       azure_agentic_max_output_tokens: ${azure_agentic_max_output_tokens}
       created: ${new Date().toISOString()}
   result: skm_result

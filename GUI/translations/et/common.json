@@ -603,6 +603,8 @@
       "azureAgentName": "Agendi nimi",
       "azureAgentType": "Agendi tüüp",
       "azureClientId": "Kliendi ID",
+      "azureClientIdIsSetPlaceholder": "•••••••• (kliendi ID on määratud)",
+      "azureClientIdIsSetHint": "Sellele domeenile on kliendi ID juba määratud. Jäta tühjaks, et see muutmata jätta.",
       "azureClientSecret": "Kliendi salasõna",
       "azureClientSecretIsSetPlaceholder": "•••••••• (salasõna on määratud)",
       "azureClientSecretIsSetHint": "Sellele domeenile on salasõna juba määratud. Jäta tühjaks, et see muutmata jätta.",

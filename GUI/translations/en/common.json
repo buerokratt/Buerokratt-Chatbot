@@ -603,6 +603,8 @@
       "azureAgentName": "Agent name",
       "azureAgentType": "Agent type",
       "azureClientId": "Client ID",
+      "azureClientIdIsSetPlaceholder": "•••••••• (client ID is set)",
+      "azureClientIdIsSetHint": "A client ID is already saved for this domain. Leave blank to keep it unchanged.",
       "azureClientSecret": "Client secret",
       "azureClientSecretIsSetPlaceholder": "•••••••• (secret is set)",
       "azureClientSecretIsSetHint": "A secret is already saved for this domain. Leave blank to keep it unchanged.",
