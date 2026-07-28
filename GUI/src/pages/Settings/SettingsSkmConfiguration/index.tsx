@@ -46,7 +46,7 @@ const SettingsSkmConfiguration: FC = () => {
         'configs/skm-config',
         selectedDomain,
       );
-      const res = { ...data.response, azureClientSecret: '' };
+      const res = { ...data.response, azureClientId: '', azureClientSecret: '' };
 
       reset(res);
       setSkmConfig(res);
@@ -58,7 +58,7 @@ const SettingsSkmConfiguration: FC = () => {
 
   const skmConfigMutation = useMutation({
     mutationFn: (data: SkmConfig) => {
-      const { azureClientSecret: _azureClientSecret, ...body } = data;
+      const { azureClientId: _azureClientId, azureClientSecret: _azureClientSecret, ...body } = data;
       return apiDev.post<SkmConfig>('configs/skm-config', {
         ...body,
         range: data.range.toString(),
@@ -75,6 +75,7 @@ const SettingsSkmConfiguration: FC = () => {
         title: t('global.notification'),
         message: t('toast.success.updateSuccess'),
       });
+      fetchData(multiDomainEnabled ? (selectedDomains[0] ?? 'none') : 'none');
     },
     onError: (error: AxiosError) => {
       toast.open({
@@ -85,21 +86,34 @@ const SettingsSkmConfiguration: FC = () => {
     },
   });
 
-  const syncClientSecret = async (data: SkmConfig) => {
+  const syncCredentialField = async (
+    data: SkmConfig,
+    { endpoint, field, value }: { endpoint: string; field: 'id' | 'secret'; value: string },
+  ) => {
     if (data.useAgentic !== 'true') {
       return;
     }
     const domains = data.domainUUID ?? [];
     if (domains.length > 1) {
-      await Promise.all(domains.map((id) => apiDev.post('configs/skm-config/secret', { domain: id, secret: '' })));
+      await Promise.all(domains.map((domainId) => apiDev.post(endpoint, { domain: domainId, [field]: '' })));
       return;
     }
-    if (!data.azureClientSecret) {
+    if (!value) {
       return;
     }
     const domain = domains.length === 1 ? domains[0] : 'none';
-    await apiDev.post('configs/skm-config/secret', { domain, secret: data.azureClientSecret });
+    await apiDev.post(endpoint, { domain, [field]: value });
   };
+
+  const syncClientId = (data: SkmConfig) =>
+    syncCredentialField(data, { endpoint: 'configs/skm-config/id', field: 'id', value: data.azureClientId });
+
+  const syncClientSecret = (data: SkmConfig) =>
+    syncCredentialField(data, {
+      endpoint: 'configs/skm-config/secret',
+      field: 'secret',
+      value: data.azureClientSecret,
+    });
 
   const handleFormSubmit = handleSubmit(async (data) => {
     const validationMessage = isValid(data);
@@ -117,6 +131,7 @@ const SettingsSkmConfiguration: FC = () => {
       }
       try {
         await skmConfigMutation.mutateAsync(data);
+        await syncClientId(data);
         await syncClientSecret(data);
       } catch {
         // Failure toast already shown by skmConfigMutation.onError
@@ -186,6 +201,7 @@ const SettingsSkmConfiguration: FC = () => {
       azureClientSecret: '',
       azureAgenticMaxOutputTokens: '4000',
       domainUUID: [],
+      azureClientIdIsSet: 'false',
       azureClientSecretIsSet: 'false',
     };
     setSkmConfig(skmConfig);
@@ -215,6 +231,7 @@ const SettingsSkmConfiguration: FC = () => {
   const handleTransfer = async (targetIds: string[]) => {
     try {
       await transferMutation.mutateAsync({ sourceDomainUuid: selectedDomains[0], targetDomainUuids: targetIds });
+      await Promise.all(targetIds.map((id) => apiDev.post('configs/skm-config/id', { domain: id, id: '' })));
       await Promise.all(targetIds.map((id) => apiDev.post('configs/skm-config/secret', { domain: id, secret: '' })));
     } catch {
       // Failure toast already shown by transferMutation.onError
@@ -307,8 +324,8 @@ const SettingsSkmConfiguration: FC = () => {
             <Track gap={16} direction="vertical" align="left" style={{ paddingTop: 16 }}>
               {getTextControl('azureAgentName')}
               {getTextControl('azureAgentType')}
-              {getTextControl('azureClientId')}
               {getNumberControl('azureAgenticMaxOutputTokens')}
+              {getPasswordControl('azureClientId')}
               {getPasswordControl('azureClientSecret')}
             </Track>
           )}
@@ -366,9 +383,7 @@ const SettingsSkmConfiguration: FC = () => {
     );
   }
 
-  function getTextControl(
-    name: 'indexName' | 'semanticConfiguration' | 'azureAgentName' | 'azureAgentType' | 'azureClientId',
-  ) {
+  function getTextControl(name: 'indexName' | 'semanticConfiguration' | 'azureAgentName' | 'azureAgentType') {
     return (
       <Controller
         name={name}
@@ -388,9 +403,10 @@ const SettingsSkmConfiguration: FC = () => {
     );
   }
 
-  function getPasswordControl(name: 'azureClientSecret') {
+  function getPasswordControl(name: 'azureClientId' | 'azureClientSecret') {
     const disabled = multiDomainEnabled && selectedDomains.length > 1;
-    const secretIsSet = skmConfig?.azureClientSecretIsSet === 'true';
+    const isSetKey = `${name}IsSet` as keyof SkmConfig;
+    const valueIsSet = skmConfig?.[isSetKey] === 'true';
     return (
       <Controller
         name={name}
@@ -406,9 +422,7 @@ const SettingsSkmConfiguration: FC = () => {
                   autoComplete="new-password"
                   disabled={disabled}
                   placeholder={
-                    secretIsSet
-                      ? t('settings.skmConfiguration.azureClientSecretIsSetPlaceholder').toString()
-                      : undefined
+                    valueIsSet ? t(`settings.skmConfiguration.${name}IsSetPlaceholder`).toString() : undefined
                   }
                   onChange={field.onChange}
                   value={field.value}
@@ -418,10 +432,8 @@ const SettingsSkmConfiguration: FC = () => {
               </Track>
               {getTooltip(name)}
             </Track>
-            {secretIsSet && (
-              <span style={{ fontSize: 12, color: '#5d6071' }}>
-                {t('settings.skmConfiguration.azureClientSecretIsSetHint')}
-              </span>
+            {valueIsSet && (
+              <span style={{ fontSize: 12, color: '#5d6071' }}>{t(`settings.skmConfiguration.${name}IsSetHint`)}</span>
             )}
           </Track>
         )}

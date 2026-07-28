@@ -4,11 +4,7 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
 
-    <changeSet id="20281882419420" author="ahmedyasser">
-        <insert tableName="configuration">
-            <column name="key" value="azure_client_id"/>
-            <column name="value" value=""/>
-        </insert>
+    <changeSet id="20281882419421" author="ahmedyasser">
         <insert tableName="configuration">
             <column name="key" value="azure_agentic_max_output_tokens"/>
             <column name="value" value="4000"/>
