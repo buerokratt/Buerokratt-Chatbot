@@ -85,24 +85,18 @@ extractRequestData:
     followUpStatus: ${incoming.body.followUpStatus ?? []}
     theme: ${incoming.body.theme ?? []}
 
-initializeState:
-  assign:
-    page: 1
-    page_size: 100
-    totalPages: 1
-    allChats: []
-    allMessages: []
-  next: fetchPage
-
 fetchPage:
   call: http.post
+  # Unpaginated export responses can exceed Ruuter's default 256 KiB buffer.
+  # The limit is configured in constants.ini and specified in KiB.
+  limit: "[#CHAT_HISTORY_EXPORT_RESPONSE_SIZE_LIMIT_KB]"
   args:
     url: "[#CHATBOT_RESQL]/get-cs-all-ended-chats"
     body:
       start: ${startDate}
       end: ${endDate}
-      page: ${page}
-      page_size: ${page_size}
+      page: 1
+      page_size: 100
       sorting: ${incoming.body.sorting}
       search: ${incoming.body.search}
       customerSupportIds: ${incoming.body.customerSupportIds?.join(',') ?? ''}
@@ -119,65 +113,26 @@ fetchPage:
       followUpStatus: ${followUpStatus}
       theme: ${theme}
       isChatAnalysisEnabled: ${true}
+      isPaginationEnabled: ${false}
   result: pageResult
-  next: savePageBody
-
-savePageBody:
-  assign:
-    pageBody: ${pageResult.response.body}
-    totalPages: "${pageResult.response.body.length > 0 ? pageResult.response.body[0].totalPages : 0}"
   next: checkHasResults
 
 checkHasResults:
   switch:
-    - condition: ${totalPages == "0"}
+    - condition: ${pageResult.response.body.length === 0}
       next: return_empty
   next: fetchPageMessages
 
 fetchPageMessages:
   call: http.post
+  # Message volume varies per chat and can exceed Ruuter's default 256 KiB buffer.
+  # The limit is configured in constants.ini and specified in KiB.
+  limit: "[#CHAT_HISTORY_EXPORT_RESPONSE_SIZE_LIMIT_KB]"
   args:
     url: "[#CHATBOT_RESQL]/get-chats-with-messages"
     body:
-      chatIds: ${pageBody.map(c => c.id)}
+      chatIds: ${pageResult.response.body.map(c => c.id)}
   result: messagesResult
-  next: saveMessagesBody
-
-saveMessagesBody:
-  assign:
-    messagesBody: ${messagesResult.response.body}
-  next: appendChats
-
-appendChats:
-  switch:
-    - condition: ${allChats.length === 0}
-      next: appendFirstPage
-  next: appendNextPage
-
-appendFirstPage:
-  assign:
-    allChats: ${[allChats, ...pageBody]}
-    allMessages: ${[allMessages, ...messagesBody]}
-    page: ${page + 1}
-  next: checkMorePages
-
-appendNextPage:
-  assign:
-    allChats: ${[...allChats, ...pageBody]}
-    allMessages: ${[...allMessages, ...messagesBody]}
-    page: ${page + 1}
-  next: checkMorePages
-
-checkMorePages:
-  switch:
-    - condition: ${page <= totalPages}
-      next: fetchPage
-  next: prepareFinalData
-
-prepareFinalData:
-  assign:
-    finalChats: ${allChats.splice(1, allChats.length - 1)}
-    finalMessages: ${allMessages.splice(1, allMessages.length - 1)}
   next: get_xlsx_data
 
 get_xlsx_data:
@@ -185,11 +140,11 @@ get_xlsx_data:
   args:
     url: "[#CHATBOT_DMAPPER]/conversion/chats-to-xlsx"
     body:
-      chatMessages: ${finalMessages}
+      chatMessages: ${messagesResult.response.body}
       chatHeaders: ${headers}
       chatColumnIds: ${columnIds}
-      chatIds: ${finalChats.map(c => c.id)}
-      chatRows: ${finalChats}
+      chatIds: ${pageResult.response.body.map(c => c.id)}
+      chatRows: ${pageResult.response.body}
       language: ${language}
   result: xlsxData
   next: assign_s3_filepath

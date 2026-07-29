@@ -1,3 +1,5 @@
+-- When pagination is disabled, :page and :page_size are still required for ReSQL
+-- parameter binding, but they do not affect the returned rows or total page count.
 WITH rating_config AS MATERIALIZED (
     SELECT value AS is_five_rating_scale
     FROM configuration
@@ -265,7 +267,10 @@ SELECT
         ELSE ARRAY[]::text[]
     END AS theme,
     COUNT(*) OVER() AS total_count,
-    CEIL(COUNT(*) OVER() / :page_size::DECIMAL) AS total_pages
+    CASE
+        WHEN NOT COALESCE(:isPaginationEnabled::BOOLEAN, TRUE) THEN 1
+        ELSE CEIL(COUNT(*) OVER() / :page_size::DECIMAL)
+    END AS total_pages
 FROM EndedChatMessages AS c
 JOIN Messages AS m ON c.base_id = m.chat_base_id
 LEFT JOIN ChatHistoryComments AS s ON s.chat_id = m.chat_base_id
@@ -564,4 +569,15 @@ ORDER BY
     CASE WHEN :sorting = 'id desc' THEN c.base_id END DESC,
     c.ended DESC,
     c.base_id ASC
-OFFSET ((GREATEST(:page, 1) - 1) * :page_size) LIMIT :page_size;
+OFFSET (
+    CASE
+        WHEN NOT COALESCE(:isPaginationEnabled::BOOLEAN, TRUE) THEN 0
+        ELSE (GREATEST(:page, 1) - 1) * :page_size
+    END
+)
+LIMIT (
+    CASE
+        WHEN NOT COALESCE(:isPaginationEnabled::BOOLEAN, TRUE) THEN NULL
+        ELSE :page_size
+    END
+);

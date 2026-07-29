@@ -109,6 +109,7 @@ getEndedChats:
       followUpStatus: ${followUpStatus}
       theme: ${theme}
       isChatAnalysisEnabled: ${isChatAnalysisEnabled}
+      isPaginationEnabled: ${true}
   result: res
 
 returnSuccess:
