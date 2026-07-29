@@ -200,7 +200,7 @@ check_service_name:
 getGreetingServiceStatus:
   call: http.post
   args:
-    url: "[#SERVICE_RESQL]/get-service-status-by-id"
+    url: "[#CHATBOT_RESQL]/get-service-status-by-id"
     body:
       serviceId: ${greetingServiceId}
   result: service_status_res
