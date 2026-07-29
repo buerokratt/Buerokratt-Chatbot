@@ -100,3 +100,18 @@ like this:
 The private Ruuter routes under `POST /backoffice/cron-tasks/chat-generation/*` are used by CronManager's `chat_generation.sh` script to create test and demo chat data without running real end-user, TARA, or customer-support-agent authentication flows.
 
 These endpoints are intended only for automated chat generation. They accept generated chat and message metadata and are protected with an `x-ruuter-nonce`.
+
+---
+### Ended chat history export (download)
+
+The ended chat history download flow retrieves all chats matching the selected filters in a single ReSQL request. It calls `get-cs-all-ended-chats` with `isPaginationEnabled: false`; in this mode, `page` and `page_size` remain required ReSQL parameters but do not limit the returned rows. The regular chat history table continues to call the same query with pagination enabled.
+
+The export then retrieves messages for all selected chats and passes the chat and message data to Data Mapper for XLSX generation. This avoids the previous Ruuter pagination loop, which could not process more than ten pages because of Ruuter's step-recursion limit.
+
+Unpaginated chat and message responses can exceed Ruuter's default 256 KiB HTTP response buffer. `CHAT_HISTORY_EXPORT_RESPONSE_SIZE_LIMIT_KB` in `constants.ini` controls the per-response limit for both ReSQL calls in the download flow. The value is specified in KiB and defaults to `20480` (20 MiB).
+
+> **Important:** A value that is too low causes the export to fail with HTTP 500, while an excessively high value allows Ruuter to buffer larger responses and can increase memory pressure. After changing this value, restart `ruuter-private` for the new configuration to take effect.
+
+The appropriate limit is deployment-specific and may require future tuning. Export size depends on each client's chat volume, the number and length of messages, selected filters, and general usage patterns. Keeping the value in `constants.ini` allows it to be adjusted for a client's data profile without changing the download DSL.
+
+The limit applies separately to the chat response and the message response; it is not a combined export-size limit. If either data-fetch request fails, the download endpoint returns HTTP 500 with `Failed to fetch chat history export data`.
