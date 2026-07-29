@@ -67,6 +67,8 @@ const SettingsSkmConfiguration: FC = () => {
         inScope: data.inScope.toString(),
         useAgentic: data.useAgentic.toString(),
         azureAgenticMaxOutputTokens: data.azureAgenticMaxOutputTokens?.toString(),
+        azureClientIdIsSet: (!!_azureClientId).toString(),
+        azureClientSecretIsSet: (!!_azureClientSecret).toString(),
       });
     },
     onSuccess: () => {
@@ -75,7 +77,6 @@ const SettingsSkmConfiguration: FC = () => {
         title: t('global.notification'),
         message: t('toast.success.updateSuccess'),
       });
-      fetchData(multiDomainEnabled ? (selectedDomains[0] ?? 'none') : 'none');
     },
     onError: (error: AxiosError) => {
       toast.open({
@@ -133,6 +134,7 @@ const SettingsSkmConfiguration: FC = () => {
         await skmConfigMutation.mutateAsync(data);
         await syncClientId(data);
         await syncClientSecret(data);
+        await fetchData(multiDomainEnabled ? (selectedDomains[0] ?? 'none') : 'none');
       } catch {
         // Failure toast already shown by skmConfigMutation.onError
       }
