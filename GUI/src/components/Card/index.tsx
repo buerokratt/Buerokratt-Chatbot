@@ -33,7 +33,7 @@ const Card: FC<PropsWithChildren<CardProps>> = ({
 
   if (tabs) {
     return (
-      <div className="card-tabs-wrapper">
+      <div className={clsx('card-tabs-wrapper', { 'card-tabs-wrapper--scrollable': isScrollable })}>
         <div className="card__tabs">{tabs}</div>
         {cardContent}
       </div>

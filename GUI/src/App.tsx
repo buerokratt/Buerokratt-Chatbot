@@ -16,7 +16,7 @@ import SettingsUsers from 'pages/Settings/SettingsUsers';
 import SettingsWelcomeMessage from 'pages/Settings/SettingsWelcomeMessage';
 import SettingsWorkingTime from 'pages/Settings/SettingsWorkingTime';
 import { FC } from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import useStore from 'store';
 import { UserInfo } from 'types/userInfo';
 import './locale/et_EE';
@@ -37,32 +37,36 @@ import SettingsChatAnalysis from 'pages/Settings/SettingsChatAnalysis';
 
 const App: FC = () => {
   const multiDomainEnabled = import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
+  const location = useLocation();
 
-  useQuery<{
-    data: { custom_jwt_userinfo: UserInfo };
-  }>({
+  const userInfoQuery = useQuery<{ response: UserInfo }>({
     queryKey: ['auth/jwt/userinfo', 'prod'],
-    onSuccess: (res: { response: UserInfo }) => {
+    onSuccess: (res) => {
       localStorage.setItem('exp', res.response.JWTExpirationTimestamp);
 
-      if (multiDomainEnabled) {
-        getWidgetData(res.response.idCode)
-          .then((domains) => {
-            const selectedDomains = domains
-              .filter((d) => d.selected)
-              .map((d) => d.url)
-              .filter(Boolean);
-
-            useStore.getState().setAllDomains(domains);
-            useStore.getState().setUserDomains(selectedDomains);
-            useHeaderStore.getState().setUserDomains(selectedDomains);
-          })
-          .catch((e) => {
-            console.error('Failed to fetch widget data:', e);
-          });
-      }
-
       return useStore.getState().setUserInfo(res.response);
+    },
+  });
+
+  const idCode = userInfoQuery.data?.response?.idCode;
+
+  useQuery({
+    queryKey: ['widget-data', idCode, location.pathname],
+    queryFn: () => getWidgetData(idCode!),
+    enabled: multiDomainEnabled && !!idCode,
+    refetchOnWindowFocus: false,
+    onSuccess: (domains) => {
+      const selectedDomains = domains
+        .filter((d) => d.selected)
+        .map((d) => d.url)
+        .filter(Boolean);
+
+      useStore.getState().setAllDomains(domains);
+      useStore.getState().setUserDomains(selectedDomains);
+      useHeaderStore.getState().setUserDomains(selectedDomains);
+    },
+    onError: (e) => {
+      console.error('Failed to fetch widget data:', e);
     },
   });
 

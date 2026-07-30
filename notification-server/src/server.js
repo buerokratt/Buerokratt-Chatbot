@@ -9,7 +9,13 @@ const { initializeAzureOpenAI } = require('./azureOpenAI');
 const { serverConfig } = require('./config');
 const { stoppedChannels } = require('./connectionManager');
 const { addToLogoutQueue, removeFromLogoutQueue } = require('./logoutQueue');
-const { enqueueChatId, dequeueChatId, sendBulkNotification, createAzureOpenAIStreamRequest, createLLMOrchestrationStreamRequest } = require('./openSearch');
+const {
+  enqueueChatId,
+  dequeueChatId,
+  sendBulkNotification,
+  createAzureOpenAIStreamRequest,
+  createLLMOrchestrationStreamRequest,
+} = require('./openSearch');
 const { buildSSEResponse } = require('./sseUtil');
 const streamQueue = require('./streamQueue');
 const { addToTerminationQueue, removeFromTerminationQueue } = require('./terminationQueue');
@@ -179,7 +185,17 @@ app.post('/channels/:channelId/llm-stream', async (req, res) => {
 
 app.post('/channels/:channelId/stream', (req, res) => {
   const { channelId } = req.params;
-  const { messages, options = {}, use_agentic = false, agent_name, agent_type } = req.body;
+  const {
+    messages,
+    options = {},
+    use_agentic = false,
+    agent_name,
+    agent_type,
+    azure_client_id,
+    azure_client_secret,
+    azure_agentic_max_output_tokens,
+    raw_response = false,
+  } = req.body;
 
   if (!messages || !Array.isArray(messages)) {
     return res.status(400).json({ error: 'Messages array is required' });
@@ -194,6 +210,10 @@ app.post('/channels/:channelId/stream', (req, res) => {
     use_agentic,
     agent_name,
     agent_type,
+    azure_client_id,
+    azure_client_secret,
+    azure_agentic_max_output_tokens,
+    raw_response,
   }).catch((error) => {
     console.error(`Stream error for channel ${channelId}:`, error.message);
   });

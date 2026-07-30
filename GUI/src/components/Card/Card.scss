@@ -6,6 +6,10 @@
 .card-tabs-wrapper {
   display: flex;
   flex-direction: column;
+
+  &--scrollable {
+    min-height: 0;
+  }
 }
 
 .card {
@@ -26,7 +30,8 @@
   }
 
   &--scrollable {
-    max-height: max(200px, calc(100vh - 270px)) !important;
+    max-height: none !important;
+    min-height: 200px;
     overflow-y: auto;
   }
 

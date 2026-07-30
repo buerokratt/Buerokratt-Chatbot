@@ -46,7 +46,7 @@ const SettingsSkmConfiguration: FC = () => {
         'configs/skm-config',
         selectedDomain,
       );
-      const res = data.response;
+      const res = { ...data.response, azureClientId: '', azureClientSecret: '' };
 
       reset(res);
       setSkmConfig(res);
@@ -57,15 +57,20 @@ const SettingsSkmConfiguration: FC = () => {
   };
 
   const skmConfigMutation = useMutation({
-    mutationFn: (data: SkmConfig) =>
-      apiDev.post<SkmConfig>('configs/skm-config', {
-        ...data,
+    mutationFn: (data: SkmConfig) => {
+      const { azureClientId: _azureClientId, azureClientSecret: _azureClientSecret, ...body } = data;
+      return apiDev.post<SkmConfig>('configs/skm-config', {
+        ...body,
         range: data.range.toString(),
         documents: data.documents.toString(),
         maxTokens: data.maxTokens.toString(),
         inScope: data.inScope.toString(),
         useAgentic: data.useAgentic.toString(),
-      }),
+        azureAgenticMaxOutputTokens: data.azureAgenticMaxOutputTokens?.toString(),
+        azureClientIdIsSet: (!!_azureClientId).toString(),
+        azureClientSecretIsSet: (!!_azureClientSecret).toString(),
+      });
+    },
     onSuccess: () => {
       toast.open({
         type: 'success',
@@ -82,11 +87,57 @@ const SettingsSkmConfiguration: FC = () => {
     },
   });
 
-  const handleFormSubmit = handleSubmit((data) => {
+  const syncCredentialField = async (
+    data: SkmConfig,
+    { endpoint, field, value }: { endpoint: string; field: 'id' | 'secret'; value: string },
+  ) => {
+    if (data.useAgentic !== 'true') {
+      return;
+    }
+    const domains = data.domainUUID ?? [];
+    if (domains.length > 1) {
+      await Promise.all(domains.map((domainId) => apiDev.post(endpoint, { domain: domainId, [field]: '' })));
+      return;
+    }
+    if (!value) {
+      return;
+    }
+    const domain = domains.length === 1 ? domains[0] : 'none';
+    await apiDev.post(endpoint, { domain, [field]: value });
+  };
+
+  const syncClientId = (data: SkmConfig) =>
+    syncCredentialField(data, { endpoint: 'configs/skm-config/id', field: 'id', value: data.azureClientId });
+
+  const syncClientSecret = (data: SkmConfig) =>
+    syncCredentialField(data, {
+      endpoint: 'configs/skm-config/secret',
+      field: 'secret',
+      value: data.azureClientSecret,
+    });
+
+  const handleFormSubmit = handleSubmit(async (data) => {
     const validationMessage = isValid(data);
     if (validationMessage === '') {
       data.domainUUID = multiDomainEnabled ? selectedDomains : [];
-      skmConfigMutation.mutate(data);
+      if (data.useAgentic === 'true' && skmConfig) {
+        data.range = skmConfig.range;
+        data.documents = skmConfig.documents;
+        data.maxTokens = skmConfig.maxTokens;
+        data.systemMessage = skmConfig.systemMessage;
+        data.indexName = skmConfig.indexName;
+        data.semanticConfiguration = skmConfig.semanticConfiguration;
+        data.queryType = skmConfig.queryType;
+        data.inScope = skmConfig.inScope;
+      }
+      try {
+        await skmConfigMutation.mutateAsync(data);
+        await syncClientId(data);
+        await syncClientSecret(data);
+        await fetchData(multiDomainEnabled ? (selectedDomains[0] ?? 'none') : 'none');
+      } catch {
+        // Failure toast already shown by skmConfigMutation.onError
+      }
     } else {
       toast.open({
         type: 'error',
@@ -97,20 +148,24 @@ const SettingsSkmConfiguration: FC = () => {
   });
 
   const isValid = (data: SkmConfig) => {
-    const range = parseInt(data.range ?? '3');
-    const documents = parseInt(data.documents ?? '5');
-    const maxTokens = parseInt(data.maxTokens ?? '1000');
-    const systemMessage = data.systemMessage;
-    if (range < 1 || range > 5) {
-      return t('settings.skmConfiguration.validation.range');
-    } else if (documents < 1 || documents > 20) {
-      return t('settings.skmConfiguration.validation.documents');
-    } else if (maxTokens < 1 || maxTokens > 2000) {
-      return t('settings.skmConfiguration.validation.maxTokens');
-    } else if (systemMessage.length < 1) {
-      return t('settings.skmConfiguration.validation.systemMessage');
-    } else {
+    if (useAgentic === 'true') {
       return '';
+    } else {
+      const range = parseInt(data.range ?? '3');
+      const documents = parseInt(data.documents ?? '5');
+      const maxTokens = parseInt(data.maxTokens ?? '1000');
+      const systemMessage = data.systemMessage;
+      if (range < 1 || range > 5) {
+        return t('settings.skmConfiguration.validation.range');
+      } else if (documents < 1 || documents > 20) {
+        return t('settings.skmConfiguration.validation.documents');
+      } else if (maxTokens < 1 || maxTokens > 2000) {
+        return t('settings.skmConfiguration.validation.maxTokens');
+      } else if (systemMessage.length < 1) {
+        return t('settings.skmConfiguration.validation.systemMessage');
+      } else {
+        return '';
+      }
     }
   };
 
@@ -126,6 +181,9 @@ const SettingsSkmConfiguration: FC = () => {
     useAgentic: t('settings.skmConfiguration.tooltip.useAgentic'),
     azureAgentName: t('settings.skmConfiguration.tooltip.azureAgentName'),
     azureAgentType: t('settings.skmConfiguration.tooltip.azureAgentType'),
+    azureClientId: t('settings.skmConfiguration.tooltip.azureClientId'),
+    azureClientSecret: t('settings.skmConfiguration.tooltip.azureClientSecret'),
+    azureAgenticMaxOutputTokens: t('settings.skmConfiguration.tooltip.azureAgenticMaxOutputTokens'),
   };
 
   const resetSettingsToDefault = () => {
@@ -141,7 +199,12 @@ const SettingsSkmConfiguration: FC = () => {
       useAgentic: 'false',
       azureAgentName: 'ai-act-agent',
       azureAgentType: 'agent_reference',
+      azureClientId: '',
+      azureClientSecret: '',
+      azureAgenticMaxOutputTokens: '4000',
       domainUUID: [],
+      azureClientIdIsSet: 'false',
+      azureClientSecretIsSet: 'false',
     };
     setSkmConfig(skmConfig);
     reset(skmConfig);
@@ -167,8 +230,14 @@ const SettingsSkmConfiguration: FC = () => {
     },
   });
 
-  const handleTransfer = (targetIds: string[]) => {
-    transferMutation.mutate({ sourceDomainUuid: selectedDomains[0], targetDomainUuids: targetIds });
+  const handleTransfer = async (targetIds: string[]) => {
+    try {
+      await transferMutation.mutateAsync({ sourceDomainUuid: selectedDomains[0], targetDomainUuids: targetIds });
+      await Promise.all(targetIds.map((id) => apiDev.post('configs/skm-config/id', { domain: id, id: '' })));
+      await Promise.all(targetIds.map((id) => apiDev.post('configs/skm-config/secret', { domain: id, secret: '' })));
+    } catch {
+      // Failure toast already shown by transferMutation.onError
+    }
   };
 
   const handleDomainSelection = useDomainSelectionHandler(setSelectedDomains, fetchData, resetSettingsToDefault);
@@ -257,6 +326,9 @@ const SettingsSkmConfiguration: FC = () => {
             <Track gap={16} direction="vertical" align="left" style={{ paddingTop: 16 }}>
               {getTextControl('azureAgentName')}
               {getTextControl('azureAgentType')}
+              {getNumberControl('azureAgenticMaxOutputTokens')}
+              {getPasswordControl('azureClientId')}
+              {getPasswordControl('azureClientSecret')}
             </Track>
           )}
         </Fragment>
@@ -276,7 +348,10 @@ const SettingsSkmConfiguration: FC = () => {
       | 'inScope'
       | 'useAgentic'
       | 'azureAgentName'
-      | 'azureAgentType',
+      | 'azureAgentType'
+      | 'azureClientId'
+      | 'azureClientSecret'
+      | 'azureAgenticMaxOutputTokens',
   ) {
     return (
       <Tooltip content={tooltips[name]}>
@@ -287,7 +362,9 @@ const SettingsSkmConfiguration: FC = () => {
     );
   }
 
-  function getNumberControl(name: 'systemMessage' | 'range' | 'documents' | 'maxTokens') {
+  function getNumberControl(
+    name: 'systemMessage' | 'range' | 'documents' | 'maxTokens' | 'azureAgenticMaxOutputTokens',
+  ) {
     return (
       <Controller
         name={name}
@@ -322,6 +399,44 @@ const SettingsSkmConfiguration: FC = () => {
               value={field.value}
             />
             {getTooltip(name)}
+          </Track>
+        )}
+      />
+    );
+  }
+
+  function getPasswordControl(name: 'azureClientId' | 'azureClientSecret') {
+    const disabled = multiDomainEnabled && selectedDomains.length > 1;
+    const isSetKey = `${name}IsSet` as keyof SkmConfig;
+    const valueIsSet = skmConfig?.[isSetKey] === 'true';
+    return (
+      <Controller
+        name={name}
+        control={control}
+        render={({ field }) => (
+          <Track gap={10} style={{ width: '100%' }} isMultiline>
+            <Track gap={10} style={{ width: '100%' }}>
+              <Track direction="vertical" align="left" gap={4} style={{ width: '100%' }}>
+                <FormInput
+                  name={name}
+                  label={t(`settings.skmConfiguration.${name}`)}
+                  type="password"
+                  autoComplete="new-password"
+                  disabled={disabled}
+                  placeholder={
+                    valueIsSet ? t(`settings.skmConfiguration.${name}IsSetPlaceholder`).toString() : undefined
+                  }
+                  onChange={field.onChange}
+                  value={field.value}
+                  onCopy={(e) => e.preventDefault()}
+                  onCut={(e) => e.preventDefault()}
+                />
+              </Track>
+              {getTooltip(name)}
+            </Track>
+            {valueIsSet && (
+              <span style={{ fontSize: 12, color: '#5d6071' }}>{t(`settings.skmConfiguration.${name}IsSetHint`)}</span>
+            )}
           </Track>
         )}
       />

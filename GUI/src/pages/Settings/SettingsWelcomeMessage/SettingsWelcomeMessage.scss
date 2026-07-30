@@ -1,0 +1,230 @@
+@import 'src/styles/tools/spacing';
+@import 'src/styles/tools/color';
+@import 'src/styles/settings/variables/other';
+@import 'src/styles/settings/variables/typography';
+
+.greeting-type {
+  &__title {
+    font-weight: 600;
+    margin: 0;
+    font-size: $veera-font-size-100;
+    line-height: 24px;
+
+    &--uppercase {
+      text-transform: uppercase;
+      font-size: $veera-font-size-80;
+      letter-spacing: 0.04em;
+    }
+  }
+
+  &__description {
+    color: rgba(0, 0, 0, 0.54);
+    margin: 0;
+    font-size: $veera-font-size-80;
+    line-height: 20px;
+  }
+}
+
+.welcome-message-section {
+  gap: get-spacing(haapsalu);
+  width: 100%;
+  padding-right: get-spacing(haapsalu);
+  box-sizing: border-box;
+
+  &__label {
+    flex: 0 0 20%;
+    padding-right: get-spacing(paldiski);
+    box-sizing: border-box;
+  }
+
+  &__control {
+    flex: 0 1 50%;
+    width: 100%;
+    max-width: 50%;
+    min-width: 0;
+
+    .textarea {
+      align-items: flex-start;
+    }
+
+    &--wide {
+      flex: 1;
+      max-width: none;
+    }
+  }
+
+  &__required-hint {
+    margin: 8px 0 0;
+    color: rgba(0, 0, 0, 0.54);
+    font-size: $veera-font-size-80;
+    line-height: 20px;
+  }
+}
+
+.greeting-type-options {
+  width: 100%;
+}
+
+.greeting-type-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid #d2d3d8;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+
+  &--selected {
+    border-color: #003cff;
+    background: #f0f4ff;
+
+    .greeting-type-option__radio {
+      border-color: #8f91a8;
+
+      &::after {
+        opacity: 1;
+      }
+    }
+
+    .greeting-type-option__icon {
+      background: rgba(0, 60, 255, 0.1);
+      color: #003cff;
+    }
+  }
+
+  &__radio {
+    position: relative;
+    display: block;
+    width: 20px;
+    height: 20px;
+    margin-top: 8px;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px #8f91a8;
+    flex-shrink: 0;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: #003cff;
+      transform: translate(-50%, -50%);
+      opacity: 0;
+    }
+  }
+
+  &__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.05);
+    flex-shrink: 0;
+  }
+
+  &__label {
+    display: block;
+    font-weight: 600;
+  }
+
+  &__description {
+    display: block;
+    color: rgba(0, 0, 0, 0.54);
+    font-size: 0.875rem;
+  }
+}
+
+.greeting-notice {
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px 16px;
+  border: 1px solid #f5c78a;
+  border-radius: 8px;
+  background: #fff8ee;
+
+  p {
+    margin: 0;
+    color: rgba(0, 0, 0, 0.87);
+    font-size: $veera-font-size-80;
+    line-height: 20px;
+  }
+}
+
+.create-service-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 8px 16px;
+  border: 1px solid #003cff;
+  border-radius: 8px;
+  background: #fff;
+  color: #003cff;
+  font-size: $veera-font-size-100;
+  font-weight: 600;
+  line-height: 24px;
+  text-decoration: none;
+
+  &:hover {
+    background: #f0f4ff;
+  }
+}
+
+.service-info-card {
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px 16px;
+  border: 1px solid #b3c7ff;
+  border-radius: 8px;
+  background: #f0f4ff;
+  box-sizing: border-box;
+  overflow: hidden;
+
+  &__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: rgba(0, 60, 255, 0.1);
+  }
+
+  &__name {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 36px;
+    font-weight: 600;
+    line-height: 36px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__meta {
+    flex: 0 0 auto;
+  }
+
+  &__meta-label {
+    color: rgba(0, 0, 0, 0.54);
+    font-size: $veera-font-size-80;
+    line-height: 20px;
+    white-space: nowrap;
+  }
+
+  &__updated {
+    font-size: $veera-font-size-100;
+    line-height: 24px;
+    white-space: nowrap;
+  }
+}

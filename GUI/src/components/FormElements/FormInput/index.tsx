@@ -38,6 +38,7 @@ const FieldInput = forwardRef<HTMLInputElement, InputProps>(
             maxLength={CHAT_INPUT_LENGTH}
             id={id}
             ref={ref}
+            disabled={disabled}
             aria-label={hideLabel ? label : undefined}
             {...rest}
           />
