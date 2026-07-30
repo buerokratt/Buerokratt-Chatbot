@@ -69,16 +69,10 @@ trigger_post_service:
       chatId: ${chatId}
   error: return_service_error
   result: res
-  next: validate_response
-
-validate_response:
-  switch:
-    - condition: ${res.response.body.response[0]?.content}
-      next: return_service_error
   next: return_result
 
 return_result:
-  return: ${res.response.body.response[0]}
+  return: ${res.response.body.response}
   next: end
 
 return_service_error:
