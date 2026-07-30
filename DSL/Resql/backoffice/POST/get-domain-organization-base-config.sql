@@ -17,13 +17,13 @@ WHERE KEY IN ('organizationWorkingAllTime',
   AND NOT deleted
     )
 SELECT
-    MAX(CASE WHEN KEY = 'organizationWorkingAllTime' THEN value END) AS is_available_all_time,
-    MAX(CASE WHEN KEY = 'organizationNoCsaAskForContacts' THEN value END) AS ask_for_contacts,
-    MAX(CASE WHEN KEY = 'organizationNoCsaAvailableMessage' THEN value END) AS no_csa_message,
-    MAX(CASE WHEN KEY = 'organizationOutsideWorkingHoursAskForContacts' THEN value END) AS outside_working_hours_ask_for_contacts,
-    MAX(CASE WHEN KEY = 'organizationOutsideWorkingHoursMessage' THEN value END) AS outside_working_hours_message,
-    MAX(CASE WHEN KEY = 'organizationBotCannotAnswerMessage' THEN value END) AS bot_cannot_answer_message,
-    MAX(CASE WHEN KEY = 'organizationRedirectIfBotCannotAnswerMessage' THEN value END) AS redirect_if_bot_cannot_answer_message,
-    MAX(CASE WHEN KEY = 'organizationUseCSA' THEN value END) AS is_organization_use_csa,
-    MAX(CASE WHEN KEY = 'organizationValidationNoCsaMessage' THEN value END) AS validation_no_csa_message
+    COALESCE(MAX(CASE WHEN KEY = 'organizationWorkingAllTime' THEN value END), 'false') AS is_available_all_time,
+    COALESCE(MAX(CASE WHEN KEY = 'organizationNoCsaAskForContacts' THEN value END), 'false') AS ask_for_contacts,
+    COALESCE(MAX(CASE WHEN KEY = 'organizationNoCsaAvailableMessage' THEN value END), '') AS no_csa_message,
+    COALESCE(MAX(CASE WHEN KEY = 'organizationOutsideWorkingHoursAskForContacts' THEN value END), 'false') AS outside_working_hours_ask_for_contacts,
+    COALESCE(MAX(CASE WHEN KEY = 'organizationOutsideWorkingHoursMessage' THEN value END), '') AS outside_working_hours_message,
+    COALESCE(MAX(CASE WHEN KEY = 'organizationBotCannotAnswerMessage' THEN value END), '') AS bot_cannot_answer_message,
+    COALESCE(MAX(CASE WHEN KEY = 'organizationRedirectIfBotCannotAnswerMessage' THEN value END), '') AS redirect_if_bot_cannot_answer_message,
+    COALESCE(MAX(CASE WHEN KEY = 'organizationUseCSA' THEN value END), 'false') AS is_organization_use_csa,
+    COALESCE(MAX(CASE WHEN KEY = 'organizationValidationNoCsaMessage' THEN value END), '') AS validation_no_csa_message
 FROM configuration_values;

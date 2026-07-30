@@ -10,7 +10,12 @@ export interface SkmConfig {
   useAgentic: string;
   azureAgentName: string;
   azureAgentType: string;
+  azureClientId: string;
+  azureClientSecret: string;
+  azureAgenticMaxOutputTokens: string;
   domainUUID?: string[];
+  azureClientIdIsSet?: string;
+  azureClientSecretIsSet?: string;
 }
 
 export interface SkmConfigResponse {

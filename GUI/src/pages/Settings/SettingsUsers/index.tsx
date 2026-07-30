@@ -222,7 +222,11 @@ const SettingsUsers: FC = () => {
   );
 
   const deleteView = (props: any) => (
-    <Button appearance="text" onClick={() => setDeletableRow(props.row.original.idCode)}>
+    <Button
+      appearance="text"
+      disabled={props.row.original.idCode === userInfo?.idCode}
+      onClick={() => setDeletableRow(props.row.original.idCode)}
+    >
       <Icon icon={<MdOutlineDeleteOutline />} />
       {t('global.delete')}
     </Button>

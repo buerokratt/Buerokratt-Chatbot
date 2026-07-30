@@ -542,8 +542,36 @@
       "welcomeMessage": "Welcome Message",
       "description": "The bureaucrat's automatic welcome message that is displayed as the first message when opening a chat window.",
       "greetingActive": "Greeting Active",
+      "greetingActiveOn": "Greeting is turned on.",
+      "greetingActiveOff": "Greeting is turned off. Chat starts by default without a greeting message.",
       "messageChanged": "Welcome message changed successfully",
-      "emptyMessage": "Welcome message can't be empty"
+      "emptyMessage": "Welcome message can't be empty",
+      "emptyService": "Please select a service",
+      "greetingType": "Greeting Type",
+      "greetingTypeDescription": "Choose what the chatbot should show when opened",
+      "messageOption": "Welcome Message",
+      "messageOptionDescription": "Show a custom welcome message",
+      "welcomeMessageHint": "The message is displayed first when opening the chatbot.",
+      "serviceOption": "Service",
+      "serviceOptionDescription": "Start a predefined service flow",
+      "serviceTypeWarning": "When selecting a service, free text input and AI are disabled in the chat. The user moves only through buttons.",
+      "draftServiceWarning": "This service is a draft and will not start for end users. Activate it in the Services module before saving.",
+      "createService": "Create service",
+      "noServices": "No services",
+      "fallbackMessage": "Fallback Welcome Message",
+      "fallbackMessageDescription": "This message will be shown if the Greeting Service is unavailable or fails.",
+      "messageRequired": "This message is required.",
+      "greetingService": "Greeting Service",
+      "service": "Service",
+      "serviceDescription": "Select the service that will be triggered when the chat widget opens",
+      "serviceDropdownPlaceholder": "Select a service",
+      "serviceState": {
+        "active": "Active",
+        "ready": "Ready",
+        "draft": "Draft",
+        "inactive": "Inactive"
+      },
+      "lastUpdated": "Last updated"
     },
     "sessionLength": {
       "tooltip": {
@@ -574,6 +602,13 @@
       "useAgentic": "Use agentic retrieval",
       "azureAgentName": "Agent name",
       "azureAgentType": "Agent type",
+      "azureClientId": "Client ID",
+      "azureClientIdIsSetPlaceholder": "•••••••• (client ID is set)",
+      "azureClientIdIsSetHint": "A client ID is already saved for this domain. Leave blank to keep it unchanged.",
+      "azureClientSecret": "Client secret",
+      "azureClientSecretIsSetPlaceholder": "•••••••• (secret is set)",
+      "azureClientSecretIsSetHint": "A secret is already saved for this domain. Leave blank to keep it unchanged.",
+      "azureAgenticMaxOutputTokens": "Maximum output tokens",
       "tooltip": {
         "range": "Range defines the threshold at which documents are considered relevant to your queries. Increasing the stringency means a higher relevance threshold and filtering out more less relevant documents. However, a very high stringency may cause answers to fail to be generated because there are too few documents available. The default severity level is 3.Possible values: 1 - 5",
         "documents": "This determines the number of highest-scoring documents to use to build answers from your data index. It's worth increasing this value if you have short documents or want to provide more context. The default value is 5.Possible values: 1 - 20",
@@ -585,7 +620,10 @@
         "inScope": "When the search service returns 0 chunks from the data, the user query is not sent on to the LLM (when 'Yes' is selected) and a predefined response is sent to the user straight from the search service",
         "useAgentic": "Agentic retrieval allows for more sophisticated content retrieval from AI Search index(es). The prerequisite to use agentic retrieval is a knowledge agent set up in Foundry portal. When using agentic retrieval, the LLM settings have to be configured in the Foundry portal.",
         "azureAgentName": "Name of the agent that is set up in Foundry portal.",
-        "azureAgentType": "Knowledge agent type. Default value is 'agent_reference'."
+        "azureAgentType": "Knowledge agent type. Default value is 'agent_reference'.",
+        "azureClientId": "Agent application (client) ID that is registered in Azure",
+        "azureClientSecret": "Agent application secret that is registered in Azure",
+        "azureAgenticMaxOutputTokens": "Maximum total number of tokens that the agent is allowed to consume per turn. This includes any LLM-driven query planning and reasoning the agent performs before or during the search."
       },
       "validation": {
         "range": "Range must be between 1 and 5",

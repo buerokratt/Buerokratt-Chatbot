@@ -47,8 +47,9 @@ const SettingsFeedback: FC = () => {
         selectedDomain,
       );
       const res = data.response;
-      reset(res);
-      setFeedbackConfig(getFeedbackConfigData(res));
+      const converted = getFeedbackConfigData(res);
+      reset(converted);
+      setFeedbackConfig(converted);
     } catch (error) {
       console.error('Failed to fetch feedback', error);
     }

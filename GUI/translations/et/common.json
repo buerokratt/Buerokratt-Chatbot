@@ -541,9 +541,37 @@
     "welcomeMessage": {
       "welcomeMessage": "Tervitussõnum",
       "description": "Bürokrati automaatne tervitussõnum, mida kuvatakse esimese sõnumina vestlusakna avamisel",
-      "greetingActive": "Tervitus aktiivne",
+      "greetingActive": "Tervituse olek",
+      "greetingActiveOn": "Tervitus on sisselülitatud.",
+      "greetingActiveOff": "Tervitus on välja lülitatud. Vestlus algab vaikimisi ilma tervitussõnumita.",
       "messageChanged": "Tervitust muudeti edukalt",
-      "emptyMessage": "Tervitussõnumi väli ei tohi olla tühi"
+      "emptyMessage": "Tervitussõnumi väli ei tohi olla tühi",
+      "emptyService": "Palun valige teenus",
+      "greetingType": "Tervituse tüüp",
+      "greetingTypeDescription": "Valige, mida vestlusrobot peaks avamisel näitama",
+      "messageOption": "Tervitussõnum",
+      "messageOptionDescription": "Näita kohandatud tervitussõnumit",
+      "welcomeMessageHint": "Sõnum kuvatakse vestlusroboti avamisel esimesena.",
+      "serviceOption": "Teenus",
+      "serviceOptionDescription": "Käivita eelmääratud teenuse voog",
+      "serviceTypeWarning": "Teenuse valimisel keelatakse vestluses vaba tekstisisestus ja AI. Kasutaja liigub ainult nuppude kaudu.",
+      "draftServiceWarning": "See teenus on mustand ega käivitu lõppkasutajatele. Aktiveeri see Teenuste moodulis enne salvestamist.",
+      "createService": "Loo teenus",
+      "noServices": "Teenuseid pole",
+      "fallbackMessage": "Varutervitussõnum",
+      "fallbackMessageDescription": "Seda sõnumit näidatakse, kui tervitusteenus ei ole saadaval või ebaõnnestub.",
+      "messageRequired": "See sõnum on kohustuslik.",
+      "greetingService": "Tervitusteenus",
+      "service": "Teenus",
+      "serviceDescription": "Valige teenus, mis käivitatakse vestlusroboti avamisel",
+      "serviceDropdownPlaceholder": "Valige teenus",
+      "serviceState": {
+        "active": "Aktiivne",
+        "ready": "Valmis",
+        "draft": "Mustand",
+        "inactive": "Mitteaktiivne"
+      },
+      "lastUpdated": "Viimane uuendus"
     },
     "sessionLength": {
       "tooltip": {
@@ -574,6 +602,13 @@
       "useAgentic": "Kasutan agendilist otsingut",
       "azureAgentName": "Agendi nimi",
       "azureAgentType": "Agendi tüüp",
+      "azureClientId": "Kliendi ID",
+      "azureClientIdIsSetPlaceholder": "•••••••• (kliendi ID on määratud)",
+      "azureClientIdIsSetHint": "Sellele domeenile on kliendi ID juba määratud. Jäta tühjaks, et see muutmata jätta.",
+      "azureClientSecret": "Kliendi salasõna",
+      "azureClientSecretIsSetPlaceholder": "•••••••• (salasõna on määratud)",
+      "azureClientSecretIsSetHint": "Sellele domeenile on salasõna juba määratud. Jäta tühjaks, et see muutmata jätta.",
+      "azureAgenticMaxOutputTokens": "Maksimaalne väljundtokenite arv",
       "tooltip": {
         "range": "Rangus määrab künnise, mille alusel xdokumente peetakse teie päringutele asjakohasteks. Ranguse tõstmine tähendab kõrgemat asjakohasuse künnist ja rohkemate vähem asjakohaste dokumentide filtreerimist. Väga kõrge rangus võib aga põhjustada vastuste genereerimise ebaõnnestumise, kuna kättesaadavaid dokumente on liiga vähe. Vaikimisi on ranguse tase 3.Võimalikud väärtused: 1 - 5",
         "documents": "See määrab teie andmeindeksist vastuste koostamiseks kasutatavate kõrgeima skooriga dokumentide arvu. Seda väärtust tasub suurendada, kui teil on lühikesed dokumendid või soovite pakkuda rohkem konteksti. Vaikeväärtus on 5.Võimalikud väärtused: 1 - 20",
@@ -585,7 +620,10 @@
         "inScope": "Kui otsing tagastab andmetest 0 vastet, siis 'Jah' puhul ei saadeta kasutaja küsimust keelemudelile, vaid kindlaksmääratud vastus tuleb otsingusüsteemist",
         "useAgentic": "Agendiline otsing võimaldab sügavamat otsingut teadmusbaasis olevatest dokumentidest. Selle kasutamise eelduseks on Foundry portaalis loodud agent. Agendilise otsigu puhul tuleb SKMi seadistused teha Foundry portaalis.",
         "azureAgentName": "Foundry portaalis loodud agendi nimi.",
-        "azureAgentType": "Otsinguagendi tüüp. Vaikeväärtus on 'agent_reference'."
+        "azureAgentType": "Otsinguagendi tüüp. Vaikeväärtus on 'agent_reference'.",
+        "azureClientId": "Azure'is registreeritud agendi rakenduse (client) ID",
+        "azureClientSecret": "Azure'is registreeritud agendi rakenduse secret",
+        "azureAgenticMaxOutputTokens": "Maksimaalne tokenite arv mida agent saab ühele päringule vastust koostades kulutada. Sinna hulka arvestatakse ka tokenid mida agent kasutab sisemiselt enne otsingut või otsingu vältel."
       },
       "validation": {
         "range": "Rangus peab olema vahemikus 1 kuni 5",

@@ -41,6 +41,7 @@ assignBgkConfig:
     in_scope: "[#BGK_IN_SCOPE]"
     stream: "[#BGK_STREAM]"
     use_agentic: "[#BGK_USE_AGENTIC]"
+    raw_response: "[#BGK_RAW_RESPONSE]"
     agent_name: "[#AZURE_AGENT_NAME]"
     agent_type: "[#AZURE_AGENT_TYPE]"
     domain: ${incoming.body.domain}
@@ -201,6 +202,7 @@ trigger_ai_stream:
       use_agentic: ${use_agentic.toLowerCase() === 'true'}
       agent_name: ${agent_name}
       agent_type: ${agent_type}
+      raw_response: ${raw_response.toLowerCase() === 'true'}
       messages: ${messages}
       options:
         data_sources: ${data_sources}
