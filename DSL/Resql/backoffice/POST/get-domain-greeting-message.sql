@@ -8,8 +8,8 @@ SELECT
     (CASE WHEN (est.value IS NULL OR est.deleted IS true) THEN '' ELSE est.value END) AS est,
     (CASE WHEN (active.value = 'true' AND active.deleted IS false) THEN true ELSE false END) AS is_active,
     (CASE WHEN (type.value IS NULL OR type.deleted IS true) THEN 'message' ELSE type.value END) AS type,
-    (CASE WHEN (service_id.value IS NULL OR service_id.deleted IS true) THEN '' ELSE service_id.value END) AS service_id,
-    (CASE WHEN (service_name.value IS NULL OR service_name.deleted IS true) THEN '' ELSE service_name.value END) AS service_name
+    (CASE WHEN (service_id.value IS NULL OR service_id.deleted IS true OR NOT EXISTS (SELECT 1 FROM services s WHERE s.service_id = service_id.value AND NOT s.deleted)) THEN '' ELSE service_id.value END) AS service_id,
+    (CASE WHEN (service_id.value IS NULL OR service_id.deleted IS true OR NOT EXISTS (SELECT 1 FROM services s WHERE s.service_id = service_id.value AND NOT s.deleted)) THEN '' ELSE service_name.value END) AS service_name
 FROM
     (
         SELECT id, key, value, deleted
