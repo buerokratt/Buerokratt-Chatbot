@@ -1,3 +1,3 @@
-### 2.1.51 (05, Aug 2026)
+### 2.1.52 (05, Aug 2026)
 ## Others
-- Update README.md by [<u>@KlviG</u>](https://www.github.com/KlviG) in [#2c637eef](https://github.com/buerokratt/Buerokratt-Chatbot/commit/2c637eef)
+- Update check-version.yml by [<u>@KlviG</u>](https://www.github.com/KlviG) in [#a2446aa7](https://github.com/buerokratt/Buerokratt-Chatbot/commit/a2446aa7)
