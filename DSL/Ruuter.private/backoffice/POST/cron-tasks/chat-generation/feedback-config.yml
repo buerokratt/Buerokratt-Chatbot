@@ -1,0 +1,63 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Returns the currently configured feedback rating scale for chat generation"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    header:
+      - field: x-ruuter-nonce
+        type: string
+        description: "Nonce field"
+    body:
+      - field: domain
+        type: string
+        description: "Body field 'domain'"
+
+assignValues:
+  assign:
+    domain: ${incoming.body.domain}
+  next: checkForPassedDomain
+
+checkForPassedDomain:
+  switch:
+    - condition: ${domain === null || domain === '' || domain === 'none'}
+      next: getFeedbackConfig
+  next: getDomainUUID
+
+getDomainUUID:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-uuid"
+    body:
+      domainUrl: ${domain + '%'}
+  result: domainUuid
+  next: validate_domain_res
+
+validate_domain_res:
+  switch:
+    - condition: ${domainUuid.response.body.length > 0}
+      next: getDomainFeedbackConfig
+  next: getFeedbackConfig
+
+getDomainFeedbackConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-feedback-config"
+    body:
+      domainUUID: ${domainUuid.response.body[0].domainId}
+  result: res
+  next: return_result
+
+getFeedbackConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-feedback-config"
+  result: res
+  next: return_result
+
+return_result:
+  return: ${res.response.body[0]}
+  next: end
