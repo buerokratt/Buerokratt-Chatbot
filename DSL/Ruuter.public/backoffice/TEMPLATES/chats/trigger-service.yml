@@ -29,6 +29,12 @@ assign_data:
     servicePath: "${input[1].split(serviceMethod === 'post' ? '/POST/' : '/GET/', 2)[1]}"
     serviceInput: ${input.slice(2).map(item => item.replace(/[()]/g, ""))}
     baseUrl: "${serviceType === 'common_service' ? '[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]' : '[#CHATBOT_RUUTER_PUBLIC_INTERNAL_SERVICE]'}"
+get_new_nonce:
+  call: http.post
+  args:
+    url: "[#TRAINING_RESQL]/get-new-nonce"
+  result: nonce_res
+  next: check_for_service_method
  
 check_for_service_method:
   switch:
@@ -40,6 +46,8 @@ trigger_get_service:
   call: http.get
   args:
     url: "${baseUrl}/${servicePath}"
+    headers:
+      x-ruuter-nonce: ${nonce_res.response.body[0].nonce}
     query:
       input: ${serviceInput.join(',')}
       authorId: ${authorId}
@@ -52,6 +60,8 @@ trigger_post_service:
   call: http.post
   args:
     url: "${baseUrl}/${servicePath}"
+    headers:
+      x-ruuter-nonce: ${nonce_res.response.body[0].nonce}
     body:
       input: ${serviceInput}
       authorId: ${authorId}
