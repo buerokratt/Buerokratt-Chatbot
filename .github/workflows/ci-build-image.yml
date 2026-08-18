@@ -41,4 +41,3 @@ jobs:
 
       - name: Push Docker image to ghcr
         run: docker push $DOCKER_TAG_CUSTOM
-
