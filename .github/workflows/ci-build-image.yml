@@ -1,21 +1,17 @@
-name: Build and publish GUI
+name: Build and publish GUI with nginx
 
 on:
   push:
-    branches: [ fredy-temp ]
+    branches:
+      - v3.3.1
     paths:
-      - '.env.gui'
+      - '.env.test'
 
 jobs:
   PackageDeploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
-      - name: Debugging Step
-        run: |
-          echo "Checking runner status..."
-          # Add more debugging commands as needed
-          
       - uses: actions/checkout@v2
 
       - name: Docker Setup BuildX
@@ -23,8 +19,8 @@ jobs:
 
       - name: Load environment variables and set them
         run: |
-          if [ -f .env.gui ]; then
-            export $(cat .env.gui | grep -v '^#' | xargs)
+          if [ -f .env.test ]; then
+            export $(cat .env.test | grep -v '^#' | xargs)
           fi
           echo "RELEASE=$RELEASE" >> $GITHUB_ENV
           echo "VERSION=$VERSION" >> $GITHUB_ENV
@@ -38,7 +34,7 @@ jobs:
       - name: Docker Build
         run: | 
            cd GUI
-           docker image build --tag $DOCKER_TAG_CUSTOM .
+           docker image build --tag $DOCKER_TAG_CUSTOM --no-cache .
 
       - name: Log in to GitHub container registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin

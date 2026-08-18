@@ -40,10 +40,19 @@ jobs:
       - name: Log in to GitHub container registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
 
+      - name: Build Notification image
+        run: |
+          echo "Building Docker image for branch: ${{ env.BRANCH }} major: ${{ env.MAJOR }} minor: ${{ env.MINOR }} patch: ${{ env.PATCH }}"
+          cd notification-server && docker image build --tag $DOCKER_TAG_CUSTOM-notification-node --no-cache .
       - name: Push Docker image to GitHub Packages
         run: |
           echo "Pushing Docker image to GitHub Packages"
           docker push $DOCKER_TAG_CUSTOM
+      
+      - name: Push Notification image to GitHub Packages
+        run: |
+          echo "Pushing Docker image to GitHub Packages"
+          docker push $DOCKER_TAG_CUSTOM-notification-node
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
