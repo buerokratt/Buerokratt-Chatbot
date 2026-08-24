@@ -41,6 +41,13 @@ assign_data:
     serviceInput: ${incoming.body.entities}
     baseUrl: "${isCommon === true ? '[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]' : '[#CHATBOT_RUUTER_PUBLIC_INTERNAL_SERVICE]'}"
 
+get_new_nonce:
+  call: http.post
+  args:
+    url: "[#TRAINING_RESQL]/get-new-nonce"
+  result: nonce_res
+  next: check_for_service_method
+
 check_for_service_method:
   switch:
     - condition: ${serviceMethod.toUpperCase() === 'POST'}
@@ -51,6 +58,8 @@ trigger_get_service:
   call: http.get
   args:
     url: "${baseUrl}/${servicePath}"
+    headers:
+      x-ruuter-nonce: ${nonce_res.response.body[0].nonce}
     query:
       input: ${serviceInput.join(',')}
       authorId: ${authorId}
@@ -63,22 +72,18 @@ trigger_post_service:
   call: http.post
   args:
     url: "${baseUrl}/${servicePath}"
+    headers:
+      x-ruuter-nonce: ${nonce_res.response.body[0].nonce}
     body:
       input: ${serviceInput}
       authorId: ${authorId}
       chatId: ${chatId}
   error: return_service_error
   result: res
-  next: validate_response
-
-validate_response:
-  switch:
-    - condition: ${res.response.body.response[0]?.content}
-      next: return_service_error
   next: return_result
 
 return_result:
-  return: ${res.response.body.response[0]}
+  return: ${res.response.body.response}
   next: end
 
 return_service_error:

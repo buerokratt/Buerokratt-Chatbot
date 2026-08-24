@@ -522,6 +522,7 @@
       "duration": "Time for user to respond",
       "minutes": "minutes",
       "rule": "Session length is allowed between 5 min - 480 min (8h)",
+      "emptySession": "Time for user to respond can't be empty",
       "invalidSession": "Conversation timeout duration must be between 5 and 480 minutes"
     },
     "greeting": {

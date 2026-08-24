@@ -157,6 +157,12 @@ const SettingsSessionLength: FC = () => {
         title: t('global.notificationError'),
         message: t('settings.userSession.invalidSession'),
       });
+    } else if (!data.chatActiveDuration) {
+      toast.open({
+        type: 'error',
+        title: t('global.notificationError'),
+        message: t('settings.chatDuration.emptySession'),
+      });
     } else if (valueInRange(data.chatActiveDuration, 5, 480)) {
       toast.open({
         type: 'error',
