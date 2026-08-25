@@ -204,18 +204,19 @@ getGreetingServiceStatus:
     body:
       serviceId: ${greetingServiceId}
   result: service_status_res
-  next: assignGreetingServiceStatus
+  next: checkGreetingServiceIsActive
 
-assignGreetingServiceStatus:
-  assign:
-    greetingServiceStatus: "${service_status_res.response.body[0]?.currentState === 'active' ? 'active' : 'draft'}"
-  next: triggerGreetingService
+checkGreetingServiceIsActive:
+  switch:
+    - condition: ${service_status_res.response.body[0]?.currentState === 'active'}
+      next: triggerGreetingService
+  next: insertFallbackGreeting
 
 triggerGreetingService:
   template: "[#CHATBOT_PROJECT_LAYER]/chats/trigger-service"
   requestType: templates
   body:
-    message: "${'#service,/POST/services/' + greetingServiceStatus + '/' + greetingServiceName}"
+    message: "${'#service,/POST/services/active/' + greetingServiceName}"
     chatId: ${chatUuid}
     authorId: ${chat_bot_name}
   result: trigger_res
@@ -224,7 +225,7 @@ triggerGreetingService:
 
 check_trigger_result:
   switch:
-    - condition: ${trigger_res == null || trigger_res === 'Service is not approved' || trigger_res.length === 0}
+    - condition: ${trigger_res == null || trigger_res === 'Service is not approved' || trigger_res === 'There was a problem triggering the service' || trigger_res.length === 0}
       next: insertFallbackGreeting
   next: insertServiceMessages
 
