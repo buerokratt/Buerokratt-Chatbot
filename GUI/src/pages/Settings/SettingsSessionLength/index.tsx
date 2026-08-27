@@ -135,13 +135,12 @@ const SettingsSessionLength: FC = () => {
     },
   });
 
-  const valueInRange = (inputValue: string, minValue: number, maxValue: number) => {
-    const value = parseInt(inputValue);
-    if (!value) {
+  const valueOutOfRange = (inputValue: string, minValue: number, maxValue: number) => {
+    const value = parseInt(inputValue, 10);
+    if (Number.isNaN(value)) {
       return false;
-    } else {
-      return value < minValue || value > maxValue;
     }
+    return value < minValue || value > maxValue;
   };
 
   const onSubmit = (data: FormValues) => {
@@ -151,7 +150,7 @@ const SettingsSessionLength: FC = () => {
         title: t('global.notificationError'),
         message: t('settings.userSession.emptySession'),
       });
-    } else if (valueInRange(data.sessionLength, 30, 480)) {
+    } else if (valueOutOfRange(data.sessionLength, 30, 480)) {
       toast.open({
         type: 'error',
         title: t('global.notificationError'),
@@ -163,7 +162,7 @@ const SettingsSessionLength: FC = () => {
         title: t('global.notificationError'),
         message: t('settings.chatDuration.emptySession'),
       });
-    } else if (valueInRange(data.chatActiveDuration, 5, 480)) {
+    } else if (valueOutOfRange(data.chatActiveDuration, 5, 480)) {
       toast.open({
         type: 'error',
         title: t('global.notificationError'),
