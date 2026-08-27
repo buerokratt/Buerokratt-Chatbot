@@ -13,11 +13,24 @@ import { ROLES } from 'utils/constants';
 import './MultiDomain.scss';
 import { WDomain } from '../../../types/widgetModels';
 
+const normalizeUrl = (url: string) => {
+  const trimmed = url.trim();
+  return trimmed.endsWith('/') ? trimmed : trimmed + '/';
+};
+
+const normalizeUrlForComparison = (url: string) => normalizeUrl(url).toLowerCase();
+
 const MultiDomain: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
   const hasRendered = useRef<boolean>();
-  const { control, handleSubmit, reset } = useForm<{
+  const {
+    control,
+    handleSubmit,
+    reset,
+    getValues,
+    formState: { errors },
+  } = useForm<{
     widgetDomains: WDomain[];
   }>({
     defaultValues: {
@@ -81,12 +94,30 @@ const MultiDomain: FC = () => {
     fetchData();
   }, [fetchData, trackKey]);
 
+  const validateUniqueName = (value: string, index: number) => {
+    const trimmed = value.trim().toLowerCase();
+    if (!trimmed) return true;
+
+    const domains = getValues('widgetDomains');
+    const isDuplicate = domains.some((domain, i) => i !== index && domain.name.trim().toLowerCase() === trimmed);
+
+    return isDuplicate ? t('multiDomains.duplicateName') : true;
+  };
+
+  const validateUniqueUrl = (value: string, index: number) => {
+    if (!value.trim()) return true;
+
+    const normalized = normalizeUrlForComparison(value);
+    const domains = getValues('widgetDomains');
+    const isDuplicate = domains.some((domain, i) => i !== index && normalizeUrlForComparison(domain.url) === normalized);
+
+    return isDuplicate ? t('multiDomains.duplicateUrl') : true;
+  };
+
   const convertDomains = (newWidgets: WDomain[]) => {
     const result: WDomain[] = [];
 
     const findById = (arr: WDomain[], id: string) => arr.find((x) => x.domainId === id);
-
-    const normalizeUrl = (url: string) => (url.endsWith('/') ? url : url + '/');
 
     for (const oldItem of initialDomains) {
       const match = findById(newWidgets, oldItem.domainId);
@@ -139,26 +170,45 @@ const MultiDomain: FC = () => {
         }
       >
         {fields.map((field, index) => (
-          <Track gap={10} key={field.id} direction="horizontal" justify="start" style={{ marginBottom: '15px' }}>
-            <Controller
-              name={`widgetDomains.${index}.name`}
-              control={control}
-              render={({ field }) => (
-                <FormInput
-                  label={`${index + 1}. ${t('multiDomains.domainName')}`}
-                  className="inline-form"
-                  style={{ maxWidth: '500px' }}
-                  {...field}
-                />
+          <Track
+            gap={10}
+            key={field.id}
+            direction="horizontal"
+            justify="start"
+            align="left"
+            style={{ marginBottom: '15px' }}
+          >
+            <div style={{ maxWidth: '500px' }}>
+              <Controller
+                name={`widgetDomains.${index}.name`}
+                control={control}
+                rules={{ validate: (value) => validateUniqueName(value, index) }}
+                render={({ field }) => (
+                  <FormInput
+                    label={`${index + 1}. ${t('multiDomains.domainName')}`}
+                    className="inline-form"
+                    style={{ maxWidth: '500px' }}
+                    {...field}
+                  />
+                )}
+              />
+              {errors.widgetDomains?.[index]?.name && (
+                <span style={{ color: '#f00' }}>{errors.widgetDomains[index]?.name?.message}</span>
               )}
-            />
-            <Controller
-              name={`widgetDomains.${index}.url`}
-              control={control}
-              render={({ field }) => (
-                <FormInput label="URL" className="inline-form" style={{ maxWidth: '500px' }} {...field} />
+            </div>
+            <div style={{ maxWidth: '500px' }}>
+              <Controller
+                name={`widgetDomains.${index}.url`}
+                control={control}
+                rules={{ validate: (value) => validateUniqueUrl(value, index) }}
+                render={({ field }) => (
+                  <FormInput label="URL" className="inline-form" style={{ maxWidth: '500px' }} {...field} />
+                )}
+              />
+              {errors.widgetDomains?.[index]?.url && (
+                <span style={{ color: '#f00' }}>{errors.widgetDomains[index]?.url?.message}</span>
               )}
-            />
+            </div>
             <Track gap={8} justify="between">
               <Button appearance="error" disabled={fields.length === 1} onClick={() => remove(index)}>
                 <Icon icon={<MdDeleteOutline color="white" />} />

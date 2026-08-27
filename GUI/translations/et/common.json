@@ -83,7 +83,9 @@
     "selectDomains": "Vali Domeenid",
     "chooseDomain": "Vali domeen:",
     "allDomains": "Kõik",
-    "noDomains": "Domeene ei ole saadaval. Palun võtke ühendust süsteemiadministraatoriga."
+    "noDomains": "Domeene ei ole saadaval. Palun võtke ühendust süsteemiadministraatoriga.",
+    "duplicateName": "Selline domeeni nimi on juba olemas",
+    "duplicateUrl": "Selline URL on juba olemas"
   },
   "menu": {
     "conversations": "Vestlused",
