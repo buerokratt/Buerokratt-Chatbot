@@ -199,13 +199,40 @@ trigger_service:
     chatId: ${chatId}
     authorId: ${chat_bot_name}
   result: converted_messages_res
-  error: return_bot_error
+  error: insert_unavailable_service_message
   next: check_for_trigger_service_response
 
 check_for_trigger_service_response:
   switch:
     - condition: ${converted_messages_res === 'Service is not approved'}
       next: post_message_to_bot
+    - condition: ${converted_messages_res == null || converted_messages_res === 'There was a problem triggering the service' || converted_messages_res.length === 0}
+      next: insert_unavailable_service_message
+  next: add_bot_message_to_db
+
+insert_unavailable_service_message:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_HBS]/bot_responses_to_messages"
+    headers:
+      type: json
+    body:
+      data:
+        {
+          "botMessages": [{"text": "Kahjuks see teenus ei ole praegu saadaval. Saate jätkata vestlust."}],
+          "chatId": "${chatId}",
+          "authorId": "${chat_bot_name}",
+          "authorFirstName": "",
+          "authorLastName": "",
+          "authorTimestamp": "${new Date().toISOString()}",
+          "created": "${new Date().toISOString()}",
+        }
+  result: converted_messages_res
+  next: assign_unavailable_service_messages
+
+assign_unavailable_service_messages:
+  assign:
+    converted_messages_res: ${converted_messages_res.response.body}
   next: add_bot_message_to_db
 
 check_if_client_bot_is_active:
