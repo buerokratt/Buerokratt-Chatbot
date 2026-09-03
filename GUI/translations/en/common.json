@@ -83,7 +83,9 @@
     "selectDomains": "Select Domains",
     "chooseDomain": "Select domain:",
     "allDomains": "All",
-    "noDomains": "No domains available. Please contact your system administrator."
+    "noDomains": "No domains available. Please contact your system administrator.",
+    "duplicateName": "This domain name already exists",
+    "duplicateUrl": "This URL already exists"
   },
   "menu": {
     "conversations": "Conversations",
