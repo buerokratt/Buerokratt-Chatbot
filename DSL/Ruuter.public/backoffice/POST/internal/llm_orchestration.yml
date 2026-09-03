@@ -1,0 +1,150 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: Description placeholder for 'llm_orchestration'
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: message
+        type: string
+        description: Body field 'message'
+      - field: chatId
+        type: string
+        description: Body field 'chatId'  
+      - field: authorId
+        type: string
+        description: Body field 'authorId'  
+      - field: domain
+        type: string
+        description: "Body field 'domain'"
+
+extract_data:
+  assign:
+    chatId: ${incoming.body.chatId}
+    domain: ${incoming.body.domain}
+    authorId: ${incoming.body.authorId}
+    message: ${incoming.body.message ?? ''}
+
+get_chat_messages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-llm-chat-messages"
+    body:
+      chatId: ${chatId}
+  result: chat_messages_res
+
+assign_messages:
+  assign:
+    messages: '$=chat_messages_res.response.body.map(m => ({ authorRole: (m.author_role === "assistant" ? "bot" : m.author_role), message: m.content, timestamp: m.created }))='
+
+check_if_anonymizer_is_active:
+  switch:
+    - condition: ${[#ANONYMIZER_ENABLED] === true}
+      next: checkForPassedDomain
+  next: trigger_llm_stream
+
+checkForPassedDomain:
+  switch:
+    - condition: ${domain === 'none'}
+      next: getAnonymizerConfig
+  next: getDomainUUID
+
+getDomainUUID:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-uuid"
+    body:
+      domainUrl: ${domain + '%'}
+  result: domainUuid
+  next: validate_domain_res
+
+validate_domain_res:
+  switch:
+    - condition: ${domainUuid.response.body.length > 0}
+      next: getDomainAnonymizerConfig
+  next: getAnonymizerConfig
+
+getAnonymizerConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-anonymizer-config"
+  result: anonymizer_configs_res
+  next: assignAnonymizerConfigs
+
+getDomainAnonymizerConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-anonymizer-config"
+    body:
+      domainUUID: ${domainUuid.response.body[0].domainId}
+  result: anonymizer_configs_res
+  next: assignAnonymizerConfigs
+
+assignAnonymizerConfigs:
+  assign:
+    anonymizer_configs: ${anonymizer_configs_res.response.body[0]}
+  next: check_if_anonymize_before_llm
+
+check_if_anonymize_before_llm:
+  switch:
+    - condition: ${anonymizer_configs.isAnonymizationBeforeLlm === 'true'}
+      next: prepareAnonymizerConfig
+  next: trigger_llm_stream
+
+prepareAnonymizerConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_HBS]/prepare_anonymizer_config"
+    headers:
+      type: json
+    body:
+      texts: ${messages.filter(i => i.authorRole === 'user').map(i => i.message)}
+      approach: ${anonymizer_configs.anonymizerSelectedApproach}
+      entities: ${anonymizer_configs.anonymizerSelectedEntities.split(',')}
+      allowlist: ${anonymizer_configs.anonymizerAllowlist.split(',')}
+      denylist: ${anonymizer_configs.anonymizerDenylist.split(',')}
+      hash_type: "[#ANONYMIZER_HASH_TYPE]"
+  result: preparedAnonymizerConfigs
+  next: assignPreparedAnonymizerConfigs
+
+assignPreparedAnonymizerConfigs:
+  assign:
+    preparedAnonymizerConfigs: ${preparedAnonymizerConfigs.response.body}
+  next: anonymizeText
+
+anonymizeText:
+  call: http.post
+  args:
+    url: "[#CHATBOT_ANONYMIZER]/anonymize"
+    body:
+      texts: ${preparedAnonymizerConfigs.texts}
+      anonymizers: ${preparedAnonymizerConfigs.anonymizers}
+      entities: ${preparedAnonymizerConfigs.entities}
+      allowlist: ${preparedAnonymizerConfigs.allowlist}
+      denylist: ${preparedAnonymizerConfigs.denylist}
+  result: anonymize_res
+  next: assign_anonymized_messages
+
+assign_anonymized_messages:
+  assign:
+    anonymizedMessages: ${anonymize_res.response.body.results}
+    messages: "$=messages.map((m, i) => m.authorRole === 'user' ? {...m, message: anonymizedMessages[messages.slice(0, i).filter(msg => msg.authorRole === 'user').length].text} : m)="
+
+trigger_llm_stream:
+  call: http.post
+  args:
+    url: "[#CHATBOT_NOTIFICATIONS]/channels/${chatId}/llm-stream"
+    body:
+      chatId: ${chatId}
+      message: ${message}
+      authorId: ${authorId}
+      conversationHistory: ${messages}
+  result: llm_stream_result
+  next: return_result  
+
+return_result:
+  return: "stream triggered"
+  next: end
