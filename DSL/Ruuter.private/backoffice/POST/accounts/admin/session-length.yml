@@ -26,6 +26,12 @@ declaration:
       - field: autoCloseText
         type: string
         description: "Body field 'autoCloseText'"
+      - field: awayStatusActive
+        type: string
+        description: "Body field 'awayStatusActive'"
+      - field: awayStatusTimeout
+        type: string
+        description: "Body field 'awayStatusTimeout'"
 
 extractRequestData:
   assign:
@@ -35,6 +41,8 @@ extractRequestData:
     idleMessage: ${incoming.body.idleMessage}
     showAutoCloseText: ${incoming.body.showAutoCloseText}
     autoCloseText: ${incoming.body.autoCloseText}
+    awayStatusActive: ${incoming.body.awayStatusActive}
+    awayStatusTimeout: ${incoming.body.awayStatusTimeout}
 
 setConfigurationValue:
   call: http.post
@@ -48,6 +56,8 @@ setConfigurationValue:
       idle_message: ${idleMessage}
       show_auto_close_text: ${showAutoCloseText}
       auto_close_text: ${autoCloseText}
+      away_status_active: ${awayStatusActive}
+      away_status_timeout: ${awayStatusTimeout}
   result: res
 
 return_result:
