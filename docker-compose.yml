@@ -390,6 +390,102 @@ services:
       - vault-network
       - bykstack
 
+  vault-agent-gui:
+    container_name: vault-agent-gui
+    image: hashicorp/vault:1.18
+    entrypoint: vault agent -config=/agent/config/llm-module-gui-agent.hcl
+    depends_on:
+      vault-init:
+        condition: service_completed_successfully
+    user: "0"
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - ./vault/agent/llm-module-gui-agent.hcl:/agent/config/llm-module-gui-agent.hcl:ro
+      - ./vault/agent-out/llm-module-gui:/vault/secrets
+      - vault-agent-creds:/agent/credentials:ro
+    healthcheck:
+      test: ["CMD", "sh", "-c", "test -s /vault/secrets/.agent-token"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    networks:
+      - vault-network
+      - bykstack
+
+  vault-agent-cron:
+    container_name: vault-agent-cron
+    image: hashicorp/vault:1.18
+    entrypoint: vault agent -config=/agent/config/llm-module-cron-agent.hcl
+    depends_on:
+      vault-init:
+        condition: service_completed_successfully
+    user: "0"
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - ./vault/agent/llm-module-cron-agent.hcl:/agent/config/llm-module-cron-agent.hcl:ro
+      - ./vault/agent-out/llm-module-cron:/vault/secrets
+      - vault-agent-creds:/agent/credentials:ro
+    healthcheck:
+      test: ["CMD", "sh", "-c", "test -s /vault/secrets/.agent-token"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    networks:
+      - vault-network
+      - bykstack
+
+  vault-agent-llm:
+    container_name: vault-agent-llm
+    image: hashicorp/vault:1.18
+    entrypoint: vault agent -config=/agent/config/llm-module-llm-agent.hcl
+    depends_on:
+      vault-init:
+        condition: service_completed_successfully
+    user: "0"
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - ./vault/agent/llm-module-llm-agent.hcl:/agent/config/llm-module-llm-agent.hcl:ro
+      - ./vault/agent-out/llm-module-llm:/vault/secrets
+      - vault-agent-creds:/agent/credentials:ro
+    healthcheck:
+      test: ["CMD", "sh", "-c", "test -s /vault/secrets/.agent-token"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    networks:
+      - vault-network
+      - bykstack
+
+  vault-agent-cleaner:
+    container_name: vault-agent-cleaner
+    image: hashicorp/vault:1.18
+    entrypoint: vault agent -config=/agent/config/ckb-cleaner-agent.hcl
+    depends_on:
+      vault-init:
+        condition: service_completed_successfully
+    user: "0"
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - ./vault/agent/ckb-cleaner-agent.hcl:/agent/config/ckb-cleaner-agent.hcl:ro
+      - ./vault/agent-out/ckb-cleaner:/vault/secrets
+      - vault-agent-creds:/agent/credentials:ro
+    healthcheck:
+      test: ["CMD", "sh", "-c", "test -s /vault/secrets/.agent-token"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    networks:
+      - vault-network
+      - bykstack
+
 volumes:
   opensearch-data:
   spacy_models:
