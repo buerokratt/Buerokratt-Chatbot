@@ -11,7 +11,7 @@ import { apiDev } from 'services/api';
 import './SettingsSessionLength.scss';
 import { ROLES } from 'utils/constants';
 
-import { WELCOME_MESSAGE_LENGTH } from '../../../constants/config';
+import { AWAY_STATUS_TIMEOUT_MAX, AWAY_STATUS_TIMEOUT_MIN, WELCOME_MESSAGE_LENGTH } from '../../../constants/config';
 import { InfoTooltip } from '../../../utils/getToolTipWithText';
 
 type FormValues = {
@@ -21,6 +21,8 @@ type FormValues = {
   idleMessage: string;
   showAutoCloseText: boolean;
   autoCloseText: string;
+  awayStatusActive: boolean;
+  awayStatusTimeout: string;
 };
 
 type ConfigItem = {
@@ -41,6 +43,8 @@ const SettingsSessionLength: FC = () => {
       idleMessage: '',
       showAutoCloseText: false,
       autoCloseText: '',
+      awayStatusActive: false,
+      awayStatusTimeout: '',
     },
   });
 
@@ -51,10 +55,20 @@ const SettingsSessionLength: FC = () => {
     idleMessageText: t('settings.sessionLength.tooltip.idleMessageText'),
     showEndMessage: t('settings.sessionLength.tooltip.showEndMessage'),
     endMessageText: t('settings.sessionLength.tooltip.endMessageText'),
+    awayStatusActive: t('settings.sessionLength.tooltip.awayStatusActive'),
+    awayStatusTimeout: t('settings.sessionLength.tooltip.awayStatusTimeout'),
   };
 
   const getTooltip = (
-    name: 'sessionLength' | 'idleTimout' | 'showIdleMessage' | 'idleMessageText' | 'showEndMessage' | 'endMessageText',
+    name:
+      | 'sessionLength'
+      | 'idleTimout'
+      | 'showIdleMessage'
+      | 'idleMessageText'
+      | 'showEndMessage'
+      | 'endMessageText'
+      | 'awayStatusActive'
+      | 'awayStatusTimeout',
   ) => {
     return (
       <Tooltip content={tooltips[name]}>
@@ -75,13 +89,24 @@ const SettingsSessionLength: FC = () => {
     );
   };
 
-  const [sessionLength, chatActiveDuration, showIdleWarning, idleMessage, showAutoCloseText, autoCloseText] = watch([
+  const [
+    sessionLength,
+    chatActiveDuration,
+    showIdleWarning,
+    idleMessage,
+    showAutoCloseText,
+    autoCloseText,
+    awayStatusActive,
+    awayStatusTimeout,
+  ] = watch([
     'sessionLength',
     'chatActiveDuration',
     'showIdleWarning',
     'idleMessage',
     'showAutoCloseText',
     'autoCloseText',
+    'awayStatusActive',
+    'awayStatusTimeout',
   ]);
 
   useQuery({
@@ -94,11 +119,13 @@ const SettingsSessionLength: FC = () => {
         chatActiveDuration: data.chat_active_duration,
         autoCloseText: data.auto_close_text,
         idleMessage: data.idle_message,
+        awayStatusTimeout: data.away_status_timeout,
       };
 
       const booleanFields = {
         showIdleWarning: data.show_idle_warning,
         showAutoCloseText: data.show_auto_close_text,
+        awayStatusActive: data.away_status_active,
       };
 
       Object.entries(stringFields).forEach(([key, value]) => setValue(key as keyof FormValues, value ?? ''));
@@ -118,6 +145,8 @@ const SettingsSessionLength: FC = () => {
         idleMessage: idleMessage,
         showAutoCloseText: showAutoCloseText.toString(),
         autoCloseText: autoCloseText,
+        awayStatusActive: awayStatusActive.toString(),
+        awayStatusTimeout: awayStatusTimeout,
       }),
     onSuccess: () => {
       toast.open({
@@ -167,6 +196,21 @@ const SettingsSessionLength: FC = () => {
         type: 'error',
         title: t('global.notificationError'),
         message: t('settings.chatDuration.invalidSession'),
+      });
+    } else if (data.awayStatusActive && !data.awayStatusTimeout) {
+      toast.open({
+        type: 'error',
+        title: t('global.notificationError'),
+        message: t('settings.awayStatus.emptyTimeout'),
+      });
+    } else if (
+      data.awayStatusActive &&
+      valueOutOfRange(data.awayStatusTimeout, AWAY_STATUS_TIMEOUT_MIN, AWAY_STATUS_TIMEOUT_MAX)
+    ) {
+      toast.open({
+        type: 'error',
+        title: t('global.notificationError'),
+        message: t('settings.awayStatus.invalidTimeout'),
       });
     } else {
       sessionLengthMutation.mutate();
@@ -304,6 +348,48 @@ const SettingsSessionLength: FC = () => {
                       )}
                     />
                     {getTooltip('endMessageText')}
+                  </Track>
+                )}
+              </>
+            )}
+          />
+          <Controller
+            name="awayStatusActive"
+            control={control}
+            render={({ field }) => (
+              <>
+                <Switch
+                  label={t('settings.awayStatus.title')}
+                  onLabel={t('global.yes') ?? 'yes'}
+                  offLabel={t('global.no') ?? 'no'}
+                  onCheckedChange={(e) => field.onChange(e)}
+                  checked={field.value}
+                  tooltip={<InfoTooltip name="settings.sessionLength.tooltip.awayStatusActive" />}
+                  {...field}
+                />
+                {awayStatusActive && (
+                  <Track gap={16} direction="vertical" align="left">
+                    <p className="rule">{t('settings.awayStatus.description')}</p>
+                    <Track>
+                      <Controller
+                        name="awayStatusTimeout"
+                        control={control}
+                        render={({ field }) => (
+                          <FormInput
+                            {...field}
+                            labelWidth={130}
+                            name="awayStatusTimeout"
+                            label={t('settings.awayStatus.timeout')}
+                            type="number"
+                          />
+                        )}
+                      />
+                      <Track gap={10}>
+                        <label className="minute">{t('settings.awayStatus.minutes')}</label>
+                        {getTooltip('awayStatusTimeout')}
+                      </Track>
+                    </Track>
+                    <label className="rule">{t('settings.awayStatus.rule')}</label>
                   </Track>
                 )}
               </>
