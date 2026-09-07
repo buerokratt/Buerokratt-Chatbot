@@ -7,7 +7,7 @@ INIT_FILE="$DATA_DIR/init.json"
 INIT_FLAG="$DATA_DIR/.initialized"
 CREDENTIALS_DIR="/agent/credentials"
 
-echo "=== Backoffice Vault Initialization ==="
+echo "=== Vault Initialization (backoffice, CKB, LLM Module) ==="
 
 # ---------------------------------------------------------------------------
 # Helpers (used on every run, not just first-time init)
@@ -72,6 +72,142 @@ reconcile_secret_id() {
         echo "$role: secret_id invalid or missing - minting a new one"
         mint_secret_id "$role" "$sid_file"
     fi
+}
+
+# ---------------------------------------------------------------------------
+# CKB / LLM Module support
+# authenticate and authorize Common-Knowledge's and LLM-Module's services
+# instead of each module running its own Vault stack.
+# ---------------------------------------------------------------------------
+
+# Create or update an ACL policy from its HCL body. Idempotent - safe on every run.
+put_policy() {
+    name="$1"; policy="$2"
+    policy_json=$(echo "$policy" | jq -Rs '{"policy":.}')
+    wget -q -O- --post-data="$policy_json" \
+        --header="X-Vault-Token: $ROOT_TOKEN" \
+        --header='Content-Type: application/json' \
+        "$VAULT_ADDR/v1/sys/policies/acl/$name" >/dev/null
+}
+
+# Policies for CKB's and LLM-Module's services, scoped to their own secret/
+# path prefix (secret/ckb/* and secret/llm-module/*) so the two modules can't
+# read or write each other's connections/encryption keys. Bodies mirror what
+# each module's own (now superseded) vault-init script already granted.
+create_module_policies() {
+    for module in ckb llm-module; do
+        put_policy "$module-gui-policy" \
+"path \"secret/data/$module/encryption/public_key\" { capabilities = [\"read\"] }
+path \"secret/metadata/$module/encryption/public_key\" { capabilities = [\"read\"] }
+path \"secret/data/$module/encryption/private_key\" { capabilities = [\"deny\"] }
+path \"secret/data/$module/llm/*\" { capabilities = [\"deny\"] }
+path \"secret/data/$module/embeddings/*\" { capabilities = [\"deny\"] }"
+
+        put_policy "$module-cron-manager-policy" \
+"path \"secret/data/$module/encryption/public_key\" { capabilities = [\"read\"] }
+path \"secret/metadata/$module/encryption/public_key\" { capabilities = [\"read\"] }
+path \"secret/data/$module/encryption/private_key\" { capabilities = [\"read\"] }
+path \"secret/metadata/$module/encryption/private_key\" { capabilities = [\"read\"] }
+path \"secret/data/$module/llm/connections/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\"] }
+path \"secret/metadata/$module/llm/connections/*\" { capabilities = [\"read\", \"list\", \"delete\"] }
+path \"secret/data/$module/embeddings/connections/*\" { capabilities = [\"create\", \"read\", \"update\", \"delete\"] }
+path \"secret/metadata/$module/embeddings/connections/*\" { capabilities = [\"read\", \"list\", \"delete\"] }
+path \"auth/token/lookup-self\" { capabilities = [\"read\"] }"
+
+        put_policy "$module-llm-orchestration-policy" \
+"path \"secret/data/$module/llm/connections/*\" { capabilities = [\"read\", \"list\"] }
+path \"secret/metadata/$module/llm/connections/*\" { capabilities = [\"read\", \"list\"] }
+path \"secret/data/$module/embeddings/connections/*\" { capabilities = [\"read\", \"list\"] }
+path \"secret/metadata/$module/embeddings/connections/*\" { capabilities = [\"read\", \"list\"] }
+path \"secret/data/$module/encryption/*\" { capabilities = [\"deny\"] }
+path \"auth/token/lookup-self\" { capabilities = [\"read\"] }"
+    done
+
+    # CKB-only: the cleaning-server has no encryption-key access, just
+    # read-only access to the LLM connections it needs for cleanup jobs.
+    put_policy "ckb-cleaner-policy" \
+'path "secret/data/ckb/llm/connections/*" { capabilities = ["read", "list"] }
+path "secret/metadata/ckb/llm/connections/*" { capabilities = ["read", "list"] }
+path "secret/data/ckb/encryption/*" { capabilities = ["deny"] }
+path "auth/token/lookup-self" { capabilities = ["read"] }'
+}
+
+# Apply the CKB and LLM-Module AppRole definitions. Periodic tokens, same as
+# backoffice-service - called on every run so config changes (e.g. token
+# period) land without re-initializing Vault.
+configure_module_approles() {
+    upsert_approle "ckb-gui-service"                      "ckb-gui-policy"                      "20m"
+    upsert_approle "ckb-cron-manager-service"             "ckb-cron-manager-policy"             "30m"
+    upsert_approle "ckb-llm-orchestration-service"        "ckb-llm-orchestration-policy"        "1h"
+    upsert_approle "ckb-cleaner-service"                  "ckb-cleaner-policy"                  "1h"
+    upsert_approle "llm-module-gui-service"               "llm-module-gui-policy"               "20m"
+    upsert_approle "llm-module-cron-manager-service"      "llm-module-cron-manager-policy"      "30m"
+    upsert_approle "llm-module-llm-orchestration-service" "llm-module-llm-orchestration-policy" "1h"
+}
+
+# Reconcile (reuse-or-mint) every CKB/LLM-Module secret_id. reconcile_secret_id
+# already handles the true-first-time case too (ensure_role_id creates the
+# role_id, then a missing secret_id fails validation and gets minted), so this
+# is safe to call unconditionally on every run - first deploy or redeploy.
+reconcile_module_secret_ids() {
+    for role in ckb-gui-service ckb-cron-manager-service ckb-llm-orchestration-service ckb-cleaner-service \
+                llm-module-gui-service llm-module-cron-manager-service llm-module-llm-orchestration-service; do
+        reconcile_secret_id "$role" "$CREDENTIALS_DIR/${role}_role_id" "$CREDENTIALS_DIR/${role}_secret_id"
+    done
+}
+
+# Return 0 if secret/data/<path> already exists in Vault, 1 otherwise.
+secret_exists() {
+    path="$1"
+    wget -q -O- --header="X-Vault-Token: $ROOT_TOKEN" "$VAULT_ADDR/v1/secret/data/$path" 2>/dev/null \
+        | jq -e '.data.data' >/dev/null 2>&1
+}
+
+# Generate a module's RSA-2048 keypair only if it doesn't already have one.
+# Never regenerates an existing keypair on redeploy - that would silently
+# break decryption of anything already encrypted with the old public key.
+ensure_rsa_keypair() {
+    module="$1"
+    if secret_exists "$module/encryption/public_key"; then
+        echo "$module: RSA keypair already exists - skipping"
+    else
+        echo "$module: generating RSA keypair"
+        generate_and_store_rsa_keypair "$module"
+    fi
+}
+
+# Generate an RSA-2048 keypair and store it at secret/<module>/encryption/{public_key,private_key}.
+# Each module's GUI encrypts credentials client-side with the public key;
+# only that module's cron-manager can read the private key to decrypt them.
+# Called only via ensure_rsa_keypair above - never call directly on redeploy.
+generate_and_store_rsa_keypair() {
+    module="$1"
+    key_dir="/tmp/rsa-$module-$$"
+    mkdir -p "$key_dir"
+
+    if ! openssl genrsa -out "$key_dir/private.pem" 2048 2>/dev/null; then
+        echo "ERROR: Failed to generate private key for $module"; rm -rf "$key_dir"; return 1
+    fi
+    if ! openssl rsa -in "$key_dir/private.pem" -pubout -out "$key_dir/public.pem" 2>/dev/null; then
+        echo "ERROR: Failed to extract public key for $module"; rm -rf "$key_dir"; return 1
+    fi
+
+    public_key=$(sed ':a;N;$!ba;s/\n/\\n/g' "$key_dir/public.pem")
+    private_key=$(sed ':a;N;$!ba;s/\n/\\n/g' "$key_dir/private.pem")
+    created_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+    key_id="rsa-keypair-$(date +%s)"
+
+    wget -q -O- --post-data='{"data":{"key":"'"$public_key"'","algorithm":"RSA-OAEP","key_size":2048,"key_id":"'"$key_id"'","created_at":"'"$created_at"'"}}' \
+        --header="X-Vault-Token: $ROOT_TOKEN" \
+        --header='Content-Type: application/json' \
+        "$VAULT_ADDR/v1/secret/data/$module/encryption/public_key" >/dev/null
+
+    wget -q -O- --post-data='{"data":{"key":"'"$private_key"'","algorithm":"RSA-OAEP","key_size":2048,"key_id":"'"$key_id"'","created_at":"'"$created_at"'"}}' \
+        --header="X-Vault-Token: $ROOT_TOKEN" \
+        --header='Content-Type: application/json' \
+        "$VAULT_ADDR/v1/secret/data/$module/encryption/private_key" >/dev/null
+
+    rm -rf "$key_dir"
 }
 
 # ---------------------------------------------------------------------------
@@ -148,6 +284,19 @@ path "secret/metadata/backoffice/*" { capabilities = ["read", "list", "delete"] 
         --header='Content-Type: application/json' \
         "$VAULT_ADDR/v1/secret/data/backoffice/global/tim-postgresql" >/dev/null
 
+    echo "Creating CKB and LLM-Module policies..."
+    create_module_policies
+
+    echo "Creating CKB and LLM-Module AppRoles..."
+    configure_module_approles
+
+    echo "Fetching CKB and LLM-Module credentials..."
+    reconcile_module_secret_ids
+
+    echo "Generating RSA keypairs for CKB and LLM-Module encryption..."
+    ensure_rsa_keypair "ckb"
+    ensure_rsa_keypair "llm-module"
+
     touch "$INIT_FLAG"
     echo "=== First time setup complete ==="
 else
@@ -173,7 +322,16 @@ else
     # does not invalidate the existing secret_id.
     upsert_approle "backoffice-service" "backoffice-admin-policy" "1h"
 
+    # Re-apply CKB/LLM-Module policies + AppRoles too, and generate their RSA
+    # keypairs if this vault is being upgraded from an .initialized state
+    # that never ran the first-time block above for them.
+    create_module_policies
+    configure_module_approles
+    ensure_rsa_keypair "ckb"
+    ensure_rsa_keypair "llm-module"
+
     reconcile_secret_id "backoffice-service" "$CREDENTIALS_DIR/role_id" "$CREDENTIALS_DIR/secret_id"
+    reconcile_module_secret_ids
 fi
 
 echo "=== Vault init complete ==="
