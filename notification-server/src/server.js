@@ -4,7 +4,7 @@ const csurf = require('csurf');
 const express = require('express');
 const helmet = require('helmet');
 
-const { buildNotificationSearchInterval, buildQueueCounter } = require('./addOns');
+const { buildNotificationSearchInterval } = require('./addOns');
 const { sendAzureAgenticRequest } = require('./azureAgenticRequest');
 const { initializeAzureOpenAI } = require('./azureOpenAI');
 const { extractMessageTextPart } = require('./citationFormatting');
@@ -45,15 +45,6 @@ app.get('/sse/notifications/:channelId', (req, res) => {
     res,
     buildCallbackFunction: buildNotificationSearchInterval({ channelId }),
     channelId,
-  });
-});
-
-app.get('/sse/queue/:id', (req, res) => {
-  const { id } = req.params;
-  buildSSEResponse({
-    req,
-    res,
-    buildCallbackFunction: buildQueueCounter({ id }),
   });
 });
 
