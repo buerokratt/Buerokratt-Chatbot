@@ -1,12 +1,35 @@
 const { Client } = require('@opensearch-project/opensearch');
+const { v4: uuidv4 } = require('uuid');
 
 const { sendAzureAgenticRequest } = require('./azureAgenticRequest');
 const { streamAzureOpenAIResponse } = require('./azureOpenAI');
-const { openSearchConfig } = require('./config');
+const { newNotificationsConfig, openSearchConfig } = require('./config');
 const { activeConnections, stoppedChannels } = require('./connectionManager');
 const streamQueue = require('./streamQueue');
 
 let client = buildClient();
+
+async function publishNotificationEvent(chatId, event) {
+  const envelope = {
+    eventUuid: uuidv4(),
+    recipient: 'CHAT',
+    recipientUuid: [chatId],
+    type: event.type,
+    payload: event,
+  };
+
+  const response = await fetch(newNotificationsConfig.eventUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(envelope),
+  });
+
+  if (!response.ok) {
+    throw new Error(`New notification event was rejected: ${response.status} ${response.statusText}`);
+  }
+}
 
 async function searchNotification({ channelId, connectionId, sender }) {
   try {
@@ -51,208 +74,146 @@ async function createAzureOpenAIStreamRequest({
   raw_response = false,
 }) {
   const { stream = true } = options;
+  const sender = (event) => publishNotificationEvent(channelId, event);
 
   try {
     stoppedChannels.delete(channelId);
+    let response;
 
-    const connections = Array.from(activeConnections.entries()).filter(
-      ([_, connData]) => connData.channelId === channelId,
-    );
-
-    if (connections.length === 0) {
-      const requestId = streamQueue.addToQueue(channelId, {
-        messages,
-        options,
-        use_agentic,
+    if (use_agentic) {
+      response = await sendAzureAgenticRequest(messages, {
+        ...options,
+        stream,
         agent_name,
         agent_type,
-        azure_client_id,
-        azure_client_secret,
-        azure_agentic_max_output_tokens,
-        raw_response,
+        client_id: azure_client_id,
+        client_secret: azure_client_secret,
+        max_output_tokens: azure_agentic_max_output_tokens,
       });
-      console.log('No active connections for channel, queued request');
+    } else {
+      response = await streamAzureOpenAIResponse(messages, options);
     }
 
-    const responsePromises = connections.map(async ([connectionId, connData]) => {
-      const { sender } = connData;
+    if (raw_response) {
+      if (stream) {
+        for await (const part of response) {
+          if (stoppedChannels.has(channelId)) break;
+          await sender(part.type ? part : { type: 'raw_response', data: part });
+        }
+      } else {
+        await sender(response.type ? response : { type: 'raw_response', data: response });
+      }
+      return { success: true, channelId };
+    }
 
-      try {
-        let response;
+    const openAIFallback1 =
+      'The requested information is not found in the retrieved data. Please try another query or topic.';
+    const openAIFallback2 =
+      'The requested information is not available in the retrieved data. Please try another query or topic.';
+    const estonianFallback =
+      'Mulle kättesaadavates andmetes puudub teie küsimusele vastav info. Palun täpsustage oma küsimust.';
+
+    if (stream) {
+      await sender({
+        type: 'stream_start',
+        streamId: channelId,
+        channelId,
+      });
+
+      let context;
+      let cumulative = '';
+      let startedStreaming = false;
+
+      for await (const part of response) {
+        if (stoppedChannels.has(channelId)) break;
+
+        let content = '';
 
         if (use_agentic) {
-          response = await sendAzureAgenticRequest(messages, {
-            ...options,
-            stream,
-            agent_name,
-            agent_type,
-            client_id: azure_client_id,
-            client_secret: azure_client_secret,
-            max_output_tokens: azure_agentic_max_output_tokens,
-          });
+          if (part.type === 'response.output_text.delta') content = part.delta || '';
         } else {
-          response = await streamAzureOpenAIResponse(messages, options);
+          const choice = part.choices?.[0];
+          if (!choice) continue;
+          if (!context && choice.delta?.context) context = choice.delta.context;
+          content = choice.delta?.content || '';
         }
 
-        if (!activeConnections.has(connectionId)) {
-          return;
+        if (!content) continue;
+
+        if (use_agentic) {
+          startedStreaming = true;
+          await sender({ type: 'stream_chunk', channelId, content, isComplete: false });
+          continue;
         }
 
-        if (raw_response) {
-          if (stream) {
-            for await (const part of response) {
-              if (!activeConnections.has(connectionId) || stoppedChannels.has(channelId)) break;
-              sender(part);
-            }
-          } else {
-            sender(response);
-          }
-          return;
+        cumulative += content;
+
+        if (startedStreaming) {
+          await sender({ type: 'stream_chunk', channelId, content, isComplete: false });
+          continue;
         }
 
-        const openAIFallback1 =
-          'The requested information is not found in the retrieved data. Please try another query or topic.';
-        const openAIFallback2 =
-          'The requested information is not available in the retrieved data. Please try another query or topic.';
-        const estonianFallback =
-          'Mulle kättesaadavates andmetes puudub teie küsimusele vastav info. Palun täpsustage oma küsimust.';
+        const isPrefixOfT1 = openAIFallback1.startsWith(cumulative);
+        const isPrefixOfT2 = openAIFallback2.startsWith(cumulative);
+        if (isPrefixOfT1 || isPrefixOfT2) continue;
 
-        if (stream) {
-          sender({
-            type: 'stream_start',
-            streamId: channelId,
-            channelId,
-          });
+        startedStreaming = true;
+        await sender({ type: 'stream_chunk', channelId, content: cumulative, isComplete: false });
+      }
 
-          let context;
-          let cumulative = '';
-          let startedStreaming = false;
-
-          for await (const part of response) {
-            if (!activeConnections.has(connectionId) || stoppedChannels.has(channelId)) break;
-
-            let content = '';
-
-            if (use_agentic) {
-              if (part.type === 'response.output_text.delta') {
-                content = part.delta || '';
-              }
-            } else {
-              const choice = part.choices?.[0];
-              if (!choice) continue;
-              if (!context && choice.delta?.context) context = choice.delta.context;
-              content = choice.delta?.content || '';
-            }
-
-            if (!content) continue;
-
-            if (use_agentic) {
-              if (!startedStreaming) {
-                startedStreaming = true;
-              }
-              sender({
-                type: 'stream_chunk',
-                channelId,
-                content,
-                isComplete: false,
-              });
-            } else {
-              cumulative += content;
-
-              if (startedStreaming) {
-                sender({
-                  type: 'stream_chunk',
-                  channelId,
-                  content,
-                  isComplete: false,
-                });
-              } else {
-                const isPrefixOfT1 = openAIFallback1.startsWith(cumulative);
-                const isPrefixOfT2 = openAIFallback2.startsWith(cumulative);
-
-                if (isPrefixOfT1 || isPrefixOfT2) continue;
-
-                startedStreaming = true;
-
-                sender({
-                  type: 'stream_chunk',
-                  channelId,
-                  content: cumulative,
-                  isComplete: false,
-                });
-              }
-            }
-          }
-
-          if (activeConnections.has(connectionId) && !stoppedChannels.has(channelId)) {
-            if (!startedStreaming) {
-              const trimmed = cumulative.trim();
-              if (trimmed === openAIFallback1 || trimmed === openAIFallback2) {
-                sender({
-                  type: 'stream_chunk',
-                  channelId,
-                  content: estonianFallback,
-                  isComplete: false,
-                });
-              }
-            }
-
-            sender({
-              type: 'stream_complete',
+      if (!stoppedChannels.has(channelId)) {
+        if (!startedStreaming) {
+          const trimmed = cumulative.trim();
+          if (trimmed === openAIFallback1 || trimmed === openAIFallback2) {
+            await sender({
+              type: 'stream_chunk',
               channelId,
-              content: '',
-              context: context || {},
-              isComplete: true,
+              content: estonianFallback,
+              isComplete: false,
             });
           }
-        } else {
-          let content = '';
-          let context = {};
-
-          if (use_agentic) {
-            const messageOutput = response.output?.find((item) => item.type === 'message');
-            content = messageOutput?.content?.[0]?.text || '';
-          } else {
-            content = response.choices?.[0]?.message?.content || '';
-            context = response.choices?.[0]?.message?.context || {};
-          }
-
-          const trimmed = content.trim();
-          const isDefaultMessage = trimmed === openAIFallback1 || trimmed === openAIFallback2;
-
-          if (isDefaultMessage && !use_agentic) content = estonianFallback;
-
-          sender({
-            type: 'complete_response',
-            channelId,
-            content: content,
-            context,
-            isComplete: true,
-          });
         }
-      } catch (error) {
-        if (activeConnections.has(connectionId)) {
-          const errorMessage = `Failed to ${stream ? 'stream' : 'generate'} response: ${error.message}`;
-          sender({
-            type: stream ? 'stream_error' : 'response_error',
-            channelId,
-            content: errorMessage,
-            isComplete: true,
-          });
-        }
-        throw error;
+
+        await sender({
+          type: 'stream_complete',
+          channelId,
+          content: '',
+          context: context || {},
+          isComplete: true,
+        });
       }
-    });
+    } else {
+      let content = '';
+      let context = {};
 
-    await Promise.all(responsePromises);
+      if (use_agentic) {
+        const messageOutput = response.output?.find((item) => item.type === 'message');
+        content = messageOutput?.content?.[0]?.text || '';
+      } else {
+        content = response.choices?.[0]?.message?.content || '';
+        context = response.choices?.[0]?.message?.context || {};
+      }
+
+      const trimmed = content.trim();
+      const isDefaultMessage = trimmed === openAIFallback1 || trimmed === openAIFallback2;
+      if (isDefaultMessage && !use_agentic) content = estonianFallback;
+
+      await sender({ type: 'complete_response', channelId, content, context, isComplete: true });
+    }
 
     return {
       success: true,
       channelId,
-      connectionsCount: connections.length,
-      message: `Azure OpenAI ${stream ? 'streaming' : 'response'} completed for all connections`,
+      message: `Azure OpenAI ${stream ? 'streaming' : 'response'} published`,
     };
   } catch (error) {
+    const errorMessage = `Failed to ${stream ? 'stream' : 'generate'} response: ${error.message}`;
+    await sender({
+      type: stream ? 'stream_error' : 'response_error',
+      channelId,
+      content: errorMessage,
+      isComplete: true,
+    }).catch((publishError) => console.error('Failed to publish LLM error event:', publishError));
     console.error(`Error in createAzureOpenAIStreamRequest (stream=${stream}):`, error);
     throw error;
   }
@@ -346,29 +307,6 @@ async function isQueueIndexExists() {
     })
     .catch(handleError);
   return res.body;
-}
-
-async function findChatIdOrder(chatId) {
-  const found = await findChatId(chatId);
-  if (!found) return 0;
-
-  const response = await client
-    .search({
-      index: openSearchConfig.chatQueueIndex,
-      body: {
-        query: {
-          range: {
-            timestamp: {
-              lt: found.timestamp,
-            },
-          },
-        },
-        size: 0,
-      },
-    })
-    .catch(handleError);
-
-  return response.body.hits.total.value + 1;
 }
 
 function buildClient() {
@@ -485,7 +423,6 @@ module.exports = {
   searchNotification,
   enqueueChatId,
   dequeueChatId,
-  findChatIdOrder,
   sendBulkNotification,
   createAzureOpenAIStreamRequest,
   createLLMOrchestrationStreamRequest,
