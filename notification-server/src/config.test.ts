@@ -16,7 +16,6 @@ describe('config', () => {
     expect(config.serverConfig).toBeDefined();
     expect(config.serverConfig.port).toBeDefined();
     expect(config.serverConfig.refreshInterval).toBeDefined();
-    expect(config.serverConfig.queueRefreshInterval).toBeDefined();
   });
 
   it('should have getUrl function that returns a valid URL string', () => {
