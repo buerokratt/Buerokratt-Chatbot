@@ -29,6 +29,8 @@ This repo will primarily contain:
 - choose dev branch and run `docker build -t rasa .`
 - Clone [Anonymizer](https://github.com/buerokratt/Presidio-Anonymizer)
 - choose dev branch and run `docker build --platform=linux/amd64 -t anonymizer .`
+- Clone [Notifications Node](https://github.com/buerokratt/notifications-node)
+- Navigate to Notifications Node's `api` directory and build the image `docker build -t notifications-node .`
 
 ### Run with local bot - deprecated
 
