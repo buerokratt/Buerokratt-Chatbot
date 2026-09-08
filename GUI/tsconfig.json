@@ -16,6 +16,9 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "baseUrl": "src",
+    "paths": {
+      "@buerokratt-ria/notifications/react": ["../node_modules/@buerokratt-ria/notifications/dist/react"]
+    },
     "types": ["vite/client", "node"]
   },
   "include": ["src"],

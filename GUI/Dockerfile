@@ -3,6 +3,7 @@ ARG nginx_version=nginx:1.25.4-alpine
 FROM node:22.18.0-alpine AS image
 WORKDIR /usr/buerokratt-chatbot
 COPY ./package*.json ./
+COPY ./notifications-sdk.tgz ./
 
 FROM image AS build
 RUN npm install --legacy-peer-deps --mode=development
@@ -15,6 +16,7 @@ COPY ./nginx/http-nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build ./usr/buerokratt-chatbot/build/assets /usr/share/nginx/html/buerokratt-chatbot/chat/assets
 COPY --from=build ./usr/buerokratt-chatbot/build/index.html /usr/share/nginx/html/buerokratt-chatbot
 COPY --from=build ./usr/buerokratt-chatbot/build/favicon.ico /usr/share/nginx/html/buerokratt-chatbot
+COPY --from=build ./usr/buerokratt-chatbot/build/notifications-service-worker.js /usr/share/nginx/html/buerokratt-chatbot/notifications-service-worker.js
 RUN apk add --no-cache bash
 COPY ./nginx/scripts/env.sh /docker-entrypoint.d/env.sh
 RUN chmod +x /docker-entrypoint.d/env.sh
