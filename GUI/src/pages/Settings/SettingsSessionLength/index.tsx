@@ -13,6 +13,7 @@ import { ROLES } from 'utils/constants';
 
 import { WELCOME_MESSAGE_LENGTH } from '../../../constants/config';
 import { InfoTooltip } from '../../../utils/getToolTipWithText';
+import { isBlankInput, valueOutOfRange } from './validation';
 
 type FormValues = {
   sessionLength: string;
@@ -135,16 +136,8 @@ const SettingsSessionLength: FC = () => {
     },
   });
 
-  const valueOutOfRange = (inputValue: string, minValue: number, maxValue: number) => {
-    const value = parseInt(inputValue, 10);
-    if (Number.isNaN(value)) {
-      return false;
-    }
-    return value < minValue || value > maxValue;
-  };
-
   const onSubmit = (data: FormValues) => {
-    if (!data.sessionLength) {
+    if (isBlankInput(data.sessionLength)) {
       toast.open({
         type: 'error',
         title: t('global.notificationError'),
@@ -156,7 +149,7 @@ const SettingsSessionLength: FC = () => {
         title: t('global.notificationError'),
         message: t('settings.userSession.invalidSession'),
       });
-    } else if (!data.chatActiveDuration) {
+    } else if (isBlankInput(data.chatActiveDuration)) {
       toast.open({
         type: 'error',
         title: t('global.notificationError'),
