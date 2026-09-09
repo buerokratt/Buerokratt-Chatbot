@@ -1,22 +1,25 @@
-clear_notifications:
+generate_notification_event_uuid:
   call: http.post
   args:
-    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query?conflicts=proceed&refresh=true"
-    body:
-      query:
-        term:
-          channelId: ${incoming.body.chatId}
-  result: clear_res
+    url: "[#CHATBOT_DMAPPER_HBS]/return_uuid"
+    headers:
+      type: json
+  result: notification_uuid_result
+  next: notify
 
 notify:
   call: http.post
   args:
-    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
+    url: "[#CHATBOT_NOTIFICATION_NODE]/private/v1/notifications/events"
     body:
-      channelId: ${incoming.body.chatId}
-      timestamp: ${new Date().toISOString()}
-      payload: { "type": "${incoming.body.type}", "messageId": "${incoming.body.messageId}" }
+      eventUuid: ${notification_uuid_result.response.body.uuid}
+      recipient: "CHAT"
+      recipientUuid: ${incoming.body.chatId}
+      type: ${incoming.body.type}
+      payload:
+        messageId: ${incoming.body.messageId}
   result: notify_res
+  next: return_result
 
 return_result:
   return: "Notification sent"

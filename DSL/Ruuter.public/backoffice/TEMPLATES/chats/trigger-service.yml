@@ -32,7 +32,7 @@ assign_data:
 get_new_nonce:
   call: http.post
   args:
-    url: "[#TRAINING_RESQL]/get-new-nonce"
+    url: "[#CHATBOT_RESQL]/get-new-nonce"
   result: nonce_res
   next: check_for_service_method
  
