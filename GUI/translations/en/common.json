@@ -85,7 +85,9 @@
     "allDomains": "All",
     "noDomains": "No domains available. Please contact your system administrator.",
     "duplicateName": "This domain name already exists",
-    "duplicateUrl": "This URL already exists"
+    "duplicateUrl": "This URL already exists",
+    "requiredName": "Domain name cannot be empty",
+    "requiredUrl": "URL cannot be empty"
   },
   "menu": {
     "conversations": "Conversations",
