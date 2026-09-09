@@ -12,13 +12,12 @@ import { ROLES } from 'utils/constants';
 
 import './MultiDomain.scss';
 import { WDomain } from '../../../types/widgetModels';
-
-const normalizeUrl = (url: string) => {
-  const trimmed = url.trim();
-  return trimmed.endsWith('/') ? trimmed : trimmed + '/';
-};
-
-const normalizeUrlForComparison = (url: string) => normalizeUrl(url).toLowerCase();
+import {
+  hasDuplicateName,
+  hasDuplicateUrl,
+  isBlank,
+  normalizeUrl,
+} from './validation';
 
 const MultiDomain: FC = () => {
   const { t } = useTranslation();
@@ -95,21 +94,19 @@ const MultiDomain: FC = () => {
   }, [fetchData, trackKey]);
 
   const validateUniqueName = (value: string, index: number) => {
-    const trimmed = value.trim().toLowerCase();
-    if (!trimmed) return true;
+    if (isBlank(value)) return t('multiDomains.requiredName');
 
     const domains = getValues('widgetDomains');
-    const isDuplicate = domains.some((domain, i) => i !== index && domain.name.trim().toLowerCase() === trimmed);
+    const isDuplicate = hasDuplicateName(domains, value, index);
 
     return isDuplicate ? t('multiDomains.duplicateName') : true;
   };
 
   const validateUniqueUrl = (value: string, index: number) => {
-    if (!value.trim()) return true;
+    if (isBlank(value)) return t('multiDomains.requiredUrl');
 
-    const normalized = normalizeUrlForComparison(value);
     const domains = getValues('widgetDomains');
-    const isDuplicate = domains.some((domain, i) => i !== index && normalizeUrlForComparison(domain.url) === normalized);
+    const isDuplicate = hasDuplicateUrl(domains, value, index);
 
     return isDuplicate ? t('multiDomains.duplicateUrl') : true;
   };
