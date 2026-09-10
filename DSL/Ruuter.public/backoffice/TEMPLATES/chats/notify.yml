@@ -1,23 +1,44 @@
-
-clear_notifications:
+get_notification_recipients:
   call: http.post
   args:
-    url: "[#CHATBOT_OPENSEARCH]/notifications/_delete_by_query?conflicts=proceed&refresh=true"
-    body:
-      query:
-        term:
-          channelId: "chat-list"
-  result: clear_res
+    url: "[#CHATBOT_RESQL]/get-notification-recipient-csa-list"
+  result: notification_recipients_result
+  next: assign_notification_recipients
+
+assign_notification_recipients:
+  assign:
+    notification_recipients: ${notification_recipients_result.response.body.map(recipient => recipient.idCode)}
+  next: send_notification
+
+send_notification:
+  switch:
+    - condition: ${notification_recipients.length > 0}
+      next: generate_notification_event_uuid
+  next: return_result
+
+generate_notification_event_uuid:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_HBS]/return_uuid"
+    headers:
+      type: json
+  result: notification_uuid_result
+  next: notify
 
 notify:
   call: http.post
   args:
-    url: "[#CHATBOT_OPENSEARCH]/notifications/_doc"
+    url: "[#CHATBOT_NOTIFICATION_NODE]/private/v1/notifications/events"
     body:
-      channelId: "chat-list"
-      timestamp: ${new Date().toISOString()}
-      payload: { "status": "Chat Status Changed", "chatId": "${incoming.body.chatId}" }
+      eventUuid: ${notification_uuid_result.response.body.uuid}
+      recipient: "USER"
+      recipientUuid: ${notification_recipients}
+      type: "chat_status_changed"
+      payload:
+        status: "Chat Status Changed"
+        chatId: ${incoming.body.chatId}
   result: notify_res
+  next: return_result
 
 return_result:
   return: "Notification sent"

@@ -5,9 +5,9 @@ import { ReactComponent as BykLogo } from 'assets/logo.svg';
 import { AxiosError } from 'axios';
 import { Button, Dialog, Drawer, Icon, Section, Switch, SwitchBox, Track } from 'components';
 import { useDing } from 'hooks/useAudio';
+import useExtendUserSession from 'hooks/useExtendUserSession';
 import { useToast } from 'hooks/useToast';
 import { FC, useEffect, useState } from 'react';
-import { useCookies } from 'react-cookie';
 import { useTranslation } from 'react-i18next';
 import { MdOutlineExpandMore } from 'react-icons/md';
 import { useIdleTimer } from 'react-idle-timer';
@@ -55,8 +55,6 @@ const Header: FC = () => {
     newChatEmailNotifications: false,
     useAutocorrect: true,
   });
-  const customJwtCookieKey = 'customJwtCookie';
-
   useEffect(() => {
     const interval = setInterval(() => {
       const expirationTimeStamp = localStorage.getItem('exp');
@@ -97,7 +95,6 @@ const Header: FC = () => {
     },
   });
 
-  const [_, setCookie] = useCookies([customJwtCookieKey]);
   const unansweredChatsLength = useStore((state) => state.unansweredChatsLength());
   const forwardedChatsLength = useStore((state) => state.forwordedChatsLength());
 
@@ -188,6 +185,8 @@ const Header: FC = () => {
     },
   });
 
+  const extendUserSessionMutation = useExtendUserSession();
+
   const customerSupportActivityMutation = useMutation({
     mutationFn: (data: CustomerSupportActivityDTO) =>
       apiDev.post('accounts/customer-support-activity', {
@@ -206,22 +205,6 @@ const Header: FC = () => {
         message: error.message,
       });
     },
-  });
-
-  const setNewCookie = (cookieValue: string) => {
-    const cookieOptions = { path: '/' };
-    setCookie(customJwtCookieKey, cookieValue, cookieOptions);
-  };
-
-  const extendUserSessionMutation = useMutation({
-    mutationFn: async () => {
-      const {
-        data: { data },
-      } = await apiDev.post('extend', {});
-      if (data.custom_jwt_extend === null) return;
-      setNewCookie(data.custom_jwt_extend);
-    },
-    onError: (error: AxiosError) => {},
   });
 
   const logoutMutation = useMutation({

@@ -20,6 +20,7 @@
   "dependencies": {
     "@buerokratt-ria/header": "^0.1.54",
     "@buerokratt-ria/menu": "^0.2.15",
+    "@buerokratt-ria/notifications": "file:notifications-sdk.tgz",
     "@buerokratt-ria/styles": "^0.0.1",
     "@buerokratt-ria/common-gui-components": "^0.0.66",
     "@fontsource/roboto": "^4.5.8",
