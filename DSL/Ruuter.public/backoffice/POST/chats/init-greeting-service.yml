@@ -75,6 +75,23 @@ getChatUuid:
 assignChatUuid:
   assign:
     chatUuid: ${chat_uuid_result.response.body.uuid}
+  next: get_existing_chat_jwt
+
+get_existing_chat_jwt:
+  call: http.post
+  args:
+    url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
+    contentType: plaintext
+    headers:
+      cookie: ${incoming.headers.cookie}
+    plaintext:
+      "chatJwt"
+  result: existing_chat_jwt_result
+  next: assignExistingChatIds
+
+assignExistingChatIds:
+  assign:
+    existingChatIds: ${existing_chat_jwt_result.response.body?.chatIds ?? []}
   next: get_session_length
 
 get_session_length:
@@ -93,7 +110,10 @@ generate_cookie:
     body:
       JWTName: "chatJwt"
       expirationInMinutes: ${session_result.response.body[0]?.value ?? '120'}
-      content: { "chatId": "${chatUuid}", "forwardTo": "" }
+      content:
+        chatId: "${chatUuid}"
+        chatIds: ${existingChatIds.concat([chatUuid])}
+        forwardTo: ""
   result: cookie_result
   next: assign_cookie
 
