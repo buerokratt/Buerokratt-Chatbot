@@ -196,6 +196,12 @@ getMessageUuid:
 assignMessageUuid:
   assign:
     messageUuid: ${message_uuid_result.response.body.uuid}
+  next: checkForExistingChatJwtCookie
+
+checkForExistingChatJwtCookie:
+  switch:
+    - condition: ${incoming.headers.cookie == null}
+      next: assignEmptyChatIds
   next: get_existing_chat_jwt
 
 get_existing_chat_jwt:
@@ -213,6 +219,11 @@ get_existing_chat_jwt:
 assignExistingChatIds:
   assign:
     existingChatIds: ${existing_chat_jwt_result.response.body?.chatIds ?? []}
+  next: get_session_length
+
+assignEmptyChatIds:
+  assign:
+    existingChatIds: []
   next: get_session_length
 
 get_session_length:
