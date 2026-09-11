@@ -27,6 +27,10 @@ declaration:
       - field: cookie
         type: string
         description: "Cookie field"
+    params:
+      - field: chatId
+        type: string
+        description: "Optional: which chat (of possibly several tracked in the chatJwt cookie) this request concerns. Must be one of the cookie's chatIds or the request is denied."
 
 extractRequestData:
   assign:
@@ -150,7 +154,24 @@ get_chat_info:
    plaintext:
       "chatJwt"
   result: res
+  next: checkForQueryChatId
+
+checkForQueryChatId:
+  switch:
+    - condition: ${incoming.params.chatId != null && incoming.params.chatId !== ""}
+      next: validateQueryChatId
   next: check_chat_info_response
+
+validateQueryChatId:
+  switch:
+    - condition: ${(res.response.body?.chatIds ?? []).includes(incoming.params.chatId)}
+      next: assignValidatedChatId
+  next: return_forbidden
+
+assignValidatedChatId:
+  assign:
+    chatId: ${incoming.params.chatId}
+  next: getActiveChatById
 
 check_chat_info_response:
   switch:
@@ -279,4 +300,9 @@ return_content_length_exceeded:
 return_bot_error:
   status: 420
   return: "Bot error"
+  next: end
+
+return_forbidden:
+  status: 403
+  return: "Chat access denied"
   next: end  
