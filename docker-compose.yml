@@ -5,7 +5,6 @@ services:
     container_name: ruuter-public
     image: ruuter
     environment:
-      - application.cors.allowedOrigins=http://localhost:8086,http://localhost:3001,http://localhost:3003,http://localhost:3004,http://localhost:8080,https://smax.example.com
       - application.cors.allowedOrigins=http://localhost:8086,http://localhost:3001,http://localhost:3003,http://localhost:3004,http://localhost:3006,http://localhost:8080,https://smax.example.com
       - application.httpCodesAllowList=200,201,202,400,401,403,500
       - application.internalRequests.allowedIPs=127.0.0.1
@@ -240,13 +239,13 @@ services:
     cpus: "0.5"
     mem_limit: "1G"
 
-  chat-widget:
-    container_name: chat-widget
-    image: chat-widget
-    ports:
-      - 3003:3003
-    networks:
-      - bykstack
+  # chat-widget:
+  #   container_name: chat-widget
+  #   image: chat-widget
+  #   ports:
+  #     - 3003:3003
+  #   networks:
+  #     - bykstack
 
   authentication-layer:
     container_name: authentication-layer
