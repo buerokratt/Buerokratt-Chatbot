@@ -219,10 +219,6 @@ async function createAzureOpenAIStreamRequest({
   }
 }
 
-async function sendBulkNotification({ operations }) {
-  await client.bulk({ body: operations });
-}
-
 async function markAsSent({ _index, _id }, connectionId) {
   await client.update({
     index: _index,
@@ -423,7 +419,6 @@ module.exports = {
   searchNotification,
   enqueueChatId,
   dequeueChatId,
-  sendBulkNotification,
   createAzureOpenAIStreamRequest,
   createLLMOrchestrationStreamRequest,
 };

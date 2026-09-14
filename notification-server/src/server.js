@@ -12,7 +12,6 @@ const { addToLogoutQueue, removeFromLogoutQueue } = require('./logoutQueue');
 const {
   enqueueChatId,
   dequeueChatId,
-  sendBulkNotification,
   createAzureOpenAIStreamRequest,
   createLLMOrchestrationStreamRequest,
 } = require('./openSearch');
@@ -54,15 +53,6 @@ app.use((req, res, next) => {
   }
   console.log('---------------------------------------------------');
   next();
-});
-
-app.post('/bulk-notifications', async (req, res) => {
-  try {
-    await sendBulkNotification(req.body);
-    res.status(200).json({ response: 'sent successfully' });
-  } catch {
-    res.status(500).json({ response: 'error' });
-  }
 });
 
 app.post('/add-to-logout-queue', async (req, res) => {
