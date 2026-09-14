@@ -339,7 +339,7 @@ const Header: FC = () => {
                   name="csaStatus"
                   onColor="#308653"
                   onLabel={t('global.present') ?? ''}
-                  offLabel={t('global.away') ?? ''}
+                  offLabel={t('global.busy') ?? ''}
                 />
               </Track>
               <span

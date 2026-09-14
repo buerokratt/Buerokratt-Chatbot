@@ -49,6 +49,7 @@
     "csaStatus": "Customer support status",
     "present": "Present",
     "away": "Away",
+    "busy": "Busy",
     "today": "Today",
     "forward": "Forward",
     "chosen": "Chosen",
@@ -413,7 +414,7 @@
       "idCodePlaceholder": "The personal identification number must start with a country prefix, (eg.EE12345678910)",
       "choose": "Choose",
       "userExists": "User Exists",
-      "userChangeStatusMessage": "Do you want to change the user status to away?",
+      "userChangeStatusMessage": "Do you want to change the user status to busy?",
       "statusCommentUpdated": "Status clarification updated"
     },
     "chat": {
@@ -532,9 +533,10 @@
       "description": "When active, users will automatically be set to away status after the selected period of inactivity.",
       "timeout": "Away status time",
       "minutes": "Minutes",
-      "rule": "Away status time is allowed between 5 min - 120 min (2h)",
+      "rule": "Away status time is allowed between {{min}} min - {{max}} min, and must be shorter than the session length",
       "emptyTimeout": "Away status time can't be empty",
-      "invalidTimeout": "Away status time must be between 5 and 120 minutes"
+      "invalidTimeout": "Away status time must be between 5 and 120 minutes",
+      "timeoutExceedsSession": "Away status time must be shorter than the session length"
     },
     "greeting": {
       "title": "Greeting message"
