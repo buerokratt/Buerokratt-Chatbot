@@ -1,5 +1,5 @@
 const { serverConfig } = require('./config');
-const { searchNotification, findChatIdOrder } = require('./openSearch');
+const { searchNotification } = require('./openSearch');
 
 function buildNotificationSearchInterval({ channelId, interval = serverConfig.refreshInterval }) {
   return ({ connectionId, sender }) => {
@@ -17,26 +17,6 @@ function buildNotificationSearchInterval({ channelId, interval = serverConfig.re
   };
 }
 
-function buildQueueCounter({ id, interval = serverConfig.queueRefreshInterval }) {
-  return ({ sender }) => {
-    let lastOrder = 0;
-    const intervalHandle = setInterval(async () => {
-      try {
-        const order = await findChatIdOrder(id);
-
-        if (order == lastOrder) return;
-        lastOrder = order;
-        sender({ order });
-      } catch (error) {
-        console.log(error);
-      }
-    }, interval);
-
-    return () => clearInterval(intervalHandle);
-  };
-}
-
 module.exports = {
   buildNotificationSearchInterval,
-  buildQueueCounter,
 };

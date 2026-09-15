@@ -199,7 +199,9 @@ services:
       - REACT_APP_RUUTER_PRIVATE_API_URL=http://localhost:8088/backoffice
       - REACT_APP_CUSTOMER_SERVICE_LOGIN=http://localhost:3004/et/dev-auth
       - REACT_APP_NOTIFICATION_NODE_URL=http://localhost:4040
-      - REACT_APP_CSP=upgrade-insecure-requests; default-src 'self'; font-src 'self' data:; img-src * data:; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; object-src 'none'; connect-src 'self' http://localhost:8086 http://localhost:8088 http://localhost:8085 http://localhost:4040 https://admin.dev.buerokratt.ee/chat/menu.json;
+      - REACT_APP_NEW_NOTIFICATION_NODE_URL=http://localhost:3010
+      - REACT_APP_NOTIFICATIONS_VAPID_PUBLIC_KEY=BGtr18_RnioZdJqSdhw3tHEKwklwzm-er3gnHWYolmx0GW-WhAhT-xu46acxbhRZN3_JTyqkFJPI8kFLkyONsGs
+      - REACT_APP_CSP=upgrade-insecure-requests; default-src 'self'; font-src 'self' data:; img-src * data:; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; object-src 'none'; connect-src 'self' http://localhost:8086 http://localhost:8088 http://localhost:8085 http://localhost:4040 http://localhost:3010 https://admin.dev.buerokratt.ee/chat/menu.json;
       - DEBUG_ENABLED=true
       - CHOKIDAR_USEPOLLING=true
       - PORT=3001
@@ -280,8 +282,8 @@ services:
     networks:
       - bykstack
 
-  notifications-node:
-    container_name: notifications-node
+  notification-node-old:
+    container_name: notification-node-old
     build:
       context: ./notification-server
       dockerfile: Dockerfile
@@ -289,6 +291,7 @@ services:
       - 4040:4040
     depends_on:
       - opensearch-node
+      - notification-node
     environment:
       OPENSEARCH_PROTOCOL: http
       OPENSEARCH_HOST: opensearch-node
@@ -297,11 +300,11 @@ services:
       OPENSEARCH_PASSWORD: admin
       PORT: 4040
       REFRESH_INTERVAL: 1000
-      QUEUE_REFRESH_INTERVAL: 4000
       CORS_WHITELIST_ORIGINS: http://localhost:3001,http://localhost:3003,http://localhost:3004,http://localhost:8080
       RUUTER_URL: http://ruuter-public:8086
       PRIVATE_RUUTER_URL: http://ruuter-private:8088
       TERMINATION_TIMEOUT: 10
+      NEW_NOTIFICATIONS_NODE_EVENT_URL: http://notification-node:3001/private/v1/notifications/events
     volumes:
       - /app/node_modules
       - ./notification-server:/app
@@ -485,6 +488,75 @@ services:
     networks:
       - vault-network
       - bykstack
+  valkey:
+    container_name: new_notifications_valkey
+    image: valkey/valkey:8-alpine
+    command: ["valkey-server", "--appendonly", "yes"]
+    networks:
+      - bykstack
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  rabbitmq:
+    container_name: new_notifications_rabbitmq
+    image: rabbitmq:4.3-management-alpine
+    ports:
+      - "15672:15672"
+    networks:
+      - bykstack
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  notification-node:
+    container_name: notification-node
+    image: notifications-node
+    depends_on:
+      valkey:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+
+      API_CORS_ORIGIN: http://localhost:3001,http://localhost:3003
+      API_DOCUMENTATION_ENABLED: "true"
+      API_PORT_PUBLIC: "3000"
+      API_PORT_PRIVATE: "3001"
+
+      TIM_URL: http://tim:8085
+      TIM_JWT_COOKIE_NAMES: chatJwt,customJwtCookie,customSmaxJwtCookie,userJwt
+      TIM_TOKEN_REVALIDATION_INTERVAL_MS: "5000"
+
+      RABBITMQ_URL: amqp://rabbitmq:5672?heartbeat=30
+      RABBITMQ_PREFIX: development
+
+      VALKEY_HOST: valkey
+      VALKEY_PORT: "6379"
+      VALKEY_USE_TLS: "false"
+      VALKEY_USERNAME:
+      VALKEY_PASSWORD:
+      VALKEY_CONNECT_TIMEOUT_MS: "10000"
+      VALKEY_REQUEST_TIMEOUT_MS: "5000"
+
+      WEB_PUSH_VAPID_SUBJECT: mailto:notifications@example.com
+      WEB_PUSH_VAPID_PUBLIC_KEY: BGtr18_RnioZdJqSdhw3tHEKwklwzm-er3gnHWYolmx0GW-WhAhT-xu46acxbhRZN3_JTyqkFJPI8kFLkyONsGs
+      WEB_PUSH_VAPID_PRIVATE_KEY: sbbab246el5KZfUIKgmX_UTHDgvwpK4J2aAzbYKkoeU
+      WEB_PUSH_TTL_SECONDS: "86400"
+      WEB_PUSH_REQUEST_TIMEOUT_MS: "10000"
+      WEB_PUSH_CONCURRENCY: "20"
+
+    ports:
+      - "3010:3000"
+      - "3011:3001"
+    networks:
+      - bykstack
+
 
 volumes:
   opensearch-data:

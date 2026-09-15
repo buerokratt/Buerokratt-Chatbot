@@ -1,6 +1,7 @@
 import { CHAT_INPUT_LENGTH, isHiddenFeaturesEnabled } from 'constants/config';
 
 import { userStore as useHeaderStore } from '@buerokratt-ria/header';
+import { useNotificationEvents } from '@buerokratt-ria/notifications/react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { ReactComponent as BykLogoWhite } from 'assets/logo-white.svg';
 import { AxiosError } from 'axios';
@@ -32,7 +33,6 @@ import ChatEvent from '../ChatEvent';
 import ChatTextArea from './ChatTextArea';
 import LoaderOverlay from './LoaderOverlay';
 import PreviewMessage from './PreviewMessage';
-import sse from '../../services/sse-service';
 
 import './Chat.scss';
 import { useInterval } from 'usehooks-ts';
@@ -205,9 +205,10 @@ const Chat: FC<ChatProps> = ({
     chatRef.current.scrollIntoView({ block: 'end', inline: 'end' });
   };
 
-  useEffect(() => {
-    const onMessage = async (res: any) => {
-      if (res.type === 'preview') {
+  useNotificationEvents({
+    eventTypes: ['message', 'preview'],
+    listener: async ({ type }) => {
+      if (type === 'preview') {
         const previewMessage = await apiDev.get('agents/chats/messages/preview?chatId=' + chat.id);
         setPreviewTypingMessage(previewMessage.data.response);
         if (!previewMessage.data.response && messageListRef.current?.length > 0) {
@@ -216,14 +217,8 @@ const Chat: FC<ChatProps> = ({
       } else if (messageListRef.current?.length > 0) {
         await getNewMessages();
       }
-    };
-
-    const events = sse(`/${chat.id}`, onMessage);
-
-    return () => {
-      events.close();
-    };
-  }, [chat.id]);
+    },
+  });
 
   const getNewMessages = async () => {
     const res =
