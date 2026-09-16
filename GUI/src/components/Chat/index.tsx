@@ -32,11 +32,14 @@ import ChatMessage from './ChatMessage';
 import ChatEvent from '../ChatEvent';
 import ChatTextArea from './ChatTextArea';
 import LoaderOverlay from './LoaderOverlay';
-import PreviewMessage from './PreviewMessage';
+import TypingIndicator from './TypingIndicator';
 
 import './Chat.scss';
 import { useInterval } from 'usehooks-ts';
 import { BotConfig } from 'types/botConfig';
+
+const TYPING_INDICATOR_FALLBACK_TIMEOUT_MS = 10_000;
+const isTypingEvent = (type: string): boolean => type === 'typing';
 
 type ChatProps = {
   chat: ChatType;
@@ -88,7 +91,8 @@ const Chat: FC<ChatProps> = ({
   const messageListRef = useRef(messagesList);
   const [latestPermissionMessageCreated, setLatestPermissionMessageCreated] = useState<string>();
   const [latestPermissionMessageSeconds, setLatestPermissionMessageSeconds] = useState<number>(0);
-  const [previewTypingMessage, setPreviewTypingMessage] = useState<string | undefined>();
+  const [isUserTyping, setIsUserTyping] = useState(false);
+  const typingIndicatorTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [isChatEditingAllowed, setIsChatEditingAllowed] = useState<boolean>(false);
   const [isNewMessageNotificationVisible, setIsNewMessageNotificationVisible] = useState<boolean>(false);
@@ -162,6 +166,36 @@ const Chat: FC<ChatProps> = ({
     messageListRef.current = messagesList;
   }, [messagesList]);
 
+  const clearTypingIndicator = () => {
+    if (typingIndicatorTimeoutRef.current !== null) {
+      clearTimeout(typingIndicatorTimeoutRef.current);
+      typingIndicatorTimeoutRef.current = null;
+    }
+    setIsUserTyping(false);
+  };
+
+  const refreshTypingIndicator = () => {
+    if (typingIndicatorTimeoutRef.current !== null) {
+      clearTimeout(typingIndicatorTimeoutRef.current);
+    }
+
+    setIsUserTyping(true);
+    typingIndicatorTimeoutRef.current = setTimeout(() => {
+      typingIndicatorTimeoutRef.current = null;
+      setIsUserTyping(false);
+    }, TYPING_INDICATOR_FALLBACK_TIMEOUT_MS);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (typingIndicatorTimeoutRef.current !== null) {
+        clearTimeout(typingIndicatorTimeoutRef.current);
+        typingIndicatorTimeoutRef.current = null;
+      }
+      setIsUserTyping(false);
+    };
+  }, [chat.id]);
+
   useEffect(() => {
     isCsaAtEndRef.current = isCsaAtEnd;
   }, [isCsaAtEnd]);
@@ -206,15 +240,15 @@ const Chat: FC<ChatProps> = ({
   };
 
   useNotificationEvents({
-    eventTypes: ['message', 'preview'],
+    eventTypes: ['message', 'typing'],
     listener: async ({ type }) => {
-      if (type === 'preview') {
-        const previewMessage = await apiDev.get('agents/chats/messages/preview?chatId=' + chat.id);
-        setPreviewTypingMessage(previewMessage.data.response);
-        if (!previewMessage.data.response && messageListRef.current?.length > 0) {
-          await getNewMessages();
-        }
-      } else if (messageListRef.current?.length > 0) {
+      if (isTypingEvent(type)) {
+        refreshTypingIndicator();
+        return;
+      }
+
+      clearTypingIndicator();
+      if (messageListRef.current?.length > 0) {
         await getNewMessages();
       }
     },
@@ -226,7 +260,6 @@ const Chat: FC<ChatProps> = ({
         `agents/chats/messages/new?chatId=${chat.id}&lastRead=${chat.lastMessageTimestamp?.split('+')[0] ?? ''}`,
       )) ?? [];
     const messages = res.data.response;
-    setPreviewTypingMessage(undefined);
     const filteredMessages = messages?.filter((newMessage: Message) => {
       return filterMessages(messageListRef.current, newMessage);
     });
@@ -551,7 +584,7 @@ const Chat: FC<ChatProps> = ({
         });
       });
     }
-  }, [messageGroups, previewTypingMessage]);
+  }, [messageGroups, isUserTyping]);
 
   const handleResponseTextSend = async (editMessage: boolean) => {
     const newMessage: Message = {
@@ -797,13 +830,12 @@ const Chat: FC<ChatProps> = ({
               )}
             </div>
           ))}
-          {/* Preview commented Out as requested by clients in task -1024- */}
-          {previewTypingMessage && (
+          {isUserTyping && (
             <div className={clsx(['active-chat__group'])} key={`group`}>
               <div className="active-chat__group-initials">{<BykLogoWhite height={24} />}</div>
               <div className="active-chat__group-name">{t('chat.userTyping')}</div>
               <div className="active-chat__messages">
-                <PreviewMessage key={`preview-message`} preview={previewTypingMessage ?? ''} />
+                <TypingIndicator />
               </div>
             </div>
           )}

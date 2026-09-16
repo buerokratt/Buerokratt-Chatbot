@@ -23,16 +23,6 @@ extractRequestData:
     chatId: "${incoming.body.chatId}"
     event: "${incoming.body.event}"
     authorTimestamp: "${incoming.body.authorTimestamp}"
-  next: deleteMessagePreview
-
-deleteMessagePreview:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RESQL]/delete-message-preview"
-    body:
-      chatId: ${chatId}
-      content: ""
-  result: res
   next: getMessageUuid
 
 getMessageUuid:

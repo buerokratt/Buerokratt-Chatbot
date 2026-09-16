@@ -31,16 +31,6 @@ extractRequestData:
     authorTimestamp: "${incoming.body.message.authorTimestamp}"
     status: "${incoming.body.status}"
     endedTimestamp: ${incoming.body.ended ?? new Date().toISOString()}
-  next: deleteMessagePreview
-
-deleteMessagePreview:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RESQL]/delete-message-preview"
-    body:
-      chatId: ${chatId}
-      content: ""
-  result: res
   next: getMessageUuid
 
 getMessageUuid:

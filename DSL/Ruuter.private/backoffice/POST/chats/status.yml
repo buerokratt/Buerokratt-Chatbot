@@ -35,17 +35,7 @@ extractRequestData:
     authorFirstName: "${incoming.body.authorFirstName}"
     authorId: "${incoming.body.authorId}"
     authorRole: "${incoming.body.authorRole}"
-  next: deleteMessagePreview  
-
-deleteMessagePreview:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RESQL]/delete-message-preview"
-    body:
-      chatId: ${chatId}
-      content: ""
-  result: res
-  next: getMessageUuid 
+  next: getMessageUuid
 
 getMessageUuid:
   call: http.post

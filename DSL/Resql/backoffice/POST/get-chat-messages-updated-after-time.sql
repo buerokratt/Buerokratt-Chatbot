@@ -1,14 +1,4 @@
-WITH MaxPreviews AS (
-  SELECT MAX(id) maxId
-  FROM message_preview
-  GROUP BY chat_base_id
-),
-MessagePreviews AS (
-  SELECT content, chat_base_id
-  FROM message_preview
-  JOIN MaxPreviews ON id = maxId
-),
-MaxMessages AS (
+WITH MaxMessages AS (
 	SELECT max(id) AS maxId 
 	FROM message
 	WHERE chat_base_id = :chatId
@@ -40,13 +30,11 @@ SELECT m.base_id AS id,
        m.forwarded_from_csa,
        m.forwarded_to_csa,
        m.original_base_id,
-       mp.content AS preview,
        rating,
        m.created,
        updated,
        u.csa_title 
 FROM message m
-LEFT JOIN MessagePreviews mp ON m.chat_base_id = mp.chat_base_id
 LEFT JOIN LatestActiveUser u ON m.author_id = u.id_code
 JOIN MaxMessages ON m.id = maxId
 WHERE :timeRangeBegin::timestamp with time zone < m.updated
@@ -56,4 +44,3 @@ AND m.base_id NOT IN (
   WHERE original_base_id IS NOT NULL
 )
 ORDER BY m.created ASC;
-

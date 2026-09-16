@@ -17,7 +17,7 @@ notify:
       recipientUuid: ${[incoming.body.chatId]}
       type: ${incoming.body.type}
       payload:
-        messageId: ${incoming.body.messageId}
+        messageId: ${incoming.body.messageId ?? ""}
   result: notify_res
   next: return_result
 

@@ -111,7 +111,7 @@ export interface GroupedPendingChat {
 export enum MessageSseEvent {
   READ = 'message-read',
   DELIVERED = 'message-delivered',
-  PREVIEW = 'message-preview',
+  TYPING = 'typing',
 }
 
 export type MessageStatus = {
