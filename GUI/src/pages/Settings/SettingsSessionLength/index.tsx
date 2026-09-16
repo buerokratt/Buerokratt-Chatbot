@@ -172,6 +172,12 @@ const SettingsSessionLength: FC = () => {
     return value < minValue || value > maxValue;
   };
 
+  const parsedSessionLength = parseInt(sessionLength, 10);
+  const awayStatusTimeoutMax =
+    !Number.isNaN(parsedSessionLength) && parsedSessionLength <= AWAY_STATUS_TIMEOUT_MAX
+      ? parsedSessionLength - 1
+      : AWAY_STATUS_TIMEOUT_MAX;
+
   const onSubmit = (data: FormValues) => {
     if (!data.sessionLength) {
       toast.open({
@@ -211,6 +217,12 @@ const SettingsSessionLength: FC = () => {
         type: 'error',
         title: t('global.notificationError'),
         message: t('settings.awayStatus.invalidTimeout'),
+      });
+    } else if (data.awayStatusActive && parseInt(data.awayStatusTimeout, 10) >= parseInt(data.sessionLength, 10)) {
+      toast.open({
+        type: 'error',
+        title: t('global.notificationError'),
+        message: t('settings.awayStatus.timeoutExceedsSession'),
       });
     } else {
       sessionLengthMutation.mutate();
@@ -381,6 +393,7 @@ const SettingsSessionLength: FC = () => {
                             name="awayStatusTimeout"
                             label={t('settings.awayStatus.timeout')}
                             type="number"
+                            min={AWAY_STATUS_TIMEOUT_MIN}
                           />
                         )}
                       />
@@ -389,7 +402,12 @@ const SettingsSessionLength: FC = () => {
                         {getTooltip('awayStatusTimeout')}
                       </Track>
                     </Track>
-                    <label className="rule">{t('settings.awayStatus.rule')}</label>
+                    <label className="rule">
+                      {t('settings.awayStatus.rule', {
+                        min: AWAY_STATUS_TIMEOUT_MIN,
+                        max: awayStatusTimeoutMax,
+                      })}
+                    </label>
                   </Track>
                 )}
               </>

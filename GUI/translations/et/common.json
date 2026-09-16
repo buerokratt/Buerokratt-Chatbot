@@ -49,6 +49,7 @@
     "csaStatus": "Nõustaja",
     "present": "Kohal",
     "away": "Eemal",
+    "busy": "Hõivatud",
     "today": "Täna",
     "forward": "Suuna",
     "chosen": "Valitud",
@@ -413,7 +414,7 @@
       "idCodePlaceholder": "Isikukood peab algama riigi eesliitega, (eg.EE12345678910)",
       "choose": "Vali",
       "userExists": "Kasutaja on olemas",
-      "userChangeStatusMessage": "Kas sa soovid kasutaja staatuseks muuta eemal?",
+      "userChangeStatusMessage": "Kas sa soovid kasutaja staatuseks muuta hõivatud?",
       "statusCommentUpdated": "Staatuse täpsustus uuendatud"
     },
     "chat": {
@@ -532,9 +533,10 @@
       "description": "Kui lubatud, siis muudetakse kasutaja staatus pärast valitud aja möödumist automaatselt eemal olevaks.",
       "timeout": "Eemal oleku aeg",
       "minutes": "Minutit",
-      "rule": "Eemal oleku aeg on lubatud vahemikus 5 min - 120 min (2h)",
+      "rule": "Eemal oleku aeg on lubatud vahemikus {{min}} min - {{max}} min ning peab olema lühem kui seansi pikkus",
       "emptyTimeout": "Eemal oleku aja väli ei tohi olla tühi",
-      "invalidTimeout": "Eemal oleku aeg peab olema vahemikus 5 - 120 minutit"
+      "invalidTimeout": "Eemal oleku aeg peab olema vahemikus 5 - 120 minutit",
+      "timeoutExceedsSession": "Eemal oleku aeg peab olema lühem kui seansi pikkus"
     },
     "greeting": {
       "title": "Tervitussõnum"
