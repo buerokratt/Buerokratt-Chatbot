@@ -23,16 +23,6 @@ extractRequestData:
     chatId: "${incoming.body.chatId}"
     event: "${incoming.body.event}"
     authorTimestamp: "${incoming.body.authorTimestamp}"
-  next: deleteMessagePreview
-
-deleteMessagePreview:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RESQL]/delete-message-preview"
-    body:
-      chatId: ${chatId}
-      content: ""
-  result: res
   next: getMessageUuid
 
 getMessageUuid:
@@ -118,6 +108,16 @@ endChat:
       receivedFrom: ${activeChat.receivedFrom ?? ""}
       receivedFromName: ${activeChat.receivedFromName ?? ""}
   result: end_chat_res
+  next: notify_messages
+
+notify_messages:
+  template: "[#CHATBOT_PROJECT_LAYER]/messages/notify"
+  requestType: templates
+  body:
+    chatId: ${chatId}
+    type: "message"
+    messageId: ${messageUuid}
+  result: messages_notify_res
   next: notify_chats
 
 notify_chats:

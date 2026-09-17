@@ -36,16 +36,9 @@ export interface Message {
   originalCreated?: string;
   rating?: string;
   created?: string;
-  preview?: string;
   updated?: string;
   buttons?: string;
   options?: string;
-}
-
-export interface MessagePreviewSseResponse {
-  data: Message;
-  origin: string;
-  type: string;
 }
 
 export enum AttachmentTypes {

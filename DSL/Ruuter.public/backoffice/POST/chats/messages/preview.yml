@@ -1,7 +1,7 @@
 declaration:
   call: declare
   version: 0.1
-  description: "Decription placeholder for 'PREVIEW'"
+  description: "Send the user's typing state for a chat"
   method: post
   accepts: json
   returns: json
@@ -11,36 +11,21 @@ declaration:
       - field: chatId
         type: string
         description: "Body field 'chatId'"
-      - field: content
-        type: string
-        description: "Body field 'content'"
 
 extractRequestData:
   assign:
     chatId: ${incoming.body.chatId}
-    content: ${incoming.body.content}
-  next: insertMessagePreview
+  next: notify_typing
 
-insertMessagePreview:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RESQL]/insert-message-preview"
-    body:
-      chatId: ${chatId}
-      content: ${content}
-  result: res
-  next: notify_messages
-
-notify_messages:
+notify_typing:
   template: "[#CHATBOT_PROJECT_LAYER]/messages/notify"
   requestType: templates
   body:
     chatId: ${chatId}
-    type: "preview"
-    messageId: ""
+    type: "typing"
   result: messages_notify_res
   next: return_result
 
 return_result:
-  return: "Message Event Sent Successfully"
+  return: "Typing Event Sent Successfully"
   next: end
