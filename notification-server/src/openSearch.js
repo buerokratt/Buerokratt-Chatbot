@@ -2,11 +2,195 @@ const { Client } = require('@opensearch-project/opensearch');
 
 const { sendAzureAgenticRequest } = require('./azureAgenticRequest');
 const { streamAzureOpenAIResponse } = require('./azureOpenAI');
+const {
+  extractMessageTextPart,
+  formatAgenticCitations,
+  mapAnnotationsToCitations,
+  createAgenticStreamState,
+  consumeAgenticStreamDelta,
+  flushAgenticStreamBuffer,
+} = require('./citationFormatting');
 const { openSearchConfig } = require('./config');
 const { activeConnections, stoppedChannels } = require('./connectionManager');
 const streamQueue = require('./streamQueue');
 
 let client = buildClient();
+
+async function streamAgenticResponse({ response, connectionId, channelId, sender }) {
+  const citationState = createAgenticStreamState();
+  let finalAnnotations = [];
+
+  for await (const part of response) {
+    if (!activeConnections.has(connectionId) || stoppedChannels.has(channelId)) break;
+
+    if (part.type === 'response.output_text.delta') {
+      const emitText = consumeAgenticStreamDelta(citationState, part.delta || '');
+      if (emitText) {
+        sender({ type: 'stream_chunk', channelId, content: emitText, isComplete: false });
+      }
+    } else if (part.type === 'response.completed') {
+      const fullResponse = part.response ?? part;
+      finalAnnotations = extractMessageTextPart(fullResponse)?.annotations || [];
+    }
+  }
+
+  if (!activeConnections.has(connectionId) || stoppedChannels.has(channelId)) return;
+
+  const trailingText = flushAgenticStreamBuffer(citationState);
+  if (trailingText) {
+    sender({ type: 'stream_chunk', channelId, content: trailingText, isComplete: false });
+  }
+
+  const citations = mapAnnotationsToCitations(finalAnnotations);
+
+  sender({
+    type: 'stream_complete',
+    channelId,
+    content: '',
+    context: citations.length > 0 ? { citations } : {},
+    isComplete: true,
+  });
+}
+
+function isFallbackMessage(text, openAIFallback1, openAIFallback2) {
+  return text === openAIFallback1 || text === openAIFallback2;
+}
+
+async function fetchLLMResponse({
+  use_agentic,
+  messages,
+  options,
+  stream,
+  agent_name,
+  agent_type,
+  azure_client_id,
+  azure_client_secret,
+  azure_agentic_max_output_tokens,
+}) {
+  if (use_agentic) {
+    return sendAzureAgenticRequest(messages, {
+      ...options,
+      stream,
+      agent_name,
+      agent_type,
+      client_id: azure_client_id,
+      client_secret: azure_client_secret,
+      max_output_tokens: azure_agentic_max_output_tokens,
+    });
+  }
+  return streamAzureOpenAIResponse(messages, options);
+}
+
+async function sendRawResponse({ response, connectionId, channelId, sender, stream }) {
+  if (!stream) {
+    sender(response);
+    return;
+  }
+
+  for await (const part of response) {
+    if (!activeConnections.has(connectionId) || stoppedChannels.has(channelId)) break;
+    sender(part);
+  }
+}
+
+async function deliverResponse({
+  response,
+  connectionId,
+  channelId,
+  sender,
+  stream,
+  use_agentic,
+  openAIFallback1,
+  openAIFallback2,
+  estonianFallback,
+}) {
+  if (!stream) {
+    const { content, context } = buildCompleteResponseContent({
+      response,
+      use_agentic,
+      openAIFallback1,
+      openAIFallback2,
+      estonianFallback,
+    });
+    sender({ type: 'complete_response', channelId, content, context, isComplete: true });
+    return;
+  }
+
+  sender({ type: 'stream_start', streamId: channelId, channelId });
+
+  if (use_agentic) {
+    await streamAgenticResponse({ response, connectionId, channelId, sender });
+  } else {
+    await streamClassicResponse({ response, connectionId, channelId, sender, openAIFallback1, openAIFallback2, estonianFallback });
+  }
+}
+
+function buildCompleteResponseContent({ response, use_agentic, openAIFallback1, openAIFallback2, estonianFallback }) {
+  if (use_agentic) {
+    const textPart = extractMessageTextPart(response);
+    return formatAgenticCitations(textPart?.text, textPart?.annotations);
+  }
+
+  const content = response.choices?.[0]?.message?.content || '';
+  const context = response.choices?.[0]?.message?.context || {};
+  const trimmed = content.trim();
+
+  return {
+    content: isFallbackMessage(trimmed, openAIFallback1, openAIFallback2) ? estonianFallback : content,
+    context,
+  };
+}
+
+function isFallbackPrefix(text, openAIFallback1, openAIFallback2) {
+  return openAIFallback1.startsWith(text) || openAIFallback2.startsWith(text);
+}
+
+function processClassicDelta(state, part, openAIFallback1, openAIFallback2) {
+  const choice = part.choices?.[0];
+  if (!choice) return null;
+
+  if (!state.context && choice.delta?.context) state.context = choice.delta.context;
+  const content = choice.delta?.content || '';
+  if (!content) return null;
+
+  state.cumulative += content;
+
+  if (state.startedStreaming) return content;
+
+  if (isFallbackPrefix(state.cumulative, openAIFallback1, openAIFallback2)) return null;
+
+  state.startedStreaming = true;
+  return state.cumulative;
+}
+
+async function streamClassicResponse({
+  response,
+  connectionId,
+  channelId,
+  sender,
+  openAIFallback1,
+  openAIFallback2,
+  estonianFallback,
+}) {
+  const state = { context: undefined, cumulative: '', startedStreaming: false };
+
+  for await (const part of response) {
+    if (!activeConnections.has(connectionId) || stoppedChannels.has(channelId)) break;
+
+    const emitText = processClassicDelta(state, part, openAIFallback1, openAIFallback2);
+    if (emitText) {
+      sender({ type: 'stream_chunk', channelId, content: emitText, isComplete: false });
+    }
+  }
+
+  if (!activeConnections.has(connectionId) || stoppedChannels.has(channelId)) return;
+
+  if (!state.startedStreaming && isFallbackMessage(state.cumulative.trim(), openAIFallback1, openAIFallback2)) {
+    sender({ type: 'stream_chunk', channelId, content: estonianFallback, isComplete: false });
+  }
+
+  sender({ type: 'stream_complete', channelId, content: '', context: state.context || {}, isComplete: true });
+}
 
 async function searchNotification({ channelId, connectionId, sender }) {
   try {
@@ -78,35 +262,24 @@ async function createAzureOpenAIStreamRequest({
       const { sender } = connData;
 
       try {
-        let response;
-
-        if (use_agentic) {
-          response = await sendAzureAgenticRequest(messages, {
-            ...options,
-            stream,
-            agent_name,
-            agent_type,
-            client_id: azure_client_id,
-            client_secret: azure_client_secret,
-            max_output_tokens: azure_agentic_max_output_tokens,
-          });
-        } else {
-          response = await streamAzureOpenAIResponse(messages, options);
-        }
+        const response = await fetchLLMResponse({
+          use_agentic,
+          messages,
+          options,
+          stream,
+          agent_name,
+          agent_type,
+          azure_client_id,
+          azure_client_secret,
+          azure_agentic_max_output_tokens,
+        });
 
         if (!activeConnections.has(connectionId)) {
           return;
         }
 
         if (raw_response) {
-          if (stream) {
-            for await (const part of response) {
-              if (!activeConnections.has(connectionId) || stoppedChannels.has(channelId)) break;
-              sender(part);
-            }
-          } else {
-            sender(response);
-          }
+          await sendRawResponse({ response, connectionId, channelId, sender, stream });
           return;
         }
 
@@ -117,119 +290,17 @@ async function createAzureOpenAIStreamRequest({
         const estonianFallback =
           'Mulle kättesaadavates andmetes puudub teie küsimusele vastav info. Palun täpsustage oma küsimust.';
 
-        if (stream) {
-          sender({
-            type: 'stream_start',
-            streamId: channelId,
-            channelId,
-          });
-
-          let context;
-          let cumulative = '';
-          let startedStreaming = false;
-
-          for await (const part of response) {
-            if (!activeConnections.has(connectionId) || stoppedChannels.has(channelId)) break;
-
-            let content = '';
-
-            if (use_agentic) {
-              if (part.type === 'response.output_text.delta') {
-                content = part.delta || '';
-              }
-            } else {
-              const choice = part.choices?.[0];
-              if (!choice) continue;
-              if (!context && choice.delta?.context) context = choice.delta.context;
-              content = choice.delta?.content || '';
-            }
-
-            if (!content) continue;
-
-            if (use_agentic) {
-              if (!startedStreaming) {
-                startedStreaming = true;
-              }
-              sender({
-                type: 'stream_chunk',
-                channelId,
-                content,
-                isComplete: false,
-              });
-            } else {
-              cumulative += content;
-
-              if (startedStreaming) {
-                sender({
-                  type: 'stream_chunk',
-                  channelId,
-                  content,
-                  isComplete: false,
-                });
-              } else {
-                const isPrefixOfT1 = openAIFallback1.startsWith(cumulative);
-                const isPrefixOfT2 = openAIFallback2.startsWith(cumulative);
-
-                if (isPrefixOfT1 || isPrefixOfT2) continue;
-
-                startedStreaming = true;
-
-                sender({
-                  type: 'stream_chunk',
-                  channelId,
-                  content: cumulative,
-                  isComplete: false,
-                });
-              }
-            }
-          }
-
-          if (activeConnections.has(connectionId) && !stoppedChannels.has(channelId)) {
-            if (!startedStreaming) {
-              const trimmed = cumulative.trim();
-              if (trimmed === openAIFallback1 || trimmed === openAIFallback2) {
-                sender({
-                  type: 'stream_chunk',
-                  channelId,
-                  content: estonianFallback,
-                  isComplete: false,
-                });
-              }
-            }
-
-            sender({
-              type: 'stream_complete',
-              channelId,
-              content: '',
-              context: context || {},
-              isComplete: true,
-            });
-          }
-        } else {
-          let content = '';
-          let context = {};
-
-          if (use_agentic) {
-            const messageOutput = response.output?.find((item) => item.type === 'message');
-            content = messageOutput?.content?.[0]?.text || '';
-          } else {
-            content = response.choices?.[0]?.message?.content || '';
-            context = response.choices?.[0]?.message?.context || {};
-          }
-
-          const trimmed = content.trim();
-          const isDefaultMessage = trimmed === openAIFallback1 || trimmed === openAIFallback2;
-
-          if (isDefaultMessage && !use_agentic) content = estonianFallback;
-
-          sender({
-            type: 'complete_response',
-            channelId,
-            content: content,
-            context,
-            isComplete: true,
-          });
-        }
+        await deliverResponse({
+          response,
+          connectionId,
+          channelId,
+          sender,
+          stream,
+          use_agentic,
+          openAIFallback1,
+          openAIFallback2,
+          estonianFallback,
+        });
       } catch (error) {
         if (activeConnections.has(connectionId)) {
           const errorMessage = `Failed to ${stream ? 'stream' : 'generate'} response: ${error.message}`;
