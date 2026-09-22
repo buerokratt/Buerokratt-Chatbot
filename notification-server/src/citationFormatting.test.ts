@@ -8,6 +8,7 @@ const {
   createAgenticStreamState,
   consumeAgenticStreamDelta,
   flushAgenticStreamBuffer,
+  hasAzureAiSearchTool,
 } = require('./citationFormatting.js');
 
 const RIA_TEXT =
@@ -81,7 +82,9 @@ describe('formatAgenticCitations (non-streaming)', () => {
 
   it('strips a marker whose annotation has an invalid span instead of leaving it raw', () => {
     const text = 'See A【1:1†source】.';
-    const annotations = [{ type: 'url_citation', url: 'https://www.ria.ee/a', title: 'A', start_index: -1, end_index: 5 }];
+    const annotations = [
+      { type: 'url_citation', url: 'https://www.ria.ee/a', title: 'A', start_index: -1, end_index: 5 },
+    ];
 
     const { content, context } = formatAgenticCitations(text, annotations);
 
@@ -105,6 +108,46 @@ describe('formatAgenticCitations (non-streaming)', () => {
   it('handles empty text', () => {
     expect(formatAgenticCitations('', [])).toEqual({ content: '', context: {} });
     expect(formatAgenticCitations(undefined as unknown as string, undefined)).toEqual({ content: '', context: {} });
+  });
+});
+
+describe('search index url filtering', () => {
+  it('discards citations whose URL ends with .search.windows.net/', () => {
+    const text = 'See A【1:1†source】 and B【1:2†source】.';
+    const annotations = [
+      annotationFor(text, '【1:1†source】', 'https://myservice.search.windows.net/', 'Index'),
+      annotationFor(text, '【1:2†source】', 'https://www.ria.ee/b', 'B'),
+    ];
+
+    const { content, context } = formatAgenticCitations(text, annotations);
+
+    expect(content).not.toMatch(/【|】/);
+    expect(context.citations).toHaveLength(1);
+    expect(context.citations[0].filepath).toBe('https://www.ria.ee/b');
+  });
+
+  it('excludes search index URLs from mapAnnotationsToCitations', () => {
+    const annotations = [annotationFor('x', 'x', 'https://myservice.search.windows.net/', 'Index'), ...ANNOTATIONS];
+
+    const citations = mapAnnotationsToCitations(annotations);
+
+    expect(citations.map((c: { filepath: string }) => c.filepath)).not.toContain(
+      'https://myservice.search.windows.net/',
+    );
+    expect(citations).toHaveLength(3);
+  });
+});
+
+describe('hasAzureAiSearchTool', () => {
+  it('returns true when the response tools include azure_ai_search', () => {
+    expect(hasAzureAiSearchTool({ tools: [{ type: 'azure_ai_search', azure_ai_search: {} }] })).toBe(true);
+  });
+
+  it('returns false when the tools do not include azure_ai_search', () => {
+    expect(hasAzureAiSearchTool({ tools: [{ type: 'file_search' }] })).toBe(false);
+    expect(hasAzureAiSearchTool({ tools: [] })).toBe(false);
+    expect(hasAzureAiSearchTool({})).toBe(false);
+    expect(hasAzureAiSearchTool(undefined)).toBe(false);
   });
 });
 

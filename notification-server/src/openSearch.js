@@ -9,6 +9,7 @@ const {
   createAgenticStreamState,
   consumeAgenticStreamDelta,
   flushAgenticStreamBuffer,
+  hasAzureAiSearchTool,
 } = require('./citationFormatting');
 const { openSearchConfig } = require('./config');
 const { activeConnections, stoppedChannels } = require('./connectionManager');
@@ -30,7 +31,9 @@ async function streamAgenticResponse({ response, connectionId, channelId, sender
       }
     } else if (part.type === 'response.completed') {
       const fullResponse = part.response ?? part;
-      finalAnnotations = extractMessageTextPart(fullResponse)?.annotations || [];
+      finalAnnotations = hasAzureAiSearchTool(fullResponse)
+        ? extractMessageTextPart(fullResponse)?.annotations || []
+        : [];
     }
   }
 
@@ -121,14 +124,23 @@ async function deliverResponse({
   if (use_agentic) {
     await streamAgenticResponse({ response, connectionId, channelId, sender });
   } else {
-    await streamClassicResponse({ response, connectionId, channelId, sender, openAIFallback1, openAIFallback2, estonianFallback });
+    await streamClassicResponse({
+      response,
+      connectionId,
+      channelId,
+      sender,
+      openAIFallback1,
+      openAIFallback2,
+      estonianFallback,
+    });
   }
 }
 
 function buildCompleteResponseContent({ response, use_agentic, openAIFallback1, openAIFallback2, estonianFallback }) {
   if (use_agentic) {
     const textPart = extractMessageTextPart(response);
-    return formatAgenticCitations(textPart?.text, textPart?.annotations);
+    const annotations = hasAzureAiSearchTool(response) ? textPart?.annotations : [];
+    return formatAgenticCitations(textPart?.text, annotations);
   }
 
   const content = response.choices?.[0]?.message?.content || '';
