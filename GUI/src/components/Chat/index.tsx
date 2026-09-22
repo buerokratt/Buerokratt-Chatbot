@@ -1077,7 +1077,7 @@ const Chat: FC<ChatProps> = ({
           <div className="active-chat__side-actions">
             <Track gap={8} style={{ marginBottom: 36 }}>
               <Label type="warning">!</Label>
-              <p className="csa-away">Nõustaja on eemal.</p>
+              <p className="csa-away">{t('chat.active.csaBusy')}</p>
             </Track>
             {userInfo?.authorities.some((authority) =>
               [ROLES.ROLE_ADMINISTRATOR, ROLES.ROLE_CUSTOMER_SUPPORT_AGENT].includes(authority as ROLES),

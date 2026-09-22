@@ -187,7 +187,8 @@
       "ContactedUser": "Contacted User",
       "couldNotReachUser": "Could Not Reach User",
       "messageSendingFailed": "Message sending failed!",
-      "sendAgain": "Send again"
+      "sendAgain": "Send again",
+      "csaBusy": "Customer support is busy."
     },
     "history": {
       "title": "History",
@@ -533,7 +534,7 @@
       "description": "When active, users will automatically be set to away status after the selected period of inactivity.",
       "timeout": "Away status time",
       "minutes": "Minutes",
-      "rule": "Away status time is allowed between {{min}} min - {{max}} min, and must be shorter than the session length",
+      "rule": "Away status time is allowed between {{min}} min - {{max}} min",
       "emptyTimeout": "Away status time can't be empty",
       "invalidTimeout": "Away status time must be between 5 and 120 minutes",
       "timeoutExceedsSession": "Away status time must be shorter than the session length"

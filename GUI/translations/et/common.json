@@ -187,7 +187,8 @@
       "ContactedUser": "Kasutajaga ühendust võetud",
       "couldNotReachUser": "Kasutajaga ei õnnestunud ühendust saada",
       "messageSendingFailed": "Sõnumi saatmine ebaõnnestus!",
-      "sendAgain": "Saada uuesti"
+      "sendAgain": "Saada uuesti",
+      "csaBusy": "Nõustaja on hõivatud."
     },
     "history": {
       "title": "Ajalugu",
@@ -533,7 +534,7 @@
       "description": "Kui lubatud, siis muudetakse kasutaja staatus pärast valitud aja möödumist automaatselt eemal olevaks.",
       "timeout": "Eemal oleku aeg",
       "minutes": "Minutit",
-      "rule": "Eemal oleku aeg on lubatud vahemikus {{min}} min - {{max}} min ning peab olema lühem kui seansi pikkus",
+      "rule": "Eemal oleku aeg on lubatud vahemikus {{min}} min - {{max}} min",
       "emptyTimeout": "Eemal oleku aja väli ei tohi olla tühi",
       "invalidTimeout": "Eemal oleku aeg peab olema vahemikus 5 - 120 minutit",
       "timeoutExceedsSession": "Eemal oleku aeg peab olema lühem kui seansi pikkus"
