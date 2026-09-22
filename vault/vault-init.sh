@@ -114,13 +114,20 @@ path \"secret/data/$module/embeddings/connections/*\" { capabilities = [\"create
 path \"secret/metadata/$module/embeddings/connections/*\" { capabilities = [\"read\", \"list\", \"delete\"] }
 path \"auth/token/lookup-self\" { capabilities = [\"read\"] }"
 
+        langfuse_grant=""
+        if [ "$module" = "llm-module" ]; then
+            langfuse_grant="
+path \"secret/data/langfuse/*\" { capabilities = [\"read\"] }
+path \"secret/metadata/langfuse/*\" { capabilities = [\"read\", \"list\"] }"
+        fi
+
         put_policy "$module-llm-orchestration-policy" \
 "path \"secret/data/$module/llm/connections/*\" { capabilities = [\"read\", \"list\"] }
 path \"secret/metadata/$module/llm/connections/*\" { capabilities = [\"read\", \"list\"] }
 path \"secret/data/$module/embeddings/connections/*\" { capabilities = [\"read\", \"list\"] }
 path \"secret/metadata/$module/embeddings/connections/*\" { capabilities = [\"read\", \"list\"] }
 path \"secret/data/$module/encryption/*\" { capabilities = [\"deny\"] }
-path \"auth/token/lookup-self\" { capabilities = [\"read\"] }"
+path \"auth/token/lookup-self\" { capabilities = [\"read\"] }$langfuse_grant"
     done
 
     # CKB-only: the cleaning-server has no encryption-key access, just

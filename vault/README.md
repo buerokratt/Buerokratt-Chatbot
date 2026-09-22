@@ -45,6 +45,11 @@ for token-less requests - consumers never handle a raw Vault token.
   `secret/ckb/encryption/{public_key,private_key}` - CKB's secrets.
 - `secret/llm-module/llm/connections/*`, `secret/llm-module/embeddings/connections/*`,
   `secret/llm-module/encryption/{public_key,private_key}` - LLM-Module's secrets.
+- `secret/langfuse/*` - Langfuse tracing credentials (public/secret key, host)
+  for LLM-Module's orchestration service. Flat, not module-prefixed, since
+  Langfuse is shared observability rather than a per-module secret - mirrors
+  the path LLM-Module's own `llm_orchestration_service.py` and
+  `store-langfuse-secrets.sh` already read/write.
 
 Each module's policies are scoped to its own prefix only, so CKB and
 LLM-Module can't read or write each other's connections or encryption keys.
@@ -59,7 +64,7 @@ LLM-Module can't read or write each other's connections or encryption keys.
 | `ckb-cleaner-service` | `ckb-cleaner-policy` | read/list on `ckb/llm/connections/*` only; `ckb/encryption/*` denied |
 | `llm-module-gui-service` | `llm-module-gui-policy` | same shape as `ckb-gui-policy`, under `llm-module/*` |
 | `llm-module-cron-manager-service` | `llm-module-cron-manager-policy` | same shape as `ckb-cron-manager-policy`, under `llm-module/*` |
-| `llm-module-llm-orchestration-service` | `llm-module-llm-orchestration-policy` | same shape as `ckb-llm-orchestration-policy`, under `llm-module/*` |
+| `llm-module-llm-orchestration-service` | `llm-module-llm-orchestration-policy` | same shape as `ckb-llm-orchestration-policy`, under `llm-module/*`, plus read/list on `secret/langfuse/*` |
 
 `ckb-gui-service`, `ckb-cron-manager-service`, and `ckb-llm-orchestration-service`
 are fully configured (policy + AppRole + credentials) but have no running
