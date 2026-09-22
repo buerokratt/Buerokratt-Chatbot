@@ -238,9 +238,6 @@ const SettingsAppearance: FC = () => {
                 max={WIDGET_TIMING_SECONDS_MAX}
                 step={1}
               />
-              {errors.widgetProactiveSeconds && (
-                <span style={{ color: '#f00' }}>{errors.widgetProactiveSeconds.message}</span>
-              )}
             </div>
             {sourceDomainSelected && (
               <DomainTransfer
@@ -251,6 +248,9 @@ const SettingsAppearance: FC = () => {
               />
             )}
           </Track>
+          {errors.widgetProactiveSeconds && (
+            <span style={{ color: '#f00' }}>{errors.widgetProactiveSeconds.message}</span>
+          )}
           <Controller
             name="isWidgetActive"
             control={control}
