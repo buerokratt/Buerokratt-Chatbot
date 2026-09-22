@@ -35,6 +35,16 @@ function isValidHttpUrl(candidate) {
   }
 }
 
+const SEARCH_INDEX_URL_SUFFIX = '.search.windows.net/';
+
+function isSearchIndexUrl(candidate) {
+  return typeof candidate === 'string' && candidate.endsWith(SEARCH_INDEX_URL_SUFFIX);
+}
+
+function hasAzureAiSearchTool(response) {
+  return Array.isArray(response?.tools) && response.tools.some((tool) => tool?.type === 'azure_ai_search');
+}
+
 function extractMessageTextPart(fullResponse) {
   const messageOutput = fullResponse?.output?.find((item) => item.type === 'message');
   const content = messageOutput?.content;
@@ -48,7 +58,10 @@ function toCitation(annotation) {
 
 function sortedValidAnnotations(annotations) {
   return (annotations || [])
-    .filter((annotation) => annotation?.type === 'url_citation' && isValidHttpUrl(annotation.url))
+    .filter(
+      (annotation) =>
+        annotation?.type === 'url_citation' && isValidHttpUrl(annotation.url) && !isSearchIndexUrl(annotation.url),
+    )
     .sort((a, b) => (a.start_index ?? 0) - (b.start_index ?? 0));
 }
 
@@ -103,4 +116,5 @@ module.exports = {
   createAgenticStreamState,
   consumeAgenticStreamDelta,
   flushAgenticStreamBuffer,
+  hasAzureAiSearchTool,
 };
