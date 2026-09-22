@@ -12,6 +12,7 @@ import { Controller, useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import './SettingsAppearance.scss';
 import { MdOutlinePalette } from 'react-icons/md';
+import { WIDGET_TIMING_SECONDS_MAX, WIDGET_TIMING_SECONDS_MIN } from 'constants/config';
 import { apiDev } from 'services/api';
 import { ROLES } from 'utils/constants';
 
@@ -37,7 +38,14 @@ const SettingsAppearance: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
   const hasRendered = useRef<boolean>();
-  const { register, control, handleSubmit, reset, setValue } = useForm<WidgetAppearance>();
+  const {
+    register,
+    control,
+    handleSubmit,
+    reset,
+    setValue,
+    formState: { errors },
+  } = useForm<WidgetAppearance>();
   const [showPreview, setShowPreview] = useState(false);
   const [showColorPalette, setShowColorPalette] = useState(false);
   const [delayFinished, setDelayFinished] = useState(false);
@@ -217,11 +225,23 @@ const SettingsAppearance: FC = () => {
       >
         <Track gap={8} direction="vertical" align="left">
           <Track justify="between" align="center" style={{ width: '100%' }}>
-            <FormInput
-              {...register('widgetProactiveSeconds')}
-              label={t('settings.appearance.widgetProactiveSeconds')}
-              type="number"
-            />
+            <div style={{ flex: 1 }}>
+              <FormInput
+                {...register('widgetProactiveSeconds', {
+                  valueAsNumber: true,
+                  min: { value: WIDGET_TIMING_SECONDS_MIN, message: t('settings.appearance.invalidTimingRange') },
+                  max: { value: WIDGET_TIMING_SECONDS_MAX, message: t('settings.appearance.invalidTimingRange') },
+                })}
+                label={t('settings.appearance.widgetProactiveSeconds')}
+                type="number"
+                min={WIDGET_TIMING_SECONDS_MIN}
+                max={WIDGET_TIMING_SECONDS_MAX}
+                step={1}
+              />
+              {errors.widgetProactiveSeconds && (
+                <span style={{ color: '#f00' }}>{errors.widgetProactiveSeconds.message}</span>
+              )}
+            </div>
             {sourceDomainSelected && (
               <DomainTransfer
                 allDomains={allDomains}
@@ -243,11 +263,23 @@ const SettingsAppearance: FC = () => {
               />
             )}
           />
-          <FormInput
-            {...register('widgetDisplayBubbleMessageSeconds')}
-            label={t('settings.appearance.widgetDisplayBubbleMessageSeconds')}
-            type="number"
-          />
+          <div style={{ width: '100%' }}>
+            <FormInput
+              {...register('widgetDisplayBubbleMessageSeconds', {
+                valueAsNumber: true,
+                min: { value: WIDGET_TIMING_SECONDS_MIN, message: t('settings.appearance.invalidTimingRange') },
+                max: { value: WIDGET_TIMING_SECONDS_MAX, message: t('settings.appearance.invalidTimingRange') },
+              })}
+              label={t('settings.appearance.widgetDisplayBubbleMessageSeconds')}
+              type="number"
+              min={WIDGET_TIMING_SECONDS_MIN}
+              max={WIDGET_TIMING_SECONDS_MAX}
+              step={1}
+            />
+            {errors.widgetDisplayBubbleMessageSeconds && (
+              <span style={{ color: '#f00' }}>{errors.widgetDisplayBubbleMessageSeconds.message}</span>
+            )}
+          </div>
           <FormInput
             {...register('widgetBubbleMessageText')}
             label={t('settings.appearance.widgetBubbleMessageText')}
