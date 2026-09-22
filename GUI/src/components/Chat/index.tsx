@@ -83,6 +83,7 @@ const Chat: FC<ChatProps> = ({
   const toast = useToast();
 
   const [responseText, setResponseText] = useState('');
+  const isSendingResponseRef = useRef(false);
   const chatCsaActive = useHeaderStore((state) => state.chatCsaActive);
   const [messagesList, setMessagesList] = useState<Message[]>([]);
   const messageListRef = useRef(messagesList);
@@ -559,6 +560,9 @@ const Chat: FC<ChatProps> = ({
   }, [messageGroups, previewTypingMessage]);
 
   const handleResponseTextSend = async (editMessage: boolean) => {
+    if (isSendingResponseRef.current || responseText === '') return;
+    isSendingResponseRef.current = true;
+
     const newMessage: Message = {
       chatId: chat.id,
       authorRole: AUTHOR_ROLES.BACKOFFICE_USER,
@@ -577,32 +581,31 @@ const Chat: FC<ChatProps> = ({
       }),
     };
 
-    if (responseText !== '') {
-      try {
-        const res = await postMessageMutation.mutateAsync({
-          message: newMessage,
-          editing: editMessage,
-        });
-        const message = {
-          ...res.data.response,
-          id: res.data.response.baseId,
-        };
+    try {
+      const res = await postMessageMutation.mutateAsync({
+        message: newMessage,
+        editing: editMessage,
+      });
+      const message = {
+        ...res.data.response,
+        id: res.data.response.baseId,
+      };
 
-        if (selectedMessage) {
-          const index = messagesList.findIndex((m) => m.id === selectedMessage.id);
-          const updatedMessages = [...messagesList];
-          updatedMessages[index] = message;
-          setMessagesList(updatedMessages);
-        } else {
-          setMessagesList((oldMessages) => [...oldMessages, message]);
-        }
-      } catch (error) {
-        console.error(error);
-        setMessagesList((oldMessages) => [...oldMessages, newMessage]);
-      } finally {
-        setResponseText('');
-        setSelectedMessage(null);
+      if (selectedMessage) {
+        const index = messagesList.findIndex((m) => m.id === selectedMessage.id);
+        const updatedMessages = [...messagesList];
+        updatedMessages[index] = message;
+        setMessagesList(updatedMessages);
+      } else {
+        setMessagesList((oldMessages) => [...oldMessages, message]);
       }
+    } catch (error) {
+      console.error(error);
+      setMessagesList((oldMessages) => [...oldMessages, newMessage]);
+    } finally {
+      setResponseText('');
+      setSelectedMessage(null);
+      isSendingResponseRef.current = false;
     }
   };
 
@@ -844,11 +847,18 @@ const Chat: FC<ChatProps> = ({
                     onSubmit={(e) => handleResponseTextSend(true)}
                     maxLength={CHAT_INPUT_LENGTH}
                     onChange={(e) => setResponseText(e.target.value)}
+                    disabled={postMessageMutation.isPending}
                   />
                 </div>
 
                 <div className="edit-toolbar__edit-actions">
-                  <Button id="myButton" appearance="primary" size="s" onClick={() => handleResponseTextSend(true)}>
+                  <Button
+                    id="myButton"
+                    appearance={postMessageMutation.isPending ? 'loading' : 'primary'}
+                    size="s"
+                    disabled={postMessageMutation.isPending}
+                    onClick={() => handleResponseTextSend(true)}
+                  >
                     <Icon icon={<MdDoneOutline fontSize={18} />} size="medium" />
                   </Button>
                   <Button
@@ -877,9 +887,15 @@ const Chat: FC<ChatProps> = ({
                     onSubmit={(e) => handleResponseTextSend(false)}
                     maxLength={CHAT_INPUT_LENGTH}
                     onChange={(e) => setResponseText(e.target.value)}
+                    disabled={postMessageMutation.isPending}
                   />
                   <div className="active-chat__toolbar-actions">
-                    <Button id="myButton" appearance="primary" onClick={() => handleResponseTextSend(false)}>
+                    <Button
+                      id="myButton"
+                      appearance={postMessageMutation.isPending ? 'loading' : 'primary'}
+                      disabled={postMessageMutation.isPending}
+                      onClick={() => handleResponseTextSend(false)}
+                    >
                       <Icon icon={<MdOutlineSend fontSize={18} />} size="medium" />
                       <input
                         type="file"
