@@ -82,7 +82,9 @@ describe('formatAgenticCitations (non-streaming)', () => {
 
   it('strips a marker whose annotation has an invalid span instead of leaving it raw', () => {
     const text = 'See A【1:1†source】.';
-    const annotations = [{ type: 'url_citation', url: 'https://www.ria.ee/a', title: 'A', start_index: -1, end_index: 5 }];
+    const annotations = [
+      { type: 'url_citation', url: 'https://www.ria.ee/a', title: 'A', start_index: -1, end_index: 5 },
+    ];
 
     const { content, context } = formatAgenticCitations(text, annotations);
 

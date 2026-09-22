@@ -124,7 +124,15 @@ async function deliverResponse({
   if (use_agentic) {
     await streamAgenticResponse({ response, connectionId, channelId, sender });
   } else {
-    await streamClassicResponse({ response, connectionId, channelId, sender, openAIFallback1, openAIFallback2, estonianFallback });
+    await streamClassicResponse({
+      response,
+      connectionId,
+      channelId,
+      sender,
+      openAIFallback1,
+      openAIFallback2,
+      estonianFallback,
+    });
   }
 }
 

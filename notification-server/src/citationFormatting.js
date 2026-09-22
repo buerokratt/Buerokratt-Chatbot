@@ -77,7 +77,8 @@ function formatAgenticCitations(text, annotations) {
 
   for (const annotation of sortedValidAnnotations(annotations)) {
     const { start_index: start, end_index: end } = annotation;
-    const isValidSpan = Number.isInteger(start) && Number.isInteger(end) && start >= cursor && end <= rawText.length && start < end;
+    const isValidSpan =
+      Number.isInteger(start) && Number.isInteger(end) && start >= cursor && end <= rawText.length && start < end;
     if (!isValidSpan) continue;
 
     content += rawText.slice(cursor, start);
