@@ -469,7 +469,8 @@
       "widgetProactiveSeconds": "Animatsiooni kestus sekundites",
       "widgetDisplayBubbleMessageSeconds": "Animatsiooni viivitus sekundites",
       "widgetColor": "Põhivärv",
-      "widgetAnimation": "Animatsioon"
+      "widgetAnimation": "Animatsioon",
+      "invalidTimingRange": "Väärtus peab olema vahemikus 1 kuni 10 sekundit"
     },
     "workingTime": {
       "title": "Asutuse tööaeg",

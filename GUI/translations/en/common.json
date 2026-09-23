@@ -469,7 +469,8 @@
       "widgetProactiveSeconds": "Widget proactive seconds",
       "widgetDisplayBubbleMessageSeconds": "Widget bubble message seconds",
       "widgetColor": "Widget color",
-      "widgetAnimation": "Widget animation"
+      "widgetAnimation": "Widget animation",
+      "invalidTimingRange": "Value must be between 1 and 10 seconds"
     },
     "workingTime": {
       "title": "Organization working time",
