@@ -3,11 +3,10 @@ import Markdownify from 'components/Chat/Markdownify';
 import OptionMessage from 'components/OptionMessage';
 import { format } from 'date-fns';
 import { FC, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Message } from 'types/message';
 import { parseButtons, parseOptions } from 'utils/parse-utils';
 
-import { useToast } from '../../hooks/useToast';
+import { useCopyToClipboard } from '../../hooks/useCopyToClipboard';
 
 type ChatMessageProps = {
   message: Message;
@@ -17,28 +16,11 @@ type ChatMessageProps = {
 const ChatMessage: FC<ChatMessageProps> = ({ message, onMessageClick }) => {
   const buttons = useMemo(() => parseButtons(message), [message.buttons]);
   const options = useMemo(() => parseOptions(message), [message.options]);
-  const { t } = useTranslation();
-  const toast = useToast();
+  const copyToClipboard = useCopyToClipboard();
 
-  const handleContextMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-    const content = message.content ?? '';
-    navigator.clipboard
-      .writeText(content)
-      .then(() => {
-        toast.open({
-          type: 'success',
-          title: t('global.notification'),
-          message: t('toast.copied'),
-        });
-      })
-      .catch((err) => {
-        toast.open({
-          type: 'error',
-          title: t('global.notification'),
-          message: err?.message,
-        });
-      });
+  const handleClick = () => {
+    copyToClipboard(message.content ?? '');
+    onMessageClick?.(message);
   };
 
   return (
@@ -46,8 +28,7 @@ const ChatMessage: FC<ChatMessageProps> = ({ message, onMessageClick }) => {
       <div className="historical-chat__message">
         <button
           className="historical-chat__message-text"
-          onClick={onMessageClick ? () => onMessageClick(message) : undefined}
-          onContextMenu={handleContextMenu}
+          onClick={handleClick}
         >
           <Markdownify message={message.content ?? ''} sanitizeLinks={message.authorRole === 'end-user'} />
         </button>
