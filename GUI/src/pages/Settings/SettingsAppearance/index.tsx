@@ -44,6 +44,7 @@ const SettingsAppearance: FC = () => {
     handleSubmit,
     reset,
     setValue,
+    trigger,
     formState: { errors },
   } = useForm<WidgetAppearance>();
   const [showPreview, setShowPreview] = useState(false);
@@ -151,7 +152,27 @@ const SettingsAppearance: FC = () => {
     widgetConfigMutation.mutate(data);
   });
 
-  const handlePreview = () => {
+  const isTimingValid = (value: unknown) => {
+    const seconds = Number(value);
+    return Number.isFinite(seconds) && seconds >= WIDGET_TIMING_SECONDS_MIN && seconds <= WIDGET_TIMING_SECONDS_MAX;
+  };
+  const isPreviewTimingValid =
+    isTimingValid(widgetProactiveSeconds) && isTimingValid(widgetDisplayBubbleMessageSeconds);
+
+  useEffect(() => {
+    if (showPreview && !isPreviewTimingValid) {
+      setShowPreview(false);
+      setDelayFinished(false);
+      trigger(['widgetProactiveSeconds', 'widgetDisplayBubbleMessageSeconds']);
+    }
+  }, [showPreview, isPreviewTimingValid]);
+
+  const handlePreview = async () => {
+    if (!showPreview) {
+      const isValid = await trigger(['widgetProactiveSeconds', 'widgetDisplayBubbleMessageSeconds']);
+      if (!isValid) return;
+    }
+
     setShowPreview((prevState) => {
       if (prevState) {
         setDelayFinished(false);
@@ -338,7 +359,7 @@ const SettingsAppearance: FC = () => {
         </Track>
       </Card>
 
-      {showPreview && (
+      {showPreview && isPreviewTimingValid && (
         <div className="profile__wrapper">
           <motion.div
             className={clsx(
