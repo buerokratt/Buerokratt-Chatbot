@@ -26,10 +26,7 @@ const ChatMessage: FC<ChatMessageProps> = ({ message, onMessageClick }) => {
   return (
     <>
       <div className="historical-chat__message">
-        <button
-          className="historical-chat__message-text"
-          onClick={handleClick}
-        >
+        <button className="historical-chat__message-text" onClick={handleClick}>
           <Markdownify message={message.content ?? ''} sanitizeLinks={message.authorRole === 'end-user'} />
         </button>
         <time dateTime={message.created} className="historical-chat__message-date">
