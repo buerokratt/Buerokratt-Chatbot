@@ -1,12 +1,23 @@
 const { v4: uuidv4 } = require('uuid');
 
-const { activeConnections } = require('./connectionManager');
+const { activeConnections, abortConnectionRequests } = require('./connectionManager');
 const { createAzureOpenAIStreamRequest } = require('./openSearch');
+const {
+  LLM_GUI_QUEUE_SOURCE,
+  createLLMOrchestrationStreamRequest: createLLMGuiStreamRequest,
+} = require('./streamingService');
 const streamQueue = require('./streamQueue');
 
-function buildSSEResponse({ res, req, buildCallbackFunction, channelId }) {
-  addSSEHeader(req, res);
+// Comment frames are written this often so that every intermediate proxy sees
+// traffic and does not close the connection on its idle timer. EventSource
+// ignores comment frames, so this is invisible to the browser.
+const HEARTBEAT_INTERVAL_MS = Number(process.env.SSE_HEARTBEAT_INTERVAL_MS || 15_000);
+
+function buildSSEResponse({ res, req, buildCallbackFunction, channelId, llmStream = false }) {
+  addSSEHeader(req, res, llmStream);
   keepStreamAlive(res);
+  // Only LLM Module GUI connections get the heartbeat; the other SSE routes are unchanged.
+  const heartbeat = llmStream ? startHeartbeat(res) : null;
   const connectionId = generateConnectionID();
   const sender = buildSender(res);
 
@@ -14,6 +25,7 @@ function buildSSEResponse({ res, req, buildCallbackFunction, channelId }) {
     res,
     sender,
     channelId,
+    abortControllers: new Set(),
   });
 
   if (channelId) {
@@ -26,18 +38,23 @@ function buildSSEResponse({ res, req, buildCallbackFunction, channelId }) {
 
   req.on('close', () => {
     console.log(`Client disconnected from SSE for channel ${channelId}`);
+    clearInterval(heartbeat);
+    // Cancel any in-flight upstream generation - nobody is left to read it.
+    abortConnectionRequests(connectionId);
     activeConnections.delete(connectionId);
     cleanUp?.();
   });
 }
 
-function addSSEHeader(req, res) {
+function addSSEHeader(req, res, llmStream) {
   const origin = extractOrigin(req.headers.origin);
 
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
     Connection: 'keep-alive',
+    // Stops nginx-style proxies buffering the stream into a single response.
+    ...(llmStream && { 'X-Accel-Buffering': 'no' }),
     'Access-Control-Allow-Origin': origin,
     'Access-Control-Allow-Credentials': true,
     'Access-Control-Expose-Headers': 'Origin, X-Requested-With, Content-Type, Cache-Control, Connection, Accept',
@@ -52,6 +69,30 @@ function extractOrigin(reqOrigin) {
 
 function keepStreamAlive(res) {
   res.write('');
+}
+
+/**
+ * Keep the SSE connection warm with periodic comment frames, so proxies between
+ * the browser and this server do not time it out during a long generation pause.
+ * @returns {NodeJS.Timeout} interval handle; the caller must clear it on close.
+ */
+function startHeartbeat(res) {
+  const heartbeat = setInterval(() => {
+    try {
+      // A `:` line is an SSE comment: ignored by EventSource, but it is traffic.
+      res.write(': ping\n\n');
+      if (typeof res.flush === 'function') {
+        res.flush();
+      }
+    } catch (error) {
+      console.error('SSE heartbeat write failed:', error);
+      clearInterval(heartbeat);
+    }
+  }, HEARTBEAT_INTERVAL_MS);
+
+  // Do not hold the event loop open purely for a heartbeat.
+  heartbeat.unref?.();
+  return heartbeat;
 }
 
 function generateConnectionID() {
@@ -81,7 +122,13 @@ function processPendingStreamsForChannel(channelId) {
     pendingRequests.forEach(async (requestData) => {
       if (streamQueue.shouldRetry(requestData)) {
         try {
-          if (requestData.message === undefined) {
+          if (requestData.source === LLM_GUI_QUEUE_SOURCE) {
+            await createLLMGuiStreamRequest({
+              channelId,
+              message: requestData.message,
+              options: requestData.options,
+            });
+          } else if (requestData.message === undefined) {
             await createAzureOpenAIStreamRequest({
               use_agentic: requestData.use_agentic,
               agent_name: requestData.agent_name,
@@ -107,7 +154,9 @@ function processPendingStreamsForChannel(channelId) {
 
           streamQueue.removeFromQueue(channelId, requestData.id);
         } catch (error) {
-          console.error(`Failed to process queued stream for channel ${channelId}:`, error);
+          // Strip line breaks so the request value cannot inject fake log lines
+          const logChannelId = channelId.replace(/[\n\r]/g, '');
+          console.error(`Failed to process queued stream for channel ${logChannelId}:`, error);
           streamQueue.incrementRetryCount(channelId, requestData.id);
         }
       } else {

@@ -17,6 +17,7 @@ const {
   createLLMOrchestrationStreamRequest,
 } = require('./openSearch');
 const { buildSSEResponse } = require('./sseUtil');
+const { createLLMOrchestrationStreamRequest: createLLMGuiStreamRequest } = require('./streamingService');
 const streamQueue = require('./streamQueue');
 const { addToTerminationQueue, removeFromTerminationQueue } = require('./terminationQueue');
 
@@ -51,6 +52,29 @@ app.get('/sse/queue/:id', (req, res) => {
     req,
     res,
     buildCallbackFunction: buildQueueCounter({ id }),
+  });
+});
+
+// LLM Module GUI streaming connection
+app.get('/sse/stream/:channelId', (req, res) => {
+  const { channelId } = req.params;
+  // Strip line breaks so the request value cannot inject fake log lines
+  const logChannelId = channelId.replace(/[\n\r]/g, '');
+  buildSSEResponse({
+    req,
+    res,
+    buildCallbackFunction: ({ connectionId }) => {
+      // For streaming SSE, we don't set up an interval
+      // Instead, we wait for POST requests to trigger streaming
+      console.log(`SSE streaming connection established for channel ${logChannelId}, connection ${connectionId}`);
+
+      // Return cleanup function (no-op for streaming connections)
+      return () => {
+        console.log(`SSE streaming connection closed for channel ${logChannelId}, connection ${connectionId}`);
+      };
+    },
+    channelId,
+    llmStream: true,
   });
 });
 
@@ -183,6 +207,37 @@ app.post('/channels/:channelId/llm-stream', async (req, res) => {
   });
 });
 
+// LLM Module GUI streaming trigger - held open until the stream completes
+app.post('/channels/:channelId/orchestrate/stream', async (req, res) => {
+  try {
+    const { channelId } = req.params;
+    const { message, options = {} } = req.body;
+
+    if (!message || typeof message !== 'string') {
+      return res.status(400).json({ error: 'Message string is required' });
+    }
+
+    const result = await createLLMGuiStreamRequest({
+      channelId,
+      message,
+      options,
+    });
+
+    res.status(200).json(result);
+  } catch (error) {
+    if (error.message.includes('No active connections found for this channel - request queued')) {
+      res.status(202).json({
+        message: 'Request queued - will be processed when connection becomes available',
+        status: 'queued',
+      });
+    } else if (error.message === 'No active connections found for this channel') {
+      res.status(404).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: 'Failed to start LLM orchestration streaming' });
+    }
+  }
+});
+
 app.post('/channels/:channelId/stream', (req, res) => {
   const { channelId } = req.params;
   const {
@@ -257,5 +312,12 @@ setInterval(
 const server = app.listen(serverConfig.port, () => {
   console.log(`Server running on port ${serverConfig.port}`);
 });
+
+// The SSE GET and the trigger POST are both long-lived by design. Disable the
+// per-request cap and let the upstream idle watchdog in streamingService.js
+// decide when a stream has genuinely stalled.
+server.requestTimeout = 0;
+server.headersTimeout = 65_000;
+server.keepAliveTimeout = 61_000;
 
 module.exports = server;
