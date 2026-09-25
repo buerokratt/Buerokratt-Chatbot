@@ -101,7 +101,9 @@ async function createLLMOrchestrationStreamRequest({ channelId, message, options
     ([_, connData]) => connData.channelId === channelId,
   );
 
-  console.log(`Active connections for channel ${channelId}:`, connections.length);
+  // Strip line breaks so the request value cannot inject fake log lines
+  const logChannelId = channelId.replace(/[\n\r]/g, '');
+  console.log(`Active connections for channel ${logChannelId}:`, connections.length);
 
   if (connections.length === 0) {
     streamQueue.addToQueue(channelId, { message, options, source: LLM_GUI_QUEUE_SOURCE });
@@ -113,7 +115,7 @@ async function createLLMOrchestrationStreamRequest({ channelId, message, options
     }
   }
 
-  console.log(`Streaming LLM orchestration for channel ${channelId} to ${connections.length} connections`);
+  console.log(`Streaming LLM orchestration for channel ${logChannelId} to ${connections.length} connections`);
 
   try {
     const responsePromises = connections.map(([connectionId, connData]) =>

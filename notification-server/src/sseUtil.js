@@ -2,11 +2,11 @@ const { v4: uuidv4 } = require('uuid');
 
 const { activeConnections, abortConnectionRequests } = require('./connectionManager');
 const { createAzureOpenAIStreamRequest } = require('./openSearch');
-const streamQueue = require('./streamQueue');
 const {
   LLM_GUI_QUEUE_SOURCE,
   createLLMOrchestrationStreamRequest: createLLMGuiStreamRequest,
 } = require('./streamingService');
+const streamQueue = require('./streamQueue');
 
 // Comment frames are written this often so that every intermediate proxy sees
 // traffic and does not close the connection on its idle timer. EventSource
@@ -154,7 +154,9 @@ function processPendingStreamsForChannel(channelId) {
 
           streamQueue.removeFromQueue(channelId, requestData.id);
         } catch (error) {
-          console.error(`Failed to process queued stream for channel ${channelId}:`, error);
+          // Strip line breaks so the request value cannot inject fake log lines
+          const logChannelId = channelId.replace(/[\n\r]/g, '');
+          console.error(`Failed to process queued stream for channel ${logChannelId}:`, error);
           streamQueue.incrementRetryCount(channelId, requestData.id);
         }
       } else {

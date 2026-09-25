@@ -17,8 +17,8 @@ const {
   createLLMOrchestrationStreamRequest,
 } = require('./openSearch');
 const { buildSSEResponse } = require('./sseUtil');
-const streamQueue = require('./streamQueue');
 const { createLLMOrchestrationStreamRequest: createLLMGuiStreamRequest } = require('./streamingService');
+const streamQueue = require('./streamQueue');
 const { addToTerminationQueue, removeFromTerminationQueue } = require('./terminationQueue');
 
 const app = express();
@@ -58,17 +58,19 @@ app.get('/sse/queue/:id', (req, res) => {
 // LLM Module GUI streaming connection
 app.get('/sse/stream/:channelId', (req, res) => {
   const { channelId } = req.params;
+  // Strip line breaks so the request value cannot inject fake log lines
+  const logChannelId = channelId.replace(/[\n\r]/g, '');
   buildSSEResponse({
     req,
     res,
     buildCallbackFunction: ({ connectionId }) => {
       // For streaming SSE, we don't set up an interval
       // Instead, we wait for POST requests to trigger streaming
-      console.log(`SSE streaming connection established for channel ${channelId}, connection ${connectionId}`);
+      console.log(`SSE streaming connection established for channel ${logChannelId}, connection ${connectionId}`);
 
       // Return cleanup function (no-op for streaming connections)
       return () => {
-        console.log(`SSE streaming connection closed for channel ${channelId}, connection ${connectionId}`);
+        console.log(`SSE streaming connection closed for channel ${logChannelId}, connection ${connectionId}`);
       };
     },
     channelId,
