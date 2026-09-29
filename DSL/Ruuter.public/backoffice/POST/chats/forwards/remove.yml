@@ -6,6 +6,20 @@ declaration:
   accepts: json
   returns: json
   namespace: backoffice
+  allowlist:
+    header:
+      - field: cookie
+        type: string
+        description: "Cookie field"
+    params:
+      - field: chatId
+        type: string
+        description: "Chat Id"
+
+extractRequestData:
+  assign:
+    cookie: ${incoming.headers.cookie}
+  next: get_chat_info
 
 get_chat_info:
   call: http.post
@@ -17,7 +31,24 @@ get_chat_info:
    plaintext:
       "chatJwt"
   result: infoRes
+  next: checkForQueryChatId
+
+checkForQueryChatId:
+  switch:
+    - condition: ${incoming.params.chatId != null && incoming.params.chatId !== ""}
+      next: validateQueryChatId
   next: check_chat_info_response
+
+validateQueryChatId:
+  switch:
+    - condition: ${(infoRes.response.body?.chatIds ?? []).includes(incoming.params.chatId)}
+      next: assignValidatedChatId
+  next: return_forbidden
+
+assignValidatedChatId:
+  assign:
+    chatId: ${incoming.params.chatId}
+  next: getActiveChatById
 
 check_chat_info_response:
   switch:
@@ -92,3 +123,8 @@ return_chat_ended:
   return: "Chat Has Ended"
   status: 400
   next: end  
+
+return_forbidden:
+  status: 403
+  return: "Chat access denied"
+  next: end
