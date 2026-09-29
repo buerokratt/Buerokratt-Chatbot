@@ -311,6 +311,7 @@ insertChat:
       endUserPhone: ${endUserPhone}
       endUserOs: ${endUserOs}
       endUserUrl: ${endUserUrl}
+      domain: ${domain}
       externalId: ""
       forwardedTo: ""
       forwardedToName: ""
