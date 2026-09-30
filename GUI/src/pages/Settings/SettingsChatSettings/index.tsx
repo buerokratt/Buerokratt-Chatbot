@@ -56,6 +56,7 @@ const SettingsChatSettings: FC = () => {
     show_sub_title: t('settings.chat.tooltip.showSubTitle'),
     sub_title: t('settings.chat.tooltip.subTitle'),
     llm_module_active: t('settings.chat.tooltip.llmModuleActive'),
+    response_waiting_time: t('settings.chat.tooltip.responseWaitingTime'),
   };
 
   useEffect(() => {
@@ -217,7 +218,8 @@ const SettingsChatSettings: FC = () => {
       | 'is_edit_chat_visible'
       | 'show_sub_title'
       | 'sub_title'
-      | 'llm_module_active',
+      | 'llm_module_active'
+      | 'response_waiting_time',
   ) {
     return (
       <Tooltip content={tooltips[name]}>
@@ -396,8 +398,9 @@ const SettingsChatSettings: FC = () => {
                   step={1}
                   value={parseInt(responseWaitingTime) || 10}
                   onChange={(e) => setResponseWaitingTime(e.target.value)}
-                  style={{ flex: 1 }}
+                  style={{ flex: 1, minWidth: '150px' }}
                 />
+                {getTooltip('response_waiting_time')}
               </Track>
             </Track>
             <Track gap={8} style={{ width: '100%' }}>
