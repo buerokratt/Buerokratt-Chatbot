@@ -146,7 +146,13 @@ async function deliverResponse({
       openAIFallback2,
       estonianFallback,
     });
-    await publishNotificationEvent(channelId, { type: 'complete_response', channelId, content, context, isComplete: true });
+    await publishNotificationEvent(channelId, {
+      type: 'complete_response',
+      channelId,
+      content,
+      context,
+      isComplete: true,
+    });
     return;
   }
 
@@ -204,13 +210,7 @@ function processClassicDelta(state, part, openAIFallback1, openAIFallback2) {
   return state.cumulative;
 }
 
-async function streamClassicResponse({
-  response,
-  channelId,
-  openAIFallback1,
-  openAIFallback2,
-  estonianFallback,
-}) {
+async function streamClassicResponse({ response, channelId, openAIFallback1, openAIFallback2, estonianFallback }) {
   const state = { context: undefined, cumulative: '', startedStreaming: false };
 
   for await (const part of response) {
@@ -325,7 +325,6 @@ async function createAzureOpenAIStreamRequest({
       openAIFallback2,
       estonianFallback,
     });
-
 
     return {
       success: true,
