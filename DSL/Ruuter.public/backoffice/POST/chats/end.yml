@@ -21,11 +21,16 @@ declaration:
       - field: cookie
         type: string
         description: "Cookie field"
+    params:
+      - field: chatId
+        type: string
+        description: "Optional: id of the specific chat being ended, when more than one is tracked in the chatJwt cookie. When present, only that id is removed from the cookie instead of clearing it entirely."
 
 extractRequestData:
   assign:
     cookie: ${incoming.headers.cookie ?? "nonce"}
     chatId: "${incoming.body.message.chatId}"
+    queryChatId: ${incoming.params.chatId ?? ""}
     event: "${incoming.body.message.event}"
     authorRole: ${incoming.body.message.authorRole}
     authorTimestamp: "${incoming.body.message.authorTimestamp}"
@@ -132,7 +137,69 @@ checkForCookie:
   switch:
     - condition: ${cookie === "nonce"}
       next: notify_chats_final
+  next: checkForQueryChatId
+
+checkForQueryChatId:
+  switch:
+    - condition: ${queryChatId !== ""}
+      next: get_chat_jwt_for_removal
   next: blacklist_chat_jwt
+
+get_chat_jwt_for_removal:
+  call: http.post
+  args:
+    url: "[#CHATBOT_TIM]/jwt/custom-jwt-userinfo"
+    contentType: plaintext
+    headers:
+      cookie: ${cookie}
+    plaintext: "chatJwt"
+  result: chat_jwt_for_removal_res
+  next: assignRemainingChatIds
+
+assignRemainingChatIds:
+  assign:
+    remainingChatIds: ${(chat_jwt_for_removal_res.response.body?.chatIds ?? []).filter(id => id !== queryChatId)}
+    previousDefaultChatId: ${chat_jwt_for_removal_res.response.body?.chatId ?? ""}
+  next: checkRemainingChatIds
+
+checkRemainingChatIds:
+  switch:
+    - condition: ${remainingChatIds.length === 0}
+      next: blacklist_chat_jwt
+  next: get_session_length_for_reissue
+
+get_session_length_for_reissue:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-configuration"
+    body:
+      key: "session_length"
+  result: reissue_session_result
+  next: reissue_chat_jwt
+
+reissue_chat_jwt:
+  call: http.post
+  args:
+    url: "[#CHATBOT_TIM]/jwt/custom-jwt-generate"
+    body:
+      JWTName: "chatJwt"
+      expirationInMinutes: ${reissue_session_result.response.body[0]?.value ?? '120'}
+      content:
+        chatId: "${previousDefaultChatId === queryChatId ? remainingChatIds[0] : previousDefaultChatId}"
+        chatIds: ${remainingChatIds}
+        forwardTo: ""
+  result: reissued_cookie_result
+  next: assign_reissued_cookie
+
+assign_reissued_cookie:
+  assign:
+    chatCookie:
+      chatJwt: ${reissued_cookie_result.response.body.token}
+      Domain: "[#DOMAIN]"
+      Secure: true
+      HttpOnly: true
+      SameSite: "[#COOKIE_SAME_SITE]"
+  next: notify_chats
 
 notify_chats_final:
   template: "[#CHATBOT_PROJECT_LAYER]/chats/notify"

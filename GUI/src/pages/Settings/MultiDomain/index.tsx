@@ -109,7 +109,9 @@ const MultiDomain: FC = () => {
 
     const normalized = normalizeUrlForComparison(value);
     const domains = getValues('widgetDomains');
-    const isDuplicate = domains.some((domain, i) => i !== index && normalizeUrlForComparison(domain.url) === normalized);
+    const isDuplicate = domains.some(
+      (domain, i) => i !== index && normalizeUrlForComparison(domain.url) === normalized,
+    );
 
     return isDuplicate ? t('multiDomains.duplicateUrl') : true;
   };

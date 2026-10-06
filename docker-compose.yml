@@ -5,7 +5,7 @@ services:
     container_name: ruuter-public
     image: ruuter
     environment:
-      - application.cors.allowedOrigins=http://localhost:8086,http://localhost:3001,http://localhost:3003,http://localhost:3004,http://localhost:8080,https://smax.example.com
+      - application.cors.allowedOrigins=http://localhost:8086,http://localhost:3001,http://localhost:3003,http://localhost:3004,http://localhost:3006,http://localhost:8080,https://smax.example.com
       - application.httpCodesAllowList=200,201,202,400,401,403,500
       - application.internalRequests.allowedIPs=127.0.0.1
       - application.logging.displayRequestContent=true
@@ -165,9 +165,9 @@ services:
       - users_db
     environment:
       - sqlms.datasources.[0].name=byk
-      - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://171.22.247.13:5433/byk?sslmode=require
+      - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://171.22.247.156:5434/byk
       - sqlms.datasources.[0].username=byk
-      - sqlms.datasources.[0].password=2nH09n6Gly
+      - sqlms.datasources.[0].password=byk
       - logging.level.org.springframework.boot=INFO
     ports:
       - 8082:8082
@@ -189,42 +189,6 @@ services:
       - ./data:/var/lib/postgresql/data
     networks:
       - bykstack
-
-  resql_training:
-    container_name: resql-training
-    image: resql
-    environment:
-      - sqlms.datasources.[0].name=byk
-      - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://171.22.247.13:5434/train_db
-      - sqlms.datasources.[0].username=byk
-      - sqlms.datasources.[0].password=01234
-      - logging.level.org.springframework.boot=INFO
-      - server.port=8083
-    ports:
-      - 8083:8083
-    volumes:
-      - ./DSL/Resql:/DSL
-    networks:
-      - bykstack
-
-  resql_service:
-    container_name: resql-service
-    image: resql
-    environment:
-      - sqlms.datasources.[0].name=byk
-      - sqlms.datasources.[0].jdbcUrl=jdbc:postgresql://171.22.247.13:5435/services_db
-      - sqlms.datasources.[0].username=byk
-      - sqlms.datasources.[0].password=01234
-      - logging.level.org.springframework.boot=INFO
-      - server.port=8084
-    ports:
-      - 8084:8084
-    volumes:
-      - ./DSL/Resql:/DSL
-    networks:
-      - bykstack
-    cpus: "0.5"
-    mem_limit: "1G"
 
   gui:
     container_name: gui
@@ -415,6 +379,102 @@ services:
       - ./vault/agent/backoffice-agent.hcl:/agent/config/backoffice-agent.hcl:ro
       - ./vault/templates:/vault/templates:ro
       - ./vault/agent-out:/vault/secrets
+      - vault-agent-creds:/agent/credentials:ro
+    healthcheck:
+      test: ["CMD", "sh", "-c", "test -s /vault/secrets/.agent-token"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    networks:
+      - vault-network
+      - bykstack
+
+  vault-agent-gui:
+    container_name: vault-agent-gui
+    image: hashicorp/vault:1.18
+    entrypoint: vault agent -config=/agent/config/llm-module-gui-agent.hcl
+    depends_on:
+      vault-init:
+        condition: service_completed_successfully
+    user: "0"
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - ./vault/agent/llm-module-gui-agent.hcl:/agent/config/llm-module-gui-agent.hcl:ro
+      - ./vault/agent-out/llm-module-gui:/vault/secrets
+      - vault-agent-creds:/agent/credentials:ro
+    healthcheck:
+      test: ["CMD", "sh", "-c", "test -s /vault/secrets/.agent-token"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    networks:
+      - vault-network
+      - bykstack
+
+  vault-agent-cron:
+    container_name: vault-agent-cron
+    image: hashicorp/vault:1.18
+    entrypoint: vault agent -config=/agent/config/llm-module-cron-agent.hcl
+    depends_on:
+      vault-init:
+        condition: service_completed_successfully
+    user: "0"
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - ./vault/agent/llm-module-cron-agent.hcl:/agent/config/llm-module-cron-agent.hcl:ro
+      - ./vault/agent-out/llm-module-cron:/vault/secrets
+      - vault-agent-creds:/agent/credentials:ro
+    healthcheck:
+      test: ["CMD", "sh", "-c", "test -s /vault/secrets/.agent-token"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    networks:
+      - vault-network
+      - bykstack
+
+  vault-agent-llm:
+    container_name: vault-agent-llm
+    image: hashicorp/vault:1.18
+    entrypoint: vault agent -config=/agent/config/llm-module-llm-agent.hcl
+    depends_on:
+      vault-init:
+        condition: service_completed_successfully
+    user: "0"
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - ./vault/agent/llm-module-llm-agent.hcl:/agent/config/llm-module-llm-agent.hcl:ro
+      - ./vault/agent-out/llm-module-llm:/vault/secrets
+      - vault-agent-creds:/agent/credentials:ro
+    healthcheck:
+      test: ["CMD", "sh", "-c", "test -s /vault/secrets/.agent-token"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    networks:
+      - vault-network
+      - bykstack
+
+  vault-agent-cleaner:
+    container_name: vault-agent-cleaner
+    image: hashicorp/vault:1.18
+    entrypoint: vault agent -config=/agent/config/ckb-cleaner-agent.hcl
+    depends_on:
+      vault-init:
+        condition: service_completed_successfully
+    user: "0"
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - ./vault/agent/ckb-cleaner-agent.hcl:/agent/config/ckb-cleaner-agent.hcl:ro
+      - ./vault/agent-out/ckb-cleaner:/vault/secrets
       - vault-agent-creds:/agent/credentials:ro
     healthcheck:
       test: ["CMD", "sh", "-c", "test -s /vault/secrets/.agent-token"]

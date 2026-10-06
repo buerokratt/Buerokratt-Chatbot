@@ -63,9 +63,11 @@ const ChatTextArea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             lang={i18n.language === 'et' ? 'et' : 'en'}
             spellCheck={'true'}
             ref={ref}
+            disabled={disabled}
             onKeyDownCapture={(e) => {
               if (e.key === 'Enter') {
                 e.preventDefault();
+                if (disabled) return;
                 if (onSubmit) onSubmit(e);
               }
             }}

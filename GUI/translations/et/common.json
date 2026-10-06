@@ -49,6 +49,7 @@
     "csaStatus": "Nõustaja",
     "present": "Kohal",
     "away": "Eemal",
+    "busy": "Hõivatud",
     "today": "Täna",
     "forward": "Suuna",
     "chosen": "Valitud",
@@ -186,7 +187,8 @@
       "ContactedUser": "Kasutajaga ühendust võetud",
       "couldNotReachUser": "Kasutajaga ei õnnestunud ühendust saada",
       "messageSendingFailed": "Sõnumi saatmine ebaõnnestus!",
-      "sendAgain": "Saada uuesti"
+      "sendAgain": "Saada uuesti",
+      "csaBusy": "Nõustaja on hõivatud."
     },
     "history": {
       "title": "Ajalugu",
@@ -413,7 +415,7 @@
       "idCodePlaceholder": "Isikukood peab algama riigi eesliitega, (eg.EE12345678910)",
       "choose": "Vali",
       "userExists": "Kasutaja on olemas",
-      "userChangeStatusMessage": "Kas sa soovid kasutaja staatuseks muuta eemal?",
+      "userChangeStatusMessage": "Kas sa soovid kasutaja staatuseks muuta hõivatud?",
       "statusCommentUpdated": "Staatuse täpsustus uuendatud"
     },
     "chat": {
@@ -468,7 +470,8 @@
       "widgetProactiveSeconds": "Animatsiooni kestus sekundites",
       "widgetDisplayBubbleMessageSeconds": "Animatsiooni viivitus sekundites",
       "widgetColor": "Põhivärv",
-      "widgetAnimation": "Animatsioon"
+      "widgetAnimation": "Animatsioon",
+      "invalidTimingRange": "Väärtus peab olema vahemikus 1 kuni 10 sekundit"
     },
     "workingTime": {
       "title": "Asutuse tööaeg",
@@ -527,6 +530,16 @@
       "emptySession": "Kasutaja poolse vastuse ooteaja väli ei tohi olla tühi",
       "invalidSession": "Sessiooni pikkus peab olema vahemikus 5 - 480 minutit"
     },
+    "awayStatus": {
+      "title": "Eemal oleku staatus",
+      "description": "Kui lubatud, siis muudetakse kasutaja staatus pärast valitud aja möödumist automaatselt eemal olevaks.",
+      "timeout": "Eemal oleku aeg",
+      "minutes": "Minutit",
+      "rule": "Eemal oleku aeg on lubatud vahemikus {{min}} min - {{max}} min",
+      "emptyTimeout": "Eemal oleku aja väli ei tohi olla tühi",
+      "invalidTimeout": "Eemal oleku aeg peab olema vahemikus 5 - 120 minutit",
+      "timeoutExceedsSession": "Eemal oleku aeg peab olema lühem kui seansi pikkus"
+    },
     "greeting": {
       "title": "Tervitussõnum"
     },
@@ -583,7 +596,9 @@
         "showIdleMessage": "Enne vestluse lõpetamist saab passiivsele kasutajale saata hoiatava sõnumi. Kui valida \"Jah\", kuvatakse vestluses hoiatav sõnum vahetult enne sulgemist. Kui valida \"Ei\", siis sõnumit ei saadeta.",
         "idleMessageText": "Enne vestluse lõpetamist saadetakse passiivsele kasutajale hoiatava sõnumi. Sõnumi alla kuvatakse ainult ühte nuppu \"Jätka\", mis annab võimaluse kasutajal vestlust jätkata.",
         "showEndMessage": "Vestlust lõpetades on vestlusaknast näha viimast lauset Bürokrati poolt saadetuna. Kui valida \"Jah\", kuvatakse vestluses viimase reana Bürokrati lõppsõnumit. Kui valida \"Ei\", siis sõnumit ei kuvata ning kasutajale minimeeritakse vestlusaken automaatselt. Sõnumit kuvatakse lõppkasutajale 1 minut, seejärel rakendub lõppsõnumi seadistus.",
-        "endMessageText": "Vestlus lõpetatakse kasutaja vaatest nii, et vestlusaken jääb avatuks. Kasutaja näeb aknas viimase sõnumina Bürokrati teadet, mille sõnumi sisu on määratud selles seadistuses."
+        "endMessageText": "Vestlus lõpetatakse kasutaja vaatest nii, et vestlusaken jääb avatuks. Kasutaja näeb aknas viimase sõnumina Bürokrati teadet, mille sõnumi sisu on määratud selles seadistuses.",
+        "awayStatusActive": "Kui valida \"Jah\", muudetakse tagatoa kasutaja staatus pärast valitud aja jooksul mitteaktiivsena olemist automaatselt eemal olevaks. Kui valida \"Ei\", siis kasutaja staatust automaatselt eemal olevaks ei muudeta.",
+        "awayStatusTimeout": "Määrab aja, mille möödumisel mitteaktiivse tagatoa kasutaja staatus muudetakse automaatselt eemal olevaks."
       }
     },
     "skmConfiguration": {

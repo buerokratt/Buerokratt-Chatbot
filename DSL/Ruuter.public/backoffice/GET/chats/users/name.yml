@@ -11,6 +11,10 @@ declaration:
       - field: cookie
         type: string
         description: "Cookie field"
+    params:
+      - field: chatId
+        type: string
+        description: "Optional: which chat (of possibly several tracked in the chatJwt cookie) this request concerns. Must be one of the cookie's chatIds or the request is denied."
 
 get_tara_user_info:
   call: http.get
@@ -42,7 +46,24 @@ get_chat_info:
    plaintext:
       "chatJwt"
   result: infoRes
+  next: checkForQueryChatId
+
+checkForQueryChatId:
+  switch:
+    - condition: ${incoming.params.chatId != null && incoming.params.chatId !== ""}
+      next: validateQueryChatId
   next: check_chat_info_response
+
+validateQueryChatId:
+  switch:
+    - condition: ${(infoRes.response.body?.chatIds ?? []).includes(incoming.params.chatId)}
+      next: assignValidatedChatId
+  next: return_forbidden
+
+assignValidatedChatId:
+  assign:
+    chatId: ${incoming.params.chatId}
+  next: insertIdAndName
 
 check_chat_info_response:
   switch:
@@ -182,4 +203,9 @@ return_result_with_cookie:
 
 return_chat_not_exists:
   return: "Chat does not exist"
+  next: end
+
+return_forbidden:
+  status: 403
+  return: "Chat access denied"
   next: end

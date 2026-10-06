@@ -49,6 +49,7 @@
     "csaStatus": "Customer support status",
     "present": "Present",
     "away": "Away",
+    "busy": "Busy",
     "today": "Today",
     "forward": "Forward",
     "chosen": "Chosen",
@@ -186,7 +187,8 @@
       "ContactedUser": "Contacted User",
       "couldNotReachUser": "Could Not Reach User",
       "messageSendingFailed": "Message sending failed!",
-      "sendAgain": "Send again"
+      "sendAgain": "Send again",
+      "csaBusy": "Customer support is busy."
     },
     "history": {
       "title": "History",
@@ -413,7 +415,7 @@
       "idCodePlaceholder": "The personal identification number must start with a country prefix, (eg.EE12345678910)",
       "choose": "Choose",
       "userExists": "User Exists",
-      "userChangeStatusMessage": "Do you want to change the user status to away?",
+      "userChangeStatusMessage": "Do you want to change the user status to busy?",
       "statusCommentUpdated": "Status clarification updated"
     },
     "chat": {
@@ -426,8 +428,8 @@
       "showSubTitle": "Show chat window subtitle",
       "subTitle": "Chat window subtitle",
       "llmModuleActive": "LLM module active",
-      "showBurokrattConfirmation": "Do you want to make Bürokrat visible on the website?",
-      "hideBurokrattConfirmation": "Do you want to hide Bürokrat on the website?",
+      "showBurokrattConfirmation": "Do you want to make Bürokratt visible on the website?",
+      "hideBurokrattConfirmation": "Do you want to hide Bürokratt on the website?",
       "responseWaitingTime": "Response wait time",
       "responseProcessingNotice": "Response processing notice",
       "seconds": "seconds",
@@ -468,7 +470,8 @@
       "widgetProactiveSeconds": "Widget proactive seconds",
       "widgetDisplayBubbleMessageSeconds": "Widget bubble message seconds",
       "widgetColor": "Widget color",
-      "widgetAnimation": "Widget animation"
+      "widgetAnimation": "Widget animation",
+      "invalidTimingRange": "Value must be between 1 and 10 seconds"
     },
     "workingTime": {
       "title": "Organization working time",
@@ -527,6 +530,16 @@
       "emptySession": "Time for user to respond can't be empty",
       "invalidSession": "Conversation timeout duration must be between 5 and 480 minutes"
     },
+    "awayStatus": {
+      "title": "Away status",
+      "description": "When active, users will automatically be set to away status after the selected period of inactivity.",
+      "timeout": "Away status time",
+      "minutes": "Minutes",
+      "rule": "Away status time is allowed between {{min}} min - {{max}} min",
+      "emptyTimeout": "Away status time can't be empty",
+      "invalidTimeout": "Away status time must be between 5 and 120 minutes",
+      "timeoutExceedsSession": "Away status time must be shorter than the session length"
+    },
     "greeting": {
       "title": "Greeting message"
     },
@@ -583,7 +596,9 @@
         "showIdleMessage": "Before ending the chat, a warning message can be sent to an inactive user. If \"Yes\" is selected, the warning message will be displayed in the chat shortly before the chat is closed. If \"No\" is selected, the message will not be sent.",
         "idleMessageText": "Before ending the chat, a warning message is sent to the inactive user. Only one option \"Continue\" is displayed below the message, clicking it will allow the user to continue chatting.",
         "showEndMessage": "When ending the chat, the last sentence from Bürokratt will be visible in the chat window. If \"Yes\" is selected, Bürokratt's closing message will be displayed as the final line in the chat. If \"No\" is selected, the message will not be shown and the chat window will be automatically minimized for the user. End user will see the message for one minute and then the end message settings will be applied.",
-        "endMessageText": "The chat is ended from the user's perspective while keeping the chat window open. The user will see this Bürokratt's message as the final sentence in the chat widget."
+        "endMessageText": "The chat is ended from the user's perspective while keeping the chat window open. The user will see this Bürokratt's message as the final sentence in the chat widget.",
+        "awayStatusActive": "If \"Yes\" is selected, backoffice users will automatically be set to away status after being inactive for the selected time. If \"No\" is selected, users' status will never be changed to away automatically.",
+        "awayStatusTimeout": "Specifies the time after which an inactive backoffice user's status is automatically changed to away."
       }
     },
     "skmConfiguration": {
