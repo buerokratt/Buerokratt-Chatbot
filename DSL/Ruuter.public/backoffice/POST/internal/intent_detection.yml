@@ -46,83 +46,23 @@ check_if_bot_name_exists:
 
 assignParameters:
   assign:
-    currentDate: ${new Date().toISOString().split('T')[0]}
     sender: ${incoming.body.sender}
     domain: ${incoming.body.domain}
     botName: ${get_bot_name_result.response.body[0].value}
-
-assign_config:
-  assign:
-    strictness: "[#ID_STRICTNESS]"
-    max_tokens: "[#ID_MAX_TOKENS]"
-    documents: "[#ID_DOCUMENTS]"
-    index_name: "[#ID_INDEX_NAME]"
-    query_type: "[#ID_QUERY_TYPE]"
-    system_message: "[#ID_BGK_SYSTEM_MESSAGE]"
-    search_endpoint: "[#ID_SEARCH_ENDPOINT]"
-    completion_endpoint: "[#ID_COMPLETION_ENDPOINT]"
-    chatbot_external_key: "[#ID_CHATBOT_EXTERNAL_KEY]"
-    embedded_endpoint: "[#ID_EMBEDDED_ENDPOINT_AZURE]"
-    chatbot_external_api_key: "[#ID_CHATBOT_EXTERNAL_API_KEY]"
-    chatbot_external_bot_url: "[#ID_CHATBOT_EXTERNAL_BOT_URL]"
-    semantic_configuration: "[#ID_SEMANTIC_CONFIGURATION]"
-    in_scope: "[#ID_IN_SCOPE]"
-    stream: "[#ID_STREAM]"
+    agent_name: "[#ID_AGENT_NAME]"
+    domain_id: null
     entities: ${[]}
 
 check_if_bot_is_active:
   switch:
-    - condition: ${[#ID_ACTIVE] === true}
-      next: assign_data_sources
+    - condition: ${[#ID_ACTIVE] === true && agent_name !== ''}
+      next: checkForDomain
   next: return_skip
 
-assign_data_sources:
-  assign:
-    data_sources:
-      - type: azure_search
-        parameters:
-          endpoint: ${search_endpoint}
-          index_name: ${index_name}
-          semantic_configuration: ${semantic_configuration}
-          query_type: ${query_type}
-          in_scope: ${in_scope.toLowerCase() === 'true'}
-          strictness: ${parseInt(strictness ?? '3')}
-          top_n_documents: ${parseInt(documents ?? '5')}
-          authentication:
-            type: api_key
-            key: ${chatbot_external_key}
-          embedding_dependency:
-            type: endpoint
-            endpoint: ${embedded_endpoint}
-            authentication:
-              type: api_key
-              key: ${chatbot_external_api_key}
-
-prepare_messages:
-  call: http.post
-  args:
-    url: "[#CHATBOT_DMAPPER_HBS]/intent_detection_message"
-    headers:
-      type: json
-    body:
-      prompt_message: ${system_message}
-      new_message: ${message}
-  result: prepare_messages_res
-
-assign_messages:
-  assign:
-    messages: ${prepare_messages_res.response.body}
-
-check_if_anonymizer_is_active:
-  switch:
-    - condition: ${[#ANONYMIZER_ENABLED] === true}
-      next: checkForPassedDomain
-  next: detect_intent
-
-checkForPassedDomain:
+checkForDomain:
   switch:
     - condition: ${domain === 'none'}
-      next: getAnonymizerConfig
+      next: getSkmConfig
   next: getDomainUUID
 
 getDomainUUID:
@@ -137,8 +77,82 @@ getDomainUUID:
 validate_domain_res:
   switch:
     - condition: ${domainUuid.response.body.length > 0}
-      next: getDomainAnonymizerConfig
-  next: getAnonymizerConfig
+      next: assignDomainId
+  next: getSkmConfig
+
+assignDomainId:
+  assign:
+    domain_id: ${domainUuid.response.body[0].domainId}
+  next: getDomainSkmConfig
+
+getDomainSkmConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-skm-config"
+    body:
+      domainUUID: ${domain_id}
+  result: skm_res
+  next: assignSkmConfig
+
+getSkmConfig:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-skm-config"
+  result: skm_res
+  next: assignSkmConfig
+
+assignSkmConfig:
+  assign:
+    skm_config: ${skm_res.response.body[0]}
+    azure_client_id: ""
+    azure_client_secret: ""
+  next: checkForAgenticCredentials
+
+checkForAgenticCredentials:
+  switch:
+    - condition: ${skm_config.azureClientIdIsSet === 'true'}
+      next: fetchAzureClientId
+  next: assign_messages
+
+fetchAzureClientId:
+  call: http.get
+  args:
+    url: "[#VAULT_AGENT_BACKOFFICE]/v1/secret/data/backoffice/${domain_id ?? 'global'}/azure-agentic-client-id"
+  result: vault_id_res
+  next: assignAzureClientId
+
+assignAzureClientId:
+  assign:
+    azure_client_id: ${vault_id_res.response.body.data.data.client_id}
+  next: fetchAzureClientSecret
+
+fetchAzureClientSecret:
+  call: http.get
+  args:
+    url: "[#VAULT_AGENT_BACKOFFICE]/v1/secret/data/backoffice/${domain_id ?? 'global'}/azure-agentic"
+  result: vault_res
+  next: assignAzureClientSecret
+
+assignAzureClientSecret:
+  assign:
+    azure_client_secret: ${vault_res.response.body.data.data.client_secret}
+  next: assign_messages
+
+assign_messages:
+  assign:
+    messages: ${[{ role: 'user', content: message }]}
+
+check_if_anonymizer_is_active:
+  switch:
+    - condition: ${[#ANONYMIZER_ENABLED] === true}
+      next: checkForPassedDomain
+  next: detect_intent
+
+checkForPassedDomain:
+  switch:
+    - condition: ${domain_id == null}
+      next: getAnonymizerConfig
+  next: getDomainAnonymizerConfig
 
 getAnonymizerConfig:
   call: http.post
@@ -152,7 +166,7 @@ getDomainAnonymizerConfig:
   args:
     url: "[#CHATBOT_RESQL]/get-domain-anonymizer-config"
     body:
-      domainUUID: ${domainUuid.response.body[0].domainId}
+      domainUUID: ${domain_id}
   result: anonymizer_configs_res
   next: assignAnonymizerConfigs
 
@@ -209,31 +223,29 @@ assign_anonymized_messages:
 detect_intent:
   call: http.post
   args:
-    url: ${completion_endpoint}
+    url: "[#CHATBOT_NOTIFICATIONS]/intent-detection"
     headers:
       Content-Type: application/json
-      api-key: "[#ID_CHATBOT_EXTERNAL_API_KEY]"
     body:
       messages: ${messages}
-      data_sources: ${data_sources}
-      max_tokens: ${parseInt(max_tokens ?? '1000')}
-      temperature: 0
-      top_p: 1
-      stream: ${stream.toLowerCase() === 'true'}
-      frequency_penalty: 0
-      presence_penalty: 0
+      agent_name: ${agent_name}
+      agent_type: ${skm_config.azureAgentType}
+      azure_client_id: ${azure_client_id}
+      azure_client_secret: ${azure_client_secret}
+      azure_agentic_max_output_tokens: ${parseInt(skm_config.azureAgenticMaxOutputTokens ?? '4000')}
+    error: return_skip
   result: llmResponse
-  next: check_for_choices
+  next: check_for_content
 
-check_for_choices:
+check_for_content:
   switch:
-    - condition: ${llmResponse.response.body.choices[0]?.message.content !== null && llmResponse.response.body.choices[0]?.message.content.startsWith('{')}
+    - condition: ${llmResponse.response.body.content?.startsWith('{')}
       next: assign_intent_json
   next: return_skip
 
 assign_intent_json:
   assign:
-    intentJson: ${JSON.parse(llmResponse.response.body.choices[0].message.content)}
+    intentJson: ${JSON.parse(llmResponse.response.body.content)}
 
 check_for_intent:
   switch:
