@@ -443,7 +443,8 @@
         "isEditChatVisible": "If on is selected, only the advisor is able to edit their most recently sent response. If off is selected, the advisor cannot modify their last message after it has been sent.",
         "showSubTitle": "By selecting Yes, in addition to the Bürokrati title, a subtitle will also be displayed in the chat window. The settings for the subtitle text can be found below. By selecting No, the subtitle will not be shown, but the Bürokrati title will still remain visible.",
         "subTitle": "Enter the subtitle text here.",
-        "llmModuleActive": "If on is selected, the LLM module will be active. If off is selected, the LLM module will be inactive."
+        "llmModuleActive": "If on is selected, the LLM module will be active. If off is selected, the LLM module will be inactive.",
+        "responseWaitingTime": "Specifies how long the loading animation is shown while Bürokratt prepares an answer, before it is replaced by the processing notice. If no notice is set, only the animation is shown (three dots)."
       }
     },
     "emergencyNotices": {
