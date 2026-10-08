@@ -121,7 +121,22 @@ get_organization_base_config:
 assign_organization_base_config:
   assign:
     base_config: ${org_base_config_res.response.body[0]}
-  next: check_if_organization_use_csa
+  next: get_chat
+
+get_chat:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-chat-by-id"
+    body:
+      id: ${chatId}
+  result: get_chat_result
+  next: check_chat_belongs_to_bot
+
+check_chat_belongs_to_bot:
+  switch:
+    - condition: ${get_chat_result.response.body[0]?.customerSupportId === get_bot_name_result.response.body[0].value}
+      next: check_if_organization_use_csa
+  next: return_chat_already_forwarded
 
 check_if_organization_use_csa:
   switch:
@@ -307,6 +322,11 @@ notify_messages:
 return_result:
   status: 200
   return: "Chat forwarded to backoffice"
+  next: end
+
+return_chat_already_forwarded:
+  status: 200
+  return: "Chat already forwarded to backoffice"
   next: end
 
 return_bot_is_not_active:
