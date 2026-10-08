@@ -5,7 +5,9 @@ const express = require('express');
 const helmet = require('helmet');
 
 const { buildNotificationSearchInterval, buildQueueCounter } = require('./addOns');
+const { sendAzureAgenticRequest } = require('./azureAgenticRequest');
 const { initializeAzureOpenAI } = require('./azureOpenAI');
+const { extractMessageTextPart } = require('./citationFormatting');
 const { serverConfig } = require('./config');
 const { stoppedChannels } = require('./connectionManager');
 const { addToLogoutQueue, removeFromLogoutQueue } = require('./logoutQueue');
@@ -272,6 +274,32 @@ app.post('/channels/:channelId/stream', (req, res) => {
   }).catch((error) => {
     console.error(`Stream error for channel ${channelId}:`, error.message);
   });
+});
+
+app.post('/intent-detection', async (req, res) => {
+  const { messages, agent_name, agent_type, azure_client_id, azure_client_secret, azure_agentic_max_output_tokens } =
+    req.body;
+
+  if (!messages || !Array.isArray(messages)) {
+    return res.status(400).json({ error: 'Messages array is required' });
+  }
+
+  try {
+    const response = await sendAzureAgenticRequest(messages, {
+      stream: false,
+      agent_name,
+      agent_type,
+      client_id: azure_client_id,
+      client_secret: azure_client_secret,
+      max_output_tokens: azure_agentic_max_output_tokens,
+    });
+
+    res.status(200).json({ content: extractMessageTextPart(response)?.text?.trim() ?? '' });
+  } catch (error) {
+    const logMessage = String(error?.message ?? error).replace(/[\n\r]/g, ' ');
+    console.error('Intent detection error:', logMessage);
+    res.status(500).json({ error: 'Failed to detect intent' });
+  }
 });
 
 app.post('/channels/:channelId/stream/stop', async (req, res) => {
