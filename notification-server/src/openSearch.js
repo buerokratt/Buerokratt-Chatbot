@@ -2,6 +2,7 @@ const { Client } = require('@opensearch-project/opensearch');
 
 const { sendAzureAgenticRequest } = require('./azureAgenticRequest');
 const { streamAzureOpenAIResponse } = require('./azureOpenAI');
+const { getPreviousResponseId, savePreviousResponseId } = require('./chatLlmState');
 const {
   extractMessageTextPart,
   formatAgenticCitations,
@@ -59,8 +60,17 @@ function isFallbackMessage(text, openAIFallback1, openAIFallback2) {
   return text === openAIFallback1 || text === openAIFallback2;
 }
 
-async function fetchLLMResponse({
-  use_agentic,
+async function* saveResponseIdOnCompletion(stream, chatId) {
+  for await (const part of stream) {
+    if (part.type === 'response.completed' || part.type === 'response.incomplete') {
+      await savePreviousResponseId(chatId, (part.response ?? part).id);
+    }
+    yield part;
+  }
+}
+
+async function fetchAgenticResponse({
+  channelId,
   messages,
   options,
   stream,
@@ -70,16 +80,30 @@ async function fetchLLMResponse({
   azure_client_secret,
   azure_agentic_max_output_tokens,
 }) {
+  const previous_response_id = await getPreviousResponseId(channelId);
+
+  const response = await sendAzureAgenticRequest(messages, {
+    ...options,
+    stream,
+    agent_name,
+    agent_type,
+    client_id: azure_client_id,
+    client_secret: azure_client_secret,
+    max_output_tokens: azure_agentic_max_output_tokens,
+    previous_response_id,
+  });
+
+  if (stream) {
+    return saveResponseIdOnCompletion(response, channelId);
+  }
+
+  await savePreviousResponseId(channelId, response?.id);
+  return response;
+}
+
+async function fetchLLMResponse({ use_agentic, messages, options, ...agenticParams }) {
   if (use_agentic) {
-    return sendAzureAgenticRequest(messages, {
-      ...options,
-      stream,
-      agent_name,
-      agent_type,
-      client_id: azure_client_id,
-      client_secret: azure_client_secret,
-      max_output_tokens: azure_agentic_max_output_tokens,
-    });
+    return fetchAgenticResponse({ messages, options, ...agenticParams });
   }
   return streamAzureOpenAIResponse(messages, options);
 }
@@ -275,6 +299,7 @@ async function createAzureOpenAIStreamRequest({
 
       try {
         const response = await fetchLLMResponse({
+          channelId,
           use_agentic,
           messages,
           options,

@@ -1,0 +1,47 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Stores the last agentic LLM response id of a chat, used as 'previous_response_id' in the next request"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: chatId
+        type: string
+        description: "Body field 'chatId'"
+      - field: previousResponseId
+        type: string
+        description: "Body field 'previousResponseId'"
+
+extractRequestData:
+  assign:
+    chatId: ${incoming.body.chatId ?? ''}
+    previousResponseId: ${incoming.body.previousResponseId ?? ''}
+
+validateRequest:
+  switch:
+    - condition: ${chatId === '' || previousResponseId === ''}
+      next: return_bad_request
+  next: upsertChatLlmState
+
+upsertChatLlmState:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/upsert-chat-llm-state"
+    body:
+      chatId: ${chatId}
+      previousResponseId: ${previousResponseId}
+  result: upsert_res
+  error: return_bad_request
+  next: return_result
+
+return_result:
+  return: "Saved"
+  next: end
+
+return_bad_request:
+  status: 400
+  return: "Bad Request"
+  next: end
