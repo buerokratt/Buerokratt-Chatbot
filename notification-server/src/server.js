@@ -296,6 +296,8 @@ app.post('/intent-detection', async (req, res) => {
 
     res.status(200).json({ content: extractMessageTextPart(response)?.text?.trim() ?? '' });
   } catch (error) {
+    const logMessage = String(error?.message ?? error).replace(/[\n\r]/g, ' ');
+    console.error('Intent detection error:', logMessage);
     res.status(500).json({ error: 'Failed to detect intent' });
   }
 });
