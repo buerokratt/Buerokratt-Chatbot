@@ -75,6 +75,19 @@ assign_data_sources:
               type: api_key
               key: ${chatbot_external_api_key}
 
+check_if_agentic_request:
+  switch:
+    - condition: ${use_agentic.toLowerCase() === 'true'}
+      next: assign_agentic_messages
+  next: get_chat_messages
+
+assign_agentic_messages:
+  assign:
+    messages:
+      - role: "user"
+        content: ${message}
+  next: check_if_anonymizer_is_active
+
 get_chat_messages:
   call: http.post
   args:
