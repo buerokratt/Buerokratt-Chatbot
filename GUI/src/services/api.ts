@@ -22,16 +22,6 @@ const apiDev = axios.create({
   withCredentials: true,
 });
 
-const notificationApiDev = axios.create({
-  baseURL: import.meta.env.REACT_APP_NOTIFICATION_NODE_URL,
-  headers: {
-    Accept: 'application/json',
-    'Content-Type': 'application/json',
-    'Cache-Control': 'no-cache, no-store, must-revalidate',
-  },
-  withCredentials: false,
-});
-
 const AxiosInterceptor = ({ children }) => {
   const { t } = useTranslation();
 
@@ -54,11 +44,8 @@ const AxiosInterceptor = ({ children }) => {
 
     const apiInterceptor = api.interceptors.response.use(resInterceptor, errInterceptor);
     const apiDevInterceptor = apiDev.interceptors.response.use(resInterceptor, errInterceptor);
-    const notificationApiDevInterceptor = notificationApiDev.interceptors.response.use(resInterceptor, errInterceptor);
-
     return () => {
       api.interceptors.response.eject(apiInterceptor);
-      notificationApiDev.interceptors.response.eject(notificationApiDevInterceptor);
       apiDev.interceptors.response.eject(apiDevInterceptor);
     };
   }, [t]);
@@ -81,6 +68,4 @@ api.interceptors.request.use((axiosRequest) => axiosRequest, handleRequestError)
 
 apiDev.interceptors.request.use((axiosRequest) => axiosRequest, handleRequestError);
 
-notificationApiDev.interceptors.request.use((axiosRequest) => axiosRequest, handleRequestError);
-
-export { api, apiDev, notificationApiDev, AxiosInterceptor };
+export { api, apiDev, AxiosInterceptor };
