@@ -68,8 +68,12 @@ const AxiosInterceptor = ({ children }) => {
 
 const handleRequestError = (error: AxiosError) => {
   import.meta.env.DEBUG_ENABLED && console.debug(error);
+  return Promise.reject(new Error(error.message));
+};
+
+const handleUnauthorizedResponse = (error: AxiosError) => {
   if (error.response?.status === 401) {
-    // To be added: handle unauthorized requests
+    window.location.href = import.meta.env.REACT_APP_CUSTOMER_SERVICE_LOGIN;
   }
   if (error.response?.status === 403) {
     // To be added: handle forbidden requests
@@ -78,8 +82,10 @@ const handleRequestError = (error: AxiosError) => {
 };
 
 api.interceptors.request.use((axiosRequest) => axiosRequest, handleRequestError);
+api.interceptors.response.use((response) => response, handleUnauthorizedResponse);
 
 apiDev.interceptors.request.use((axiosRequest) => axiosRequest, handleRequestError);
+apiDev.interceptors.response.use((response) => response, handleUnauthorizedResponse);
 
 notificationApiDev.interceptors.request.use((axiosRequest) => axiosRequest, handleRequestError);
 
