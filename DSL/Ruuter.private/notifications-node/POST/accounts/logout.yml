@@ -1,0 +1,68 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Log out a backoffice user after the Notifications Node confirms the last connection was lost."
+  method: post
+  accepts: json
+  returns: json
+  namespace: notifications-node
+  allowlist:
+    body:
+      - field: userIdCode
+        type: string
+        description: "The user's national identity code from the authenticated customJwtCookie."
+      - field: jwtId
+        type: string
+        description: "JTI of the disconnected session to remove from TIM."
+
+extractRequestData:
+  assign:
+    userIdCode: ${incoming.body.userIdCode ?? ""}
+    jwtId: ${incoming.body.jwtId ?? ""}
+  next: validateCallback
+
+validateCallback:
+  switch:
+    - condition: ${userIdCode !== "" && jwtId !== ""}
+      next: unassignAllClaimedChats
+  next: returnBadRequest
+
+unassignAllClaimedChats:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/update-chats-assignee-by-user-id"
+    body:
+      userId: ${userIdCode}
+  result: unclaimRes
+  next: setCustomerSupportAgentAway
+
+setCustomerSupportAgentAway:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/set-customer-support-status"
+    body:
+      userIdCode: ${userIdCode}
+      active: false
+      status: "offline"
+      statusComment: ""
+      created: ${new Date().toISOString()}
+  result: setStatusRes
+  next: deleteCustomJwtByJti
+
+deleteCustomJwtByJti:
+  call: http.post
+  args:
+    url: "[#CHATBOT_TIM]/sessionkey/delete"
+    body:
+      sessionKey: ${jwtId}
+  result: removedCustomJwtKey
+  next: returnResult
+
+returnResult:
+  return: "Logged Out Successfully"
+  next: end
+
+returnBadRequest:
+  return: "userIdCode and jwtId are required"
+  status: 400
+  next: end

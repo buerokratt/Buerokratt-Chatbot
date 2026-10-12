@@ -138,14 +138,7 @@ notify_messages:
     type: "message"
     messageId: ${uuid}
   result: messages_notify_res
-
-remove_chat_id_from_queue_notification_node_if_existed:
-  call: http.post
-  args:
-    url: "[#CHATBOT_NOTIFICATIONS]/dequeue"
-    body:
-      id: ${id}
-  result: remove_chat_id_from_queue_notification_node_if_existed_res
+  next: return_result
 
 return_result:
   return: ${assignPendingChatRes.response.body}

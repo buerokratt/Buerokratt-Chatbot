@@ -1,3 +1,5 @@
+import { createNotificationsClient } from '@buerokratt-ria/notifications';
+import { NotificationsProvider } from '@buerokratt-ria/notifications/react';
 import { QueryClient, QueryClientProvider, QueryFunction } from '@tanstack/react-query';
 import { ToastProvider } from 'context/ToastContext';
 import React from 'react';
@@ -29,6 +31,11 @@ const queryClient = new QueryClient({
   },
 });
 
+const notificationsClient = createNotificationsClient({
+  apiBaseUrl: import.meta.env.REACT_APP_NEW_NOTIFICATION_NODE_URL,
+  vapidPublicKey: import.meta.env.REACT_APP_NOTIFICATIONS_VAPID_PUBLIC_KEY,
+});
+
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
@@ -36,7 +43,9 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
         <AxiosInterceptor>
           <ToastProvider>
             <CookiesProvider>
-              <App />
+              <NotificationsProvider client={notificationsClient}>
+                <App />
+              </NotificationsProvider>
             </CookiesProvider>
           </ToastProvider>
         </AxiosInterceptor>

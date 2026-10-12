@@ -21,7 +21,8 @@ import useStore from 'store';
 import { UserInfo } from 'types/userInfo';
 import './locale/et_EE';
 
-import useTabCloseEffect from './hooks/useTabCloseEffects';
+import useNotificationsConnection from './hooks/useNotificationsConnection';
+import useWebPush from './hooks/useWebPush';
 import ValidationRequests from './pages/Chat/ValidationRequests';
 import DeleteConversations from './pages/Settings/DeleteConversations';
 
@@ -70,7 +71,8 @@ const App: FC = () => {
     },
   });
 
-  useTabCloseEffect();
+  useNotificationsConnection(Boolean(idCode));
+  useWebPush();
 
   return (
     <Routes>
