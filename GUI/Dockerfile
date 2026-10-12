@@ -3,7 +3,6 @@ ARG nginx_version=nginx:1.25.4-alpine
 FROM node:22.18.0-alpine AS image
 WORKDIR /usr/buerokratt-chatbot
 COPY ./package*.json ./
-COPY ./notifications-sdk.tgz ./
 
 FROM image AS build
 RUN npm install --legacy-peer-deps --mode=development
