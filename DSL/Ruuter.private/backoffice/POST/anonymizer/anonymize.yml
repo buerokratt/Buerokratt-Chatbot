@@ -54,9 +54,9 @@ prepareAnonymizerConfig:
     body:
       texts: ${[text]}
       approach: ${configs.anonymizerSelectedApproach}
-      entities: ${configs.anonymizerSelectedEntities.split(',')}
-      allowlist: ${configs.anonymizerAllowlist.split(',')}
-      denylist: ${configs.anonymizerDenylist.split(',')}
+      entities: "${configs.anonymizerSelectedEntities ? configs.anonymizerSelectedEntities.split(',') : []}"
+      allowlist: "${configs.anonymizerAllowlist ? configs.anonymizerAllowlist.split(',') : []}"
+      denylist: "${configs.anonymizerDenylist ? configs.anonymizerDenylist.split(',') : []}"
       hash_type: "[#ANONYMIZER_HASH_TYPE]"
   result: preparedConfigs
 
