@@ -95,8 +95,8 @@ const MultiDomain: FC = () => {
   }, [fetchData, trackKey]);
 
   const validateUniqueName = (value: string, index: number) => {
-    const trimmed = value.trim().toLowerCase();
-    if (!trimmed) return true;
+    const trimmed = (value ?? '').trim().toLowerCase();
+    if (!trimmed) return t('multiDomains.nameRequired');
 
     const domains = getValues('widgetDomains');
     const isDuplicate = domains.some((domain, i) => i !== index && domain.name.trim().toLowerCase() === trimmed);
@@ -105,7 +105,7 @@ const MultiDomain: FC = () => {
   };
 
   const validateUniqueUrl = (value: string, index: number) => {
-    if (!value.trim()) return true;
+    if (!(value ?? '').trim()) return t('multiDomains.urlRequired');
 
     const normalized = normalizeUrlForComparison(value);
     const domains = getValues('widgetDomains');
