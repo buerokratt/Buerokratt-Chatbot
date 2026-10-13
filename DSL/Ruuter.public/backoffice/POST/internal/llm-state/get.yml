@@ -1,0 +1,47 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: "Returns the last agentic LLM response id of a chat, used as 'previous_response_id'"
+  method: post
+  accepts: json
+  returns: json
+  namespace: backoffice
+  allowlist:
+    body:
+      - field: chatId
+        type: string
+        description: "Body field 'chatId'"
+
+extractRequestData:
+  assign:
+    chatId: ${incoming.body.chatId ?? ''}
+
+validateRequest:
+  switch:
+    - condition: ${chatId === ''}
+      next: return_bad_request
+  next: getChatLlmState
+
+getChatLlmState:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-chat-llm-state"
+    body:
+      chatId: ${chatId}
+  result: llm_state_res
+  error: return_bad_request
+  next: assign_result
+
+assign_result:
+  assign:
+    result:
+      previousResponseId: ${llm_state_res.response.body[0]?.previousResponseId ?? ''}
+
+return_result:
+  return: ${result}
+  next: end
+
+return_bad_request:
+  status: 400
+  return: "Bad Request"
+  next: end

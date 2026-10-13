@@ -4,5 +4,5 @@ SELECT cm.chat_base_id::text AS chat_uuid,
        cm.value,
        cm.created_at
 FROM chat_measurements cm
-WHERE cm.chat_base_id = CAST(:chatUuid AS uuid)
+WHERE cm.chat_base_id = :chatUuid::uuid
 ORDER BY cm.created_at ASC, cm.id ASC;
