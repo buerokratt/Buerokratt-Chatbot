@@ -45,7 +45,7 @@ get_cookie_info:
 
 check_cookie_info_response:
   switch:
-    - condition: ${200 <= info_res.response.statusCodeValue && info_res.response.statusCodeValue < 300}
+    - condition: ${200 <= info_res.response.statusCodeValue && info_res.response.statusCodeValue < 300 && info_res.response.body != null}
       next: assign_role
   next: return_could_not_fetch_user_info
 
