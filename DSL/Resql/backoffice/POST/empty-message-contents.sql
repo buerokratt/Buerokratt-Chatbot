@@ -11,4 +11,4 @@ SET end_user_id         = NULL,
 WHERE base_id IN (:chats);
 
 DELETE FROM chat_llm_state
-WHERE chat_base_id IN (:chats);
+WHERE chat_base_id::text IN (:chats);
