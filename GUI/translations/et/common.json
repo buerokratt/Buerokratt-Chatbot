@@ -86,7 +86,9 @@
     "allDomains": "Kõik",
     "noDomains": "Domeene ei ole saadaval. Palun võtke ühendust süsteemiadministraatoriga.",
     "duplicateName": "Selline domeeni nimi on juba olemas",
-    "duplicateUrl": "Selline URL on juba olemas"
+    "duplicateUrl": "Selline URL on juba olemas",
+    "nameRequired": "Domeeni nimi on kohustuslik",
+    "urlRequired": "URL on kohustuslik"
   },
   "menu": {
     "conversations": "Vestlused",
