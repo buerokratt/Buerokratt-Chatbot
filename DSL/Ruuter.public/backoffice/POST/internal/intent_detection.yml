@@ -140,7 +140,7 @@ assignAzureClientSecret:
 
 assign_messages:
   assign:
-    messages: "${[{ role: 'user', content: message }]}"
+    messages: [{ role: 'user', content: "${message}" }]
 
 check_if_anonymizer_is_active:
   switch:
