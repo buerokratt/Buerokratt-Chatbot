@@ -305,7 +305,6 @@ trigger_service:
     chatId: ${sender}
     authorId: ${botName}
     ruuterType: ${validated_intent.response.body[0].ruuterType}
-    serviceType: ${validated_intent.response.body[0].isCommon}
     serviceName: ${validated_intent.response.body[0].name}
   result: service_response
   error: return_error
