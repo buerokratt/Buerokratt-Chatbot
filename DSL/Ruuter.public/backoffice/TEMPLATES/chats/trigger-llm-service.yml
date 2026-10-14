@@ -23,9 +23,6 @@ declaration:
       - field: ruuterType
         type: string
         description: "ruuterType field"
-      - field: isCommon
-        type: object
-        description: "serviceType field"
       - field: serviceName
         type: string
         description: "serviceName field"
@@ -34,12 +31,11 @@ assign_data:
   assign:
     chatId: ${incoming.body.chatId}
     authorId: ${incoming.body.authorId}
-    isCommon: ${incoming.body.isCommon}
     serviceMethod: ${incoming.body.ruuterType}
     serviceName: ${incoming.body.serviceName}
     servicePath: "${'/services/active/' + serviceName}"
     serviceInput: ${incoming.body.entities}
-    baseUrl: "${isCommon === true ? '[#CHATBOT_RUUTER_PUBLIC_INTERNAL_CS]' : '[#CHATBOT_RUUTER_PUBLIC_INTERNAL_SERVICE]'}"
+    baseUrl: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL_SERVICE]"
 
 get_new_nonce:
   call: http.post
