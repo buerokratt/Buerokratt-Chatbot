@@ -443,7 +443,8 @@
         "isEditChatVisible": "Kui valida sees, siis on ainult nõustajal võimalik oma viimati saadetud vastust korrigeerida. Valides väljas, ei saa nõustaja tagant järgi viimast sõnumit muuta.",
         "showSubTitle": "Valides jah, näidatakse vestlusaknas lisaks Bürokrati pealkirjale ka alampealkirja. Alampealkirja teksti seadistuse leiab allpoolt. Valides ei, alampealkirja ei kuvata, aga Bürokrati pealkiri jääb endiselt nähtavale.",
         "subTitle": "Sisesta lahtrisse alampealkirja sisutekst.",
-        "llmModuleActive": "Kui valida sees, on LLM moodul aktiivne. Valides väljas, on LLM moodul inaktiivne."
+        "llmModuleActive": "Kui valida sees, on LLM moodul aktiivne. Valides väljas, on LLM moodul inaktiivne.",
+        "responseWaitingTime": "Määrab, kui kaua kuvatakse laadimisanimatsiooni ajal, mil Bürokratt vastust koostab, enne kui see asendatakse töötlemise teavitusega. Kui teavitust pole seadistatud, kuvatakse vaid animatsiooni (kolme punkti)."
       }
     },
     "emergencyNotices": {
