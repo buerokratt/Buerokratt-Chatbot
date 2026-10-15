@@ -121,7 +121,22 @@ get_organization_base_config:
 assign_organization_base_config:
   assign:
     base_config: ${org_base_config_res.response.body[0]}
-  next: check_if_organization_use_csa
+  next: get_chat
+
+get_chat:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-chat-by-id"
+    body:
+      id: ${chatId}
+  result: get_chat_result
+  next: check_chat_belongs_to_bot
+
+check_chat_belongs_to_bot:
+  switch:
+    - condition: ${get_chat_result.response.body[0]?.customerSupportId === get_bot_name_result.response.body[0].value}
+      next: check_if_organization_use_csa
+  next: return_chat_already_forwarded
 
 check_if_organization_use_csa:
   switch:
@@ -133,7 +148,30 @@ check_if_organization_is_available_all_time:
   switch:
     - condition: ${base_config.isAvailableAllTime === 'true'}
       next: get_all_available_csas
+  next: check_domain_organization_working_hours
+
+check_domain_organization_working_hours:
+  switch:
+    - condition: ${domain === 'none'}
+      next: get_organization_working_details
+  next: validate_domain
+
+validate_domain:
+  switch:
+    - condition: ${domainId.response.body.length > 0}
+      next: get_domain_organization_working_details
   next: get_organization_working_details
+
+get_domain_organization_working_details:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-is-domain-organization-available"
+    body:
+      holidays: ${holidays}
+      holiday_names: ${holidayNames}
+      domainUUID: ${domainId.response.body[0].domainId}
+  result: org_res
+  next: assign_organization_details
 
 get_organization_working_details:
   call: http.post
@@ -307,6 +345,11 @@ notify_messages:
 return_result:
   status: 200
   return: "Chat forwarded to backoffice"
+  next: end
+
+return_chat_already_forwarded:
+  status: 200
+  return: "Chat already forwarded to backoffice"
   next: end
 
 return_bot_is_not_active:
