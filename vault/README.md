@@ -1,9 +1,9 @@
-# Vault support for backoffice, CKB, and LLM Module
+# Vault support for backoffice, CKB, LLM Module, and Service Module
 
 HashiCorp Vault stores sensitive configuration (DB credentials, API tokens,
 LLM/embedding connection secrets, etc.) instead of keeping it in plaintext in
 `docker-compose.yml`. This Vault is the single instance intended for
-Buerokratt-Chatbot, Common-Knowledge (CKB), and LLM-Module - rather than each
+Buerokratt-Chatbot, Common-Knowledge (CKB), LLM-Module, and Service-Module - rather than each
 module running its own. Other modules attach to it via the shared `bykstack`
 network, using the same container names/ports their own compose files
 already reference, so no changes are required on their side to point at it.
@@ -16,7 +16,7 @@ already reference, so no changes are required on their side to point at it.
   boundary is the access control, so the listener itself stays plain HTTP.
 - **`vault-init`** - one-shot container that initializes/unseals Vault on
   first run, sets up the KV engine, AppRole auth, every policy/AppRole below
-  (backoffice, CKB, LLM Module), seeds the `tim-postgresql` secret, and
+  (backoffice, CKB, LLM Module, Service Module), seeds the `tim-postgresql` secret, and
   generates CKB's and LLM-Module's RSA encryption keypairs. Safe to re-run -
   it's idempotent.
 - **`vault-agent-backoffice`** - a Vault Agent for backoffice's own services.
@@ -31,6 +31,10 @@ already reference, so no changes are required on their side to point at it.
 - **`vault-agent-cleaner`** - a Vault Agent for CKB's `cleaning-server`,
   proxying on `:8204` - the exact host:port CKB's own compose file already
   points it at.
+- **`vault-agent-service-module` / `vault-agent-service-module-test`** - Vault
+  Agents for Service-Module's Ruuter, proxying on `:8205` (production
+  identity) and `:8206` (test identity). Service-Module's `constants.ini`
+  points `SERVICE_VAULT_AGENT` at one of them.
 
 All Vault Agents follow the same shape: log in once via AppRole (credentials
 minted by `vault-init`), renew the token forever, and inject it transparently
@@ -45,6 +49,9 @@ for token-less requests - consumers never handle a raw Vault token.
   `secret/ckb/encryption/{public_key,private_key}` - CKB's secrets.
 - `secret/llm-module/llm/connections/*`, `secret/llm-module/embeddings/connections/*`,
   `secret/llm-module/encryption/{public_key,private_key}` - LLM-Module's secrets.
+- `secret/service-module/prod/*`, `secret/service-module/test/*` -
+  Service-Module's secrets (e.g. `azure-search` with an `api_key` field),
+  split by environment so test credentials can't read production secrets.
 - `secret/langfuse/*` - Langfuse tracing credentials (public/secret key, host)
   for LLM-Module's orchestration service. Flat, not module-prefixed, since
   Langfuse is shared observability rather than a per-module secret - mirrors
@@ -54,7 +61,7 @@ for token-less requests - consumers never handle a raw Vault token.
 Each module's policies are scoped to its own prefix only, so CKB and
 LLM-Module can't read or write each other's connections or encryption keys.
 
-## CKB / LLM-Module policies and AppRoles
+## CKB / LLM-Module / Service-Module policies and AppRoles
 
 | AppRole | Policy | Access |
 |---|---|---|
@@ -65,6 +72,8 @@ LLM-Module can't read or write each other's connections or encryption keys.
 | `llm-module-gui-service` | `llm-module-gui-policy` | same shape as `ckb-gui-policy`, under `llm-module/*` |
 | `llm-module-cron-manager-service` | `llm-module-cron-manager-policy` | same shape as `ckb-cron-manager-policy`, under `llm-module/*` |
 | `llm-module-llm-orchestration-service` | `llm-module-llm-orchestration-policy` | same shape as `ckb-llm-orchestration-policy`, under `llm-module/*`, plus read/list on `secret/langfuse/*` |
+| `service-module-service` | `service-module-policy` | read-only on `service-module/prod/*`; everything else denied |
+| `service-module-test-service` | `service-module-test-policy` | read-only on `service-module/test/*`; `service-module/prod/*` explicitly denied |
 
 `ckb-gui-service`, `ckb-cron-manager-service`, and `ckb-llm-orchestration-service`
 are fully configured (policy + AppRole + credentials) but have no running
@@ -76,7 +85,8 @@ following the `vault-agent-cleaner` pattern once CKB needs it.
 
 ```sh
 docker compose up -d vault vault-init vault-agent-backoffice \
-  vault-agent-gui vault-agent-cron vault-agent-llm vault-agent-cleaner
+  vault-agent-gui vault-agent-cron vault-agent-llm vault-agent-cleaner \
+  vault-agent-service-module vault-agent-service-module-test
 ```
 
 Any other service that depends on a Vault-sourced secret (currently just
@@ -84,7 +94,7 @@ Any other service that depends on a Vault-sourced secret (currently just
 before starting. CKB's and LLM-Module's own containers (started from their
 own compose files, attached to the shared `bykstack` network) resolve
 `vault-agent-gui` / `vault-agent-cron` / `vault-agent-llm` / `vault-agent-cleaner`
-by name once this compose stack is up.
+/ `vault-agent-service-module` by name once this compose stack is up.
 
 ## Adding a new secret
 
