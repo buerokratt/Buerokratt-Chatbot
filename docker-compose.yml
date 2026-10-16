@@ -486,6 +486,54 @@ services:
       - vault-network
       - bykstack
 
+  vault-agent-service-module:
+    container_name: vault-agent-service-module
+    image: hashicorp/vault:1.18
+    entrypoint: vault agent -config=/agent/config/service-module-agent.hcl
+    depends_on:
+      vault-init:
+        condition: service_completed_successfully
+    user: "0"
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - ./vault/agent/service-module-agent.hcl:/agent/config/service-module-agent.hcl:ro
+      - ./vault/agent-out/service-module:/vault/secrets
+      - vault-agent-creds:/agent/credentials:ro
+    healthcheck:
+      test: ["CMD", "sh", "-c", "test -s /vault/secrets/.agent-token"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    networks:
+      - vault-network
+      - bykstack
+
+  vault-agent-service-module-test:
+    container_name: vault-agent-service-module-test
+    image: hashicorp/vault:1.18
+    entrypoint: vault agent -config=/agent/config/service-module-test-agent.hcl
+    depends_on:
+      vault-init:
+        condition: service_completed_successfully
+    user: "0"
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - ./vault/agent/service-module-test-agent.hcl:/agent/config/service-module-test-agent.hcl:ro
+      - ./vault/agent-out/service-module-test:/vault/secrets
+      - vault-agent-creds:/agent/credentials:ro
+    healthcheck:
+      test: ["CMD", "sh", "-c", "test -s /vault/secrets/.agent-token"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    networks:
+      - vault-network
+      - bykstack
+
 volumes:
   opensearch-data:
   spacy_models:
