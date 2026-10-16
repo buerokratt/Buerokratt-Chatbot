@@ -50,7 +50,7 @@ mapDomainsData:
     url: "[#CHATBOT_DMAPPER]/utils/map-domains-data"
     body:
       domains: ${domains.response.body}
-      userDomains: ${user_domains.response.body?.[0] ?? {"domains": [], "selected": []}}
+      userDomains: '${user_domains.response.body?.[0] ?? {"domains": [], "selected": []}}'
   result: mappedDomains
 
 returnSuccess:

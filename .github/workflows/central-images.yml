@@ -23,6 +23,7 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+      - run: python3 -m pip install PyYAML==6.0.2
       - run: python3 ci/central/check.py
       - name: Isolated PostgreSQL greeting regression
         run: python3 ci/central/test-greeting-sql.py

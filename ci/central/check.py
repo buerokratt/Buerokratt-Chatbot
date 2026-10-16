@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Offline checks for publishable Central build inputs."""
-import ast,json,re,subprocess
+import ast,json,re,subprocess,yaml
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
 images=json.loads((ROOT/'ci/central/images.json').read_text())
@@ -21,4 +21,5 @@ for name in files:
  assert not re.search(rb'(?m)^-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----',data),name
  if p.suffix=='.py':ast.parse(data)
  if p.suffix=='.json':json.loads(data)
+ if p.suffix in ['.yml','.yaml']:yaml.safe_load(data)
 print(json.dumps({'status':'PASS','components':len(images),'changedFilesChecked':len(files),'clusterAccess':False}))
