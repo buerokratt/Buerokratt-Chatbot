@@ -18,7 +18,18 @@ declaration:
 extractRequestData:
   assign:
     chatId: ${incoming.body.chatId}
-    timeout: ${incoming.body.timeout}
+    timeout: ${Number(incoming.body.timeout ?? 30)}
+
+validateDuration:
+  switch:
+    - condition: ${Number.isSafeInteger(timeout) && timeout > 0}
+      next: addKeyToTim
+  next: returnInvalidDuration
+
+returnInvalidDuration:
+  status: 400
+  return: "Invalid session duration"
+  next: end
 
 addKeyToTim:
   call: http.post
@@ -30,5 +41,5 @@ addKeyToTim:
   result: addedKey
 
 return_result:
-  return: "Key added to the tim sadly"
+  return: "Session key added"
   next: end

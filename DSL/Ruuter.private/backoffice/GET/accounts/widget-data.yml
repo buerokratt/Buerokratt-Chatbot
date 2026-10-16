@@ -33,13 +33,24 @@ getUserDomains:
       user_login: ${user_id}
   result: user_domains
 
+validateDomainResponses:
+  switch:
+    - condition: ${domains.response.statusCodeValue === 200 && user_domains.response.statusCodeValue === 200 && Array.isArray(domains.response.body) && Array.isArray(user_domains.response.body)}
+      next: mapDomainsData
+  next: returnDomainError
+
+returnDomainError:
+  status: 502
+  return: "Widget domain lookup failed"
+  next: end
+
 mapDomainsData:
   call: http.post
   args:
     url: "[#CHATBOT_DMAPPER]/utils/map-domains-data"
     body:
       domains: ${domains.response.body}
-      userDomains: ${user_domains.response.body[0]}
+      userDomains: ${user_domains.response.body?.[0] ?? {"domains": [], "selected": []}}
   result: mappedDomains
 
 returnSuccess:

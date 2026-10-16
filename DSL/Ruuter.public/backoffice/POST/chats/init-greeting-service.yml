@@ -232,15 +232,16 @@ check_service_name:
 getGreetingServiceStatus:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/get-service-status-by-id"
+    url: "[#SERVICE_RESQL]/get-service-by-id"
     body:
-      serviceId: ${greetingServiceId}
+      id: ${greetingServiceId}
   result: service_status_res
+  error: insertFallbackGreeting
   next: checkGreetingServiceIsActive
 
 checkGreetingServiceIsActive:
   switch:
-    - condition: ${service_status_res.response.body[0]?.currentState === 'active'}
+    - condition: ${service_status_res.response.body?.[0]?.state === 'active'}
       next: triggerGreetingService
   next: insertFallbackGreeting
 
