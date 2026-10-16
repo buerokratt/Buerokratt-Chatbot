@@ -1,29 +1,33 @@
-WITH LatestChats AS (
-    SELECT DISTINCT ON (base_id) base_id, status, updated, ended
+WITH MaxChats AS (
+    SELECT MAX(id) AS maxId
     FROM chat
-    WHERE updated >= (CURRENT_DATE - INTERVAL '1 day')
-      AND updated < CURRENT_DATE + INTERVAL '1 day'
-    ORDER BY base_id, updated DESC
+    GROUP BY base_id
+),
+OpenChats AS (
+    SELECT c.base_id, c.updated
+    FROM chat c
+    JOIN MaxChats mc ON c.id = mc.maxId
+    WHERE c.status IS NOT NULL
+      AND c.status <> 'ENDED'
+      AND c.ended IS NULL
 ),
 LatestMessageTime AS (
-    SELECT 
-        chat_base_id,
-        MAX(updated) AS last_message_updated
-    FROM message
-    GROUP BY chat_base_id
+    SELECT
+        m.chat_base_id,
+        MAX(m.updated) AS last_message_updated
+    FROM message m
+    JOIN OpenChats oc ON m.chat_base_id = oc.base_id
+    GROUP BY m.chat_base_id
 ),
 ChatsWithDeadTime AS (
-    SELECT 
-        lc.base_id,
-        COALESCE(lmt.last_message_updated, lc.updated) AS last_activity_time,
-        COALESCE(lmt.last_message_updated, lc.updated) + 
+    SELECT
+        oc.base_id,
+        COALESCE(lmt.last_message_updated, oc.updated) AS last_activity_time,
+        COALESCE(lmt.last_message_updated, oc.updated) +
             (COALESCE(:idleTime::integer, 5) || ' minutes')::INTERVAL +
             (COALESCE(:inactivityTime::integer, 5) || ' minutes')::INTERVAL AS dead_time
-    FROM LatestChats lc
-    LEFT JOIN LatestMessageTime lmt ON lc.base_id = lmt.chat_base_id
-    WHERE lc.status IS NOT NULL
-      AND lc.status <> 'ENDED'
-      AND lc.ended IS NULL
+    FROM OpenChats oc
+    LEFT JOIN LatestMessageTime lmt ON oc.base_id = lmt.chat_base_id
 )
 SELECT array_agg(
     json_build_object(
