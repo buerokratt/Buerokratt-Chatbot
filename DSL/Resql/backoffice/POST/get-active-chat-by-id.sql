@@ -78,7 +78,7 @@ FROM (
     ORDER BY updated DESC
     LIMIT 1
 ) AS c
-JOIN message AS m ON c.base_id = m.chat_base_id
+LEFT JOIN message AS m ON c.base_id = m.chat_base_id
 WHERE c.ended IS NULL
-ORDER BY m.updated DESC
+ORDER BY m.updated DESC NULLS LAST
 LIMIT 1;
