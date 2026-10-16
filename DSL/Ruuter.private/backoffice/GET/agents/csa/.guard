@@ -13,7 +13,7 @@ authenticate:
 
 check_authority_result:
   switch:
-    - condition: ${authority_result !== "false"}
+    - condition: ${authority_result != null && authority_result !== false && authority_result !== "false" && authority_result.idCode != null && authority_result.idCode !== ""}
       next: guard_success
   next: guard_fail
 

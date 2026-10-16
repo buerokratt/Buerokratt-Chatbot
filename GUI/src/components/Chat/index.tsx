@@ -87,6 +87,8 @@ const Chat: FC<ChatProps> = ({
   const chatCsaActive = useHeaderStore((state) => state.chatCsaActive);
   const [messagesList, setMessagesList] = useState<Message[]>([]);
   const messageListRef = useRef(messagesList);
+  const currentChatIdRef = useRef(chat.id);
+  currentChatIdRef.current = chat.id;
   const [latestPermissionMessageCreated, setLatestPermissionMessageCreated] = useState<string>();
   const [latestPermissionMessageSeconds, setLatestPermissionMessageSeconds] = useState<number>(0);
   const [previewTypingMessage, setPreviewTypingMessage] = useState<string | undefined>();
@@ -214,12 +216,13 @@ const Chat: FC<ChatProps> = ({
         if (!previewMessage.data.response && messageListRef.current?.length > 0) {
           await getNewMessages();
         }
-      } else if (messageListRef.current?.length > 0) {
-        await getNewMessages();
+      } else {
+        if (messageListRef.current?.length > 0) await getNewMessages();
+        else await getMessages();
       }
     };
 
-    const events = sse(`/${chat.id}`, onMessage);
+    const events = sse(`/${chat.id}`, onMessage, getMessages);
 
     return () => {
       events.close();
@@ -231,6 +234,7 @@ const Chat: FC<ChatProps> = ({
       (await apiDev.get(
         `agents/chats/messages/new?chatId=${chat.id}&lastRead=${chat.lastMessageTimestamp?.split('+')[0] ?? ''}`,
       )) ?? [];
+    if (currentChatIdRef.current !== chat.id) return;
     const messages = res.data.response;
     setPreviewTypingMessage(undefined);
     const filteredMessages = messages?.filter((newMessage: Message) => {
@@ -243,7 +247,11 @@ const Chat: FC<ChatProps> = ({
       setTimeout(() => {
         handleLastUserMessage(newDisplayableMessages);
       }, 500);
-      setMessagesList((oldMessages) => [...oldMessages, ...newDisplayableMessages]);
+      setMessagesList((oldMessages) => {
+        const merged = [...oldMessages, ...newDisplayableMessages.filter(message => filterMessages(oldMessages, message))];
+        messageListRef.current = merged;
+        return merged;
+      });
     }
 
     handlePermissionMessages();
@@ -292,6 +300,8 @@ const Chat: FC<ChatProps> = ({
 
     handlePermissionMessages();
 
+    if (currentChatIdRef.current !== chat.id) return;
+    messageListRef.current = res.response;
     setMessagesList(res.response);
   };
 

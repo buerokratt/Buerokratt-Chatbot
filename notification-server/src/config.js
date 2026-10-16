@@ -1,23 +1,19 @@
 require('dotenv').config();
 
 module.exports = {
-  openSearchConfig: {
-    notificationIndex: 'notifications',
-    chatQueueIndex: 'chatqueue',
-    ssl: {
-      rejectUnauthorized: false,
-    },
-    getUrl: () => {
-      const protocol = process.env.OPENSEARCH_PROTOCOL || 'https';
-      const username = process.env.OPENSEARCH_USERNAME || 'admin';
-      const password = process.env.OPENSEARCH_PASSWORD || 'admin';
-      const host = process.env.OPENSEARCH_HOST || 'host.docker.internal';
-      const port = process.env.OPENSEARCH_PORT || '9200';
-
-      return `${protocol}://${username}:${password}@${host}:${port}`;
-    },
-    retry_on_conflict: 6,
-  },
+  openSearchConfig: (() => {
+    const fs = require('fs');
+    const origin = new URL(process.env.OPENSEARCH_URL);
+    if (!['https:', 'http:'].includes(origin.protocol) || origin.username || origin.password || origin.pathname !== '/' || origin.search || origin.hash) throw new Error('Invalid Central origin');
+    if (origin.protocol === 'http:' && process.env.OPENSEARCH_ALLOW_HTTP !== 'true') throw new Error('HTTP requires explicit opt-in');
+    const username = fs.readFileSync(process.env.OPENSEARCH_USERNAME_FILE, 'utf8');
+    const password = fs.readFileSync(process.env.OPENSEARCH_PASSWORD_FILE, 'utf8');
+    if (!username || !password || username.includes(':') || /[\x00-\x1f]/.test(username + password)) throw new Error('Invalid credential files');
+    if (process.env.OPENSEARCH_INDEX_PREFIX !== 'central-byk-test-chatbot-') throw new Error('Invalid installation prefix');
+    return { notificationIndex: process.env.OPENSEARCH_INDEX_PREFIX + 'notifications', chatQueueIndex: process.env.OPENSEARCH_INDEX_PREFIX + 'chatqueue',
+      ssl: { rejectUnauthorized: true, ...(process.env.OPENSEARCH_CA_FILE ? { ca: fs.readFileSync(process.env.OPENSEARCH_CA_FILE) } : {}) },
+      auth: { username, password }, getUrl: () => origin.origin, retry_on_conflict: 6 };
+  })(),
   serverConfig: {
     port: process.env.PORT || 4040,
     refreshInterval: process.env.REFRESH_INTERVAL || 1000,

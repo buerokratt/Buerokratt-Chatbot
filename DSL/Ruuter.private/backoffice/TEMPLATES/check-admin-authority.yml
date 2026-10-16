@@ -25,7 +25,7 @@ get_cookie_info:
 
 check_cookie_info_response:
   switch:
-    - condition: ${200 <= res.response.statusCodeValue && res.response.statusCodeValue < 300 && res.response.body != null}
+    - condition: ${200 <= res.response.statusCodeValue && res.response.statusCodeValue < 300 && res.response.body != null && typeof(res.response.body.idCode) === "string" && String(res.response.body.idCode).trim().length > 0 && res.response.body.authorities != null}
       next: check_user_authority
   next: return_unauthorized
 

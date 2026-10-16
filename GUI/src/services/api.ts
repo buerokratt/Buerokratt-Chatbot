@@ -1,9 +1,13 @@
+import headerApi from '@buerokratt-ria/header/src/services/api';
+import headerPrivateApi from '@buerokratt-ria/header/src/services/api-dev';
+import { api as sharedApi, apiDev as sharedPrivateApi, apiDevEnded as sharedHistoryApi } from '@buerokratt-ria/common-gui-components/services/api';
+import { coordinateAuthenticatedRequests } from './authenticatedAdapter';
 import axios, { AxiosError } from 'axios';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const api = axios.create({
-  baseURL: import.meta.env.BASE_URL,
+  baseURL: import.meta.env.REACT_APP_RUUTER_API_URL,
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json',
@@ -31,6 +35,14 @@ const notificationApiDev = axios.create({
   },
   withCredentials: false,
 });
+
+coordinateAuthenticatedRequests(api);
+coordinateAuthenticatedRequests(apiDev);
+coordinateAuthenticatedRequests(sharedApi);
+coordinateAuthenticatedRequests(sharedPrivateApi);
+coordinateAuthenticatedRequests(sharedHistoryApi);
+coordinateAuthenticatedRequests(headerApi);
+coordinateAuthenticatedRequests(headerPrivateApi);
 
 const AxiosInterceptor = ({ children }) => {
   const { t } = useTranslation();

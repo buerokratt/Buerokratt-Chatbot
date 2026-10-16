@@ -1,4 +1,3 @@
-const abortQueue = [];
 const timeouts = new Map();
 const terminationDelay = process.env.TERMINATION_TIMEOUT || 10;
 
@@ -8,27 +7,16 @@ function addToTerminationQueue(id, timeout = terminationDelay, callback) {
   }
 
   const handle = setTimeout(async () => {
-    const aborts = spliceAborts(id);
     timeouts.delete(id);
-
-    if (aborts.length === 0) {
-      await callback();
-    }
+    await callback();
   }, timeout * 1000);
 
   timeouts.set(id, handle);
 }
 
 function removeFromTerminationQueue(id) {
-  abortQueue.push({ id, at: Date.now() });
-}
-
-function spliceAborts(id) {
-  const abortIndex = abortQueue.findIndex((x) => x.id === id && 10000 > Date.now() - x.at);
-  if (abortIndex === -1) {
-    return [];
-  }
-  return abortQueue.splice(abortIndex, 1);
+  clearTimeout(timeouts.get(id));
+  timeouts.delete(id);
 }
 
 module.exports = {

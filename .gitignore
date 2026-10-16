@@ -7,3 +7,12 @@ node_modules
 /vault/agent-out/*
 !/vault/agent-out/tim-postgresql.env
 .env.gui
+
+# Private operator state and generated CI artifacts
+/.central-build/
+/.central-release/
+/installation-state/
+/operator-bindings.json
+/published-images.json
+/rit-byrokratt.yaml
+*.kubeconfig

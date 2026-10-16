@@ -46,7 +46,7 @@ authenticate:
 
 check_authority_result:
   switch:
-    - condition: ${authority_result !== "false"}
+    - condition: ${authority_result != null && authority_result !== false && authority_result !== "false" && typeof(authority_result.idCode) === "string" && String(authority_result.idCode).trim().length > 0}
       next: guard_success
   next: guard_fail
 

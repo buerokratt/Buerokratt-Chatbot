@@ -42,7 +42,27 @@ unclaimAllAssignedChats:
     body:
       userId: ${idCode}
   result: unclaim_res
-  next: return_result
+  next: requeue_unclaimed_chats
+
+requeue_unclaimed_chats:
+  call: http.post
+  args:
+    url: "[#CHATBOT_NOTIFICATIONS]/enqueue-many"
+    body:
+      ids: ${unclaim_res.response.body.map(row => row.id)}
+  result: queue_res
+  next: check_queue_receipts
+
+check_queue_receipts:
+  switch:
+    - condition: ${queue_res.response.statusCodeValue === 200}
+      next: return_result
+  next: return_queue_error
+
+return_queue_error:
+  status: 207
+  return: ${queue_res.response.body}
+  next: end
 
 return_result:
   return: ${unclaim_res.response.body}

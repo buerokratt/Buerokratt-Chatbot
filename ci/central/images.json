@@ -1,0 +1,10 @@
+{
+  "backoffice": {
+    "dockerfile": "ci/central/backoffice.Dockerfile",
+    "context": "."
+  },
+  "legacy": {
+    "dockerfile": "ci/central/legacy.Dockerfile",
+    "context": "."
+  }
+}

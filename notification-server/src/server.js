@@ -9,7 +9,7 @@ const { sendAzureAgenticRequest } = require('./azureAgenticRequest');
 const { initializeAzureOpenAI } = require('./azureOpenAI');
 const { extractMessageTextPart } = require('./citationFormatting');
 const { serverConfig } = require('./config');
-const { stoppedChannels } = require('./connectionManager');
+const { stoppedChannels, activeConnections, abortConnectionRequests } = require('./connectionManager');
 const { addToLogoutQueue, removeFromLogoutQueue } = require('./logoutQueue');
 const {
   enqueueChatId,
@@ -29,9 +29,14 @@ app.use(cors());
 app.use(helmet.hidePoweredBy());
 app.use(express.json({ extended: false }));
 app.use(cookieParser());
+app.use((req, res, next) => {
+  if (process.env.LLM_GENERATION_ENABLED === 'false' && req.method === 'POST' && (/^\/channels\/[^/]+\/(llm-stream|stream)$/.test(req.path) || req.path === '/intent-detection')) return res.status(503).json({error:'Model generation is disabled for this deployment'});
+  next();
+});
 app.use(csurf({ cookie: true, ignoreMethods: ['GET', 'POST'] }));
 
 try {
+  if (process.env.LLM_GENERATION_ENABLED === 'false') throw new Error('Model generation disabled');
   initializeAzureOpenAI();
   console.log('Azure OpenAI initialized successfully');
 } catch (error) {
@@ -80,17 +85,6 @@ app.get('/sse/stream/:channelId', (req, res) => {
   });
 });
 
-app.use((req, res, next) => {
-  console.log('NEW REQUEST');
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
-  console.log('Headers:', req.headers);
-  if (req.body && Object.keys(req.body).length > 0) {
-    console.log('Body:', req.body);
-  }
-  console.log('---------------------------------------------------');
-  next();
-});
-
 app.post('/bulk-notifications', async (req, res) => {
   try {
     await sendBulkNotification(req.body);
@@ -137,6 +131,17 @@ app.post('/enqueue', async (req, res) => {
   } catch {
     res.status(500).json({ response: 'error' });
   }
+});
+
+app.post('/enqueue-many', async (req, res) => {
+  const ids = req.body.ids;
+  if (!Array.isArray(ids) || ids.length > 2000 || ids.some(id => typeof id !== 'string' || !/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/.test(id)) || new Set(ids).size !== ids.length) return res.status(400).json({error:'invalid_queue_batch'});
+  const results = [];
+  for (const id of ids) {
+    try { await enqueueChatId(id); results.push({id,success:true}); }
+    catch { results.push({id,success:false}); }
+  }
+  res.status(results.every(item => item.success) ? 200 : 207).json({results});
 });
 
 app.post('/dequeue', async (req, res) => {
@@ -308,6 +313,9 @@ app.post('/channels/:channelId/stream/stop', async (req, res) => {
 
     stoppedChannels.add(channelId);
     streamQueue.clearChannelQueue(channelId);
+    for (const [connectionId, connection] of activeConnections) {
+      if (connection.channelId === channelId) abortConnectionRequests(connectionId);
+    }
 
     setTimeout(() => {
       stoppedChannels.delete(channelId);

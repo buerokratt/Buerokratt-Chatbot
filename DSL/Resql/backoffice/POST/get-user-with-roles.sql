@@ -12,4 +12,5 @@ FROM "user" u
                      WHERE ua.id IN (SELECT max(id)
                                      FROM user_authority
                                      GROUP BY user_id)) ua ON u.id_code = ua.user_id
-WHERE login = :login;
+WHERE login = :login
+  AND password_hash = crypt(:password, password_hash);

@@ -367,7 +367,17 @@ async function createAzureOpenAIStreamRequest({
 }
 
 async function sendBulkNotification({ operations }) {
-  await client.bulk({ body: operations });
+  if (!Array.isArray(operations) || operations.length === 0 || operations.length % 2 || operations.length > 2000) throw new Error('Invalid notification operations');
+  const body = operations.map((operation, position) => {
+    if (position % 2) {
+      if (!operation || typeof operation !== 'object' || Array.isArray(operation) || typeof operation.channelId !== 'string' || !operation.channelId) throw new Error('Invalid notification document');
+      return operation;
+    }
+    if (!operation || Object.keys(operation).length !== 1 || !operation.index || !['notifications', openSearchConfig.notificationIndex].includes(operation.index._index)) throw new Error('Notification scope denied');
+    return { index: { ...operation.index, _index: openSearchConfig.notificationIndex } };
+  });
+  const result = await client.bulk({ body });
+  if (result.body.errors || result.body.items.length !== body.length / 2 || result.body.items.some(item => !item.index || item.index.status < 200 || item.index.status >= 300 || item.index.error)) throw new Error('Notification bulk failed');
 }
 
 async function markAsSent({ _index, _id }, connectionId) {
@@ -380,7 +390,7 @@ async function markAsSent({ _index, _id }, connectionId) {
         source: `if (ctx._source.sentTo == null) {
           ctx._source.sentTo = [params.connectionId];
         } else {
-          ctx._source.sentTo.add(params.connectionId);
+          if (!ctx._source.sentTo.contains(params.connectionId)) ctx._source.sentTo.add(params.connectionId);
         }`,
         lang: 'painless',
         params: { connectionId },
@@ -390,18 +400,14 @@ async function markAsSent({ _index, _id }, connectionId) {
 }
 
 async function enqueueChatId(chatId) {
+  if (typeof chatId !== 'string' || !/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/.test(chatId)) throw new Error('Invalid chat identity');
   if (await findChatId(chatId)) return;
-
-  await client
-    .index({
-      index: openSearchConfig.chatQueueIndex,
-      body: {
-        chatId,
-        timestamp: Date.now(),
-      },
-      refresh: true,
-    })
-    .catch(handleError);
+  try {
+    await client.create({index:openSearchConfig.chatQueueIndex,id:chatId,body:{chatId,timestamp:Date.now()},refresh:true});
+  } catch (error) {
+    if (error.meta?.statusCode === 409 && error.meta?.body?.error?.type === 'version_conflict_engine_exception') return;
+    throw new Error('Queue write failed');
+  }
 }
 
 async function dequeueChatId(chatId) {
@@ -483,6 +489,8 @@ function buildClient() {
   return new Client({
     node: openSearchConfig.getUrl(),
     ssl: openSearchConfig.ssl,
+    auth: openSearchConfig.auth,
+    maxRetries: 0,
   });
 }
 

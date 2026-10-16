@@ -12,10 +12,10 @@ declaration:
         type: string
         description: "Body field 'userId'"
       - field: userDomains
-        type: string
+        type: json
         description: "Body field 'userDomains'"
       - field: selectedDomains
-        type: string
+        type: json
         description: "Body field 'selectedDomains'"
 
 

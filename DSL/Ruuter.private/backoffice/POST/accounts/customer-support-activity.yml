@@ -35,7 +35,7 @@ extractRequestData:
 check_body_user_id_code:
   switch:
     - condition: ${incoming.body.userIdCode != null}
-      next: setCustomerSupportActivity
+      next: get_user_info
   next: get_user_info
 
 get_user_info:
@@ -58,7 +58,7 @@ check_user_info_response:
 
 assignIdCode:
   assign:
-    idCode: ${res.response.body.idCode}
+    idCode: '${res.response.body.authorities.includes("ROLE_ADMINISTRATOR") && typeof(incoming.body.userIdCode) === "string" && incoming.body.userIdCode.trim().length > 0 ? incoming.body.userIdCode : res.response.body.idCode}'
   next: setCustomerSupportActivity
 
 setCustomerSupportActivity:

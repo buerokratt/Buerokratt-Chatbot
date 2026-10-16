@@ -122,4 +122,5 @@ SELECT base_id, '', '', end_user_id, end_user_first_name,
        end_user_phone, end_user_os, end_user_url, feedback_text, feedback_rating,
        feedback_rating_five, external_id, forwarded_to, forwarded_to_name, received_from, received_from_name, ''
 FROM active_chats
-WHERE customer_support_id = :userId;
+WHERE customer_support_id = :userId
+RETURNING base_id AS id;

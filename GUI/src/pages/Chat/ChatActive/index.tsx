@@ -47,8 +47,10 @@ const ChatActive: FC = () => {
   const activeChats = useHeaderStore((state) => state.getGroupedActiveChats());
 
   useEffect(() => {
-    useHeaderStore.getState().loadActiveChats();
-  }, []);
+    Promise.resolve(useHeaderStore.getState().loadActiveChats()).then(() => {
+      if (typeof state?.chatId === 'string') useHeaderStore.getState().setSelectedChatId(state.chatId);
+    });
+  }, [state?.chatId]);
 
   const handleCsaForward = async (chat: ChatType, user: User) => {
     try {
@@ -122,7 +124,7 @@ const ChatActive: FC = () => {
         className="vertical-tabs"
         orientation="vertical"
         onValueChange={useHeaderStore.getState().setSelectedChatId}
-        defaultValue={state?.chatId}
+        value={selectedChatId ?? ''}
         style={{ height: '100%', overflow: 'hidden' }}
       >
         <Tabs.List

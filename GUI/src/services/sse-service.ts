@@ -1,6 +1,6 @@
 const notificationNodeUrl = import.meta.env.REACT_APP_NOTIFICATION_NODE_URL;
 
-const sse = <T>(url: string, onMessage: (data: T) => void): EventSource => {
+const sse = <T>(url: string, onMessage: (data: T) => void, onOpen?: () => void | Promise<void>): EventSource => {
   if (!notificationNodeUrl) {
     console.error('Notification node url is not defined');
     throw new Error('Notification node url is not defined');
@@ -17,6 +17,7 @@ const sse = <T>(url: string, onMessage: (data: T) => void): EventSource => {
   };
 
   eventSource.onopen = () => {
+    Promise.resolve(onOpen?.()).catch(() => console.warn('SSE storage catch-up failed'));
     console.log('SSE connection Opened');
   };
 

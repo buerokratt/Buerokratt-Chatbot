@@ -116,7 +116,8 @@ const ChatUnanswered: FC = () => {
       orientation="vertical"
       onValueChange={useHeaderStore.getState().setSelectedChatId}
       style={{ height: '100%', overflow: 'hidden' }}
-    >
+
+      value={selectedChatId ?? ''}>
       <Tabs.List className="vertical-tabs__list" aria-label={t('chat.active.list') ?? ''} style={{ overflow: 'auto' }}>
         <div className="vertical-tabs__group-header">
           <p>{`${t('chat.unansweredChats')} ${
