@@ -98,7 +98,7 @@ check_domain_bot_is_active:
       key: "is_bot_active"
       domain: ${domainId.response.body[0].domainId}
   result: is_bot_active_result
-  next: check_bot_activity_result
+  next: check_domain_bot_activity_result
 
 check_bot_is_active:
   call: http.post
@@ -109,11 +109,55 @@ check_bot_is_active:
   result: is_bot_active_result
   next: check_bot_activity_result
 
+check_domain_bot_activity_result:
+  switch:
+    - condition: ${is_bot_active_result.response.body[0]?.value === 'true'}
+      next: get_domain_llm_module_activity
+  next: assign_bot_not_active_response
+
 check_bot_activity_result:
   switch:
     - condition: ${is_bot_active_result.response.body[0]?.value === 'true'}
-      next: check_for_intent
+      next: get_llm_module_activity
   next: assign_bot_not_active_response
+
+get_domain_llm_module_activity:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-configuration"
+    body:
+      key: "llm_module_active"
+      domain: ${domainId.response.body[0].domainId}
+  result: llm_module_activity_result
+  next: check_if_llm_module_active  
+
+get_llm_module_activity:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-configuration"
+    body:
+      key: "llm_module_active"
+  result: llm_module_activity_result
+  next: check_if_llm_module_active
+
+check_if_llm_module_active:
+  switch:
+    - condition: ${llm_module_activity_result.response.body[0]?.value === 'true'}
+      next: call_llm_orchestration
+  next: check_for_intent
+
+call_llm_orchestration:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL]/internal/llm_orchestration"
+    body:
+      chatId: ${chatId}
+      authorId: ${chat_bot_name}
+      message: ${content}
+      domain: ${domain}
+  result: llm_orchestration_response
+  error: return_bot_error
+  next: return_message_sent
 
 assign_bot_not_active_response:
   assign:
