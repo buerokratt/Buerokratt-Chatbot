@@ -20,5 +20,5 @@ JOIN (
     OR c.end_user_url LIKE d.base_url || '?%'
     OR c.end_user_url LIKE d.base_url || '#%'
 WHERE c.base_id IS NOT NULL
-ORDER BY c.base_id, length(d.url) DESC
+ORDER BY c.base_id, length(d.url) ASC
 ON CONFLICT (chat_base_id) DO NOTHING;
