@@ -88,7 +88,8 @@
     "duplicateName": "Selline domeeni nimi on juba olemas",
     "duplicateUrl": "Selline URL on juba olemas",
     "nameRequired": "Domeeni nimi on kohustuslik",
-    "urlRequired": "URL on kohustuslik"
+    "urlRequired": "URL on kohustuslik",
+    "invalidUrl": "Palun sisestage kehtiv URL (nt https://example.com)"
   },
   "menu": {
     "conversations": "Vestlused",

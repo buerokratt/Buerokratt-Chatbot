@@ -88,7 +88,8 @@
     "duplicateName": "This domain name already exists",
     "duplicateUrl": "This URL already exists",
     "nameRequired": "Domain name is required",
-    "urlRequired": "URL is required"
+    "urlRequired": "URL is required",
+    "invalidUrl": "Please enter a valid URL (e.g. https://example.com)"
   },
   "menu": {
     "conversations": "Conversations",
