@@ -437,7 +437,7 @@
       "seconds": "seconds",
       "responseWaitingTimeRangeInfo": "Allowed range 1 sec - 120 sec (2 min)",
       "tooltip": {
-        "isBotActive": "If on is selected, Bürokratt will automatically respond to the client using an AI-based conversational solution (depending on the technical setup, either LLM, RAG, or RASA solution). If off is selected, the conversation will be automatically forwarded to an advisor.",
+        "isBotActive": "If on is selected, Bürokratt will automatically respond to the client using an AI-based conversational solution (depending on the technical setup, either LLM or RAG solution). If off is selected, the conversation will be automatically forwarded to an advisor.",
         "isBurokrattActive": "If on is selected, Bürokratt will be visible on the website. If off is selected, Bürokratt will be hidden from the website.",
         "instantlyOpenChatWidget": "If on is selected, the chat window will open automatically when the user lands on the website. If off is selected, Bürokratt will be minimized and the user must open the chat window themselves. This setting works only in the desktop view and does not apply to the mobile view!",
         "isCsaNameVisible": "If the setting is enabled, the advisor's name is displayed on the left side of the chat window above the chat participant's picture . If the setting is disabled, the name will not be shown.",

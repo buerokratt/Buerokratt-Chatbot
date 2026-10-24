@@ -161,14 +161,14 @@ call_llm_orchestration:
 
 assign_bot_not_active_response:
   assign:
-    post_message_to_bot_result: { 
+    post_message_to_bot_result: {
       "response": { "body": [
-        { 
+        {
          "recipient_id" : "${chatId}",
          "text" : "Suunan teid klienditeenindajale. Varuge natukene kannatust."
         }
       ]}}
-  next: check_if_bot_is_unable_to_reply
+  next: check_base_config_domain
 
 check_for_intent:
   call: http.post
@@ -196,43 +196,11 @@ check_for_service:
   switch:
     - condition: ${content.startsWith("#common_service") || content.startsWith("#service")}
       next: assign_service_content
-  next: post_message_to_bot
+  next: check_if_client_bot_is_active
 
 assign_service_content:
   assign:
     service_content: ${content}
-  next: trigger_service
-
-post_message_to_bot:
-  call: http.post
-  args:
-    url: "[#CHATBOT_BOT]/webhooks/rest/webhook"
-    body:
-      sender: ${chatId}
-      message: ${content}
-    error: return_bot_error
-  result: post_message_to_bot_result
-  next: check_if_bot_is_unable_to_reply
-
-check_if_bot_is_unable_to_reply:
-  switch:
-    - condition: ${post_message_to_bot_result.response.body?.[0]?.text == 'UNKNOWN'}
-      next: check_if_client_bot_is_active
-    - condition: ${post_message_to_bot_result.response.body?.[0]?.text == 'Suunan teid klienditeenindajale. Varuge natukene kannatust.'}
-      next: check_base_config_domain
-    - condition: ${post_message_to_bot_result.response.body?.[0]?.text == 'Suunan vestluse nõustajale. Palun oodake.'}
-      next: check_base_config_domain
-    - condition: ${post_message_to_bot_result.response.body?.[0]?.text == 'Suunan teid klienditeenindajale. Palun oodake.'}
-      next: check_base_config_domain
-    - condition: ${post_message_to_bot_result.response.body?.[0]?.text == 'Suunan teid riigiinfo konsultandile. Varuge natukene kannatust.'}
-      next: check_base_config_domain
-    - condition: ${post_message_to_bot_result.response.body?.[0]?.text.startsWith("#common_service") || post_message_to_bot_result.response.body?.[0]?.text.startsWith("#service")}
-      next: assign_service_content_from_bot_response
-  next: extract_bot_responses
-
-assign_service_content_from_bot_response:
-  assign:
-    service_content: ${post_message_to_bot_result.response.body?.[0]?.text}
   next: trigger_service
 
 trigger_service:
@@ -249,7 +217,7 @@ trigger_service:
 check_for_trigger_service_response:
   switch:
     - condition: ${converted_messages_res === 'Service is not approved'}
-      next: post_message_to_bot
+      next: check_if_client_bot_is_active
     - condition: ${converted_messages_res == null || converted_messages_res === 'There was a problem triggering the service' || converted_messages_res.length === 0}
       next: insert_unavailable_service_message
   next: add_bot_message_to_db
@@ -320,7 +288,7 @@ check_for_bgk_bot:
 check_if_bgk_bot_is_unable_to_reply:
   switch:
     - condition: ${converted_messages_res == 'ERROR'}
-      next: check_if_user_wants_csa
+      next: assign_redirect_to_csa_response
     - condition: ${converted_messages_res.response.body.response == 'stream triggered'}
       next: return_message_sent
   next: assign_fallback_bot_converted_messages_res
@@ -330,15 +298,16 @@ assign_fallback_bot_converted_messages_res:
     converted_messages_res: ${converted_messages_res.response.body.response}
   next: add_bot_message_to_db
 
-check_if_user_wants_csa:
-  call: http.post
-  args:
-    url: "[#CHATBOT_BOT]/webhooks/rest/webhook"
-    body:
-      sender: ${chatId}
-      message: "csa"
-  result: post_message_to_bot_result
-  next: check_for_post_message_to_bot_result
+assign_redirect_to_csa_response:
+  assign:
+    post_message_to_bot_result: {
+      "response": { "body": [
+        {
+         "recipient_id" : "${chatId}",
+         "text" : "Suunan teid klienditeenindajale. Varuge natukene kannatust."
+        }
+      ]}}
+  next: check_base_config_domain
 
 check_base_config_domain:
   switch:
@@ -547,12 +516,6 @@ add_chat_id_to_queue_notification_node:
 extract_bot_responses_after_redirect_to_back_office:
   assign:
     botMsg: ${post_message_to_bot_result.response.body}
-  next: normalize_html_links_in_bot_messages
-
-extract_bot_responses:
-  assign:
-    botMsg: ${post_message_to_bot_result.response.body}
-    botMsgTxt: ${post_message_to_bot_result.response.body?.[0]?.text}
   next: normalize_html_links_in_bot_messages
 
 normalize_html_links_in_bot_messages:

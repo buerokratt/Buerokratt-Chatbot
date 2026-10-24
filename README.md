@@ -25,19 +25,11 @@ This repo will primarily contain:
 - build chat widget image `docker build -f Dockerfile.dev -t chat-widget .`
 - Clone [Authentication Layer](https://github.com/buerokratt/Authentication-layer)
 - build authentication layer image `docker build -f Dockerfile.dev -t authentication-layer .`
-- Clone [RASA](https://github.com/buerokratt/Rasa-for-Buerokratt)
-- choose dev branch and run `docker build -t rasa .`
 - Clone [Anonymizer](https://github.com/buerokratt/Presidio-Anonymizer)
 - choose dev branch and run `docker build --platform=linux/amd64 -t anonymizer .`
 
-### Run with local bot - deprecated
+### Run
 
-- Change `CHATBOT_BOT=http://bot:5005` in constants.ini
-- Navigate to current repo and run `docker-compose $(find docker-* | sed -e 's/^/-f /') up -d`
-
-### Run with remote bot - deprecated
-
-- Change `CHATBOT_BOT=http://171.22.247.37:5005` in constants.ini
 - Navigate to current repo and run `docker-compose up -d`
 
 ### Database setup
