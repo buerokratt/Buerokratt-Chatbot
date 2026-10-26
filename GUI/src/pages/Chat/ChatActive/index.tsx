@@ -48,6 +48,10 @@ const ChatActive: FC = () => {
 
   useEffect(() => {
     useHeaderStore.getState().loadActiveChats();
+
+    return () => {
+      useHeaderStore.getState().setSelectedChatId(null);
+    };
   }, []);
 
   const handleCsaForward = async (chat: ChatType, user: User) => {

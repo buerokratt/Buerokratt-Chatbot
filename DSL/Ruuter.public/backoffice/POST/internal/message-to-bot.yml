@@ -459,6 +459,7 @@ get_all_available_csas:
 assign_available_csas:
   assign:
     available_csas: ${csas_res.response.body.length}
+    available_csa_ids: ${csas_res.response.body.map(csa => csa.idCode)}
   next: check_if_csas_are_available
 
 check_if_csas_are_available:
@@ -491,6 +492,32 @@ redirect_chat_to_back_office:
     body:
       chatId: ${chatId}
   result: redirect_chat_to_back_office_result
+  next: generate_backoffice_notification_uuid
+
+generate_backoffice_notification_uuid:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_HBS]/return_uuid"
+    headers:
+      type: json
+  result: backoffice_notification_uuid_result
+  next: notify_available_csas_by_web_push
+
+notify_available_csas_by_web_push:
+  call: http.post
+  args:
+    url: "[#CHATBOT_NOTIFICATION_NODE]/private/v1/notifications/events"
+    body:
+      eventUuid: ${backoffice_notification_uuid_result.response.body.uuid}
+      recipient: "USER"
+      recipientUuid: ${available_csa_ids}
+      type: "CHAT_FORWARDED_TO_CSA"
+      payload:
+        chatId: ${chatId}
+      webPush:
+        title: "Teavitus"
+        body: "Uus vestlus"
+  result: backoffice_web_push_result
   next: extract_bot_responses_after_redirect_to_back_office
 
 extract_bot_responses_after_redirect_to_back_office:

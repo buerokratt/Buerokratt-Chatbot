@@ -196,8 +196,13 @@ getActiveChatById:
 checkActiveChatResult:
   switch:
     - condition: ${activeChatRes.response.body.length > 0}
-      next: getUuid
+      next: assignActiveChat
   next: return_chat_ended
+
+assignActiveChat:
+  assign:
+    activeChat: ${activeChatRes.response.body[0]}
+  next: getUuid
 
 getUuid:
   call: http.post
@@ -276,6 +281,53 @@ notify_messages:
     type: "message"
     messageId: ${uuid}
   result: messages_notify_res
+  next: getBotInstitutionId
+
+getBotInstitutionId:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-configuration"
+    body:
+      key: "bot_institution_id"
+  result: bot_institution_result
+  next: assignBotInstitutionId
+
+assignBotInstitutionId:
+  assign:
+    botInstitutionId: ${bot_institution_result.response.body[0]?.value ?? ""}
+  next: checkAssignedToCsa
+
+checkAssignedToCsa:
+  switch:
+    - condition: ${authorRole === 'end-user' && (event == null || event === '') && activeChat.customerSupportId && activeChat.customerSupportId !== botInstitutionId && silent != 'true' && silent != true}
+      next: generateCsaPushEventUuid
+  next: return_result
+
+generateCsaPushEventUuid:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_HBS]/return_uuid"
+    headers:
+      type: json
+  result: csa_push_event_uuid_result
+  next: notifyCsaByWebPush
+
+notifyCsaByWebPush:
+  call: http.post
+  args:
+    url: "[#CHATBOT_NOTIFICATION_NODE]/private/v1/notifications/events"
+    body:
+      eventUuid: ${csa_push_event_uuid_result.response.body.uuid}
+      recipient: "USER"
+      recipientUuid: ${[activeChat.customerSupportId]}
+      type: "message"
+      payload:
+        chatId: ${chatId}
+        messageId: ${uuid}
+      webPush:
+        title: "Vestlus"
+        body: "Uus sõnum"
+  result: csa_push_result
   next: return_result
 
 return_result:

@@ -22,7 +22,6 @@ import { UserInfo } from 'types/userInfo';
 import './locale/et_EE';
 
 import useNotificationsConnection from './hooks/useNotificationsConnection';
-import useWebPush from './hooks/useWebPush';
 import ValidationRequests from './pages/Chat/ValidationRequests';
 import DeleteConversations from './pages/Settings/DeleteConversations';
 
@@ -72,7 +71,6 @@ const App: FC = () => {
   });
 
   useNotificationsConnection(Boolean(idCode));
-  useWebPush();
 
   return (
     <Routes>
