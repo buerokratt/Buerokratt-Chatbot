@@ -50,9 +50,6 @@ const Header: FC = () => {
     forwardedChatPopupNotifications: true,
     forwardedChatSoundNotifications: true,
     forwardedChatEmailNotifications: false,
-    newChatPopupNotifications: false,
-    newChatSoundNotifications: true,
-    newChatEmailNotifications: false,
     useAutocorrect: true,
   });
   useEffect(() => {
@@ -103,17 +100,17 @@ const Header: FC = () => {
       return;
     }
 
-    if (userProfileSettings.newChatSoundNotifications) {
+    if (userProfileSettings.forwardedChatSoundNotifications) {
       ding?.play();
     }
-    if (userProfileSettings.newChatEmailNotifications) {
+    if (userProfileSettings.forwardedChatEmailNotifications) {
       // To be done: send email notification
     }
-    if (userProfileSettings.newChatPopupNotifications) {
+    if (userProfileSettings.forwardedChatPopupNotifications) {
       toast.open({
         type: 'info',
-        title: t('global.notification'),
-        message: t('settings.users.newUnansweredChat'),
+        title: t('settings.users.newForwardedChatTitle'),
+        message: t('settings.users.newForwardedChatMessage'),
       });
     }
   };
@@ -141,8 +138,8 @@ const Header: FC = () => {
     if (userProfileSettings.forwardedChatPopupNotifications) {
       toast.open({
         type: 'info',
-        title: t('global.notification'),
-        message: t('settings.users.newForwardedChat'),
+        title: t('settings.users.newForwardedChatTitle'),
+        message: t('settings.users.newForwardedChatMessage'),
       });
     }
   };
@@ -161,10 +158,7 @@ const Header: FC = () => {
       await apiDev.post('accounts/settings', {
         forwardedChatPopupNotifications: data.forwardedChatPopupNotifications,
         forwardedChatSoundNotifications: data.forwardedChatSoundNotifications,
-        forwardedChatEmailNotifications: data.newChatEmailNotifications,
-        newChatPopupNotifications: data.newChatPopupNotifications,
-        newChatSoundNotifications: data.newChatSoundNotifications,
-        newChatEmailNotifications: data.newChatEmailNotifications,
+        forwardedChatEmailNotifications: data.forwardedChatEmailNotifications,
         useAutocorrect: data.useAutocorrect,
       });
       setUserProfileSettings(data);
@@ -442,17 +436,11 @@ const Header: FC = () => {
                   <p className="h6">{t('settings.users.emailNotifications')}</p>
                   <SwitchBox
                     name="forwardedChatEmailNotifications"
-                    label={t('settings.users.newForwardedChat')}
+                    label={t('settings.users.newForwardedChatTitle')}
                     checked={userProfileSettings.forwardedChatEmailNotifications}
                     onCheckedChange={(checked) =>
                       handleUserProfileSettingsChange('forwardedChatEmailNotifications', checked)
                     }
-                  />
-                  <SwitchBox
-                    name="newChatEmailNotifications"
-                    label={t('settings.users.newUnansweredChat')}
-                    checked={userProfileSettings.newChatEmailNotifications}
-                    onCheckedChange={(checked) => handleUserProfileSettingsChange('newChatEmailNotifications', checked)}
                   />
                 </Track>
               </Section>
@@ -461,17 +449,11 @@ const Header: FC = () => {
                   <p className="h6">{t('settings.users.soundNotifications')}</p>
                   <SwitchBox
                     name="forwardedChatSoundNotifications"
-                    label={t('settings.users.newForwardedChat')}
+                    label={t('settings.users.newForwardedChatTitle')}
                     checked={userProfileSettings.forwardedChatSoundNotifications}
                     onCheckedChange={(checked) =>
                       handleUserProfileSettingsChange('forwardedChatSoundNotifications', checked)
                     }
-                  />
-                  <SwitchBox
-                    name="newChatSoundNotifications"
-                    label={t('settings.users.newUnansweredChat')}
-                    checked={userProfileSettings.newChatSoundNotifications}
-                    onCheckedChange={(checked) => handleUserProfileSettingsChange('newChatSoundNotifications', checked)}
                   />
                 </Track>
               </Section>
@@ -480,17 +462,11 @@ const Header: FC = () => {
                   <p className="h6">{t('settings.users.popupNotifications')}</p>
                   <SwitchBox
                     name="forwardedChatPopupNotifications"
-                    label={t('settings.users.newForwardedChat')}
+                    label={t('settings.users.newForwardedChatTitle')}
                     checked={userProfileSettings.forwardedChatPopupNotifications}
                     onCheckedChange={(checked) =>
                       handleUserProfileSettingsChange('forwardedChatPopupNotifications', checked)
                     }
-                  />
-                  <SwitchBox
-                    name="newChatPopupNotifications"
-                    label={t('settings.users.newUnansweredChat')}
-                    checked={userProfileSettings.newChatPopupNotifications}
-                    onCheckedChange={(checked) => handleUserProfileSettingsChange('newChatPopupNotifications', checked)}
                   />
                 </Track>
               </Section>

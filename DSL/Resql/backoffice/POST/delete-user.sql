@@ -48,10 +48,9 @@ delete_authority AS (
 delete_settings AS (
     INSERT INTO user_profile_settings 
         (user_id, forwarded_chat_popup_notifications, forwarded_chat_sound_notifications, 
-         forwarded_chat_email_notifications, new_chat_popup_notifications, 
-         new_chat_sound_notifications, new_chat_email_notifications, use_autocorrect)
+         forwarded_chat_email_notifications, use_autocorrect)
     SELECT 
-        :userIdCode, false, false, false, false, false, false, false
+        :userIdCode, false, false, false, false
     WHERE 1 < (SELECT COUNT(user_id) FROM active_administrators)
        OR (1 = (SELECT COUNT(user_id) FROM active_administrators)
            AND :userIdCode NOT IN (SELECT user_id FROM active_administrators))
@@ -60,9 +59,6 @@ delete_settings AS (
         forwarded_chat_popup_notifications = false,
         forwarded_chat_sound_notifications = false,
         forwarded_chat_email_notifications = false,
-        new_chat_popup_notifications = false,
-        new_chat_sound_notifications = false,
-        new_chat_email_notifications = false,
         use_autocorrect = false
 )
 SELECT max(status) FROM "user" WHERE id_code = :userIdCode;
