@@ -38,6 +38,7 @@ extractRequestData:
     domain: ${incoming.body.domain}
     event: ""
     isOrgAvailable: false
+    messageTimestamp: ${new Date().toISOString()}
 
 get_bot_name:
   call: http.post
@@ -322,8 +323,8 @@ format_messages:
           "authorFirstName": "",
           "authorLastName": "",
           "event": "${event ?? ''}",
-          "authorTimestamp": "${new Date().toISOString()}",
-          "created": "${new Date().toISOString()}",
+          "authorTimestamp": "${messageTimestamp}",
+          "created": "${messageTimestamp}",
         }
   result: formated_messages_res
 
@@ -345,11 +346,11 @@ insertMessage:
       chatId: ${sender}
       messageId: ${uuid}
       content: ${format_messages[0].content}
-      authorTimestamp: ${new Date().toISOString()}
+      authorTimestamp: ${messageTimestamp}
       authorId: ${authorId}
       authorFirstName: ""
       authorRole: "buerokratt"
-      created: ${new Date().toISOString()}
+      created: ${messageTimestamp}
       authorLastName: ""
       rating: ""
       event: ${event ?? ""}
