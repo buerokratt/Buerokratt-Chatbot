@@ -9,7 +9,6 @@ import clsx from 'clsx';
 import { Button, Icon, Label, Track } from 'components';
 import { format } from 'date-fns';
 import { et } from 'date-fns/locale';
-import { useNewMessageSound } from 'hooks/useAudio';
 import { useToast } from 'hooks/useToast';
 import { ChangeEvent, FC, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -96,7 +95,6 @@ const Chat: FC<ChatProps> = ({
   const [isCsaAtEnd, setIsCsaAtEnd] = useState<boolean>(true);
   const isCsaAtEndRef = useRef(isCsaAtEnd);
 
-  const [newMessageEffect] = useNewMessageSound();
   const navigate = useNavigate();
   const allDomains = useStore((state) => state.allDomains);
   const multiDomainEnabled = import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
@@ -280,7 +278,6 @@ const Chat: FC<ChatProps> = ({
       messagesLength < res.response.length &&
       res.response[res.response.length - 1].authorId != userInfo?.idCode
     ) {
-      newMessageEffect?.play();
       onRefresh();
     }
     messagesLength = res.response.length;
