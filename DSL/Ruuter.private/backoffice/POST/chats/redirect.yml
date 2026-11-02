@@ -137,6 +137,32 @@ insertMessage:
       forwardedFromCsa: ${forwardedFromCsa}
       forwardedToCsa: ${forwardedToCsa}
   result: insertMessageResult
+  next: generateCsaForwardPushEventUuid
+
+generateCsaForwardPushEventUuid:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER_HBS]/return_uuid"
+    headers:
+      type: json
+  result: csa_forward_push_event_uuid_result
+  next: notifyForwardedCsaByWebPush
+
+notifyForwardedCsaByWebPush:
+  call: http.post
+  args:
+    url: "[#CHATBOT_NOTIFICATION_NODE]/private/v1/notifications/events"
+    body:
+      eventUuid: ${csa_forward_push_event_uuid_result.response.body.uuid}
+      recipient: "USER"
+      recipientUuid: ${[customerSupportId]}
+      type: "CHAT_FORWARDED_TO_CSA"
+      payload:
+        chatId: ${id}
+      webPush:
+        title: "Vestlus"
+        body: "Uus suunatud vestlus"
+  result: csa_forward_push_result
   next: notify_chats
 
 notify_chats:

@@ -17,15 +17,6 @@ declaration:
       - field: forwardedChatSoundNotifications
         type: boolean
         description: "Body field 'forwardedChatSoundNotifications'"
-      - field: newChatEmailNotifications
-        type: boolean
-        description: "Body field 'newChatEmailNotifications'"
-      - field: newChatPopupNotifications
-        type: boolean
-        description: "Body field 'newChatPopupNotifications'"
-      - field: newChatSoundNotifications
-        type: boolean
-        description: "Body field 'newChatSoundNotifications'"
       - field: useAutocorrect
         type: boolean
         description: "Body field 'useAutocorrect'"
@@ -39,9 +30,6 @@ extractRequestData:
     forwardedChatPopupNotifications: ${incoming.body.forwardedChatPopupNotifications}
     forwardedChatSoundNotifications: ${incoming.body.forwardedChatSoundNotifications}
     forwardedChatEmailNotifications: ${incoming.body.forwardedChatEmailNotifications}
-    newChatPopupNotifications: ${incoming.body.newChatPopupNotifications}
-    newChatSoundNotifications: ${incoming.body.newChatSoundNotifications}
-    newChatEmailNotifications: ${incoming.body.newChatEmailNotifications}
     useAutocorrect: ${incoming.body.useAutocorrect}
 
 get_user_info:
@@ -76,9 +64,6 @@ setUserSettingValue:
       forwardedChatPopupNotifications: ${forwardedChatPopupNotifications}
       forwardedChatSoundNotifications: ${forwardedChatSoundNotifications}
       forwardedChatEmailNotifications: ${forwardedChatEmailNotifications}
-      newChatPopupNotifications: ${newChatPopupNotifications}
-      newChatSoundNotifications: ${newChatSoundNotifications}
-      newChatEmailNotifications: ${newChatEmailNotifications}
       useAutocorrect: ${useAutocorrect}
   result: returnSuccess
 

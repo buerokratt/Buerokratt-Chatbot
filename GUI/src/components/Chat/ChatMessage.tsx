@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { format } from 'date-fns';
+import { useCopyToClipboard } from 'hooks/useCopyToClipboard';
 import { useToast } from 'hooks/useToast';
 import { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -41,6 +42,12 @@ const ChatMessage: FC<ChatMessageProps> = ({ message, onSelect, selected, editab
   const [messageHeight, setMessageHeight] = useState(0);
   const messageRef = useRef<HTMLButtonElement>(null);
   const toast = useToast();
+  const copyToClipboard = useCopyToClipboard();
+
+  const handleMessageClick = () => {
+    if (!isEditing) copyToClipboard(content);
+    onSelect(message);
+  };
 
   useEffect(() => {
     setMessageHeight(messageRef?.current?.clientHeight ?? 0);
@@ -85,7 +92,7 @@ const ChatMessage: FC<ChatMessageProps> = ({ message, onSelect, selected, editab
             message.event === CHAT_EVENTS.APPROVED_VALIDATION ||
             !message.event) && (
             <>
-              <button className={clsx('active-chat__message-text')} ref={messageRef} onClick={() => onSelect(message)}>
+              <button className={clsx('active-chat__message-text')} ref={messageRef} onClick={handleMessageClick}>
                 <Track direction={isEditing ? 'vertical' : 'horizontal'}>
                   {message.event === CHAT_EVENTS.WAITING_VALIDATION && isEditing && (
                     <FormTextarea

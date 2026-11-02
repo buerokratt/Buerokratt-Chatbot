@@ -249,14 +249,7 @@ notify_chats:
   body:
     chatId: ${chatId}
   result: chats_notify_res
-
-remove_chat_id_from_queue_notification_node_if_existed:
-  call: http.post
-  args:
-    url: "[#CHATBOT_NOTIFICATIONS]/dequeue"
-    body:
-      id: ${chatId}
-  result: remove_chat_id_from_queue_notification_node_if_existed_res
+  next: return_result
 
 return_result:
   headers:

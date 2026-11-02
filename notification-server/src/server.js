@@ -4,22 +4,13 @@ const csurf = require('csurf');
 const express = require('express');
 const helmet = require('helmet');
 
-const { buildNotificationSearchInterval, buildQueueCounter } = require('./addOns');
 const { initializeAzureOpenAI } = require('./azureOpenAI');
 const { serverConfig } = require('./config');
 const { stoppedChannels } = require('./connectionManager');
-const { addToLogoutQueue, removeFromLogoutQueue } = require('./logoutQueue');
-const {
-  enqueueChatId,
-  dequeueChatId,
-  sendBulkNotification,
-  createAzureOpenAIStreamRequest,
-  createLLMOrchestrationStreamRequest,
-} = require('./openSearch');
+const { createAzureOpenAIStreamRequest } = require('./openSearch');
 const { buildSSEResponse } = require('./sseUtil');
 const { createLLMOrchestrationStreamRequest: createLLMGuiStreamRequest } = require('./streamingService');
 const streamQueue = require('./streamQueue');
-const { addToTerminationQueue, removeFromTerminationQueue } = require('./terminationQueue');
 
 const app = express();
 
@@ -35,25 +26,6 @@ try {
 } catch (error) {
   console.error('Failed to initialize Azure OpenAI:', error.message);
 }
-
-app.get('/sse/notifications/:channelId', (req, res) => {
-  const { channelId } = req.params;
-  buildSSEResponse({
-    req,
-    res,
-    buildCallbackFunction: buildNotificationSearchInterval({ channelId }),
-    channelId,
-  });
-});
-
-app.get('/sse/queue/:id', (req, res) => {
-  const { id } = req.params;
-  buildSSEResponse({
-    req,
-    res,
-    buildCallbackFunction: buildQueueCounter({ id }),
-  });
-});
 
 // LLM Module GUI streaming connection
 app.get('/sse/stream/:channelId', (req, res) => {
@@ -87,103 +59,6 @@ app.use((req, res, next) => {
   }
   console.log('---------------------------------------------------');
   next();
-});
-
-app.post('/bulk-notifications', async (req, res) => {
-  try {
-    await sendBulkNotification(req.body);
-    res.status(200).json({ response: 'sent successfully' });
-  } catch {
-    res.status(500).json({ response: 'error' });
-  }
-});
-
-app.post('/add-to-logout-queue', async (req, res) => {
-  const cookies = req.headers.cookie;
-
-  try {
-    await addToLogoutQueue(cookies, 5, () =>
-      fetch(`${process.env.PRIVATE_RUUTER_URL}/backoffice/accounts/logout`, {
-        method: 'GET',
-        headers: {
-          cookie: cookies,
-        },
-      }),
-    );
-
-    console.log('User was loged out.');
-    res.sendStatus(200);
-  } catch (err) {
-    console.error('Error forwarding request:', JSON.stringify(err));
-    res.sendStatus(500);
-  }
-});
-
-app.post('/remove-from-logout-queue', async (req, res) => {
-  try {
-    await removeFromLogoutQueue(req.headers.cookie);
-    res.status(200).json({ response: 'Logout would be canceled' });
-  } catch {
-    res.status(500).json({ response: 'error' });
-  }
-});
-
-app.post('/enqueue', async (req, res) => {
-  try {
-    await enqueueChatId(req.body.id);
-    res.status(200).json({ response: 'enqueued successfully' });
-  } catch {
-    res.status(500).json({ response: 'error' });
-  }
-});
-
-app.post('/dequeue', async (req, res) => {
-  try {
-    await dequeueChatId(req.body.id);
-    res.status(200).json({ response: 'dequeued successfully' });
-  } catch {
-    res.status(500).json({ response: 'error' });
-  }
-});
-
-app.post('/add-chat-to-termination-queue', express.json(), express.text(), async (req, res) => {
-  try {
-    const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-
-    addToTerminationQueue(body.chatId, body.timeout, () =>
-      fetch(`${process.env.RUUTER_URL}/backoffice/chats/end`, {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          cookie: body.cookie || req.headers.cookie,
-        },
-        body: JSON.stringify({
-          message: {
-            chatId: body.chatId,
-            authorRole: 'end-user',
-            event: 'CLIENT_LEFT_FOR_UNKNOWN_REASONS',
-            authorTimestamp: new Date().toISOString(),
-          },
-        }),
-      }),
-    );
-
-    res.status(200).json({ response: 'Chat will be terminated soon' });
-  } catch (error) {
-    console.error('Error adding chat to termination queue:', error);
-    res.status(500).json({ response: 'error' });
-  }
-});
-
-app.post('/remove-chat-from-termination-queue', express.json(), express.text(), async (req, res) => {
-  const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-
-  try {
-    removeFromTerminationQueue(body.chatId);
-    res.status(200).json({ response: 'Chat termination will be canceled' });
-  } catch {
-    res.status(500).json({ response: 'error' });
-  }
 });
 
 app.post('/channels/:channelId/llm-stream', async (req, res) => {
