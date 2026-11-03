@@ -47,11 +47,6 @@ extractRequestData:
     silent: ${incoming.body.silent}
     domain: ${incoming.body.domain}
     messageEndUserUrl: ${incoming.body.endUserUrl ?? ''}
-  next: validateMessageEndUserUrl
-
-validateMessageEndUserUrl:
-  assign:
-    messageEndUserUrl: "${(messageEndUserUrl + '').length <= 2048 && ((messageEndUserUrl + '').startsWith('http://') || (messageEndUserUrl + '').startsWith('https://')) ? messageEndUserUrl : ''}"
   next: checkContentLength
 
 checkContentLength:

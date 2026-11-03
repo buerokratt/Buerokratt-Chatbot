@@ -71,7 +71,7 @@ The agent must declare a `url` structured input and use `{{url}}`, for example i
 ## How it works
 
 - The widget sends the current page URL (`window.location.href`) as `endUserUrl` with every message. If the user moves to another page, the next message carries the new URL.
-- Ruuter checks the URL. It must start with `http://` or `https://` and be at most 2048 characters long; otherwise it is dropped. Ruuter then stores it with the user's message (`message.end_user_url`) and passes it on to the bot.
+- Ruuter stores the URL with the user's message (`message.end_user_url`) and passes it on to the bot.
 - Chat history still shows the URL of the page where the chat started (`chat.end_user_url`).
 
 ## Good to know

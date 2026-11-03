@@ -44,10 +44,6 @@ extractRequestData:
     messageTimestamp: ${new Date().toISOString()}
     messageEndUserUrl: ${incoming.body.endUserUrl ?? ''}
 
-validateMessageEndUserUrl:
-  assign:
-    messageEndUserUrl: "${(messageEndUserUrl + '').length <= 2048 && ((messageEndUserUrl + '').startsWith('http://') || (messageEndUserUrl + '').startsWith('https://')) ? messageEndUserUrl : ''}"
-
 get_bot_name:
   call: http.post
   args:

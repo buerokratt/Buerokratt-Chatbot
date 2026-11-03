@@ -51,10 +51,6 @@ extractRequestData:
     domain: ${incoming.body.domain}
     messageEndUserUrl: ${incoming.body.endUserUrl ?? incoming.body.endUserTechnicalData?.endUserUrl ?? ''}
 
-validateMessageEndUserUrl:
-  assign:
-    messageEndUserUrl: "${(messageEndUserUrl + '').length <= 2048 && ((messageEndUserUrl + '').startsWith('http://') || (messageEndUserUrl + '').startsWith('https://')) ? messageEndUserUrl : ''}"
-
 check_if_anonymizer_is_active:
   switch:
     - condition: ${[#ANONYMIZER_ENABLED] === true}
