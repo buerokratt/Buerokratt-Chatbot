@@ -94,6 +94,7 @@ insertGreetingMessage:
       forwardedByUser: ""
       forwardedFromCsa: ""
       forwardedToCsa: ""
+      endUserUrl: ""
   result: insertMessageResult
   next: returnSuccess  
 

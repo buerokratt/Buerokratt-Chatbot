@@ -13,6 +13,7 @@ export interface SkmConfig {
   azureClientId: string;
   azureClientSecret: string;
   azureAgenticMaxOutputTokens: string;
+  azureAgenticUseStructuredInputs: string;
   domainUUID?: string[];
   azureClientIdIsSet?: string;
   azureClientSecretIsSet?: string;

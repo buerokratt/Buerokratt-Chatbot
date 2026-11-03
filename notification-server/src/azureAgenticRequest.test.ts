@@ -36,6 +36,23 @@ describe('buildRequestBody', () => {
     expect(body.agent).toEqual({ name: 'agent', type: 'agent_reference' });
     expect(body.max_output_tokens).toBe(1000);
   });
+
+  it('includes structured_inputs when provided', () => {
+    const structured_inputs = { url: 'https://test.ee/et/mingilink' };
+    const body = buildRequestBody(MESSAGES, { ...AGENT_OPTIONS, stream: false, structured_inputs });
+
+    expect(body.structured_inputs).toEqual(structured_inputs);
+  });
+
+  it('omits structured_inputs when absent or empty', () => {
+    expect(buildRequestBody(MESSAGES, { ...AGENT_OPTIONS, stream: false })).not.toHaveProperty('structured_inputs');
+    expect(buildRequestBody(MESSAGES, { ...AGENT_OPTIONS, stream: false, structured_inputs: {} })).not.toHaveProperty(
+      'structured_inputs',
+    );
+    expect(buildRequestBody(MESSAGES, { ...AGENT_OPTIONS, stream: false, structured_inputs: null })).not.toHaveProperty(
+      'structured_inputs',
+    );
+  });
 });
 
 describe('isPreviousResponseNotFound', () => {
@@ -94,6 +111,18 @@ describe('sendAzureAgenticRequest', () => {
     expect(requestBodies).toHaveLength(2);
     expect(requestBodies[0].previous_response_id).toBe('resp_old');
     expect(requestBodies[1]).not.toHaveProperty('previous_response_id');
+  });
+
+  it('keeps structured_inputs when retrying without previous_response_id', async () => {
+    stubFetch([
+      jsonResponse({ error: { code: 'previous_response_not_found' } }, 400),
+      jsonResponse({ id: 'resp_new', output: [] }),
+    ]);
+    const structured_inputs = { url: 'https://test.ee/et' };
+
+    await sendAzureAgenticRequest(MESSAGES, { ...AGENT_OPTIONS, previous_response_id: 'resp_old', structured_inputs });
+
+    expect(requestBodies.map((body) => body.structured_inputs)).toEqual([structured_inputs, structured_inputs]);
   });
 
   it('does not retry other errors', async () => {

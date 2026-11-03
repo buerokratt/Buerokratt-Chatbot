@@ -67,6 +67,7 @@ const SettingsSkmConfiguration: FC = () => {
         inScope: data.inScope.toString(),
         useAgentic: data.useAgentic.toString(),
         azureAgenticMaxOutputTokens: data.azureAgenticMaxOutputTokens?.toString(),
+        azureAgenticUseStructuredInputs: (data.azureAgenticUseStructuredInputs ?? 'false').toString(),
         azureClientIdIsSet: (!!_azureClientId).toString(),
         azureClientSecretIsSet: (!!_azureClientSecret).toString(),
       });
@@ -184,6 +185,7 @@ const SettingsSkmConfiguration: FC = () => {
     azureClientId: t('settings.skmConfiguration.tooltip.azureClientId'),
     azureClientSecret: t('settings.skmConfiguration.tooltip.azureClientSecret'),
     azureAgenticMaxOutputTokens: t('settings.skmConfiguration.tooltip.azureAgenticMaxOutputTokens'),
+    azureAgenticUseStructuredInputs: t('settings.skmConfiguration.tooltip.azureAgenticUseStructuredInputs'),
   };
 
   const resetSettingsToDefault = () => {
@@ -202,6 +204,7 @@ const SettingsSkmConfiguration: FC = () => {
       azureClientId: '',
       azureClientSecret: '',
       azureAgenticMaxOutputTokens: '4000',
+      azureAgenticUseStructuredInputs: 'false',
       domainUUID: [],
       azureClientIdIsSet: 'false',
       azureClientSecretIsSet: 'false',
@@ -329,6 +332,7 @@ const SettingsSkmConfiguration: FC = () => {
               {getNumberControl('azureAgenticMaxOutputTokens')}
               {getPasswordControl('azureClientId')}
               {getPasswordControl('azureClientSecret')}
+              {getSwitchControl('azureAgenticUseStructuredInputs')}
             </Track>
           )}
         </Fragment>
@@ -351,7 +355,8 @@ const SettingsSkmConfiguration: FC = () => {
       | 'azureAgentType'
       | 'azureClientId'
       | 'azureClientSecret'
-      | 'azureAgenticMaxOutputTokens',
+      | 'azureAgenticMaxOutputTokens'
+      | 'azureAgenticUseStructuredInputs',
   ) {
     return (
       <Tooltip content={tooltips[name]}>
@@ -443,7 +448,7 @@ const SettingsSkmConfiguration: FC = () => {
     );
   }
 
-  function getSwitchControl(name: 'inScope' | 'useAgentic') {
+  function getSwitchControl(name: 'inScope' | 'useAgentic' | 'azureAgenticUseStructuredInputs') {
     return (
       <Controller
         name={name}

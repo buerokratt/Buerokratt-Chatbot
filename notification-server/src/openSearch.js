@@ -79,6 +79,7 @@ async function fetchAgenticResponse({
   azure_client_id,
   azure_client_secret,
   azure_agentic_max_output_tokens,
+  structured_inputs,
 }) {
   const previous_response_id = await getPreviousResponseId(channelId);
 
@@ -91,6 +92,7 @@ async function fetchAgenticResponse({
     client_secret: azure_client_secret,
     max_output_tokens: azure_agentic_max_output_tokens,
     previous_response_id,
+    structured_inputs,
   });
 
   if (stream) {
@@ -268,6 +270,7 @@ async function createAzureOpenAIStreamRequest({
   azure_client_id,
   azure_client_secret,
   azure_agentic_max_output_tokens,
+  structured_inputs,
   raw_response = false,
 }) {
   const { stream = true } = options;
@@ -289,6 +292,7 @@ async function createAzureOpenAIStreamRequest({
         azure_client_id,
         azure_client_secret,
         azure_agentic_max_output_tokens,
+        structured_inputs,
         raw_response,
       });
       console.log('No active connections for channel, queued request');
@@ -309,6 +313,7 @@ async function createAzureOpenAIStreamRequest({
           azure_client_id,
           azure_client_secret,
           azure_agentic_max_output_tokens,
+          structured_inputs,
         });
 
         if (!activeConnections.has(connectionId)) {
