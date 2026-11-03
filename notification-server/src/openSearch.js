@@ -115,6 +115,9 @@ async function fetchAgenticResponse({
     max_output_tokens: azure_agentic_max_output_tokens,
     previous_response_id,
     structured_inputs,
+  }).catch((error) => {
+    if (stream || !error.message?.includes('"code":"content_filter"')) throw error;
+    return { output: [{ type: 'message', content: [{ type: 'output_text', text: ESTONIAN_GUARDRAIL_MESSAGE }] }] };
   });
 
   if (stream) {
