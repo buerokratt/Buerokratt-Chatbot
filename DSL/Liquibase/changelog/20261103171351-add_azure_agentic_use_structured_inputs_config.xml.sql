@@ -1,10 +1,12 @@
+-- liquibase formatted sql
+-- changeset 1AhmedYasser:20261103171351
 <?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
 
-    <changeSet id="20281883455541" author="ahmedyasser">
+    <changeSet id="20261103171351" author="ahmedyasser">
         <insert tableName="configuration">
             <column name="key" value="azure_agentic_use_structured_inputs"/>
             <column name="value" value="false"/>
