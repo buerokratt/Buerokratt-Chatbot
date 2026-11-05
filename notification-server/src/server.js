@@ -9,7 +9,7 @@ const { sendAzureAgenticRequest } = require('./azureAgenticRequest');
 const { initializeAzureOpenAI } = require('./azureOpenAI');
 const { extractMessageTextPart } = require('./citationFormatting');
 const { serverConfig } = require('./config');
-const { stoppedChannels } = require('./connectionManager');
+const { stoppedChannels, currentStreams } = require('./connectionManager');
 const { addToLogoutQueue, removeFromLogoutQueue } = require('./logoutQueue');
 const {
   enqueueChatId,
@@ -309,6 +309,7 @@ app.post('/channels/:channelId/stream/stop', async (req, res) => {
     const { channelId } = req.params;
 
     stoppedChannels.add(channelId);
+    currentStreams.delete(channelId);
     streamQueue.clearChannelQueue(channelId);
 
     setTimeout(() => {
