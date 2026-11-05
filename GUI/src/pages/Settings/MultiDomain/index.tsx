@@ -156,17 +156,19 @@ const MultiDomain: FC = () => {
       if (!oldMatch) {
         result.push({
           ...newItem,
+          name: newItem.name.trim(),
           url: normalizeUrl(newItem.url),
           active: true,
         });
         continue;
       }
 
-      const changed = oldMatch.name !== newItem.name || oldMatch.url !== newItem.url;
+      const changed = oldMatch.name !== newItem.name.trim() || oldMatch.url !== normalizeUrl(newItem.url);
 
       if (changed) {
         result.push({
           ...newItem,
+          name: newItem.name.trim(),
           url: normalizeUrl(newItem.url),
           active: true,
         });
