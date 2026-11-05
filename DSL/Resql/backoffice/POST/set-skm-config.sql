@@ -13,7 +13,8 @@ WITH last_configuration AS (
      'skm_use_agentic',
      'azure_agent_name',
      'azure_agent_type',
-     'azure_agentic_max_output_tokens')
+     'azure_agentic_max_output_tokens',
+     'azure_agentic_use_structured_inputs')
     AND id IN (SELECT max(id) from configuration GROUP BY key)
     AND deleted = FALSE
 ), new_configuration as (
@@ -31,7 +32,8 @@ WITH last_configuration AS (
         ('skm_use_agentic', :skm_use_agentic),
         ('azure_agent_name', :azure_agent_name),
         ('azure_agent_type', :azure_agent_type),
-        ('azure_agentic_max_output_tokens', :azure_agentic_max_output_tokens)
+        ('azure_agentic_max_output_tokens', :azure_agentic_max_output_tokens),
+        ('azure_agentic_use_structured_inputs', :azure_agentic_use_structured_inputs)
    ) as new_values (key, value)
 )
 INSERT INTO configuration (key, value, created)

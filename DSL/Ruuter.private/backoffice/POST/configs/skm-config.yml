@@ -44,6 +44,9 @@ declaration:
       - field: azureAgenticMaxOutputTokens
         type: string
         description: "Body field 'azureAgenticMaxOutputTokens'"
+      - field: azureAgenticUseStructuredInputs
+        type: string
+        description: "Body field 'azureAgenticUseStructuredInputs'"
       - field: domainUUID
         type: object
         description: "Body field 'domainUUID'"
@@ -62,6 +65,7 @@ extractRequestData:
     azure_agent_name: ${incoming.body.azureAgentName}
     azure_agent_type: ${incoming.body.azureAgentType}
     azure_agentic_max_output_tokens: ${incoming.body.azureAgenticMaxOutputTokens}
+    azure_agentic_use_structured_inputs: ${incoming.body.azureAgenticUseStructuredInputs ?? 'false'}
     domains: ${incoming.body.domainUUID}
 
 checkForDomains:
@@ -87,6 +91,7 @@ setDomainSkmConfig:
       azure_agent_name: ${azure_agent_name}
       azure_agent_type: ${azure_agent_type}
       azure_agentic_max_output_tokens: ${azure_agentic_max_output_tokens}
+      azure_agentic_use_structured_inputs: ${azure_agentic_use_structured_inputs}
       created: ${new Date().toISOString()}
       domains: ${JSON.stringify(domains)}
   result: skm_result
@@ -109,6 +114,7 @@ setSkmConfig:
       azure_agent_name: ${azure_agent_name}
       azure_agent_type: ${azure_agent_type}
       azure_agentic_max_output_tokens: ${azure_agentic_max_output_tokens}
+      azure_agentic_use_structured_inputs: ${azure_agentic_use_structured_inputs}
       created: ${new Date().toISOString()}
   result: skm_result
   next: return_result

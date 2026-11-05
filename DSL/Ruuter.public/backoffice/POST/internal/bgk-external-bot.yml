@@ -18,6 +18,9 @@ declaration:
       - field: domain
         type: string
         description: "Body field 'domain'"  
+      - field: endUserUrl
+        type: string
+        description: "Body field 'endUserUrl'"
 
 extract_data:
   assign:
@@ -46,6 +49,9 @@ assignBgkConfig:
     agent_type: "[#AZURE_AGENT_TYPE]"
     domain: ${incoming.body.domain}
     message: ${incoming.body.message ?? ''}
+    endUserUrl: ${incoming.body.endUserUrl ?? ''}
+    use_structured_inputs: 'false'
+    structured_inputs: {}
 
 check_if_client_bot_is_active:
   switch:
@@ -86,6 +92,48 @@ assign_agentic_messages:
     messages:
       - role: "user"
         content: ${message}
+  next: check_use_structured_inputs_domain
+
+check_use_structured_inputs_domain:
+  switch:
+    - condition: ${domain === 'none'}
+      next: get_use_structured_inputs_config
+  next: get_use_structured_inputs_domain_uuid
+
+get_use_structured_inputs_domain_uuid:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-uuid"
+    body:
+      domainUrl: ${domain + '%'}
+  result: use_structured_inputs_domain_uuid
+  next: validate_use_structured_inputs_domain
+
+validate_use_structured_inputs_domain:
+  switch:
+    - condition: ${use_structured_inputs_domain_uuid.response.body.length > 0}
+      next: get_domain_use_structured_inputs_config
+  next: get_use_structured_inputs_config
+
+get_domain_use_structured_inputs_config:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-domain-skm-config"
+    body:
+      domainUUID: ${use_structured_inputs_domain_uuid.response.body[0].domainId}
+  result: use_structured_inputs_res
+  next: assign_use_structured_inputs
+
+get_use_structured_inputs_config:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-skm-config"
+  result: use_structured_inputs_res
+  next: assign_use_structured_inputs
+
+assign_use_structured_inputs:
+  assign:
+    use_structured_inputs: ${use_structured_inputs_res.response.body[0]?.azureAgenticUseStructuredInputs ?? 'false'}
   next: check_if_anonymizer_is_active
 
 get_chat_messages:
@@ -116,7 +164,7 @@ check_if_anonymizer_is_active:
   switch:
     - condition: ${[#ANONYMIZER_ENABLED] === true}
       next: checkForPassedDomain
-  next: trigger_ai_stream
+  next: check_structured_inputs
 
 checkForPassedDomain:
   switch:
@@ -164,7 +212,7 @@ check_if_anonymize_before_llm:
   switch:
     - condition: ${anonymizer_configs.isAnonymizationBeforeLlm === 'true'}
       next: prepareAnonymizerConfig
-  next: trigger_ai_stream
+  next: check_structured_inputs
 
 prepareAnonymizerConfig:
   call: http.post
@@ -205,6 +253,18 @@ assign_anonymized_messages:
     anonymizedMessages: ${anonymize_res.response.body.results}
     messages: "$=messages.map((m, i) => m.role === 'user' ? {...m, content: anonymizedMessages[messages.slice(0, i).filter(msg => msg.role === 'user').length].text} : m)="
 
+check_structured_inputs:
+  switch:
+    - condition: ${use_agentic.toLowerCase() === 'true' && use_structured_inputs === 'true' && endUserUrl !== ''}
+      next: assign_structured_inputs
+  next: trigger_ai_stream
+
+assign_structured_inputs:
+  assign:
+    structured_inputs:
+      url: ${endUserUrl}
+  next: trigger_ai_stream
+
 trigger_ai_stream:
   call: http.post
   args:
@@ -215,6 +275,7 @@ trigger_ai_stream:
       use_agentic: ${use_agentic.toLowerCase() === 'true'}
       agent_name: ${agent_name}
       agent_type: ${agent_type}
+      structured_inputs: ${structured_inputs}
       raw_response: ${raw_response.toLowerCase() === 'true'}
       messages: ${messages}
       options:

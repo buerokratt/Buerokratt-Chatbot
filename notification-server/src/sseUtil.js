@@ -136,6 +136,7 @@ function processPendingStreamsForChannel(channelId) {
               azure_client_id: requestData.azure_client_id,
               azure_client_secret: requestData.azure_client_secret,
               azure_agentic_max_output_tokens: requestData.azure_agentic_max_output_tokens,
+              structured_inputs: requestData.structured_inputs,
               channelId,
               messages: requestData.messages,
               options: requestData.options,

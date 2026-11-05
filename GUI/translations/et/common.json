@@ -631,6 +631,7 @@
       "azureClientSecretIsSetPlaceholder": "•••••••• (salasõna on määratud)",
       "azureClientSecretIsSetHint": "Sellele domeenile on salasõna juba määratud. Jäta tühjaks, et see muutmata jätta.",
       "azureAgenticMaxOutputTokens": "Maksimaalne väljundtokenite arv",
+      "azureAgenticUseStructuredInputs": "Saada iga päringuga agendile kontekstiks lõppkasutaja URL",
       "tooltip": {
         "range": "Rangus määrab künnise, mille alusel xdokumente peetakse teie päringutele asjakohasteks. Ranguse tõstmine tähendab kõrgemat asjakohasuse künnist ja rohkemate vähem asjakohaste dokumentide filtreerimist. Väga kõrge rangus võib aga põhjustada vastuste genereerimise ebaõnnestumise, kuna kättesaadavaid dokumente on liiga vähe. Vaikimisi on ranguse tase 3.Võimalikud väärtused: 1 - 5",
         "documents": "See määrab teie andmeindeksist vastuste koostamiseks kasutatavate kõrgeima skooriga dokumentide arvu. Seda väärtust tasub suurendada, kui teil on lühikesed dokumendid või soovite pakkuda rohkem konteksti. Vaikeväärtus on 5.Võimalikud väärtused: 1 - 20",
@@ -645,7 +646,8 @@
         "azureAgentType": "Otsinguagendi tüüp. Vaikeväärtus on 'agent_reference'.",
         "azureClientId": "Azure'is registreeritud agendi rakenduse (client) ID",
         "azureClientSecret": "Azure'is registreeritud agendi rakenduse secret",
-        "azureAgenticMaxOutputTokens": "Maksimaalne tokenite arv mida agent saab ühele päringule vastust koostades kulutada. Sinna hulka arvestatakse ka tokenid mida agent kasutab sisemiselt enne otsingut või otsingu vältel."
+        "azureAgenticMaxOutputTokens": "Maksimaalne tokenite arv mida agent saab ühele päringule vastust koostades kulutada. Sinna hulka arvestatakse ka tokenid mida agent kasutab sisemiselt enne otsingut või otsingu vältel.",
+        "azureAgenticUseStructuredInputs": "Kui see on sisse lülitatud, edastatakse iga sõnumi saatmise hetkel lõppkasutaja avatud lehe URL Foundry agendile struktureeritud sisendina 'url'. Agent peab defineerima struktureeritud sisendi 'url' (nt kasutades seda juhistes või Azure AI Search filtris kujul {{url}}). Väljalülitatuna saadetakse päringud ilma struktureeritud sisenditeta."
       },
       "validation": {
         "range": "Rangus peab olema vahemikus 1 kuni 5",

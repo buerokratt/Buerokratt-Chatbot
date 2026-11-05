@@ -631,6 +631,7 @@
       "azureClientSecretIsSetPlaceholder": "•••••••• (secret is set)",
       "azureClientSecretIsSetHint": "A secret is already saved for this domain. Leave blank to keep it unchanged.",
       "azureAgenticMaxOutputTokens": "Maximum output tokens",
+      "azureAgenticUseStructuredInputs": "Include current end-user URL as context in each request",
       "tooltip": {
         "range": "Range defines the threshold at which documents are considered relevant to your queries. Increasing the stringency means a higher relevance threshold and filtering out more less relevant documents. However, a very high stringency may cause answers to fail to be generated because there are too few documents available. The default severity level is 3.Possible values: 1 - 5",
         "documents": "This determines the number of highest-scoring documents to use to build answers from your data index. It's worth increasing this value if you have short documents or want to provide more context. The default value is 5.Possible values: 1 - 20",
@@ -645,7 +646,8 @@
         "azureAgentType": "Knowledge agent type. Default value is 'agent_reference'.",
         "azureClientId": "Agent application (client) ID that is registered in Azure",
         "azureClientSecret": "Agent application secret that is registered in Azure",
-        "azureAgenticMaxOutputTokens": "Maximum total number of tokens that the agent is allowed to consume per turn. This includes any LLM-driven query planning and reasoning the agent performs before or during the search."
+        "azureAgenticMaxOutputTokens": "Maximum total number of tokens that the agent is allowed to consume per turn. This includes any LLM-driven query planning and reasoning the agent performs before or during the search.",
+        "azureAgenticUseStructuredInputs": "When enabled, the URL of the page the end user is on when sending each message is passed to the Foundry agent as the structured input 'url'. The agent must declare a 'url' structured input (e.g. used in its instructions or Azure AI Search filter as {{url}}). When disabled, requests are sent without structured inputs."
       },
       "validation": {
         "range": "Range must be between 1 and 5",

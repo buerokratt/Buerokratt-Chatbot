@@ -18,6 +18,9 @@ declaration:
       - field: domain
         type: string
         description: "Body field 'domain'"
+      - field: endUserUrl
+        type: string
+        description: "Body field 'endUserUrl'"
 
 extract_data:
   assign:
@@ -27,6 +30,8 @@ extract_data:
     stream: "[#SKM_STREAM]"
     raw_response: "[#SKM_RAW_RESPONSE]"
     message: ${incoming.body.message ?? ''}
+    endUserUrl: ${incoming.body.endUserUrl ?? ''}
+    structured_inputs: {}
 
 checkForDomain:
   switch:
@@ -71,6 +76,7 @@ assignSkmConfig:
     use_agentic: ${skm_config.useAgentic}
     agent_name: ${skm_config.azureAgentName}
     agent_type: ${skm_config.azureAgentType}
+    use_structured_inputs: ${skm_config.azureAgenticUseStructuredInputs ?? 'false'}
     azure_client_id: ""
     azure_client_secret: ""
 
@@ -166,7 +172,7 @@ check_if_anonymizer_is_active:
   switch:
     - condition: ${[#ANONYMIZER_ENABLED] === true}
       next: checkForPassedDomain
-  next: trigger_ai_stream
+  next: check_structured_inputs
 
 checkForPassedDomain:
   switch:
@@ -199,7 +205,7 @@ check_if_anonymize_before_llm:
   switch:
     - condition: ${anonymizer_configs.isAnonymizationBeforeLlm === 'true'}
       next: prepareAnonymizerConfig
-  next: trigger_ai_stream
+  next: check_structured_inputs
 
 prepareAnonymizerConfig:
   call: http.post
@@ -240,6 +246,18 @@ assign_anonymized_messages:
     anonymizedMessages: ${anonymize_res.response.body.results}
     messages: "$=messages.map((m, i) => m.role === 'user' ? {...m, content: anonymizedMessages[messages.slice(0, i).filter(msg => msg.role === 'user').length].text} : m)="
 
+check_structured_inputs:
+  switch:
+    - condition: ${use_agentic.toLowerCase() === 'true' && use_structured_inputs === 'true' && endUserUrl !== ''}
+      next: assign_structured_inputs
+  next: trigger_ai_stream
+
+assign_structured_inputs:
+  assign:
+    structured_inputs:
+      url: ${endUserUrl}
+  next: trigger_ai_stream
+
 trigger_ai_stream:
   call: http.post
   args:
@@ -254,6 +272,7 @@ trigger_ai_stream:
       azure_client_id: ${azure_client_id}
       azure_client_secret: ${azure_client_secret}
       azure_agentic_max_output_tokens: ${parseInt(skm_config.azureAgenticMaxOutputTokens ?? '4000')}
+      structured_inputs: ${structured_inputs}
       raw_response: ${raw_response.toLowerCase() === 'true'}
       messages: ${messages}
       options:

@@ -26,6 +26,9 @@ declaration:
       - field: domain
         type: string
         description: "Body field 'domain'"  
+      - field: endUserUrl
+        type: string
+        description: "Body field 'endUserUrl'"
 
 extractRequestData:
   assign:
@@ -39,6 +42,7 @@ extractRequestData:
     event: ""
     isOrgAvailable: false
     messageTimestamp: ${new Date().toISOString()}
+    messageEndUserUrl: ${incoming.body.endUserUrl ?? ''}
 
 get_bot_name:
   call: http.post
@@ -84,6 +88,7 @@ trigger_bgk_bot:
       sender: ${sender}
       message: ${message.content ?? ''}
       domain: ${domain}
+      endUserUrl: ${messageEndUserUrl}
   result: bgk_bot_response
   error: return_bad_request
   next: end
@@ -357,6 +362,7 @@ insertMessage:
       forwardedByUser: ""
       forwardedFromCsa: ""
       forwardedToCsa: ""
+      endUserUrl: ""
   result: insertMessageResult
 
 notify_chats:

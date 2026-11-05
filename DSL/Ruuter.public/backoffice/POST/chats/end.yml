@@ -101,6 +101,7 @@ postMessage:
       forwardedByUser: ""
       forwardedFromCsa: ""
       forwardedToCsa: ""
+      endUserUrl: ""
   result: message_res
   next: endChat
 

@@ -27,6 +27,9 @@ declaration:
       - field: domain
         type: string
         description: "Body field 'domain'"
+      - field: endUserUrl
+        type: string
+        description: "Body field 'endUserUrl'"
 
 extractRequestData:
   assign:
@@ -46,6 +49,7 @@ extractRequestData:
     holidays: ${incoming.body.holidays}
     holidayNames: ${incoming.body.holidayNames}
     domain: ${incoming.body.domain}
+    messageEndUserUrl: ${incoming.body.endUserUrl ?? incoming.body.endUserTechnicalData?.endUserUrl ?? ''}
 
 check_if_anonymizer_is_active:
   switch:
@@ -289,6 +293,7 @@ postClientMessage:
       forwardedByUser: ${forwardedByUser}
       forwardedFromCsa: ${forwardedFromCsa}
       forwardedToCsa: ${forwardedToCsa}
+      endUserUrl: ${messageEndUserUrl}
   result: insertMessageResult
   next: insertChat
 
@@ -330,6 +335,7 @@ postMessageToBot:
       holidays: ${holidays}
       holidayNames: ${holidayNames}
       domain: ${domain}
+      endUserUrl: ${messageEndUserUrl}
   result: message_to_bot_result
   next: check_for_post_message_to_bot_result
 

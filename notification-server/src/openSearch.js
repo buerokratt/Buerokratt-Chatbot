@@ -18,15 +18,37 @@ const streamQueue = require('./streamQueue');
 
 let client = buildClient();
 
+const AGENTIC_GUARDRAIL_MESSAGE = "I'm sorry, but i cannot assist with that request.";
+const ESTONIAN_GUARDRAIL_MESSAGE = 'Palun vabandust, aga kahjuks ei saa ma sellele päringule vastata.';
+
+function isGuardrailMessage(text) {
+  return text.trim().toLowerCase() === AGENTIC_GUARDRAIL_MESSAGE.toLowerCase();
+}
+
+// Holds the start of a streamed answer until it is clear it is not the guardrail message
+function holdGuardrailText(held, text) {
+  if (!held.isHolding || !text) return text;
+  held.text += text;
+  if (AGENTIC_GUARDRAIL_MESSAGE.toLowerCase().startsWith(held.text.trim().toLowerCase())) return '';
+  held.isHolding = false;
+  return held.text;
+}
+
+function releaseHeldText(held) {
+  if (!held.isHolding) return '';
+  return isGuardrailMessage(held.text) ? ESTONIAN_GUARDRAIL_MESSAGE : held.text;
+}
+
 async function streamAgenticResponse({ response, connectionId, channelId, sender }) {
   const citationState = createAgenticStreamState();
+  const held = { text: '', isHolding: true };
   let finalAnnotations = [];
 
   for await (const part of response) {
     if (!activeConnections.has(connectionId) || stoppedChannels.has(channelId)) break;
 
     if (part.type === 'response.output_text.delta') {
-      const emitText = consumeAgenticStreamDelta(citationState, part.delta || '');
+      const emitText = holdGuardrailText(held, consumeAgenticStreamDelta(citationState, part.delta || ''));
       if (emitText) {
         sender({ type: 'stream_chunk', channelId, content: emitText, isComplete: false });
       }
@@ -40,7 +62,7 @@ async function streamAgenticResponse({ response, connectionId, channelId, sender
 
   if (!activeConnections.has(connectionId) || stoppedChannels.has(channelId)) return;
 
-  const trailingText = flushAgenticStreamBuffer(citationState);
+  const trailingText = releaseHeldText(held) + flushAgenticStreamBuffer(citationState);
   if (trailingText) {
     sender({ type: 'stream_chunk', channelId, content: trailingText, isComplete: false });
   }
@@ -79,6 +101,7 @@ async function fetchAgenticResponse({
   azure_client_id,
   azure_client_secret,
   azure_agentic_max_output_tokens,
+  structured_inputs,
 }) {
   const previous_response_id = await getPreviousResponseId(channelId);
 
@@ -91,6 +114,10 @@ async function fetchAgenticResponse({
     client_secret: azure_client_secret,
     max_output_tokens: azure_agentic_max_output_tokens,
     previous_response_id,
+    structured_inputs,
+  }).catch((error) => {
+    if (stream || !error.message?.includes('"code":"content_filter"')) throw error;
+    return { output: [{ type: 'message', content: [{ type: 'output_text', text: ESTONIAN_GUARDRAIL_MESSAGE }] }] };
   });
 
   if (stream) {
@@ -164,7 +191,8 @@ function buildCompleteResponseContent({ response, use_agentic, openAIFallback1, 
   if (use_agentic) {
     const textPart = extractMessageTextPart(response);
     const annotations = hasAzureAiSearchTool(response) ? textPart?.annotations : [];
-    return formatAgenticCitations(textPart?.text, annotations);
+    const { content, context } = formatAgenticCitations(textPart?.text, annotations);
+    return { content: isGuardrailMessage(content) ? ESTONIAN_GUARDRAIL_MESSAGE : content, context };
   }
 
   const content = response.choices?.[0]?.message?.content || '';
@@ -268,6 +296,7 @@ async function createAzureOpenAIStreamRequest({
   azure_client_id,
   azure_client_secret,
   azure_agentic_max_output_tokens,
+  structured_inputs,
   raw_response = false,
 }) {
   const { stream = true } = options;
@@ -289,6 +318,7 @@ async function createAzureOpenAIStreamRequest({
         azure_client_id,
         azure_client_secret,
         azure_agentic_max_output_tokens,
+        structured_inputs,
         raw_response,
       });
       console.log('No active connections for channel, queued request');
@@ -309,6 +339,7 @@ async function createAzureOpenAIStreamRequest({
           azure_client_id,
           azure_client_secret,
           azure_agentic_max_output_tokens,
+          structured_inputs,
         });
 
         if (!activeConnections.has(connectionId)) {

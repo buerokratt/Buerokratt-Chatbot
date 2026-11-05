@@ -55,7 +55,14 @@ function isPreviousResponseNotFound(status, errorData) {
   );
 }
 
-function buildRequestBody(messages, { stream, agent_name, agent_type, max_output_tokens, previous_response_id }) {
+function hasStructuredInputs(structured_inputs) {
+  return !!structured_inputs && typeof structured_inputs === 'object' && Object.keys(structured_inputs).length > 0;
+}
+
+function buildRequestBody(
+  messages,
+  { stream, agent_name, agent_type, max_output_tokens, previous_response_id, structured_inputs },
+) {
   return {
     ...(previous_response_id && { previous_response_id }),
     input: messages.filter((msg) => msg.role !== 'system'),
@@ -63,6 +70,7 @@ function buildRequestBody(messages, { stream, agent_name, agent_type, max_output
       name: agent_name,
       type: agent_type,
     },
+    ...(hasStructuredInputs(structured_inputs) && { structured_inputs }),
     stream: stream,
     max_output_tokens: parseInt(max_output_tokens ?? azureAgenticConfig.maxOutputTokens) || 4000,
   };

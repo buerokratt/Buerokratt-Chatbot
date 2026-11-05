@@ -110,6 +110,7 @@ insertMessage:
       forwardedByUser: ""
       forwardedFromCsa: ""
       forwardedToCsa: ""
+      endUserUrl: ""
   result: insertMessageResult
   next: notify_chats
 
