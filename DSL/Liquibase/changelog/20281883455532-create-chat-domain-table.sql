@@ -1,5 +1,5 @@
 -- liquibase formatted sql
--- changeset 1AhmedYasser:20281883455532
+-- changeset 1AhmedYasser:20281883455532 validCheckSum:9:fc5196a4fe9eba191051b8342eaf71f0
 CREATE TABLE chat_domain (
     chat_base_id VARCHAR(36) PRIMARY KEY,
     domain TEXT NOT NULL,
