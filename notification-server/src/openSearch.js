@@ -13,7 +13,7 @@ const {
   hasAzureAiSearchTool,
 } = require('./citationFormatting');
 const { openSearchConfig } = require('./config');
-const { activeConnections, stoppedChannels } = require('./connectionManager');
+const { activeConnections, stoppedChannels, currentStreams } = require('./connectionManager');
 const streamQueue = require('./streamQueue');
 
 let client = buildClient();
@@ -271,6 +271,8 @@ async function createAzureOpenAIStreamRequest({
   raw_response = false,
 }) {
   const { stream = true } = options;
+  const streamToken = {};
+  currentStreams.set(channelId, streamToken);
 
   try {
     stoppedChannels.delete(channelId);
@@ -295,7 +297,9 @@ async function createAzureOpenAIStreamRequest({
     }
 
     const responsePromises = connections.map(async ([connectionId, connData]) => {
-      const { sender } = connData;
+      const sender = (data) => {
+        if (currentStreams.get(channelId) === streamToken) connData.sender(data);
+      };
 
       try {
         const response = await fetchLLMResponse({
@@ -363,6 +367,8 @@ async function createAzureOpenAIStreamRequest({
   } catch (error) {
     console.error(`Error in createAzureOpenAIStreamRequest (stream=${stream}):`, error);
     throw error;
+  } finally {
+    if (currentStreams.get(channelId) === streamToken) currentStreams.delete(channelId);
   }
 }
 
@@ -512,11 +518,18 @@ async function createLLMOrchestrationStreamRequest({ channelId, chatId, message,
     url: 'sse-stream-context',
   };
 
-  await Promise.all(
-    connections.map(([connectionId, connData]) =>
-      handleLLMConnection(connectionId, connData, orchestrationPayload, channelId),
-    ),
-  );
+  const streamToken = {};
+  currentStreams.set(channelId, streamToken);
+
+  try {
+    await Promise.all(
+      connections.map(([connectionId, connData]) =>
+        handleLLMConnection(connectionId, connData, orchestrationPayload, channelId, streamToken),
+      ),
+    );
+  } finally {
+    if (currentStreams.get(channelId) === streamToken) currentStreams.delete(channelId);
+  }
   return { success: true, channelId };
 }
 
@@ -549,9 +562,9 @@ function processSSELine(line, sender, channelId) {
   return false;
 }
 
-async function readLLMStream(reader, decoder, sender, channelId, connectionId) {
+async function readLLMStream(reader, decoder, sender, channelId, connectionId, streamToken) {
   let buffer = '';
-  while (activeConnections.has(connectionId)) {
+  while (activeConnections.has(connectionId) && currentStreams.get(channelId) === streamToken) {
     const { done, value } = await reader.read();
     if (done) break;
     buffer += decoder.decode(value, { stream: true });
@@ -561,10 +574,13 @@ async function readLLMStream(reader, decoder, sender, channelId, connectionId) {
       if (processSSELine(line, sender, channelId)) return;
     }
   }
+  await reader.cancel();
 }
 
-async function handleLLMConnection(connectionId, connData, orchestrationPayload, channelId) {
-  const { sender } = connData;
+async function handleLLMConnection(connectionId, connData, orchestrationPayload, channelId, streamToken) {
+  const sender = (data) => {
+    if (currentStreams.get(channelId) === streamToken) connData.sender(data);
+  };
   try {
     const response = await fetch(
       `${process.env.LLM_ORCHESTRATOR_URL || 'http://llm-orchestration-service:8100'}/orchestrate/stream`,
@@ -579,7 +595,7 @@ async function handleLLMConnection(connectionId, connData, orchestrationPayload,
     }
     if (!activeConnections.has(connectionId)) return;
     sender({ type: 'stream_start', streamId: channelId, channelId, isComplete: false });
-    await readLLMStream(response.body.getReader(), new TextDecoder(), sender, channelId, connectionId);
+    await readLLMStream(response.body.getReader(), new TextDecoder(), sender, channelId, connectionId, streamToken);
   } catch (error) {
     console.error(`LLM streaming error for connection ${connectionId}:`, error);
     if (activeConnections.has(connectionId)) {
