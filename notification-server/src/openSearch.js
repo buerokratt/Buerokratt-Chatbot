@@ -65,7 +65,7 @@ async function streamAgenticResponse({ response, connectionId, channelId, sender
   let finalAnnotations = [];
 
   for await (const part of response) {
-    if (!activeConnections.has(connectionId) || stoppedChannels.has(channelId)) break;
+    if (stoppedChannels.has(channelId)) break;
 
     if (part.type === 'response.output_text.delta') {
       const emitText = holdGuardrailText(held, consumeAgenticStreamDelta(citationState, part.delta || ''));
@@ -85,7 +85,7 @@ async function streamAgenticResponse({ response, connectionId, channelId, sender
     }
   }
 
-  if (!activeConnections.has(connectionId) || stoppedChannels.has(channelId)) return;
+  if (stoppedChannels.has(channelId)) return;
 
   const trailingText = releaseHeldText(held) + flushAgenticStreamBuffer(citationState);
   if (trailingText) {
