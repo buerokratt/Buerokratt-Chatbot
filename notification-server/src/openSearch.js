@@ -311,7 +311,7 @@ async function createAzureOpenAIStreamRequest({
 }) {
   const { stream = true } = options;
   const streamToken = {};
-  currentStreams.set(channelId, streamToken);
+  
 
   try {
     stoppedChannels.delete(channelId);
