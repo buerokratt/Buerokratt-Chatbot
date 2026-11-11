@@ -12,9 +12,9 @@ const {
   flushAgenticStreamBuffer,
   hasAzureAiSearchTool,
 } = require('./citationFormatting');
-const { stoppedChannels, currentStreams } = require('./connectionManager');
 const { newNotificationsConfig } = require('./config');
 
+const stoppedChannels = new Set();
 const AGENTIC_GUARDRAIL_MESSAGE = "I'm sorry, but i cannot assist with that request.";
 const ESTONIAN_GUARDRAIL_MESSAGE = 'Palun vabandust, aga kahjuks ei saa ma sellele päringule vastata.';
 
@@ -58,7 +58,7 @@ function releaseHeldText(held) {
   return isGuardrailMessage(held.text) ? ESTONIAN_GUARDRAIL_MESSAGE : held.text;
 }
 
-async function streamAgenticResponse({ response, connectionId, channelId, sender }) {
+async function streamAgenticResponse({ response, channelId }) {
   const citationState = createAgenticStreamState();
   const held = { text: '', isHolding: true };
   let finalAnnotations = [];
@@ -164,14 +164,14 @@ async function fetchLLMResponse({ use_agentic, messages, options, ...agenticPara
   return streamAzureOpenAIResponse(messages, options);
 }
 
-async function sendRawResponse({ response, connectionId, channelId, sender, stream }) {
+async function sendRawResponse({ response, channelId, sender, stream }) {
   if (!stream) {
     sender(response);
     return;
   }
 
   for await (const part of response) {
-    if ( stoppedChannels.has(channelId)) break;
+    if (stoppedChannels.has(channelId)) break;
     sender(part);
   }
 }
@@ -309,8 +309,6 @@ async function createAzureOpenAIStreamRequest({
   raw_response = false,
 }) {
   const { stream = true } = options;
-  const streamToken = {};
-  currentStreams.set(channelId, streamToken);
 
   try {
     stoppedChannels.delete(channelId);
