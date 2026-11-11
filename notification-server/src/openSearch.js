@@ -12,9 +12,8 @@ const {
   flushAgenticStreamBuffer,
   hasAzureAiSearchTool,
 } = require('./citationFormatting');
+const { stoppedChannels, currentStreams } = require('./connectionManager');
 const { newNotificationsConfig } = require('./config');
-
-const stoppedChannels = new Set();
 
 const AGENTIC_GUARDRAIL_MESSAGE = "I'm sorry, but i cannot assist with that request.";
 const ESTONIAN_GUARDRAIL_MESSAGE = 'Palun vabandust, aga kahjuks ei saa ma sellele päringule vastata.';
@@ -65,7 +64,7 @@ async function streamAgenticResponse({ response, connectionId, channelId, sender
   let finalAnnotations = [];
 
   for await (const part of response) {
-    if (!activeConnections.has(connectionId) || stoppedChannels.has(channelId)) break;
+    if (stoppedChannels.has(channelId)) break;
 
     if (part.type === 'response.output_text.delta') {
       const emitText = holdGuardrailText(held, consumeAgenticStreamDelta(citationState, part.delta || ''));
@@ -85,7 +84,7 @@ async function streamAgenticResponse({ response, connectionId, channelId, sender
     }
   }
 
-  if (!activeConnections.has(connectionId) || stoppedChannels.has(channelId)) return;
+  if (stoppedChannels.has(channelId)) return;
 
   const trailingText = releaseHeldText(held) + flushAgenticStreamBuffer(citationState);
   if (trailingText) {
@@ -172,7 +171,7 @@ async function sendRawResponse({ response, connectionId, channelId, sender, stre
   }
 
   for await (const part of response) {
-    if (!activeConnections.has(connectionId) || stoppedChannels.has(channelId)) break;
+    if ( stoppedChannels.has(channelId)) break;
     sender(part);
   }
 }
