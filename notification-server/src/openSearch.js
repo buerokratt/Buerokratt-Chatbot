@@ -10,9 +10,9 @@ const {
   flushAgenticStreamBuffer,
   hasAzureAiSearchTool,
 } = require('./citationFormatting');
-const { stoppedChannels, currentStreams } = require('./connectionManager');
 const { newNotificationsConfig } = require('./config');
 
+const stoppedChannels = new Set();
 const AGENTIC_GUARDRAIL_MESSAGE = "I'm sorry, but i cannot assist with that request.";
 const ESTONIAN_GUARDRAIL_MESSAGE = 'Palun vabandust, aga kahjuks ei saa ma sellele päringule vastata.';
 
@@ -190,8 +190,6 @@ async function createAgenticStreamRequest({
   raw_response = false,
 }) {
   const { stream = true } = options;
-  const streamToken = {};
-  currentStreams.set(channelId, streamToken);
 
   try {
     stoppedChannels.delete(channelId);

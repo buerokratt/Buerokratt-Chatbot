@@ -7,11 +7,7 @@ const helmet = require('helmet');
 const { sendAzureAgenticRequest } = require('./azureAgenticRequest');
 const { extractMessageTextPart } = require('./citationFormatting');
 const { serverConfig } = require('./config');
-const { stoppedChannels, currentStreams } = require('./connectionManager');
-const { createAgenticStreamRequest } = require('./openSearch');
-const { buildSSEResponse } = require('./sseUtil');
-const { createLLMOrchestrationStreamRequest: createLLMGuiStreamRequest } = require('./streamingService');
-const streamQueue = require('./streamQueue');
+const { createAgenticStreamRequest, stoppedChannels } = require('./openSearch');
 
 const app = express();
 
@@ -53,58 +49,6 @@ app.use((req, res, next) => {
   }
   console.log('---------------------------------------------------');
   next();
-});
-
-app.post('/channels/:channelId/llm-stream', async (req, res) => {
-  const { channelId } = req.params;
-  const { chatId, message, authorId, conversationHistory = [] } = req.body;
-
-  if (!message) {
-    return res.status(400).json({ error: 'message is required' });
-  }
-
-  res.status(202).json({ response: 'stream triggered' });
-
-  createLLMOrchestrationStreamRequest({
-    channelId,
-    chatId: chatId || channelId,
-    message,
-    authorId,
-    conversationHistory,
-  }).catch((error) => {
-    console.error('LLM stream error for channel:', error.message);
-  });
-});
-
-// LLM Module GUI streaming trigger - held open until the stream completes
-app.post('/channels/:channelId/orchestrate/stream', async (req, res) => {
-  try {
-    const { channelId } = req.params;
-    const { message, options = {} } = req.body;
-
-    if (!message || typeof message !== 'string') {
-      return res.status(400).json({ error: 'Message string is required' });
-    }
-
-    const result = await createLLMGuiStreamRequest({
-      channelId,
-      message,
-      options,
-    });
-
-    res.status(200).json(result);
-  } catch (error) {
-    if (error.message.includes('No active connections found for this channel - request queued')) {
-      res.status(202).json({
-        message: 'Request queued - will be processed when connection becomes available',
-        status: 'queued',
-      });
-    } else if (error.message === 'No active connections found for this channel') {
-      res.status(404).json({ error: error.message });
-    } else {
-      res.status(500).json({ error: 'Failed to start LLM orchestration streaming' });
-    }
-  }
 });
 
 app.post('/channels/:channelId/stream', (req, res) => {
@@ -174,8 +118,6 @@ app.post('/channels/:channelId/stream/stop', async (req, res) => {
     const { channelId } = req.params;
 
     stoppedChannels.add(channelId);
-    currentStreams.delete(channelId);
-    streamQueue.clearChannelQueue(channelId);
 
     setTimeout(() => {
       stoppedChannels.delete(channelId);
@@ -188,30 +130,12 @@ app.post('/channels/:channelId/stream/stop', async (req, res) => {
   }
 });
 
-setInterval(
-  () => {
-    const now = Date.now();
-    const oneHour = 60 * 60 * 1000;
-
-    for (const [channelId, requests] of streamQueue.queue.entries()) {
-      const staleRequests = requests.filter((req) => now - req.timestamp > oneHour || !streamQueue.shouldRetry(req));
-
-      staleRequests.forEach((staleReq) => {
-        streamQueue.removeFromQueue(channelId, staleReq.id);
-        console.log(`Cleaned up stale stream request for channel ${channelId}`);
-      });
-    }
-  },
-  5 * 60 * 1000,
-);
-
 const server = app.listen(serverConfig.port, () => {
   console.log(`Server running on port ${serverConfig.port}`);
 });
 
-// The SSE GET and the trigger POST are both long-lived by design. Disable the
-// per-request cap and let the upstream idle watchdog in streamingService.js
-// decide when a stream has genuinely stalled.
+// Intent detection can wait on an upstream agentic response, so do not impose
+// Node's default total request timeout.
 server.requestTimeout = 0;
 server.headersTimeout = 65_000;
 server.keepAliveTimeout = 61_000;
