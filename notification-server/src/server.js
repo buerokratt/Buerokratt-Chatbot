@@ -4,24 +4,11 @@ const csurf = require('csurf');
 const express = require('express');
 const helmet = require('helmet');
 
-const { buildNotificationSearchInterval, buildQueueCounter } = require('./addOns');
 const { sendAzureAgenticRequest } = require('./azureAgenticRequest');
 const { initializeAzureOpenAI } = require('./azureOpenAI');
 const { extractMessageTextPart } = require('./citationFormatting');
 const { serverConfig } = require('./config');
-const { stoppedChannels, currentStreams } = require('./connectionManager');
-const { addToLogoutQueue, removeFromLogoutQueue } = require('./logoutQueue');
-const {
-  enqueueChatId,
-  dequeueChatId,
-  sendBulkNotification,
-  createAzureOpenAIStreamRequest,
-  createLLMOrchestrationStreamRequest,
-} = require('./openSearch');
-const { buildSSEResponse } = require('./sseUtil');
-const { createLLMOrchestrationStreamRequest: createLLMGuiStreamRequest } = require('./streamingService');
-const streamQueue = require('./streamQueue');
-const { addToTerminationQueue, removeFromTerminationQueue } = require('./terminationQueue');
+const { createAzureOpenAIStreamRequest, stoppedChannels } = require('./openSearch');
 
 const app = express();
 
@@ -38,48 +25,6 @@ try {
   console.error('Failed to initialize Azure OpenAI:', error.message);
 }
 
-app.get('/sse/notifications/:channelId', (req, res) => {
-  const { channelId } = req.params;
-  buildSSEResponse({
-    req,
-    res,
-    buildCallbackFunction: buildNotificationSearchInterval({ channelId }),
-    channelId,
-  });
-});
-
-app.get('/sse/queue/:id', (req, res) => {
-  const { id } = req.params;
-  buildSSEResponse({
-    req,
-    res,
-    buildCallbackFunction: buildQueueCounter({ id }),
-  });
-});
-
-// LLM Module GUI streaming connection
-app.get('/sse/stream/:channelId', (req, res) => {
-  const { channelId } = req.params;
-  // Strip line breaks so the request value cannot inject fake log lines
-  const logChannelId = channelId.replace(/[\n\r]/g, '');
-  buildSSEResponse({
-    req,
-    res,
-    buildCallbackFunction: ({ connectionId }) => {
-      // For streaming SSE, we don't set up an interval
-      // Instead, we wait for POST requests to trigger streaming
-      console.log(`SSE streaming connection established for channel ${logChannelId}, connection ${connectionId}`);
-
-      // Return cleanup function (no-op for streaming connections)
-      return () => {
-        console.log(`SSE streaming connection closed for channel ${logChannelId}, connection ${connectionId}`);
-      };
-    },
-    channelId,
-    llmStream: true,
-  });
-});
-
 app.use((req, res, next) => {
   console.log('NEW REQUEST');
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
@@ -89,155 +34,6 @@ app.use((req, res, next) => {
   }
   console.log('---------------------------------------------------');
   next();
-});
-
-app.post('/bulk-notifications', async (req, res) => {
-  try {
-    await sendBulkNotification(req.body);
-    res.status(200).json({ response: 'sent successfully' });
-  } catch {
-    res.status(500).json({ response: 'error' });
-  }
-});
-
-app.post('/add-to-logout-queue', async (req, res) => {
-  const cookies = req.headers.cookie;
-
-  try {
-    await addToLogoutQueue(cookies, 5, () =>
-      fetch(`${process.env.PRIVATE_RUUTER_URL}/backoffice/accounts/logout`, {
-        method: 'GET',
-        headers: {
-          cookie: cookies,
-        },
-      }),
-    );
-
-    console.log('User was loged out.');
-    res.sendStatus(200);
-  } catch (err) {
-    console.error('Error forwarding request:', JSON.stringify(err));
-    res.sendStatus(500);
-  }
-});
-
-app.post('/remove-from-logout-queue', async (req, res) => {
-  try {
-    await removeFromLogoutQueue(req.headers.cookie);
-    res.status(200).json({ response: 'Logout would be canceled' });
-  } catch {
-    res.status(500).json({ response: 'error' });
-  }
-});
-
-app.post('/enqueue', async (req, res) => {
-  try {
-    await enqueueChatId(req.body.id);
-    res.status(200).json({ response: 'enqueued successfully' });
-  } catch {
-    res.status(500).json({ response: 'error' });
-  }
-});
-
-app.post('/dequeue', async (req, res) => {
-  try {
-    await dequeueChatId(req.body.id);
-    res.status(200).json({ response: 'dequeued successfully' });
-  } catch {
-    res.status(500).json({ response: 'error' });
-  }
-});
-
-app.post('/add-chat-to-termination-queue', express.json(), express.text(), async (req, res) => {
-  try {
-    const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-
-    addToTerminationQueue(body.chatId, body.timeout, () =>
-      fetch(`${process.env.RUUTER_URL}/backoffice/chats/end`, {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          cookie: body.cookie || req.headers.cookie,
-        },
-        body: JSON.stringify({
-          message: {
-            chatId: body.chatId,
-            authorRole: 'end-user',
-            event: 'CLIENT_LEFT_FOR_UNKNOWN_REASONS',
-            authorTimestamp: new Date().toISOString(),
-          },
-        }),
-      }),
-    );
-
-    res.status(200).json({ response: 'Chat will be terminated soon' });
-  } catch (error) {
-    console.error('Error adding chat to termination queue:', error);
-    res.status(500).json({ response: 'error' });
-  }
-});
-
-app.post('/remove-chat-from-termination-queue', express.json(), express.text(), async (req, res) => {
-  const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-
-  try {
-    removeFromTerminationQueue(body.chatId);
-    res.status(200).json({ response: 'Chat termination will be canceled' });
-  } catch {
-    res.status(500).json({ response: 'error' });
-  }
-});
-
-app.post('/channels/:channelId/llm-stream', async (req, res) => {
-  const { channelId } = req.params;
-  const { chatId, message, authorId, conversationHistory = [] } = req.body;
-
-  if (!message) {
-    return res.status(400).json({ error: 'message is required' });
-  }
-
-  res.status(202).json({ response: 'stream triggered' });
-
-  createLLMOrchestrationStreamRequest({
-    channelId,
-    chatId: chatId || channelId,
-    message,
-    authorId,
-    conversationHistory,
-  }).catch((error) => {
-    console.error('LLM stream error for channel:', error.message);
-  });
-});
-
-// LLM Module GUI streaming trigger - held open until the stream completes
-app.post('/channels/:channelId/orchestrate/stream', async (req, res) => {
-  try {
-    const { channelId } = req.params;
-    const { message, options = {} } = req.body;
-
-    if (!message || typeof message !== 'string') {
-      return res.status(400).json({ error: 'Message string is required' });
-    }
-
-    const result = await createLLMGuiStreamRequest({
-      channelId,
-      message,
-      options,
-    });
-
-    res.status(200).json(result);
-  } catch (error) {
-    if (error.message.includes('No active connections found for this channel - request queued')) {
-      res.status(202).json({
-        message: 'Request queued - will be processed when connection becomes available',
-        status: 'queued',
-      });
-    } else if (error.message === 'No active connections found for this channel') {
-      res.status(404).json({ error: error.message });
-    } else {
-      res.status(500).json({ error: 'Failed to start LLM orchestration streaming' });
-    }
-  }
 });
 
 app.post('/channels/:channelId/stream', (req, res) => {
@@ -309,8 +105,6 @@ app.post('/channels/:channelId/stream/stop', async (req, res) => {
     const { channelId } = req.params;
 
     stoppedChannels.add(channelId);
-    currentStreams.delete(channelId);
-    streamQueue.clearChannelQueue(channelId);
 
     setTimeout(() => {
       stoppedChannels.delete(channelId);
@@ -323,30 +117,12 @@ app.post('/channels/:channelId/stream/stop', async (req, res) => {
   }
 });
 
-setInterval(
-  () => {
-    const now = Date.now();
-    const oneHour = 60 * 60 * 1000;
-
-    for (const [channelId, requests] of streamQueue.queue.entries()) {
-      const staleRequests = requests.filter((req) => now - req.timestamp > oneHour || !streamQueue.shouldRetry(req));
-
-      staleRequests.forEach((staleReq) => {
-        streamQueue.removeFromQueue(channelId, staleReq.id);
-        console.log(`Cleaned up stale stream request for channel ${channelId}`);
-      });
-    }
-  },
-  5 * 60 * 1000,
-);
-
 const server = app.listen(serverConfig.port, () => {
   console.log(`Server running on port ${serverConfig.port}`);
 });
 
-// The SSE GET and the trigger POST are both long-lived by design. Disable the
-// per-request cap and let the upstream idle watchdog in streamingService.js
-// decide when a stream has genuinely stalled.
+// Intent detection can wait on an upstream agentic response, so do not impose
+// Node's default total request timeout.
 server.requestTimeout = 0;
 server.headersTimeout = 65_000;
 server.keepAliveTimeout = 61_000;
