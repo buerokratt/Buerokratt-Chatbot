@@ -22,6 +22,7 @@ import {
   RESPONSE_PROCESSING_NOTICE_LENGTH,
   RESPONSE_WAITING_TIME_MIN,
   RESPONSE_WAITING_TIME_MAX,
+  isLlmModuleToggleVisible,
 } from 'constants/config';
 
 const SettingsChatSettings: FC = () => {
@@ -312,7 +313,7 @@ const SettingsChatSettings: FC = () => {
                 {getTooltip('sub_title')}
               </Track>
             )}
-            {isLlmModuleActive != undefined && (
+            {isLlmModuleToggleVisible && isLlmModuleActive != undefined && (
               <Track gap={10}>
                 <Switch
                   name="llm_module_active"
