@@ -1,7 +1,7 @@
 const { v4: uuidv4 } = require('uuid');
 
 const { activeConnections, abortConnectionRequests } = require('./connectionManager');
-const { createAzureOpenAIStreamRequest } = require('./openSearch');
+const { createAgenticStreamRequest } = require('./openSearch');
 const {
   LLM_GUI_QUEUE_SOURCE,
   createLLMOrchestrationStreamRequest: createLLMGuiStreamRequest,
@@ -129,8 +129,7 @@ function processPendingStreamsForChannel(channelId) {
               options: requestData.options,
             });
           } else if (requestData.message === undefined) {
-            await createAzureOpenAIStreamRequest({
-              use_agentic: requestData.use_agentic,
+            await createAgenticStreamRequest({
               agent_name: requestData.agent_name,
               agent_type: requestData.agent_type,
               azure_client_id: requestData.azure_client_id,

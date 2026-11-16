@@ -7,15 +7,13 @@ It works through Foundry [structured inputs](https://learn.microsoft.com/en-us/a
 ## Enabling it
 
 1. Backoffice → **Settings → SKM configuration**
-2. Turn on **Use agentic retrieval**
-3. Turn on **Include current end-user URL as context in each request**
-4. Save
+2. Turn on **Include current end-user URL as context in each request**
+3. Save
 
 | Config key | Default |
 |:--|:--|
 | `azure_agentic_use_structured_inputs` | `false` |
 
-- The switch applies to both the SKM and the BGK agentic paths. BGK uses its own `BGK_USE_AGENTIC` to turn agentic retrieval on, but reads this switch from the SKM configuration.
 - With multi-domain enabled, the switch can be set per domain.
 - When the switch is off, requests are sent as before, without `structured_inputs`.
 
