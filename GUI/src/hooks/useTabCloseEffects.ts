@@ -48,9 +48,13 @@ const useTabCloseEffect = () => {
   };
 
   useEffect(() => {
-    setTimeout(() => {
-      return makeCall('cancel');
+    makeCall('cancel');
+
+    const retryCancelTimeout = setTimeout(() => {
+      makeCall('cancel');
     }, 2500);
+
+    return () => clearTimeout(retryCancelTimeout);
   }, []);
 
   useEffect(() => {
