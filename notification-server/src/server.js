@@ -6,7 +6,6 @@ const helmet = require('helmet');
 
 const { buildNotificationSearchInterval, buildQueueCounter } = require('./addOns');
 const { sendAzureAgenticRequest } = require('./azureAgenticRequest');
-const { initializeAzureOpenAI } = require('./azureOpenAI');
 const { extractMessageTextPart } = require('./citationFormatting');
 const { serverConfig } = require('./config');
 const { stoppedChannels, currentStreams } = require('./connectionManager');
@@ -15,7 +14,7 @@ const {
   enqueueChatId,
   dequeueChatId,
   sendBulkNotification,
-  createAzureOpenAIStreamRequest,
+  createAgenticStreamRequest,
   createLLMOrchestrationStreamRequest,
 } = require('./openSearch');
 const { buildSSEResponse } = require('./sseUtil');
@@ -30,13 +29,6 @@ app.use(helmet.hidePoweredBy());
 app.use(express.json({ extended: false }));
 app.use(cookieParser());
 app.use(csurf({ cookie: true, ignoreMethods: ['GET', 'POST'] }));
-
-try {
-  initializeAzureOpenAI();
-  console.log('Azure OpenAI initialized successfully');
-} catch (error) {
-  console.error('Failed to initialize Azure OpenAI:', error.message);
-}
 
 app.get('/sse/notifications/:channelId', (req, res) => {
   const { channelId } = req.params;
@@ -245,7 +237,6 @@ app.post('/channels/:channelId/stream', (req, res) => {
   const {
     messages,
     options = {},
-    use_agentic = false,
     agent_name,
     agent_type,
     azure_client_id,
@@ -261,11 +252,10 @@ app.post('/channels/:channelId/stream', (req, res) => {
 
   res.status(202).json({ response: 'stream triggered' });
 
-  createAzureOpenAIStreamRequest({
+  createAgenticStreamRequest({
     channelId,
     messages,
     options,
-    use_agentic,
     agent_name,
     agent_type,
     azure_client_id,

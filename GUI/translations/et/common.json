@@ -608,20 +608,6 @@
     "skmConfiguration": {
       "title": "SKMi konfiguratsioon",
       "description": "Siin on võimalik SKMi parameetreid sätestada.",
-      "range": "Rangus",
-      "documents": "Leitud dokumendid",
-      "systemMessage": "Süsteemi juhis",
-      "maxTokens": "Maksimaalne tokenite arv",
-      "indexName": "Indeks",
-      "queryType": "Otsingutüüp",
-      "semantic": "Semantiline",
-      "vector": "Vektor",
-      "simple": "Märksõna",
-      "vectorSimpleHybrid": "Hübriid (märksõna + vektor)",
-      "vectorSemanticHybrid": "Hübriid + semantiline",
-      "semanticConfiguration": "Semantiline Konfiguratsioon",
-      "inScope": "Vastused ainult asutuse andmete põhjal",
-      "useAgentic": "Kasutan agendilist otsingut",
       "azureAgentName": "Agendi nimi",
       "azureAgentType": "Agendi tüüp",
       "azureClientId": "Kliendi ID",
@@ -633,27 +619,12 @@
       "azureAgenticMaxOutputTokens": "Maksimaalne väljundtokenite arv",
       "azureAgenticUseStructuredInputs": "Saada iga päringuga agendile kontekstiks lõppkasutaja URL",
       "tooltip": {
-        "range": "Rangus määrab künnise, mille alusel xdokumente peetakse teie päringutele asjakohasteks. Ranguse tõstmine tähendab kõrgemat asjakohasuse künnist ja rohkemate vähem asjakohaste dokumentide filtreerimist. Väga kõrge rangus võib aga põhjustada vastuste genereerimise ebaõnnestumise, kuna kättesaadavaid dokumente on liiga vähe. Vaikimisi on ranguse tase 3.Võimalikud väärtused: 1 - 5",
-        "documents": "See määrab teie andmeindeksist vastuste koostamiseks kasutatavate kõrgeima skooriga dokumentide arvu. Seda väärtust tasub suurendada, kui teil on lühikesed dokumendid või soovite pakkuda rohkem konteksti. Vaikeväärtus on 5.Võimalikud väärtused: 1 - 20",
-        "systemMessage": "Anna mudelile juhised ja kontekst selle kohta, kuidas see peaks käituma.",
-        "maxTokens": "Sea piirang mudeli vastuses kasutatavate tokenite arvule.Võimalikud väärtused: 1 - 2000",
-        "indexName": "Azures loodud indeksi nimi.",
-        "queryType": "Vali otsingutüüp.",
-        "semanticConfiguration": "Azures loodud indeksi semantiline konfiguratsioon",
-        "inScope": "Kui otsing tagastab andmetest 0 vastet, siis 'Jah' puhul ei saadeta kasutaja küsimust keelemudelile, vaid kindlaksmääratud vastus tuleb otsingusüsteemist",
-        "useAgentic": "Agendiline otsing võimaldab sügavamat otsingut teadmusbaasis olevatest dokumentidest. Selle kasutamise eelduseks on Foundry portaalis loodud agent. Agendilise otsigu puhul tuleb SKMi seadistused teha Foundry portaalis.",
         "azureAgentName": "Foundry portaalis loodud agendi nimi.",
         "azureAgentType": "Otsinguagendi tüüp. Vaikeväärtus on 'agent_reference'.",
         "azureClientId": "Azure'is registreeritud agendi rakenduse (client) ID",
         "azureClientSecret": "Azure'is registreeritud agendi rakenduse secret",
         "azureAgenticMaxOutputTokens": "Maksimaalne tokenite arv mida agent saab ühele päringule vastust koostades kulutada. Sinna hulka arvestatakse ka tokenid mida agent kasutab sisemiselt enne otsingut või otsingu vältel.",
         "azureAgenticUseStructuredInputs": "Kui see on sisse lülitatud, edastatakse iga sõnumi saatmise hetkel lõppkasutaja avatud lehe URL Foundry agendile struktureeritud sisendina 'url'. Agent peab defineerima struktureeritud sisendi 'url' (nt kasutades seda juhistes või Azure AI Search filtris kujul {{url}}). Väljalülitatuna saadetakse päringud ilma struktureeritud sisenditeta."
-      },
-      "validation": {
-        "range": "Rangus peab olema vahemikus 1 kuni 5",
-        "documents": "Leitud dokumendid peab olema vahemikus 1 kuni 20",
-        "maxTokens": "Maksimaalne tokenite arv peab olema vahemikus 1 kuni 2000",
-        "systemMessage": "Süsteemisõnumi väli ei tohi olla tühi"
       }
     },
     "chatAnalysis": {

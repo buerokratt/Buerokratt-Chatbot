@@ -255,7 +255,7 @@ check_if_client_bot_is_active:
   switch:
     - condition: ${[#SKM_ACTIVE] === true}
       next: check_for_client_bot
-  next: check_for_bgk_bot
+  next: assign_redirect_to_csa_response
 
 check_for_client_bot:
   call: http.post
@@ -273,30 +273,9 @@ check_for_client_bot:
 check_if_client_bot_is_unable_to_reply:
   switch:
     - condition: ${converted_messages_res == 'ERROR' || converted_messages_res.response.body.response === 'ERROR'}
-      next: check_for_bgk_bot
-    - condition: ${converted_messages_res.response.body.response == 'stream triggered'}
-      next: return_message_sent  
-  next: assign_fallback_bot_converted_messages_res
-
-check_for_bgk_bot:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL]/internal/bgk-external-bot"
-    body:
-      sender: ${chatId}
-      message: ${content}
-      domain: ${domain}
-      endUserUrl: ${endUserUrl}
-  result: converted_messages_res
-  error: return_bot_error
-  next: check_if_bgk_bot_is_unable_to_reply
-
-check_if_bgk_bot_is_unable_to_reply:
-  switch:
-    - condition: ${converted_messages_res == 'ERROR'}
       next: assign_redirect_to_csa_response
     - condition: ${converted_messages_res.response.body.response == 'stream triggered'}
-      next: return_message_sent
+      next: return_message_sent  
   next: assign_fallback_bot_converted_messages_res
 
 assign_fallback_bot_converted_messages_res:

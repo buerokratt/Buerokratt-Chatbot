@@ -12,15 +12,6 @@ FROM configuration AS c
 ON c.domain = d.domain
 WHERE
     c.key IN (
-     'skm_range',
-     'skm_documents',
-     'skm_system_message',
-     'skm_max_tokens',
-     'skm_index_name',
-     'skm_query_type',
-     'skm_semantic_configuration',
-     'skm_in_scope',
-     'skm_use_agentic',
      'azure_agent_name',
      'azure_agent_type',
      'azure_agentic_max_output_tokens',
@@ -42,15 +33,6 @@ SELECT
     now() AS created
 FROM (
     VALUES
-        ('skm_range', :skm_range),
-        ('skm_documents', :skm_documents),
-        ('skm_system_message', :skm_system_message),
-        ('skm_max_tokens', :skm_max_tokens),
-        ('skm_index_name', :skm_index_name),
-        ('skm_query_type', :skm_query_type),
-        ('skm_semantic_configuration', :skm_semantic_configuration),
-        ('skm_in_scope', :skm_in_scope),
-        ('skm_use_agentic', :skm_use_agentic),
         ('azure_agent_name', :azure_agent_name),
         ('azure_agent_type', :azure_agent_type),
         ('azure_agentic_max_output_tokens', :azure_agentic_max_output_tokens),

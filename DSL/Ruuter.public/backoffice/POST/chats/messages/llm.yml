@@ -76,22 +76,7 @@ check_value:
       next: check_base_config_domain
     - condition: ${correct_value.map((item) => item.text)[0].startsWith('$validate_')}
       next: assign_validation_event
-    - condition: ${correct_value.map((item) => item.text)[0] === '$general_knowledge' || correct_value.map((item) => item.text)[0].startsWith('$general_knowledge')}
-      next: trigger_bgk_bot  
   next: format_messages
-
-trigger_bgk_bot:
-  call: http.post
-  args:
-    url: "[#CHATBOT_RUUTER_PUBLIC_INTERNAL]/internal/bgk-external-bot"
-    body:
-      sender: ${sender}
-      message: ${message.content ?? ''}
-      domain: ${domain}
-      endUserUrl: ${messageEndUserUrl}
-  result: bgk_bot_response
-  error: return_bad_request
-  next: end
 
 check_base_config_domain:
   switch:
