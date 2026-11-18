@@ -116,9 +116,15 @@ get_chat_history:
       maxPairs: ${parseInt('[#SKM_CONTEXT_MESSAGE_PAIRS]') || 0}
   result: chat_history_res
 
+assign_current_message:
+  assign:
+    current_message:
+      role: "user"
+      content: ${message}
+
 assign_messages:
   assign:
-    messages: "$=[...chat_history_res.response.body.map(m => ({ role: m.role, content: m.content })), { role: 'user', content: message }]="
+    messages: ${chat_history_res.response.body.concat([current_message])}
 
 check_if_anonymizer_is_active:
   switch:
