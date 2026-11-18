@@ -49,22 +49,12 @@ async function* parseSSEStream(response) {
   }
 }
 
-function isPreviousResponseNotFound(status, errorData) {
-  return (
-    (status === 400 || status === 404) && /previous_response_not_found|previous response .* not found/i.test(errorData)
-  );
-}
-
 function hasStructuredInputs(structured_inputs) {
   return !!structured_inputs && typeof structured_inputs === 'object' && Object.keys(structured_inputs).length > 0;
 }
 
-function buildRequestBody(
-  messages,
-  { stream, agent_name, agent_type, max_output_tokens, previous_response_id, structured_inputs },
-) {
+function buildRequestBody(messages, { stream, agent_name, agent_type, max_output_tokens, structured_inputs }) {
   return {
-    ...(previous_response_id && { previous_response_id }),
     input: messages.filter((msg) => msg.role !== 'system'),
     agent: {
       name: agent_name,
@@ -77,7 +67,7 @@ function buildRequestBody(
 }
 
 async function sendAzureAgenticRequest(messages, options = {}) {
-  const { stream = false, agent_name, agent_type, client_id, client_secret, previous_response_id } = options;
+  const { stream = false, agent_name, agent_type, client_id, client_secret } = options;
 
   if (!azureAgenticConfig.endpoint || !azureAgenticConfig.projectName) {
     throw new Error('Azure Agentic endpoint and project name are required');
@@ -109,12 +99,6 @@ async function sendAzureAgenticRequest(messages, options = {}) {
 
     if (!response.ok) {
       const errorData = await response.text();
-
-      if (previous_response_id && isPreviousResponseNotFound(response.status, errorData)) {
-        console.warn('Previous agentic response not found, retrying without previous_response_id');
-        return sendAzureAgenticRequest(messages, { ...options, previous_response_id: undefined });
-      }
-
       throw new Error(`Azure Agentic API request failed: ${response.status} - ${errorData}`);
     }
 
@@ -133,5 +117,4 @@ async function sendAzureAgenticRequest(messages, options = {}) {
 module.exports = {
   sendAzureAgenticRequest,
   buildRequestBody,
-  isPreviousResponseNotFound,
 };

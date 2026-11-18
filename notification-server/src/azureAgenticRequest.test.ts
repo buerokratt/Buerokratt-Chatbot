@@ -3,11 +3,17 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const { azureAgenticAuthConfig, azureAgenticConfig } = require('./config.js');
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const { sendAzureAgenticRequest, buildRequestBody, isPreviousResponseNotFound } = require('./azureAgenticRequest.js');
+const { sendAzureAgenticRequest, buildRequestBody } = require('./azureAgenticRequest.js');
 
 const MESSAGES = [
   { role: 'system', content: 'You are a helpful assistant' },
   { role: 'user', content: 'Tere' },
+];
+
+const HISTORY_MESSAGES = [
+  { role: 'user', content: 'What do you know about taxes?' },
+  { role: 'assistant', content: 'Which taxes do you want to know about?' },
+  { role: 'user', content: 'VAT rates.' },
 ];
 
 const AGENT_OPTIONS = { agent_name: 'agent', agent_type: 'agent_reference', max_output_tokens: 1000 };
@@ -17,16 +23,11 @@ function jsonResponse(body: unknown, status = 200) {
 }
 
 describe('buildRequestBody', () => {
-  it('omits previous_response_id on the first message of a chat', () => {
-    const body = buildRequestBody(MESSAGES, { ...AGENT_OPTIONS, stream: true });
+  it('sends the conversation history explicitly in input without previous_response_id', () => {
+    const body = buildRequestBody(HISTORY_MESSAGES, { ...AGENT_OPTIONS, stream: true, previous_response_id: 'resp_1' });
 
     expect(body).not.toHaveProperty('previous_response_id');
-  });
-
-  it('includes previous_response_id when there is a previous response', () => {
-    const body = buildRequestBody(MESSAGES, { ...AGENT_OPTIONS, stream: true, previous_response_id: 'resp_123' });
-
-    expect(body.previous_response_id).toBe('resp_123');
+    expect(body.input).toEqual(HISTORY_MESSAGES);
   });
 
   it('never sends the system message', () => {
@@ -52,21 +53,6 @@ describe('buildRequestBody', () => {
     expect(buildRequestBody(MESSAGES, { ...AGENT_OPTIONS, stream: false, structured_inputs: null })).not.toHaveProperty(
       'structured_inputs',
     );
-  });
-});
-
-describe('isPreviousResponseNotFound', () => {
-  it('detects the not-found error code', () => {
-    expect(isPreviousResponseNotFound(400, '{"error":{"code":"previous_response_not_found"}}')).toBe(true);
-  });
-
-  it('detects the not-found error message', () => {
-    expect(isPreviousResponseNotFound(404, "Previous response with id 'resp_1' not found.")).toBe(true);
-  });
-
-  it('ignores unrelated errors', () => {
-    expect(isPreviousResponseNotFound(400, 'Invalid max_output_tokens')).toBe(false);
-    expect(isPreviousResponseNotFound(500, 'previous_response_not_found')).toBe(false);
   });
 });
 
@@ -99,38 +85,23 @@ describe('sendAzureAgenticRequest', () => {
     );
   }
 
-  it('retries without previous_response_id when the previous response no longer exists', async () => {
-    stubFetch([
-      jsonResponse({ error: { code: 'previous_response_not_found' } }, 400),
-      jsonResponse({ id: 'resp_new', output: [] }),
-    ]);
+  it('sends a single request with the full history', async () => {
+    stubFetch([jsonResponse({ id: 'resp_new', output: [] })]);
 
-    const response = await sendAzureAgenticRequest(MESSAGES, { ...AGENT_OPTIONS, previous_response_id: 'resp_old' });
+    const response = await sendAzureAgenticRequest(HISTORY_MESSAGES, AGENT_OPTIONS);
 
     expect(response.id).toBe('resp_new');
-    expect(requestBodies).toHaveLength(2);
-    expect(requestBodies[0].previous_response_id).toBe('resp_old');
-    expect(requestBodies[1]).not.toHaveProperty('previous_response_id');
+    expect(requestBodies).toHaveLength(1);
+    expect(requestBodies[0]).not.toHaveProperty('previous_response_id');
+    expect(requestBodies[0].input).toEqual(HISTORY_MESSAGES);
   });
 
-  it('keeps structured_inputs when retrying without previous_response_id', async () => {
-    stubFetch([
-      jsonResponse({ error: { code: 'previous_response_not_found' } }, 400),
-      jsonResponse({ id: 'resp_new', output: [] }),
-    ]);
-    const structured_inputs = { url: 'https://test.ee/et' };
+  it('does not retry failed requests', async () => {
+    stubFetch([jsonResponse({ error: { code: 'previous_response_not_found' } }, 400)]);
 
-    await sendAzureAgenticRequest(MESSAGES, { ...AGENT_OPTIONS, previous_response_id: 'resp_old', structured_inputs });
-
-    expect(requestBodies.map((body) => body.structured_inputs)).toEqual([structured_inputs, structured_inputs]);
-  });
-
-  it('does not retry other errors', async () => {
-    stubFetch([jsonResponse('Internal error', 500)]);
-
-    await expect(
-      sendAzureAgenticRequest(MESSAGES, { ...AGENT_OPTIONS, previous_response_id: 'resp_old' }),
-    ).rejects.toThrow('Azure Agentic API request failed: 500');
+    await expect(sendAzureAgenticRequest(MESSAGES, AGENT_OPTIONS)).rejects.toThrow(
+      'Azure Agentic API request failed: 400',
+    );
     expect(requestBodies).toHaveLength(1);
   });
 });
