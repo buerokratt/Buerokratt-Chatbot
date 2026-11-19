@@ -9,6 +9,3 @@ SET end_user_id         = NULL,
     end_user_email      = NULL,
     end_user_phone      = NULL
 WHERE base_id IN (:chats);
-
-DELETE FROM chat_llm_state
-WHERE chat_base_id::text IN (:chats);

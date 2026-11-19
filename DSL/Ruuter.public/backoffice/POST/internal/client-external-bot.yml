@@ -82,7 +82,7 @@ checkForAgenticCredentials:
   switch:
     - condition: ${skm_config.azureClientIdIsSet === 'true'}
       next: fetchAzureClientId
-  next: assign_messages
+  next: get_chat_history
 
 fetchAzureClientId:
   call: http.get
@@ -107,11 +107,24 @@ assignAzureClientSecret:
   assign:
     azure_client_secret: ${vault_res.response.body.data.data.client_secret}
 
+get_chat_history:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-agentic-chat-history"
+    body:
+      chatId: ${sender}
+      maxPairs: ${parseInt('[#SKM_CONTEXT_MESSAGE_PAIRS]') || 0}
+  result: chat_history_res
+
+assign_current_message:
+  assign:
+    current_message:
+      role: "user"
+      content: ${message}
+
 assign_messages:
   assign:
-    messages:
-      - role: "user"
-        content: ${message}
+    messages: ${chat_history_res.response.body.concat([current_message])}
 
 check_if_anonymizer_is_active:
   switch:

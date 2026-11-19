@@ -1,7 +1,6 @@
 const { Client } = require('@opensearch-project/opensearch');
 
 const { sendAzureAgenticRequest } = require('./azureAgenticRequest');
-const { getPreviousResponseId, savePreviousResponseId } = require('./chatLlmState');
 const {
   extractMessageTextPart,
   formatAgenticCitations,
@@ -77,17 +76,7 @@ async function streamAgenticResponse({ response, connectionId, channelId, sender
   });
 }
 
-async function* saveResponseIdOnCompletion(stream, chatId) {
-  for await (const part of stream) {
-    if (part.type === 'response.completed' || part.type === 'response.incomplete') {
-      await savePreviousResponseId(chatId, (part.response ?? part).id);
-    }
-    yield part;
-  }
-}
-
 async function fetchAgenticResponse({
-  channelId,
   messages,
   options,
   stream,
@@ -98,9 +87,7 @@ async function fetchAgenticResponse({
   azure_agentic_max_output_tokens,
   structured_inputs,
 }) {
-  const previous_response_id = await getPreviousResponseId(channelId);
-
-  const response = await sendAzureAgenticRequest(messages, {
+  return sendAzureAgenticRequest(messages, {
     ...options,
     stream,
     agent_name,
@@ -108,19 +95,11 @@ async function fetchAgenticResponse({
     client_id: azure_client_id,
     client_secret: azure_client_secret,
     max_output_tokens: azure_agentic_max_output_tokens,
-    previous_response_id,
     structured_inputs,
   }).catch((error) => {
     if (stream || !error.message?.includes('"code":"content_filter"')) throw error;
     return { output: [{ type: 'message', content: [{ type: 'output_text', text: ESTONIAN_GUARDRAIL_MESSAGE }] }] };
   });
-
-  if (stream) {
-    return saveResponseIdOnCompletion(response, channelId);
-  }
-
-  await savePreviousResponseId(channelId, response?.id);
-  return response;
 }
 
 async function sendRawResponse({ response, connectionId, channelId, sender, stream }) {
@@ -228,7 +207,6 @@ async function createAgenticStreamRequest({
 
       try {
         const response = await fetchAgenticResponse({
-          channelId,
           messages,
           options,
           stream,
