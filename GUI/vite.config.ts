@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite';
+import { notificationsServiceWorker } from '@buerokratt-ria/notifications/vite';
 import react from '@vitejs/plugin-react';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import svgr from 'vite-plugin-svgr';
@@ -7,7 +8,7 @@ import path from 'path';
 // https://vitejs.dev/config/
 export default defineConfig({
   envPrefix: 'REACT_APP_',
-  plugins: [react(), tsconfigPaths(), svgr()],
+  plugins: [react(), tsconfigPaths(), svgr(), notificationsServiceWorker()],
   base: 'chat',
   build: {
     outDir: './build',

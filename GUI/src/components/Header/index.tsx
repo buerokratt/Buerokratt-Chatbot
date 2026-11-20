@@ -5,9 +5,9 @@ import { ReactComponent as BykLogo } from 'assets/logo.svg';
 import { AxiosError } from 'axios';
 import { Button, Dialog, Drawer, Icon, Section, Switch, SwitchBox, Track } from 'components';
 import { useDing } from 'hooks/useAudio';
+import useExtendUserSession from 'hooks/useExtendUserSession';
 import { useToast } from 'hooks/useToast';
 import { FC, useEffect, useState } from 'react';
-import { useCookies } from 'react-cookie';
 import { useTranslation } from 'react-i18next';
 import { MdOutlineExpandMore } from 'react-icons/md';
 import { useIdleTimer } from 'react-idle-timer';
@@ -50,13 +50,8 @@ const Header: FC = () => {
     forwardedChatPopupNotifications: true,
     forwardedChatSoundNotifications: true,
     forwardedChatEmailNotifications: false,
-    newChatPopupNotifications: false,
-    newChatSoundNotifications: true,
-    newChatEmailNotifications: false,
     useAutocorrect: true,
   });
-  const customJwtCookieKey = 'customJwtCookie';
-
   useEffect(() => {
     const interval = setInterval(() => {
       const expirationTimeStamp = localStorage.getItem('exp');
@@ -97,7 +92,6 @@ const Header: FC = () => {
     },
   });
 
-  const [_, setCookie] = useCookies([customJwtCookieKey]);
   const unansweredChatsLength = useStore((state) => state.unansweredChatsLength());
   const forwardedChatsLength = useStore((state) => state.forwordedChatsLength());
 
@@ -106,17 +100,17 @@ const Header: FC = () => {
       return;
     }
 
-    if (userProfileSettings.newChatSoundNotifications) {
+    if (userProfileSettings.forwardedChatSoundNotifications) {
       ding?.play();
     }
-    if (userProfileSettings.newChatEmailNotifications) {
+    if (userProfileSettings.forwardedChatEmailNotifications) {
       // To be done: send email notification
     }
-    if (userProfileSettings.newChatPopupNotifications) {
+    if (userProfileSettings.forwardedChatPopupNotifications) {
       toast.open({
         type: 'info',
-        title: t('global.notification'),
-        message: t('settings.users.newUnansweredChat'),
+        title: t('settings.users.newForwardedChatTitle'),
+        message: t('settings.users.newForwardedChatMessage'),
       });
     }
   };
@@ -144,8 +138,8 @@ const Header: FC = () => {
     if (userProfileSettings.forwardedChatPopupNotifications) {
       toast.open({
         type: 'info',
-        title: t('global.notification'),
-        message: t('settings.users.newForwardedChat'),
+        title: t('settings.users.newForwardedChatTitle'),
+        message: t('settings.users.newForwardedChatMessage'),
       });
     }
   };
@@ -164,10 +158,7 @@ const Header: FC = () => {
       await apiDev.post('accounts/settings', {
         forwardedChatPopupNotifications: data.forwardedChatPopupNotifications,
         forwardedChatSoundNotifications: data.forwardedChatSoundNotifications,
-        forwardedChatEmailNotifications: data.newChatEmailNotifications,
-        newChatPopupNotifications: data.newChatPopupNotifications,
-        newChatSoundNotifications: data.newChatSoundNotifications,
-        newChatEmailNotifications: data.newChatEmailNotifications,
+        forwardedChatEmailNotifications: data.forwardedChatEmailNotifications,
         useAutocorrect: data.useAutocorrect,
       });
       setUserProfileSettings(data);
@@ -188,6 +179,8 @@ const Header: FC = () => {
     },
   });
 
+  const extendUserSessionMutation = useExtendUserSession();
+
   const customerSupportActivityMutation = useMutation({
     mutationFn: (data: CustomerSupportActivityDTO) =>
       apiDev.post('accounts/customer-support-activity', {
@@ -206,22 +199,6 @@ const Header: FC = () => {
         message: error.message,
       });
     },
-  });
-
-  const setNewCookie = (cookieValue: string) => {
-    const cookieOptions = { path: '/' };
-    setCookie(customJwtCookieKey, cookieValue, cookieOptions);
-  };
-
-  const extendUserSessionMutation = useMutation({
-    mutationFn: async () => {
-      const {
-        data: { data },
-      } = await apiDev.post('extend', {});
-      if (data.custom_jwt_extend === null) return;
-      setNewCookie(data.custom_jwt_extend);
-    },
-    onError: (error: AxiosError) => {},
   });
 
   const logoutMutation = useMutation({
@@ -459,17 +436,11 @@ const Header: FC = () => {
                   <p className="h6">{t('settings.users.emailNotifications')}</p>
                   <SwitchBox
                     name="forwardedChatEmailNotifications"
-                    label={t('settings.users.newForwardedChat')}
+                    label={t('settings.users.newForwardedChatTitle')}
                     checked={userProfileSettings.forwardedChatEmailNotifications}
                     onCheckedChange={(checked) =>
                       handleUserProfileSettingsChange('forwardedChatEmailNotifications', checked)
                     }
-                  />
-                  <SwitchBox
-                    name="newChatEmailNotifications"
-                    label={t('settings.users.newUnansweredChat')}
-                    checked={userProfileSettings.newChatEmailNotifications}
-                    onCheckedChange={(checked) => handleUserProfileSettingsChange('newChatEmailNotifications', checked)}
                   />
                 </Track>
               </Section>
@@ -478,17 +449,11 @@ const Header: FC = () => {
                   <p className="h6">{t('settings.users.soundNotifications')}</p>
                   <SwitchBox
                     name="forwardedChatSoundNotifications"
-                    label={t('settings.users.newForwardedChat')}
+                    label={t('settings.users.newForwardedChatTitle')}
                     checked={userProfileSettings.forwardedChatSoundNotifications}
                     onCheckedChange={(checked) =>
                       handleUserProfileSettingsChange('forwardedChatSoundNotifications', checked)
                     }
-                  />
-                  <SwitchBox
-                    name="newChatSoundNotifications"
-                    label={t('settings.users.newUnansweredChat')}
-                    checked={userProfileSettings.newChatSoundNotifications}
-                    onCheckedChange={(checked) => handleUserProfileSettingsChange('newChatSoundNotifications', checked)}
                   />
                 </Track>
               </Section>
@@ -497,17 +462,11 @@ const Header: FC = () => {
                   <p className="h6">{t('settings.users.popupNotifications')}</p>
                   <SwitchBox
                     name="forwardedChatPopupNotifications"
-                    label={t('settings.users.newForwardedChat')}
+                    label={t('settings.users.newForwardedChatTitle')}
                     checked={userProfileSettings.forwardedChatPopupNotifications}
                     onCheckedChange={(checked) =>
                       handleUserProfileSettingsChange('forwardedChatPopupNotifications', checked)
                     }
-                  />
-                  <SwitchBox
-                    name="newChatPopupNotifications"
-                    label={t('settings.users.newUnansweredChat')}
-                    checked={userProfileSettings.newChatPopupNotifications}
-                    onCheckedChange={(checked) => handleUserProfileSettingsChange('newChatPopupNotifications', checked)}
                   />
                 </Track>
               </Section>
