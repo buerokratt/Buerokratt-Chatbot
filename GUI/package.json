@@ -20,6 +20,7 @@
   "dependencies": {
     "@buerokratt-ria/header": "^0.1.57",
     "@buerokratt-ria/menu": "^0.2.15",
+    "@buerokratt-ria/notifications": "^0.0.2",
     "@buerokratt-ria/styles": "^0.0.1",
     "@buerokratt-ria/common-gui-components": "^0.0.74",
     "@fontsource/roboto": "^4.5.8",
@@ -109,7 +110,7 @@
     "msw": "^0.49.2",
     "prettier": "^3.7.4",
     "sass": "^1.57.0",
-    "typescript": "^4.9.3",
+    "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.4",
     "vite": "^4.4.9",
     "vite-plugin-env-compatible": "^1.1.1",
@@ -119,8 +120,8 @@
     "vitest": "^4.0.15"
   },
   "engines": {
-    "node": "^22.18.0",
-    "npm": "^10.9.3"
+    "node": "^24.21.0",
+    "npm": "^11.19.0"
   },
   "browserslist": {
     "production": [
