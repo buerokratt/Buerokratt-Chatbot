@@ -113,9 +113,6 @@ setUserProfileSettings:
       forwardedChatPopupNotifications: false
       forwardedChatSoundNotifications: true
       forwardedChatEmailNotifications: false
-      newChatPopupNotifications: false
-      newChatSoundNotifications: true
-      newChatEmailNotifications: false
       useAutocorrect: true
   result: set_user_profile_settings_res
   next: checkForDomains
