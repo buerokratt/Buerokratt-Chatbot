@@ -249,7 +249,7 @@ assign_intent_json:
 
 check_for_intent:
   switch:
-    - condition: ${intentJson.intent === 'OOD'}
+    - condition: ${typeof intentJson?.intent !== 'string' || intentJson.intent === 'OOD'}
       next: return_skip
   next: validate_service
 
@@ -259,6 +259,7 @@ validate_service:
     url: "[#CHATBOT_RESQL]/get-active-service-by-name"
     body:
       service_name: ${intentJson.intent}
+    error: return_skip
   result: validated_intent
   next: check_intent_present
 

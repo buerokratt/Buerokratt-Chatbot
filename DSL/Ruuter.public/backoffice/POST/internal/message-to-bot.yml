@@ -182,6 +182,7 @@ check_for_intent:
       sender: ${chatId}
       message: ${content}
       domain: ${domain}
+    error: check_for_service
   result: llm_service_response
   next: check_service_result
 
