@@ -4,7 +4,7 @@ const csurf = require('csurf');
 const express = require('express');
 const helmet = require('helmet');
 
-const { buildNotificationSearchInterval, buildQueueCounter } = require('./addOns');
+const { buildNotificationSearchInterval } = require('./addOns');
 const { sendAzureAgenticRequest } = require('./azureAgenticRequest');
 const { extractMessageTextPart } = require('./citationFormatting');
 const { serverConfig } = require('./config');
@@ -13,7 +13,6 @@ const { addToLogoutQueue, removeFromLogoutQueue } = require('./logoutQueue');
 const {
   enqueueChatId,
   dequeueChatId,
-  sendBulkNotification,
   createAgenticStreamRequest,
   createLLMOrchestrationStreamRequest,
 } = require('./openSearch');
@@ -37,15 +36,6 @@ app.get('/sse/notifications/:channelId', (req, res) => {
     res,
     buildCallbackFunction: buildNotificationSearchInterval({ channelId }),
     channelId,
-  });
-});
-
-app.get('/sse/queue/:id', (req, res) => {
-  const { id } = req.params;
-  buildSSEResponse({
-    req,
-    res,
-    buildCallbackFunction: buildQueueCounter({ id }),
   });
 });
 
@@ -81,15 +71,6 @@ app.use((req, res, next) => {
   }
   console.log('---------------------------------------------------');
   next();
-});
-
-app.post('/bulk-notifications', async (req, res) => {
-  try {
-    await sendBulkNotification(req.body);
-    res.status(200).json({ response: 'sent successfully' });
-  } catch {
-    res.status(500).json({ response: 'error' });
-  }
 });
 
 app.post('/add-to-logout-queue', async (req, res) => {
