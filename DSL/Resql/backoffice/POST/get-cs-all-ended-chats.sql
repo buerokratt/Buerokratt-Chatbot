@@ -474,18 +474,8 @@ ORDER BY
     CASE WHEN :sorting = 'www desc' THEN c.end_user_url END DESC,
     CASE WHEN :sorting = 'contactsMessage asc' THEN ContactsMessage.content END ASC,
     CASE WHEN :sorting = 'contactsMessage desc' THEN ContactsMessage.content END DESC,
-    CASE WHEN :sorting = 'authenticatedPerson asc' THEN (
-        COALESCE(c.end_user_first_name, '') <> ''
-        OR COALESCE(c.end_user_last_name, '') <> ''
-        OR COALESCE(c.end_user_id, '') <> ''
-        OR COALESCE(ContactsMessage.content, '') <> ''
-    ) END ASC,
-    CASE WHEN :sorting = 'authenticatedPerson desc' THEN (
-        COALESCE(c.end_user_first_name, '') <> ''
-        OR COALESCE(c.end_user_last_name, '') <> ''
-        OR COALESCE(c.end_user_id, '') <> ''
-        OR COALESCE(ContactsMessage.content, '') <> ''
-    ) END DESC,
+    CASE WHEN :sorting = 'authenticatedPerson asc' THEN (NULLIF(TRIM(c.end_user_id), '') IS NOT NULL) END ASC,
+    CASE WHEN :sorting = 'authenticatedPerson desc' THEN (NULLIF(TRIM(c.end_user_id), '') IS NOT NULL) END DESC,
     CASE WHEN :sorting = 'comment asc' THEN s.comment END ASC,
     CASE WHEN :sorting = 'comment desc' THEN s.comment END DESC,
     CASE WHEN :sorting = 'labels asc' THEN c.labels END ASC,

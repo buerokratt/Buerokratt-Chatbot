@@ -136,6 +136,7 @@ insertMessage:
       forwardedByUser: ${forwardedByUser}
       forwardedFromCsa: ${forwardedFromCsa}
       forwardedToCsa: ${forwardedToCsa}
+      endUserUrl: ""
   result: insertMessageResult
   next: notify_chats
 

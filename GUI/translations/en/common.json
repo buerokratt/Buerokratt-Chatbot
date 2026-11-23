@@ -86,7 +86,10 @@
     "allDomains": "All",
     "noDomains": "No domains available. Please contact your system administrator.",
     "duplicateName": "This domain name already exists",
-    "duplicateUrl": "This URL already exists"
+    "duplicateUrl": "This URL already exists",
+    "nameRequired": "Domain name is required",
+    "urlRequired": "URL is required",
+    "invalidUrl": "Please enter a valid URL (e.g. https://example.com)"
   },
   "menu": {
     "conversations": "Conversations",
@@ -435,7 +438,7 @@
       "seconds": "seconds",
       "responseWaitingTimeRangeInfo": "Allowed range 1 sec - 120 sec (2 min)",
       "tooltip": {
-        "isBotActive": "If on is selected, Bürokratt will automatically respond to the client using an AI-based conversational solution (depending on the technical setup, either LLM, RAG, or RASA solution). If off is selected, the conversation will be automatically forwarded to an advisor.",
+        "isBotActive": "If on is selected, Bürokratt will automatically respond to the client using an AI-based conversational solution (depending on the technical setup, either LLM or RAG solution). If off is selected, the conversation will be automatically forwarded to an advisor.",
         "isBurokrattActive": "If on is selected, Bürokratt will be visible on the website. If off is selected, Bürokratt will be hidden from the website.",
         "instantlyOpenChatWidget": "If on is selected, the chat window will open automatically when the user lands on the website. If off is selected, Bürokratt will be minimized and the user must open the chat window themselves. This setting works only in the desktop view and does not apply to the mobile view!",
         "isCsaNameVisible": "If the setting is enabled, the advisor's name is displayed on the left side of the chat window above the chat participant's picture . If the setting is disabled, the name will not be shown.",
@@ -443,7 +446,8 @@
         "isEditChatVisible": "If on is selected, only the advisor is able to edit their most recently sent response. If off is selected, the advisor cannot modify their last message after it has been sent.",
         "showSubTitle": "By selecting Yes, in addition to the Bürokrati title, a subtitle will also be displayed in the chat window. The settings for the subtitle text can be found below. By selecting No, the subtitle will not be shown, but the Bürokrati title will still remain visible.",
         "subTitle": "Enter the subtitle text here.",
-        "llmModuleActive": "If on is selected, the LLM module will be active. If off is selected, the LLM module will be inactive."
+        "llmModuleActive": "If on is selected, the LLM module will be active. If off is selected, the LLM module will be inactive.",
+        "responseWaitingTime": "Specifies how long the loading animation is shown while Bürokratt prepares an answer, before it is replaced by the processing notice. If no notice is set, only the animation is shown (three dots)."
       }
     },
     "emergencyNotices": {
@@ -604,20 +608,6 @@
     "skmConfiguration": {
       "title": "SKM Configuration",
       "description": "Here it is possible to set SKM parameters.",
-      "range": "Strictness",
-      "documents": "Found Documents",
-      "systemMessage": "System Instruction",
-      "maxTokens": "Maximum Number Of Tokens",
-      "indexName": "Index",
-      "queryType": "Search Type",
-      "semantic": "Semantic",
-      "vector": "Vector",
-      "simple": "Keyword",
-      "vectorSimpleHybrid": "Hybrid (keyword + vector)",
-      "vectorSemanticHybrid": "Hybrid + Semantic",
-      "semanticConfiguration": "Semantic Configuration",
-      "inScope": "Limit bot responses to your data",
-      "useAgentic": "Use agentic retrieval",
       "azureAgentName": "Agent name",
       "azureAgentType": "Agent type",
       "azureClientId": "Client ID",
@@ -627,27 +617,14 @@
       "azureClientSecretIsSetPlaceholder": "•••••••• (secret is set)",
       "azureClientSecretIsSetHint": "A secret is already saved for this domain. Leave blank to keep it unchanged.",
       "azureAgenticMaxOutputTokens": "Maximum output tokens",
+      "azureAgenticUseStructuredInputs": "Include current end-user URL as context in each request",
       "tooltip": {
-        "range": "Range defines the threshold at which documents are considered relevant to your queries. Increasing the stringency means a higher relevance threshold and filtering out more less relevant documents. However, a very high stringency may cause answers to fail to be generated because there are too few documents available. The default severity level is 3.Possible values: 1 - 5",
-        "documents": "This determines the number of highest-scoring documents to use to build answers from your data index. It's worth increasing this value if you have short documents or want to provide more context. The default value is 5.Possible values: 1 - 20",
-        "systemMessage": "Give the model instructions and context about how it should behave.",
-        "maxTokens": "Set a limit on the number of tokens used in a model response.Possible values: 1 - 2000",
-        "indexName": "The name of the index created in Azure.",
-        "queryType": "Choose a search type.",
-        "semanticConfiguration": "Semantic configuration of an index created in Azure",
-        "inScope": "When the search service returns 0 chunks from the data, the user query is not sent on to the LLM (when 'Yes' is selected) and a predefined response is sent to the user straight from the search service",
-        "useAgentic": "Agentic retrieval allows for more sophisticated content retrieval from AI Search index(es). The prerequisite to use agentic retrieval is a knowledge agent set up in Foundry portal. When using agentic retrieval, the LLM settings have to be configured in the Foundry portal.",
         "azureAgentName": "Name of the agent that is set up in Foundry portal.",
         "azureAgentType": "Knowledge agent type. Default value is 'agent_reference'.",
         "azureClientId": "Agent application (client) ID that is registered in Azure",
         "azureClientSecret": "Agent application secret that is registered in Azure",
-        "azureAgenticMaxOutputTokens": "Maximum total number of tokens that the agent is allowed to consume per turn. This includes any LLM-driven query planning and reasoning the agent performs before or during the search."
-      },
-      "validation": {
-        "range": "Range must be between 1 and 5",
-        "documents": "Documents must be between 1 and 20",
-        "maxTokens": "Maxmimum number of tokens must be between 1 and 2000",
-        "systemMessage": "System message can't be empty"
+        "azureAgenticMaxOutputTokens": "Maximum total number of tokens that the agent is allowed to consume per turn. This includes any LLM-driven query planning and reasoning the agent performs before or during the search.",
+        "azureAgenticUseStructuredInputs": "When enabled, the URL of the page the end user is on when sending each message is passed to the Foundry agent as the structured input 'url'. The agent must declare a 'url' structured input (e.g. used in its instructions or Azure AI Search filter as {{url}}). When disabled, requests are sent without structured inputs."
       }
     },
     "chatAnalysis": {

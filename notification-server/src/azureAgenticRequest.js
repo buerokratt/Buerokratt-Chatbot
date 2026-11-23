@@ -49,8 +49,25 @@ async function* parseSSEStream(response) {
   }
 }
 
+function hasStructuredInputs(structured_inputs) {
+  return !!structured_inputs && typeof structured_inputs === 'object' && Object.keys(structured_inputs).length > 0;
+}
+
+function buildRequestBody(messages, { stream, agent_name, agent_type, max_output_tokens, structured_inputs }) {
+  return {
+    input: messages.filter((msg) => msg.role !== 'system'),
+    agent: {
+      name: agent_name,
+      type: agent_type,
+    },
+    ...(hasStructuredInputs(structured_inputs) && { structured_inputs }),
+    stream: stream,
+    max_output_tokens: parseInt(max_output_tokens ?? azureAgenticConfig.maxOutputTokens) || 4000,
+  };
+}
+
 async function sendAzureAgenticRequest(messages, options = {}) {
-  const { stream = false, agent_name, agent_type, client_id, client_secret, max_output_tokens } = options;
+  const { stream = false, agent_name, agent_type, client_id, client_secret } = options;
 
   if (!azureAgenticConfig.endpoint || !azureAgenticConfig.projectName) {
     throw new Error('Azure Agentic endpoint and project name are required');
@@ -69,23 +86,13 @@ async function sendAzureAgenticRequest(messages, options = {}) {
 
     const requestUrl = `${azureAgenticConfig.endpoint}/api/projects/${azureAgenticConfig.projectName}/openai/responses?api-version=${azureAgenticConfig.apiVersion}`;
 
-    const requestBody = {
-      input: messages.filter((msg) => msg.role !== 'system'),
-      agent: {
-        name: agent_name,
-        type: agent_type,
-      },
-      stream: stream,
-      max_output_tokens: parseInt(max_output_tokens ?? azureAgenticConfig.maxOutputTokens) || 4000,
-    };
-
     const fetchOptions = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`,
       },
-      body: JSON.stringify(requestBody),
+      body: JSON.stringify(buildRequestBody(messages, { ...options, stream })),
     };
 
     const response = await fetch(requestUrl, fetchOptions);
@@ -109,4 +116,5 @@ async function sendAzureAgenticRequest(messages, options = {}) {
 
 module.exports = {
   sendAzureAgenticRequest,
+  buildRequestBody,
 };

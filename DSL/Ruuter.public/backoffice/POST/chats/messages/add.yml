@@ -23,6 +23,9 @@ declaration:
       - field: domain
         type: string
         description: "Body field 'domain'"
+      - field: endUserUrl
+        type: string
+        description: "Body field 'endUserUrl'"
     header:
       - field: cookie
         type: string
@@ -43,6 +46,7 @@ extractRequestData:
     cookie: ${incoming.headers.cookie}
     silent: ${incoming.body.silent}
     domain: ${incoming.body.domain}
+    messageEndUserUrl: ${incoming.body.endUserUrl ?? ''}
   next: checkContentLength
 
 checkContentLength:
@@ -232,6 +236,7 @@ insertMessage:
       forwardedByUser: ""
       forwardedFromCsa: ""
       forwardedToCsa: ""
+      endUserUrl: ${messageEndUserUrl}
   result: insertMessageResult
   next: check_skip_bot
 
@@ -251,6 +256,7 @@ postMessageToBot:
       holidays: ${holidays}
       holidayNames: ${holidayNames}
       domain: ${domain}
+      endUserUrl: ${messageEndUserUrl}
   result: message_to_bot_result
   next: check_for_post_message_to_bot_result
 

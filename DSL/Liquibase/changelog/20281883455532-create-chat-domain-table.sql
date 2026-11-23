@@ -1,5 +1,6 @@
 -- liquibase formatted sql
 -- changeset 1AhmedYasser:20281883455532
+-- validCheckSum: 9:fc5196a4fe9eba191051b8342eaf71f0
 CREATE TABLE chat_domain (
     chat_base_id VARCHAR(36) PRIMARY KEY,
     domain TEXT NOT NULL,
@@ -20,5 +21,5 @@ JOIN (
     OR c.end_user_url LIKE d.base_url || '?%'
     OR c.end_user_url LIKE d.base_url || '#%'
 WHERE c.base_id IS NOT NULL
-ORDER BY c.base_id, length(d.url) DESC
+ORDER BY c.base_id, length(d.url) ASC
 ON CONFLICT (chat_base_id) DO NOTHING;

@@ -65,7 +65,7 @@ const ChatAnalysis: FC = () => {
   const fetchData = async (selectedDomain: string) => {
     try {
       const data = await fetchConfigurationFromDomain<ChatAnalysisConfigResponse>(
-        'configs/chat-analysis',
+        'configs/analysis/chat-analysis',
         selectedDomain,
       );
       const res = data.response;

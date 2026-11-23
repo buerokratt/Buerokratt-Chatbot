@@ -69,6 +69,7 @@ insertMessage:
       forwardedByUser: ${message.forwardedByUser ?? ""}
       forwardedFromCsa: ${message.forwardedFromCsa ?? ""}
       forwardedToCsa: ${message.forwardedToCsa ?? ""}
+      endUserUrl: ""
       rating: ${rating ?? ""}
   result: insertMessageResult
   next: notify_chats

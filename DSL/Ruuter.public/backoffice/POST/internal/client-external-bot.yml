@@ -18,15 +18,19 @@ declaration:
       - field: domain
         type: string
         description: "Body field 'domain'"
+      - field: endUserUrl
+        type: string
+        description: "Body field 'endUserUrl'"
 
 extract_data:
   assign:
-    currentDate: ${new Date().toISOString().split('T')[0]}
     sender: ${incoming.body.sender}
     domain: ${incoming.body.domain}
     stream: "[#SKM_STREAM]"
     raw_response: "[#SKM_RAW_RESPONSE]"
     message: ${incoming.body.message ?? ''}
+    endUserUrl: ${incoming.body.endUserUrl ?? ''}
+    structured_inputs: {}
 
 checkForDomain:
   switch:
@@ -68,17 +72,17 @@ getSkmConfig:
 assignSkmConfig:
   assign:
     skm_config: ${skm_res.response.body[0]}
-    use_agentic: ${skm_config.useAgentic}
     agent_name: ${skm_config.azureAgentName}
     agent_type: ${skm_config.azureAgentType}
+    use_structured_inputs: ${skm_config.azureAgenticUseStructuredInputs ?? 'false'}
     azure_client_id: ""
     azure_client_secret: ""
 
 checkForAgenticCredentials:
   switch:
-    - condition: ${use_agentic.toLowerCase() === 'true' && skm_config.azureClientIdIsSet === 'true'}
+    - condition: ${skm_config.azureClientIdIsSet === 'true'}
       next: fetchAzureClientId
-  next: assign_data_sources
+  next: get_chat_history
 
 fetchAzureClientId:
   call: http.get
@@ -103,57 +107,30 @@ assignAzureClientSecret:
   assign:
     azure_client_secret: ${vault_res.response.body.data.data.client_secret}
 
-assign_data_sources:
-  assign:
-    data_sources:
-      - type: azure_search
-        parameters:
-          endpoint: "[#SEARCH_ENDPOINT]"
-          index_name: ${skm_config.indexName}
-          semantic_configuration: ${skm_config.semanticConfiguration ?? 'azureml-default'}
-          query_type: ${skm_config.queryType}
-          in_scope: ${skm_config.inScope === 'true' ?? true}
-          strictness: ${parseInt(skm_config.range ?? '3')}
-          top_n_documents: ${parseInt(skm_config.documents ?? '5')}
-          authentication:
-            type: api_key
-            key: "[#CHATBOT_EXTERNAL_KEY]"
-          embedding_dependency:
-            type: endpoint
-            endpoint: "[#EMBEDDED_ENDPOINT_AZURE]"
-            authentication:
-              type: api_key
-              key: "[#CHATBOT_EXTERNAL_API_KEY]"
-
-get_chat_messages:
+get_chat_history:
   call: http.post
   args:
-    url: "[#CHATBOT_RESQL]/get-llm-chat-messages"
+    url: "[#CHATBOT_RESQL]/get-agentic-chat-history"
     body:
       chatId: ${sender}
-  result: chat_messages_res
+      maxPairs: ${parseInt('[#SKM_CONTEXT_MESSAGE_PAIRS]') || 0}
+  result: chat_history_res
 
-prepare_messages:
-  call: http.post
-  args:
-    url: "[#CHATBOT_DMAPPER_HBS]/prepare-llm-messages"
-    headers:
-      type: json
-    body:
-      prompt_message: "${skm_config.systemMessage} The current date is ${currentDate}"
-      messages: ${chat_messages_res.response.body}
-      new_message: ${message}
-  result: prepare_messages_res
+assign_current_message:
+  assign:
+    current_message:
+      role: "user"
+      content: ${message}
 
 assign_messages:
   assign:
-    messages: ${prepare_messages_res.response.body}
+    messages: ${chat_history_res.response.body.concat([current_message])}
 
 check_if_anonymizer_is_active:
   switch:
     - condition: ${[#ANONYMIZER_ENABLED] === true}
       next: checkForPassedDomain
-  next: trigger_ai_stream
+  next: check_structured_inputs
 
 checkForPassedDomain:
   switch:
@@ -186,7 +163,7 @@ check_if_anonymize_before_llm:
   switch:
     - condition: ${anonymizer_configs.isAnonymizationBeforeLlm === 'true'}
       next: prepareAnonymizerConfig
-  next: trigger_ai_stream
+  next: check_structured_inputs
 
 prepareAnonymizerConfig:
   call: http.post
@@ -227,6 +204,18 @@ assign_anonymized_messages:
     anonymizedMessages: ${anonymize_res.response.body.results}
     messages: "$=messages.map((m, i) => m.role === 'user' ? {...m, content: anonymizedMessages[messages.slice(0, i).filter(msg => msg.role === 'user').length].text} : m)="
 
+check_structured_inputs:
+  switch:
+    - condition: ${use_structured_inputs === 'true' && endUserUrl !== ''}
+      next: assign_structured_inputs
+  next: trigger_ai_stream
+
+assign_structured_inputs:
+  assign:
+    structured_inputs:
+      url: ${endUserUrl}
+  next: trigger_ai_stream
+
 trigger_ai_stream:
   call: http.post
   args:
@@ -235,22 +224,16 @@ trigger_ai_stream:
       Content-Type: application/json
       api-key: "[#CHATBOT_EXTERNAL_API_KEY]"
     body:
-      use_agentic: ${use_agentic.toLowerCase() === 'true'}
       agent_name: ${agent_name}
       agent_type: ${agent_type}
       azure_client_id: ${azure_client_id}
       azure_client_secret: ${azure_client_secret}
       azure_agentic_max_output_tokens: ${parseInt(skm_config.azureAgenticMaxOutputTokens ?? '4000')}
+      structured_inputs: ${structured_inputs}
       raw_response: ${raw_response.toLowerCase() === 'true'}
       messages: ${messages}
       options:
-        data_sources: ${data_sources}
-        max_tokens: ${parseInt(skm_config.maxTokens ?? '1000')}
-        temperature: 0
-        top_p: 1
         stream: ${stream.toLowerCase() === 'true'}
-        frequency_penalty: 0
-        presence_penalty: 0
   result: stream_response
 
 return_result:

@@ -8,33 +8,6 @@ declaration:
   namespace: backoffice
   allowlist:
     body:
-      - field: range
-        type: string
-        description: "Body field 'range'"
-      - field: documents
-        type: string
-        description: "Body field 'documents'"
-      - field: systemMessage
-        type: string
-        description: "Body field 'systemMessage'"
-      - field: maxTokens
-        type: string
-        description: "Body field 'maxTokens'"
-      - field: indexName
-        type: string
-        description: "Body field 'indexName'"
-      - field: queryType
-        type: string
-        description: "Body field 'queryType'"  
-      - field: semanticConfiguration
-        type: string
-        description: "Body field 'semanticConfiguration'"    
-      - field: inScope
-        type: string
-        description: "Body field 'inScope'"
-      - field: useAgentic
-        type: string
-        description: "Body field 'useAgentic'"
       - field: azureAgentName
         type: string
         description: "Body field 'azureAgentName'"
@@ -44,24 +17,19 @@ declaration:
       - field: azureAgenticMaxOutputTokens
         type: string
         description: "Body field 'azureAgenticMaxOutputTokens'"
+      - field: azureAgenticUseStructuredInputs
+        type: string
+        description: "Body field 'azureAgenticUseStructuredInputs'"
       - field: domainUUID
         type: object
         description: "Body field 'domainUUID'"
 
 extractRequestData:
   assign:
-    skm_range: ${incoming.body.range}
-    skm_documents: ${incoming.body.documents}
-    skm_system_message: ${incoming.body.systemMessage}
-    skm_max_tokens: ${incoming.body.maxTokens}
-    skm_index_name: ${incoming.body.indexName}
-    skm_query_type: ${incoming.body.queryType}
-    skm_semantic_configuration: ${incoming.body.semanticConfiguration}
-    skm_in_scope: ${incoming.body.inScope}
-    skm_use_agentic: ${incoming.body.useAgentic}
     azure_agent_name: ${incoming.body.azureAgentName}
     azure_agent_type: ${incoming.body.azureAgentType}
     azure_agentic_max_output_tokens: ${incoming.body.azureAgenticMaxOutputTokens}
+    azure_agentic_use_structured_inputs: ${incoming.body.azureAgenticUseStructuredInputs ?? 'false'}
     domains: ${incoming.body.domainUUID}
 
 checkForDomains:
@@ -75,18 +43,10 @@ setDomainSkmConfig:
   args:
     url: "[#CHATBOT_RESQL]/set-domain-skm-config"
     body:
-      skm_range: ${skm_range}
-      skm_documents: ${skm_documents}
-      skm_system_message: ${skm_system_message}
-      skm_max_tokens: ${skm_max_tokens}
-      skm_index_name: ${skm_index_name}
-      skm_query_type: ${skm_query_type}
-      skm_semantic_configuration: ${skm_semantic_configuration}
-      skm_in_scope: ${skm_in_scope}
-      skm_use_agentic: ${skm_use_agentic}
       azure_agent_name: ${azure_agent_name}
       azure_agent_type: ${azure_agent_type}
       azure_agentic_max_output_tokens: ${azure_agentic_max_output_tokens}
+      azure_agentic_use_structured_inputs: ${azure_agentic_use_structured_inputs}
       created: ${new Date().toISOString()}
       domains: ${JSON.stringify(domains)}
   result: skm_result
@@ -97,18 +57,10 @@ setSkmConfig:
   args:
     url: "[#CHATBOT_RESQL]/set-skm-config"
     body:
-      skm_range: ${skm_range}
-      skm_documents: ${skm_documents}
-      skm_system_message: ${skm_system_message}
-      skm_max_tokens: ${skm_max_tokens}
-      skm_index_name: ${skm_index_name}
-      skm_query_type: ${skm_query_type}
-      skm_semantic_configuration: ${skm_semantic_configuration}
-      skm_in_scope: ${skm_in_scope}
-      skm_use_agentic: ${skm_use_agentic}
       azure_agent_name: ${azure_agent_name}
       azure_agent_type: ${azure_agent_type}
       azure_agentic_max_output_tokens: ${azure_agentic_max_output_tokens}
+      azure_agentic_use_structured_inputs: ${azure_agentic_use_structured_inputs}
       created: ${new Date().toISOString()}
   result: skm_result
   next: return_result

@@ -1,5 +1,6 @@
 const activeConnections = new Map();
 const stoppedChannels = new Set();
+const currentStreams = new Map();
 
 /**
  * Register an AbortController for an in-flight upstream request belonging to a
@@ -48,6 +49,7 @@ function abortConnectionRequests(connectionId) {
 module.exports = {
   activeConnections,
   stoppedChannels,
+  currentStreams,
   registerAbortController,
   unregisterAbortController,
   abortConnectionRequests,

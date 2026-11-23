@@ -522,6 +522,14 @@
   color: inherit;
 }
 
+.reset pre,
+.reset code {
+  max-width: 100%;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
 .newMessageContainer {
   position: absolute;
   bottom: 115px;

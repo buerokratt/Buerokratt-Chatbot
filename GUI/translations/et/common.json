@@ -86,7 +86,10 @@
     "allDomains": "Kõik",
     "noDomains": "Domeene ei ole saadaval. Palun võtke ühendust süsteemiadministraatoriga.",
     "duplicateName": "Selline domeeni nimi on juba olemas",
-    "duplicateUrl": "Selline URL on juba olemas"
+    "duplicateUrl": "Selline URL on juba olemas",
+    "nameRequired": "Domeeni nimi on kohustuslik",
+    "urlRequired": "URL on kohustuslik",
+    "invalidUrl": "Palun sisestage kehtiv URL (nt https://example.com)"
   },
   "menu": {
     "conversations": "Vestlused",
@@ -435,7 +438,7 @@
       "seconds": "sekundit",
       "responseWaitingTimeRangeInfo": "Lubatud vahemik 1 sek - 120 sek (2 min)",
       "tooltip": {
-        "isBotActive": "Valides sees, vastab Bürokratt automaatselt kliendile kasutades tehisintellektil põhinevat vestluslahendust (vastavalt tehnilisele lahendusele kas keelemudelit, RAG või RASA lahendust). Valides väljas, suunatakse vestlus automaatselt nõustajale.",
+        "isBotActive": "Valides sees, vastab Bürokratt automaatselt kliendile kasutades tehisintellektil põhinevat vestluslahendust (vastavalt tehnilisele lahendusele kas keelemudelit või RAG lahendust). Valides väljas, suunatakse vestlus automaatselt nõustajale.",
         "isBurokrattActive": "Valides sees, on Bürokratt veebilehel nähtav. Valides väljas, peidetakse veebilehelt Bürokratt ära.",
         "instantlyOpenChatWidget": "Valides sees, avatakse vestlusaken automaatselt, kui kasutaja veebilehele maandub. Valides väljas, on Bürokratt minimeeritud ning vestlemiseks peab kasutaja ise vestlusakna avama. Seadistus töötab ainult arvutivaatest ja ei ole rakendu mobiilivaates!",
         "isCsaNameVisible": "Kui seadistus on sees, kuvatakse vestlusaknas vasakul oleva vestleja pildi kohal nõustaja nime. Kui seadistus on väljas, siis profiili kohal ei kuvata nõustaja nime.",
@@ -443,7 +446,8 @@
         "isEditChatVisible": "Kui valida sees, siis on ainult nõustajal võimalik oma viimati saadetud vastust korrigeerida. Valides väljas, ei saa nõustaja tagant järgi viimast sõnumit muuta.",
         "showSubTitle": "Valides jah, näidatakse vestlusaknas lisaks Bürokrati pealkirjale ka alampealkirja. Alampealkirja teksti seadistuse leiab allpoolt. Valides ei, alampealkirja ei kuvata, aga Bürokrati pealkiri jääb endiselt nähtavale.",
         "subTitle": "Sisesta lahtrisse alampealkirja sisutekst.",
-        "llmModuleActive": "Kui valida sees, on LLM moodul aktiivne. Valides väljas, on LLM moodul inaktiivne."
+        "llmModuleActive": "Kui valida sees, on LLM moodul aktiivne. Valides väljas, on LLM moodul inaktiivne.",
+        "responseWaitingTime": "Määrab, kui kaua kuvatakse laadimisanimatsiooni ajal, mil Bürokratt vastust koostab, enne kui see asendatakse töötlemise teavitusega. Kui teavitust pole seadistatud, kuvatakse vaid animatsiooni (kolme punkti)."
       }
     },
     "emergencyNotices": {
@@ -604,20 +608,6 @@
     "skmConfiguration": {
       "title": "SKMi konfiguratsioon",
       "description": "Siin on võimalik SKMi parameetreid sätestada.",
-      "range": "Rangus",
-      "documents": "Leitud dokumendid",
-      "systemMessage": "Süsteemi juhis",
-      "maxTokens": "Maksimaalne tokenite arv",
-      "indexName": "Indeks",
-      "queryType": "Otsingutüüp",
-      "semantic": "Semantiline",
-      "vector": "Vektor",
-      "simple": "Märksõna",
-      "vectorSimpleHybrid": "Hübriid (märksõna + vektor)",
-      "vectorSemanticHybrid": "Hübriid + semantiline",
-      "semanticConfiguration": "Semantiline Konfiguratsioon",
-      "inScope": "Vastused ainult asutuse andmete põhjal",
-      "useAgentic": "Kasutan agendilist otsingut",
       "azureAgentName": "Agendi nimi",
       "azureAgentType": "Agendi tüüp",
       "azureClientId": "Kliendi ID",
@@ -627,27 +617,14 @@
       "azureClientSecretIsSetPlaceholder": "•••••••• (salasõna on määratud)",
       "azureClientSecretIsSetHint": "Sellele domeenile on salasõna juba määratud. Jäta tühjaks, et see muutmata jätta.",
       "azureAgenticMaxOutputTokens": "Maksimaalne väljundtokenite arv",
+      "azureAgenticUseStructuredInputs": "Saada iga päringuga agendile kontekstiks lõppkasutaja URL",
       "tooltip": {
-        "range": "Rangus määrab künnise, mille alusel xdokumente peetakse teie päringutele asjakohasteks. Ranguse tõstmine tähendab kõrgemat asjakohasuse künnist ja rohkemate vähem asjakohaste dokumentide filtreerimist. Väga kõrge rangus võib aga põhjustada vastuste genereerimise ebaõnnestumise, kuna kättesaadavaid dokumente on liiga vähe. Vaikimisi on ranguse tase 3.Võimalikud väärtused: 1 - 5",
-        "documents": "See määrab teie andmeindeksist vastuste koostamiseks kasutatavate kõrgeima skooriga dokumentide arvu. Seda väärtust tasub suurendada, kui teil on lühikesed dokumendid või soovite pakkuda rohkem konteksti. Vaikeväärtus on 5.Võimalikud väärtused: 1 - 20",
-        "systemMessage": "Anna mudelile juhised ja kontekst selle kohta, kuidas see peaks käituma.",
-        "maxTokens": "Sea piirang mudeli vastuses kasutatavate tokenite arvule.Võimalikud väärtused: 1 - 2000",
-        "indexName": "Azures loodud indeksi nimi.",
-        "queryType": "Vali otsingutüüp.",
-        "semanticConfiguration": "Azures loodud indeksi semantiline konfiguratsioon",
-        "inScope": "Kui otsing tagastab andmetest 0 vastet, siis 'Jah' puhul ei saadeta kasutaja küsimust keelemudelile, vaid kindlaksmääratud vastus tuleb otsingusüsteemist",
-        "useAgentic": "Agendiline otsing võimaldab sügavamat otsingut teadmusbaasis olevatest dokumentidest. Selle kasutamise eelduseks on Foundry portaalis loodud agent. Agendilise otsigu puhul tuleb SKMi seadistused teha Foundry portaalis.",
         "azureAgentName": "Foundry portaalis loodud agendi nimi.",
         "azureAgentType": "Otsinguagendi tüüp. Vaikeväärtus on 'agent_reference'.",
         "azureClientId": "Azure'is registreeritud agendi rakenduse (client) ID",
         "azureClientSecret": "Azure'is registreeritud agendi rakenduse secret",
-        "azureAgenticMaxOutputTokens": "Maksimaalne tokenite arv mida agent saab ühele päringule vastust koostades kulutada. Sinna hulka arvestatakse ka tokenid mida agent kasutab sisemiselt enne otsingut või otsingu vältel."
-      },
-      "validation": {
-        "range": "Rangus peab olema vahemikus 1 kuni 5",
-        "documents": "Leitud dokumendid peab olema vahemikus 1 kuni 20",
-        "maxTokens": "Maksimaalne tokenite arv peab olema vahemikus 1 kuni 2000",
-        "systemMessage": "Süsteemisõnumi väli ei tohi olla tühi"
+        "azureAgenticMaxOutputTokens": "Maksimaalne tokenite arv mida agent saab ühele päringule vastust koostades kulutada. Sinna hulka arvestatakse ka tokenid mida agent kasutab sisemiselt enne otsingut või otsingu vältel.",
+        "azureAgenticUseStructuredInputs": "Kui see on sisse lülitatud, edastatakse iga sõnumi saatmise hetkel lõppkasutaja avatud lehe URL Foundry agendile struktureeritud sisendina 'url'. Agent peab defineerima struktureeritud sisendi 'url' (nt kasutades seda juhistes või Azure AI Search filtris kujul {{url}}). Väljalülitatuna saadetakse päringud ilma struktureeritud sisenditeta."
       }
     },
     "chatAnalysis": {

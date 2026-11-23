@@ -60,6 +60,7 @@ registerEmailSentEvent:
       forwardedByUser: ""
       forwardedFromCsa: ""
       forwardedToCsa: ""
+      endUserUrl: ""
       created: ${new Date().toISOString()}
 
 returnSuccess:

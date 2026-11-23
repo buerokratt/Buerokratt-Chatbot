@@ -43,7 +43,7 @@ const SettingsFeedback: FC = () => {
   const fetchData = async (selectedDomain: string) => {
     try {
       const data: { response: FeedbackConfig } = await fetchConfigurationFromDomain<{ response: FeedbackConfig }>(
-        'configs/feedback',
+        'configs/analysis/feedback',
         selectedDomain,
       );
       const res = data.response;

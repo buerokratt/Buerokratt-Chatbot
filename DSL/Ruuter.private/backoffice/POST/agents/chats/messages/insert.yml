@@ -102,6 +102,7 @@ insertMessage:
       forwardedByUser: ""
       forwardedFromCsa: ""
       forwardedToCsa: ""
+      endUserUrl: ""
   result: insertMessageResult
 
 getMessageById:

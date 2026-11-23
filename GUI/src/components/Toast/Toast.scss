@@ -4,8 +4,6 @@
 @import 'src/styles/settings/variables/typography';
 
 $toast-height: 48px;
-$toast-gap: 8px;
-$toast-step: $toast-height + $toast-gap;
 
 .toast {
   height: $toast-height;
@@ -88,14 +86,39 @@ $toast-step: $toast-height + $toast-gap;
       }
     }
 
-    &:has(.toast:hover) .toast {
-      @for $i from 1 through 8 {
-        &:nth-last-child(#{$i}) {
-          transform: translateY(#{($i - 1) * $toast-step}) scale(1);
+    &[data-expanded='true'] {
+      height: var(--toast-list-height, auto);
+      max-height: calc(100vh - 32px);
+      overflow-y: auto;
+
+      .toast {
+        height: auto;
+        min-height: $toast-height;
+        padding-top: 12px;
+        padding-bottom: 12px;
+
+        &:nth-last-child(n) {
+          transform: translateY(var(--toast-offset, 0)) scale(1) !important;
           opacity: 1;
-          z-index: 10 - $i;
+          z-index: auto;
           pointer-events: auto;
         }
+      }
+
+      .toast__body {
+        flex-wrap: wrap;
+      }
+
+      .toast__title {
+        flex-shrink: 1;
+        max-width: 100%;
+        white-space: normal;
+        overflow-wrap: anywhere;
+      }
+
+      .toast__content {
+        white-space: normal;
+        overflow-wrap: anywhere;
       }
     }
   }

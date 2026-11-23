@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import { Button, Card, FormInput, FormSelect, FormTextarea, Icon, Switch, Tooltip, Track } from 'components';
+import { Button, Card, FormInput, Icon, Switch, Tooltip, Track } from 'components';
 import withAuthorization from 'hoc/with-authorization';
 import { useToast } from 'hooks/useToast';
 import { FC, Fragment, useEffect, useState } from 'react';
@@ -11,7 +11,6 @@ import { apiDev } from 'services/api';
 import { SkmConfig, SkmConfigResponse } from 'types/skmConfig';
 import { ROLES } from 'utils/constants';
 
-import { getQueryTypes } from './data';
 import DomainTabSelector from '../../../components/DomainTabSelector';
 import DomainTransfer from '../../../components/DomainTransfer';
 import { useDomainSelectionHandler } from '../../../hooks/useDomainSelectionHandler';
@@ -23,8 +22,7 @@ import { SelectOption } from 'types';
 const SettingsSkmConfiguration: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
-  const { control, handleSubmit, reset, watch } = useForm<SkmConfig>();
-  const useAgentic = watch('useAgentic');
+  const { control, handleSubmit, reset } = useForm<SkmConfig>();
   const [key, setKey] = useState(0);
   const [skmConfig, setSkmConfig] = useState<SkmConfig | undefined>(undefined);
   const multiDomainEnabled = import.meta.env.REACT_APP_ENABLE_MULTI_DOMAIN?.toLowerCase() === 'true';
@@ -61,12 +59,8 @@ const SettingsSkmConfiguration: FC = () => {
       const { azureClientId: _azureClientId, azureClientSecret: _azureClientSecret, ...body } = data;
       return apiDev.post<SkmConfig>('configs/skm-config', {
         ...body,
-        range: data.range.toString(),
-        documents: data.documents.toString(),
-        maxTokens: data.maxTokens.toString(),
-        inScope: data.inScope.toString(),
-        useAgentic: data.useAgentic.toString(),
         azureAgenticMaxOutputTokens: data.azureAgenticMaxOutputTokens?.toString(),
+        azureAgenticUseStructuredInputs: (data.azureAgenticUseStructuredInputs ?? 'false').toString(),
         azureClientIdIsSet: (!!_azureClientId).toString(),
         azureClientSecretIsSet: (!!_azureClientSecret).toString(),
       });
@@ -91,9 +85,6 @@ const SettingsSkmConfiguration: FC = () => {
     data: SkmConfig,
     { endpoint, field, value }: { endpoint: string; field: 'id' | 'secret'; value: string },
   ) => {
-    if (data.useAgentic !== 'true') {
-      return;
-    }
     const domains = data.domainUUID ?? [];
     if (domains.length > 1) {
       await Promise.all(domains.map((domainId) => apiDev.post(endpoint, { domain: domainId, [field]: '' })));
@@ -117,91 +108,34 @@ const SettingsSkmConfiguration: FC = () => {
     });
 
   const handleFormSubmit = handleSubmit(async (data) => {
-    const validationMessage = isValid(data);
-    if (validationMessage === '') {
-      data.domainUUID = multiDomainEnabled ? selectedDomains : [];
-      if (data.useAgentic === 'true' && skmConfig) {
-        data.range = skmConfig.range;
-        data.documents = skmConfig.documents;
-        data.maxTokens = skmConfig.maxTokens;
-        data.systemMessage = skmConfig.systemMessage;
-        data.indexName = skmConfig.indexName;
-        data.semanticConfiguration = skmConfig.semanticConfiguration;
-        data.queryType = skmConfig.queryType;
-        data.inScope = skmConfig.inScope;
-      }
-      try {
-        await skmConfigMutation.mutateAsync(data);
-        await syncClientId(data);
-        await syncClientSecret(data);
-        await fetchData(multiDomainEnabled ? (selectedDomains[0] ?? 'none') : 'none');
-      } catch {
-        // Failure toast already shown by skmConfigMutation.onError
-      }
-    } else {
-      toast.open({
-        type: 'error',
-        title: t('global.notificationError'),
-        message: validationMessage,
-      });
+    data.domainUUID = multiDomainEnabled ? selectedDomains : [];
+    try {
+      await skmConfigMutation.mutateAsync(data);
+      await syncClientId(data);
+      await syncClientSecret(data);
+      await fetchData(multiDomainEnabled ? (selectedDomains[0] ?? 'none') : 'none');
+    } catch {
+      // Failure toast already shown by skmConfigMutation.onError
     }
   });
 
-  const isValid = (data: SkmConfig) => {
-    if (useAgentic === 'true') {
-      return '';
-    } else {
-      const range = parseInt(data.range ?? '3');
-      const documents = parseInt(data.documents ?? '5');
-      const maxTokens = parseInt(data.maxTokens ?? '1000');
-      const systemMessage = data.systemMessage;
-      if (range < 1 || range > 5) {
-        return t('settings.skmConfiguration.validation.range');
-      } else if (documents < 1 || documents > 20) {
-        return t('settings.skmConfiguration.validation.documents');
-      } else if (maxTokens < 1 || maxTokens > 2000) {
-        return t('settings.skmConfiguration.validation.maxTokens');
-      } else if (systemMessage.length < 1) {
-        return t('settings.skmConfiguration.validation.systemMessage');
-      } else {
-        return '';
-      }
-    }
-  };
-
   const tooltips = {
-    range: t('settings.skmConfiguration.tooltip.range'),
-    documents: t('settings.skmConfiguration.tooltip.documents'),
-    systemMessage: t('settings.skmConfiguration.tooltip.systemMessage'),
-    maxTokens: t('settings.skmConfiguration.tooltip.maxTokens'),
-    indexName: t('settings.skmConfiguration.tooltip.indexName'),
-    queryType: t('settings.skmConfiguration.tooltip.queryType'),
-    semanticConfiguration: t('settings.skmConfiguration.tooltip.semanticConfiguration'),
-    inScope: t('settings.skmConfiguration.tooltip.inScope'),
-    useAgentic: t('settings.skmConfiguration.tooltip.useAgentic'),
     azureAgentName: t('settings.skmConfiguration.tooltip.azureAgentName'),
     azureAgentType: t('settings.skmConfiguration.tooltip.azureAgentType'),
     azureClientId: t('settings.skmConfiguration.tooltip.azureClientId'),
     azureClientSecret: t('settings.skmConfiguration.tooltip.azureClientSecret'),
     azureAgenticMaxOutputTokens: t('settings.skmConfiguration.tooltip.azureAgenticMaxOutputTokens'),
+    azureAgenticUseStructuredInputs: t('settings.skmConfiguration.tooltip.azureAgenticUseStructuredInputs'),
   };
 
   const resetSettingsToDefault = () => {
     const skmConfig = {
-      range: '3',
-      documents: '5',
-      systemMessage: '',
-      maxTokens: '1000',
-      indexName: '',
-      queryType: 'vector_semantic_hybrid',
-      semanticConfiguration: 'azureml-default',
-      inScope: 'true',
-      useAgentic: 'false',
       azureAgentName: 'ai-act-agent',
       azureAgentType: 'agent_reference',
       azureClientId: '',
       azureClientSecret: '',
       azureAgenticMaxOutputTokens: '4000',
+      azureAgenticUseStructuredInputs: 'false',
       domainUUID: [],
       azureClientIdIsSet: 'false',
       azureClientSecretIsSet: 'false',
@@ -266,71 +200,23 @@ const SettingsSkmConfiguration: FC = () => {
       >
         <Fragment key={key}>
           <Track gap={16} direction="vertical" align="left">
-            <Track justify="between" align="center" style={{ width: '100%' }}>
-              {getSwitchControl('useAgentic')}
-              {sourceDomainSelected && (
+            {sourceDomainSelected && (
+              <Track justify="end" style={{ width: '100%' }}>
                 <DomainTransfer
                   allDomains={domainOptions}
                   excludedDomainIds={selectedDomains}
                   onTransfer={handleTransfer}
                   isTransferring={transferMutation.isPending}
                 />
-              )}
-            </Track>
-            {useAgentic !== 'true' && (
-              <>
-                {getNumberControl('range')}
-                {getNumberControl('documents')}
-                <Controller
-                  name="systemMessage"
-                  control={control}
-                  render={({ field }) => (
-                    <Track gap={10} style={{ width: '100%' }}>
-                      <FormTextarea
-                        label={t('settings.skmConfiguration.systemMessage')}
-                        maxLength={-1}
-                        onChange={field.onChange}
-                        defaultValue={field.value}
-                        name="label"
-                        height={320}
-                        useRichText
-                      />
-                      {getTooltip('systemMessage')}
-                    </Track>
-                  )}
-                />
-                {getNumberControl('maxTokens')}
-                {getTextControl('indexName')}
-                {getTextControl('semanticConfiguration')}
-                <Controller
-                  name="queryType"
-                  control={control}
-                  render={({ field }) => (
-                    <Track gap={10} style={{ width: '100%' }}>
-                      <FormSelect
-                        {...field}
-                        onSelectionChange={(selection) => field.onChange(selection?.value)}
-                        label={t('settings.skmConfiguration.queryType')}
-                        defaultValue={field.value}
-                        options={getQueryTypes()}
-                      />
-                      {getTooltip('queryType')}
-                    </Track>
-                  )}
-                />
-                {getSwitchControl('inScope')}
-              </>
+              </Track>
             )}
+            {getTextControl('azureAgentName')}
+            {getTextControl('azureAgentType')}
+            {getNumberControl('azureAgenticMaxOutputTokens')}
+            {getPasswordControl('azureClientId')}
+            {getPasswordControl('azureClientSecret')}
+            {getSwitchControl('azureAgenticUseStructuredInputs')}
           </Track>
-          {useAgentic === 'true' && (
-            <Track gap={16} direction="vertical" align="left" style={{ paddingTop: 16 }}>
-              {getTextControl('azureAgentName')}
-              {getTextControl('azureAgentType')}
-              {getNumberControl('azureAgenticMaxOutputTokens')}
-              {getPasswordControl('azureClientId')}
-              {getPasswordControl('azureClientSecret')}
-            </Track>
-          )}
         </Fragment>
       </Card>
     </>
@@ -338,20 +224,12 @@ const SettingsSkmConfiguration: FC = () => {
 
   function getTooltip(
     name:
-      | 'range'
-      | 'documents'
-      | 'systemMessage'
-      | 'maxTokens'
-      | 'indexName'
-      | 'queryType'
-      | 'semanticConfiguration'
-      | 'inScope'
-      | 'useAgentic'
       | 'azureAgentName'
       | 'azureAgentType'
       | 'azureClientId'
       | 'azureClientSecret'
-      | 'azureAgenticMaxOutputTokens',
+      | 'azureAgenticMaxOutputTokens'
+      | 'azureAgenticUseStructuredInputs',
   ) {
     return (
       <Tooltip content={tooltips[name]}>
@@ -362,9 +240,7 @@ const SettingsSkmConfiguration: FC = () => {
     );
   }
 
-  function getNumberControl(
-    name: 'systemMessage' | 'range' | 'documents' | 'maxTokens' | 'azureAgenticMaxOutputTokens',
-  ) {
+  function getNumberControl(name: 'azureAgenticMaxOutputTokens') {
     return (
       <Controller
         name={name}
@@ -385,7 +261,7 @@ const SettingsSkmConfiguration: FC = () => {
     );
   }
 
-  function getTextControl(name: 'indexName' | 'semanticConfiguration' | 'azureAgentName' | 'azureAgentType') {
+  function getTextControl(name: 'azureAgentName' | 'azureAgentType') {
     return (
       <Controller
         name={name}
@@ -443,7 +319,7 @@ const SettingsSkmConfiguration: FC = () => {
     );
   }
 
-  function getSwitchControl(name: 'inScope' | 'useAgentic') {
+  function getSwitchControl(name: 'azureAgenticUseStructuredInputs') {
     return (
       <Controller
         name={name}

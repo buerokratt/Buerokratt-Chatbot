@@ -25,9 +25,9 @@ get_cookie_info:
 
 check_cookie_info_response:
   switch:
-    - condition: ${200 <= res.response.statusCodeValue && res.response.statusCodeValue < 300}
+    - condition: ${200 <= res.response.statusCodeValue && res.response.statusCodeValue < 300 && res.response.body != null}
       next: check_user_authority
-  next: return_bad_request
+  next: return_unauthorized
 
 check_user_authority:
   switch:
@@ -41,10 +41,5 @@ return_authorized:
 
 return_unauthorized:
   status: 200
-  return: false
-  next: end
-
-return_bad_request:
-  status: 400
   return: false
   next: end

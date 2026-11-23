@@ -1,7 +1,6 @@
 const { Client } = require('@opensearch-project/opensearch');
 
 const { sendAzureAgenticRequest } = require('./azureAgenticRequest');
-const { streamAzureOpenAIResponse } = require('./azureOpenAI');
 const {
   extractMessageTextPart,
   formatAgenticCitations,
@@ -12,20 +11,42 @@ const {
   hasAzureAiSearchTool,
 } = require('./citationFormatting');
 const { openSearchConfig } = require('./config');
-const { activeConnections, stoppedChannels } = require('./connectionManager');
+const { activeConnections, stoppedChannels, currentStreams } = require('./connectionManager');
 const streamQueue = require('./streamQueue');
 
 let client = buildClient();
 
+const AGENTIC_GUARDRAIL_MESSAGE = "I'm sorry, but i cannot assist with that request.";
+const ESTONIAN_GUARDRAIL_MESSAGE = 'Palun vabandust, aga kahjuks ei saa ma sellele päringule vastata.';
+
+function isGuardrailMessage(text) {
+  return text.trim().toLowerCase() === AGENTIC_GUARDRAIL_MESSAGE.toLowerCase();
+}
+
+// Holds the start of a streamed answer until it is clear it is not the guardrail message
+function holdGuardrailText(held, text) {
+  if (!held.isHolding || !text) return text;
+  held.text += text;
+  if (AGENTIC_GUARDRAIL_MESSAGE.toLowerCase().startsWith(held.text.trim().toLowerCase())) return '';
+  held.isHolding = false;
+  return held.text;
+}
+
+function releaseHeldText(held) {
+  if (!held.isHolding) return '';
+  return isGuardrailMessage(held.text) ? ESTONIAN_GUARDRAIL_MESSAGE : held.text;
+}
+
 async function streamAgenticResponse({ response, connectionId, channelId, sender }) {
   const citationState = createAgenticStreamState();
+  const held = { text: '', isHolding: true };
   let finalAnnotations = [];
 
   for await (const part of response) {
     if (!activeConnections.has(connectionId) || stoppedChannels.has(channelId)) break;
 
     if (part.type === 'response.output_text.delta') {
-      const emitText = consumeAgenticStreamDelta(citationState, part.delta || '');
+      const emitText = holdGuardrailText(held, consumeAgenticStreamDelta(citationState, part.delta || ''));
       if (emitText) {
         sender({ type: 'stream_chunk', channelId, content: emitText, isComplete: false });
       }
@@ -39,7 +60,7 @@ async function streamAgenticResponse({ response, connectionId, channelId, sender
 
   if (!activeConnections.has(connectionId) || stoppedChannels.has(channelId)) return;
 
-  const trailingText = flushAgenticStreamBuffer(citationState);
+  const trailingText = releaseHeldText(held) + flushAgenticStreamBuffer(citationState);
   if (trailingText) {
     sender({ type: 'stream_chunk', channelId, content: trailingText, isComplete: false });
   }
@@ -55,12 +76,7 @@ async function streamAgenticResponse({ response, connectionId, channelId, sender
   });
 }
 
-function isFallbackMessage(text, openAIFallback1, openAIFallback2) {
-  return text === openAIFallback1 || text === openAIFallback2;
-}
-
-async function fetchLLMResponse({
-  use_agentic,
+async function fetchAgenticResponse({
   messages,
   options,
   stream,
@@ -69,19 +85,21 @@ async function fetchLLMResponse({
   azure_client_id,
   azure_client_secret,
   azure_agentic_max_output_tokens,
+  structured_inputs,
 }) {
-  if (use_agentic) {
-    return sendAzureAgenticRequest(messages, {
-      ...options,
-      stream,
-      agent_name,
-      agent_type,
-      client_id: azure_client_id,
-      client_secret: azure_client_secret,
-      max_output_tokens: azure_agentic_max_output_tokens,
-    });
-  }
-  return streamAzureOpenAIResponse(messages, options);
+  return sendAzureAgenticRequest(messages, {
+    ...options,
+    stream,
+    agent_name,
+    agent_type,
+    client_id: azure_client_id,
+    client_secret: azure_client_secret,
+    max_output_tokens: azure_agentic_max_output_tokens,
+    structured_inputs,
+  }).catch((error) => {
+    if (stream || !error.message?.includes('"code":"content_filter"')) throw error;
+    return { output: [{ type: 'message', content: [{ type: 'output_text', text: ESTONIAN_GUARDRAIL_MESSAGE }] }] };
+  });
 }
 
 async function sendRawResponse({ response, connectionId, channelId, sender, stream }) {
@@ -96,112 +114,22 @@ async function sendRawResponse({ response, connectionId, channelId, sender, stre
   }
 }
 
-async function deliverResponse({
-  response,
-  connectionId,
-  channelId,
-  sender,
-  stream,
-  use_agentic,
-  openAIFallback1,
-  openAIFallback2,
-  estonianFallback,
-}) {
+async function deliverResponse({ response, connectionId, channelId, sender, stream }) {
   if (!stream) {
-    const { content, context } = buildCompleteResponseContent({
-      response,
-      use_agentic,
-      openAIFallback1,
-      openAIFallback2,
-      estonianFallback,
-    });
+    const { content, context } = buildCompleteResponseContent(response);
     sender({ type: 'complete_response', channelId, content, context, isComplete: true });
     return;
   }
 
   sender({ type: 'stream_start', streamId: channelId, channelId });
-
-  if (use_agentic) {
-    await streamAgenticResponse({ response, connectionId, channelId, sender });
-  } else {
-    await streamClassicResponse({
-      response,
-      connectionId,
-      channelId,
-      sender,
-      openAIFallback1,
-      openAIFallback2,
-      estonianFallback,
-    });
-  }
+  await streamAgenticResponse({ response, connectionId, channelId, sender });
 }
 
-function buildCompleteResponseContent({ response, use_agentic, openAIFallback1, openAIFallback2, estonianFallback }) {
-  if (use_agentic) {
-    const textPart = extractMessageTextPart(response);
-    const annotations = hasAzureAiSearchTool(response) ? textPart?.annotations : [];
-    return formatAgenticCitations(textPart?.text, annotations);
-  }
-
-  const content = response.choices?.[0]?.message?.content || '';
-  const context = response.choices?.[0]?.message?.context || {};
-  const trimmed = content.trim();
-
-  return {
-    content: isFallbackMessage(trimmed, openAIFallback1, openAIFallback2) ? estonianFallback : content,
-    context,
-  };
-}
-
-function isFallbackPrefix(text, openAIFallback1, openAIFallback2) {
-  return openAIFallback1.startsWith(text) || openAIFallback2.startsWith(text);
-}
-
-function processClassicDelta(state, part, openAIFallback1, openAIFallback2) {
-  const choice = part.choices?.[0];
-  if (!choice) return null;
-
-  if (!state.context && choice.delta?.context) state.context = choice.delta.context;
-  const content = choice.delta?.content || '';
-  if (!content) return null;
-
-  state.cumulative += content;
-
-  if (state.startedStreaming) return content;
-
-  if (isFallbackPrefix(state.cumulative, openAIFallback1, openAIFallback2)) return null;
-
-  state.startedStreaming = true;
-  return state.cumulative;
-}
-
-async function streamClassicResponse({
-  response,
-  connectionId,
-  channelId,
-  sender,
-  openAIFallback1,
-  openAIFallback2,
-  estonianFallback,
-}) {
-  const state = { context: undefined, cumulative: '', startedStreaming: false };
-
-  for await (const part of response) {
-    if (!activeConnections.has(connectionId) || stoppedChannels.has(channelId)) break;
-
-    const emitText = processClassicDelta(state, part, openAIFallback1, openAIFallback2);
-    if (emitText) {
-      sender({ type: 'stream_chunk', channelId, content: emitText, isComplete: false });
-    }
-  }
-
-  if (!activeConnections.has(connectionId) || stoppedChannels.has(channelId)) return;
-
-  if (!state.startedStreaming && isFallbackMessage(state.cumulative.trim(), openAIFallback1, openAIFallback2)) {
-    sender({ type: 'stream_chunk', channelId, content: estonianFallback, isComplete: false });
-  }
-
-  sender({ type: 'stream_complete', channelId, content: '', context: state.context || {}, isComplete: true });
+function buildCompleteResponseContent(response) {
+  const textPart = extractMessageTextPart(response);
+  const annotations = hasAzureAiSearchTool(response) ? textPart?.annotations : [];
+  const { content, context } = formatAgenticCitations(textPart?.text, annotations);
+  return { content: isGuardrailMessage(content) ? ESTONIAN_GUARDRAIL_MESSAGE : content, context };
 }
 
 async function searchNotification({ channelId, connectionId, sender }) {
@@ -234,19 +162,21 @@ async function searchNotification({ channelId, connectionId, sender }) {
   }
 }
 
-async function createAzureOpenAIStreamRequest({
+async function createAgenticStreamRequest({
   channelId,
   messages,
   options = {},
-  use_agentic = false,
   agent_name,
   agent_type,
   azure_client_id,
   azure_client_secret,
   azure_agentic_max_output_tokens,
+  structured_inputs,
   raw_response = false,
 }) {
   const { stream = true } = options;
+  const streamToken = {};
+  currentStreams.set(channelId, streamToken);
 
   try {
     stoppedChannels.delete(channelId);
@@ -259,23 +189,24 @@ async function createAzureOpenAIStreamRequest({
       const requestId = streamQueue.addToQueue(channelId, {
         messages,
         options,
-        use_agentic,
         agent_name,
         agent_type,
         azure_client_id,
         azure_client_secret,
         azure_agentic_max_output_tokens,
+        structured_inputs,
         raw_response,
       });
       console.log('No active connections for channel, queued request');
     }
 
     const responsePromises = connections.map(async ([connectionId, connData]) => {
-      const { sender } = connData;
+      const sender = (data) => {
+        if (currentStreams.get(channelId) === streamToken) connData.sender(data);
+      };
 
       try {
-        const response = await fetchLLMResponse({
-          use_agentic,
+        const response = await fetchAgenticResponse({
           messages,
           options,
           stream,
@@ -284,6 +215,7 @@ async function createAzureOpenAIStreamRequest({
           azure_client_id,
           azure_client_secret,
           azure_agentic_max_output_tokens,
+          structured_inputs,
         });
 
         if (!activeConnections.has(connectionId)) {
@@ -295,24 +227,7 @@ async function createAzureOpenAIStreamRequest({
           return;
         }
 
-        const openAIFallback1 =
-          'The requested information is not found in the retrieved data. Please try another query or topic.';
-        const openAIFallback2 =
-          'The requested information is not available in the retrieved data. Please try another query or topic.';
-        const estonianFallback =
-          'Mulle kättesaadavates andmetes puudub teie küsimusele vastav info. Palun täpsustage oma küsimust.';
-
-        await deliverResponse({
-          response,
-          connectionId,
-          channelId,
-          sender,
-          stream,
-          use_agentic,
-          openAIFallback1,
-          openAIFallback2,
-          estonianFallback,
-        });
+        await deliverResponse({ response, connectionId, channelId, sender, stream });
       } catch (error) {
         if (activeConnections.has(connectionId)) {
           const errorMessage = `Failed to ${stream ? 'stream' : 'generate'} response: ${error.message}`;
@@ -333,11 +248,13 @@ async function createAzureOpenAIStreamRequest({
       success: true,
       channelId,
       connectionsCount: connections.length,
-      message: `Azure OpenAI ${stream ? 'streaming' : 'response'} completed for all connections`,
+      message: `Agentic ${stream ? 'streaming' : 'response'} completed for all connections`,
     };
   } catch (error) {
-    console.error(`Error in createAzureOpenAIStreamRequest (stream=${stream}):`, error);
+    console.error(`Error in createAgenticStreamRequest (stream=${stream}):`, error);
     throw error;
+  } finally {
+    if (currentStreams.get(channelId) === streamToken) currentStreams.delete(channelId);
   }
 }
 
@@ -487,11 +404,18 @@ async function createLLMOrchestrationStreamRequest({ channelId, chatId, message,
     url: 'sse-stream-context',
   };
 
-  await Promise.all(
-    connections.map(([connectionId, connData]) =>
-      handleLLMConnection(connectionId, connData, orchestrationPayload, channelId),
-    ),
-  );
+  const streamToken = {};
+  currentStreams.set(channelId, streamToken);
+
+  try {
+    await Promise.all(
+      connections.map(([connectionId, connData]) =>
+        handleLLMConnection(connectionId, connData, orchestrationPayload, channelId, streamToken),
+      ),
+    );
+  } finally {
+    if (currentStreams.get(channelId) === streamToken) currentStreams.delete(channelId);
+  }
   return { success: true, channelId };
 }
 
@@ -524,9 +448,9 @@ function processSSELine(line, sender, channelId) {
   return false;
 }
 
-async function readLLMStream(reader, decoder, sender, channelId, connectionId) {
+async function readLLMStream(reader, decoder, sender, channelId, connectionId, streamToken) {
   let buffer = '';
-  while (activeConnections.has(connectionId)) {
+  while (activeConnections.has(connectionId) && currentStreams.get(channelId) === streamToken) {
     const { done, value } = await reader.read();
     if (done) break;
     buffer += decoder.decode(value, { stream: true });
@@ -536,10 +460,13 @@ async function readLLMStream(reader, decoder, sender, channelId, connectionId) {
       if (processSSELine(line, sender, channelId)) return;
     }
   }
+  await reader.cancel();
 }
 
-async function handleLLMConnection(connectionId, connData, orchestrationPayload, channelId) {
-  const { sender } = connData;
+async function handleLLMConnection(connectionId, connData, orchestrationPayload, channelId, streamToken) {
+  const sender = (data) => {
+    if (currentStreams.get(channelId) === streamToken) connData.sender(data);
+  };
   try {
     const response = await fetch(
       `${process.env.LLM_ORCHESTRATOR_URL || 'http://llm-orchestration-service:8100'}/orchestrate/stream`,
@@ -554,7 +481,7 @@ async function handleLLMConnection(connectionId, connData, orchestrationPayload,
     }
     if (!activeConnections.has(connectionId)) return;
     sender({ type: 'stream_start', streamId: channelId, channelId, isComplete: false });
-    await readLLMStream(response.body.getReader(), new TextDecoder(), sender, channelId, connectionId);
+    await readLLMStream(response.body.getReader(), new TextDecoder(), sender, channelId, connectionId, streamToken);
   } catch (error) {
     console.error(`LLM streaming error for connection ${connectionId}:`, error);
     if (activeConnections.has(connectionId)) {
@@ -570,6 +497,6 @@ module.exports = {
   dequeueChatId,
   findChatIdOrder,
   sendBulkNotification,
-  createAzureOpenAIStreamRequest,
+  createAgenticStreamRequest,
   createLLMOrchestrationStreamRequest,
 };

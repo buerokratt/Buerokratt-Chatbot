@@ -7,7 +7,7 @@ INIT_FILE="$DATA_DIR/init.json"
 INIT_FLAG="$DATA_DIR/.initialized"
 CREDENTIALS_DIR="/agent/credentials"
 
-echo "=== Vault Initialization (backoffice, CKB, LLM Module) ==="
+echo "=== Vault Initialization (backoffice, CKB, LLM Module, Service Module) ==="
 
 # ---------------------------------------------------------------------------
 # Helpers (used on every run, not just first-time init)
@@ -75,9 +75,9 @@ reconcile_secret_id() {
 }
 
 # ---------------------------------------------------------------------------
-# CKB / LLM Module support
-# authenticate and authorize Common-Knowledge's and LLM-Module's services
-# instead of each module running its own Vault stack.
+# CKB / LLM Module / Service Module support
+# authenticate and authorize Common-Knowledge's, LLM-Module's and
+# Service-Module's services instead of each module running its own Vault stack.
 # ---------------------------------------------------------------------------
 
 # Create or update an ACL policy from its HCL body. Idempotent - safe on every run.
@@ -90,9 +90,9 @@ put_policy() {
         "$VAULT_ADDR/v1/sys/policies/acl/$name" >/dev/null
 }
 
-# Policies for CKB's and LLM-Module's services, scoped to their own secret/
-# path prefix (secret/ckb/* and secret/llm-module/*) so the two modules can't
-# read or write each other's connections/encryption keys. Bodies mirror what
+# Policies for CKB's, LLM-Module's and Service-Module's services, scoped to
+# their own secret/ path prefix (secret/ckb/*, secret/llm-module/* and
+# secret/service-module/*) so modules can't read or write each other's secrets. Bodies mirror what
 # each module's own (now superseded) vault-init script already granted.
 create_module_policies() {
     for module in ckb llm-module; do
@@ -137,9 +137,19 @@ path \"auth/token/lookup-self\" { capabilities = [\"read\"] }$langfuse_grant"
 path "secret/metadata/ckb/llm/connections/*" { capabilities = ["read", "list"] }
 path "secret/data/ckb/encryption/*" { capabilities = ["deny"] }
 path "auth/token/lookup-self" { capabilities = ["read"] }'
+
+    put_policy "service-module-policy" \
+'path "secret/data/service-module/prod/*" { capabilities = ["read"] }
+path "secret/metadata/service-module/prod/*" { capabilities = ["read", "list"] }'
+
+    put_policy "service-module-test-policy" \
+'path "secret/data/service-module/test/*" { capabilities = ["read"] }
+path "secret/metadata/service-module/test/*" { capabilities = ["read", "list"] }
+path "secret/data/service-module/prod/*" { capabilities = ["deny"] }
+path "secret/metadata/service-module/prod/*" { capabilities = ["deny"] }'
 }
 
-# Apply the CKB and LLM-Module AppRole definitions. Periodic tokens, same as
+# Apply the CKB, LLM-Module and Service-Module AppRole definitions. Periodic tokens, same as
 # backoffice-service - called on every run so config changes (e.g. token
 # period) land without re-initializing Vault.
 configure_module_approles() {
@@ -150,15 +160,18 @@ configure_module_approles() {
     upsert_approle "llm-module-gui-service"               "llm-module-gui-policy"               "20m"
     upsert_approle "llm-module-cron-manager-service"      "llm-module-cron-manager-policy"      "30m"
     upsert_approle "llm-module-llm-orchestration-service" "llm-module-llm-orchestration-policy" "1h"
+    upsert_approle "service-module-service"               "service-module-policy"               "1h"
+    upsert_approle "service-module-test-service"          "service-module-test-policy"          "1h"
 }
 
-# Reconcile (reuse-or-mint) every CKB/LLM-Module secret_id. reconcile_secret_id
+# Reconcile (reuse-or-mint) every CKB/LLM-Module/Service-Module secret_id. reconcile_secret_id
 # already handles the true-first-time case too (ensure_role_id creates the
 # role_id, then a missing secret_id fails validation and gets minted), so this
 # is safe to call unconditionally on every run - first deploy or redeploy.
 reconcile_module_secret_ids() {
     for role in ckb-gui-service ckb-cron-manager-service ckb-llm-orchestration-service ckb-cleaner-service \
-                llm-module-gui-service llm-module-cron-manager-service llm-module-llm-orchestration-service; do
+                llm-module-gui-service llm-module-cron-manager-service llm-module-llm-orchestration-service \
+                service-module-service service-module-test-service; do
         reconcile_secret_id "$role" "$CREDENTIALS_DIR/${role}_role_id" "$CREDENTIALS_DIR/${role}_secret_id"
     done
 }
@@ -291,13 +304,13 @@ path "secret/metadata/backoffice/*" { capabilities = ["read", "list", "delete"] 
         --header='Content-Type: application/json' \
         "$VAULT_ADDR/v1/secret/data/backoffice/global/tim-postgresql" >/dev/null
 
-    echo "Creating CKB and LLM-Module policies..."
+    echo "Creating CKB, LLM-Module and Service-Module policies..."
     create_module_policies
 
-    echo "Creating CKB and LLM-Module AppRoles..."
+    echo "Creating CKB, LLM-Module and Service-Module AppRoles..."
     configure_module_approles
 
-    echo "Fetching CKB and LLM-Module credentials..."
+    echo "Fetching CKB, LLM-Module and Service-Module credentials..."
     reconcile_module_secret_ids
 
     echo "Generating RSA keypairs for CKB and LLM-Module encryption..."
@@ -329,7 +342,7 @@ else
     # does not invalidate the existing secret_id.
     upsert_approle "backoffice-service" "backoffice-admin-policy" "1h"
 
-    # Re-apply CKB/LLM-Module policies + AppRoles too, and generate their RSA
+    # Re-apply CKB/LLM-Module/Service-Module policies + AppRoles too, and generate their RSA
     # keypairs if this vault is being upgraded from an .initialized state
     # that never ran the first-time block above for them.
     create_module_policies

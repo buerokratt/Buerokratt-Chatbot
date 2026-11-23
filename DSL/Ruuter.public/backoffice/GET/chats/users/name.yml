@@ -121,6 +121,7 @@ insertMessage:
       forwardedByUser: ""
       forwardedFromCsa: ""
       forwardedToCsa: ""
+      endUserUrl: ""
   result: insertMessageResult
   next: check_for_personal_code
 

@@ -320,6 +320,7 @@ insert_chat_to_back_office_message:
       forwardedByUser: ""
       forwardedFromCsa: ""
       forwardedToCsa: ""
+      endUserUrl: ""
       rating: ""
   result: insert_chat_to_back_office_message_result
   next: notify_chats

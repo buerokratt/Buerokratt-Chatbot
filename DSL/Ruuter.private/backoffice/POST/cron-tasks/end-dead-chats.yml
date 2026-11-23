@@ -48,15 +48,6 @@ validateDeadChats:
 assign_dead_chats:
   assign:
     deadChats: ${res.response.body[0].deadChats.map(chatStr => JSON.parse(chatStr))}
-    baseIds: ${deadChats.map(chat => chat.base_id)}
-
-checkTimIds:
-  call: http.post
-  args:
-    url: "[#CHATBOT_TIM]/sessionkey/keysString"
-    body:
-      keys: ${baseIds.join(',')}
-  result: deadKeys
 
 returnSuccess:
   return: ${deadChats}

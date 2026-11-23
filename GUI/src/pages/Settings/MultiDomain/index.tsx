@@ -20,6 +20,15 @@ const normalizeUrl = (url: string) => {
 
 const normalizeUrlForComparison = (url: string) => normalizeUrl(url).toLowerCase();
 
+const isValidUrl = (url: string) => {
+  try {
+    const parsed = new URL(url.trim());
+    return ['http:', 'https:'].includes(parsed.protocol) && !!parsed.hostname;
+  } catch {
+    return false;
+  }
+};
+
 const MultiDomain: FC = () => {
   const { t } = useTranslation();
   const toast = useToast();
@@ -29,7 +38,8 @@ const MultiDomain: FC = () => {
     handleSubmit,
     reset,
     getValues,
-    formState: { errors },
+    trigger,
+    formState: { errors, isSubmitted },
   } = useForm<{
     widgetDomains: WDomain[];
   }>({
@@ -96,7 +106,7 @@ const MultiDomain: FC = () => {
 
   const validateUniqueName = (value: string, index: number) => {
     const trimmed = value.trim().toLowerCase();
-    if (!trimmed) return true;
+    if (!trimmed) return t('multiDomains.nameRequired');
 
     const domains = getValues('widgetDomains');
     const isDuplicate = domains.some((domain, i) => i !== index && domain.name.trim().toLowerCase() === trimmed);
@@ -105,7 +115,8 @@ const MultiDomain: FC = () => {
   };
 
   const validateUniqueUrl = (value: string, index: number) => {
-    if (!value.trim()) return true;
+    if (!value.trim()) return t('multiDomains.urlRequired');
+    if (!isValidUrl(value)) return t('multiDomains.invalidUrl');
 
     const normalized = normalizeUrlForComparison(value);
     const domains = getValues('widgetDomains');
@@ -114,6 +125,17 @@ const MultiDomain: FC = () => {
     );
 
     return isDuplicate ? t('multiDomains.duplicateUrl') : true;
+  };
+
+  const revalidateColumn = (column: 'name' | 'url') => {
+    if (!isSubmitted) return;
+    const domains = getValues('widgetDomains');
+    trigger(domains.map((_, i) => `widgetDomains.${i}.${column}` as const));
+  };
+
+  const removeDomain = (index: number) => {
+    remove(index);
+    if (isSubmitted) trigger('widgetDomains');
   };
 
   const convertDomains = (newWidgets: WDomain[]) => {
@@ -134,17 +156,19 @@ const MultiDomain: FC = () => {
       if (!oldMatch) {
         result.push({
           ...newItem,
+          name: newItem.name.trim(),
           url: normalizeUrl(newItem.url),
           active: true,
         });
         continue;
       }
 
-      const changed = oldMatch.name !== newItem.name || oldMatch.url !== newItem.url;
+      const changed = oldMatch.name !== newItem.name.trim() || oldMatch.url !== normalizeUrl(newItem.url);
 
       if (changed) {
         result.push({
           ...newItem,
+          name: newItem.name.trim(),
           url: normalizeUrl(newItem.url),
           active: true,
         });
@@ -167,7 +191,7 @@ const MultiDomain: FC = () => {
             <Button appearance="secondary" onClick={() => append({ name: '', url: '', domainId: crypto.randomUUID() })}>
               {t('multiDomains.addNew')}
             </Button>
-            <Button onClick={handleSubmit(handleFormSubmit)}>{t('global.save')}</Button>
+            <Button onClick={handleFormSubmit}>{t('global.save')}</Button>
           </Track>
         }
       >
@@ -191,6 +215,10 @@ const MultiDomain: FC = () => {
                     className="inline-form"
                     style={{ maxWidth: '500px' }}
                     {...field}
+                    onChange={(e) => {
+                      field.onChange(e);
+                      revalidateColumn('name');
+                    }}
                   />
                 )}
               />
@@ -204,7 +232,16 @@ const MultiDomain: FC = () => {
                 control={control}
                 rules={{ validate: (value) => validateUniqueUrl(value, index) }}
                 render={({ field }) => (
-                  <FormInput label="URL" className="inline-form" style={{ maxWidth: '500px' }} {...field} />
+                  <FormInput
+                    label="URL"
+                    className="inline-form"
+                    style={{ maxWidth: '500px' }}
+                    {...field}
+                    onChange={(e) => {
+                      field.onChange(e);
+                      revalidateColumn('url');
+                    }}
+                  />
                 )}
               />
               {errors.widgetDomains?.[index]?.url && (
@@ -212,7 +249,7 @@ const MultiDomain: FC = () => {
               )}
             </div>
             <Track gap={8} justify="between">
-              <Button appearance="error" disabled={fields.length === 1} onClick={() => remove(index)}>
+              <Button appearance="error" disabled={fields.length === 1} onClick={() => removeDomain(index)}>
                 <Icon icon={<MdDeleteOutline color="white" />} />
               </Button>
             </Track>

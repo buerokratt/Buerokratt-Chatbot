@@ -5,7 +5,7 @@ check_for_cookie:
   next: authenticate
 
 authenticate:
-  template: "[#CHATBOT_PROJECT_LAYER]/check-admin-authority"
+  template: "[#CHATBOT_PROJECT_LAYER]/check-user-authority"
   requestType: templates
   headers:
     cookie: ${incoming.headers.cookie}
@@ -24,5 +24,5 @@ guard_success:
 
 guard_fail:
   return: "unauthorized"
-  status: 403
+  status: 401
   next: end
