@@ -9,6 +9,7 @@ const { sendAzureAgenticRequest } = require('./azureAgenticRequest');
 const { extractMessageTextPart } = require('./citationFormatting');
 const { serverConfig } = require('./config');
 const { stoppedChannels, currentStreams } = require('./connectionManager');
+const { extractIntentJson } = require('./intentDetection');
 const { addToLogoutQueue, removeFromLogoutQueue } = require('./logoutQueue');
 const {
   enqueueChatId,
@@ -286,7 +287,7 @@ app.post('/intent-detection', async (req, res) => {
       max_output_tokens: azure_agentic_max_output_tokens,
     });
 
-    res.status(200).json({ content: extractMessageTextPart(response)?.text?.trim() ?? '' });
+    res.status(200).json({ content: extractIntentJson(extractMessageTextPart(response)?.text) });
   } catch (error) {
     const logMessage = String(error?.message ?? error).replace(/[\n\r]/g, ' ');
     console.error('Intent detection error:', logMessage);
