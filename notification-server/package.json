@@ -13,7 +13,6 @@
     "lint:fix": "eslint . --fix --max-warnings 0"
   },
   "dependencies": {
-    "@opensearch-project/opensearch": "^2.4.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "csurf": "^1.11.0",
