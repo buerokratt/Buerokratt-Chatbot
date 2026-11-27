@@ -15,6 +15,10 @@ declaration:
         type: string
         description: "Body field 'feedbackText'"
 
+return_service_unavailable:
+  return: "Service unavailable"
+  next: end
+
 extractRequestData:
   assign:
     chatId: ${incoming.body.chatId}
