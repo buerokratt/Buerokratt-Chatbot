@@ -16,7 +16,7 @@ declaration:
         description: "Body field 'feedbackRating'"
 
 return_service_unavailable:
-  return: "error: service unavailable"
+  return: "Service unavailable"
   next: end
 
 extractRequestData:
