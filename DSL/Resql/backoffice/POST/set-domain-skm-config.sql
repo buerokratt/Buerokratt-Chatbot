@@ -15,7 +15,8 @@ WHERE
      'azure_agent_name',
      'azure_agent_type',
      'azure_agentic_max_output_tokens',
-     'azure_agentic_use_structured_inputs'
+     'azure_agentic_use_structured_inputs',
+     'citation_document_id_enabled'
     )
   AND c.deleted = FALSE
   AND c.id = (
@@ -36,7 +37,8 @@ FROM (
         ('azure_agent_name', :azure_agent_name),
         ('azure_agent_type', :azure_agent_type),
         ('azure_agentic_max_output_tokens', :azure_agentic_max_output_tokens),
-        ('azure_agentic_use_structured_inputs', :azure_agentic_use_structured_inputs)
+        ('azure_agentic_use_structured_inputs', :azure_agentic_use_structured_inputs),
+        ('citation_document_id_enabled', :citation_document_id_enabled)
    ) AS v(key, value)
     )
 INSERT INTO configuration (key, value, domain, created)

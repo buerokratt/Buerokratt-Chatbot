@@ -140,6 +140,7 @@ function processPendingStreamsForChannel(channelId) {
               messages: requestData.messages,
               options: requestData.options,
               raw_response: requestData.raw_response,
+              citation_document_id_enabled: requestData.citation_document_id_enabled,
             });
           } else {
             const { createLLMOrchestrationStreamRequest } = require('./openSearch');

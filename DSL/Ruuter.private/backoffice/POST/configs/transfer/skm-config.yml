@@ -38,6 +38,7 @@ transferToTargets:
       azure_agent_type: ${source.response.body[0].azureAgentType}
       azure_agentic_max_output_tokens: ${source.response.body[0].azureAgenticMaxOutputTokens}
       azure_agentic_use_structured_inputs: ${source.response.body[0].azureAgenticUseStructuredInputs}
+      citation_document_id_enabled: ${source.response.body[0].citationDocumentIdEnabled}
       domains: ${JSON.stringify(targetDomainUuids)}
   result: res
 
