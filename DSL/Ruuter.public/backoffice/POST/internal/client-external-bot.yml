@@ -75,6 +75,7 @@ assignSkmConfig:
     agent_name: ${skm_config.azureAgentName}
     agent_type: ${skm_config.azureAgentType}
     use_structured_inputs: ${skm_config.azureAgenticUseStructuredInputs ?? 'false'}
+    citation_document_id_enabled: ${skm_config.citationDocumentIdEnabled === 'true'}
     azure_client_id: ""
     azure_client_secret: ""
 
@@ -231,6 +232,7 @@ trigger_ai_stream:
       azure_agentic_max_output_tokens: ${parseInt(skm_config.azureAgenticMaxOutputTokens ?? '4000')}
       structured_inputs: ${structured_inputs}
       raw_response: ${raw_response.toLowerCase() === 'true'}
+      citation_document_id_enabled: ${citation_document_id_enabled}
       messages: ${messages}
       options:
         stream: ${stream.toLowerCase() === 'true'}

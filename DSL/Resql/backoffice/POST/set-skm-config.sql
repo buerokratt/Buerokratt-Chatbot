@@ -5,7 +5,8 @@ WITH last_configuration AS (
      'azure_agent_name',
      'azure_agent_type',
      'azure_agentic_max_output_tokens',
-     'azure_agentic_use_structured_inputs')
+     'azure_agentic_use_structured_inputs',
+     'citation_document_id_enabled')
     AND id IN (SELECT max(id) from configuration GROUP BY key)
     AND deleted = FALSE
 ), new_configuration as (
@@ -15,7 +16,8 @@ WITH last_configuration AS (
         ('azure_agent_name', :azure_agent_name),
         ('azure_agent_type', :azure_agent_type),
         ('azure_agentic_max_output_tokens', :azure_agentic_max_output_tokens),
-        ('azure_agentic_use_structured_inputs', :azure_agentic_use_structured_inputs)
+        ('azure_agentic_use_structured_inputs', :azure_agentic_use_structured_inputs),
+        ('citation_document_id_enabled', :citation_document_id_enabled)
    ) as new_values (key, value)
 )
 INSERT INTO configuration (key, value, created)

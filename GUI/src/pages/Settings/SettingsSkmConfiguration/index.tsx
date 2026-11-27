@@ -61,6 +61,7 @@ const SettingsSkmConfiguration: FC = () => {
         ...body,
         azureAgenticMaxOutputTokens: data.azureAgenticMaxOutputTokens?.toString(),
         azureAgenticUseStructuredInputs: (data.azureAgenticUseStructuredInputs ?? 'false').toString(),
+        citationDocumentIdEnabled: (data.citationDocumentIdEnabled ?? 'false').toString(),
         azureClientIdIsSet: (!!_azureClientId).toString(),
         azureClientSecretIsSet: (!!_azureClientSecret).toString(),
       });
@@ -126,6 +127,7 @@ const SettingsSkmConfiguration: FC = () => {
     azureClientSecret: t('settings.skmConfiguration.tooltip.azureClientSecret'),
     azureAgenticMaxOutputTokens: t('settings.skmConfiguration.tooltip.azureAgenticMaxOutputTokens'),
     azureAgenticUseStructuredInputs: t('settings.skmConfiguration.tooltip.azureAgenticUseStructuredInputs'),
+    citationDocumentIdEnabled: t('settings.skmConfiguration.tooltip.citationDocumentIdEnabled'),
   };
 
   const resetSettingsToDefault = () => {
@@ -136,6 +138,7 @@ const SettingsSkmConfiguration: FC = () => {
       azureClientSecret: '',
       azureAgenticMaxOutputTokens: '4000',
       azureAgenticUseStructuredInputs: 'false',
+      citationDocumentIdEnabled: 'false',
       domainUUID: [],
       azureClientIdIsSet: 'false',
       azureClientSecretIsSet: 'false',
@@ -216,6 +219,7 @@ const SettingsSkmConfiguration: FC = () => {
             {getPasswordControl('azureClientId')}
             {getPasswordControl('azureClientSecret')}
             {getSwitchControl('azureAgenticUseStructuredInputs')}
+            {getSwitchControl('citationDocumentIdEnabled')}
           </Track>
         </Fragment>
       </Card>
@@ -229,7 +233,8 @@ const SettingsSkmConfiguration: FC = () => {
       | 'azureClientId'
       | 'azureClientSecret'
       | 'azureAgenticMaxOutputTokens'
-      | 'azureAgenticUseStructuredInputs',
+      | 'azureAgenticUseStructuredInputs'
+      | 'citationDocumentIdEnabled',
   ) {
     return (
       <Tooltip content={tooltips[name]}>
@@ -319,7 +324,7 @@ const SettingsSkmConfiguration: FC = () => {
     );
   }
 
-  function getSwitchControl(name: 'azureAgenticUseStructuredInputs') {
+  function getSwitchControl(name: 'azureAgenticUseStructuredInputs' | 'citationDocumentIdEnabled') {
     return (
       <Controller
         name={name}

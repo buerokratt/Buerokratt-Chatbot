@@ -1,6 +1,7 @@
 const { Client } = require('@opensearch-project/opensearch');
 
 const { sendAzureAgenticRequest } = require('./azureAgenticRequest');
+const { addCitationDocumentIds } = require('./citationDocumentIds');
 const {
   extractMessageTextPart,
   formatAgenticCitations,
@@ -37,10 +38,16 @@ function releaseHeldText(held) {
   return isGuardrailMessage(held.text) ? ESTONIAN_GUARDRAIL_MESSAGE : held.text;
 }
 
-async function streamAgenticResponse({ response, connectionId, channelId, sender }) {
+function buildCitationContext(citations, response, citationDocumentIdEnabled) {
+  const context = citations.length > 0 ? { citations } : {};
+  return citationDocumentIdEnabled ? addCitationDocumentIds(context, response) : context;
+}
+
+async function streamAgenticResponse({ response, connectionId, channelId, sender, citationDocumentIdEnabled }) {
   const citationState = createAgenticStreamState();
   const held = { text: '', isHolding: true };
   let finalAnnotations = [];
+  let finalResponse;
 
   for await (const part of response) {
     if (!activeConnections.has(connectionId) || stoppedChannels.has(channelId)) break;
@@ -52,6 +59,7 @@ async function streamAgenticResponse({ response, connectionId, channelId, sender
       }
     } else if (part.type === 'response.completed') {
       const fullResponse = part.response ?? part;
+      finalResponse = fullResponse;
       finalAnnotations = hasAzureAiSearchTool(fullResponse)
         ? extractMessageTextPart(fullResponse)?.annotations || []
         : [];
@@ -71,7 +79,7 @@ async function streamAgenticResponse({ response, connectionId, channelId, sender
     type: 'stream_complete',
     channelId,
     content: '',
-    context: citations.length > 0 ? { citations } : {},
+    context: buildCitationContext(citations, finalResponse, citationDocumentIdEnabled),
     isComplete: true,
   });
 }
@@ -114,22 +122,25 @@ async function sendRawResponse({ response, connectionId, channelId, sender, stre
   }
 }
 
-async function deliverResponse({ response, connectionId, channelId, sender, stream }) {
+async function deliverResponse({ response, connectionId, channelId, sender, stream, citationDocumentIdEnabled }) {
   if (!stream) {
-    const { content, context } = buildCompleteResponseContent(response);
+    const { content, context } = buildCompleteResponseContent(response, citationDocumentIdEnabled);
     sender({ type: 'complete_response', channelId, content, context, isComplete: true });
     return;
   }
 
   sender({ type: 'stream_start', streamId: channelId, channelId });
-  await streamAgenticResponse({ response, connectionId, channelId, sender });
+  await streamAgenticResponse({ response, connectionId, channelId, sender, citationDocumentIdEnabled });
 }
 
-function buildCompleteResponseContent(response) {
+function buildCompleteResponseContent(response, citationDocumentIdEnabled) {
   const textPart = extractMessageTextPart(response);
   const annotations = hasAzureAiSearchTool(response) ? textPart?.annotations : [];
   const { content, context } = formatAgenticCitations(textPart?.text, annotations);
-  return { content: isGuardrailMessage(content) ? ESTONIAN_GUARDRAIL_MESSAGE : content, context };
+  return {
+    content: isGuardrailMessage(content) ? ESTONIAN_GUARDRAIL_MESSAGE : content,
+    context: citationDocumentIdEnabled ? addCitationDocumentIds(context, response) : context,
+  };
 }
 
 async function searchNotification({ channelId, connectionId, sender }) {
@@ -173,8 +184,10 @@ async function createAgenticStreamRequest({
   azure_agentic_max_output_tokens,
   structured_inputs,
   raw_response = false,
+  citation_document_id_enabled = false,
 }) {
   const { stream = true } = options;
+  const citationDocumentIdEnabled = String(citation_document_id_enabled).toLowerCase() === 'true';
   const streamToken = {};
   currentStreams.set(channelId, streamToken);
 
@@ -196,6 +209,7 @@ async function createAgenticStreamRequest({
         azure_agentic_max_output_tokens,
         structured_inputs,
         raw_response,
+        citation_document_id_enabled: citationDocumentIdEnabled,
       });
       console.log('No active connections for channel, queued request');
     }
@@ -227,7 +241,7 @@ async function createAgenticStreamRequest({
           return;
         }
 
-        await deliverResponse({ response, connectionId, channelId, sender, stream });
+        await deliverResponse({ response, connectionId, channelId, sender, stream, citationDocumentIdEnabled });
       } catch (error) {
         if (activeConnections.has(connectionId)) {
           const errorMessage = `Failed to ${stream ? 'stream' : 'generate'} response: ${error.message}`;

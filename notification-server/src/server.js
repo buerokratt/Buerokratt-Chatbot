@@ -244,6 +244,7 @@ app.post('/channels/:channelId/stream', (req, res) => {
     azure_agentic_max_output_tokens,
     structured_inputs,
     raw_response = false,
+    citation_document_id_enabled = false,
   } = req.body;
 
   if (!messages || !Array.isArray(messages)) {
@@ -263,6 +264,7 @@ app.post('/channels/:channelId/stream', (req, res) => {
     azure_agentic_max_output_tokens,
     structured_inputs,
     raw_response,
+    citation_document_id_enabled,
   }).catch((error) => {
     console.error(`Stream error for channel ${channelId}:`, error.message);
   });
